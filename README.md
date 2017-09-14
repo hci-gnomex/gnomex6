@@ -1,6 +1,9 @@
-# GNomEx
+# GNomEx6
 
-Project website:  <http://hci-bio-demo.hci.utah.edu/gnomexDocumentation/wordpress/>
+## Status 
+
+Flex to Angular 4 conversion is in progress. The current release of GNomEx can be found here: https://github.com/hci-gnomex/gnomex
+
 
 ## Description
 
@@ -14,6 +17,3 @@ GNomEx is a web application with a Flash client user interface and a Java backen
 - Automated billing/customer notifications
 - Configurable annotations for experiments, samples, or analyses
 - Built in ABI file viewer
-
-### SourceForge Link 
-<https://sourceforge.net/projects/gnomex/>
