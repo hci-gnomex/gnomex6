@@ -22,6 +22,67 @@ import {Subscription} from "rxjs/Subscription";
     selector: "experiments",
     templateUrl: "./experiments.component.html",
     styles: [`
+        .inlineComboBox {
+            display: inline-block;
+        }
+
+        .hintLink
+        {
+            fontSize: 9;
+            paddingLeft: 1;
+            paddingRight: 1;
+            paddingBottom: 1;
+            paddingTop: 1;
+        }
+
+        .sidebar {
+            width: 25%;
+            position: relative;
+            left: 0;
+            background-color: #ccc;
+            transition: all .25s;
+        }
+
+        .container {
+            display: flex;
+            min-height:100px;
+        }
+
+        .t {
+            display: table;
+            width: 100%;
+        }
+
+        .tr {
+            display: table-row;
+            width: 100%;
+        }
+
+        .td {
+            display: table-cell;
+        }
+
+        .jqx-tree {
+            height: 100%;
+        }
+
+        .jqx-notification {
+            margin-top: 30em;
+            margin-left: 20em;
+        }
+
+        //.jqx-notification {
+          //  height: 10em;
+          //  position: relative }
+        //.jqx-notification p {
+          //  margin: 0;
+          //  background: yellow;
+          //  position: absolute;
+          //  top: 50%;
+          //  left: 50%;
+          //  margin-right: -50%;
+          //  transform: translate(-50%, -50%) }
+
         div.background {
             width: 100%;
             height: 100%;
@@ -32,9 +93,7 @@ import {Subscription} from "rxjs/Subscription";
             display: block;
             flex-direction: column;
         }
-`, require("./browse-experiments-component.less").toString()],
-    encapsulation: ViewEncapsulation.None
-
+    `]
 })
 export class BrowseExperimentsComponent {
 
