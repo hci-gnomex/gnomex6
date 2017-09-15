@@ -3,7 +3,8 @@
  */
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {TestComponent, DescriptionTab, PrepTab, ExperimentDetail} from "./experiment-detail/index";
 
 import { EXPERIMENTS_ROUTING } from "./experiments.routes";
 
@@ -26,10 +27,17 @@ import { ServicesModule } from "../services/services.module";
 import { BrowseExperimentsComponent } from "./browse-experiments.component";
 import { ExperimentOrdersComponent }  from "./orders/experiment-orders.component";
 import { ViewExperimentComponent }    from "./view-experiment.component";
+import {RichEditorModule} from "../../modules/rich-editor.module";
+import {GridModule} from "hci-ng-grid";
+import {DropDownModule} from "../../modules/dropdown.module";
 /**
  * @author mbyrne
  * @since 12/19/16
  */
+
+
+export const componentFactories = [TestComponent, DescriptionTab, PrepTab]; // need add components that will be tabs here
+                                                                          // could be put in gnomexFlex as w
 @NgModule({
     imports: [
       EXPERIMENTS_ROUTING,
@@ -38,22 +46,33 @@ import { ViewExperimentComponent }    from "./view-experiment.component";
       ComboBoxModule,
       CommonModule,
       ExpanderModule,
+      ReactiveFormsModule,
       FormsModule,
+      GridModule,
       InputModule,
       JqxGridModule,
       LoaderModule,
       NotificationModule,
+      RichEditorModule,
       ServicesModule,
       TextAreaModule,
       ToggleButtonModule,
       TreeModule,
       UtilModule,
-      WindowModule
+      WindowModule,
+      DropDownModule
     ],
+
     declarations: [
       BrowseExperimentsComponent,
       ExperimentOrdersComponent,
-      ViewExperimentComponent    ]
+      ViewExperimentComponent,
+      TestComponent,
+      DescriptionTab,
+      ExperimentDetail,
+      PrepTab ],
+    entryComponents: [...componentFactories]
+
 })
 export class ExperimentsModule {
 }
