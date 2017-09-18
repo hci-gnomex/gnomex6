@@ -64,12 +64,10 @@ export class ExperimentDetail implements OnInit {
     }
 
     changeState(){
-        if(this.state === TabContainer.VIEW )
-        {
+        if(this.state === TabContainer.VIEW ) {
             this.visStr= "View"
             this.state = TabContainer.EDIT;
-        }
-        else{
+        } else {
             this.visStr = "Edit"
             this.state = TabContainer.VIEW;
         }

@@ -20,9 +20,9 @@ export class PrepTab extends PrimaryTab {
     };
     emailMessage: string;
 
-    private validationMessages = {
-        required: 'Please enter your email address',
-        pattern: 'Please enter a valid email address'
+    validationMessages = {
+        required: "Please enter your email address",
+        pattern: "Please enter a valid email address"
     };
 
     prepForm: FormGroup;
@@ -136,5 +136,5 @@ function emailMatcher(c: AbstractControl): { [key: string]: boolean } | null { /
     if (emailControl.value === confirmControl.value) {
         return null;
     }
-    return { 'match': true };// if we need to reference the validator in html we do ...errors.match,
+    return { 'match': true }; // if we need to reference the validator in html we do ...errors.match,
 }

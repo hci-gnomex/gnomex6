@@ -13,7 +13,7 @@ import 'rxjs/add/operator/debounceTime'
     `
 })
 export class PrimaryTab {
-    name: string
+    name: string;
     @Output() changeStatus = new EventEmitter<ComponentCommunicatorEvent>();
     private _theForm: FormGroup;
     protected _state:string;

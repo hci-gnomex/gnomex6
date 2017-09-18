@@ -71,17 +71,6 @@ import {Subscription} from "rxjs/Subscription";
             margin-left: 20em;
         }
 
-        //.jqx-notification {
-          //  height: 10em;
-          //  position: relative }
-        //.jqx-notification p {
-          //  margin: 0;
-          //  background: yellow;
-          //  position: absolute;
-          //  top: 50%;
-          //  left: 50%;
-          //  margin-right: -50%;
-          //  transform: translate(-50%, -50%) }
 
         div.background {
             width: 100%;

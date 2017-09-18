@@ -7,7 +7,7 @@ import {Http, Response} from "@angular/http";
 import {UserService} from "@hci/user";
 import {AppHeaderComponent} from "@hci/app-header";
 import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigationItemGroup} from "@hci/navigation";
-import {AppFooterComponent} from "@hci/app-footer";
+//import {AppFooterComponent} from "@hci/app-footer";
 import { Observable } from "rxjs/Observable";
 import 'rxjs/operator/finally';
 import {promise} from "selenium-webdriver";
@@ -32,8 +32,8 @@ export class GnomexAppComponent implements OnInit {
   @ViewChild(AppHeaderComponent)
   private _appHdrCmpt: AppHeaderComponent;
 
-  @ViewChild(AppFooterComponent)
-  private _appFooterCmpt: AppFooterComponent;
+  //@ViewChild(AppFooterComponent)
+  //private _appFooterCmpt: AppFooterComponent;
 
   private _primaryNavEnabled: Observable<boolean>;
 
@@ -47,7 +47,7 @@ export class GnomexAppComponent implements OnInit {
     let isDone: boolean = false;
     console.log("GnomexAppComponent ngOnInit");
     this.setupHeaderComponent();
-    this.setupFooterComponent();
+//    this.setupFooterComponent();
 
         this.userService.addLoginCallback({onLogin: () => {
             console.log("GnomexAppComponent onLogin");
@@ -88,10 +88,10 @@ getDictionaries(): Observable<any> {
     });
   }
 
-  private setupFooterComponent() {
-    this._appFooterCmpt.appName = this.appNameTitle;
-    this._appFooterCmpt.copyright = "Huntsman Cancer Institute";
-  }
+ // private setupFooterComponent() {
+ //   this._appFooterCmpt.appName = this.appNameTitle;
+ //   this._appFooterCmpt.copyright = "Huntsman Cancer Institute";
+ // }
 
   /**
    * A convenience methods to fetch the necessary items for the Experiments dropdown.
