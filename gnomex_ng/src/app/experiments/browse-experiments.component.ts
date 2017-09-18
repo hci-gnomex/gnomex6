@@ -43,6 +43,60 @@ import {Subscription} from "rxjs/Subscription";
             transition: all .25s;
         }
 
+        .flex-column-container {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            height: 100%;
+        }
+
+        .flex-row-container {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .item-row {
+
+        }
+        .item-row-one {
+            flex-grow: 1;
+        }
+
+        .item-row-two {
+            flex-grow: 1;
+        }
+
+        .item {
+            flex: 1 1 auto;
+            font-size: small;
+        }
+
+        .one {
+            width: 100%;
+            flex-grow: .25
+        }
+
+        .two {
+            width: 20%;
+            flex-grow: .10;
+        }
+
+        .three {
+            width: 20%;
+            height: 6em;
+            flex-grow: 8;
+        }
+
+        .four {
+            width: 20%;
+            flex-grow: .10;
+        }
+
+        .five {
+            width: 20%;
+            flex-grow: .10;
+        }
+
         .container {
             display: flex;
             min-height:100px;
