@@ -15,7 +15,7 @@ import { jqxGridComponent } from "../../../assets/jqwidgets-ts/angular_jqxgrid";
 				<div style="position:relative; display:block; height:100%; width:100%; max-height:100%; overflow: auto">
 					<jqxGrid #theGrid
 									 (onBindingcomplete)="onGridBindingComplete()"
-									 [width]="'calc(100% - 20px)'"
+									 [width]="'calc(100% - 2px)'"
 									 [height]="600"
 									 [source]="dataAdapter"
 									 [pageable]="true"
