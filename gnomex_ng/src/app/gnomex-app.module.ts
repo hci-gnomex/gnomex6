@@ -6,13 +6,14 @@ import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from "@angular/core";
 
 import {APP_ROUTING} from "./gnomex-app.routes";
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {HttpModule} from "@angular/http";
 import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
 import {RouterModule} from "@angular/router";
-import {FormsModule} from "@angular/forms";
+import {FormsModule,ReactiveFormsModule} from "@angular/forms";
 import {UtilModule} from "./util/util.module";
 import {DropdownModule, CollapseModule} from "ng2-bootstrap";
 import {
@@ -24,7 +25,7 @@ import {NavigationModule} from "@hci/navigation";
 import {LocalStorageModule, LocalStorageService, ILocalStorageServiceConfig} from "angular-2-local-storage";
 
 import "./gnomex-app.css";
-import {AppFooterModule, APP_INFO_SOURCE} from "@hci/app-footer";
+//import {AppFooterModule, APP_INFO_SOURCE} from "@hci/app-footer";
 import {ServicesModule} from "./services/services.module";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
@@ -43,6 +44,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         HttpModule,
         RouterModule,
         FormsModule,
+        ReactiveFormsModule,
         HomeModule,
         UtilModule,
         DropdownModule.forRoot(),
@@ -50,7 +52,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AppHeaderModule,
         UserModule,
         NavigationModule,
-        AppFooterModule,
         ExperimentsModule,
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig)
@@ -70,8 +71,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: LOGIN_ROUTE, useValue: "/login"},
         UserService,
         ExperimentsService,
-        LocalStorageService,
-        {provide: APP_INFO_SOURCE, useValue: "data/appInfo.json"}
+        LocalStorageService
     ]
 })
 export class GnomexAppModule {

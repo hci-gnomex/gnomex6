@@ -3,8 +3,8 @@ import {URLSearchParams} from "@angular/http";
 
 import {LabListService} from "../services/lab-list.service";
 import {GetLabService} from "../services/get-lab.service";
-import {jqxComboBox} from "jqwidgets-framework";
-import {jqxCalendar} from "jqwidgets-framework";
+//import {jqxComboBox} from "jqwidgets-framework";
+//import {jqxCalendar} from "jqwidgets-framework";
 import {AppUserListService} from "../services/app-user-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ExperimentsService} from "../experiments/experiments.service";
@@ -265,7 +265,7 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onLabSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
             this.idLabString = event.args.item.value;
             if (this.showOwnerComboBox) {
                 this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
@@ -282,19 +282,19 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onMultiLabSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
             this.multiSelectIdLabs.add(event.args.item.value);
         }
     }
 
     onMultiLabUnselect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
             this.multiSelectIdLabs.delete(event.args.item.value);
         }
     }
 
     onAppUserSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
             this.idAppUserString = event.args.item.value;
         } else {
             this.idAppUserString = "";
@@ -306,7 +306,7 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onCoreFacilitySelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
             this.idCoreFacilityString = event.args.item.value;
             if (this.showRequestCategoryComboBox) {
                 this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory").subscribe((response) => {
@@ -334,7 +334,7 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onOrganismSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
             this.idOrganismString = event.args.item.value;
             if (this.showGenomeBuildComboBox) {
                 this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.GenomeBuildLite").subscribe((response) => {
@@ -362,7 +362,7 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onGenomeBuildSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
             this.idGenomeBuildString = event.args.item.value;
         } else {
             this.idGenomeBuildString = "";
@@ -374,7 +374,7 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onRequestCategorySelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
             this.codeRequestCategoryString = event.args.item.value;
         } else {
             this.codeRequestCategoryString = "";
