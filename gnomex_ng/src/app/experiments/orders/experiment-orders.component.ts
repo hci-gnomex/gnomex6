@@ -1,15 +1,21 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
 
 import {ExperimentsService} from "../experiments.service";
 import {Subscription} from "rxjs/Subscription";
 import {NgModel} from "@angular/forms"
 import {URLSearchParams} from "@angular/http";
+
 import {BrowseFilterComponent} from "../../util/browse-filter.component";
-import {jqxGridComponent} from "../../../assets/jqwidgets-ts/angular_jqxgrid";
 import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
+import {jqxGridComponent} from "../../../assets/jqwidgets-ts/angular_jqxgrid";
+import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
 /**
+ *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
+ *	the navigation bar.
  *
- * @author u0556399
+ *	The purpose of this page is to summarize all the experiments at specific points in the workflow
+ *	and allows the user to move items to other stages.
+ *
  * @since 7/20/2017.
  */
 @Component({
@@ -31,21 +37,8 @@ import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcomb
 							<div class="t" style="height: 100%; width: 100%;">
 								<div class="tr" style="width: 100%;">
 									<div class="td" style="width: 100%; height: 100%;">
-										<div style="display: block; width: 100%; height: 100%; padding: 0.1em;">
-											<jqxGrid #myGrid
-															 [width]="'100%'"
-															 [height]="'100%'"
-															 [source]="dataAdapter"
-															 [pageable]="false"
-															 [autoheight]="false"
-															 [editable]="false"
-															 [sortable]="true"
-															 [columns]="columns"
-															 [altrows]="true"
-															 [selectionmode]="'checkbox'"
-															 [columnsresize]="true"
-															 #gridReference>
-											</jqxGrid>
+										<div style="display:block; height:100%; width:100%;">
+											<GnomexStyledGrid #myGrid></GnomexStyledGrid>
 										</div>
 									</div>
 								</div>
@@ -58,9 +51,7 @@ import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcomb
 														<div class="t">
 															<div class="tr">
 																<div class="td">
-																	<div class="title">{{myGrid.getselectedrowindexes().length}}
-																		selected
-																	</div>
+																	<div class="title">{{myGrid.getselectedrowindexes().length}} selected</div>
 																</div>
 																<div class="td">
 																	<jqxComboBox #statusComboBox
@@ -188,16 +179,36 @@ import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcomb
 })
 export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
-	@ViewChild('myGrid') myGrid: jqxGridComponent;
+	@ViewChild('myGrid') myGrid: GnomexStyledGridComponent;
 	@ViewChild('statusComboBox') statusCombobox: jqxComboBoxComponent;
 
 	private orders: Array<any>;
 
-	private editViewRenderer = (row: number, column: any, value: any): any => {
-		return `<div style="display: table; width: 100%; height:100%; text-align: center;">
-							<a style="display: table-cell; padding: 0em 0.5em 0em 1em; width: 50%; height: 100%; vertical-align: middle;">Edit!</a>
-							<a style="display: table-cell; padding: 0em 1em 0em 0.5em; width: 50%; height: 100%; vertical-align: middle;">View!</a>
+
+	private actionCellsRenderer = (row: number, column: any, value: any): any => {
+		return `<div style="display:inline-block; width: 80%; padding-left: 10%; padding-right:10%; text-align: center; font-size: x-small">
+							<div style="display:inline-block; width: 35%; text-align: center;">
+								<a>View</a>
+							</div>
+							<div style="display:inline-block; width: 35%; padding-left:10%; text-align: center;">
+								<a>Edit</a>
+							</div>
 						</div>`;
+	};
+
+	private experimentNumberCellsRenderer = (row: number, column: any, value: any): any => {
+		let imgSource = this.source.localdata[row].icon;
+		return `<div style="display: block; text-align: left; padding: 0.3rem 0.5rem; font-size: x-small;">
+							<img src="` + imgSource +`" alt="NO ICON"/>` + value +
+					 `</div>`;
+	};
+
+	private textCellsRenderer = (row: number, column: any, value: any): any => {
+		return `<div style="display: block; text-align: left; padding: 0.3rem 0.5rem; font-size: x-small;">` + value + `</div>`;
+	};
+
+	private numberCellsRenderer = (row: number, column: any, value: any): any => {
+		return `<div style="display: block; text-align: right; padding: 0.3rem 0.5rem; font-size: x-small;">` + value + `</div>`;
 	};
 
 	private dropdownChoices: any[] = [
@@ -210,30 +221,39 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	];
 
 	private columns: any[] = [
-		{text: "# ", datafield: "requestNumber", width: "4%"},
-		{text: "Name", datafield: "name", width: "14%"},
-		{text: "Action", width: "9%", cellsrenderer: this.editViewRenderer},
-		{text: "Samples", datafield: "numberOfSamples", width: "4%"},
-		{text: "Status", datafield: "requestStatus", width: "6%"},
-		{text: "Type", width: "8%"},
-		{text: "Submitted on", datafield: "createDate", width: "10%"},
-		{text: "Container", datafield: "container", width: "6%"},
-		{text: "Submitter", datafield: "ownerName", width: "13%"},
-		{text: "Lab", datafield: "labName"}
+		{text: "# ", 							datafield: "requestNumber", 	width: "4%",	cellsrenderer: this.experimentNumberCellsRenderer},
+		{text: "Name", 						datafield: "name", 						width: "6%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Action", 																				width: "5%", 	cellsrenderer: this.actionCellsRenderer},
+		{text: "Samples",					datafield: "numberOfSamples", width: "4%", 	cellsrenderer: this.numberCellsRenderer},
+		{text: "Status", 					datafield: "requestStatus", 	width: "4%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Type", 																					width: "7%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Submitted on", 		datafield: "createDate", 			width: "7%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Container", 			datafield: "container", 			width: "4%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Submitter", 			datafield: "ownerName", 			width: "6%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Lab", 						datafield: "labName", 				width: "8%",	cellsrenderer: this.textCellsRenderer},
+		{text: "Notes for core", 	datafield: "corePrepInstructions", 					cellsrenderer: this.textCellsRenderer}
 	];
 
 	private source = {
 		datatype: "json",
-		localdata: [],
+		localdata: [
+			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""},
+			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""},
+			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""},
+			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""},
+			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""}
+		],
 		datafields: [
 			{name: "name", type: "string"},
+			{name: "icon", type: "string"},
 			{name: "requestNumber", type: "string"},
 			{name: "requestStatus", type: "string"},
 			{name: "container", type: "string"},
 			{name: "ownerName", type: "string"},
 			{name: "labName", type: "string"},
 			{name: "createDate", type: "string"},
-			{name: "numberOfSamples", type: "string"}
+			{name: "numberOfSamples", type: "string"},
+			{name: "corePrepInstructions", type: "string"}
 		]
 	};
 
@@ -253,8 +273,10 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	private selectedRequestNumbers: string[];
 	private changeStatusResponsesRecieved: number;
 
+
 	constructor(private experimentsService: ExperimentsService) {
 	}
+
 
 	goButtonClicked(): void {
 
@@ -270,7 +292,6 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		this.changeStatusResponsesRecieved = 0;
 
 		for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
-			//	console.log("Changing Experiment numbers: " + this.myGrid.getcell(gridSelectedIndexes[i].valueOf(), "requestNumber").value + " status to " + this.statusCombobox.getSelectedItem().value);
 			let idRequest: string = "" + this.myGrid.getcell(gridSelectedIndexes[i].valueOf(), "requestNumber").value;
 			let cleanedIdRequest: string = idRequest.slice(0, idRequest.indexOf("R") >= 0 ? idRequest.indexOf("R") : idRequest.length);
 			this.selectedRequestNumbers.push(cleanedIdRequest);
@@ -289,11 +310,14 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
 	updateGridData(data: Array<any>) {
 		this.source.localdata = Array.isArray(data) ? data : [data];
-		this.dataAdapter = new jqx.dataAdapter(this.source);
+		this.myGrid.setDataAdapterSource(this.source);
 		this.myGrid.selectedrowindexes([]);
 	}
 
 	ngOnInit(): void {
+		this.myGrid.setColumns(this.columns);
+		this.myGrid.setDataAdapterSource(this.source);
+
 		this.experimentsSubscription = this.experimentsService.getExperimentsObservable()
 				.subscribe((response) => {
 					this.orders = response;
