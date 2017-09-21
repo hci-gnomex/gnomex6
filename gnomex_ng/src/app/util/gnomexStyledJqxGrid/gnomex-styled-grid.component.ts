@@ -7,32 +7,7 @@ import { jqxGridComponent } from "../../../assets/jqwidgets-ts/angular_jqxgrid";
 
 @Component({
 	selector: "GnomexStyledGrid",
-	template: `
-		<div #boundingParent style="display: block; width: 100%; height: 100%">
-			<div #artificialGridBounding
-					 style="display: block; width: 100%; border: solid 1px darkgrey; border-radius:4px"
-					 [style.height]="artificialGridBoundingStretch ? '100%' : '' + savedHeight + 'px'">
-				<div style="position:relative; display:block; height:100%; width:100%; max-height:100%; overflow: auto">
-					<jqxGrid #theGrid
-									 (onBindingcomplete)="onGridBindingComplete()"
-									 [width]="'calc(100% - 2px)'"
-									 [height]="600"
-									 [source]="dataAdapter"
-									 [pageable]="true"
-									 [autoheight]="true"
-									 [autorowheight]="true"
-									 [editable]="false"
-									 [sortable]="true"
-									 [columns]="columns"
-									 [altrows]="true"
-									 [columnsresize]="true"
-									 [selectionmode]="'checkbox'"
-									 #gridReference>
-					</jqxGrid>
-				</div>
-			</div>
-		</div>
-	`,
+	templateUrl: "./gnomex-styled-grid.component.html",
 	styles: []
 })
 export class GnomexStyledGridComponent implements OnInit, OnDestroy {
@@ -96,8 +71,8 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy {
 
 	private onGridBindingComplete() {
 		this.isGridDrawn = true;
-		this.theGrid.pagesizeoptions(['100', '1000']);
-		this.theGrid.pagesize(1000);
+		this.theGrid.pagesizeoptions(['100', '250', '1000']);
+		this.theGrid.pagesize(250);
 
 		// It is important that the child is smaller than the parent, so that we can detect resizing.
 		this.savedHeight = this.boundingParent.nativeElement.offsetHeight - 1;
@@ -119,7 +94,6 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy {
 
 				setTimeout(() => {
 					// It is important that the child is smaller than the parent, so that we can detect resizing.
-					console.log('Resetting height');
 					this.savedHeight = this.boundingParent.nativeElement.offsetHeight - 1;
 
 					setTimeout(() => {
@@ -134,8 +108,6 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy {
 	}
 
 	private onTimer(): void {
-		console.log("onTimerCalled");
-
 		if(this.autoresize) {
 			this.resizeIfNeeded();
 		}
