@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, ViewChild, ViewEncapsulation} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from "@angular/core";
 
 import { URLSearchParams } from "@angular/http";
 
@@ -43,6 +43,60 @@ import {Subscription} from "rxjs/Subscription";
             transition: all .25s;
         }
 
+        .flex-column-container {
+           display: flex;
+            flex-direction: column;
+            background-color: white;
+            height: 100%;
+        }
+
+        .flex-row-container {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .item-row {
+
+        }
+        .item-row-one {
+            flex-grow: 1;
+        }
+
+        .item-row-two {
+            flex-grow: 1;
+        }
+
+        .item {
+            flex: 1 1 auto;
+            font-size: small;
+        }
+
+        .one {
+            width: 100%;
+            flex-grow: .25
+        }
+
+        .two {
+            width: 20%;
+            flex-grow: .10;
+        }
+
+        .three {
+            width: 20%;
+            height: 6em;
+            flex-grow: 8;
+        }
+
+        .four {
+            width: 20%;
+            flex-grow: .10;
+        }
+
+        .five {
+            width: 20%;
+            flex-grow: .10;
+        }
+                
         .container {
             display: flex;
             min-height:100px;
@@ -84,7 +138,7 @@ import {Subscription} from "rxjs/Subscription";
         }
     `]
 })
-export class BrowseExperimentsComponent {
+export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("tree") treeComponent: TreeComponent;
     @ViewChild("reassignWindow") reassignWindow: jqxWindowComponent;
@@ -141,7 +195,7 @@ export class BrowseExperimentsComponent {
     private targetItem: any;
     private projectDescription: string = "";
     private projectName: string = "";
-    private experimentService: ExperimentsService;
+    public experimentService: ExperimentsService;
     private labMembers: any;
     private billingAccounts: any;
     private dragEndItems: any;
@@ -154,21 +208,26 @@ export class BrowseExperimentsComponent {
     private idCoreFacility: string = "3";
     private showBillingCombo: boolean = false;
     private experimentCount: number;
-    private subscription: Subscription;
+    private projectRequestListSubscription: Subscription;
 
     ngOnInit() {
-        this.treeModel = this.treeComponent.treeModel;
-
+        this.treeModel = this.treeComponent.treeModel
     }
+
+    ngAfterViewInit() {
+        this.jqxLoader.close();
+        this.jqxConstructorLoader.close();
+    }
+
     constructor(private experimentsService: ExperimentsService) {
 
 
         this.experimentService = experimentsService;
 
-        this.experimentsService.getExperiments().subscribe(response => {
-            this.buildTree(response);
-            //this.thisResponse = response;
-        })
+        // this.experimentsService.getExperiments().subscribe(response => {
+        //     this.buildTree(response);
+        //     //this.thisResponse = response;
+        // })
         this.items = [];
         this.dragEndItems = [];
         this.labMembers = [];
@@ -176,9 +235,8 @@ export class BrowseExperimentsComponent {
         this.labs = [];
 
 
-        this.experimentsService.getProjectRequestListObservable().subscribe(response => {
+        this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
-            //this.thisResponse = response;
         });
 
     }
@@ -198,7 +256,6 @@ export class BrowseExperimentsComponent {
         } else {
             this.items = response;
         }
-        this.labs = this.labs.concat(this.items);
         for( var l of this.items) {
             if (!this.isArray(l.Project)) {
                 l.items = [l.Project];
@@ -244,8 +301,6 @@ export class BrowseExperimentsComponent {
                 }
             }
         }
-        this.jqxLoader.close();
-        this.jqxConstructorLoader.close();
     };
 
     /*
@@ -721,5 +776,9 @@ export class BrowseExperimentsComponent {
     responseMsgNoButtonClicked() {
         this.responseMsg = "";
         this.responseMsgWindow.close();
+    }
+
+    ngOnDestroy(): void {
+        this.projectRequestListSubscription.unsubscribe();
     }
 }
