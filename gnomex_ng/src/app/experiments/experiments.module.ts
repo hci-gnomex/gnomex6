@@ -12,6 +12,7 @@ import { TreeModule } from "angular-tree-component";
 import { ButtonModule } from "../../modules/button.module";
 import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
+import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import { ExpanderModule }     from "../../modules/expander.module";
 import { GnomexStyledGridModule } from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import { InputModule } from "../../modules/input.module";
@@ -38,6 +39,7 @@ import { ViewExperimentComponent }    from "./view-experiment.component";
       CheckBoxModule,
       ComboBoxModule,
       CommonModule,
+      EmailRelatedUsersPopupModule,
       ExpanderModule,
       FormsModule,
       GnomexStyledGridModule,
