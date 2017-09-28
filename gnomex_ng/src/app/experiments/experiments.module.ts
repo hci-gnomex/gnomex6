@@ -13,9 +13,10 @@ import { ButtonModule } from "../../modules/button.module";
 import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
 import { ExpanderModule }     from "../../modules/expander.module";
+import { GnomexStyledGridModule } from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import { InputModule } from "../../modules/input.module";
-import { JqxGridModule }      from "../../modules/jqxgrid.module";
 import { LoaderModule }       from "../../modules/loader.module";
+import { PanelModule }        from "../../modules/panel.module";
 import { NotificationModule } from "../../modules/notification.module";
 import { TextAreaModule }     from "../../modules/textarea.module";
 import { ToggleButtonModule } from "../../modules/togglebutton.module";
@@ -39,10 +40,11 @@ import { ViewExperimentComponent }    from "./view-experiment.component";
       CommonModule,
       ExpanderModule,
       FormsModule,
+      GnomexStyledGridModule,
       InputModule,
-      JqxGridModule,
       LoaderModule,
       NotificationModule,
+      PanelModule,
       ServicesModule,
       TextAreaModule,
       ToggleButtonModule,
@@ -53,7 +55,8 @@ import { ViewExperimentComponent }    from "./view-experiment.component";
     declarations: [
       BrowseExperimentsComponent,
       ExperimentOrdersComponent,
-      ViewExperimentComponent    ]
+      ViewExperimentComponent
+    ]
 })
 export class ExperimentsModule {
 }
