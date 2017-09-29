@@ -1,0 +1,119 @@
+<jqxWindow #emailSentSuccessWindow
+					 [width]="'20%'"
+					 [height]="'20%'"
+					 [autoOpen]="false">
+	<div style="background-color: #88b47c; color: #ffffff;">
+		Success!
+	</div>
+	<div>
+		<div class="t full-width full-height">
+			<div class="tr full-width full-height">
+				<div class="td align-center-center">
+					<p>Email sent!</p>
+				</div>
+			</div>
+			<div class="tr full-width">
+				<div class="td align-center-center">
+					<jqxButton (onClick)="onSuccessWindowOkClicked()">
+						Ok
+					</jqxButton>
+				</div>
+			</div>
+		</div>
+	</div>
+</jqxWindow>
+
+<jqxWindow #emailSentFailureWindow
+					 [autoOpen]="false">
+	<div style="background-color: #e87a75; color: #ffffff;">
+		Error
+	</div>
+	<div>
+		<div class="t full-width full-height">
+			<div class="tr full-width full-height">
+				<div class="td align-center-center">
+					<p>There was a problem sending the email.</p>
+				</div>
+			</div>
+			<div class="tr full-width">
+				<div class="td align-center-center">
+					<jqxButton (onClick)="onFailureWindowOkClicked()">
+						Ok
+					</jqxButton>
+				</div>
+			</div>
+		</div>
+	</div>
+</jqxWindow>
+
+<jqxWindow #windowReference
+					 [width]="'40%'"
+					 [height]="'50%'"
+					 [autoOpen]="false">
+	<div style="background-color: #88b47c; color: #ffffff;">
+		<img src="../../../assets/email_go.png" alt=""/>
+		Send email to users associated with selected orders
+	</div>
+	<div class="popup-body">
+		<div class="t full-width full-height">
+			<div class="tr full-height">
+				<div class="td">
+					<div style="display:block; width:calc(100% - 2px); height:100%; background-color: white; border: 1px solid #b7babc; padding:0.4rem 0;">
+						<div class="t full-width full-height">
+							<div class="tr full-width">
+								<div class="td" style="vertical-align: top; padding:0.4rem; color:#586c93;">
+									Subject:
+								</div>
+								<div class="td" style="width:85%; height:2rem;">
+									<div class="block full-width full-height">
+										<jqxInput #subjectInput
+												[width]="'calc(100% - 8px - 0.4rem)'"
+												[height]="'100%'"
+												[theme]="'gnomex5'">
+										</jqxInput>
+									</div>
+								</div>
+							</div>
+							<div class="tr" style="height:2rem;">
+							</div>
+							<div class="tr full-width" style="width:100%;">
+								<div class="td" style="vertical-align: top; padding:0.4rem; color:#586c93;">
+									Body:
+								</div>
+								<div class="td full-height" style="width:85%;">
+									<div class="block full-width full-height">
+										<jqxTextArea #bodyTextArea
+												[width]="'calc(100% - 2px - 0.4rem)'"
+												[height]="'calc(100% - 2px)'"
+												[theme]="'gnomex5'">
+										</jqxTextArea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="tr full-width" style="height:0.4rem;">
+			</div>
+			<div class="tr full-width" style="text-align: right;">
+				<div class="td">
+					<span class="button-container">
+						<jqxButton #sendEmailButton
+								[disabled]="emailIsInvalid() || disableSendEmailButton"
+								(onClick)="sendEmailButtonClicked()">
+							<img *ngIf="true" src="../../../assets/email_go.png" alt=""/>
+							<img *ngIf="false" src="../../../assets/email_go_disable.png" alt=""/>
+							Send email
+						</jqxButton>
+					</span>
+					<span class="button-container">
+						<jqxButton #cancelSendEmailButton (onClick)="cancelButtonClicked()">
+							Cancel
+						</jqxButton>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</jqxWindow>
