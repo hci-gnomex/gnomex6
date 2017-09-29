@@ -13,10 +13,11 @@
             <br/>
 
             <div class="col-md-8">
-                <jqxEditor id="experimentDescriptionId" [width]="800" [height]="400"
+                <jqxEditor #editorReference id="experimentDescriptionId" [width]="800" [height]="400"
                            [editable]="edit"
                            [tools]="toolbarSettings"
                            formControlName="expDescript"
+                           [formControl]="descriptionForm.get('expDescript')"
                            [toolbarPosition]="'bottom'">
                 </jqxEditor>
             </div>

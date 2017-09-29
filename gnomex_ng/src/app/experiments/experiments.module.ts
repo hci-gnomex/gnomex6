@@ -3,7 +3,7 @@
  */
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import {FormsModule,ReactiveFormsModule} from "@angular/forms";
 
 import { EXPERIMENTS_ROUTING } from "./experiments.routes";
 
@@ -28,10 +28,22 @@ import { ServicesModule } from "../services/services.module";
 import { BrowseExperimentsComponent } from "./browse-experiments.component";
 import { ExperimentOrdersComponent }  from "./orders/experiment-orders.component";
 import { ViewExperimentComponent }    from "./view-experiment.component";
+
+import {TestComponent,DescriptionTab,PrepTab,ExperimentDetail,NewExperimentComponent} from './experiment-detail/index'
+import {
+    RichEditorModule,
+    DropDownModule
+} from '../../modules/index';
+
+
 /**
  * @author mbyrne
  * @since 12/19/16
  */
+
+
+export const componentFactories = [TestComponent,DescriptionTab,PrepTab]; // need add components that will be tabs here
+                                                                          // could be put in gnomexFlex as w
 @NgModule({
     imports: [
       EXPERIMENTS_ROUTING,
@@ -52,13 +64,21 @@ import { ViewExperimentComponent }    from "./view-experiment.component";
       ToggleButtonModule,
       TreeModule,
       UtilModule,
-      WindowModule
+        WindowModule,
+        ReactiveFormsModule,
+        RichEditorModule,
+        DropDownModule
     ],
     declarations: [
       BrowseExperimentsComponent,
       ExperimentOrdersComponent,
-      ViewExperimentComponent
-    ]
-})
+                    ViewExperimentComponent,
+                    TestComponent,
+                    DescriptionTab,
+                    ExperimentDetail,
+                    PrepTab,
+                    NewExperimentComponent ],
+    entryComponents:[...componentFactories]
+})})
 export class ExperimentsModule {
 }
