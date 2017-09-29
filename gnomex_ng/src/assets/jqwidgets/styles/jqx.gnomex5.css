@@ -69,3 +69,12 @@
 .jqx-fill-state-disabled-gnomex5 {}
 .jqx-grid-group-drag-line-gnomex5 {}
 .jqx-grid-group-column-line-gnomex5 {}
+
+
+.jqx-input-gnomex5 {
+    background-color: #e4e0e0;
+}
+
+.jqx-text-area-element-gnomex5 {
+    background-color: #e4e0e0;
+}
