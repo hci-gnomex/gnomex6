@@ -25,7 +25,7 @@ import {NavigationModule} from "@hci/navigation";
 import {LocalStorageModule, LocalStorageService, ILocalStorageServiceConfig} from "angular-2-local-storage";
 
 import "./gnomex-app.css";
-import {AppFooterModule, APP_INFO_SOURCE} from "@hci/app-footer";
+//import {AppFooterModule, APP_INFO_SOURCE} from "@hci/app-footer";
 import {ServicesModule} from "./services/services.module";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
@@ -52,7 +52,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AppHeaderModule,
         UserModule,
         NavigationModule,
-        AppFooterModule,
         ExperimentsModule,
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig)
@@ -72,8 +71,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: LOGIN_ROUTE, useValue: "/login"},
         UserService,
         ExperimentsService,
-        LocalStorageService,
-        {provide: APP_INFO_SOURCE, useValue: "data/appInfo.json"}
+        LocalStorageService
     ]
 })
 export class GnomexAppModule {

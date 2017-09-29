@@ -1,129 +1,28 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
 
 import {ExperimentsService} from "../experiments.service";
 import {Subscription} from "rxjs/Subscription";
 import {NgModel} from "@angular/forms"
 import {URLSearchParams} from "@angular/http";
-import {BrowseFilterComponent} from "../../util/browse-filter.component";
-import {jqxGridComponent} from "../../../assets/jqwidgets-ts/angular_jqxgrid";
+
 import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
+
+import {BrowseFilterComponent} from "../../util/browse-filter.component";
+import {DictionaryService} from "../../services/dictionary.service";
+import {EmailRelatedUsersPopupComponent} from "../../util/emailRelatedUsersPopup/email-related-users-popup.component"
+import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
 /**
+ *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
+ *	the navigation bar.
  *
- * @author u0556399
+ *	The purpose of this page is to summarize all the experiments at specific points in the workflow
+ *	and allows the user to move items to other stages.
+ *
  * @since 7/20/2017.
  */
 @Component({
 	selector: "ExperimentOrders",
-	template: `
-		<div class="background">
-			<div class="t" style="height: 100%; width: 100%;">
-				<div class="tr" style="width: 100%;">
-					<div class="td" style="width: 100%;">
-						<browse-filter [label]="'Orders'" [iconSource]="'assets/review.png'"
-													 [mode]="'orderBrowse'"></browse-filter>
-					</div>
-				</div>
-				<div class="tr" style="height:0.3em; width:0;">
-				</div>
-				<div class="tr" style="width: 100%;">
-					<div class="td" style="width: 100%; height: 100%">
-						<div class="lower-panel">
-							<div class="t" style="height: 100%; width: 100%;">
-								<div class="tr" style="width: 100%;">
-									<div class="td" style="width: 100%; height: 100%;">
-										<div style="display: block; width: 100%; height: 100%; padding: 0.1em;">
-											<jqxGrid #myGrid
-															 [width]="'100%'"
-															 [height]="'100%'"
-															 [source]="dataAdapter"
-															 [pageable]="false"
-															 [autoheight]="false"
-															 [editable]="false"
-															 [sortable]="true"
-															 [columns]="columns"
-															 [altrows]="true"
-															 [selectionmode]="'checkbox'"
-															 [columnsresize]="true"
-															 #gridReference>
-											</jqxGrid>
-										</div>
-									</div>
-								</div>
-								<div class="tr" style="width:100%">
-									<div class="td" style="width: 100%">
-										<div class="grid-footer">
-											<div class="t" style="width: 100%">
-												<div class="tr" style="width:100%">
-													<div class="td">
-														<div class="t">
-															<div class="tr">
-																<div class="td">
-																	<div class="title">{{myGrid.getselectedrowindexes().length}}
-																		selected
-																	</div>
-																</div>
-																<div class="td">
-																	<jqxComboBox #statusComboBox
-																							 [source]="dropdownChoices"
-																							 [placeHolder]="'- Change Status -'"
-																							 [dropDownVerticalAlignment]="'top'"
-																							 [autoDropDownHeight]="true"></jqxComboBox>
-																</div>
-																<div class="td button-container">
-																	<jqxButton
-																			[disabled]="myGrid.getselectedrowindexes().length === 0 || (this.statusCombobox.getSelectedItem() === null || this.statusCombobox.getSelectedItem().value === '')"
-																			[template]="'link'"
-																			(onClick)="goButtonClicked()">
-																		<img
-																				*ngIf="myGrid.getselectedrowindexes().length  != 0 && (this.statusCombobox.getSelectedItem()  != null && this.statusCombobox.getSelectedItem().value  != '')"
-																				src="assets/bullet_go.png" alt=""
-																				style="margin-right:0.2em;"/>
-																		<img
-																				*ngIf="myGrid.getselectedrowindexes().length === 0 || (this.statusCombobox.getSelectedItem() === null || this.statusCombobox.getSelectedItem().value === '')"
-																				src="assets/bullet_go_disable.png" alt=""
-																				style="margin-right:0.2em;"/>
-																		Go
-																	</jqxButton>
-																</div>
-																<div class="td button-container">
-																	<jqxButton
-																			[disabled]="myGrid.getselectedrowindexes().length === 0"
-																			[template]="'link'"
-																			(onClick)="deleteButtonClicked()">
-																		<img *ngIf="myGrid.getselectedrowindexes().length != 0" src="assets/delete.png" alt="" style="margin-right:0.2em;"/>
-																		<img *ngIf="myGrid.getselectedrowindexes().length === 0" src="assets/delete_disable.png" alt="" style="margin-right:0.2em;"/>
-																		Delete
-																	</jqxButton>
-																</div>
-																<div class="td button-container">
-																	<jqxButton
-																			[disabled]="myGrid.getselectedrowindexes().length === 0"
-																			[template]="'link'"
-																			(onClick)="emailButtonClicked()">
-																		<img *ngIf="myGrid.getselectedrowindexes().length != 0" src="assets/email_go.png" alt="" style="margin-right:0.2em;"/>
-																		<img *ngIf="myGrid.getselectedrowindexes().length === 0" src="assets/email_go_disable.png" alt="" style="margin-right:0.2em;"/>
-																		Email
-																	</jqxButton>
-																</div>
-															</div>
-														</div>
-													</div>
-													<td style="text-align: right">
-														<div>({{(source.localdata.length === null) ? 0 : source.localdata.length + (source.localdata.length != 1 ? " orders" : " order")}})
-														</div>
-													</td>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	`,
+	templateUrl: "./experiment-orders.component.html",
 	styles: [`
       div.t {
           display: table;
@@ -188,16 +87,90 @@ import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcomb
 })
 export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
-	@ViewChild('myGrid') myGrid: jqxGridComponent;
+	@ViewChild('myGrid') myGrid: GnomexStyledGridComponent;
 	@ViewChild('statusComboBox') statusCombobox: jqxComboBoxComponent;
+	@ViewChild('windowReference') window: EmailRelatedUsersPopupComponent;
 
-	private orders: Array<any>;
 
-	private editViewRenderer = (row: number, column: any, value: any): any => {
-		return `<div style="display: table; width: 100%; height:100%; text-align: center;">
-							<a style="display: table-cell; padding: 0em 0.5em 0em 1em; width: 50%; height: 100%; vertical-align: middle;">Edit!</a>
-							<a style="display: table-cell; padding: 0em 1em 0em 0.5em; width: 50%; height: 100%; vertical-align: middle;">View!</a>
+	private dictionary: any;
+
+	private experimentsSubscription: Subscription;
+	private statusChangeSubscription: Subscription;
+
+	private selectedRequestNumbers: string[];
+	private changeStatusResponsesRecieved: number;
+
+
+	private actionCellsRenderer = (row: number, column: any, value: any): any => {
+		return `<div style="display:inline-block; width: 80%; padding-left: 10%; padding-right:10%; text-align: center;">
+							<div style="display:inline-block; width: 35%; text-align: center;">
+								<a>View</a>
+							</div>
+							<div style="display:inline-block; width: 35%; padding-left:10%; text-align: center;">
+								<a>Edit</a>
+							</div>
 						</div>`;
+	};
+
+	private experimentNumberCellsRenderer = (row: number, column: any, value: any): any => {
+		let imgSource = this.source.localdata[row].icon;
+		return `<div style="display: block; text-align: left; padding: 0.3rem 0.5rem;">
+							<img src="` + imgSource +`" alt=""/>` + value +
+					 `</div>`;
+	};
+
+	private dateCellsRenderer = (row: number, column: any, value: any): any => {
+		let tokens:string[] = ('' + value).split(' ');
+		let error:boolean = false;
+
+		error = error || tokens.length != 9;
+
+		if(error) {
+			return "";
+		} else {
+			let month: string;
+			let day: string;
+			let year: string;
+
+			let time: string;
+
+			switch(tokens[1]) {
+				case 'Jan' : month = '01'; break;
+				case 'Feb' : month = '02'; break;
+				case 'Mar' : month = '03'; break;
+				case 'Apr' : month = '04'; break;
+				case 'May' : month = '05'; break;
+				case 'Jun' : month = '06'; break;
+				case 'Jul' : month = '07'; break;
+				case 'Aug' : month = '08'; break;
+				case 'Sep' : month = '09'; break;
+				case 'Oct' : month = '10'; break;
+				case 'Nov' : month = '11'; break;
+				case 'Dec' : month = '12'; break;
+				default : error = true;
+			}
+
+			day = tokens[2];
+			year = tokens[3];
+			time = tokens[4];
+
+			if (error) {
+				return "";
+			} else {
+				return `<div style="display: block; text-align: right; padding: 0.3rem 0.5rem;">` +
+									month + '-' + day + '-' + year + ' ' + time +
+							 `</div>`;
+
+			}
+		}
+	};
+
+	private textCellsRenderer = (row: number, column: any, value: any): any => {
+		return `<div style="display: block; text-align: left; padding: 0.3rem 0.5rem;">` + value + `</div>`;
+	};
+
+	private numberCellsRenderer = (row: number, column: any, value: any): any => {
+		return `<div style="display: block; text-align: right; padding: 0.3rem 0.5rem;">` + value + `</div>`;
 	};
 
 	private dropdownChoices: any[] = [
@@ -210,16 +183,17 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	];
 
 	private columns: any[] = [
-		{text: "# ", datafield: "requestNumber", width: "4%"},
-		{text: "Name", datafield: "name", width: "14%"},
-		{text: "Action", width: "9%", cellsrenderer: this.editViewRenderer},
-		{text: "Samples", datafield: "numberOfSamples", width: "4%"},
-		{text: "Status", datafield: "requestStatus", width: "6%"},
-		{text: "Type", width: "8%"},
-		{text: "Submitted on", datafield: "createDate", width: "10%"},
-		{text: "Container", datafield: "container", width: "6%"},
-		{text: "Submitter", datafield: "ownerName", width: "13%"},
-		{text: "Lab", datafield: "labName"}
+		{text: "# ", 							datafield: "requestNumber", 	width: "4%",	cellsrenderer: this.experimentNumberCellsRenderer},
+		{text: "Name", 						datafield: "name", 						width: "6%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Action", 																				width: "5%", 	cellsrenderer: this.actionCellsRenderer},
+		{text: "Samples",					datafield: "numberOfSamples", width: "4%", 	cellsrenderer: this.numberCellsRenderer},
+		{text: "Status", 					datafield: "requestStatus", 	width: "4%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Type", 																					width: "7%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Submitted on", 		datafield: "createDate", 			width: "7%", 	cellsrenderer: this.dateCellsRenderer},
+		{text: "Container", 			datafield: "container", 			width: "4%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Submitter", 			datafield: "ownerName", 			width: "6%", 	cellsrenderer: this.textCellsRenderer},
+		{text: "Lab", 						datafield: "labName", 				width: "8%",	cellsrenderer: this.textCellsRenderer},
+		{text: "Notes for core", 	datafield: "corePrepInstructions", 					cellsrenderer: this.textCellsRenderer}
 	];
 
 	private source = {
@@ -227,86 +201,43 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		localdata: [],
 		datafields: [
 			{name: "name", type: "string"},
+			{name: "icon", type: "string"},
 			{name: "requestNumber", type: "string"},
 			{name: "requestStatus", type: "string"},
+			{name: "codeRequestCategory", type: "string"},
 			{name: "container", type: "string"},
 			{name: "ownerName", type: "string"},
 			{name: "labName", type: "string"},
-			{name: "createDate", type: "string"},
-			{name: "numberOfSamples", type: "string"}
+			{name: "createDate", type: "date"},
+			{name: "numberOfSamples", type: "string"},
+			{name: "corePrepInstructions", type: "string"}
 		]
 	};
 
-	private dataAdapter: any = new jqx.dataAdapter(this.source);
 
-	private experimentsSubscription: Subscription;
-	private statusChangeSubscription: Subscription;
-
-	private radioString_workflowState: String = 'submitted';
-	private redosEnabled: boolean = false;
-
-	private numberSelected: number = 0;
-
-	@ViewChild(BrowseFilterComponent)
-	private _browseFilterComponent: BrowseFilterComponent;
-
-	private selectedRequestNumbers: string[];
-	private changeStatusResponsesRecieved: number;
-
-	constructor(private experimentsService: ExperimentsService) {
-	}
-
-	goButtonClicked(): void {
-
-		if (this.statusCombobox.getSelectedItem().value === "") {
-			return;
-		}
-
-		// console.log("You clicked \"Go\"!");
-		let gridSelectedIndexes: Array<Number> = this.myGrid.getselectedrowindexes();
-		let statusSelectedIndex: number = this.statusCombobox.getSelectedIndex();
-
-		this.selectedRequestNumbers = [];
-		this.changeStatusResponsesRecieved = 0;
-
-		for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
-			//	console.log("Changing Experiment numbers: " + this.myGrid.getcell(gridSelectedIndexes[i].valueOf(), "requestNumber").value + " status to " + this.statusCombobox.getSelectedItem().value);
-			let idRequest: string = "" + this.myGrid.getcell(gridSelectedIndexes[i].valueOf(), "requestNumber").value;
-			let cleanedIdRequest: string = idRequest.slice(0, idRequest.indexOf("R") >= 0 ? idRequest.indexOf("R") : idRequest.length);
-			this.selectedRequestNumbers.push(cleanedIdRequest);
-
-			this.experimentsService.changeExperimentStatus(cleanedIdRequest, this.statusCombobox.getSelectedItem().value)
-		}
-	}
-
-	deleteButtonClicked(): void {
-		console.log("You clicked \"Delete\"!");
-	}
-
-	emailButtonClicked(): void {
-		console.log("You clicked \"Email\"!");
-	}
-
-	updateGridData(data: Array<any>) {
-		this.source.localdata = Array.isArray(data) ? data : [data];
-		this.dataAdapter = new jqx.dataAdapter(this.source);
-		this.myGrid.selectedrowindexes([]);
+	constructor(private experimentsService: ExperimentsService, private dictionaryService: DictionaryService) {
 	}
 
 	ngOnInit(): void {
-		this.experimentsSubscription = this.experimentsService.getExperimentsObservable()
-				.subscribe((response) => {
-					this.orders = response;
-					this.updateGridData(response);
-				});
+		this.myGrid.setColumns(this.columns);
+		this.myGrid.setDataAdapterSource(this.source);
 
+		this.experimentsSubscription = this.experimentsService.getExperimentsObservable().subscribe((response) => {
+			this.updateGridData(response);
+		});
+
+		this.dictionaryService.getDictionary('hci.gnomex.model.RequestCategory').subscribe((dictionary: any) => {
+			this.dictionary = dictionary;
+		});
+
+		// When we get a response from the backend that the status of an experiment has changed
 		this.statusChangeSubscription = this.experimentsService.getChangeExperimentStatusObservable().subscribe((response) => {
 			for (let i: number = 0; i < this.selectedRequestNumbers.length; i++) {
-				// console.log("SelectedGridValues: " + this.selectedRequestNumbers[i] + "    idRequest: " + response.idRequest);
-
 				if (this.selectedRequestNumbers[i] === response.idRequest) {
+					// count the changes made
 					this.changeStatusResponsesRecieved++;
 
+					// when the changes are all made, reload the grid data
 					if (this.changeStatusResponsesRecieved === this.selectedRequestNumbers.length) {
 						this.experimentsService.repeatGetExperiments_fromBackend();
 					}
@@ -323,7 +254,68 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy(): void {
+		// When the component dies, avoid memory leaks and stop listening to the service
+
 		this.experimentsSubscription.unsubscribe();
 		this.statusChangeSubscription.unsubscribe();
+	}
+
+	goButtonClicked(): void {
+		// The "go" button should be disabled in this case, but if we get a click without a valid status,
+		// stop.
+		if (this.statusCombobox.getSelectedItem().value === "") {
+			return;
+		}
+
+		// grab all the selected rows, and the new status
+		let gridSelectedIndexes: Array<Number> = this.myGrid.getselectedrowindexes();
+		let statusSelectedIndex: number = this.statusCombobox.getSelectedIndex();
+
+		// note that we have no responses from the backend yet
+		this.changeStatusResponsesRecieved = 0;
+
+		// get the actual experiment identifiers from the grid
+		this.selectedRequestNumbers = [];
+
+		for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
+			let idRequest: string = "" + this.myGrid.getcell(gridSelectedIndexes[i].valueOf(), "requestNumber").value;
+			let cleanedIdRequest: string = idRequest.slice(0, idRequest.indexOf("R") >= 0 ? idRequest.indexOf("R") : idRequest.length);
+			this.selectedRequestNumbers.push(cleanedIdRequest);
+
+			// send a change experiment status request to the backend for each of the selected experiments
+			// Note : See "statusChangeSubscription" in ngOnInit for processing these requests.
+			this.experimentsService.changeExperimentStatus(cleanedIdRequest, this.statusCombobox.getSelectedItem().value)
+		}
+	}
+
+	deleteButtonClicked(): void {
+		console.log("You clicked \"Delete\"!");
+	}
+
+	emailButtonClicked(): void {
+		console.log("You clicked \"Email\"!");
+		let selectedIndices: Number[] = this.myGrid.getselectedrowindexes();
+		let idRequests: number[] = [];
+
+		if(selectedIndices.length > 0 && selectedIndices[0] != null) {
+
+			for(let selectedIndex in selectedIndices) {
+				let requestNumber = this.source.localdata[selectedIndex].requestNumber;
+				idRequests.push(Number.parseInt(requestNumber.slice(0, requestNumber.length - 1)));
+			}
+
+			this.window.setIdRequests(idRequests);
+			// this.window.open();
+			this.window.window.open();
+		}
+	}
+
+	updateGridData(data: Array<any>) {
+		// rebuild the grid's data
+		this.source.localdata = Array.isArray(data) ? data : [data];
+		// send the grid data to the grid to trigger screen refresh
+		this.myGrid.setDataAdapterSource(this.source);
+		// clear all selected items.
+		this.myGrid.selectedrowindexes([]);
 	}
 }

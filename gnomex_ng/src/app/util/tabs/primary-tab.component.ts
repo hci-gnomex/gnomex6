@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core'
-import { FormGroup, FormBuilder, FormArray, Validators, AbstractControl } from '@angular/forms'
+import {FormGroup, FormBuilder, FormArray, Validators, AbstractControl, FormControl, Form} from '@angular/forms'
 import {ComponentCommunicatorEvent} from './component-status-event'
 import {TabContainer} from "./tab-container.component";
-
+import {ExperimentViewService} from '../../services/experiment-view.service'
 import 'rxjs/add/operator/debounceTime'
+import 'rxjs/add/operator/distinctUntilChanged'
+import {dependentControl} from "../validators/dependent-control.validator";
 
 @Component({
 
@@ -13,15 +15,20 @@ import 'rxjs/add/operator/debounceTime'
     `
 })
 export class PrimaryTab {
-    name: string
+    name: string;
     @Output() changeStatus = new EventEmitter<ComponentCommunicatorEvent>();
     private _theForm: FormGroup;
+    private _formRules: any;
     protected _state:string;
     protected edit:boolean;
     protected _tabVisible:boolean ;
 
-    constructor(protected fb: FormBuilder) {
+    constructor(protected fb: FormBuilder, protected rules?: ExperimentViewService) {
         this.name = "A Nameless Tab";
+    }
+
+    //abstract needs to be overidden
+    public compInit():void{
     }
 
     public set tabIsActive(visible:boolean){
@@ -52,29 +59,126 @@ export class PrimaryTab {
         return this._state;
     }
 
-    protected addChildToForm(childForm:FormGroup):void{
-        const childForms = (<FormArray>this.theForm.root).controls["childForms"];
-        childForms.push(childForm);
+    sendEventWhenFormChanges(status:string,form:FormGroup,index:number):void{
+        this.changeStatus.emit({status:status,form:form,index:index})
     }
 
-    protected validateControl(value:any,address:string){
+    public addChildToForm(childForm: FormGroup): void {
+
+        setTimeout(() => {
+            let childForms:FormArray= (<FormArray>this.theForm.controls["childForms"]);
+            childForms.push(childForm);
+            let index = childForms.length - 1;
+            childForm.statusChanges.distinctUntilChanged()
+                .debounceTime(100).subscribe(status => this.sendEventWhenFormChanges(status,childForm,index));
+        });
+    }
+
+    protected validateControl(value:any,address:string,linkerControlName:string){
+
         const childForms = (<FormArray>this.theForm.root).controls["childForms"];
-        let control: AbstractControl
+        let control: AbstractControl;
+
         for(let i = 0; i < childForms.length; i++){
+
             control= childForms.at(i).get(address);
-            if(control && !!control.validator){
-                let message:string = "loook here chippy";
-                console.log(control.errors);
-                control.setErrors({'required': true})
-                //control.setValue("<div>${message}</div>");
+
+            if(control && (control.touched || control.dirty)){
+                control.clearValidators();
+                control.setValidators(dependentControl(linkerControlName,this.rules));
+                control.setErrors({'dependentControl':null});
+                control.updateValueAndValidity();
                 break;
             }
         }
-        console.log(control)
 
     }
     protected controlsToLink(address:string, control: AbstractControl):void{
-        control.valueChanges.debounceTime(2000).subscribe(value => this.validateControl(value,address))
+        let controlName = null;
+        let parent = control.parent;
+        Object.keys(parent.controls).forEach((name) =>{
+            if(control === parent.controls[name]){
+                controlName = name;
+    }
+        });
+        control.valueChanges.debounceTime(2000).subscribe(value => this.validateControl(value,address,controlName))
+    }
+    protected setformRules(formName: string, categoryName: string) {
+        this._formRules = this.rules.experimentViewRules[formName][categoryName];
+
+    }
+    protected getformRules() {
+        return this._formRules;
+    }
+
+    private removedAllChildren(form:AbstractControl):boolean{
+
+         if(form instanceof FormGroup){
+             return Object.keys((<FormGroup>form)).length === 0;
+         }
+         else{
+             return (<FormArray>form).length === 0;
+         }
+    }
+    private recurseRemoveControls(form: AbstractControl, formRules: any) {
+        Object.keys(formRules).forEach((key: string) => {
+            if (Object.keys(formRules[key]).length > 0) {
+                let subFormGroup: AbstractControl = form.get(key);
+                this.recurseRemoveControls(subFormGroup, formRules[key]);
+               /* if(this.removedAllChildren(form.get(key))){
+                    if(form instanceof FormGroup){
+                        form.removeControl(key);
+                    }
+                    else{
+                       let fa = (<FormArray>form); // parent is fa need to remove its empty
+                    }
+                }*/
+            }
+            else if (!formRules[key]) {
+                if (form instanceof FormGroup) {
+                    form.clearValidators();
+                    form.removeControl(key);
+
+                }
+                else {
+                    let formArray = (<FormArray>form);
+                    formArray.removeAt(+key);
+                }
+
+            }
+        });
+
+    }
+    protected removeControls(rootForm: FormGroup, rootFormRules: any) {
+
+        this.recurseRemoveControls(rootForm, rootFormRules);
+    }
+
+    private recurseInitFormRules(fr: any): void {
+        Object.keys(fr).forEach((key: string) => {
+            if (Object.keys(fr[key]).length > 0) {
+                this.recurseInitFormRules(fr[key]);
+            }
+            else if (this.rules[key] !== undefined) {
+                this.rules[key] = fr[key];
+            }
+        });
+    }
+
+    initFormRules() {
+        this.recurseInitFormRules(this._formRules);
+    }
+
+
+    protected showControl(path: Array<string>): boolean {
+        let showControl: any = null;
+        showControl = Object.assign({}, showControl, this._formRules);
+        for (let i = 0; i < path.length; i++) {
+            let newPath = path[i];
+            showControl = showControl[newPath];
+        }
+        return <boolean>showControl;
     }
 
 }
+

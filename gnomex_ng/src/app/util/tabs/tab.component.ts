@@ -16,8 +16,9 @@ import {PrimaryTab} from './primary-tab.component'
 })
 export class Tab {
     @Input('tabTitle') title: string;
-    @Input() active:boolean = false;
-    @Input() enable:boolean = true;
+    @Input() active:boolean = false;// the current tab all else are hidden
+    @Input() enable:boolean = true; // allowed tab to navigate to.
+    @Input() valid:boolean = true; // form isn't valid  on tab
     private theComponent:ComponentRef<PrimaryTab>;
 
     initComp(compRef:ComponentRef<PrimaryTab>):void{

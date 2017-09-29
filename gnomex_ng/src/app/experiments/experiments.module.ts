@@ -3,8 +3,7 @@
  */
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {TestComponent, DescriptionTab, PrepTab, ExperimentDetail} from "./experiment-detail/index";
+import {FormsModule,ReactiveFormsModule} from "@angular/forms";
 
 import { EXPERIMENTS_ROUTING } from "./experiments.routes";
 
@@ -13,10 +12,12 @@ import { TreeModule } from "angular-tree-component";
 import { ButtonModule } from "../../modules/button.module";
 import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
+import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import { ExpanderModule }     from "../../modules/expander.module";
+import { GnomexStyledGridModule } from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import { InputModule } from "../../modules/input.module";
-import { JqxGridModule }      from "../../modules/jqxgrid.module";
 import { LoaderModule }       from "../../modules/loader.module";
+import { PanelModule }        from "../../modules/panel.module";
 import { NotificationModule } from "../../modules/notification.module";
 import { TextAreaModule }     from "../../modules/textarea.module";
 import { ToggleButtonModule } from "../../modules/togglebutton.module";
@@ -27,16 +28,21 @@ import { ServicesModule } from "../services/services.module";
 import { BrowseExperimentsComponent } from "./browse-experiments.component";
 import { ExperimentOrdersComponent }  from "./orders/experiment-orders.component";
 import { ViewExperimentComponent }    from "./view-experiment.component";
-import {RichEditorModule} from "../../modules/rich-editor.module";
-import {GridModule} from "hci-ng-grid";
-import {DropDownModule} from "../../modules/dropdown.module";
+
+import {TestComponent,DescriptionTab,PrepTab,ExperimentDetail,NewExperimentComponent} from './experiment-detail/index'
+import {
+    RichEditorModule,
+    DropDownModule
+} from '../../modules/index';
+
+
 /**
  * @author mbyrne
  * @since 12/19/16
  */
 
 
-export const componentFactories = [TestComponent, DescriptionTab, PrepTab]; // need add components that will be tabs here
+export const componentFactories = [TestComponent,DescriptionTab,PrepTab]; // need add components that will be tabs here
                                                                           // could be put in gnomexFlex as w
 @NgModule({
     imports: [
@@ -45,34 +51,34 @@ export const componentFactories = [TestComponent, DescriptionTab, PrepTab]; // n
       CheckBoxModule,
       ComboBoxModule,
       CommonModule,
+      EmailRelatedUsersPopupModule,
       ExpanderModule,
-      ReactiveFormsModule,
       FormsModule,
-      GridModule,
+      GnomexStyledGridModule,
       InputModule,
-      JqxGridModule,
       LoaderModule,
       NotificationModule,
-      RichEditorModule,
+      PanelModule,
       ServicesModule,
       TextAreaModule,
       ToggleButtonModule,
       TreeModule,
       UtilModule,
-      WindowModule,
-      DropDownModule
+        WindowModule,
+        ReactiveFormsModule,
+        RichEditorModule,
+        DropDownModule
     ],
-
     declarations: [
       BrowseExperimentsComponent,
       ExperimentOrdersComponent,
-      ViewExperimentComponent,
-      TestComponent,
-      DescriptionTab,
-      ExperimentDetail,
-      PrepTab ],
-    entryComponents: [...componentFactories]
-
-})
+                    ViewExperimentComponent,
+                    TestComponent,
+                    DescriptionTab,
+                    ExperimentDetail,
+                    PrepTab,
+                    NewExperimentComponent ],
+    entryComponents:[...componentFactories]
+})})
 export class ExperimentsModule {
 }

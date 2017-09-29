@@ -65,6 +65,7 @@ dependencies {
     compile fileTree(dir: 'libEnv', include: 'hci_framework.jar')
     compile fileTree(dir: 'libEnv', include: 'hci_utils.jar')
     compile fileTree(dir: 'libEnv', include: 'HCIReport.jar')
+    compile fileTree(dir: 'libEnv', include: 'jdom-2.0.6.jar')
 
     //Realm stuff
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'

@@ -12,6 +12,15 @@ import {TabsStatusEvent,TabContainer} from "../../util/tabs/"
     selector: "experiment-detail",
     template: `
 <div>
+    <button type="button" (click)="setSize()" >get Size</button>
+    <span *ngIf="viewSize > -1" > {{viewSize}}</span> 
+    
+    <div >
+        <button class="btn btn-danger" type="button" (click)="removeTab()" >Remove Tab</button>
+        <button class="btn btn-danger" type="button" (click)="addTab()" >Add Tab</button> -->
+        <!--<button class="btn btn-danger" type="button" (click)="tabKiller1()" >destroy tab 1 View</button> -->
+    </div> 
+
 
    <a *ngIf="visStr"(click)="changeState()">
      {{visStr}}
@@ -52,11 +61,12 @@ export class ExperimentDetail implements OnInit {
     buttonDisabled: boolean = true;
     @ViewChild(TabContainer) theTabs: TabContainer
     private visStr:string = "Edit";
+    viewSize:number = -1;
 
 
 
     constructor(private experimentsService: ExperimentsService) {
-        this.cNames = ["PrepTab","TestComponent", "DescriptionTab"]
+        this.cNames = ["PrepTab","TestComponent","DescriptionTab"]
     }
 
     changeStatus($event:TabsStatusEvent){
@@ -66,11 +76,11 @@ export class ExperimentDetail implements OnInit {
     changeState(){
         if(this.state === TabContainer.VIEW )
         {
-            this.visStr= "View"
+            this.visStr= "View";
             this.state = TabContainer.EDIT;
         }
         else{
-            this.visStr = "Edit"
+            this.visStr = "Edit";
             this.state = TabContainer.VIEW;
         }
     }
@@ -88,5 +98,12 @@ export class ExperimentDetail implements OnInit {
     checkIfNewState():boolean{
         return (TabContainer.NEW === this.state)
     }
+    removeTab(){
+        this.theTabs.removeLastTab()
+    }
+    addTab(){
+        this.theTabs.addTab();
+    }
+
 
 }

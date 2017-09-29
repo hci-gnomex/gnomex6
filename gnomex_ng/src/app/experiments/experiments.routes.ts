@@ -4,7 +4,7 @@
 import { Routes, RouterModule } from "@angular/router";
 import { BrowseExperimentsComponent } from "./browse-experiments.component";
 import { ViewExperimentComponent } from "./view-experiment.component";
-import { ExperimentOrdersComponent } from "./orders/experiment-orders.component";
+import {NewExperimentComponent} from "./experiment-detail/new-experiment.component";
 
 /**
  * A file defining and exporting the router configuration for the experiments module.
@@ -14,8 +14,9 @@ import { ExperimentOrdersComponent } from "./orders/experiment-orders.component"
  */
 const ROUTES: Routes = [
     { path: "experiments", component: BrowseExperimentsComponent },
-    { path: "experiments/:id", component:ViewExperimentComponent},
-    { path: "experiments-orders", component:ExperimentOrdersComponent}
+    { path: "experiments/new", component:NewExperimentComponent},
+    { path: "experiments/:id", component:ViewExperimentComponent}
+
 ];
 
 export const EXPERIMENTS_ROUTING = RouterModule.forChild(ROUTES);

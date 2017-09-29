@@ -31,7 +31,7 @@
         <div class="item four">
             <div class="flex-row-container">
                 <div class="item-row item-row-one">
-                    <jqxButton #newProject [template]="'link'" [disabled]="true" (onClick)="newProjectClicked()" [imgSrc]="'assets/folder_add.png'" [imgPosition]="'center'" [textImageRelation]="'imageBeforeText'">New Project
+                    <jqxButton class="newProjectButton" #newProject [template]="'link'" [disabled]="true" (onClick)="newProjectClicked()" [imgSrc]="'assets/folder_add.png'" [imgPosition]="'center'" [textImageRelation]="'imageBeforeText'">New Project
                     </jqxButton>
                 </div>
                 <div class="item-row item-row-two">
@@ -48,7 +48,7 @@
     </div>
 </div>
 
-<div>
+<div class="reassign">
     <jqxWindow #reassignWindow
                [width]="600"
                [height]="220"
@@ -269,7 +269,7 @@
     </jqxWindow>
 </div>
 
-<div>
+<div class="deleteProject">
     <jqxWindow #deleteProjectWindow
                [width]="250"
                [height]="100"
@@ -441,7 +441,6 @@
         Drag-and-drop experiment to move to another project.
     </div>
 </jqxNotification>
-
 <jqxNotification #msgNoAuthUsersForLab
                  [width]="'80%'" [height]="50" [position]="'top-left'" [opacity]="0.9" [autoOpen]="false" [template]="'warning'" [autoClose]="false" [closeOnClick]="true" (onClick)="clickNoOwners($event)"
 >

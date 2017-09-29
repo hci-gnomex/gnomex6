@@ -20,14 +20,6 @@ export const ROUTES: Routes = [
         resolve(require("./about/about.module").AboutModule);
       });
     })
-  },
-  {
-    path: "sidebar",
-    loadChildren: () => new Promise(resolve => {
-      (require as any).ensure([], (require: any) => {
-        resolve(require("./sidebar/sidebar.module").SidebarModule);
-      });
-    })
   }
 ];
 
