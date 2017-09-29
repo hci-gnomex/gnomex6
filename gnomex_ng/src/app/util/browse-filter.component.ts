@@ -3,14 +3,15 @@ import {URLSearchParams} from "@angular/http";
 
 import {LabListService} from "../services/lab-list.service";
 import {GetLabService} from "../services/get-lab.service";
-//import {jqxComboBox} from "jqwidgets-framework";
-//import {jqxCalendar} from "jqwidgets-framework";
+import {jqxComboBox} from "jqwidgets-framework";
+import {jqxCalendar} from "jqwidgets-framework";
 import {AppUserListService} from "../services/app-user-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ExperimentsService} from "../experiments/experiments.service";
 import {AnalysisService} from "../services/analysis.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {DataTrackService} from "../services/data-track.service";
+import {BillingService} from "../services/billing.service";
 
 @Component({
     selector: 'browse-filter',
@@ -19,6 +20,14 @@ import {DataTrackService} from "../services/data-track.service";
 })
 
 export class BrowseFilterComponent implements OnInit {
+    readonly SHOW_EMPTY_FOLDERS: string = "Show Empty Folders";
+    readonly HIDE_REQUESTS_WITH_NO_BILLING_ITEMS: string = "Hide requests with no billing items?";
+    readonly DATA_TRACK_BROWSE: string = "dataTrackBrowse";
+    readonly ANALYSIS_BROWSE: string = "analysisBrowse";
+    readonly ORDER_BROWSE: string = "orderBrowse";
+    readonly EXPERIMENT_BROWSE: string = "experimentBrowse";
+    readonly BILLING_BROWSE: string = "billingBrowse";
+
     @Input() private mode: string = "";
 
     private showLabelAndIcon: boolean = true;
@@ -32,6 +41,9 @@ export class BrowseFilterComponent implements OnInit {
     private showDateRangePicker: boolean = false;
     private dateFromString: string;
     private dateToString: string;
+
+    private showBillingPeriodPicker: boolean = false;
+    private idBillingPeriodString: string;
 
     private showSearchTextInput: boolean = false;
     private searchText: string;
@@ -79,6 +91,12 @@ export class BrowseFilterComponent implements OnInit {
     private showOrderNumberInput: boolean = false;
     private orderNumberString: string;
 
+    private showExperimentNumberInput: boolean = false;
+    private experimentNumberString: string;
+
+    private showInvoiceNumberInput: boolean = false;
+    private invoiceNumberString: string;
+
     private showVisibilityCheckboxes: boolean = false;
     private visibilityOwnerFlag: boolean;
     private visibilityInstitutionFlag: boolean;
@@ -96,21 +114,27 @@ export class BrowseFilterComponent implements OnInit {
     private labMembersList: any[] = [];
     private idAppUserString: string;
 
+    private showBillingAccountComboBox: boolean = false;
+    private idBillingAccountString: string;
+    private billingAccountList: any[] = [];
+
     private showEmptyFoldersCheckbox: boolean = false;
+    private showEmptyFoldersCheckboxLabel: string = this.SHOW_EMPTY_FOLDERS;
     private showEmptyFoldersFlag: boolean;
 
     constructor(private labListService: LabListService, private getLabService: GetLabService,
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
-                private dictionaryService: DictionaryService) {
+                private dictionaryService: DictionaryService, private billingService: BillingService) {
         this.showMore = false;
         this.resetFields();
     }
 
     ngOnInit() {
         let isAdminState: boolean = this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin;
+        let isBillingAdminState: boolean = this.createSecurityAdvisorService.isBillingAdmin;
         let isGuestState: boolean = this.createSecurityAdvisorService.isGuest;
-        if (this.mode === "experimentBrowse") {
+        if (this.mode === this.EXPERIMENT_BROWSE) {
             if (isAdminState) {
                 this.showAllCheckbox = true;
                 this.showLabComboBox = true;
@@ -127,6 +151,8 @@ export class BrowseFilterComponent implements OnInit {
                     this.labList = response;
                 });
             } else if (isGuestState) {
+                this.showMoreSwitch = true;
+                this.showMore = true;
                 this.showEmptyFoldersCheckbox = true;
             } else {
                 this.showExperimentsRadioGroup = true;
@@ -144,7 +170,7 @@ export class BrowseFilterComponent implements OnInit {
                 });
             }
             this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
-        } else if (this.mode === "orderBrowse") {
+        } else if (this.mode === this.ORDER_BROWSE) {
             if (isAdminState) {
                 this.showWorkflowStateRadioGroup = true;
                 this.showRedosCheckbox = true;
@@ -158,7 +184,7 @@ export class BrowseFilterComponent implements OnInit {
 
                 this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
             }
-        } else if (this.mode === "analysisBrowse") {
+        } else if (this.mode === this.ANALYSIS_BROWSE) {
             if (isAdminState) {
                 this.showMoreSwitch = true;
                 this.showAllCheckbox = true;
@@ -193,7 +219,7 @@ export class BrowseFilterComponent implements OnInit {
             this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OrganismLite").subscribe((response) => {
                 this.organismList = response;
             });
-        } else if (this.mode === "dataTrackBrowse") {
+        } else if (this.mode === this.DATA_TRACK_BROWSE) {
             if (isAdminState) {
                 this.showOrganismComboBox = true;
                 this.showGenomeBuildComboBox = true;
@@ -215,6 +241,27 @@ export class BrowseFilterComponent implements OnInit {
             this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OrganismLite").subscribe((response) => {
                 this.organismList = response;
             });
+        } else if (this.mode === this.BILLING_BROWSE) {
+            if (isAdminState || isBillingAdminState) {
+                this.showMoreSwitch = true;
+                this.showMore = true;
+
+                this.showLabComboBox = true;
+                this.showExperimentNumberInput = true;
+                this.showInvoiceNumberInput = true;
+                this.showBillingAccountComboBox = true;
+                this.showBillingPeriodPicker = true;
+                this.showEmptyFoldersCheckbox = true;
+                this.showEmptyFoldersCheckboxLabel = this.HIDE_REQUESTS_WITH_NO_BILLING_ITEMS;
+
+                this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
+                if (this.coreFacilityList.length === 1) {
+                    let event: any = {args: {item: {value: this.coreFacilityList[0].idCoreFacility}}};
+                    this.onCoreFacilitySelect(event);
+                } else {
+                    this.showCoreFacilityComboBox = true;
+                }
+            }
         }
     }
 
@@ -226,6 +273,7 @@ export class BrowseFilterComponent implements OnInit {
         this.redosFlag = false;
         this.orderNumberString = "";
         this.idLabString = "";
+        this.idBillingAccountString = "";
         this.multiSelectIdLabs.clear();
         this.ownerList = [];
         this.idAppUserString = "";
@@ -245,6 +293,9 @@ export class BrowseFilterComponent implements OnInit {
         this.visibilityInstitutionFlag = true;
         this.visibilityAllLabMembersFlag = true;
         this.visibilityPublicFlag = true;
+        this.experimentNumberString = "";
+        this.invoiceNumberString = "";
+        this.idBillingPeriodString = "";
     }
 
     toggleShowMore(): void {
@@ -261,15 +312,25 @@ export class BrowseFilterComponent implements OnInit {
     resetLabSelection(): void {
         this.idLabString = "";
         this.idAppUserString = "";
+        this.idBillingAccountString = "";
         this.ownerList = [];
+        this.billingAccountList = [];
     }
 
     onLabSelect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idLabString = event.args.item.value;
             if (this.showOwnerComboBox) {
                 this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
                     this.ownerList = response.Lab.historicalOwnersAndSubmitters;
+                });
+            }
+            if (this.showBillingAccountComboBox && this.mode === this.BILLING_BROWSE) {
+                this.getLabService.getLabBillingAccounts(this.idLabString).subscribe((response: any) => {
+                    let allBillingAccounts: any[] = response.Lab.billingAccounts;
+                    this.billingAccountList = allBillingAccounts.filter(account => {
+                        return account.idCoreFacility === this.idCoreFacilityString;
+                    });
                 });
             }
         } else {
@@ -282,19 +343,19 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onMultiLabSelect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.multiSelectIdLabs.add(event.args.item.value);
         }
     }
 
     onMultiLabUnselect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.multiSelectIdLabs.delete(event.args.item.value);
         }
     }
 
     onAppUserSelect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idAppUserString = event.args.item.value;
         } else {
             this.idAppUserString = "";
@@ -305,14 +366,43 @@ export class BrowseFilterComponent implements OnInit {
         this.idAppUserString = "";
     }
 
+    onBillingAccountSelect(event: any): void {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+            this.idBillingAccountString = event.args.item.value;
+        } else {
+            this.idBillingAccountString = "";
+        }
+    }
+
+    onBillingAccountUnselect(): void {
+        this.idBillingAccountString = "";
+    }
+
     onCoreFacilitySelect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idCoreFacilityString = event.args.item.value;
             if (this.showRequestCategoryComboBox) {
                 this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory").subscribe((response) => {
                     this.requestCategoryList = response.filter(cat => {
                         if (cat.isActive === "Y" && !(cat.value === "") && cat.isInternal === "Y") {
                             return cat.idCoreFacility === this.idCoreFacilityString;
+                        }
+                        return false;
+                    });
+                });
+            }
+            if (this.mode === this.BILLING_BROWSE) {
+                this.labListService.getLabList().subscribe((response: any[]) => {
+                    this.labList = response.filter(lab => {
+                        if (lab.coreFacilities.length === undefined && !(lab.coreFacilities.CoreFacility === undefined)) {
+                            return lab.coreFacilities.CoreFacility.idCoreFacility === this.idCoreFacilityString;
+                        } else if (!(lab.coreFacilities.length === undefined)) {
+                            let index: number;
+                            for (index = 0; index < lab.coreFacilities.length; index++) {
+                                if (lab.coreFacilities[index].idCoreFacility === this.idCoreFacilityString) {
+                                    return true;
+                                }
+                            }
                         }
                         return false;
                     });
@@ -328,13 +418,18 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     resetCoreFacilitySelection(): void {
-        this.idCoreFacilityString = "";
-        this.codeRequestCategoryString = "";
-        this.requestCategoryList = [];
+        if (!(this.mode === this.BILLING_BROWSE && !this.showCoreFacilityComboBox)) {
+            this.idCoreFacilityString = "";
+            this.codeRequestCategoryString = "";
+            this.requestCategoryList = [];
+            if (this.mode === this.BILLING_BROWSE) {
+                this.resetLabSelection();
+            }
+        }
     }
 
     onOrganismSelect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idOrganismString = event.args.item.value;
             if (this.showGenomeBuildComboBox) {
                 this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.GenomeBuildLite").subscribe((response) => {
@@ -362,7 +457,7 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onGenomeBuildSelect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idGenomeBuildString = event.args.item.value;
         } else {
             this.idGenomeBuildString = "";
@@ -374,7 +469,7 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onRequestCategorySelect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.codeRequestCategoryString = event.args.item.value;
         } else {
             this.codeRequestCategoryString = "";
@@ -563,22 +658,123 @@ export class BrowseFilterComponent implements OnInit {
         return params;
     }
 
+    getBillingRequestListParameters(): URLSearchParams {
+        // TODO Need to look up property for excludeNewRequest parameter
+        //<excludeNewRequests>{coreFacilityCombo.selectedItem != null &amp;&amp;parentApplication.getCoreFacilityProperty(coreFacilityCombo.selectedItem.@value, parentApplication.PROPERTY_EXCLUDE_NEW_REQUESTS) == "Y" ? 'Y' : 'N'}</excludeNewRequests>
+
+        let params: URLSearchParams = new URLSearchParams();
+
+        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
+            params.set("idBillingPeriod", this.idBillingPeriodString);
+        }
+        if (this.showLabComboBox && !(this.idLabString === "")) {
+            params.set("idLab", this.idLabString);
+        }
+        if (this.showBillingAccountComboBox && !(this.idBillingAccountString === "")) {
+            params.set("idBillingAccount", this.idBillingAccountString);
+        }
+        if ((this.showCoreFacilityComboBox && !(this.idCoreFacilityString === "")) || this.coreFacilityList.length === 1) {
+            params.set("idCoreFacility", this.idCoreFacilityString);
+        }
+        params.set("excludeInactiveBillingTemplates", "Y");
+        params.set("deepSortResults", "Y");
+        params.set("excludeNewRequests", "N");
+
+        return params;
+    }
+
+    getBillingItemListParameters(): URLSearchParams {
+        // TODO Need to look up property for excludeNewRequest parameter
+        //<excludeNewRequests>{coreFacilityCombo.selectedItem != null &amp;&amp;parentApplication.getCoreFacilityProperty(coreFacilityCombo.selectedItem.@value, parentApplication.PROPERTY_EXCLUDE_NEW_REQUESTS) == "Y" ? 'Y' : 'N'}</excludeNewRequests>
+
+        let params: URLSearchParams = new URLSearchParams();
+
+        if (this.showExperimentNumberInput && !(this.experimentNumberString === "")) {
+            params.set("requestNumber", this.experimentNumberString);
+        }
+        if (this.showInvoiceNumberInput && !(this.invoiceNumberString === "")) {
+            params.set("invoiceNumber", this.invoiceNumberString);
+        }
+        if (this.showEmptyFoldersCheckbox) {
+            params.set("showOtherBillingItems", this.showEmptyFoldersFlag ? "Y" : "N");
+        }
+        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
+            params.set("idBillingPeriod", this.idBillingPeriodString);
+        }
+        if (this.showLabComboBox && !(this.idLabString === "") && (this.experimentNumberString === "" && this.invoiceNumberString === "")) {
+            params.set("idLab", this.idLabString);
+        }
+        if (this.showBillingAccountComboBox && !(this.idBillingAccountString === "")) {
+            params.set("idBillingAccount", this.idBillingAccountString);
+        }
+        if ((this.showCoreFacilityComboBox && !(this.idCoreFacilityString === "")) || this.coreFacilityList.length === 1) {
+            params.set("idCoreFacility", this.idCoreFacilityString);
+        }
+        params.set("excludeInactiveBillingTemplates", "Y");
+        params.set("sortResults", "N");
+        params.set("excludeNewRequests", "N");
+
+        return params;
+    }
+
+    getBillingInvoiceListParameters(): URLSearchParams {
+        // TODO Need to look up property for excludeNewRequest parameter
+        //<excludeNewRequests>{coreFacilityCombo.selectedItem != null &amp;&amp;parentApplication.getCoreFacilityProperty(coreFacilityCombo.selectedItem.@value, parentApplication.PROPERTY_EXCLUDE_NEW_REQUESTS) == "Y" ? 'Y' : 'N'}</excludeNewRequests>
+
+        let params: URLSearchParams = new URLSearchParams();
+        let noRequestOrInvoiceNumber: boolean = this.experimentNumberString === "" && this.invoiceNumberString === "";
+
+        if (this.showExperimentNumberInput && !(this.experimentNumberString === "")) {
+            params.set("requestNumber", this.experimentNumberString);
+        }
+        if (this.showInvoiceNumberInput && !(this.invoiceNumberString === "")) {
+            params.set("invoiceNumber", this.invoiceNumberString);
+        }
+        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
+            params.set("idBillingPeriod", this.idBillingPeriodString);
+        }
+        if (this.showLabComboBox && !(this.idLabString === "") && noRequestOrInvoiceNumber) {
+            params.set("idLab", this.idLabString);
+        }
+        if (((this.showCoreFacilityComboBox && !(this.idCoreFacilityString === "")) || this.coreFacilityList.length === 1) && noRequestOrInvoiceNumber) {
+            params.set("idCoreFacility", this.idCoreFacilityString);
+        }
+        params.set("excludeNewRequests", "N");
+
+        return params;
+    }
+
     search(): void {
-        if (this.mode === "experimentBrowse") {
+        if (this.mode === this.EXPERIMENT_BROWSE) {
             let params: URLSearchParams = this.getExperimentBrowseParameters();
             this.experimentsService.getProjectRequestList_fromBackend(params);
-        } else if (this.mode === "orderBrowse") {
+        } else if (this.mode === this.ORDER_BROWSE) {
             let params: URLSearchParams = this.getOrderBrowseParameters();
             this.experimentsService.getExperiments_fromBackend(params);
-        } else if (this.mode === "analysisBrowse") {
+        } else if (this.mode === this.ANALYSIS_BROWSE) {
             let params: URLSearchParams = this.getAnalysisBrowseParameters();
             this.analysisService.getAnalysisGroupList(params).subscribe((response: any) => {
                 console.log("GetAnalysisGroupList called");
             });
-        } else if (this.mode === "dataTrackBrowse") {
+        } else if (this.mode === this.DATA_TRACK_BROWSE) {
             let params: URLSearchParams = this.getDataTrackBrowseParameters();
             this.dataTrackService.getDataTrackList(params).subscribe((response: any) => {
                 console.log("GetDataTrackList called");
+            });
+        } else if (this.mode === this.BILLING_BROWSE) {
+            let billingRequestListParams: URLSearchParams = this.getBillingRequestListParameters();
+            this.billingService.getBillingRequestList(billingRequestListParams).subscribe((response: any) => {
+                console.log("GetBillingRequestList called");
+            });
+
+            let billingItemListParams: URLSearchParams = this.getBillingItemListParameters();
+            this.billingService.getBillingItemList(billingItemListParams).subscribe((response: any) => {
+                console.log("GetBillingItemList called");
+            });
+
+            let billingInvoiceListParams: URLSearchParams = this.getBillingInvoiceListParameters();
+            this.billingService.getBillingInvoiceList(billingInvoiceListParams).subscribe((response: any) => {
+                console.log("GetBillingInvoiceList called");
             });
         }
     }
