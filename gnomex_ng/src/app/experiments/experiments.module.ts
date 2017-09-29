@@ -79,6 +79,6 @@ export const componentFactories = [TestComponent,DescriptionTab,PrepTab]; // nee
                     PrepTab,
                     NewExperimentComponent ],
     entryComponents:[...componentFactories]
-})})
+})
 export class ExperimentsModule {
 }
