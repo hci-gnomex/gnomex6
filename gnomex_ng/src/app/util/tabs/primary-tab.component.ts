@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, Input } from '@angular/core'
+import {Component, EventEmitter, Output, Input, OnDestroy} from '@angular/core'
 import {FormGroup, FormBuilder, FormArray, Validators, AbstractControl, FormControl, Form} from '@angular/forms'
 import {ComponentCommunicatorEvent} from './component-status-event'
 import {TabContainer} from "./tab-container.component";
@@ -14,7 +14,7 @@ import {dependentControl} from "../validators/dependent-control.validator";
               <div> </div>
     `
 })
-export class PrimaryTab {
+export class PrimaryTab implements OnDestroy{
     name: string;
     @Output() changeStatus = new EventEmitter<ComponentCommunicatorEvent>();
     private _theForm: FormGroup;
@@ -178,6 +178,9 @@ export class PrimaryTab {
             showControl = showControl[newPath];
         }
         return <boolean>showControl;
+    }
+    ngOnDestroy(){
+        this.changeStatus.unsubscribe();
     }
 
 }

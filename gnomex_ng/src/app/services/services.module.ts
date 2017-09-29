@@ -8,6 +8,9 @@ import {AnalysisService} from "./analysis.service";
 import {DictionaryService} from "./dictionary.service";
 import {DataTrackService} from "./data-track.service";
 import {ExperimentViewService} from "./experiment-view.service";
+import {BillingService} from "./billing.service"
+import {ExperimentResolverService,ProjectResolverService} from "./resolvers/index"
+
 @NgModule({
     imports: [CommonModule],
     declarations: [],
@@ -20,7 +23,11 @@ import {ExperimentViewService} from "./experiment-view.service";
         AnalysisService,
         DictionaryService,
         DataTrackService,
-        ExperimentViewService    ]
+        ExperimentViewService,
+        BillingService,
+        ExperimentResolverService,
+        ProjectResolverService
+    ]
 })
 export class ServicesModule {
 }
