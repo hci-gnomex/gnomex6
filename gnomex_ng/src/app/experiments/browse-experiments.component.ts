@@ -17,6 +17,7 @@ import { BrowseFilterComponent } from "../util/browse-filter.component";
 import { transaction } from 'mobx';
 import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
+import {Router} from "@angular/router";
 
 @Component({
     selector: "experiments",
@@ -44,7 +45,7 @@ import {Subscription} from "rxjs/Subscription";
         }
 
         .flex-column-container {
-           display: flex;
+            display: flex;
             flex-direction: column;
             background-color: white;
             height: 100%;
@@ -76,27 +77,27 @@ import {Subscription} from "rxjs/Subscription";
             flex-grow: .25
         }
 
-        .two {
-            width: 20%;
+        .help-drag-drop {
+            width: 100%;
             flex-grow: .10;
         }
 
         .three {
-            width: 20%;
+            width: 100%;
             height: 6em;
             flex-grow: 8;
         }
 
         .four {
-            width: 20%;
+            width: 100%;
             flex-grow: .10;
         }
 
         .five {
-            width: 20%;
+            width: 100%;
             flex-grow: .10;
         }
-                
+
         .container {
             display: flex;
             min-height:100px;
@@ -135,6 +136,12 @@ import {Subscription} from "rxjs/Subscription";
             border: 1px solid darkgrey;
             display: block;
             flex-direction: column;
+        }
+        .experiment-detail-panel {
+            width:75%;
+            padding: 2em;
+            margin-left: 2em;
+            border: #C8C8C8 solid thin;
         }
     `]
 })
@@ -211,15 +218,16 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private projectRequestListSubscription: Subscription;
 
     ngOnInit() {
-        this.treeModel = this.treeComponent.treeModel
+        this.treeModel = this.treeComponent.treeModel;
+        this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
     }
 
-    ngAfterViewInit() {
+    ngAfterViewInit(){
         this.jqxLoader.close();
         this.jqxConstructorLoader.close();
     }
 
-    constructor(private experimentsService: ExperimentsService) {
+    constructor(private experimentsService: ExperimentsService,private router:Router) {
 
 
         this.experimentService = experimentsService;
@@ -733,12 +741,23 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         if (this.selectedItem.level === 1) {
             this.newProject.disabled(false);
             this.deleteProject.disabled(true);
+
+            this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
             //Project
         } else if (this.selectedItem.level === 2) {
             this.newProject.disabled(false);
             this.deleteProject.disabled(false);
+
+            let idLab = this.selectedItem.data.idLab;
+            let idProject = this.selectedItem.data.idProject;
+            this.router.navigate(['/experiments',
+                {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}]);
+
             //Experiment
         } else {
+
+            let id = this.selectedItem.data.idRequest;
+            this.router.navigate(['/experiments',{outlets:{'browsePanel':[id]}}]);
             this.newProject.disabled(true);
             this.deleteProject.disabled(true);
         }

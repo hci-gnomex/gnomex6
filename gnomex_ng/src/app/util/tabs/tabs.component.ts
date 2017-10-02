@@ -58,9 +58,14 @@ export class Tabs {
         }
 
     }
-    removeLastTab(){
-        this.tabsContainer.remove();
-        this.tabs.splice(this.tabs.length  - 1, 1);
+    removeTab(index?:number){
+        if(index){
+            this.tabsContainer.remove(index);
+            this.tabs.splice(index,1);
+        }else{
+            this.tabsContainer.remove();
+            this.tabs.splice(this.tabs.length  - 1, 1);
+        }
     }
 
     clearTabs(){
@@ -77,11 +82,11 @@ export class Tabs {
 
     }
 
-    externalInsertTab(component: Type<PrimaryTab>,parentForm:FormGroup ){
-        this.insertTab(component,parentForm,this.state)
+    externalInsertTab(component: Type<PrimaryTab>,parentForm:FormGroup,index?:number ){
+        this.insertTab(component,parentForm,this.state,index)
     }
 
-    insertTab(component: Type<PrimaryTab>,parentForm:FormGroup,state:string){
+    insertTab(component: Type<PrimaryTab>,parentForm:FormGroup,state:string,index:number = null){
 
         let compFactory =this.compFR.resolveComponentFactory(component);
         let compRef = this.vcRef.createComponent(compFactory);
@@ -90,11 +95,15 @@ export class Tabs {
 
         // creating the Tab with the component nested inside
         let tabFactory = this.compFR.resolveComponentFactory(Tab);
-        let tabRef = this.tabsContainer.createComponent(tabFactory,null,undefined,[[compRef.location.nativeElement]]);
+        let tabRef = this.tabsContainer.createComponent(tabFactory,index,undefined,[[compRef.location.nativeElement]]);
         tabRef.instance.title = compRef.instance.name;
         tabRef.instance.initComp(compRef);
+        if(index){
+            this.tabs.splice(index, 0, tabRef.instance);
+        }else{
+            this.tabs.push(tabRef.instance);
+        }
 
-        this.tabs.push(tabRef.instance);
         tabRef.changeDetectorRef.detectChanges();
     }
 

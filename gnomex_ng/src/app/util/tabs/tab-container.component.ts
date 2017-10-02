@@ -61,6 +61,10 @@ export class TabContainer implements OnInit, OnDestroy{
     }
     private _state:string;
 
+    isInitalize():boolean{
+        return this.intialized
+    }
+
 
 
     constructor(private cdr: ChangeDetectorRef,
@@ -235,15 +239,35 @@ export class TabContainer implements OnInit, OnDestroy{
     }
 
 
+
+
+    removeTab(index?:number){
+        this.tabsRef.instance.removeTab(index);
+    }
+    addTab(tabName:string,index?:number){
+        let factories = <Array<Function>>Array.from(this.compFR['_factories'].keys()); //Getting a factories made from EntryComponent
+        let compFactory: Type<PrimaryTab>= null;
+
+       compFactory= <Type<PrimaryTab>>factories.find((x: any) => x.name === tabName);
+       this.tabsRef.instance.externalInsertTab(compFactory,this.theForm,index);
+    }
+    /*If tab is found it will return its index, if not -1*/
+    containsTab(tabName:string):number{
+        let tabs:Array<Tab> =this.tabsRef.instance.tabs;
+        let pos = -1;
+        for(let i = 0; i < tabs.length; i++){
+            if(tabs[i].getComp().constructor.name === tabName){
+                pos = i;
+                break;
+            }
+        }
+        return pos;
+    }
     ngOnDestroy() {
         this.tabsRef.destroy();
-    }
-
-    removeLastTab(){
-        this.tabsRef.instance.removeLastTab();
-    }
-    addTab(){
-        this.tabsRef.instance.externalInsertTab(PrepTab,this.theForm);
+        this.tabsRef = null;
+        this.tabChanged.unsubscribe();
+        this.tabStatusChanged.unsubscribe();
     }
 
 
