@@ -8,7 +8,9 @@ import {AnalysisService} from "./analysis.service";
 import {DictionaryService} from "./dictionary.service";
 import {DataTrackService} from "./data-track.service";
 import {ExperimentViewService} from "./experiment-view.service";
-import {BillingService} from "./billing.service";import {ExperimentResolverService,ProjectResolverService} from "./resolvers/index"          @NgModule({
+import {BillingService} from "./billing.service";
+import {ExperimentResolverService,ProjectResolverService} from "./resolvers/index";
+@NgModule({
     imports: [CommonModule],
     declarations: [],
     exports: [],
