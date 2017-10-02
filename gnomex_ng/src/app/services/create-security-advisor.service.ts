@@ -67,7 +67,7 @@ export class CreateSecurityAdvisorService {
 
     private myCoreFacilitiesValue: string[];
     public get myCoreFacilities(): any[] {
-        if (this.myCoreFacilitiesValue === null) {
+        if (this.myCoreFacilitiesValue === undefined || this.myCoreFacilitiesValue === null) {
             return [];
         }
         let index: number;
