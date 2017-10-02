@@ -142,6 +142,7 @@ import {Router} from "@angular/router";
             padding: 2em;
             margin-left: 2em;
             border: #C8C8C8 solid thin;
+            overflow: auto;
         }
     `]
 })
