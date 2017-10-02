@@ -4,7 +4,7 @@
 import 'rxjs/add/operator/switchMap';
 import {Component, OnInit,ViewChild} from "@angular/core";
 import {ExperimentsService} from "../experiments.service";
-import {Request} from "@angular/http";
+import { ActivatedRoute} from '@angular/router'
 
 import {TabsStatusEvent,TabContainer} from "../../util/tabs/"
 
@@ -12,15 +12,6 @@ import {TabsStatusEvent,TabContainer} from "../../util/tabs/"
     selector: "experiment-detail",
     template: `
 <div>
-    <button type="button" (click)="setSize()" >get Size</button>
-    <span *ngIf="viewSize > -1" > {{viewSize}}</span> 
-    
-    <div >
-        <button class="btn btn-danger" type="button" (click)="removeTab()" >Remove Tab</button>
-        <button class="btn btn-danger" type="button" (click)="addTab()" >Add Tab</button> -->
-        <!--<button class="btn btn-danger" type="button" (click)="tabKiller1()" >destroy tab 1 View</button> -->
-    </div> 
-
 
    <a *ngIf="visStr"(click)="changeState()">
      {{visStr}}
@@ -65,7 +56,7 @@ export class ExperimentDetail implements OnInit {
 
 
 
-    constructor(private experimentsService: ExperimentsService) {
+    constructor(private experimentsService: ExperimentsService,private route:ActivatedRoute) {
         this.cNames = ["PrepTab","TestComponent","DescriptionTab"]
     }
 
@@ -85,7 +76,11 @@ export class ExperimentDetail implements OnInit {
         }
     }
     ngOnInit(): void {
-
+        this.route.data.forEach((data) =>{
+            this.experiment = data['experiment']; // this data is carried on route look at browse-experiments.component.ts
+                                                 // & experiment-resolver.service.ts
+            console.log(this.experiment);
+        });
     }
     next(){
         this.theTabs.select(this.theTabs.activeId + 1);
@@ -98,12 +93,7 @@ export class ExperimentDetail implements OnInit {
     checkIfNewState():boolean{
         return (TabContainer.NEW === this.state)
     }
-    removeTab(){
-        this.theTabs.removeLastTab()
-    }
-    addTab(){
-        this.theTabs.addTab();
-    }
+
 
 
 }
