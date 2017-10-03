@@ -49,6 +49,16 @@ export class GnomexAppComponent implements OnInit {
     this.setupHeaderComponent();
 //    this.setupFooterComponent();
 
+      this.userService.isAuthenticated().subscribe( response => {
+        if (response) {
+            this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
+                console.log("subscribe createSecurityAdvisor");
+                isDone = true;
+                console.log(response);
+            });
+        }
+      });
+
         this.userService.addLoginCallback({onLogin: () => {
             console.log("GnomexAppComponent onLogin");
             this._primaryNavEnabled = Observable.of(true);
@@ -65,7 +75,6 @@ export class GnomexAppComponent implements OnInit {
       this._primaryNavEnabled = Observable.of(false);
       this._appHdrCmpt.primaryNavigationEnabled = this._primaryNavEnabled;
     }});
-
 
   }
 
