@@ -1,0 +1,52 @@
+<h1>Dictionary Demo</h1>
+<div>
+    <button (click)="loadAllTypes();">Load All Types</button>
+    <button (click)="loadEditableTypes();">Load Editable Types</button>
+    <button *ngIf="!reloading || reloading" (click)="reloadDictionaries();">Reload Dictionaries</button>
+    <span *ngIf="reloading">... reloading ...</span>
+</div>
+<div>
+    <jqxComboBox #type *ngIf="types; else emptyCombobox"
+                 class="inlineComboBox" [placeHolder]="'Choose a type...'"
+                 [source]="types" [displayMember]="'displayName'" [valueMember]="'className'"
+                 (onChange)="onSelectType()"
+                 (onSelect)="onSelectType()"
+                 (onUnSelect)="onSelectType()">
+    </jqxComboBox>
+    {{selectedType ? selectedType.className : ""}}
+</div>
+<div>
+    <jqxComboBox #entry *ngIf="entries; else emptyCombobox"
+                 class="inlineComboBox" [placeHolder]="'Choose an entry...'"
+                 [source]="entries" [displayMember]="'display'" [valueMember]="'value'"
+                 (onChange)="onSelectEntry()"
+                 (onSelect)="onSelectEntry()"
+                 (onUnSelect)="onSelectEntry()">
+    </jqxComboBox>
+</div>
+<div>
+    {{selectedEntryDisplay}}
+</div>
+<div>
+    {{selectedJson}}
+</div>
+<div>
+    <button (click)="loadCoreFacilities();">Load Core Facilities</button>
+    <button (click)="loadCoreFacilitiesExcludeBlank();">Load Core Facilities Exclude Blank</button>
+</div>
+<div>
+    <jqxComboBox #coreFacility *ngIf="coreFacilities; else emptyCombobox"
+                 class="inlineComboBox" [placeHolder]="'Choose a core facility...'"
+                 [source]="coreFacilities" [displayMember]="'display'" [valueMember]="'value'">
+    </jqxComboBox>
+</div>
+<div>
+    <button (click)="testCoreSecurity();">Test Core Security</button>
+</div>
+<div>
+    {{coreSecurityText}}
+</div>
+<ng-template #emptyCombobox>
+    <jqxComboBox class="inlineComboBox" [placeHolder]="'* NO DATA *'">
+    </jqxComboBox>
+</ng-template>
