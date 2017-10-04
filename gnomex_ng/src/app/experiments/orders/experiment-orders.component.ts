@@ -226,9 +226,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 			this.updateGridData(response);
 		});
 
-		this.dictionaryService.getDictionary('hci.gnomex.model.RequestCategory').subscribe((dictionary: any) => {
-			this.dictionary = dictionary;
-		});
+		this.dictionary = this.dictionaryService.getDictionary(DictionaryService.REQUEST_CATEGORY);
 
 		// When we get a response from the backend that the status of an experiment has changed
 		this.statusChangeSubscription = this.experimentsService.getChangeExperimentStatusObservable().subscribe((response) => {

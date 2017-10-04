@@ -216,9 +216,7 @@ export class BrowseFilterComponent implements OnInit {
                 this.showMore = true;
             }
 
-            this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OrganismLite").subscribe((response) => {
-                this.organismList = response;
-            });
+            this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
         } else if (this.mode === this.DATA_TRACK_BROWSE) {
             if (isAdminState) {
                 this.showOrganismComboBox = true;
@@ -238,9 +236,7 @@ export class BrowseFilterComponent implements OnInit {
                 this.showVisibilityCheckboxes = true;
             }
 
-            this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OrganismLite").subscribe((response) => {
-                this.organismList = response;
-            });
+            this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
         } else if (this.mode === this.BILLING_BROWSE) {
             if (isAdminState || isBillingAdminState) {
                 this.showMoreSwitch = true;
@@ -382,13 +378,12 @@ export class BrowseFilterComponent implements OnInit {
         if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idCoreFacilityString = event.args.item.value;
             if (this.showRequestCategoryComboBox) {
-                this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory").subscribe((response) => {
-                    this.requestCategoryList = response.filter(cat => {
-                        if (cat.isActive === "Y" && !(cat.value === "") && cat.isInternal === "Y") {
-                            return cat.idCoreFacility === this.idCoreFacilityString;
-                        }
-                        return false;
-                    });
+                let requestCategories = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
+                this.requestCategoryList = requestCategories.filter(cat => {
+                    if (cat.isActive === "Y" && !(cat.value === "") && cat.isInternal === "Y") {
+                        return cat.idCoreFacility === this.idCoreFacilityString;
+                    }
+                    return false;
                 });
             }
             if (this.mode === this.BILLING_BROWSE) {
@@ -432,13 +427,12 @@ export class BrowseFilterComponent implements OnInit {
         if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idOrganismString = event.args.item.value;
             if (this.showGenomeBuildComboBox) {
-                this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.GenomeBuildLite").subscribe((response) => {
-                    this.genomeBuildList = response.filter(gen => {
-                        if (gen.isActive === "Y" && !(gen.value === "")) {
-                            return gen.idOrganism === this.idOrganismString;
-                        }
-                        return false;
-                    });
+                let genomeBuilds = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD);
+                this.genomeBuildList = genomeBuilds.filter(gen => {
+                    if (gen.isActive === "Y" && !(gen.value === "")) {
+                        return gen.idOrganism === this.idOrganismString;
+                    }
+                    return false;
                 });
             }
         } else {

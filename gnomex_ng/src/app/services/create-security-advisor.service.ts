@@ -65,43 +65,33 @@ export class CreateSecurityAdvisorService {
         return this.versionValue;
     }
 
-    private myCoreFacilitiesValue: string[];
+    private allowAllCoreFacilities: boolean = false;
+    private myCoreFacilitiesIds: string[];
+    private coreFacilitiesICanManageIds: string[];
+    private coreFacilitiesICanSubmitToIds: string[];
+
     public get myCoreFacilities(): any[] {
-        if (this.myCoreFacilitiesValue === undefined || this.myCoreFacilitiesValue === null) {
-            return [];
+        if (this.allowAllCoreFacilities) {
+            return this.dictionaryService.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY);
+        } else {
+            return this.dictionaryService.getEntryArray(DictionaryService.CORE_FACILITY, this.myCoreFacilitiesIds);
         }
-        let index: number;
-        let result: any[] = [];
-        for (index = 0; index < this.myCoreFacilitiesValue.length; index++) {
-            result.push(JSON.parse(this.myCoreFacilitiesValue[index]));
-        }
-        return result;
     }
 
-    private coreFacilitiesICanManageValue: string[];
     public get coreFacilitiesICanManage(): any[] {
-        if (this.coreFacilitiesICanManageValue === null) {
-            return [];
+        if (this.allowAllCoreFacilities) {
+            return this.dictionaryService.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY);
+        } else {
+            return this.dictionaryService.getEntryArray(DictionaryService.CORE_FACILITY, this.coreFacilitiesICanManageIds);
         }
-        let index: number;
-        let result: any[] = [];
-        for (index = 0; index < this.coreFacilitiesICanManageValue.length; index++) {
-            result.push(JSON.parse(this.coreFacilitiesICanManageValue[index]));
-        }
-        return result;
     }
 
-    private coreFacilitiesICanSubmitToValue: string[];
     public get coreFacilitiesICanSubmitTo(): any[] {
-        if (this.coreFacilitiesICanSubmitToValue === null) {
-            return [];
+        if (this.allowAllCoreFacilities) {
+            return this.dictionaryService.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY);
+        } else {
+            return this.dictionaryService.getEntryArray(DictionaryService.CORE_FACILITY, this.coreFacilitiesICanSubmitToIds);
         }
-        let index: number;
-        let result: any[] = [];
-        for (index = 0; index < this.coreFacilitiesICanSubmitToValue.length; index++) {
-            result.push(JSON.parse(this.coreFacilitiesICanSubmitToValue[index]));
-        }
-        return result;
     }
 
     constructor(private http: Http,
@@ -162,56 +152,57 @@ export class CreateSecurityAdvisorService {
             } else {
                 throw new Error("Error");
             }
-        }).flatMap(() => this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-            console.log("return getDictionaries");
-        }));
+        });
     }
 
-    determineUsersCoreFacilities(): void {
-        this.myCoreFacilitiesValue = [];
-        this.coreFacilitiesICanManageValue = [];
-        this.coreFacilitiesICanSubmitToValue = [];
-
+    private determineUsersCoreFacilities(): void {
         if (this.isSuperAdmin) {
-            this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility").subscribe((response) => {
-                let index: number;
-                for (index = 0; index < response.length; index++) {
-                    this.myCoreFacilitiesValue.push(JSON.stringify(response[index]));
-                    this.coreFacilitiesICanManageValue.push(JSON.stringify(response[index]));
-                    this.coreFacilitiesICanSubmitToValue.push(JSON.stringify(response[index]));
-                }
-            });
+            this.allowAllCoreFacilities = true;
         } else if (!this.isGuest) {
-            this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility").subscribe((response) => {
-                let myCoreFacilitiesSet: Set<string> = new Set<string>();
-                let coreFacilitiesICanManageSet: Set<string> = new Set<string>();
-                let coreFacilitiesICanSubmitToSet: Set<string> = new Set<string>();
-                let index: number;
-                for (index = 0; index < this.result.coreFacilitiesIManage.length; index++) {
-                    coreFacilitiesICanManageSet.add(this.result.coreFacilitiesIManage[index].idCoreFacility);
-                    myCoreFacilitiesSet.add(this.result.coreFacilitiesIManage[index].idCoreFacility);
-                }
-                for (index = 0; index < this.result.coreFacilitiesICanSubmitTo.length; index++) {
-                    coreFacilitiesICanSubmitToSet.add(this.result.coreFacilitiesICanSubmitTo[index].idCoreFacility);
-                    myCoreFacilitiesSet.add(this.result.coreFacilitiesICanSubmitTo[index].idCoreFacility);
-                }
-                for (index = 0; index < this.result.coreFacilitiesForMyLab.length; index++) {
-                    myCoreFacilitiesSet.add(this.result.coreFacilitiesForMyLab[index].idCoreFacility);
-                }
-
-                for (index = 0; index < response.length; index++) {
-                    if (myCoreFacilitiesSet.has(response[index].idCoreFacility)) {
-                        this.myCoreFacilitiesValue.push(JSON.stringify(response[index]));
-                    }
-                    if (coreFacilitiesICanManageSet.has(response[index].idCoreFacility)) {
-                        this.coreFacilitiesICanManageValue.push(JSON.stringify(response[index]));
-                    }
-                    if (coreFacilitiesICanSubmitToSet.has(response[index].idCoreFacility)) {
-                        this.coreFacilitiesICanSubmitToValue.push(JSON.stringify(response[index]));
-                    }
-                }
-            });
+            this.allowAllCoreFacilities = false;
+            this.myCoreFacilitiesIds = this.concatUnique(
+                this.extractCoreFacilityIds(this.result.coreFacilitiesForMyLab),
+                this.extractCoreFacilityIds(this.result.coreFacilitiesIManage),
+                this.extractCoreFacilityIds(this.result.coreFacilitiesICanSubmitTo)
+            );
+            this.coreFacilitiesICanManageIds = this.extractCoreFacilityIds(this.result.coreFacilitiesIManage);
+            this.coreFacilitiesICanSubmitToIds = this.extractCoreFacilityIds(this.result.coreFacilitiesICanSubmitTo);
+        } else {
+            this.allowAllCoreFacilities = false;
+            this.myCoreFacilitiesIds = [];
+            this.coreFacilitiesICanManageIds = [];
+            this.coreFacilitiesICanSubmitToIds = [];
         }
+    }
+
+    private extractCoreFacilityIds(coreFacilities): string[] {
+        if (!coreFacilities) {
+            return [];
+        }
+        if (Array.isArray(coreFacilities)) {
+            // multiple core facilities are returned as an array of objects
+            return  coreFacilities.map((coreFacility) => coreFacility.idCoreFacility);
+        } else {
+            // a single core facility is returned as an object with a "CoreFacility" attribute containing the object
+            return [coreFacilities.CoreFacility.idCoreFacility];
+        }
+    }
+
+    /**
+     * Concatenates a list of arrays without adding duplicate values
+     * @param arrays
+     * @returns {any[]}
+     */
+    private concatUnique(...arrays: any[]): any[] {
+        let result = [];
+        for (let array of arrays) {
+            for (let item of array) {
+                if (result.indexOf(item) < 0) {
+                    result.push(item);
+                }
+            }
+        }
+        return result;
     }
 
 }
