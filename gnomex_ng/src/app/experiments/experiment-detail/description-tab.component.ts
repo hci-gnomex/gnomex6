@@ -60,14 +60,13 @@ export class DescriptionTab extends PrimaryTab implements OnInit{
 
 
     ngOnInit(){
-        let tabName = this.constructor.name;
         this.descriptionForm = this.fb.group({
             expName: '',
             expDescript: ['',this.rules.getControlValidator("expDescript")],
             notesForCore:['',this.rules.getControlValidator("notesForCore")],
         });
+        this.setupForm('capSeq',this.descriptionForm);
 
-        this.addChildToForm(this.descriptionForm);
     }
 
     save(){

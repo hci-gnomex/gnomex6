@@ -2,7 +2,7 @@
     <form class="form-horizontal" (ngSubmit)="save()" [formGroup]="prepForm">
 
         <fieldset>
-            <div *ngIf="rules.labName" class="form-group" [ngClass]="{'has-error': (prepForm.get('labName')?.touched || prepForm.get('labName')?.dirty) && !prepForm.get('labName')?.valid }">
+            <div *ngIf="rules.labName.visible" class="form-group" [ngClass]="{'has-error': (prepForm.get('labName')?.touched || prepForm.get('labName')?.dirty) && !prepForm.get('labName')?.valid }">
                 <label class="col-md-2 control-label" for="labNameId">Lab Name</label>
 
                 <div class="col-md-8">
@@ -19,7 +19,7 @@
             </div>
             <div formGroupName="emailGroup"
                  [ngClass]="{'has-error': prepForm.get('emailGroup')?.errors }">
-                <div *ngIf="rules.email" class="form-group"
+                <div *ngIf="rules.email.visible" class="form-group"
                      [ngClass]="{'has-error': emailMessage}" >
                     <label class="col-md-2 control-label"
                            for="emailId">Email</label>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
 
-                <div *ngIf="rules.confirmEmail"
+                <div *ngIf="rules.confirmEmail.visible"
                      class="form-group"
                      [ngClass]="{'has-error': (prepForm.get('emailGroup.confirmEmail')?.touched ||
                                                 prepForm. get('emailGroup.confirmEmail')?.dirty) &&
@@ -65,7 +65,7 @@
                 </div>
             </div>
 
-            <div *ngIf="rules.phone" class="form-group"
+            <div *ngIf="rules.phone.visible" class="form-group"
                  [ngClass]="{'has-error': !prepForm.get('phone')?.valid }">
                 <label class="col-md-2 control-label"
                        for="phoneId">Phone</label>
@@ -83,7 +83,7 @@
                         </span>
                 </div>
             </div>
-            <div *ngIf="rules.notification" class="form-group">
+            <div *ngIf="rules.notification.visible" class="form-group">
                 <label class="col-md-2 control-label">Send Notifications</label>
                 <div class="col-md-8">
                     <label class="radio-inline">
@@ -101,7 +101,7 @@
 
 
 
-            <div *ngIf="rules.experimentType" class="form-group">
+            <div *ngIf="rules.experimentType.visible" class="form-group">
                 <table>
                     <thead>
                     <td>Experiment Category</td>
@@ -127,6 +127,11 @@
                         <button class="btn btn-primary" type="submit"
                                 [disabled]="!prepForm.valid">
                                 Save
+                        </button>
+                    </span>
+                    <span>
+                        <button class="btn btn-primary" type="button" (click)="add()">
+                                Add
                         </button>
                     </span>
                 </div>

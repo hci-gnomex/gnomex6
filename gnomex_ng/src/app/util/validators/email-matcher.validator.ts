@@ -5,6 +5,10 @@ export function emailMatcher(c: AbstractControl): { [key: string]: boolean } | n
     // we have key and value pair. key is a string, value is boolean
     let emailControl = c.get('email');
     let confirmControl = c.get('confirmEmail');
+    if(!emailControl || !confirmControl){
+        return null;
+    }
+
     if (emailControl.pristine || confirmControl.pristine) {
         return null;
     }
