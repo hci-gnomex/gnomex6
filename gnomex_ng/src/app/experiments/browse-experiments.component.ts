@@ -26,8 +26,7 @@ import {Subscription} from "rxjs/Subscription";
             display: inline-block;
         }
 
-        .hintLink
-        {
+        .hintLink {
             fontSize: 9;
             paddingLeft: 1;
             paddingRight: 1;
@@ -55,51 +54,43 @@ import {Subscription} from "rxjs/Subscription";
             flex-direction: row;
         }
 
-        .item-row {
-
-        }
-        .item-row-one {
+        .br-exp-row-one {
             flex-grow: 1;
         }
 
-        .item-row-two {
+        .br-exp-item-row-two {
             flex-grow: 1;
         }
 
-        .item {
+        .br-exp-item {
             flex: 1 1 auto;
             font-size: small;
         }
 
-        .one {
+        .br-exp-one {
             width: 100%;
-            flex-grow: .25
+            flex-grow: .25;
         }
 
-        .two {
-            width: 20%;
+        .br-exp-help-drag-drop {
+            width: 100%;
             flex-grow: .10;
         }
 
-        .three {
-            width: 20%;
+        .br-exp-three {
+            width: 100%;
             height: 6em;
             flex-grow: 8;
         }
 
-        .four {
-            width: 20%;
+        .br-exp-four {
+            width: 100%;
             flex-grow: .10;
         }
 
-        .five {
-            width: 20%;
+        .br-exp-five {
+            width: 100%;
             flex-grow: .10;
-        }
-
-        .container {
-            display: flex;
-            min-height:100px;
         }
 
         .t {
@@ -125,7 +116,6 @@ import {Subscription} from "rxjs/Subscription";
             margin-left: 20em;
         }
 
-
         div.background {
             width: 100%;
             height: 100%;
@@ -133,8 +123,13 @@ import {Subscription} from "rxjs/Subscription";
             padding: 0.3em;
             border-radius: 0.3em;
             border: 1px solid darkgrey;
-            display: block;
+            display: flex;
             flex-direction: column;
+        }
+
+        .experiment-detail-panel {
+            width: 75%;
+            background-color: #0b97c4;
         }
     `]
 })
@@ -207,7 +202,7 @@ export class BrowseExperimentsComponent {
     private selectedProjectLabIndex: number = -1;
     private idCoreFacility: string = "3";
     private showBillingCombo: boolean = false;
-    private experimentCount: number;
+    public experimentCount: number;
     private subscription: Subscription;
 
     ngOnInit() {
