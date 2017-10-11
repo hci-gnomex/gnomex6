@@ -1,0 +1,307 @@
+<div style="width:100%; height:100%;">Hello World!</div>
+
+<jqxWindow #windowRef
+		[resizable]="false"
+		[isModal]="true"
+		[width]="'60em'"
+		[height]="'45em'">
+	<div #windowHeader style="background-color: #84b278; color: white;">
+		<img src="../../../assets/work_auth_form.png" alt="Image not found" style="margin-right:0.2em;"/>
+		Submit Campus Billing Account
+	</div>
+	<div style="background-color: #eeeeeb">
+		<div #windowBody style="width:calc(100% - 2px); font-size:x-small;">
+			<div class="full-width background">
+				<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
+					<div class="t full-width">
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Lab
+							</div>
+							<div class="td">
+								<jqxComboBox
+										[placeHolder]="'Select a lab...'"
+										[width]="'80%'"
+										[theme]="'gnomex5'">
+								</jqxComboBox>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								<div>
+									Core Facility
+								</div>
+								<div>
+									Help me choose
+								</div>
+							</div>
+							<div class="td">
+								<jqxComboBox
+										[width]="'100%'"
+										[theme]="'gnomex5'">
+								</jqxComboBox>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Account Type
+							</div>
+							<div class="td center-vertical-align">
+								<div class="inline-block radio-button">
+									<input type="radio" name="AccountType" value="chartfield" checked> Chartfield
+								</div>
+								<div class="inline-block radio-button">
+									<input type="radio" name="AccountType" value="po"> PO
+								</div>
+								<div class="inline-block radio-button">
+									<input type="radio" name="AccountType" value="creditcard"> Credit Card
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="vertical-spacer"></div>
+			<div class="full-width background">
+				<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
+					<div class="t full-width">
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Account Name
+							</div>
+							<div class="td">
+								<jqxInput [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Short Account Name
+							</div>
+							<div class="td">
+								<jqxInput [theme]="'gnomex5'" [width]="'15em'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td" style="vertical-align:top;">
+								<div class="td cell-label">
+									Chartfield to be charged
+								</div>
+							</div>
+							<div class="td">
+								<div class="inline-block">
+									<div class="sub-header">
+										Bus
+									</div>
+									<div>
+										<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
+										</jqxInput>
+									</div>
+									<div>
+										2 digits
+									</div>
+								</div>
+								<div class="horizontal-break"></div>
+								<div class="inline-block">
+									<div class="sub-header">
+										Org
+									</div>
+									<div>
+										<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
+										</jqxInput>
+									</div>
+									<div>
+										5 digits
+									</div>
+								</div>
+								<div class="horizontal-break"></div>
+								<div class="inline-block">
+									<div class="sub-header">
+										Fund
+									</div>
+									<div>
+										<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
+										</jqxInput>
+									</div>
+									<div>
+										4 digits
+									</div>
+								</div>
+								<div class="horizontal-break"></div>
+								<div class="inline-block" style="vertical-align: top">
+									<div class="t">
+										<div class="tr">
+											<div class="td sub-header">Activity</div>
+											<div class="td sub-header"></div>
+											<div class="td sub-header">Project</div>
+										</div>
+										<div class="tr">
+											<div class="td">
+												<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
+												</jqxInput>
+											</div>
+											<div class="td sub-header" style="width:2.5em; text-align:center;">OR</div>
+											<div class="td">
+												<jqxInput [theme]="'gnomex5'" [width]="'4rem'" [height]="'1.5rem'">
+												</jqxInput>
+											</div>
+										</div>
+										<div class="tr">
+											<div class="td">5 digits</div>
+											<div class="td"></div>
+											<div class="td">8 digits</div>
+										</div>
+									</div>
+								</div>
+								<div class="horizontal-break"></div>
+								<div class="inline-block">
+									<div class="sub-header">
+										Account
+									</div>
+									<div>
+										<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'" [value]="'64300'">
+										</jqxInput>
+									</div>
+									<div>
+										5 digits
+									</div>
+								</div>
+								<div class="horizontal-break"></div>
+								<div class="inline-block">
+									<div class="sub-header">
+										A/U
+									</div>
+									<div>
+										<jqxInput [theme]="'gnomex5'" [width]="'2rem'" [height]="'1.5rem'" [value]="1" [disabled]="true">
+										</jqxInput>
+									</div>
+									<div>
+										1 digit
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Start Date
+							</div>
+							<div class="td">
+								<span>
+									<GnomexStyledDatePicker [defaultToToday]="true"></GnomexStyledDatePicker>
+								</span>
+								<div class="inline-block" style="width:7em;">
+								</div>
+								<span class="cell-label">
+									Effective Until
+								</span>
+								<span>
+									<GnomexStyledDatePicker [defaultToToday]="false"></GnomexStyledDatePicker>
+								</span>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Total Dollar Amount
+							</div>
+							<div class="td">
+								<jqxInput [theme]="'gnomex5'" [width]="'10em'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Approved Users
+							</div>
+							<div class="td">
+								<jqxInput
+										[placeHolder]="'Click to edit'"
+										[theme]="'gnomex5'"
+										[width]="'calc(100% - 6px)'"
+										[height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Submitter Email
+							</div>
+							<div class="td">
+								<jqxInput [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Active
+							</div>
+							<div class="td center-vertical-align">
+								<div class="checkbox-container">
+									<jqxCheckBox></jqxCheckBox>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="vertical-spacer"></div>
+			<div class="full-width background">
+				<div style="position:relative; width:calc(100% - 1.6em); margin:0.8em 1.2em;">
+					<div style="font-size:small;">
+						As the Principal Investigator (P.I.) or authorized personnel of the account listed
+						above I authorize the Core Facility to charge the account for work performed on my
+						laboratory’s behalf during the dates indicated, not to exceed the dollar amount.
+						I understand that this account will be billed automatically and that I will receive
+						a detailed statement of services for any month in which my account was charged.
+					</div>
+					<div style="text-align: center">
+						<div class="t full-width">
+							<div class="tr row-spacer">
+							</div>
+							<div class="tr row-spacer">
+							</div>
+							<div class="tr">
+								<div class="td">
+									<div class="checkbox-container">
+										<jqxCheckBox></jqxCheckBox>
+									</div>
+									<div class="inline-block center-vertical-align agreement">
+										I agree
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="full-width" style="text-align:right; padding-top:4px; padding-right:0.6em;">
+				<div class="inline-block">
+					<button type="button" class="save-button" style="text-align: center;" autofocus>
+						<img src="../../../assets/save.png" alt=""/> Save
+					</button>
+				</div>
+				<div class="inline-block">
+					<button type="button" class="cancel-button">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</jqxWindow>

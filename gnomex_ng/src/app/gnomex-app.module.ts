@@ -12,6 +12,7 @@ import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
+import {NewBillingAccountModule} from "./billing/new_billing_account/new-billing-account.module";
 import {RouterModule} from "@angular/router";
 import {FormsModule,ReactiveFormsModule} from "@angular/forms";
 import {UtilModule} from "./util/util.module";
@@ -53,6 +54,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         UserModule,
         NavigationModule,
         ExperimentsModule,
+        NewBillingAccountModule,
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig)
     ],
@@ -74,5 +76,5 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         LocalStorageService
     ]
 })
-export class GnomexAppModule {
+export class GnomexAppModule {o
 }
