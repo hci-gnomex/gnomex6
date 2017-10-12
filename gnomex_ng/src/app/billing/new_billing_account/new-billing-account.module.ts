@@ -8,8 +8,10 @@ import {InputModule} from "../../../modules/input.module";
 import {WindowModule} from "../../../modules/window.module";
 
 import {GnomexStyledDatePickerModule} from "../../util/gnomexStyledDatePicker/gnomex-styled-date-picker.module";
+import {GnomexStyledGridModule} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 
-import { NewBillingAccountComponent } from "./new-billing-account.component";
+import {LabUserSelectorComponent} from "./lab-user-selector.component";
+import {NewBillingAccountComponent} from "./new-billing-account.component";
 import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
 
 @NgModule({
@@ -20,11 +22,13 @@ import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
 		CommonModule,
 		ComboBoxModule,
 		GnomexStyledDatePickerModule,
+		GnomexStyledGridModule,
 		InputModule,
 		WindowModule
 	],
 	declarations: [
-		NewBillingAccountComponent
+		NewBillingAccountComponent,
+		LabUserSelectorComponent
 	],
 	exports: [
 		NewBillingAccountComponent
