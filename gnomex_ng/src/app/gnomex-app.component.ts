@@ -11,16 +11,16 @@ import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authenti
 import {HeaderComponent} from "./header/header.component";
 import {AppHeaderComponent} from "@hci/app-header";
 import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigationItemGroup} from "@hci/navigation";
-import {AppFooterComponent} from "@hci/app-footer";
+
 import {Observable} from "rxjs/Observable";
 import 'rxjs/operator/finally';
 import {promise} from "selenium-webdriver";
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
+//import {DictionaryService} from "./services/dictionary.service";
 
 /**
  * The gnomex application component.
  *
- * @author jason.holmberg <jason.holmberg@hci.utah.edu>
  */
 @Component({
     selector: "gnomex-app",
@@ -36,15 +36,13 @@ export class GnomexAppComponent implements OnInit {
     @ViewChild(HeaderComponent)
     private _appHdrCmpt: AppHeaderComponent;
 
-    @ViewChild(AppFooterComponent)
-    private _appFooterCmpt: AppFooterComponent;
-
     private _primaryNavEnabled: Observable<boolean>;
 
     constructor(private authHttp: AuthHttp,
                 private userService: UserService,
                 private authenticationService: AuthenticationService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
+//                private dictionaryService: DictionaryService,
                 private router: Router,
                 private http: Http,
                 private _localStorageService: LocalStorageService) {
@@ -53,8 +51,7 @@ export class GnomexAppComponent implements OnInit {
     ngOnInit() {
         let isDone: boolean = false;
         console.log("GnomexAppComponent ngOnInit");
-        // this.setupHeaderComponent();
-        // this.setupFooterComponent();
+
         this.authenticationService.isAuthenticated().subscribe( response => {
             if (response) {
                 this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
@@ -88,10 +85,6 @@ export class GnomexAppComponent implements OnInit {
         }).flatMap(() => this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
             console.log("return getDictionaries");
         }));
-        // this.getDictionaries().subscribe((response: Array<Object>) => {
-        //   console.log("subscribe createDictionaries");
-        //   console.log(response);
-        // }));
     }
 
     searchFn(): (keywords: string) => void {
@@ -100,32 +93,17 @@ export class GnomexAppComponent implements OnInit {
         };
     }
 
-    // createSecurityAdvisor(): Observable<any> {
-    //   console.log("createSecurityAdvisor");
-    //   return this.http.get("/gnomex/CreateSecurityAdvisor.gx", {withCredentials: true}).map((response: Response) => {
-    //     console.log("return createSecurityAdvisor");
-    //     if (response.status === 200) {
-    //       return response.json();
-    //     } else {
-    //       throw new Error("Error");
-    //     }
-    //   }).do(() => this.getDictionaries().subscribe((response: Array<Object>) => {
-    //     console.log("subscribe createDictionaries");
-    //     console.log(response);
-    //   }));
-    // }
 
-
-    getDictionaries(): Observable<any> {
-        console.log("getDictionaries");
-        return this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-            console.log("return getDictionaries");
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        });
+getDictionaries(): Observable<any> {
+    console.log("getDictionaries");
+return this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
+    console.log("return getDictionaries");
+    if (response.status === 200) {
+        return response.json();
+    } else {
+        throw new Error("Error");
+    }
+});
     }
 
     // private setupFooterComponent() {

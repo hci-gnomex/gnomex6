@@ -55,24 +55,19 @@ export class BillingPeriodPickerComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BillingPeriod").subscribe((response) => {
-            this.billingPeriods = response;
-            let index: number;
-            let bp: any;
-            for (index = 0; index < response.length; index++) {
-                bp = response[index];
-                if (bp.calendarYear < this.minYear) {
-                    this.minYear = parseInt(bp.calendarYear);
-                } else if (bp.calendarYear > this.maxYear) {
-                    this.maxYear = parseInt(bp.calendarYear);
-                }
-                if (bp.isCurrentPeriod === "Y") {
-                    this.monthString = bp.display.substring(0, 3);
-                    this.select(bp);
-                    this.resetYear();
-                }
+        this.billingPeriods = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD);
+        for (let bp of this.billingPeriods) {
+            if (bp.calendarYear < this.minYear) {
+                this.minYear = parseInt(bp.calendarYear);
+            } else if (bp.calendarYear > this.maxYear) {
+                this.maxYear = parseInt(bp.calendarYear);
             }
-        });
+            if (bp.isCurrentPeriod === "Y") {
+                this.monthString = bp.display.substring(0, 3);
+                this.select(bp);
+                this.resetYear();
+            }
+        }
     }
 
     change(): void {

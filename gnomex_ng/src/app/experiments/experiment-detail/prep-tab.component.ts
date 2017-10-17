@@ -56,7 +56,7 @@ export class PrepTab extends PrimaryTab {
             }
         ];
 
-        let tabName =  this.constructor.name;
+
         this.prepForm = this.fb.group({
             labName: ['', this.rules.getControlValidator('labName')], //
             experimentType: ['', this.rules.getControlValidator('experimentType')],//this.rules.getControlValidator('experimentType')
@@ -69,12 +69,13 @@ export class PrepTab extends PrimaryTab {
 
         });
 
-
+        /*this.addChildToForm(this.prepForm);  // important for cross form validation
         this.setformRules(tabName,'capSeq');
         this.removeControls(this.prepForm,this.getformRules());
-        this.initFormRules();
+        this.initFormRules();*/
+        this.setupForm('capSeq',this.prepForm);
 
-        this.addChildToForm(this.prepForm);  // important for cross form validation
+
         this.controlsToLink("expDescript",this.prepForm.get("labName"));
         this.controlsToLink("energyDrink", this.prepForm.get("phone"));
 
@@ -103,7 +104,10 @@ export class PrepTab extends PrimaryTab {
 
     }
     save() {
-        //this.changeStatus.emit({status:true,component:this});
+        this.rules.changeControlState({controlName:'email',remove:true});
+    }
+    add(){
+        this.rules.changeControlState({controlName:'email',remove:false});
     }
 
     setNotification(notifyVia: string): void { // used for radio button email and text option

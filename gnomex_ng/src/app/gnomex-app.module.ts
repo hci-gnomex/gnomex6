@@ -10,6 +10,8 @@ import {APP_ROUTING} from "./gnomex-app.routes";
 import {HttpModule} from "@angular/http";
 import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
+import {DictionaryService} from "./services/dictionary.service";
+import {DictionaryDemoModule} from "./dictionary-demo/dictionary-demo.module";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
 import {RouterModule} from "@angular/router";
@@ -52,8 +54,9 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         UserModule,
         AuthenticationModule,
         NavigationModule,
-        AppFooterModule,
+
         ExperimentsModule,
+
         LocalStorageModule.withConfig(localStorageServiceConfig),
         NgbModule.forRoot(),
         CommonModule,

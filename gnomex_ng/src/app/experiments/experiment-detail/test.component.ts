@@ -60,7 +60,7 @@ export class TestComponent extends PrimaryTab implements OnInit{
         this.testForm = this.fb.group({
             energyDrink: ['', this.rules.getControlValidator("energyDrink")],
         });
-        this.addChildToForm(this.testForm);
+        this.setupForm('capSeq',this.testForm);
     }
     save(){
         //this.changeStatus.emit({status:true, component: this});
