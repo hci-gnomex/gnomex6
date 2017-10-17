@@ -9,9 +9,9 @@ import {
     Input,
     Output,
     EventEmitter,
-    Type,ViewRef
+    Type
 } from '@angular/core'
-import {FormGroup,FormBuilder, Validators,AbstractControl } from '@angular/forms';
+import {FormGroup, FormBuilder, Validators, AbstractControl, FormArray} from '@angular/forms';
 import { ActivatedRoute } from '@angular/router'
 import { Tabs } from "./tabs.component"
 import { Tab } from "./tab.component"
@@ -20,11 +20,13 @@ import { TabChangeEvent } from './tab-change-event'
 import { TabsStatusEvent } from './tab-status-event'
 import {ComponentCommunicatorEvent} from './component-status-event'
 import {PrepTab} from "../../experiments/experiment-detail/prep-tab.component";
+import 'rxjs/add/operator/distinctUntilChanged';
 
 
 @Directive({
-    selector: 'tab-container, [tab-container]'})
-export class TabContainer implements OnInit, OnDestroy {
+    selector: 'tab-container, [tab-container]'
+})
+export class TabContainer implements OnInit, OnDestroy{
 
     static readonly NEW: string = "new"
     static readonly VIEW: string = "view"
@@ -33,7 +35,6 @@ export class TabContainer implements OnInit, OnDestroy {
 
     @Output() tabChanged: EventEmitter<TabChangeEvent> = new EventEmitter();
     @Output() tabStatusChanged: EventEmitter<TabsStatusEvent> = new EventEmitter();
-    private tabRefList: Array<any> = []
     private tabsRef: ComponentRef<Tabs>
     private intialized: boolean = false
     private theForm:FormGroup;
@@ -60,6 +61,10 @@ export class TabContainer implements OnInit, OnDestroy {
     }
     private _state:string;
 
+    isInitalize():boolean{
+        return this.intialized
+    }
+
 
 
     constructor(private cdr: ChangeDetectorRef,
@@ -67,11 +72,9 @@ export class TabContainer implements OnInit, OnDestroy {
                 private viewContainer: ViewContainerRef,
                 private route: ActivatedRoute,
                 private fb: FormBuilder) {
-        this.theForm = this.fb.group({
-            childForms: this.fb.array([])
-        });
-    }
 
+    }
+    
     private validIndexes(start: number, end: number, tabLength: number): boolean {
         if (start < 0) {
             return false;
@@ -84,58 +87,90 @@ export class TabContainer implements OnInit, OnDestroy {
 
     private communicate(event: ComponentCommunicatorEvent, tabs: Tab[]): void {
 
-        let tabId = -1;
+        let tabId = event.index;
+        let status:boolean = event.status === "VALID"? true : false;
 
-        for (let i = 0; i < tabs.length; i++) {
-            if (tabs[i].getComp() === event.component) {
-                tabId = i;
-                break;
-            }
-        }
         // this is a callback function
-        const changeStatusByIndex = (status: boolean, start?: number, end?: number): void => {
+        const changeStatusByIndex = (stat = true, start?: number, end?: number): void => {
+
 
             if (start != undefined && end != undefined) { // if they provide 0 or 1 for indexes 'if' sees that as true or false
-                    if (this.validIndexes(start, end, tabs.length)) {
-                        for (let i = start; i < end; i++) {
-                            if(status){
-                                tabs[i].enable = true;
-                            }
-                            else{
-                                tabs[i].enable = false;
-                            }
-
+                if (this.validIndexes(start, end, tabs.length)) {
+                    for (let i = start; i < end; i++) {
+                        if (stat) {
+                            tabs[i].enable = true;
                         }
+                        else {
+                            tabs[i].enable = false;
+                        }
+
                     }
+                }
             }
-            else { // no range provided just change status of next tab
-                let nextId = this.activeId + 1 < tabs.length? this.activeId + 1 : -1;
-                tabs[nextId].enable = status;
+            else if (status) { // no range provided, just enable next tab if form is valid
+                let nextId = this.activeId + 1 < tabs.length ? this.activeId + 1 : -1;
+                if (!(nextId === -1) && this.activeId === tabId) {
+                    tabs[nextId].enable = stat;
+                }
             }
+
 
         };
 
+        changeStatusByIndex();// no range provided, just enable next tab if form is valid
 
-            changeStatusByIndex(event.status);
+        // Will default to enabling tabs, but handler that executes from the tab-container externally has last say
+        this.tabStatusChanged.emit({currentStatus:status, statusOfTabs: changeStatusByIndex, tabId: tabId, tabLength: tabs.length});
+        this.childFormStatusChanges(event.status,event.form,event.index);
 
-        // will change status, but handler that executes from the tab-container externally has last say
-        this.tabStatusChanged.emit({currentStatus:event.status, statusOfTabs: changeStatusByIndex, tabId: tabId, tabLength: tabs.length});
+    }
+    private initNew(tabList:Array<string>){
+        let childForms:FormArray = (<FormArray>this.theForm.controls["childForms"]);
+        if(this.tabsRef.instance.tabs.length > 1 ){
+           this.tabsRef.instance.clearTabs();
+           let startLength =  childForms.length;
+            for (let i=1; i < startLength; i++) {
+                childForms.removeAt(childForms.length -1 ); // leaving SetupTab
+            }
+        }
+
+        /* the code below is forcing 'theForm'(main parent form) to be invalid. So when it's children Forms are added to 'theForm'
+           if at least one of children forms are invalid, then there will be no change in parent form's status since it is currently invalid.
+           This will make angular's change detection not throw expressionChangedAfterBeingCheckError
+
+           We do not need to change theForm's  status back to valid(remove required error) after since it will automatically override it as the user
+           fills out the forms on later tabs.
+         */
+
+        this.componentNames = tabList;
+        this.initTabs();
+        this.tabCommunication(this.tabsRef.instance.tabs);
+
+        let firstForm:FormGroup = <FormGroup>childForms.at(0);
+
+        if(firstForm.valid){ // could
+            this.tabsRef.instance.tabs[0].getComp().changeStatus.emit({status:firstForm.status,form:firstForm,index:0})
+        }
+
     }
 
 
     private tabCommunication(tabs: Tab[]): void {
         tabs.map(tab => {
-            tab.getComp().changeStatus.subscribe(event => this.communicate(event,tabs));
+            tab.getComp().changeStatus.subscribe(event => this.communicate(event,tabs)); // for when form become valid
+        });
+        this.tabsRef.instance.tabChange.subscribe(event => {
+            this.tabChanged.emit(event);
         });
 
     }
 
-    private initTab(): void {
+    private initTabs(): void {
 
         let tabs: Tab[] = this.tabsRef.instance.tabs;
 
         let factories = <Array<Function>>Array.from(this.compFR['_factories'].keys()); //Getting a factories made from EntryComponent
-        let compFactoryArray: Array<Type<PrimaryTab>> = []
+        let compFactoryArray: Array<Type<PrimaryTab>> = [];
 
         for (let i = 0; i < this.componentNames.length; i++) {
             compFactoryArray.push(<Type<PrimaryTab>>factories.find((x: any) => x.name === this.componentNames[i]))
@@ -148,20 +183,15 @@ export class TabContainer implements OnInit, OnDestroy {
         this.tabsRef.instance.state = this.state;
         this.tabsRef.instance.initContent(tabs);
 
-        this.tabCommunication(tabs);
-        this.tabsRef.instance.tabChange.subscribe(event => {
-            this.tabChanged.emit(event);
-        });
-
-        /*if(!this.tabsRef){
-            const tabsFactory = this.compFR.resolveComponentFactory(Tabs);
-            this.tabsRef = this.viewContainer.createComponent(tabsFactory, 0, undefined, [this.tabRefList]);
-            this.tabsRef.instance.state = this.state; // giving tabs state before init(important for 'new' state)
-            this.tabsRef.instance.initContent(tabs);*/
     }
-    open():void{
-        this.tabsRef.instance.insertTab(PrepTab,this.theForm,this.state);
-        this.initTab();
+    private createTab():void{
+        let tabsInstance = this.tabsRef.instance;
+        tabsInstance.insertTab(PrepTab,this.theForm,this.state);
+        tabsInstance.initContent(tabsInstance.tabs);
+
+        let prepTab =<PrepTab>tabsInstance.tabs[0].getComp();
+        prepTab.initNewExperiment.subscribe(initEvent => this.initNew(initEvent)); // when new experiment selected
+
     }
 
     get activeId():number{
@@ -175,35 +205,70 @@ export class TabContainer implements OnInit, OnDestroy {
     }
 
 
+    childFormStatusChanges(status:string,form:FormGroup,index:number):void{
+        if( form.invalid && (form.touched || form.dirty)){
+            this.tabsRef.instance.tabs[index].valid = false;
+        }
+        else if(form.valid){
+            this.tabsRef.instance.tabs[index].valid = true;
+        }
+    }
+
 
     ngOnInit() {
+        this.theForm = this.fb.group({
+            childForms: this.fb.array([])
+        });
+
         let tabsFactory = this.compFR.resolveComponentFactory(Tabs);
         this.tabsRef = this.viewContainer.createComponent(tabsFactory);
-        this.tabsRef.instance.tabs = []
+        this.tabsRef.instance.tabs = [];
 
         if(this.state == TabContainer.NEW){
-            this.open();
+            this.createTab();
         }else{
-            this.initTab();
+            this.initTabs();
+            this.tabCommunication(this.tabsRef.instance.tabs);
         }
+
 
         this.intialized = true;
-        //this.addTab()
 
     }
-    ngOnChange() {
-        if (this.intialized) {
-            this.initTab();
+    ngAfterViewInit(){
+    }
+
+
+
+
+    removeTab(index?:number){
+        this.tabsRef.instance.removeTab(index);
+    }
+    addTab(tabName:string,index?:number){
+        let factories = <Array<Function>>Array.from(this.compFR['_factories'].keys()); //Getting a factories made from EntryComponent
+        let compFactory: Type<PrimaryTab>= null;
+
+       compFactory= <Type<PrimaryTab>>factories.find((x: any) => x.name === tabName);
+       this.tabsRef.instance.externalInsertTab(compFactory,this.theForm,index);
+    }
+    /*If tab is found it will return its index, if not -1*/
+    containsTab(tabName:string):number{
+        let tabs:Array<Tab> =this.tabsRef.instance.tabs;
+        let pos = -1;
+        for(let i = 0; i < tabs.length; i++){
+            if(tabs[i].getComp().constructor.name === tabName){
+                pos = i;
+                break;
+            }
         }
-
+        return pos;
     }
-
-
-
     ngOnDestroy() {
         this.tabsRef.destroy();
+        this.tabsRef = null;
+        this.tabChanged.unsubscribe();
+        this.tabStatusChanged.unsubscribe();
     }
-
 
 
 }

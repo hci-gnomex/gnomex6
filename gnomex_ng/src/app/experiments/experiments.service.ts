@@ -12,8 +12,10 @@ export class ExperimentsService {
 
 	private experimentOrders: any[];
     private projectRequestList: any[];
+
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
+    private projectSubject:Subject<any> = new Subject();
 
     private haveLoadedExperimentOrders: boolean = false;
     private previousURLParams: URLSearchParams = null;
@@ -130,7 +132,7 @@ export class ExperimentsService {
     }
 
         getExperiment(id: string): Observable<any> {
-        return this._http.get("/gnomex/GetRequest.gx?requestNumber=" + id, {withCredentials: true}).map((response: Response) => {
+        return this._http.get("/gnomex/GetRequest.gx?idRequest=" + id, {withCredentials: true}).map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
@@ -160,6 +162,29 @@ export class ExperimentsService {
         });
 
     }
+
+
+    getProjectObsevable():Observable<any>{
+        return this.projectSubject.asObservable();
+    }
+    emitProject(project:any):void{
+        this.projectSubject.next(project);
+    }
+    getProject_fromBackend(params: URLSearchParams): void {
+            this._http.get("/gnomex/GetProject.gx",{search: params})
+                .subscribe((response: Response) => {
+                console.log("getProject called");
+                if (response.status === 200) {
+                    let project = response.json();
+                    this.emitProject(project);
+                    //return response.json().Request;
+                } else {
+                    throw new Error("Error getting Project");
+                }
+            });
+    }
+
+
 
     getProject(params: URLSearchParams):  Observable<any> {
         return this._http.get("/gnomex/GetProject.gx", {search: params}).map((response: Response) => {

@@ -12,6 +12,7 @@ import { Observable } from "rxjs/Observable";
 import 'rxjs/operator/finally';
 import {promise} from "selenium-webdriver";
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
+import {DictionaryService} from "./services/dictionary.service";
 
 /**
  * The gnomex application component.
@@ -39,6 +40,7 @@ export class GnomexAppComponent implements OnInit {
 
     constructor(private userService: UserService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private dictionaryService: DictionaryService,
                 private router: Router,
                 private http: Http) {
     }
@@ -49,6 +51,17 @@ export class GnomexAppComponent implements OnInit {
     this.setupHeaderComponent();
 //    this.setupFooterComponent();
 
+      this.userService.isAuthenticated().subscribe( response => {
+        if (response) {
+            this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
+                console.log("subscribe createSecurityAdvisor");
+                isDone = true;
+                console.log(response);
+                this.dictionaryService.reload();
+            });
+        }
+      });
+
         this.userService.addLoginCallback({onLogin: () => {
             console.log("GnomexAppComponent onLogin");
             this._primaryNavEnabled = Observable.of(true);
@@ -57,6 +70,7 @@ export class GnomexAppComponent implements OnInit {
                 console.log("subscribe createSecurityAdvisor");
                 isDone = true;
                 console.log(response);
+                this.dictionaryService.reload();
             });
 
         }});
@@ -66,7 +80,6 @@ export class GnomexAppComponent implements OnInit {
       this._appHdrCmpt.primaryNavigationEnabled = this._primaryNavEnabled;
     }});
 
-
   }
 
     searchFn(): (keywords: string) => void {
@@ -75,18 +88,6 @@ export class GnomexAppComponent implements OnInit {
         };
     }
 
-
-getDictionaries(): Observable<any> {
-    console.log("getDictionaries");
-    return this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-      console.log("return getDictionaries");
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error("Error");
-      }
-    });
-  }
 
  // private setupFooterComponent() {
  //   this._appFooterCmpt.appName = this.appNameTitle;

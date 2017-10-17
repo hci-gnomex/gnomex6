@@ -4,7 +4,7 @@
 import 'rxjs/add/operator/switchMap';
 import {Component, OnInit,ViewChild} from "@angular/core";
 import {ExperimentsService} from "../experiments.service";
-import {Request} from "@angular/http";
+import { ActivatedRoute} from '@angular/router'
 
 import {TabsStatusEvent,TabContainer} from "../../util/tabs/"
 
@@ -52,11 +52,12 @@ export class ExperimentDetail implements OnInit {
     buttonDisabled: boolean = true;
     @ViewChild(TabContainer) theTabs: TabContainer
     private visStr:string = "Edit";
+    viewSize:number = -1;
 
 
 
-    constructor(private experimentsService: ExperimentsService) {
-        this.cNames = ["PrepTab","TestComponent", "DescriptionTab"]
+    constructor(private experimentsService: ExperimentsService,private route:ActivatedRoute) {
+        this.cNames = ["PrepTab","TestComponent","DescriptionTab"]
     }
 
     changeStatus($event:TabsStatusEvent){
@@ -64,16 +65,22 @@ export class ExperimentDetail implements OnInit {
     }
 
     changeState(){
-        if(this.state === TabContainer.VIEW ) {
-            this.visStr= "View"
+        if(this.state === TabContainer.VIEW )
+        {
+            this.visStr= "View";
             this.state = TabContainer.EDIT;
-        } else {
-            this.visStr = "Edit"
+        }
+        else{
+            this.visStr = "Edit";
             this.state = TabContainer.VIEW;
         }
     }
     ngOnInit(): void {
-
+        this.route.data.forEach((data) =>{
+            this.experiment = data['experiment']; // this data is carried on route look at browse-experiments.component.ts
+                                                 // & experiment-resolver.service.ts
+            console.log(this.experiment);
+        });
     }
     next(){
         this.theTabs.select(this.theTabs.activeId + 1);
@@ -86,5 +93,7 @@ export class ExperimentDetail implements OnInit {
     checkIfNewState():boolean{
         return (TabContainer.NEW === this.state)
     }
+
+
 
 }

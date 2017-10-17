@@ -10,6 +10,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {HttpModule} from "@angular/http";
 import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
+import {DictionaryService} from "./services/dictionary.service";
+import {DictionaryDemoModule} from "./dictionary-demo/dictionary-demo.module";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
 import {NewBillingAccountModule} from "./billing/new_billing_account/new-billing-account.module";
@@ -48,6 +50,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         ReactiveFormsModule,
         HomeModule,
         UtilModule,
+        DictionaryDemoModule,
         DropdownModule.forRoot(),
         CollapseModule.forRoot(),
         AppHeaderModule,
@@ -73,6 +76,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: LOGIN_ROUTE, useValue: "/login"},
         UserService,
         ExperimentsService,
+        DictionaryService,
         LocalStorageService
     ]
 })

@@ -38,7 +38,7 @@
             <input [(ngModel)]="allFlag" id="allCheckbox" type="checkbox">
             <label for="allCheckbox">All</label>
         </div>
-        <div class="inlineDiv" *ngIf="showLabComboBox">
+        <div class="inlineDiv" *ngIf="showLabComboBox && (mode === 'billingBrowse' ? !(idCoreFacilityString === '') : true)">
             <label>Group</label>
             <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
                          [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
@@ -51,7 +51,15 @@
                              (onSelect)="onAppUserSelect($event)" (onUnselect)="onAppUserUnselect()">
                 </jqxComboBox>
             </div>
+            <div class="inlineDiv" *ngIf="showBillingAccountComboBox && !(idLabString === '')">
+                <label>Account</label>
+                <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an Account...'"
+                             [source]="billingAccountList" [displayMember]="'accountNameDisplay'" [valueMember]="'idBillingAccount'"
+                             (onSelect)="onBillingAccountSelect($event)" (onUnselect)="onBillingAccountUnselect()">
+                </jqxComboBox>
+            </div>
         </div>
+        <billing-period-picker *ngIf="showBillingPeriodPicker" [(billingPeriod)]="idBillingPeriodString"></billing-period-picker>
         <date-range-picker-custom *ngIf="showDateRangePicker" [(from)]="dateFromString" [(to)]="dateToString"></date-range-picker-custom>
         <div class="divider" *ngIf="showDateRangePicker && showOrderNumberInput"></div>
         <div class="inlineDiv" *ngIf="showOrderNumberInput">
@@ -84,10 +92,22 @@
             <input [(ngModel)]="visibilityPublicFlag" id="visibilityPublicCheckbox" type="checkbox">
             <label for="visibilityPublicCheckbox">Public</label>
         </div>
+        <div class="inlineDiv" *ngIf="showExperimentNumberInput">
+            <label for="experimentNumberInput">Experiment #</label>
+            <input class="filterTextInput" [(ngModel)]="experimentNumberString" id="experimentNumberInput">
+        </div>
+        <div class="inlineDiv" *ngIf="showInvoiceNumberInput">
+            <label for="invoiceNumberInput">Invoice #</label>
+            <input class="filterTextInput" [(ngModel)]="invoiceNumberString" id="invoiceNumberInput">
+        </div>
         <button *ngIf="showMoreSwitch && !showMore" class="showHideButton" (click)="toggleShowMore()"><img src="../../assets/arrow_down.gif" alt="">More...</button>
         <button class="searchButton" (click)="search()"><img src="../../assets/magnifier.png" alt="">Search</button>
     </div>
     <div *ngIf="showMoreSwitch && showMore" class="indentedDiv">
+        <div *ngIf="showEmptyFoldersCheckbox" class="inlineDiv">
+            <input [(ngModel)]="showEmptyFoldersFlag" id="showEmptyFoldersCheckbox" type="checkbox">
+            <label for="showEmptyFoldersCheckbox">{{showEmptyFoldersCheckboxLabel}}</label>
+        </div>
         <div class="inlineDiv" *ngIf="showExternalExperimentsCheckbox">
             <input [(ngModel)]="externalExperimentsFlag" id="externalExperimentsCheckbox" type="checkbox">
             <label for="externalExperimentsCheckbox">External Experiments</label>
@@ -134,11 +154,5 @@
             <input class="filterTextInput" [(ngModel)]="ccNumberString" id="ccNumberInput">
         </div>
         <button class="showHideButton" (click)="toggleShowMore()"><img src="../../assets/arrow_up.gif" alt="">Less...</button>
-    </div>
-    <div class="indentedDiv" *ngIf="showEmptyFoldersCheckbox">
-        <div *ngIf="showEmptyFoldersCheckbox" class="inlineDiv">
-            <input [(ngModel)]="showEmptyFoldersFlag" id="showEmptyFoldersCheckbox" type="checkbox">
-            <label for="showEmptyFoldersCheckbox">Show Empty Folders</label>
-        </div>
     </div>
 </div>

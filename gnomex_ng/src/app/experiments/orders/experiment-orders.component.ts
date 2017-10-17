@@ -9,6 +9,7 @@ import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcomb
 
 import {BrowseFilterComponent} from "../../util/browse-filter.component";
 import {DictionaryService} from "../../services/dictionary.service";
+import {EmailRelatedUsersPopupComponent} from "../../util/emailRelatedUsersPopup/email-related-users-popup.component"
 import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
@@ -21,7 +22,7 @@ import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-s
  */
 @Component({
 	selector: "ExperimentOrders",
-	templateUrl: "./experimentOrders.component.html",
+	templateUrl: "./experiment-orders.component.html",
 	styles: [`
       div.t {
           display: table;
@@ -88,6 +89,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
 	@ViewChild('myGrid') myGrid: GnomexStyledGridComponent;
 	@ViewChild('statusComboBox') statusCombobox: jqxComboBoxComponent;
+	@ViewChild('windowReference') window: EmailRelatedUsersPopupComponent;
 
 
 	private dictionary: any;
@@ -196,13 +198,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
 	private source = {
 		datatype: "json",
-		localdata: [
-			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""},
-			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""},
-			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""},
-			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""},
-			{name: "", icon: "", requestNumber: "", requestStatus: "", container: "", ownerName: "", labName: "", createDate: "", numberOfSamples: "", corePrepInstructions: ""}
-		],
+		localdata: [],
 		datafields: [
 			{name: "name", type: "string"},
 			{name: "icon", type: "string"},
@@ -230,9 +226,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 			this.updateGridData(response);
 		});
 
-		this.dictionaryService.getDictionary('hci.gnomex.model.RequestCategory').subscribe((dictionary: any) => {
-			this.dictionary = dictionary;
-		});
+		this.dictionary = this.dictionaryService.getDictionary(DictionaryService.REQUEST_CATEGORY);
 
 		// When we get a response from the backend that the status of an experiment has changed
 		this.statusChangeSubscription = this.experimentsService.getChangeExperimentStatusObservable().subscribe((response) => {
@@ -298,6 +292,20 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
 	emailButtonClicked(): void {
 		console.log("You clicked \"Email\"!");
+		let selectedIndices: Number[] = this.myGrid.getselectedrowindexes();
+		let idRequests: number[] = [];
+
+		if(selectedIndices.length > 0 && selectedIndices[0] != null) {
+
+			for(let selectedIndex in selectedIndices) {
+				let requestNumber = this.source.localdata[selectedIndex].requestNumber;
+				idRequests.push(Number.parseInt(requestNumber.slice(0, requestNumber.length - 1)));
+			}
+
+			this.window.setIdRequests(idRequests);
+			// this.window.open();
+			this.window.window.open();
+		}
 	}
 
 	updateGridData(data: Array<any>) {

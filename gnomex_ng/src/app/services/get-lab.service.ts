@@ -40,4 +40,18 @@ export class GetLabService {
         return this.getLab(params);
     }
 
+    getLabBillingAccounts(idLab: string): Observable<any> {
+        let params: URLSearchParams = new URLSearchParams();
+        params.set("idLab", idLab);
+        params.set("includeBillingAccounts", "Y");
+        params.set("includeProductCounts", "N");
+        params.set("includeProjects", "N");
+        params.set("includeCoreFacilities", "N");
+        params.set("includeHistoricalOwnersAndSubmitters", "N");
+        params.set("includeInstitutions", "N");
+        params.set("includeSubmitters", "N");
+        params.set("includeMoreCollaboratorInfo", "N");
+        return this.getLab(params);
+    }
+
 }

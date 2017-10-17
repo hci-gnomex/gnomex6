@@ -1,9 +1,9 @@
-import { Component } from '@angular/core'
+import {Component, EventEmitter, Output} from '@angular/core'
 import { FormGroup, FormBuilder, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common'
 import { PrimaryTab } from '../../util/tabs/primary-tab.component'
-
 import 'rxjs/add/operator/debounceTime'
+import {ExperimentViewService} from "../../services/experiment-view.service";
 
 @Component({
 
@@ -13,6 +13,7 @@ import 'rxjs/add/operator/debounceTime'
 export class PrepTab extends PrimaryTab {
 
     entries = [];
+    @Output() initNewExperiment = new EventEmitter();
     name: string = "Prep Tab";
     selectedEntry: { [key: string]: any } = {
         value: null,
@@ -20,61 +21,63 @@ export class PrepTab extends PrimaryTab {
     };
     emailMessage: string;
 
-    validationMessages = {
-        required: "Please enter your email address",
-        pattern: "Please enter a valid email address"
+    private validationMessages = {
+        required: 'Please enter your email address',
+        pattern: 'Please enter a valid email address'
     };
 
     prepForm: FormGroup;
 
 
 
-    constructor(protected fb: FormBuilder) {
-        super(fb);
+    constructor(protected fb: FormBuilder,private expViewRules:ExperimentViewService) {
+        super(fb,expViewRules);
     }
-
-
 
 
     ngOnInit() {
 
-        console.log("I am in the child")
         this.entries = [
             {
                 description: 'entry 1',
-                value: 1
+                value: ["TestComponent", "DescriptionTab"]
             },
             {
                 description: 'entry 2',
-                value: 2
+                value:  ["TestComponent", "PrepTab"]
             },
             {
                 description: 'entry 3',
-                value: 3
+                value: ["TestComponent"]
             },
             {
                 description: 'entry 4',
-                value: 4
+                value: ["DescriptionTab","TestComponent","DescriptionTab","TestComponent",]
             }
         ];
 
 
         this.prepForm = this.fb.group({
-            labName: ['', [Validators.required, Validators.minLength(3)]],
-            billingAcount: '',
-            experimentType: this.fb.array([]),
+            labName: ['', this.rules.getControlValidator('labName')], //
+            experimentType: ['', this.rules.getControlValidator('experimentType')],//this.rules.getControlValidator('experimentType')
             emailGroup: this.fb.group({
-                email: ['', [Validators.required, Validators.pattern('[a-z0-9._%+-]+@[a-z0-9.-]+')]],
-                confirmEmail: ['', Validators.required],
-            }, { validator: emailMatcher }),
+                email: ['', this.rules.getControlValidator('email') ],
+                confirmEmail: ['', this.rules.getControlValidator('confirmEmail')],
+            }, { validator: this.rules.getControlValidator('emailGroup') }),
             phone: '',
             notification: 'email',
 
         });
 
+        /*this.addChildToForm(this.prepForm);  // important for cross form validation
+        this.setformRules(tabName,'capSeq');
+        this.removeControls(this.prepForm,this.getformRules());
+        this.initFormRules();*/
+        this.setupForm('capSeq',this.prepForm);
 
-        this.addChildToForm(this.prepForm);  // important for cross form validation
+
         this.controlsToLink("expDescript",this.prepForm.get("labName"));
+        this.controlsToLink("energyDrink", this.prepForm.get("phone"));
 
 
 
@@ -87,18 +90,24 @@ export class PrepTab extends PrimaryTab {
         this.prepForm.get("notification").valueChanges
             .subscribe(value => this.setNotification(value));
         const emailControl = this.prepForm.get('emailGroup.email');
-        emailControl.valueChanges.debounceTime(1000).subscribe(value => {
-            //this.invalidTab.emit(this);
-            this.setMessage(emailControl)
-        });
+        if(emailControl){
+            emailControl.valueChanges.debounceTime(1000).subscribe(value => {
+                this.setMessage(emailControl)
+            });
+        }
     }
     onSelectionChange(entry) {
         // clone the object for immutability
-        this.selectedEntry = Object.assign({}, this.selectedEntry, entry); // copying entry into selectedEntry
+        if(this.prepForm.get("experimentType").value !== ''){
+            this.initNewExperiment.emit(entry.value);
+        }
+
     }
     save() {
-        console.log(this.theForm);
-        this.changeStatus.emit({status:true,component:this});
+        this.rules.changeControlState({controlName:'email',remove:true});
+    }
+    add(){
+        this.rules.changeControlState({controlName:'email',remove:false});
     }
 
     setNotification(notifyVia: string): void { // used for radio button email and text option
@@ -106,7 +115,6 @@ export class PrepTab extends PrimaryTab {
 
         const phoneControl = this.prepForm.get('phone'); // getting access to the phoneControl
         if (notifyVia === 'text') {
-            phoneControl
             phoneControl.setValidators(Validators.required); // setting validator during runtime
         } else {
             phoneControl.clearValidators();
@@ -126,15 +134,3 @@ export class PrepTab extends PrimaryTab {
 
 }
 
-function emailMatcher(c: AbstractControl): { [key: string]: boolean } | null { // returns if its valid returns null or object if invalid defining the broken rule
-    // we have key and value pair. key is a string, value is boolean
-    let emailControl = c.get('email');
-    let confirmControl = c.get('confirmEmail');
-    if (emailControl.pristine || confirmControl.pristine) {
-        return null;
-    }
-    if (emailControl.value === confirmControl.value) {
-        return null;
-    }
-    return { 'match': true }; // if we need to reference the validator in html we do ...errors.match,
-}

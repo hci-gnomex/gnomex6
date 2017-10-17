@@ -6,36 +6,33 @@ import { Tab } from './tab.component';
 import { TabChangeEvent } from './tab-change-event'
 import { TabContainer } from './tab-container.component'
 import {PrimaryTab} from "./primary-tab.component";
-import {PrepTab} from "../../experiments/experiment-detail/prep-tab.component";
-import {FormGroup} from "@angular/forms";
+import {Form, FormGroup} from "@angular/forms";
 
 @Component({
     selector: 'tabs',
 
-    template: `
-            
-            <ul #container class="nav nav-tabs">
-                <li class="nav-item" *ngFor="let tab of tabs"  [class.active]="tab.active" [class.disabled]="!tab.enable" >
-                    <a class="nav-link" (click)="selectTab(tab)" role="tab" [ngClass]="{selecting:true, active:isActive(tab)}" 
-                       [class.active]="tab.enable" [class.disabled]="!tab.enable">
+    template: `        
+            <ul #container class="tabs-nav">
+                <li class="tab-item"  [ngClass]="{  'disable-tab':!tab.enable, 'active-tab':tab.active, 'error':!tab.valid}"
+                    *ngFor="let tab of tabs" (click)="selectTab(tab)" >
+                    <a class="tab-link" >
                         {{tab.title}}</a>
                 </li>
             </ul>
             <ng-content></ng-content>
-  `
+  `,
+    styles: [require("./tabs.component.less").toString()]
 
 })
 export class Tabs {
-
     tabs: Tab[];
     activeTabId: number;
     state:string;
-    private projectableNodeList:Array<any> = [];
-    @ViewChild('container', {read: ViewContainerRef}) tabsContainer:ViewContainerRef
+    @ViewChild('container', {read: ViewContainerRef}) tabsContainer:ViewContainerRef;
 
     @Output() tabChange = new EventEmitter<TabChangeEvent>();
 
-    constructor(private compFR:ComponentFactoryResolver){
+    constructor(private compFR:ComponentFactoryResolver, private vcRef:ViewContainerRef){
 
     }
 
@@ -61,25 +58,55 @@ export class Tabs {
         }
 
     }
-    insertTab(component: Type<PrimaryTab>,parentForm:FormGroup,state:string){
-        let compFactory =this.compFR.resolveComponentFactory(component);
-        let compRef = this.tabsContainer.createComponent(compFactory);
-        compRef.instance.theForm = parentForm;
-        compRef.instance.setState(state)
+    removeTab(index?:number){
+        if(index){
+            this.tabsContainer.remove(index);
+            this.tabs.splice(index,1);
+        }else{
+            this.tabsContainer.remove();
+            this.tabs.splice(this.tabs.length  - 1, 1);
+        }
+    }
 
+    clearTabs(){
+        // this is a like a stack (LIFO)
+        let contLength = this.tabsContainer.length - 1; // minus 2, because the last 2 will be the first tab and it's nested component
+
+        for(let i = 0; i < contLength; i++) {
+
+            this.tabsContainer.remove();
+
+        }
+
+        this.tabs.splice(1,this.tabs.length  - 1)
+
+    }
+
+    externalInsertTab(component: Type<PrimaryTab>,parentForm:FormGroup,index?:number ){
+        this.insertTab(component,parentForm,this.state,index)
+    }
+
+    insertTab(component: Type<PrimaryTab>,parentForm:FormGroup,state:string,index:number = null){
+
+        let compFactory =this.compFR.resolveComponentFactory(component);
+        let compRef = this.vcRef.createComponent(compFactory);
+        compRef.instance.theForm = parentForm;
+        compRef.instance.setState(state);
+
+        // creating the Tab with the component nested inside
         let tabFactory = this.compFR.resolveComponentFactory(Tab);
-        let tabRef = this.tabsContainer.createComponent(tabFactory, 0,undefined,[[compRef.location.nativeElement]]);
+        let tabRef = this.tabsContainer.createComponent(tabFactory,index,undefined,[[compRef.location.nativeElement]]);
         tabRef.instance.title = compRef.instance.name;
         tabRef.instance.initComp(compRef);
+        if(index){
+            this.tabs.splice(index, 0, tabRef.instance);
+        }else{
+            this.tabs.push(tabRef.instance);
+        }
 
-        this.tabs.push(tabRef.instance);
         tabRef.changeDetectorRef.detectChanges();
-
     }
 
-    addTab(tab: Tab) {
-        this.tabs.push(tab)
-    }
 
     selectTabById(id: number) {
         // need try catch here
@@ -113,7 +140,10 @@ export class Tabs {
                 this.activeTabId = selectedTabIndex;
                 tab.active = true;
                 tab.getComp().tabIsActive= true;
-                tab.getComp().setState(this.state); // need to run state actions like disable components when tab becomes active
+                setTimeout(() => {
+                    tab.getComp().setState(this.state);// need to run state actions like disable components when tab becomes active
+                });
+
             }
 
         }
@@ -123,7 +153,6 @@ export class Tabs {
 
         }
 
-        console.log(this.tabs);
         // activate the tab the user has clicked on.
 
     }

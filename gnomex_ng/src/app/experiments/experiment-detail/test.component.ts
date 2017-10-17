@@ -4,6 +4,7 @@
 import {Component,OnInit} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
+import {ExperimentViewService} from "../../services/experiment-view.service";
 
 
 @Component({
@@ -17,13 +18,17 @@ import {PrimaryTab} from "../../util/tabs/primary-tab.component"
             <div class="col-md-8">
                 <input class="form-control" id="energyNameId" type="text" placeholder="Energy Drink (required)" formControlName="energyDrink"
                 />
-                <span style="color:red;" class="help-block" *ngIf="(testForm.get('energyDrink').touched || testForm.get('energyDrink').dirty) && testForm.get('energyDrink').errors">
+                <span style="color:red;" class="help-block"
+                      *ngIf="(testForm.get('energyDrink').touched || testForm.get('energyDrink').dirty) && testForm.get('energyDrink').errors">
                             <span *ngIf="testForm.get('energyDrink').errors.required">
                                 Please enter your Energy Drink name.
                             </span>
                 <span style="color:red;" *ngIf="testForm.get('energyDrink').errors.minlength">
                                 The energy drink name must be longer than 3 characters.
                             </span>
+                    <span style="color:red;" *ngIf="testForm.get('energyDrink').errors.dependentControl">
+                                {{testForm.get('energyDrink').errors.dependentControl}}
+                    </span>
                 </span>
             </div>
         </div>
@@ -46,18 +51,18 @@ export class TestComponent extends PrimaryTab implements OnInit{
     testForm:FormGroup;
     name: string = "Test Tab";
 
-    constructor(fb:FormBuilder){
-        super(fb);
-
+    constructor(protected fb: FormBuilder,private expViewRules:ExperimentViewService) {
+        super(fb,expViewRules);
     }
 
     ngOnInit(){
+        let tabName = this.constructor.name;
         this.testForm = this.fb.group({
-            energyDrink: ['', [Validators.required, Validators.minLength(3)]],
+            energyDrink: ['', this.rules.getControlValidator("energyDrink")],
         });
-        this.addChildToForm(this.testForm);
+        this.setupForm('capSeq',this.testForm);
     }
     save(){
-        this.changeStatus.emit({status:true, component: this});
+        //this.changeStatus.emit({status:true, component: this});
     }
 }

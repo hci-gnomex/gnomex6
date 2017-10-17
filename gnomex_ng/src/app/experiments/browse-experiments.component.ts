@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, ViewChild, ViewEncapsulation} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from "@angular/core";
 
 import { URLSearchParams } from "@angular/http";
 
@@ -17,6 +17,7 @@ import { BrowseFilterComponent } from "../util/browse-filter.component";
 import { transaction } from 'mobx';
 import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
+import {Router} from "@angular/router";
 
 @Component({
     selector: "experiments",
@@ -76,24 +77,24 @@ import {Subscription} from "rxjs/Subscription";
             flex-grow: .25
         }
 
-        .two {
-            width: 20%;
+        .help-drag-drop {
+            width: 100%;
             flex-grow: .10;
         }
 
         .three {
-            width: 20%;
+            width: 100%;
             height: 6em;
             flex-grow: 8;
         }
 
         .four {
-            width: 20%;
+            width: 100%;
             flex-grow: .10;
         }
 
         .five {
-            width: 20%;
+            width: 100%;
             flex-grow: .10;
         }
 
@@ -136,9 +137,16 @@ import {Subscription} from "rxjs/Subscription";
             display: block;
             flex-direction: column;
         }
+        .experiment-detail-panel {
+            width:75%;
+            padding: 2em;
+            margin-left: 2em;
+            border: #C8C8C8 solid thin;
+            overflow: auto;
+        }
     `]
 })
-export class BrowseExperimentsComponent {
+export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("tree") treeComponent: TreeComponent;
     @ViewChild("reassignWindow") reassignWindow: jqxWindowComponent;
@@ -195,7 +203,7 @@ export class BrowseExperimentsComponent {
     private targetItem: any;
     private projectDescription: string = "";
     private projectName: string = "";
-    private experimentService: ExperimentsService;
+    public experimentService: ExperimentsService;
     private labMembers: any;
     private billingAccounts: any;
     private dragEndItems: any;
@@ -208,21 +216,27 @@ export class BrowseExperimentsComponent {
     private idCoreFacility: string = "3";
     private showBillingCombo: boolean = false;
     private experimentCount: number;
-    private subscription: Subscription;
+    private projectRequestListSubscription: Subscription;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
-
+        this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
     }
-    constructor(private experimentsService: ExperimentsService) {
+
+    ngAfterViewInit(){
+        this.jqxLoader.close();
+        this.jqxConstructorLoader.close();
+    }
+
+    constructor(private experimentsService: ExperimentsService,private router:Router) {
 
 
         this.experimentService = experimentsService;
 
-        this.experimentsService.getExperiments().subscribe(response => {
-            this.buildTree(response);
-            //this.thisResponse = response;
-        })
+        // this.experimentsService.getExperiments().subscribe(response => {
+        //     this.buildTree(response);
+        //     //this.thisResponse = response;
+        // })
         this.items = [];
         this.dragEndItems = [];
         this.labMembers = [];
@@ -230,9 +244,8 @@ export class BrowseExperimentsComponent {
         this.labs = [];
 
 
-        this.experimentsService.getProjectRequestListObservable().subscribe(response => {
+        this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
-            //this.thisResponse = response;
         });
 
     }
@@ -252,7 +265,6 @@ export class BrowseExperimentsComponent {
         } else {
             this.items = response;
         }
-        this.labs = this.labs.concat(this.items);
         for( var l of this.items) {
             if (!this.isArray(l.Project)) {
                 l.items = [l.Project];
@@ -298,8 +310,6 @@ export class BrowseExperimentsComponent {
                 }
             }
         }
-        this.jqxLoader.close();
-        this.jqxConstructorLoader.close();
     };
 
     /*
@@ -732,12 +742,23 @@ export class BrowseExperimentsComponent {
         if (this.selectedItem.level === 1) {
             this.newProject.disabled(false);
             this.deleteProject.disabled(true);
+
+            this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
             //Project
         } else if (this.selectedItem.level === 2) {
             this.newProject.disabled(false);
             this.deleteProject.disabled(false);
+
+            let idLab = this.selectedItem.data.idLab;
+            let idProject = this.selectedItem.data.idProject;
+            this.router.navigate(['/experiments',
+                {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}]);
+
             //Experiment
         } else {
+
+            let id = this.selectedItem.data.idRequest;
+            this.router.navigate(['/experiments',{outlets:{'browsePanel':[id]}}]);
             this.newProject.disabled(true);
             this.deleteProject.disabled(true);
         }
@@ -776,4 +797,8 @@ export class BrowseExperimentsComponent {
         this.responseMsg = "";
         this.responseMsgWindow.close();
     }
+
+    ngOnDestroy(): void {
+        this.projectRequestListSubscription.unsubscribe();
+}
 }

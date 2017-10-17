@@ -11,6 +11,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 ext {
   npmCommand = Os.isFamily(Os.FAMILY_WINDOWS) ? 'npm.cmd' : 'npm'
+  karmaCommand = Os.isFamily(Os.FAMILY_WINDOWS) ? 'karma.cmd' : 'karma'
 }
 
 task npmInstall(type: Exec) {
@@ -25,6 +26,11 @@ task webpack(type: Exec, dependsOn: npmInstall) {
   } else {
     args = ["run", "build:prod"]
   }
+}
+
+task testUnit(type: Exec) {
+  executable = karmaCommand
+  args = ['start']
 }
 
 clean {
