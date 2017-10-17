@@ -2,8 +2,7 @@
   display: inline-block;
 }
 
-.hintLink
-{
+.hintLink {
   fontSize: 9;
   paddingLeft: 1;
   paddingRight: 1;
@@ -31,45 +30,42 @@
   flex-direction: row;
 }
 
-.item-row {
-
-}
-.item-row-one {
+.br-exp-row-one {
   flex-grow: 1;
 }
 
-.item-row-two {
+.br-exp-item-row-two {
   flex-grow: 1;
 }
 
-.item {
+.br-exp-item {
   flex: 1 1 auto;
   font-size: small;
 }
 
-.one {
+.br-exp-one {
   width: 100%;
-  flex-grow: .25
+  flex-grow: .25;
 }
 
-.two {
-  width: 20%;
+.br-exp-help-drag-drop {
+  width: 100%;
   flex-grow: .10;
- }
+}
 
-.three {
-  width: 20%;
+.br-exp-three {
+  width: 100%;
   height: 6em;
   flex-grow: 8;
 }
 
-.four {
-  width: 20%;
+.br-exp-four {
+  width: 100%;
   flex-grow: .10;
 }
 
-.five {
-  width: 20%;
+.br-exp-five {
+  width: 100%;
   flex-grow: .10;
 }
 
@@ -87,15 +83,6 @@
   display: table-cell;
 }
 
-div.lower-panel{
-  height: 100%;
-  width: 100%;
-  border: 1px solid darkgrey;
-  background-color: white;
-  padding: 0.3em;
-  display: block;
-}
-
 .jqx-tree {
   height: 100%;
 }
@@ -105,14 +92,18 @@ div.lower-panel{
   margin-left: 20em;
 }
 
-//.jqx-notification {
-//  height: 10em;
-//  position: relative }
-//.jqx-notification p {
-//  margin: 0;
-//  background: yellow;
-//  position: absolute;
-//  top: 50%;
-//  left: 50%;
-//  margin-right: -50%;
-//  transform: translate(-50%, -50%) }
+div.background {
+  width: 100%;
+  height: 100%;
+  background-color: #EEEEEE;
+  padding: 0.3em;
+  border-radius: 0.3em;
+  border: 1px solid darkgrey;
+  display: flex;
+  flex-direction: column;
+}
+
+.experiment-detail-panel {
+  width: 75%;
+  background-color: #0b97c4;
+}

@@ -27,8 +27,7 @@ import {Router} from "@angular/router";
             display: inline-block;
         }
 
-        .hintLink
-        {
+        .hintLink {
             fontSize: 9;
             paddingLeft: 1;
             paddingRight: 1;
@@ -56,25 +55,22 @@ import {Router} from "@angular/router";
             flex-direction: row;
         }
 
-        .item-row {
-
-        }
-        .item-row-one {
+        .br-exp-row-one {
             flex-grow: 1;
         }
 
-        .item-row-two {
+        .br-exp-item-row-two {
             flex-grow: 1;
         }
 
-        .item {
+        .br-exp-item {
             flex: 1 1 auto;
             font-size: small;
         }
 
-        .one {
+
             width: 100%;
-            flex-grow: .25
+
         }
 
         .help-drag-drop {
@@ -94,13 +90,7 @@ import {Router} from "@angular/router";
         }
 
         .five {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .container {
-            display: flex;
-            min-height:100px;
+            width: 100%;            flex-grow: .10;
         }
 
         .t {
@@ -126,7 +116,6 @@ import {Router} from "@angular/router";
             margin-left: 20em;
         }
 
-
         div.background {
             width: 100%;
             height: 100%;
@@ -134,7 +123,7 @@ import {Router} from "@angular/router";
             padding: 0.3em;
             border-radius: 0.3em;
             border: 1px solid darkgrey;
-            display: block;
+
             flex-direction: column;
         }
         .experiment-detail-panel {
@@ -146,6 +135,7 @@ import {Router} from "@angular/router";
         }
     `]
 })
+
 export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("tree") treeComponent: TreeComponent;
@@ -203,6 +193,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private targetItem: any;
     private projectDescription: string = "";
     private projectName: string = "";
+
     public experimentService: ExperimentsService;
     private labMembers: any;
     private billingAccounts: any;
@@ -215,7 +206,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private selectedProjectLabIndex: number = -1;
     private idCoreFacility: string = "3";
     private showBillingCombo: boolean = false;
-    private experimentCount: number;
+
+    public experimentCount: number;
     private projectRequestListSubscription: Subscription;
 
     ngOnInit() {
@@ -227,6 +219,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.jqxLoader.close();
         this.jqxConstructorLoader.close();
     }
+
 
     constructor(private experimentsService: ExperimentsService,private router:Router) {
 
