@@ -19,6 +19,8 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 	private isResizing: boolean = false;
 	private isGridDrawn: boolean = false;
 
+	selectionMode: string = 'checkbox';
+
 	autoresize: boolean = true;
 	pageable: boolean = false;
 
@@ -129,10 +131,15 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 		return this.source;
 	}
 	setDataAdapterSource(source: any): void {
-
-		this.pageable = source.localdata.length > 250;
+		if(!this.pageable) {
+			this.pageable = source.localdata.length > 250;
+		}
 
 		this.source = source;
 		this.dataAdapter = new jqx.dataAdapter(this.source);
+
+		//this.theGrid.pageable(source.localdata.length > 250);
+
+		//this.pageable = source.localdata.length > 250;
 	}
 }
