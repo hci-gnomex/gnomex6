@@ -16,6 +16,7 @@ import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
 import {RouterModule} from "@angular/router";
 import {FormsModule} from "@angular/forms";
+import {MATERIAL_COMPATIBILITY_MODE} from '@angular/material';
 import {
     AUTHENTICATED_USER_ENDPOINT, UserModule, UserService
 } from "@hci/user";
@@ -56,7 +57,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         NavigationModule,
 
         ExperimentsModule,
-
         LocalStorageModule.withConfig(localStorageServiceConfig),
         NgbModule.forRoot(),
         CommonModule,
@@ -76,6 +76,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: AUTHENTICATION_ROUTE, useValue: "/authenticate"},
         {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
         {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 5},
+        {provide: MATERIAL_COMPATIBILITY_MODE, useValue: true},
         UserService,
         AuthenticationService,
         ExperimentsService,

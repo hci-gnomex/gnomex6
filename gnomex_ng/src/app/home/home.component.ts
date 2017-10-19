@@ -5,7 +5,7 @@ import {Component, ViewEncapsulation} from "@angular/core";
 
 @Component({
   selector: "gnomex-home",
-  template: require("./home.component.html"),
+  template: require('./home.component.html'),
   // template: require("./home.component.html"),
     styles: [`
     .login-view{
@@ -13,7 +13,7 @@ import {Component, ViewEncapsulation} from "@angular/core";
         width: 30em;
         margin-left: 45em;
         display: block;
-        background-image: url("../gnomex/assets/gnomex_splash_logo.png");
+        background-image: url("assets/gnomex_splash_logo.png");
         background-repeat:no-repeat;
     }        
   `],

@@ -68,29 +68,31 @@ import {Router} from "@angular/router";
             font-size: small;
         }
 
-
+        .br-exp-one {
             width: 100%;
+            flex-grow: .25;
 
         }
 
-        .help-drag-drop {
+        .br-exp-help-drag-drop {
             width: 100%;
             flex-grow: .10;
         }
 
-        .three {
+        .br-exp-three {
             width: 100%;
             height: 6em;
             flex-grow: 8;
         }
 
-        .four {
+        .br-exp-four {
             width: 100%;
             flex-grow: .10;
         }
 
-        .five {
-            width: 100%;            flex-grow: .10;
+        .br-exp-five {
+            width: 100%;            
+            flex-grow: .10;
         }
 
         .t {
@@ -123,13 +125,14 @@ import {Router} from "@angular/router";
             padding: 0.3em;
             border-radius: 0.3em;
             border: 1px solid darkgrey;
-
+            display: flex;
             flex-direction: column;
         }
         .experiment-detail-panel {
             width:75%;
             padding: 2em;
             margin-left: 2em;
+            background-color: #0b97c4;
             border: #C8C8C8 solid thin;
             overflow: auto;
         }
@@ -258,6 +261,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         } else {
             this.items = response;
         }
+        this.labs = this.labs.concat(this.items);
         for( var l of this.items) {
             if (!this.isArray(l.Project)) {
                 l.items = [l.Project];

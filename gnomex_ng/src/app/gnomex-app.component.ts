@@ -14,27 +14,33 @@ import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigati
 
 import {Observable} from "rxjs/Observable";
 import 'rxjs/operator/finally';
-import {promise} from "selenium-webdriver";
+//import {promise} from "selenium-webdriver";
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
-//import {DictionaryService} from "./services/dictionary.service";
+import {DictionaryService} from "./services/dictionary.service";
+
 
 /**
  * The gnomex application component.
  *
+ * @author jason.holmberg <jason.holmberg@hci.utah.edu>
  */
 @Component({
     selector: "gnomex-app",
     providers: [],
-    template: require("./gnomex-app.component.html")
+    templateUrl: './gnomex-app.component.html'
 })
+
 export class GnomexAppComponent implements OnInit {
     public isCollapsed: boolean = true;
     public status: {isopen: boolean} = {isopen: false};
     objLoaderStatus: boolean;
     private appNameTitle: string = "Gnomex";
 
-    @ViewChild(HeaderComponent)
-    private _appHdrCmpt: AppHeaderComponent;
+  @ViewChild(HeaderComponent)
+  private _appHdrCmpt: AppHeaderComponent;
+
+  //@ViewChild(AppFooterComponent)
+  //private _appFooterCmpt: AppFooterComponent;
 
     private _primaryNavEnabled: Observable<boolean>;
 
@@ -42,16 +48,18 @@ export class GnomexAppComponent implements OnInit {
                 private userService: UserService,
                 private authenticationService: AuthenticationService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
-//                private dictionaryService: DictionaryService,
+                private dictionaryService: DictionaryService,
                 private router: Router,
                 private http: Http,
                 private _localStorageService: LocalStorageService) {
     }
 
+
     ngOnInit() {
         let isDone: boolean = false;
         console.log("GnomexAppComponent ngOnInit");
-
+        // this.setupHeaderComponent();
+        // this.setupFooterComponent();
         this.authenticationService.isAuthenticated().subscribe( response => {
             if (response) {
                 this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
@@ -85,6 +93,10 @@ export class GnomexAppComponent implements OnInit {
         }).flatMap(() => this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
             console.log("return getDictionaries");
         }));
+        // this.getDictionaries().subscribe((response: Array<Object>) => {
+        //   console.log("subscribe createDictionaries");
+        //   console.log(response);
+        // }));
     }
 
     searchFn(): (keywords: string) => void {
@@ -94,22 +106,18 @@ export class GnomexAppComponent implements OnInit {
     }
 
 
-getDictionaries(): Observable<any> {
-    console.log("getDictionaries");
-return this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-    console.log("return getDictionaries");
-    if (response.status === 200) {
-        return response.json();
-    } else {
-        throw new Error("Error");
-    }
-});
+    getDictionaries(): Observable<any> {
+        console.log("getDictionaries");
+        return this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
+            console.log("return getDictionaries");
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
     }
 
-    // private setupFooterComponent() {
-    //     this._appFooterCmpt.appName = this.appNameTitle;
-    //     this._appFooterCmpt.copyright = "Huntsman Cancer Institute";
-    // }
 
     /**
      * A convenience methods to fetch the necessary items for the Experiments dropdown.
