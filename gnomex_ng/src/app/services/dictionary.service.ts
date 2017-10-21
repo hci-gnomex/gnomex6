@@ -1,6 +1,7 @@
 import {EventEmitter, Injectable} from "@angular/core";
 import {Http, Response} from "@angular/http";
 import {Observable} from "rxjs/Observable";
+import {ProgressService} from "../home/progress.service";
 
 @Injectable()
 export class DictionaryService {
@@ -18,7 +19,7 @@ export class DictionaryService {
     private reloadObservable: Observable<any> = null;
     private CACHE_EXPIRATION_MILLIS = 600000;   // ten minutes = 600000 millis
 
-    constructor(private _http: Http) {}
+    constructor(private _http: Http, private progressService: ProgressService) {}
 
     /**
      * Forces a full reload of the dictionary, returns an observable of an empty object when it is done.
@@ -42,6 +43,7 @@ export class DictionaryService {
                 console.log("************RELOAD************");
                 console.log(JSON.stringify(this.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY)));
                 console.log("******************************");
+                this.progressService.displayLoader(100);
                 if (callback) {
                     callback();
                 }
@@ -72,6 +74,7 @@ export class DictionaryService {
     private loadDictionaries(): Observable<any> {
         return this._http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
             if (response.status === 200) {
+                console.log("In ManageDictionaries")
                 return response.json();
             } else {
                 throw new Error("Error in ManageDictionaries");

@@ -27,6 +27,10 @@ import {CalendarModule} from "../../modules/calendar.module";
 import {LoaderModule} from "../../modules/loader.module";
 import {By} from "@angular/platform-browser";
 import {UtilModule} from "../util/util.module";
+import { RouterTestingModule } from '@angular/router/testing';
+import {ProgressService} from "../home/progress.service";
+import {BillingService} from "../services/billing.service";
+import {LaunchPropertiesService} from "../services/launch-properites.service";
 
 @Directive({
 
@@ -268,10 +272,13 @@ describe('Browse Experiment Component...', () => {
         TestBed.configureTestingModule({
             imports: [FormsModule, HttpModule, TreeModule, ButtonModule, ToggleButtonModule, ComboBoxModule,
                 WindowModule, InputModule, NotificationModule, TextAreaModule, CalendarModule, LoaderModule,
-                UtilModule],
+                UtilModule, RouterTestingModule],
             declarations: [BrowseExperimentsComponent],
             providers: [{provide: ExperimentsService, useClass: MockExperimentService},
                 {provide: LabListService, useClass: LabListService},
+                {provide: ProgressService, useClass: ProgressService},
+                {provide: BillingService, useClass: BillingService},
+                {provide: LaunchPropertiesService, useClass: LaunchPropertiesService},
                 {provide: DictionaryService, useClass: DictionaryService},
                 {provide: AnalysisService, useClass: AnalysisService},
                 {provide: DataTrackService, useClass: DataTrackService},

@@ -11,7 +11,7 @@ export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experim
 export class ExperimentsService {
 
 	private experimentOrders: any[];
-    private projectRequestList: any[];
+    public projectRequestList: any[];
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();

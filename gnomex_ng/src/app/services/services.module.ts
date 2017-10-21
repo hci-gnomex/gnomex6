@@ -10,6 +10,7 @@ import {DataTrackService} from "./data-track.service";
 import {ExperimentViewService} from "./experiment-view.service";
 import {BillingService} from "./billing.service";
 import {ExperimentResolverService,ProjectResolverService} from "./resolvers/index";
+import {LaunchPropertiesService} from "./launch-properites.service";
 @NgModule({
     imports: [CommonModule],
     declarations: [],
@@ -25,7 +26,8 @@ import {ExperimentResolverService,ProjectResolverService} from "./resolvers/inde
         ExperimentViewService,
         BillingService,
         ExperimentResolverService,
-        ProjectResolverService
+        ProjectResolverService,
+        LaunchPropertiesService
     ]})
 export class ServicesModule {
 }
