@@ -68,7 +68,7 @@ describe('Header Component...', () => {
         expect(app).toBeTruthy();
     }));
 
-    it('should whatever', async(() => {
+    it('Experiment menu should not be visible', async(() => {
         let fixture = TestBed.createComponent(HeaderComponent);
         let ne = fixture.nativeElement;
         let expMenuPresent: boolean = false;
