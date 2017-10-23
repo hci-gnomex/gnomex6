@@ -2,22 +2,17 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {Component, ViewChild, OnInit} from "@angular/core";
-import {Router} from "@angular/router";
-import {AuthHttp} from "angular2-jwt";
 import {Http, Response} from "@angular/http";
-import {LocalStorageService} from "angular-2-local-storage";
-import {UserService} from "@hci/user";
 import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {HeaderComponent} from "./header/header.component";
-import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigationItemGroup} from "@hci/navigation";
 
+import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigationItemGroup} from "@hci/navigation";
 import {Observable} from "rxjs/Observable";
 import 'rxjs/operator/finally';
 import 'rxjs/add/operator/catch'
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
 import {ProgressService} from "./home/progress.service";
 import {DictionaryService} from "./services/dictionary.service";
-
 
 /**
  * The gnomex application component.
@@ -51,7 +46,8 @@ export class GnomexAppComponent implements OnInit {
     ngOnInit() {
         let isDone: boolean = false;
         console.log("GnomexAppComponent ngOnInit");
-        this.authenticationService.isAuthenticated().subscribe( response => {
+
+        this.authenticationService.isAuthenticated().subscribe(response => {
             if (response) {
                 this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
                     console.log("subscribe createSecurityAdvisor");
@@ -63,24 +59,6 @@ export class GnomexAppComponent implements OnInit {
             }
         });
 
-        // this.authenticationService.addLoginCallback({onLogin: () => {
-        //     console.log("GnomexAppComponent onLogin");
-        //     this._primaryNavEnabled = Observable.of(true);
-        //     this._appHdrCmpt.primaryNavigationEnabled = this._primaryNavEnabled;
-        //     this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
-        //         console.log("subscribe createSecurityAdvisor");
-        //         isDone = true;
-        //         console.log(response);
-        //         this.dictionaryService.reload();
-        //     });
-        //
-        // }});
-
-        // this.authenticationService.addLogoutCallback({onLogout: () => {
-        //     this._primaryNavEnabled = Observable.of(false);
-        //     this._appHdrCmpt.primaryNavigationEnabled = this._primaryNavEnabled;
-        // }});
-
     }
 
     searchFn(): (keywords: string) => void {
@@ -88,21 +66,6 @@ export class GnomexAppComponent implements OnInit {
             window.location.href = "http://localhost/gnomex/experiments/"+keywords;
         };
     }
-
-
-    // getDictionaries(): Observable<any> {
-    //     console.log("getDictionaries");
-    //     return this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-    //         console.log("return getDictionaries");
-    //         if (response.status === 200) {
-    //             return response.json();
-    //         } else {
-    //             throw new Error("Error");
-    //         }
-    //     });
-    // }
-
-
     /**
      * A convenience methods to fetch the necessary items for the Experiments dropdown.
      *

@@ -1,18 +1,16 @@
-<mat-toolbar class="flex-column-container header-one" *ngIf="isLoggedIn$ | async">
-  <!--<mat-toolbar-row class="header-one">-->
-
+<mat-toolbar class="header-one" *ngIf="isLoggedIn | async">
   <span class="experiment-menu">
         <img src="../../assets/gnomex_logo_hdr.png">
     </span>
   <span class="experiment-menu lookup">
-      <mat-form-field floatPlaceholder='auto'>
-        <input matInput type="text" [(ngModel)]="myInput"  placeholder="Lookup by #">
+      <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
+                      [floatPlaceholder]="options.value.floatPlaceholder"
+              >
+        <input matInput type="text" [(ngModel)]="objNumber"  placeholder="Lookup by #">
       </mat-form-field>
       <button (click)="searchNumber()">
         <img src="../../assets/arrow_right.png">
       </button>
-    <!--</span>-->
-    <!--<span class="experiment-menu lookup">-->
       <mat-form-field floatPlaceholder='auto'>
         <input matInput [(ngModel)]="searchText"  placeholder="Search">
       </mat-form-field>
@@ -49,7 +47,6 @@
       </mat-menu>
     <!---->
     </span>
-  <!--</mat-toolbar-row>-->
   <mat-list></mat-list>
   <mat-toolbar-row class="header-two">
 
@@ -169,11 +166,5 @@
       <img src="../../assets/page.png" alt="Bookmark">
       Reports
     </button>
-
-    <!--<mat-icon class="material-icons" [matMenuTriggerFor]="menu">dehaze</mat-icon>-->
-    <!--<mat-menu #menu="matMenu" [overlapTrigger]="false">-->
-    <!--<button mat-menu-item>Item 1</button>-->
-    <!--<button mat-menu-item>Item 2</button>-->
-    <!--</mat-menu>-->
   </mat-toolbar-row>
 </mat-toolbar>

@@ -19,10 +19,7 @@ import {
     MatInputModule,
     MatListModule,
     MatFormFieldModule,
-    MatMenuModule,
-    MatStepperModule,
-    MatError
-}  from '@angular/material';
+	MatMenuModule, ShowOnDirtyErrorStateMatcher}  from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
 
 @NgModule({
@@ -38,9 +35,11 @@ import {HEADER_ROUTING} from "./header.routes";
       MatGridListModule,
       MatToolbarModule,
       MatFormFieldModule,
+      MatMenuModule,
       BrowserAnimationsModule
   ],
    providers: [
+       // {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}
     ],
 
     declarations: [HeaderComponent],

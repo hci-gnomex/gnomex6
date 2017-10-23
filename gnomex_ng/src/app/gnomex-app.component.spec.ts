@@ -5,6 +5,10 @@ import { Router } from "@angular/router";
 import { Http } from "@angular/http";
 import { GnomexAppComponent } from "./gnomex-app.component";
 import {UserService} from "@hci/user";
+import {AuthenticationService} from "@hci/authentication";
+import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
+import {ProgressService} from "./home/progress.service";
+import {DictionaryService} from "./services/dictionary.service";
 
 /**
  * Unit tests for the CoreAppComponent.
@@ -14,7 +18,8 @@ import {UserService} from "@hci/user";
  */
 describe("SeedAppComponent Tests", () => {
   beforeEach(() => {
-    this.gnomexAppComponent = new GnomexAppComponent(<UserService> null, <Router> null, <Http> null);
+    this.gnomexAppComponent = new GnomexAppComponent(<AuthenticationService> null, <CreateSecurityAdvisorService> null,
+                              <DictionaryService> null, <Http> null, <ProgressService> null);
   });
 
   it("Should have isCollapsed set to 'true' initially", () => {

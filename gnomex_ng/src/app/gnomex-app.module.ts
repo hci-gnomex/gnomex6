@@ -10,13 +10,11 @@ import {APP_ROUTING} from "./gnomex-app.routes";
 import {HttpModule} from "@angular/http";
 import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
-import {DictionaryService} from "./services/dictionary.service";
-import {DictionaryDemoModule} from "./dictionary-demo/dictionary-demo.module";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
+import {ProgressService} from "./home/progress.service";
 import {RouterModule} from "@angular/router";
 import {FormsModule} from "@angular/forms";
-import {MATERIAL_COMPATIBILITY_MODE} from '@angular/material';
 import {
     AUTHENTICATED_USER_ENDPOINT, UserModule, UserService
 } from "@hci/user";
@@ -52,14 +50,12 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         UserModule,
         AuthenticationModule,
         NavigationModule,
-
         ExperimentsModule,
         LocalStorageModule.withConfig(localStorageServiceConfig),
         NgbModule.forRoot(),
         CommonModule,
         UserModule,
         BrowserAnimationsModule
-
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],
@@ -73,11 +69,11 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: AUTHENTICATION_ROUTE, useValue: "/authenticate"},
         {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
         {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 5},
-        {provide: MATERIAL_COMPATIBILITY_MODE, useValue: true},
         UserService,
         AuthenticationService,
         ExperimentsService,
-        LocalStorageService
+        ProgressService
+
     ]
 })
 export class GnomexAppModule {

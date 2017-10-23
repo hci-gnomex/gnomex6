@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, OnInit, ViewEncapsulation} from "@angular/core";
+import {Component, ElementRef, OnInit, ViewEncapsulation} from "@angular/core";
 import { ExperimentsService } from '../experiments/experiments.service';
+import {ProgressService} from "../home/progress.service";
 import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {Observable} from "rxjs/Observable";
+import {LocalStorageService} from "angular-2-local-storage";
+import {FormBuilder, FormGroup} from "@angular/forms";
 
 @Component({
-  selector: "gnomex-header",
-  templateUrl: "./header.component.html",
-  // template: require("./header.component.html"),
+    selector: "gnomex-header",
+    templateUrl: "./header.component.html",
+    // template: require("./header.component.html"),
     styles: [`
         .example-fill-remaining-space {
         // This fills the remaining space, by using flexbox.
@@ -62,45 +65,48 @@ import {Observable} from "rxjs/Observable";
             border-top-color: white;
             border-bottom-color: white;
         }
-        .mat-menu-panel.myPanel {
-            max-width: 30em;
-            color: black !important;
-            background-color: white !important;
-            border-top-color: white;
-            border-bottom-color: white;
-        }
 
     `],
-        encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None
 })
-  export class HeaderComponent implements OnInit{
-  isLoggedIn$: Observable<boolean>;
 
-  constructor(private authService: AuthenticationService) {
-    // Do instance configuration here
+export class HeaderComponent implements OnInit{
+    isLoggedIn: Observable<boolean>;
+    options: FormGroup;
 
-  }
-    public myInput: string;
+    constructor(private authenticationService: AuthenticationService,
+                private progressService: ProgressService,
+                private localStorageService: LocalStorageService,
+                private formBuilder: FormBuilder) {
+        this.options = this.formBuilder.group({
+            hideRequired: false,
+            floatPlaceholder: 'auto',
+        });
+
+    }
+
+    public objNumber: string;
     public searchText: string;
     private experimentService: ExperimentsService;
     ngOnInit() {
-      this.isLoggedIn$ = this.authService.isAuthenticated();
+        this.authenticationService.isAuthenticated().subscribe( response => {
+            this.isLoggedIn = response && this.progressService.hideLoader.asObservable();
+        });
     }
     public myErrorStateMatcher(): boolean {
         return true;
     }
     public searchNumber() {
-        console.log(this.myInput);
+        console.log(this.objNumber);
     }
     public searchByText() {
         console.log(this.searchText);
     }
     public browseExp() {
-        console.log('Browse Experiments selected');
     }
 
     onLogout() {
-        this.authService.logout();
+        this.authenticationService.logout();
     }
 
 }
