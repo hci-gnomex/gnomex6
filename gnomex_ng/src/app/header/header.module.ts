@@ -18,7 +18,8 @@ import {
     MatInputModule,
     MatListModule,
     MatFormFieldModule,
-    MatStepperModule, MatError
+    MatStepperModule, MatError,
+    MatMenuModule, ShowOnDirtyErrorStateMatcher
 }  from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {HEADER_ROUTING} from "./header.routes";
@@ -36,9 +37,11 @@ import {HEADER_ROUTING} from "./header.routes";
       MatGridListModule,
       MatToolbarModule,
       MatFormFieldModule,
+      MatMenuModule,
       BrowserAnimationsModule
   ],
    providers: [
+       // {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}
     ],
 
     declarations: [HeaderComponent],

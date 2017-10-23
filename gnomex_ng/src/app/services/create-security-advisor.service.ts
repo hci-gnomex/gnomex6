@@ -5,6 +5,7 @@ import {Observable} from "rxjs/Observable";
 import 'rxjs/add/operator/map';
 import {LabListService} from "./lab-list.service";
 import {DictionaryService} from "./dictionary.service";
+import {ProgressService} from "../home/progress.service";
 
 @Injectable()
 export class CreateSecurityAdvisorService {
@@ -95,7 +96,8 @@ export class CreateSecurityAdvisorService {
     }
 
     constructor(private http: Http,
-                private labListService: LabListService, private dictionaryService: DictionaryService) {
+                private labListService: LabListService, private dictionaryService: DictionaryService,
+                private progressService: ProgressService) {
     }
 
     public hasPermission(permission: string): boolean {
@@ -115,8 +117,10 @@ export class CreateSecurityAdvisorService {
 
     createSecurityAdvisor(): Observable<any> {
         console.log("createSecurityAdvisor new");
+        this.progressService.displayLoader(20);
         return this.http.get("/gnomex/CreateSecurityAdvisor.gx", {withCredentials: true}).map((response: Response) => {
             console.log("return createSecurityAdvisor");
+            this.progressService.displayLoader(60);
             if (response.status === 200) {
                 this.result = response.json();
 
@@ -146,6 +150,7 @@ export class CreateSecurityAdvisorService {
 
                 this.labListService.getLabList().subscribe((response: any[]) => {
                     console.log("Lab List Loaded");
+                    this.progressService.displayLoader(80);
                 });
 
                 return this.result;
