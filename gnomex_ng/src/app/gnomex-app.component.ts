@@ -9,13 +9,13 @@ import {LocalStorageService} from "angular-2-local-storage";
 import {UserService} from "@hci/user";
 import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {HeaderComponent} from "./header/header.component";
-import {AppHeaderComponent} from "@hci/app-header";
 import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigationItemGroup} from "@hci/navigation";
 
 import {Observable} from "rxjs/Observable";
 import 'rxjs/operator/finally';
-//import {promise} from "selenium-webdriver";
+import 'rxjs/add/operator/catch'
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
+import {ProgressService} from "./home/progress.service";
 import {DictionaryService} from "./services/dictionary.service";
 
 
@@ -37,66 +37,50 @@ export class GnomexAppComponent implements OnInit {
     private appNameTitle: string = "Gnomex";
 
   @ViewChild(HeaderComponent)
-  private _appHdrCmpt: AppHeaderComponent;
-
-  //@ViewChild(AppFooterComponent)
-  //private _appFooterCmpt: AppFooterComponent;
 
     private _primaryNavEnabled: Observable<boolean>;
 
-    constructor(private authHttp: AuthHttp,
-                private userService: UserService,
-                private authenticationService: AuthenticationService,
+    constructor(private authenticationService: AuthenticationService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
-                private router: Router,
                 private http: Http,
-                private _localStorageService: LocalStorageService) {
+                private progressService: ProgressService) {
     }
 
 
     ngOnInit() {
         let isDone: boolean = false;
         console.log("GnomexAppComponent ngOnInit");
-        // this.setupHeaderComponent();
-        // this.setupFooterComponent();
         this.authenticationService.isAuthenticated().subscribe( response => {
             if (response) {
                 this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
                     console.log("subscribe createSecurityAdvisor");
                     isDone = true;
                     console.log(response);
+                    this.dictionaryService.reload();
+                    this.progressService.displayLoader(80);
                 });
             }
         });
 
-        this.authenticationService.isAuthenticated().subscribe((authenticated: boolean) => {
-            if (authenticated) {
-                this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
-                    console.log("subscribe createSecurityAdvisor");
-                    isDone = true;
-                    console.log(response);
-                });
-            }
-        });
-    }
+        // this.authenticationService.addLoginCallback({onLogin: () => {
+        //     console.log("GnomexAppComponent onLogin");
+        //     this._primaryNavEnabled = Observable.of(true);
+        //     this._appHdrCmpt.primaryNavigationEnabled = this._primaryNavEnabled;
+        //     this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
+        //         console.log("subscribe createSecurityAdvisor");
+        //         isDone = true;
+        //         console.log(response);
+        //         this.dictionaryService.reload();
+        //     });
+        //
+        // }});
 
-    createSecurityAdvisor(): Observable<any> {
-        console.log("createSecurityAdvisor");
-        return this.http.get("/gnomex/CreateSecurityAdvisor.gx", {withCredentials: true}).map((response: Response) => {
-            console.log("return createSecurityAdvisor");
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }).flatMap(() => this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-            console.log("return getDictionaries");
-        }));
-        // this.getDictionaries().subscribe((response: Array<Object>) => {
-        //   console.log("subscribe createDictionaries");
-        //   console.log(response);
-        // }));
+        // this.authenticationService.addLogoutCallback({onLogout: () => {
+        //     this._primaryNavEnabled = Observable.of(false);
+        //     this._appHdrCmpt.primaryNavigationEnabled = this._primaryNavEnabled;
+        // }});
+
     }
 
     searchFn(): (keywords: string) => void {
@@ -106,17 +90,17 @@ export class GnomexAppComponent implements OnInit {
     }
 
 
-    getDictionaries(): Observable<any> {
-        console.log("getDictionaries");
-        return this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-            console.log("return getDictionaries");
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        });
-    }
+    // getDictionaries(): Observable<any> {
+    //     console.log("getDictionaries");
+    //     return this.http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
+    //         console.log("return getDictionaries");
+    //         if (response.status === 200) {
+    //             return response.json();
+    //         } else {
+    //             throw new Error("Error");
+    //         }
+    //     });
+    // }
 
 
     /**
@@ -202,7 +186,7 @@ export class GnomexAppComponent implements OnInit {
         ];
         return items;
     }
-
+/*
     private setupHeaderComponent() {
         this._appHdrCmpt.primaryNavigationEnabled = this.authenticationService.isAuthenticated();
         this._appHdrCmpt.iconPath = "./assets/gnomex_logo.png";
@@ -244,7 +228,7 @@ export class GnomexAppComponent implements OnInit {
                         new PrimaryNavigationItem({
                             name: "Workflow",
                             route: "/workflow",
-                            iconClass: "fa fa-random"/*, visibility: "LIMS"*/
+                            iconClass: "fa fa-random"/*, visibility: "LIMS"
                         }),
                         new PrimaryNavigationItem({name: "Products", route: "/products", iconClass: "fa fa-shopping-basket"}),
                         new PrimaryNavigationItem({name: "Billing", route: "/billing", iconClass: "fa fa-money"}),
@@ -255,10 +239,6 @@ export class GnomexAppComponent implements OnInit {
         ];
 
 
-        /*
-         * TODO: BHY (08/12/16) - This changes based on the users current state (authenticated or not) as informed by the user
-         * service.
-         */
         this._appHdrCmpt.userMenuDropdownClass = "gx-user-menu fa fa-user-circle";
         this._appHdrCmpt.userMenuItems = [
             new NavigationItem({name: "My Account", route: "foo"}),
@@ -271,10 +251,6 @@ export class GnomexAppComponent implements OnInit {
                 }
             })];
 
-        /*
-         * TODO: JEH (10/28/16) - Update this ADMIN role when we know what it is. May also add roles to individual nav items
-         * The role specified below is require to expose the admin menu
-         */
         this._appHdrCmpt.adminMenuDropdownClass = "fa fa-gear gx-admin-menu";
         this._appHdrCmpt.adminRole = "ADMIN";
         // Each item/action in the admin menu may be guarded by a different role or none at all.
@@ -282,19 +258,6 @@ export class GnomexAppComponent implements OnInit {
             new NavigationItem({name: "Users & Groups", route: "/admin/usersgroups", iconClass: "fa fa-users"}),
             new NavigationItem({name: "Configure", route: "/config", iconClass: "fa fa-gear"}),
         ];
-        /* add back when/if necessary
-         this._appHdrCmpt.adminActionItems = [
-         new NavigationAction(
-         {
-         name: "Admin Action",
-         action: () => {
-         alert("Admin action menu item executed!");
-         }
-         })
-         ];*/
-        // TODO: BHY (08/12/16) - Enable this when we identify the use case.
-        // this._appHdrCmpt.headerAction = new HciHeaderAction("Create Foo", this._demoAppSvc.buttonAction());
-        // TODO: BHY (08/12/16) - Enable this when we identify the use case.
-        // this._appHdrCmpt.searchFn = this._demoAppSvc.searchFn();
     }
+    */
 }

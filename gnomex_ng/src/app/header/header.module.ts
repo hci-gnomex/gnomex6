@@ -2,6 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -18,9 +19,10 @@ import {
     MatInputModule,
     MatListModule,
     MatFormFieldModule,
-    MatStepperModule, MatError
+    MatMenuModule,
+    MatStepperModule,
+    MatError
 }  from '@angular/material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {HEADER_ROUTING} from "./header.routes";
 
 @NgModule({

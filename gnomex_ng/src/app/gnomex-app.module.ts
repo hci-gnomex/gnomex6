@@ -25,12 +25,10 @@ import {
     AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_ROUTE,
     AUTHENTICATION_TOKEN_KEY, AUTHENTICATION_TOKEN_ENDPOINT, AUTHENTICATION_DIRECT_ENDPOINT, AUTHENTICATION_MAX_INACTIVITY_MINUTES
 } from "@hci/authentication";
-import {AppHeaderModule} from "@hci/app-header";
 import {NavigationModule} from "@hci/navigation";
 import {LocalStorageModule, LocalStorageService, ILocalStorageServiceConfig} from "angular-2-local-storage";
 
 import "./gnomex-app.css";
-import {AppFooterModule, APP_INFO_SOURCE} from "@hci/app-footer";
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -51,7 +49,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         FormsModule,
         HeaderModule,
         HomeModule,
-        AppHeaderModule,
         UserModule,
         AuthenticationModule,
         NavigationModule,
@@ -80,8 +77,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         UserService,
         AuthenticationService,
         ExperimentsService,
-        LocalStorageService,
-        {provide: APP_INFO_SOURCE, useValue: "data/appInfo.json"}
+        LocalStorageService
     ]
 })
 export class GnomexAppModule {
