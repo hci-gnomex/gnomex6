@@ -86,11 +86,11 @@ export class PrimaryTab implements OnDestroy{
             control= (<FormArray>this.theForm.controls["childForms"]).get(path);
         }
 
-        if (control && (control.touched || control.dirty)) {
-            control.clearValidators();
-            control.setValidators(dependentControl(linkerControlName, this.rules));
-            control.setErrors({'dependentControl': null});
-            control.updateValueAndValidity();
+            if(control && (control.touched || control.dirty)){
+                control.clearValidators();
+                control.setValidators(dependentControl(linkerControlName,this.rules));
+                control.setErrors({'dependentControl':null});
+                control.updateValueAndValidity();
         }
 
 
@@ -98,10 +98,10 @@ export class PrimaryTab implements OnDestroy{
     protected controlsToLink(dependentControlName:string, control: AbstractControl):void{
         let controlName = null;
         let parent = control.parent;
-        Object.keys(parent.controls).forEach((name) => {
-            if (control === parent.controls[name]) {
+        Object.keys(parent.controls).forEach((name) =>{
+            if(control === parent.controls[name]){
                 controlName = name;
-            }
+    }
         });
         control.valueChanges.debounceTime(2000).subscribe(value => this.validateControl(value,dependentControlName,controlName))
     }
