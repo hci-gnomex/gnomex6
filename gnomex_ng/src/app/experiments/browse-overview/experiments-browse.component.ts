@@ -1,6 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import {PrimaryTab} from "../../util/tabs/primary-tab.component";
 import {FormBuilder} from "@angular/forms";
+import {ExperimentsService} from "../experiments.service";
 
 @Component({
     template: `
@@ -8,8 +9,9 @@ import {FormBuilder} from "@angular/forms";
     `
 })
 export class ExperimentsBrowseTab extends PrimaryTab implements OnInit{
-    name ="Experiments";
-    constructor(protected fb: FormBuilder) {
+    name:string = "Experiments";
+
+    constructor(protected fb: FormBuilder, private experimentService:ExperimentsService) {
         super(fb);
     }
 
