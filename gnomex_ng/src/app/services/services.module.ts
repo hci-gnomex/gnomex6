@@ -1,33 +1,39 @@
-import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {AppUserListService} from "./app-user-list.service";
-import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
-import {GetLabService} from "./get-lab.service";
-import {LabListService} from "./lab-list.service";
+import {NgModule} from "@angular/core";
+
 import {AnalysisService} from "./analysis.service";
-import {DictionaryService} from "./dictionary.service";
-import {DataTrackService} from "./data-track.service";
-import {ExperimentViewService} from "./experiment-view.service";
+import {AppUserListService} from "./app-user-list.service";
 import {BillingService} from "./billing.service";
-import {ExperimentResolverService,ProjectResolverService} from "./resolvers/index";
-import {LaunchPropertiesService} from "./launch-properites.service";
+import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
+import {DataTrackService} from "./data-track.service";
+import {DictionaryService} from "./dictionary.service";
+import {ExperimentViewService} from "./experiment-view.service";
+import {GetLabService} from "./get-lab.service";
+import {HttpService} from "./http.service";
+import {LabListService} from "./lab-list.service";
+import {PropertyService} from "./property.service";
+
+import {ExperimentResolverService} from "./resolvers/index";
+import {ProjectResolverService} from "./resolvers/index";
+
 @NgModule({
     imports: [CommonModule],
     declarations: [],
     exports: [],
     providers: [
-        AppUserListService,
-        CreateSecurityAdvisorService,
-        GetLabService,
-        LabListService,
         AnalysisService,
-        DictionaryService,
-        DataTrackService,
-        ExperimentViewService,
+        AppUserListService,
         BillingService,
+        CreateSecurityAdvisorService,
+        DataTrackService,
+        DictionaryService,
+        ExperimentViewService,
+        GetLabService,
+        HttpService,
+        LabListService,
+        PropertyService,
         ExperimentResolverService,
         ProjectResolverService,
-        LaunchPropertiesService
     ]})
 export class ServicesModule {
 }
