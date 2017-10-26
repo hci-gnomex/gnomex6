@@ -2,6 +2,7 @@ import {Inject, Injectable, OpaqueToken} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 //import {Observer} from "rxjs/Observer";
 
 export let BROWSE_EXPERIMENTS_ENDPOINT: OpaqueToken = new OpaqueToken("browse_experiments_url");
@@ -11,7 +12,8 @@ export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experim
 export class ExperimentsService {
 
 	private experimentOrders: any[];
-    public projectRequestList: any[];
+    private projectRequestList: any[];
+    public selectedTreeNode:any;
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
@@ -20,6 +22,15 @@ export class ExperimentsService {
     private haveLoadedExperimentOrders: boolean = false;
     private previousURLParams: URLSearchParams = null;
     private changeStatusSubject: Subject<any> = new Subject();
+    private requestProgressList: BehaviorSubject<any>= new BehaviorSubject([]);
+    private requestProgressDNASeqList: BehaviorSubject<any> = new BehaviorSubject([]);
+    private requestProgressSolexaList:BehaviorSubject<any> = new BehaviorSubject([]);
+
+    // conditional params
+    browsePanelParams:URLSearchParams;
+
+
+
 
     constructor(private _http: Http, @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
@@ -241,5 +252,51 @@ export class ExperimentsService {
             }
         });
     }
+
+
+    getRequestProgressListObservable():Observable<any>{
+        return this.requestProgressList;
+    }
+    getRequestProgressList_FromBackend(params:URLSearchParams):void{
+        this._http.get("/gnomex/GetRequestProgressList.gx",{search:params})
+            .subscribe((response: Response)=> {
+                if (response.status === 200){
+                    this.requestProgressDNASeqList.next(response.json());
+                }else{
+                    throw new Error("Error");
+                }
+            });
+    }
+
+    getRequestProgressSolexaListObservable():Observable<any>{
+       return this.requestProgressSolexaList.asObservable();
+    }
+    getRequestProgressSolexaList_FromBackend(params: URLSearchParams):void{
+        this._http.get("/gnomex/GetRequestProgressSolexaList.gx",{search:params})
+            .subscribe((response: Response)=> {
+                if (response.status === 200){
+                    this.requestProgressDNASeqList.next(response.json());
+                }else{
+                    throw new Error("Error");
+                }
+            });
+
+    }
+
+    getRequestProgressDNASeqListObservable(){
+        return this.requestProgressDNASeqList.asObservable();
+    }
+    getRequestProgressDNASeqList_FromBackend(params: URLSearchParams):void{
+        this._http.get("/gnomex/GetRequestProgressDNASeqList.gx",{search:params})
+            .subscribe((response: Response)=> {
+            if (response.status === 200){
+                this.requestProgressDNASeqList.next(response.json());
+            }else{
+                throw new Error("Error");
+            }
+        });
+    }
+
+
 
 }
