@@ -17,7 +17,7 @@ import {Subscription} from "rxjs/Subscription";
     template: `
         <div class="flex-container">
             
-        <div>
+                <div >
                     {{ this.experimentsService.experimentList.length + " Experiments"}}
                 </div>
                 <div >
@@ -36,25 +36,8 @@ import {Subscription} from "rxjs/Subscription";
         <div style="height: 100%;width:100%">
             <tab-container (tabChanged)="changedTab($event)"
                            [state]="state"
-                </div>
-                <div >
-                    <label>Experiment #</label>
-                    <jqxComboBox  class="inlineComboBox" 
-                            [width]="170" 
-                            [height]="20"
-                            [source]="orderedExperimentIds"
-                            (onSelect)="onIDSelect($event)" >
-                    </jqxComboBox>
-                </div>
-
-            
-        </div>
-        
-        <div style="height: 100%;width:100%">
-            <tab-container (tabChanged)="changedTab($event)"
-                           [state]="state" 
                            [componentNames]="tabNames">
-                
+
             </tab-container>
         </div>
 `,
@@ -70,7 +53,6 @@ import {Subscription} from "rxjs/Subscription";
         }
     `]
 })
-
 export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any;
     private readonly EXPERIMENT:string = "ExperimentsBrowseTab";
     private readonly PROGRESS:string = "ProgressBrowseTab";
