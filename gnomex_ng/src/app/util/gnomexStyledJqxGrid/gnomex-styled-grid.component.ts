@@ -1,4 +1,3 @@
-
 import {
     AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output,
     ViewChild
