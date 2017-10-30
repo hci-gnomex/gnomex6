@@ -1,4 +1,19 @@
-<span class="login-view"></span>
+<span [ngStyle]= "{'background-image': 'url(' + site_splash + ')'}" style="height: 20em;
+        width: 35em;
+        margin-left: 40em;
+        display: block;
+        background-repeat: no-repeat;" *ngIf="hideLoader | async;else loading"></span>
+<ng-template #loading>
+    <div #loadingWindow class="gnomex-splash">
+        <div style="text-align: center;vertical-align: top">
+            <img src={{site_logo}}>
+        </div>
+        <div style="position: absolute;bottom: 5em; width: 100%">
+            <jqxProgressBar #loadingProgress [width]="270" [height]="15" [value]="10" [colorRanges]="colorRanges">
+            </jqxProgressBar>
+        </div>
+    </div>
+</ng-template>
 
 <div class="container">
   <div class="card-group">

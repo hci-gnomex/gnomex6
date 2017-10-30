@@ -1,4 +1,8 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
+
+import {
+    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output,
+    ViewChild
+} from "@angular/core";
 
 import { jqxGridComponent } from "../../../assets/jqwidgets-ts/angular_jqxgrid";
 
@@ -12,14 +16,25 @@ import { jqxGridComponent } from "../../../assets/jqwidgets-ts/angular_jqxgrid";
 })
 export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewInit {
 
+
+	private _selectionSetting:string ="checkbox";
+	@Input() set selectionSetting(value:string){
+		this._selectionSetting = value;
+	}
+	get selectionSetting():string{
+		return this._selectionSetting;
+	}
+	@Input() styleForTheme:string ="gnomex5";
+
+
+    @Output() rowDoubleClicked: EventEmitter<any> = new EventEmitter();
+
 	@ViewChild('theGrid') theGrid: jqxGridComponent;
 	@ViewChild('artificialGridBounding') artificialGridBounding: ElementRef;
 	@ViewChild('boundingParent') boundingParent: ElementRef;
 
 	private isResizing: boolean = false;
 	private isGridDrawn: boolean = false;
-
-	selectionMode: string = 'checkbox';
 
 	autoresize: boolean = true;
 	pageable: boolean = false;
@@ -141,5 +156,9 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 		//this.theGrid.pageable(source.localdata.length > 250);
 
 		//this.pageable = source.localdata.length > 250;
+	}
+    doubleClickedRow($event:any){
+		this.rowDoubleClicked.emit($event);
+
 	}
 }

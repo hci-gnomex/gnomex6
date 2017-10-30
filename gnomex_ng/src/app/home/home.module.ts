@@ -5,14 +5,18 @@ import {NgModule} from "@angular/core";
 import {HOME_ROUTING} from "./home.routes";
 import {CommonModule} from "@angular/common";
 import {HomeComponent} from "./home.component";
+import {ProgressService} from "../home/progress.service";
+import { ProgressBarModule } from "../../modules/progressbar.module";
+import { WindowModule }       from "../../modules/window.module";
+import {LaunchPropertiesService} from "../services/launch-properites.service";
 
-/**
- * @author brandony <brandon.youkstetter@hci.utah.edu>
- * @since 8/26/16
- */
 @NgModule({
-  imports: [HOME_ROUTING, CommonModule],
-  declarations: [HomeComponent]
+  imports: [HOME_ROUTING, CommonModule,
+      WindowModule, ProgressBarModule],
+  declarations: [HomeComponent],
+  providers: [ProgressService, LaunchPropertiesService
+
+  ]
 })
 export class HomeModule {
 }

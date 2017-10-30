@@ -2,6 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -10,18 +11,15 @@ import {UserModule} from "@hci/user";
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {HeaderComponent} from "./header.component";
-import {
-    MdGridListModule,
-    MdToolbarModule,
-    MdButtonModule,
-    MdMenuModule,
-    MdInputModule,
-    MdListModule,
-    MdFormFieldModule,
-    MdStepperModule, MdError, showOnDirtyErrorStateMatcher, MD_ERROR_GLOBAL_OPTIONS
 
-}  from '@angular/material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {
+    MatGridListModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatInputModule,
+    MatListModule,
+    MatFormFieldModule,
+	MatMenuModule, ShowOnDirtyErrorStateMatcher}  from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
 
 @NgModule({
@@ -31,18 +29,18 @@ import {HEADER_ROUTING} from "./header.routes";
       FormsModule,
       CommonModule,
       UserModule,
-      MdButtonModule,
-      MdMenuModule,
-      MdInputModule,
-      MdListModule,
-      MdGridListModule,
-      MdToolbarModule,
-      MdFormFieldModule,
+      MatButtonModule,
+      MatInputModule,
+      MatListModule,
+      MatGridListModule,
+      MatToolbarModule,
+      MatFormFieldModule,
+      MatMenuModule,
       BrowserAnimationsModule
   ],
    providers: [
-        {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}
-   ],
+       // {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}
+    ],
 
     declarations: [HeaderComponent],
     exports: [HeaderComponent]

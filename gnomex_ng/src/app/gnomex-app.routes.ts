@@ -15,7 +15,11 @@ import {HomeComponent} from "./home/home.component";
  * @since 1.0.0
  */
 export const ROUTES: Routes = [
-  {path: "", redirectTo: "home", pathMatch: "full"},
+    {path: "", redirectTo: "home", pathMatch: "full"},
+    {path: "authenticate", component: DirectLoginComponent},
+    {path: "home", component: HomeComponent, canActivate: [RouteGuardService]}
 ];
 
 export const APP_ROUTING = RouterModule.forRoot(ROUTES);
+
+

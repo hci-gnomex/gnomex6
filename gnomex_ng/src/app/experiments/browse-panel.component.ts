@@ -8,7 +8,7 @@ import {Component,OnInit} from "@angular/core";
 @Component({
     selector: 'browse-panel',
     template: `        
-        <div>
+        <div style="height: calc(100% - 6em);">
             <router-outlet name="browsePanel"></router-outlet>
         </div>
 `

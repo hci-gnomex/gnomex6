@@ -27,7 +27,8 @@ import {Router} from "@angular/router";
             display: inline-block;
         }
 
-        .hintLink {
+        .hintLink
+        {
             fontSize: 9;
             paddingLeft: 1;
             paddingRight: 1;
@@ -68,29 +69,31 @@ import {Router} from "@angular/router";
             font-size: small;
         }
 
-
+        .br-exp-one {
             width: 100%;
+            flex-grow: .25;
 
         }
 
-        .help-drag-drop {
+        .br-exp-help-drag-drop {
             width: 100%;
             flex-grow: .10;
         }
 
-        .three {
+        .br-exp-three {
             width: 100%;
             height: 6em;
             flex-grow: 8;
         }
 
-        .four {
+        .br-exp-four {
             width: 100%;
             flex-grow: .10;
         }
 
-        .five {
-            width: 100%;            flex-grow: .10;
+        .br-exp-five {
+            width: 100%;
+            flex-grow: .10;
         }
 
         .t {
@@ -123,12 +126,11 @@ import {Router} from "@angular/router";
             padding: 0.3em;
             border-radius: 0.3em;
             border: 1px solid darkgrey;
-
+            display: flex;
             flex-direction: column;
         }
         .experiment-detail-panel {
             width:75%;
-            padding: 2em;
             margin-left: 2em;
             border: #C8C8C8 solid thin;
             overflow: auto;
@@ -239,7 +241,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
+            this.experimentsService.emitExperimentOverviewList(response);
+            setTimeout(()=>{
+                this.treeModel.expandAll();
         });
+        });
+
 
     }
 
@@ -258,6 +265,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         } else {
             this.items = response;
         }
+        this.labs = this.labs.concat(this.items);
         for( var l of this.items) {
             if (!this.isArray(l.Project)) {
                 l.items = [l.Project];
@@ -730,6 +738,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     treeOnSelect(event: any) {
         console.log("event");
         this.selectedItem = event.node;
+        let idLab = this.selectedItem.data.idLab;
+        let idProject = this.selectedItem.data.idProject;
+        let idRequest = this.selectedItem.data.idRequest;
+
+        let projectRequestListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
 
         //Lab
         if (this.selectedItem.level === 1) {
@@ -737,24 +750,28 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.deleteProject.disabled(true);
 
             this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+            this.experimentService.emitExperimentOverviewList(projectRequestListNode);
+
+
             //Project
         } else if (this.selectedItem.level === 2) {
             this.newProject.disabled(false);
             this.deleteProject.disabled(false);
 
-            let idLab = this.selectedItem.data.idLab;
-            let idProject = this.selectedItem.data.idProject;
             this.router.navigate(['/experiments',
                 {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}]);
+            this.experimentService.emitExperimentOverviewList(projectRequestListNode);
 
             //Experiment
         } else {
 
-            let id = this.selectedItem.data.idRequest;
-            this.router.navigate(['/experiments',{outlets:{'browsePanel':[id]}}]);
+            this.router.navigate(['/experiments',{outlets:{'browsePanel':[idRequest]}}]);
             this.newProject.disabled(true);
             this.deleteProject.disabled(true);
         }
+        this.experimentService.selectedTreeNode = _.cloneDeep(this.selectedItem.data);
+
+
     }
 
     /**
