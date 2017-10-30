@@ -3,16 +3,21 @@ import {PrimaryTab} from './primary-tab.component'
 // Probably in real app would move to a shared folder visible in app.module
 @Component({
     selector: 'tab',
-    styles: [`
-    .pane{
-      padding: 1em;
-    }
+    styles: [`        
+        .pane {
+            padding-left: 1em;
+            height: 100%;
+        }
+        ::content >>> tab {background-color:grey}
   `],
     template: `
-    <div [hidden]="!active" class="pane">
-     <ng-content></ng-content>
-    </div>
-  `
+
+        <div [hidden]="!active" class="pane">
+            <ng-content></ng-content>
+        </div>
+        
+
+    `
 })
 export class Tab {
     @Input('tabTitle') title: string;

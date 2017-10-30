@@ -6,13 +6,14 @@ import {ProgressService} from "../home/progress.service";
 @Injectable()
 export class DictionaryService {
 
-    public static BILLING_PERIOD: string = "hci.gnomex.model.BillingPeriod";
-    public static CORE_FACILITY: string = "hci.gnomex.model.CoreFacility";
-    public static GENOME_BUILD: string = "hci.gnomex.model.GenomeBuildLite";
-    public static OLIGO_BARCODE: string = "hci.gnomex.model.OligoBarcode";
-    public static ORGANISM: string = "hci.gnomex.model.OrganismLite";
-    public static REQUEST_CATEGORY: string = "hci.gnomex.model.RequestCategory";
-    public static SEQ_LIB_PROTOCOL: string = "hci.gnomex.model.SeqLibProtocol";
+    public static readonly BILLING_PERIOD: string = "hci.gnomex.model.BillingPeriod";
+    public static readonly CORE_FACILITY: string = "hci.gnomex.model.CoreFacility";
+    public static readonly GENOME_BUILD: string = "hci.gnomex.model.GenomeBuildLite";
+    public static readonly OLIGO_BARCODE: string = "hci.gnomex.model.OligoBarcode";
+    public static readonly ORGANISM: string = "hci.gnomex.model.OrganismLite";
+    public static readonly REQUEST_CATEGORY: string = "hci.gnomex.model.RequestCategory";
+    public static readonly SEQ_LIB_PROTOCOL: string = "hci.gnomex.model.SeqLibProtocol";
+    public static readonly APPLICATION:string = "hci.gnomex.model.Application";
 
     private cachedDictionaryString: any;
     private cacheExpirationTime: number = 0;

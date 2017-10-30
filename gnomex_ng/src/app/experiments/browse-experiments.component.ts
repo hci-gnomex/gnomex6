@@ -27,7 +27,8 @@ import {Router} from "@angular/router";
             display: inline-block;
         }
 
-        .hintLink {
+        .hintLink
+        {
             fontSize: 9;
             paddingLeft: 1;
             paddingRight: 1;
@@ -130,7 +131,6 @@ import {Router} from "@angular/router";
         }
         .experiment-detail-panel {
             width:75%;
-            padding: 2em;
             margin-left: 2em;
             border: #C8C8C8 solid thin;
             overflow: auto;
@@ -241,7 +241,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
+            this.experimentsService.emitExperimentOverviewList(response);
+            setTimeout(()=>{
+                this.treeModel.expandAll();
         });
+        });
+
 
     }
 
@@ -737,6 +742,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         let idProject = this.selectedItem.data.idProject;
         let idRequest = this.selectedItem.data.idRequest;
 
+        let projectRequestListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
 
         //Lab
         if (this.selectedItem.level === 1) {
@@ -744,6 +750,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.deleteProject.disabled(true);
 
             this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+            this.experimentService.emitExperimentOverviewList(projectRequestListNode);
+
+
             //Project
         } else if (this.selectedItem.level === 2) {
             this.newProject.disabled(false);
@@ -751,6 +760,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             this.router.navigate(['/experiments',
                 {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}]);
+            this.experimentService.emitExperimentOverviewList(projectRequestListNode);
 
             //Experiment
         } else {

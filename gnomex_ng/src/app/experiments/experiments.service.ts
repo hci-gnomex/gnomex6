@@ -26,12 +26,12 @@ export class ExperimentsService {
     private requestProgressDNASeqList: BehaviorSubject<any> = new BehaviorSubject([]);
     private requestProgressSolexaList:BehaviorSubject<any> = new BehaviorSubject([]);
 
+    private experimentOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
+    private filteredExperimentOverviewListSubject:Subject<any> = new Subject();
+
     // conditional params
     browsePanelParams:URLSearchParams;
-
-
-
-
+    experimentList:Array<any> =[];
     constructor(private _http: Http, @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
     getExperiments() {
@@ -261,7 +261,7 @@ export class ExperimentsService {
         this._http.get("/gnomex/GetRequestProgressList.gx",{search:params})
             .subscribe((response: Response)=> {
                 if (response.status === 200){
-                    this.requestProgressDNASeqList.next(response.json());
+                    this.requestProgressList.next(response.json());
                 }else{
                     throw new Error("Error");
                 }
@@ -275,7 +275,7 @@ export class ExperimentsService {
         this._http.get("/gnomex/GetRequestProgressSolexaList.gx",{search:params})
             .subscribe((response: Response)=> {
                 if (response.status === 200){
-                    this.requestProgressDNASeqList.next(response.json());
+                    this.requestProgressSolexaList.next(response.json());
                 }else{
                     throw new Error("Error");
                 }
@@ -295,6 +295,21 @@ export class ExperimentsService {
                 throw new Error("Error");
             }
         });
+    }
+    emitExperimentOverviewList(data:any):void{
+        this.experimentOverviewListSubject.next(data);
+    }
+    resetExperimentOverviewListSubject(){
+        this.experimentOverviewListSubject = new BehaviorSubject([]);
+    }
+    getExperimentOverviewListSubject():BehaviorSubject<any>{
+        return this.experimentOverviewListSubject;
+    }
+    emitFilteredOverviewList(data:any):void{
+        this.filteredExperimentOverviewListSubject.next(data);
+    }
+    getFilteredOverviewListObservable():Observable<any>{
+        return this.filteredExperimentOverviewListSubject.asObservable();
     }
 
 
