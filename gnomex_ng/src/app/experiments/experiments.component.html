@@ -1,6 +1,6 @@
 <div class="background">
     <div class="flex-column-container">
-        <div style="flex-grow: .01;" class="item one">
+        <div style="flex-grow: .01;" class="br-exp-item br-exp-one">
             <div style="margin-bottom: 0.3em;">
                 <browse-filter [label]="'Experiments'" [iconSource]="'assets/flask.png'"
                                [mode]="'experimentBrowse'"></browse-filter>
@@ -8,14 +8,14 @@
         </div>
 
        <div style="flex:1;"class="flex-row-container">
-            <div class="item" style="width: 15%;border: #c8c8c8 solid thin "> <!-- start tree container -->
+            <div class="br-exp-item" style="width: 15%;"> <!-- start tree container -->
                 <div class="flex-column-container" style="height:100%;">
-                    <div class="item help-drag-drop">
+                    <div class="br-exp-item br-exp-help-drag-drop">
                         <div class="flex-row-container">
-                            <div class="item-row item-row-one">
+                            <div class="br-exp-item-row-one">
                                 {{experimentCount}} experiments
                             </div>
-                            <div class="item-row item-row-two">
+                            <div class="br-exp-item-row-two">
                                 <jqxButton #dragDropHint [template]="'link'" (onClick)="dragDropHintClicked()"
                                            [imgSrc]="'assets/information.png'" [imgPosition]="'center'"
                                            [textImageRelation]="'imageBeforeText'">Drag-and-drop hint
@@ -23,7 +23,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="item three">
+                    <div class="br-exp-item br-exp-three">
                         <tree-root #tree (moveNode)="onMoveNode($event)"
                                    (dragEnd)="onDragEnd1($event)"
                                    (activate)="treeOnSelect($event)"
@@ -34,15 +34,15 @@
                             </ng-template>
                         </tree-root>
                     </div>
-                    <div class="item four">
+                    <div class="br-exp-item br-exp-four">
                         <div class="flex-row-container">
-                            <div class="item-row item-row-one">
+                            <div class="br-exp-item-row-one">
                                 <jqxButton #newProject [template]="'link'" [disabled]="true" (onClick)="newProjectClicked()"
                                            [imgSrc]="'assets/folder_add.png'" [imgPosition]="'center'"
                                            [textImageRelation]="'imageBeforeText'">New Project
                                 </jqxButton>
                             </div>
-                            <div class="item-row item-row-two">
+                            <div class="br-exp-item-row-two">
                                 <jqxButton #deleteProject [template]="'link'" [disabled]="true"
                                            (onClick)="deleteProjectClicked()" [imgSrc]="'assets/folder_delete.png'"
                                            [imgPosition]="'center'" [textImageRelation]="'imageBeforeText'">Delete Project
@@ -50,18 +50,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="item five">
-                        <div class="item-row item-row-one">
+                    <div class="br-exp-item br-exp-five">
+                        <div class="br-exp-item-row-one">
                             <jqxToggleButton #toggleButton [template]="'link'" (onClick)="expandCollapseClicked()">Expand
                                 Projects
                             </jqxToggleButton>
                         </div>
                     </div>
+
                 </div>
 
             </div> <!-- end tree container -->
-            <div class="item experiment-detail-panel ">
-                <browse-panel ></browse-panel>
+            <div  style="padding: 2em" class="br-exp-item experiment-detail-panel ">
+                <browse-panel></browse-panel>
             </div>
 
        </div>
@@ -493,3 +494,4 @@
            [width]="100"
            [height]="60">
 </jqxLoader>
+

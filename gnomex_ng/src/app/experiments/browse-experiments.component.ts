@@ -56,51 +56,44 @@ import {Router} from "@angular/router";
             flex-direction: row;
         }
 
-        .item-row {
-
-        }
-        .item-row-one {
+        .br-exp-row-one {
             flex-grow: 1;
         }
 
-        .item-row-two {
+        .br-exp-item-row-two {
             flex-grow: 1;
         }
 
-        .item {
+        .br-exp-item {
             flex: 1 1 auto;
             font-size: small;
         }
 
-        .one {
+        .br-exp-one {
             width: 100%;
-            flex-grow: .25
+            flex-grow: .25;
+
         }
 
-        .help-drag-drop {
+        .br-exp-help-drag-drop {
             width: 100%;
             flex-grow: .10;
         }
 
-        .three {
+        .br-exp-three {
             width: 100%;
             height: 6em;
             flex-grow: 8;
         }
 
-        .four {
+        .br-exp-four {
             width: 100%;
             flex-grow: .10;
         }
 
-        .five {
+        .br-exp-five {
             width: 100%;
             flex-grow: .10;
-        }
-
-        .container {
-            display: flex;
-            min-height:100px;
         }
 
         .t {
@@ -126,7 +119,6 @@ import {Router} from "@angular/router";
             margin-left: 20em;
         }
 
-
         div.background {
             width: 100%;
             height: 100%;
@@ -134,18 +126,18 @@ import {Router} from "@angular/router";
             padding: 0.3em;
             border-radius: 0.3em;
             border: 1px solid darkgrey;
-            display: block;
+            display: flex;
             flex-direction: column;
         }
         .experiment-detail-panel {
             width:75%;
-            padding: 2em;
             margin-left: 2em;
             border: #C8C8C8 solid thin;
             overflow: auto;
         }
     `]
 })
+
 export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("tree") treeComponent: TreeComponent;
@@ -203,6 +195,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private targetItem: any;
     private projectDescription: string = "";
     private projectName: string = "";
+
     public experimentService: ExperimentsService;
     private labMembers: any;
     private billingAccounts: any;
@@ -215,7 +208,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private selectedProjectLabIndex: number = -1;
     private idCoreFacility: string = "3";
     private showBillingCombo: boolean = false;
-    private experimentCount: number;
+
+    public experimentCount: number;
     private projectRequestListSubscription: Subscription;
 
     ngOnInit() {
@@ -227,6 +221,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.jqxLoader.close();
         this.jqxConstructorLoader.close();
     }
+
 
     constructor(private experimentsService: ExperimentsService,private router:Router) {
 
@@ -246,7 +241,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
+            this.experimentsService.emitExperimentOverviewList(response);
+            setTimeout(()=>{
+                this.treeModel.expandAll();
         });
+        });
+
 
     }
 
@@ -265,6 +265,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         } else {
             this.items = response;
         }
+        this.labs = this.labs.concat(this.items);
         for( var l of this.items) {
             if (!this.isArray(l.Project)) {
                 l.items = [l.Project];
@@ -737,6 +738,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     treeOnSelect(event: any) {
         console.log("event");
         this.selectedItem = event.node;
+        let idLab = this.selectedItem.data.idLab;
+        let idProject = this.selectedItem.data.idProject;
+        let idRequest = this.selectedItem.data.idRequest;
+
+        let projectRequestListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
 
         //Lab
         if (this.selectedItem.level === 1) {
@@ -744,24 +750,28 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.deleteProject.disabled(true);
 
             this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+            this.experimentService.emitExperimentOverviewList(projectRequestListNode);
+
+
             //Project
         } else if (this.selectedItem.level === 2) {
             this.newProject.disabled(false);
             this.deleteProject.disabled(false);
 
-            let idLab = this.selectedItem.data.idLab;
-            let idProject = this.selectedItem.data.idProject;
             this.router.navigate(['/experiments',
                 {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}]);
+            this.experimentService.emitExperimentOverviewList(projectRequestListNode);
 
             //Experiment
         } else {
 
-            let id = this.selectedItem.data.idRequest;
-            this.router.navigate(['/experiments',{outlets:{'browsePanel':[id]}}]);
+            this.router.navigate(['/experiments',{outlets:{'browsePanel':[idRequest]}}]);
             this.newProject.disabled(true);
             this.deleteProject.disabled(true);
         }
+        this.experimentService.selectedTreeNode = _.cloneDeep(this.selectedItem.data);
+
+
     }
 
     /**

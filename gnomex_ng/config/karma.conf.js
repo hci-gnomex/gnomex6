@@ -1,7 +1,7 @@
 /**
- * Based on https://github.com/AngularClass/angular-starter/blob/master
- */
-
+/*
+*  * Based on https://github.com/AngularClass/angular-starter/blob/master
+*/
 module.exports = function (config) {
     var testWebpackConfig = require("./webpack.test.js")({ env: "test" });
 
@@ -19,14 +19,12 @@ module.exports = function (config) {
          */
         files: [
             { pattern: "./spec-bundle.js", watched: false }
-        ],
-
+            ],
         /**
          * Preprocess matching files before serving them to the browser
          * available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
          */
         preprocessors: { "./spec-bundle.js": ["coverage", "webpack", "sourcemap"] },
-
         webpack: testWebpackConfig,
 
         coverageReporter: {

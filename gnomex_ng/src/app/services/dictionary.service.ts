@@ -1,24 +1,26 @@
 import {EventEmitter, Injectable} from "@angular/core";
 import {Http, Response} from "@angular/http";
 import {Observable} from "rxjs/Observable";
+import {ProgressService} from "../home/progress.service";
 
 @Injectable()
 export class DictionaryService {
 
-    public static BILLING_PERIOD: string = "hci.gnomex.model.BillingPeriod";
-    public static CORE_FACILITY: string = "hci.gnomex.model.CoreFacility";
-    public static GENOME_BUILD: string = "hci.gnomex.model.GenomeBuildLite";
-    public static OLIGO_BARCODE: string = "hci.gnomex.model.OligoBarcode";
-    public static ORGANISM: string = "hci.gnomex.model.OrganismLite";
-    public static REQUEST_CATEGORY: string = "hci.gnomex.model.RequestCategory";
-    public static SEQ_LIB_PROTOCOL: string = "hci.gnomex.model.SeqLibProtocol";
+    public static readonly BILLING_PERIOD: string = "hci.gnomex.model.BillingPeriod";
+    public static readonly CORE_FACILITY: string = "hci.gnomex.model.CoreFacility";
+    public static readonly GENOME_BUILD: string = "hci.gnomex.model.GenomeBuildLite";
+    public static readonly OLIGO_BARCODE: string = "hci.gnomex.model.OligoBarcode";
+    public static readonly ORGANISM: string = "hci.gnomex.model.OrganismLite";
+    public static readonly REQUEST_CATEGORY: string = "hci.gnomex.model.RequestCategory";
+    public static readonly SEQ_LIB_PROTOCOL: string = "hci.gnomex.model.SeqLibProtocol";
+    public static readonly APPLICATION:string = "hci.gnomex.model.Application";
 
     private cachedDictionaryString: any;
     private cacheExpirationTime: number = 0;
     private reloadObservable: Observable<any> = null;
     private CACHE_EXPIRATION_MILLIS = 600000;   // ten minutes = 600000 millis
 
-    constructor(private _http: Http) {}
+    constructor(private _http: Http, private progressService: ProgressService) {}
 
     /**
      * Forces a full reload of the dictionary, returns an observable of an empty object when it is done.
@@ -42,6 +44,7 @@ export class DictionaryService {
                 console.log("************RELOAD************");
                 console.log(JSON.stringify(this.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY)));
                 console.log("******************************");
+                this.progressService.displayLoader(100);
                 if (callback) {
                     callback();
                 }
@@ -72,6 +75,7 @@ export class DictionaryService {
     private loadDictionaries(): Observable<any> {
         return this._http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
             if (response.status === 200) {
+                console.log("In ManageDictionaries")
                 return response.json();
             } else {
                 throw new Error("Error in ManageDictionaries");

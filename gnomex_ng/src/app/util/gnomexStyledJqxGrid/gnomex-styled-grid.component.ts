@@ -1,4 +1,7 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {
+    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output,
+    ViewChild
+} from "@angular/core";
 
 import { jqxGridComponent } from "../../../assets/jqwidgets-ts/angular_jqxgrid";
 
@@ -11,6 +14,19 @@ import { jqxGridComponent } from "../../../assets/jqwidgets-ts/angular_jqxgrid";
 	styles: []
 })
 export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewInit {
+
+
+	private _selectionSetting:string ="checkbox";
+	@Input() set selectionSetting(value:string){
+		this._selectionSetting = value;
+	}
+	get selectionSetting():string{
+		return this._selectionSetting;
+	}
+	@Input() styleForTheme:string ="gnomex5";
+
+
+    @Output() rowDoubleClicked: EventEmitter<any> = new EventEmitter();
 
 	@ViewChild('theGrid') theGrid: jqxGridComponent;
 	@ViewChild('artificialGridBounding') artificialGridBounding: ElementRef;
@@ -134,5 +150,9 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 
 		this.source = source;
 		this.dataAdapter = new jqx.dataAdapter(this.source);
+	}
+    doubleClickedRow($event:any){
+		this.rowDoubleClicked.emit($event);
+
 	}
 }

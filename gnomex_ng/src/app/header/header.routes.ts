@@ -2,17 +2,17 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {Routes, RouterModule} from "@angular/router";
-import {AboutComponent} from "./about.component";
+import {HeaderComponent} from "./header.component";
 import {RouteGuardService} from "@hci/authentication";
 
 /**
- * A file defining and exporting the router configuration for the about module.
+ * A file defining and exporting the router configuration for the home module.
  *
  * @author brandony <brandon.youkstetter@hci.utah.edu>
  * @since 7/10/16
  */
 const ROUTES: Routes = [
-    {path: "", component: AboutComponent, canActivate: [RouteGuardService]}
+    {path: "header", component: HeaderComponent, canActivate: [RouteGuardService]}
 ];
 
-export const ABOUT_ROUTES = RouterModule.forChild(ROUTES);
+export const HEADER_ROUTING = RouterModule.forChild(ROUTES);

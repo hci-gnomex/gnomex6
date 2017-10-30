@@ -1,64 +1,16 @@
-
-<div class="container">
-  <div class="card-group">
-
-    <div class="card full">
-      <div class="card-padding">
-        <h3>Home Component</h3>
-        <p>Welcome to GNomEX.</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-padding min-30">
-        <h4>Experiments</h4>
-        <div class="col-md-offset-1">
-          <ul>
-            <li>
-              <a class="content-link" [routerLink]="[ '/experiments' ]">Browse Experiments</a>
-            </li>
-            <li>
-              <a class="content-link" [routerLink]="[ '/experiments-orders' ]">Experiment Orders</a>
-            </li>
-            <li>
-              <a class="content-link" [routerLink]="[ '/NewBillingAccount' ]">New Billing Account</a>
-            </li>
-          </ul>
+<span [ngStyle]= "{'background-image': 'url(' + site_splash + ')'}" style="height: 20em;
+        width: 35em;
+        margin-left: 40em;
+        display: block;
+        background-repeat: no-repeat;" *ngIf="hideLoader | async;else loading"></span>
+<ng-template #loading>
+    <div #loadingWindow class="gnomex-splash">
+        <div style="text-align: center;vertical-align: top">
+            <img src={{site_logo}}>
         </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-padding min-30">
-        <h4>Experiments</h4>
-        <div class="col-md-offset-1">
-          <ul>
-            <li>
-              <a class="content-link" [routerLink]="[ '/experiments/11874R' ]">View Experiment</a>
-            </li>
-            <li>
-              <a class="content-link" [routerLink]="[ '/experiments/new' ]">New Experiment</a>
-            </li>
-          </ul>
+        <div style="position: absolute;bottom: 5em; width: 100%">
+            <jqxProgressBar #loadingProgress [width]="270" [height]="15" [value]="10" [colorRanges]="colorRanges">
+            </jqxProgressBar>
         </div>
-      </div>
     </div>
-
-    <div class="card">
-      <div class="card-padding min-30">
-        <h4>About</h4>
-        <div class="col-md-offset-1">
-          <ul>
-            <li>
-              <a class="content-link" [routerLink]="[ '/about' ]">About Link</a>
-            </li>
-            <li>
-              <a class="content-link" [routerLink]="[ '/dictionary-demo' ]">Dictionary Demo</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
+</ng-template>

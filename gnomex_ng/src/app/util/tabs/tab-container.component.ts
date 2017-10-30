@@ -28,18 +28,18 @@ import 'rxjs/add/operator/distinctUntilChanged';
 })
 export class TabContainer implements OnInit, OnDestroy{
 
-    static readonly NEW: string = "new"
-    static readonly VIEW: string = "view"
-    static readonly EDIT: string = "edit"
+    static readonly NEW: string = "new";
+    static readonly VIEW: string = "view";
+    static readonly EDIT: string = "edit";
 
 
     @Output() tabChanged: EventEmitter<TabChangeEvent> = new EventEmitter();
     @Output() tabStatusChanged: EventEmitter<TabsStatusEvent> = new EventEmitter();
-    private tabsRef: ComponentRef<Tabs>
-    private intialized: boolean = false
+    private tabsRef: ComponentRef<Tabs>;
+    private intialized: boolean = false;
     private theForm:FormGroup;
 
-    private _compName: Array<string>
+    private _compName: Array<string>;
     @Input() set componentNames(value: Array<string>) {
         this._compName = value;
     }
