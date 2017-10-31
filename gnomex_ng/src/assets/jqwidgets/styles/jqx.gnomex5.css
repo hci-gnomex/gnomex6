@@ -1,4 +1,9 @@
 .jqx-widget-gnomex5 {}
+.jqx-widget-content-gnomex5 {}
+.jqx-fill-state-disabled-gnomex5 {
+    opacity: 1;
+}
+
 .jqx-grid-gnomex5 {}
 .jqx-grid-pager-gnomex5 []
 .jqx-grid-header-gnomex5 {}
@@ -13,7 +18,6 @@
 }
 
 .jqx-widget-header-gnomex5 {}
-.jqx-widget-content-gnomex5 {}
 .jqx-grid-content-gnomex5 {}
 .jqx-grid-toolbar-gnomex5 {}
 .jqx-grid-statusbar-gnomex5 {}
@@ -66,7 +70,6 @@
 .jqx-grid-group-expand-rtl-gnomex5 {}
 .jqx-grid-column-resizeline-gnomex5 {}
 .jqx-grid-column-resizestartline-gnomex5 {}
-.jqx-fill-state-disabled-gnomex5 {}
 .jqx-grid-group-drag-line-gnomex5 {}
 .jqx-grid-group-column-line-gnomex5 {}
 
@@ -74,7 +77,28 @@
 .jqx-input-gnomex5 {
     background-color: #e4e0e0;
 }
+.jqx-rc-all-gnomex5 {}
+.jqx-input-disabled-gnomex5 {}
+.jqx-menu-gnomex5 {}
+.jqx-menu-vertical-gnomex5 {}
+.jqx-menu-dropdown-gnomex5 {}
+.jqx-fill-state-pressed-gnomex5 {}
+.jqx-menu-item-gnomex5 {}
+.jqx-item-gnomex5 {}
 
-.jqx-text-area-element-gnomex5 {
+
+.jqx-combobox-input-gnomex5 {
     background-color: #e4e0e0;
 }
+.jqx-combobox-content-gnomex5 {}
+.jqx-combobox-content-disabled-gnomex5 {}
+.jqx-combobox-arrow-normal-gnomex5 {}
+.jqx-combobox-arrow-hover-gnomex5 {}
+.jqx-combobox-arrow-selected-gnomex5 {}
+.jqx-combobox-state-normal-gnomex5 {}
+.jqx-fill-state-normal-gnomex5 {}
+.jqx-combobox-state-hover-gnomex5 {}
+.jqx-fill-state-hover-gnomex5 {}
+.jqx-combobox-state-selected-gnomex5 {}
+.jqx-fill-state-pressed-gnomex5 {}
+.jqx-fill-state-focus-gnomex5 {}

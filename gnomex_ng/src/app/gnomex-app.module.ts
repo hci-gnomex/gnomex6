@@ -12,6 +12,7 @@ import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
+import {NewBillingAccountModule} from "./billing/new_billing_account/new-billing-account.module";
 import {ProgressService} from "./home/progress.service";
 import {RouterModule} from "@angular/router";
 import {FormsModule} from "@angular/forms";
@@ -29,6 +30,8 @@ import {LocalStorageModule, LocalStorageService, ILocalStorageServiceConfig} fro
 import "./gnomex-app.css";
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { ServicesModule } from './services/services.module';
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -51,6 +54,8 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AuthenticationModule,
         NavigationModule,
         ExperimentsModule,
+        NewBillingAccountModule,
+        ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig),
         NgbModule.forRoot(),
         CommonModule,
@@ -73,7 +78,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AuthenticationService,
         ExperimentsService,
         ProgressService
-
     ]
 })
 export class GnomexAppModule {
