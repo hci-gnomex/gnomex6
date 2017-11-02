@@ -1,0 +1,39 @@
+<jqxInput
+		[placeHolder]="'Click to edit'"
+		[theme]="'gnomex5'"
+		[width]="'calc(100% - 6px)'"
+		[height]="'1.5rem'"
+		[value]="inputDisplayString"
+		(click)="openUserSelectPopup()"
+		[disabled]="true">
+</jqxInput>
+
+<jqxWindow
+		#windowRef
+		[height]="'30em'"
+		[width]="'25em'"
+		[autoOpen]="false"
+		[isModal]="true"
+		[resizable]="false"
+		(onClose)="resetSelected()">
+	<div>Users</div>
+	<div>
+		<div class="full-width full-height">
+			<div class="t full-width full-height">
+				<div class="tr full-width">
+					<div class="td full-width full-height">
+						<div class="full-width full-height">
+							<GnomexStyledGrid #gridReference></GnomexStyledGrid>
+						</div>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td full-width">
+						<button type="button" (click)="saveButtonClicked()" autofocus>Save</button>
+						<button type="button" (click)="cancelButtonClicked()">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</jqxWindow>

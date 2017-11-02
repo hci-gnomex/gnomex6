@@ -6,11 +6,13 @@ import {NgModel} from "@angular/forms"
 import {URLSearchParams} from "@angular/http";
 
 import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
+import {jqxWindowComponent} from "../../../assets/jqwidgets-ts/angular_jqxwindow";
 
 import {BrowseFilterComponent} from "../../util/browse-filter.component";
 import {DictionaryService} from "../../services/dictionary.service";
 import {EmailRelatedUsersPopupComponent} from "../../util/emailRelatedUsersPopup/email-related-users-popup.component"
 import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
+import {Alert} from "selenium-webdriver";
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
  *	the navigation bar.
@@ -89,8 +91,10 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
 	@ViewChild('myGrid') myGrid: GnomexStyledGridComponent;
 	@ViewChild('statusComboBox') statusCombobox: jqxComboBoxComponent;
+	@ViewChild('errorPopup') errorPopup: jqxWindowComponent;
 	@ViewChild('windowReference') window: EmailRelatedUsersPopupComponent;
 
+	private errorMessage: string = '';
 
 	private dictionary: any;
 
@@ -287,7 +291,30 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	}
 
 	deleteButtonClicked(): void {
-		console.log("You clicked \"Delete\"!");
+		let gridSelectedIndexes: Array<Number> = this.myGrid.getselectedrowindexes();
+
+		let experimentHasBeenRun: boolean = false;
+
+		for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
+			if (this.source.localdata[i].requestStatus != 'new' && this.source.localdata[i].requestStatus != 'submitted') {
+				experimentHasBeenRun = true;
+				break;
+			}
+		}
+
+		if (experimentHasBeenRun) {
+			console.log("One or more of the selected orders has already been added to an instrument run.\"\n" +
+					"\t\t\t+ \" The order(s) cannot be deleted.");
+
+			this.errorMessage = "One or more of the selected orders has already been added to an " +
+					"instrument run. The order(s) cannot be deleted.";
+
+			this.errorPopup.open();
+		}
+	}
+
+	errorPopupOkClicked(): void {
+		this.errorPopup.close();
 	}
 
 	emailButtonClicked(): void {

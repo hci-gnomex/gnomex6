@@ -92,4 +92,26 @@
 	</div>
 </div>
 
+<jqxWindow #errorPopup
+		[autoOpen]="false"
+		[width]="'28em'"
+		[height]="'11em'">
+	<div>
+		Error!
+	</div>
+	<div>
+		<div style="width:100%; height:100%; display:block;">
+			<div style="width:80%; padding:1.3em 10% 0 10%;">
+				<div>
+					{{errorMessage}}
+				</div>
+				<div style="height:0.7em; width:100%;"></div>
+				<div style="text-align:center">
+					<button (click)="errorPopupOkClicked()">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</jqxWindow>
+
 <emailRelatedUsersPopup #windowReference></emailRelatedUsersPopup>

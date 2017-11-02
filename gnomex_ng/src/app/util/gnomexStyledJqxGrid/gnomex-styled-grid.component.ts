@@ -1,3 +1,4 @@
+
 import {
     AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output,
     ViewChild
@@ -13,7 +14,7 @@ import { jqxGridComponent } from "../../../assets/jqwidgets-ts/angular_jqxgrid";
 	templateUrl: "./gnomex-styled-grid.component.html",
 	styles: []
 })
-export class GnomexStyledGridComponent implements OnInit, OnDestroy {
+export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
 	private _selectionSetting:string ="checkbox";
@@ -36,6 +37,7 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy {
 	private isGridDrawn: boolean = false;
 
 	autoresize: boolean = true;
+	pageable: boolean = false;
 
 	// Due to the way jqxwidget grids render, and because of the graphical glitches associated with
 	// placing the grid in a css flexbox, we needed to be able to restrict the size of a cell within
@@ -58,6 +60,10 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy {
 	private dataAdapter: any = new jqx.dataAdapter(this.source);
 
 	ngOnInit(): void {
+
+	}
+
+	ngAfterViewInit(): void {
 		this.interval = setInterval(() => { this.onTimer(); }, 100);
 	}
 
@@ -91,7 +97,7 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy {
 		this.theGrid.pagesize(250);
 
 		// It is important that the child is smaller than the parent, so that we can detect resizing.
-		this.savedHeight = this.boundingParent.nativeElement.offsetHeight - 1;
+		this.savedHeight = this.boundingParent.nativeElement.offsetHeight - 3;
 		this.artificialGridBoundingStretch = false;
 	}
 
@@ -99,18 +105,18 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy {
 		if(this.isGridDrawn && !this.isResizing) {
 			this.isResizing = true;
 
-			if (this.boundingParent.nativeElement.offsetHeight - 1 === this.savedHeight) {
+			if (this.boundingParent.nativeElement.offsetHeight - 3 === this.savedHeight) {
 				// Do nothing
-			} else if (this.boundingParent.nativeElement.offsetHeight - 1 > this.savedHeight) {
+			} else if (this.boundingParent.nativeElement.offsetHeight - 3 > this.savedHeight) {
 				// Grow! Growing is easy because we know what we need to expand to.
-				this.savedHeight = this.boundingParent.nativeElement.offsetHeight - 1;
+				this.savedHeight = this.boundingParent.nativeElement.offsetHeight - 3;
 			} else {
 				// Shrink!
 				this.savedHeight = this.boundingParent.nativeElement.offsetHeight * 97 / 100;
 
 				setTimeout(() => {
 					// It is important that the child is smaller than the parent, so that we can detect resizing.
-					this.savedHeight = this.boundingParent.nativeElement.offsetHeight - 1;
+					this.savedHeight = this.boundingParent.nativeElement.offsetHeight - 3;
 
 					setTimeout(() => {
 						this.resizeIfNeeded();
@@ -140,8 +146,16 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy {
 		return this.source;
 	}
 	setDataAdapterSource(source: any): void {
+		if(!this.pageable) {
+			this.pageable = source.localdata.length > 250;
+		}
+
 		this.source = source;
 		this.dataAdapter = new jqx.dataAdapter(this.source);
+
+		//this.theGrid.pageable(source.localdata.length > 250);
+
+		//this.pageable = source.localdata.length > 250;
 	}
     doubleClickedRow($event:any){
 		this.rowDoubleClicked.emit($event);
