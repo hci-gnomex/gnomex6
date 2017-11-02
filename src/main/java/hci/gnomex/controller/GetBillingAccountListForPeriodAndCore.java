@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.BillingStatus;
@@ -34,7 +34,7 @@ public class GetBillingAccountListForPeriodAndCore extends GNomExCommand impleme
   }
 
   @Override
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (request.getParameter("idBillingPeriod") != null && request.getParameter("idBillingPeriod").length() > 0) {
       idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
     } else {

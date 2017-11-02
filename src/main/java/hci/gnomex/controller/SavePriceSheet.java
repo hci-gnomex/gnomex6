@@ -1,11 +1,11 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.model.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PriceSheetCategoryParser;
 import hci.gnomex.utility.Util;
 import java.io.Serializable;
@@ -42,7 +42,7 @@ public class SavePriceSheet extends GNomExCommand implements Serializable {
   public void validate() {
   }
   
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
     priceSheetScreen = new PriceSheet();
     HashMap errors = this.loadDetailObject(request, priceSheetScreen);

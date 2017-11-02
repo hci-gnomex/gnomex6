@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
@@ -43,10 +43,14 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
 
   private String targetDir;
 
+  private String emailAddress;
+
+  private String remoteIPAddress;
+
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     serverName = request.getServerName();
 
     if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
@@ -71,6 +75,14 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
     if (idAnalysis == null && idRequest == null && idDataTrack == null && analysisNumber == null && requestNumber == null && idProductOrder == null) {
       this.addInvalidField("missing id", "idRequest/requestNumber or idAnalysis/analysisNumber or idDataTrack or idProductOrder must be provided");
     }
+
+    emailAddress = "";
+    if (request.getParameter("emailAddress") != null && !request.getParameter("emailAddress").equals("")) {
+      emailAddress = request.getParameter("emailAddress");
+    }
+
+    remoteIPAddress = GNomExCommand.getRemoteIP(request);
+
   }
 
   public Command execute() throws RollBackCommandException {
@@ -83,6 +95,10 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
       String createYear = "";
       String targetNumber = "";
 
+      String theIdRequest = "";
+      String theIdLab = "";
+      String theIdAnalysis = "";
+
       String fdtSupported = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.FDT_SUPPORTED);
       if (fdtSupported == null || !fdtSupported.equals("Y")) {
         this.addInvalidField("fdtNotSupport", "GNomEx is not configured to support FDT.  Please contact GNomEx support to set appropriate property");
@@ -91,12 +107,15 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
       if (idAnalysis != null || analysisNumber != null) {
         Analysis analysis = null;
         if (idAnalysis != null) {
+          theIdAnalysis = "" + idAnalysis;
           analysis = (Analysis)sess.get(Analysis.class, idAnalysis);
         } else if (analysisNumber != null) {
           analysis = (Analysis)sess.createQuery("from Analysis a where a.number ='" + analysisNumber + "'").uniqueResult();
           if (analysis == null) {
             throw new RuntimeException("Cannot find analysis " + analysisNumber);
           }
+
+          theIdLab = "" + analysis.getIdLab();
         }
         if (!secAdvisor.canUploadData(analysis)) {
           this.addInvalidField("insufficient permissions", "insufficient permissions to upload analysis files");
@@ -104,6 +123,11 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
         if (this.isValid()) {
           createYear = yearFormatter.format(analysis.getCreateDate());
           String baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+          String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+          if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+            baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+                    PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+          }
           targetDir = baseDir + createYear + Constants.FILE_SEPARATOR + analysis.getNumber() + Constants.FILE_SEPARATOR + Constants.UPLOAD_STAGING_DIR;
           targetNumber = analysis.getNumber();
 
@@ -112,12 +136,17 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
       } else if (idRequest != null || requestNumber != null) {
         Request experiment = null;
         if (idRequest != null) {
+          theIdRequest = "" + idRequest;
           experiment = (Request)sess.get(Request.class, idRequest);
+          theIdLab = "" + experiment.getIdLab();
+
         } else if (requestNumber != null) {
           experiment = (Request)sess.createQuery("from Request r where r.number ='" + requestNumber + "'").uniqueResult();
           if (experiment == null) {
             throw new RuntimeException("Cannot find experiment " + requestNumber);
           }
+          theIdRequest = "" + experiment.getIdRequest();
+          theIdLab = "" + experiment.getIdLab();
         }
         if (experiment.getRequestCategory().getIsClinicalResearch() != null && experiment.getRequestCategory().getIsClinicalResearch().equals("Y")) {
           this.addInvalidField("Clinical Research", "Clinical research experiments cannot upload using FDT.");
@@ -183,9 +212,9 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
         String softlinks_dir = PropertyDictionaryHelper.getInstance(sess).GetFDTDirectory(serverName) + uuidStr;
         String softlinks_dir1  = softlinks_dir + File.separator + targetNumber;
 
-        // Create "info" file used by FDT postProcessing routine
-//        String taskFileDir = PropertyDictionaryHelper.getInstance(sess).getFDTFileDaemonTaskDir(serverName);
-        addTask(softlinks_dir, softlinks_dir1, targetDir);
+        // Create "fdtUploadTransferLog" file used by FDT postProcessing routine
+        String theFileTransferLogFile = "fdtUploadTransferLog_" + uuid.toString();
+        addTask(softlinks_dir, softlinks_dir1, targetDir, secAdvisor, remoteIPAddress, emailAddress,  theIdRequest, theIdLab,  theIdAnalysis, theFileTransferLogFile);
 
         this.xmlResult = "<FDTUploadUuid uuid='" + uuidStr + Constants.FILE_SEPARATOR + targetNumber + "'/>";
 
@@ -244,8 +273,8 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
     process.destroy();
   }
 
-  private static void addTask(String taskFileDir, String sourceDir, String targetDir) {
-    String taskFileName = taskFileDir + "/" + "info";
+  private static void addTask(String taskFileDir, String sourceDir, String targetDir, SecurityAdvisor secAdvisor, String remoteIPAddress, String emailAddress, String theIdRequest, String theIdLab, String theIdAnalysis, String theFDTUploadTransferFile ) {
+    String taskFileName = taskFileDir + "/" + "fdtUploadInfoFile";
     File taskFile;
     int numTries = 10;
     while(true) {
@@ -275,10 +304,18 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
     try {
       PrintWriter pw = new PrintWriter(new FileWriter(taskFile));
       SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-      pw.println("Started: " + f.format(new Date()));
-      pw.println("LastActivity: 0");
+//      pw.println("Started: " + f.format(new Date()));
+//      pw.println("LastActivity: 0");
       pw.println("SourceDirectory: " + sourceDir);
       pw.println("TargetDirectory: " + targetDir);
+      pw.println("EmailAddress: " + emailAddress);
+      pw.println("Remote ipAddress: " + remoteIPAddress);
+      pw.println("idAppUser: " + secAdvisor.getIdAppUser().toString());
+      pw.println("idRequest: " + theIdRequest);
+      pw.println("idLab: " + theIdLab);
+      pw.println("idAnalysis: " + theIdAnalysis);
+      pw.println("transferlog: " + theFDTUploadTransferFile);
+
       pw.flush();
       pw.close();
     } catch (IOException e) {

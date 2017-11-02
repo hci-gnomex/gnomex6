@@ -636,19 +636,27 @@ private void registerAnalysisFiles() throws Exception {
 				// Mark that the file system file has been found
 				fd.isFound(true);
 				newAnalysisFiles.add(af);
+				boolean changed = false;
 
 				// If the file size is different on the file system, update the AnalysisFile
 				if (af.getFileSize() == null || !af.getFileSize().equals(BigDecimal.valueOf(fd.getFileSize()))) {
 					af.setFileSize(BigDecimal.valueOf(fd.getFileSize()));
+					changed = true;
 				}
 
 				// If create date not set, then set it
 				if (af.getCreateDate() == null) {
 					af.setCreateDate(this.getEffectiveAnalysisFileCreateDate(fd, analysis.getCreateDate()));
+					changed = true;
 				}
-			}
 
-		}
+				if (changed) {
+					sess.saveOrUpdate(af);
+				}
+
+			}
+		} // end of compare in db
+
 
 		// Now add AnalysisFiles to the db for any files on the file system not found in the db.
 		for (Iterator i3 = fileMap.keySet().iterator(); i3.hasNext();) {
@@ -664,6 +672,7 @@ private void registerAnalysisFiles() throws Exception {
 				af.setBaseFilePath(baseAnalysisDir + analysis.getCreateYear() + File.separatorChar
 						+ analysis.getNumber());
 				af.setCreateDate(this.getEffectiveAnalysisFileCreateDate(fd, analysis.getCreateDate()));
+				sess.save(af);
 				newAnalysisFiles.add(af);
 			}
 		}

@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.ExperimentDesign;
 import hci.gnomex.model.ExperimentDesignEntry;
@@ -8,7 +10,7 @@ import hci.gnomex.model.ExperimentFactor;
 import hci.gnomex.model.ExperimentFactorEntry;
 import hci.gnomex.model.Project;
 import hci.gnomex.model.QualityControlStepEntry;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.RequestParser;
 
 import java.io.Serializable;
@@ -46,11 +48,12 @@ public class SaveProject extends GNomExCommand implements Serializable {
   public void validate() {
   }
   
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
     
     if (request.getParameter("projectXMLString") != null && !request.getParameter("projectXMLString").equals("")) {
       projectXMLString = request.getParameter("projectXMLString");
+      System.out.println ("[SaveProject] projectXMLString: " + projectXMLString);
     }
     
     if (request.getParameter("parseEntries") != null && !request.getParameter("parseEntries").equals("")) {
@@ -63,6 +66,7 @@ public class SaveProject extends GNomExCommand implements Serializable {
       projectDoc = sax.build(reader);
     } catch (JDOMException je ) {
       LOG.error( "Cannot parse projectXMLString", je );
+      System.out.println ( "Cannot parse projectXMLString" + je );
       this.addInvalidField( "RequestXMLString", "Invalid request xml");
     }
 

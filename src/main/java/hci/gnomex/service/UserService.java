@@ -5,7 +5,7 @@ package hci.gnomex.service;
 
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.util.HashSet;

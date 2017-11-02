@@ -9,7 +9,7 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.UCSCLinkFiles;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.BufferedReader;
@@ -58,18 +58,18 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	LOG.error("Post not implemented");
 }
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	String serverName = req.getServerName();
 	Session sess = null;
 	String username = "";
 	try {
-		sess = HibernateSession.currentSession(req.getUserPrincipal().getName());
+		sess = HibernateSession.currentSession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 
 		// Get the dictionary helper
 		// DictionaryHelper dh = DictionaryHelper.getInstance(sess);
 
-		username = req.getUserPrincipal().getName();
+		username = (req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest");
 
 		// Get security advisor
 		SecurityAdvisor secAdvisor = (SecurityAdvisor) req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
@@ -168,6 +168,12 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 				PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
 		String analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 				PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+		String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+		if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+			analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+					PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,username);
+		}
+
 		String dataTrackFileServerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(
 				PropertyDictionary.DATATRACK_FILESERVER_URL);
 		String dataTrackFileServerWebContext = PropertyDictionaryHelper.getInstance(sess).getProperty(
@@ -318,12 +324,14 @@ private String checkForIGVUserFolderExistence(File igvLinkDir, String username) 
 
 	String desiredDirectory = null;
 
-	for (File directory : directoryList) {
-		if (directory.getName().length() > 36) {
-			String parsedUsername = directory.getName().substring(36);
-			if (parsedUsername.equals(username)) {
-				desiredDirectory = directory.getName();
-				delete(directory);
+	if (directoryList != null) {
+		for (File directory : directoryList) {
+			if (directory.getName().length() > 36) {
+				String parsedUsername = directory.getName().substring(36);
+				if (parsedUsername.equals(username)) {
+					desiredDirectory = directory.getName();
+					delete(directory);
+				}
 			}
 		}
 	}

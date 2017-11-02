@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 
 import java.io.Serializable;
@@ -56,7 +56,7 @@ public class KeepHttpSession extends GNomExCommand implements Serializable {
    * @param session
    *          The HttpSession object
    */
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     this.keepSession = request.getParameter("keepSession");
     String whoAndWhy = request.getParameter("whoAndWhy");
     LOG.debug("keepSession: " + keepSession);
@@ -78,7 +78,7 @@ public class KeepHttpSession extends GNomExCommand implements Serializable {
    *          The new requestState value
    * @return Description of the Return Value
    */
-  public HttpServletRequest setRequestState(HttpServletRequest request) {
+  public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
     // LOG.debug("Executing setRequestState method in " +
     // this.getClass().getName());
     request.setAttribute("xmlResult", this.xmlResult);

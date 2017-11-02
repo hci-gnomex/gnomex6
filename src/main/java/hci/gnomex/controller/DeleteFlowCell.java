@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.FlowCell;
 import hci.gnomex.model.FlowCellChannel;
@@ -8,7 +8,7 @@ import hci.gnomex.model.SequenceLane;
 import hci.gnomex.model.WorkItem;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FlowCellChannelParser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -47,7 +47,7 @@ public class DeleteFlowCell extends GNomExCommand implements Serializable {
 
 	public void validate() {}
 
-  public void loadCommand(HttpServletRequest request, HttpSession session)
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session)
   {
     fc = new FlowCell();
     HashMap errors = this.loadDetailObject(request, fc);

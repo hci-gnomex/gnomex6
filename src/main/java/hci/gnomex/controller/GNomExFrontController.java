@@ -7,18 +7,17 @@ package hci.gnomex.controller;
  *@created    August 17, 2002
  */
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.*;
 
 import javax.ejb.EJBException;
 import javax.mail.Session;
@@ -29,6 +28,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -42,9 +42,10 @@ import org.apache.log4j.Logger;
 public class GNomExFrontController extends HttpServlet {
 private static Logger LOG = Logger.getLogger(GNomExFrontController.class);
 
-private static String webContextPath;
-private static Session mailSession;
-private static boolean GNomExLite;
+  private static String webContextPath;
+  private static Session mailSession;
+  private static boolean GNomExLite;
+  private static HashMap xmlHintMap = null;
 
 /**
  * Initialize global variables
@@ -67,8 +68,19 @@ public void init(ServletConfig config) throws ServletException {
 		LOG.error("Error in gnomexFrontController cannot get mail session: ", me);
 	}
 
-	initLog4j();
-}
+    initLog4j();
+
+    // we should only do this once
+    String hintFile = webContextPath + "/WEB-INF/classes/xmlHints.json";
+
+    JSONtoXML jsonTOxml = new JSONtoXML();
+    try {
+      xmlHintMap = jsonTOxml.initHints(hintFile);
+    } catch (Exception e) {
+      System.err.println("[GNomExFrontController] ERROR ERROR unable to initHints: " + e);
+    }
+    System.out.println("[GNomExFrontController] xmlHintMap size: " + xmlHintMap.size());
+  } // end of init
 
 public static void setWebContextPath(String theWebContextPath) {
 	webContextPath = theWebContextPath;
@@ -95,47 +107,40 @@ protected static void initLog4j() {
 public static boolean areWeLite() {
 	boolean glite = true;
 
-	// check for GNomExLite.properties, if it exists, then we are GNomExLite
-	/*String configFile = webContextPath + "/WEB-INF/classes/GNomExLite.properties";
-	File glp = new File(configFile);
-	if (glp.exists()) {
-		glite = true;
-	}*/
 
 	return glite;
 }
 
-/**
- * Process the HTTP Get request
- *
- * @param request
- *            Description of the Parameter
- * @param response
- *            Description of the Parameter
- * @exception ServletException
- *                Description of the Exception
- * @exception IOException
- *                Description of the Exception
- */
-public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	doPost(request, response);
-}
+  /**
+   * Process the HTTP Get request
+   *
+   * @param request1 Description of the Parameter
+   * @param response Description of the Parameter
+   * @exception ServletException Description of the Exception
+   * @exception IOException Description of the Exception
+   */
+  public void doGet(HttpServletRequest request1, HttpServletResponse response)
+      throws ServletException, IOException {
 
-/**
- * Process the HTTP Post request
- *
- * @param request
- *            Description of the Parameter
- * @param response
- *            Description of the Parameter
- * @exception ServletException
- *                Description of the Exception
- * @exception IOException
- *                Description of the Exception
- */
-public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	// get the users session
-	HttpSession session = request.getSession(true);
+//	  HttpServletWrappedRequest request = new HttpServletWrappedRequest(request1);
+    doPost(request1, response);
+  }
+
+  /**
+   * Process the HTTP Post request
+   *
+   * @param request1 Description of the Parameter
+   * @param response Description of the Parameter
+   * @exception ServletException Description of the Exception
+   * @exception IOException Description of the Exception
+   */
+  public void doPost(HttpServletRequest request1, HttpServletResponse response) throws ServletException, IOException {
+    // wrap the request so we can modify parameters
+      TreeMap  modifiedParameters = new TreeMap<>();
+      HttpServletWrappedRequest request = new HttpServletWrappedRequest(request1, modifiedParameters);
+
+    // get the users session
+    HttpSession session = request.getSession(true);
 
 	session.setAttribute("lastGNomExAccessTime", new Long(new Date().getTime()));
 
@@ -159,9 +164,10 @@ public void doPost(HttpServletRequest request, HttpServletResponse response) thr
 		commandClass = Class.forName("hci.gnomex.controller" + "." + requestName);
 		commandInstance = (Command) commandClass.newInstance();
 
-		if (request.getUserPrincipal() != null) {
-			commandInstance.setUsername(request.getUserPrincipal().getName());
-		}
+            String username = (request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : "guest");
+            if (request.getUserPrincipal() != null) {
+                commandInstance.setUsername(username);
+            }
 
 	} catch (ClassNotFoundException cnfe) {
 		LOG.error("Command " + requestName + ".class not found");
@@ -178,52 +184,77 @@ public void doPost(HttpServletRequest request, HttpServletResponse response) thr
 	}
 	// we should have a valid command.
 
-	// If we do not have a security advisor for the session, add error to command
-	// But do not require for initial data services and CMD to set the sec advisor
-	// If we have a security advisor, add it to the command instance
-	if (session.getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY) != null) {
-		commandInstance.setSecurityAdvisor((SecurityAdvisor) session
-				.getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY));
-	}
+    // If we do not have a security advisor for the session, add error to command
+    // But do not require for initial data services and CMD to set the sec advisor
+    // If we have a security advisor, add it to the command instance
+    if (session.getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY) != null) {
+      commandInstance.setSecurityAdvisor((SecurityAdvisor) session.getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY));
+    }
 
-	if (commandInstance.getSecurityAdvisor() == null && (requestName.compareTo("ManageDictionaries") != 0 // You can reload dictionary cache without
-																											// security
-			|| request.getParameter("action") == null || !request.getParameter("action").equals("reload"))
-			&& (!requestName.startsWith("CreateSecurityAdvisor"))
-			&& (!requestName.equals("ShowAnalysisDownloadForm"))
-			&& (!requestName.equals("ShowAnalysisDownloadFormForGuest"))
-			&& (!requestName.equals("ShowRequestDownloadForm"))
-			&& (!requestName.equals("ChangePassword"))
-			&& (!requestName.equals("GetLaunchProperties"))
-			&& (!requestName.equals("PublicSaveSelfRegisteredAppUser"))
-			&& (!requestName.equals("ShowRequestDownloadFormForGuest"))
-			&& (!requestName.equals("ShowExperimentMatrix"))
-			&& (!requestName.equals("ShowTopicTree"))) {
-		LOG.debug("Invalid SecurityAdvisor");
-		commandInstance.addInvalidField("SecurityAdvisor",
-				"You must create a SecurityAdvisor in order to run this command.");
-	}
-	// if command still valid, call the loadCommand method
-	if (commandInstance.isValid()) {
-		LOG.debug("Calling loadCommand on " + commandClass);
-		commandInstance.loadCommand(request, session);
-	}
-	// see if it is valid, if so call execute
-	if (commandInstance.isValid()) {
-		LOG.debug("Forwarding " + commandClass + " to the request processor for execution");
-		try {
-			commandInstance.execute();
-		} catch (Exception e) {
-			LOG.error("Error in gnomex front controller:", e);
-			StringBuilder requestDump = Util.printRequest(request);
-			String serverName = request.getServerName();
+    if (commandInstance.getSecurityAdvisor() == null
+        && (requestName.compareTo("ManageDictionaries")
+                != 0 // You can reload dictionary cache without
+            // security
+            || request.getParameter("action") == null
+            || !request.getParameter("action").equals("reload"))
+        && (!requestName.startsWith("CreateSecurityAdvisor"))
+        && (!requestName.equals("ShowAnalysisDownloadForm"))
+        && (!requestName.equals("ShowAnalysisDownloadFormForGuest"))
+        && (!requestName.equals("ShowRequestDownloadForm"))
+        && (!requestName.equals("ChangePassword"))
+        && (!requestName.equals("GetLaunchProperties"))
+        && (!requestName.equals("PublicSaveSelfRegisteredAppUser"))
+        && (!requestName.equals("ShowRequestDownloadFormForGuest"))
+        && (!requestName.equals("ShowExperimentMatrix"))
+        && (!requestName.equals("ShowTopicTree"))) {
+      LOG.debug("Invalid SecurityAdvisor");
+      commandInstance.addInvalidField(
+          "SecurityAdvisor", "You must create a SecurityAdvisor in order to run this command.");
+    }
+    // if command still valid, call the loadCommand method
+    if (commandInstance.isValid()) {
+      LOG.debug("Calling loadCommand on " + commandClass);
+      System.out.println("--->Calling loadCommand on " + commandClass);
+
+      // just testing....
+        boolean [] converted = new boolean[1];
+        converted[0] = false;
+        convertJSONRequesttoXML(request, requestName,converted);
+
+		// DEBUG dump the request if we changed anything
+        if (converted[0]) {
+			System.out.println("[GNomExFrontController after conversion] converted[0]: " + converted[0]);
+
+				Enumeration headerNames = request.getHeaderNames();
+				while (headerNames.hasMoreElements()) {
+					String headerName = (String) headerNames.nextElement();
+					String theHeader = request.getHeader(headerName);
+					if (theHeader.length() > 40) {
+						theHeader = theHeader.substring(0, 40);
+					}
+					System.out.println("[GNomExFrontController after conversion] headerName: " + headerName + " theHeader: " + theHeader);
+				}
+		}
+      commandInstance.loadCommand(request, session);
+    }
+    // see if it is valid, if so call execute
+    if (commandInstance.isValid()) {
+      LOG.debug("--->Forwarding " + commandClass + " to the request processor for execution");
+//            System.out.println ("[GNomExFrontController] --->Forwarding " + commandClass + " to the request processor for execution");
+            try {
+                commandInstance.execute();
+            } catch (Exception e) {
+                LOG.error("Error in gnomex front controller:", e);
+                System.out.println ("Error in gnomex front controller: " +  e);
+                StringBuilder requestDump = Util.printRequest(request);
+                String serverName = request.getServerName();
 
 			commandInstance.setRequestState(request);
 
 			String errorMessage = (String) request.getAttribute("errorDetails");
 			String username = commandInstance.getUsername();
 
-			Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
+                Util.sendErrorReport(HibernateSession.currentSession(), "GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
 
 			HibernateSession.rollback();
@@ -254,32 +285,32 @@ public void doPost(HttpServletRequest request, HttpServletResponse response) thr
 				LOG.error("The stacktrace for the error:");
 				LOG.error(e.getMessage(), e);
 
-				if (e instanceof GNomExRollbackException
-						&& ((GNomExRollbackException) e).getDisplayFriendlyMessage() != null) {
-					this.forwardWithError(request, response, ((GNomExRollbackException) e).getDisplayFriendlyMessage());
-				}
-				else {
-					String exMsg = null;
-					if(e.getMessage().indexOf(':') != -1) {
-						exMsg = e.getMessage().substring(e.getMessage().indexOf(':') + 1);
-					}
-					else
-						exMsg = e.getMessage();
-					this.forwardWithError(request, response, exMsg);
-				}
-			}
-			return;
-		} finally {
-			try {
-				HibernateSession.closeSession();
-			} catch (Exception ex) {
-				LOG.error("GNomExFrontController: Error closing hibernate session", ex);
-			}
-		}
-	}
-	// now set the request state, response state, and session state
-	LOG.debug("Calling setRequestState on " + commandClass);
-	commandInstance.setRequestState(request);
+                    if (e instanceof GNomExRollbackException
+                            && ((GNomExRollbackException) e).getDisplayFriendlyMessage() != null) {
+                        this.forwardWithError(request, response, ((GNomExRollbackException) e).getDisplayFriendlyMessage());
+                    } else {
+                        String exMsg = "";
+                        if (e != null && e.getMessage() != null && e.getMessage().indexOf(':') != -1) {
+                            exMsg = e.getMessage().substring(e.getMessage().indexOf(':') + 1);
+                        } else
+                            if (e != null && e.getMessage() != null ) {
+                                exMsg = e.getMessage();
+                            }
+                        this.forwardWithError(request, response, exMsg);
+                    }
+                }
+                return;
+            } finally {
+                try {
+                    HibernateSession.closeSession();
+                } catch (Exception ex) {
+                    LOG.error("GNomExFrontController: Error closing hibernate session", ex);
+                }
+            }
+        }
+        // now set the request state, response state, and session state
+        LOG.debug("Calling setRequestState on " + commandClass);
+        commandInstance.setRequestState(request);
 
 	LOG.debug("Calling setResponseState on " + commandClass);
 	commandInstance.setResponseState(response);
@@ -380,9 +411,73 @@ private void sendRedirect(HttpServletResponse response, String url) {
 	}
 }
 
-/**
- * Clean up resources
- */
-public void destroy() {
-}
+  /** Clean up resources */
+  public void destroy() {}
+
+  /*
+   *   Convert all the parameter values in the httpservletrequest from json to xml
+   */
+  public void convertJSONRequesttoXML(HttpServletWrappedRequest httpRequest, String requestName, boolean [] converted) {
+    converted[0] = false;
+
+//    System.out.println("[convertRequesttoJSON] *** starting *** " + requestName);
+
+    // are any values XML?
+/*
+            Enumeration headerNames = httpRequest.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                String headerName = (String) headerNames.nextElement();
+                String theHeader = httpRequest.getHeader(headerName);
+                if (theHeader != null && theHeader.length() > 40) {
+                    theHeader = theHeader.substring(0,40);
+                }
+                System.out.println("[convertRequesttoJSON] *BEFORE* headerName: " + headerName + " theHeader: " + theHeader);
+            }
+*/
+    System.out.println("****************************************************************************************");
+    Enumeration params = httpRequest.getParameterNames();
+    while (params.hasMoreElements()) {
+      String paramName = (String) params.nextElement();
+      String parameterValue = (String) httpRequest.getParameter(paramName);
+//      System.out.println("[convertJSONRequesttoXML] paramName: " + paramName + " parameterValue: " + parameterValue);
+
+        // is it JSON?
+        if (parameterValue != null
+            && parameterValue.length() > 0
+            && (parameterValue.startsWith("{") || parameterValue.startsWith("["))) {
+          // yes convert it
+          String hintKey = requestName + "." + paramName;
+
+          System.out.println("[convertJSONRequesttoXML] **** found a parameterValue to convert **** " + hintKey + " paramName: " + paramName + " parameterValue: " + parameterValue);
+
+          JSONtoXML jsonTOxml = new JSONtoXML();
+
+          String xmlParameterValue = null;
+          try {
+            xmlParameterValue = jsonTOxml.convertJSONtoXML(hintKey, parameterValue, xmlHintMap);
+          } catch (Exception e) {
+            System.out.println("[GNomExFrontController] ERROR ERROR from jsonTOxml.convertJSONtoXML hintKey: "
+                    + hintKey
+                    + " parameterValue: "
+                    + parameterValue);
+            e.printStackTrace();
+          }
+
+          // debug ******
+          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + "\nparameterValue: " + parameterValue + "\nxmlParameterValue:" + xmlParameterValue);
+
+          // Modify the value...
+          httpRequest.setParameter(paramName,xmlParameterValue);
+          converted[0] = true;
+        } else {
+//          System.out.println("[convertJSONRequesttoXML] ** Nothing to convert **");
+        }
+
+    } // end of while
+
+    // any parametervalues to change
+//    System.out.println("[convertJSONRequesttoXML] *** returning ***: " + converted[0]);
+      return;
+    }
+
 }

@@ -23,7 +23,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AnalysisType;
 import hci.gnomex.model.AppUserLite;
@@ -42,7 +42,7 @@ import hci.gnomex.model.PropertyType;
 import hci.gnomex.model.RequestCategory;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PriceUtil;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import org.apache.log4j.Logger;
@@ -84,7 +84,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
   }
 
 
-  public void loadCommand( HttpServletRequest request, HttpSession session ) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session ) {
 
     propertyScreen = new Property();
     HashMap errors = this.loadDetailObject( request, propertyScreen );

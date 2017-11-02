@@ -1,8 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.utility.AnalysisFileDescriptorParser;
+import hci.gnomex.utility.*;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -10,6 +10,7 @@ import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.jdom.Document;
@@ -56,7 +57,7 @@ public class CacheAnalysisFileDownloadList extends GNomExCommand implements Seri
    *@param  request  The HttpServletRequest object
    *@param  session  The HttpSession object
    */
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     this.validate();
 
     // Get the files XML string
@@ -112,7 +113,7 @@ public class CacheAnalysisFileDownloadList extends GNomExCommand implements Seri
   /* (non-Javadoc)
    * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
    */
-  public HttpServletRequest setRequestState(HttpServletRequest request) {
+  public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
     request.setAttribute("xmlResult",this.xmlResult);
     return request;
   }

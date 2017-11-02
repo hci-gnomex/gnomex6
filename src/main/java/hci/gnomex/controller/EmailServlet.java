@@ -1,13 +1,13 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Request;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.MailUtil;
 import hci.gnomex.utility.MailUtilHelper;
 
@@ -48,7 +48,7 @@ public class EmailServlet extends GNomExCommand implements Serializable {
   private static final String ORDER_EMAIL = "order";
   private static final String GENERIC_EMAIL = "contact_core";
 
-  public void loadCommand(HttpServletRequest req, HttpSession res) {
+  public void loadCommand(HttpServletWrappedRequest req, HttpSession res) {
 	sendingMode = "";
     if (req.getParameter("body") != null && !req.getParameter("body").equals("")) {
       body = new StringBuffer(req.getParameter("body"));

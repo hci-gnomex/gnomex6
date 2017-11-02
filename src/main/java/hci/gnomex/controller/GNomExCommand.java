@@ -1,7 +1,7 @@
 
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.DataTrack;
@@ -13,6 +13,7 @@ import hci.gnomex.model.Request;
 import hci.gnomex.model.RequestCategory;
 import hci.gnomex.model.Topic;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.Serializable;
@@ -49,7 +50,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
   public GNomExCommand() {
   }
 
-  protected void setRowCommands(HttpServletRequest request) {
+  protected void setRowCommands(HttpServletWrappedRequest request) {
     String URI = request.getRequestURI();
     if (URI.lastIndexOf(Constants.FILE_SEPARATOR) > 0) {
       URI = URI.substring(0, URI.lastIndexOf(Constants.FILE_SEPARATOR));
@@ -67,7 +68,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
    *@param  request  The new requestState value
    *@return          Description of the Return Value
    */
-  public HttpServletRequest setRequestState(HttpServletRequest request) {
+  public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
     // load any result objects into request attributes, keyed by the useBean id in the jsp
 
     if (this.errorDetails != null) {
@@ -118,7 +119,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
     return (SecurityAdvisor)this.getSecurityAdvisor();
   }
 
-  public static String getRemoteIP(HttpServletRequest request) {
+  public static String getRemoteIP(HttpServletWrappedRequest request) {
     String xff = request.getHeader("X-Forwarded-For");
     if (xff != null) {
       return xff.split("[\\s,]+")[0];
@@ -126,7 +127,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
     return request.getRemoteAddr();
   }
 
-  public String getAppURL(HttpServletRequest request) throws Exception {
+  public String getAppURL(HttpServletWrappedRequest request) throws Exception {
     String requestURL = request.getRequestURL().toString();
     String appURL = requestURL.substring(0, requestURL.indexOf("/gnomex"));
     appURL += ":" + request.getServerPort() + "/gnomex";
@@ -134,7 +135,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
     return appURL;    
   }
 
-  public String getLaunchAppURL(HttpServletRequest request) throws Exception {
+  public String getLaunchAppURL(HttpServletWrappedRequest request) throws Exception {
     String url = getAppURL(request) + Constants.LAUNCH_APP_JSP;
     if (this.getSecAdvisor() != null) {
       url = this.getSecAdvisor().appendIdCoreForUrl(url);
@@ -142,7 +143,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
     return url;
   }
 
-  public String getShowRequestFormURL(HttpServletRequest request) throws Exception {
+  public String getShowRequestFormURL(HttpServletWrappedRequest request) throws Exception {
     return getAppURL(request) + Constants.SHOW_REQUEST_FORM;
   }
 

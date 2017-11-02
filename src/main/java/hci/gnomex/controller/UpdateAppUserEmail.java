@@ -1,9 +1,9 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.MailUtil;
 
 import java.io.Serializable;
@@ -21,7 +21,7 @@ public class UpdateAppUserEmail extends GNomExCommand implements Serializable {
   private Integer idAppUser;
   private String email = "";
 
-  public void loadCommand(HttpServletRequest request, HttpSession sess) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
     if (request.getParameter("idAppUser") != null && !request.getParameter("idAppUser").equals("")) {
       idAppUser = Integer.parseInt(request.getParameter("idAppUser"));
     } else {

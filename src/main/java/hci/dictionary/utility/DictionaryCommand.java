@@ -1,7 +1,7 @@
 package hci.dictionary.utility;
 
 import hci.dictionary.model.DictionaryEntry;
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.model.DetailObject;
 import hci.framework.security.SecurityAdvisor;
 

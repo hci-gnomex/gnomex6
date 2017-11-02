@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.BillingAccount;
@@ -72,7 +72,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idBillingPeriod") != null) {
       idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
@@ -692,7 +692,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
   /* (non-Javadoc)
    * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
    */
-  public HttpServletRequest setRequestState(HttpServletRequest request) {
+  public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
     request.setAttribute("tray", this.tray);
     return request;
   }

@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingChargeKind;
 import hci.gnomex.model.PriceCategory;
@@ -9,7 +9,7 @@ import hci.gnomex.model.PriceSheetPriceCategory;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Step;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PriceCategoryStepParser;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
@@ -53,7 +53,7 @@ public class SavePriceCategory extends GNomExCommand implements Serializable {
   public void validate() {
   }
   
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
     priceCategoryScreen = new PriceCategory();
     HashMap errors = this.loadDetailObject(request, priceCategoryScreen);

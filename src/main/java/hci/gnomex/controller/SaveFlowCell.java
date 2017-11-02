@@ -3,7 +3,7 @@ package hci.gnomex.controller;
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.FlowCell;
@@ -14,7 +14,7 @@ import hci.gnomex.model.SequenceLane;
 import hci.gnomex.model.WorkItem;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FlowCellChannelParser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -55,7 +55,7 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
 
   public void validate() {}
 
-  public void loadCommand(HttpServletRequest request, HttpSession session)
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session)
   {
     if (request.getParameter("lastCycleDate") != null && !request.getParameter("lastCycleDate").equals("")) {
       lastCycleDateStr = request.getParameter("lastCycleDate");

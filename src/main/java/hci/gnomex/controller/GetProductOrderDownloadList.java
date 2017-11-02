@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.utilities.XMLReflectException;
@@ -42,7 +42,7 @@ public class GetProductOrderDownloadList extends GNomExCommand implements Serial
 	private String skipUploadStagingDirFiles = "N";
 
 	@Override
-	public void loadCommand(HttpServletRequest req, HttpSession sess) {
+	public void loadCommand(HttpServletWrappedRequest req, HttpSession sess) {
 		if (req.getParameter("idProductOrder") != null && !req.getParameter("idProductOrder").equals("")) {
 			idProductOrder = new Integer(req.getParameter("idProductOrder"));
 		} else {

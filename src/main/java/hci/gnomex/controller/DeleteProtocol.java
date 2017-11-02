@@ -1,7 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.model.DictionaryEntry;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AnalysisProtocol;
 import hci.gnomex.model.FeatureExtractionProtocol;
@@ -13,7 +13,7 @@ import hci.gnomex.model.ScanProtocol;
 import hci.gnomex.model.SeqLibProtocol;
 import hci.gnomex.model.SeqLibProtocolApplication;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -53,7 +53,7 @@ public class DeleteProtocol extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idProtocol") != null && !request.getParameter("idProtocol").equals("")) {
       idProtocol = new Integer(request.getParameter("idProtocol"));

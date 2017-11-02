@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
@@ -153,7 +153,7 @@ public class GetProtocolList extends GNomExCommand implements Serializable {
     return this;
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (request.getParameter("protocolClassName") != null && !request.getParameter("protocolClassName").equals("")) {
       this.protocolClassName = request.getParameter("protocolClassName");
     }

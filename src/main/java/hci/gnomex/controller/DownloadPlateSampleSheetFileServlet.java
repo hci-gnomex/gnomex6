@@ -5,7 +5,7 @@ import hci.gnomex.model.Plate;
 import hci.gnomex.model.PlateWell;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.ServletUtil;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
   
   }
     
-  protected void doGet(HttpServletRequest req, HttpServletResponse response)
+  protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
       throws ServletException, IOException {
 
       Integer idPlate = null;

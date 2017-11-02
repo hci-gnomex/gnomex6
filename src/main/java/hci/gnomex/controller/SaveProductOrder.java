@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.billing.ProductPlugin;
 import hci.gnomex.constants.Constants;
@@ -22,7 +22,7 @@ import hci.gnomex.model.ProductType;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.BillingTemplateParser;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.MailUtil;
 import hci.gnomex.utility.MailUtilHelper;
 import hci.gnomex.utility.PropertyDictionaryHelper;
@@ -78,7 +78,7 @@ private ProductPlugin productPlugin = new ProductPlugin();
 private String appURL;
 private String serverName;
 
-public void loadCommand(HttpServletRequest request, HttpSession sess) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 
 	try {
 		appURL = this.getAppURL(request);

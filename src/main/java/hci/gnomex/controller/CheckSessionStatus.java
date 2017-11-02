@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import org.apache.log4j.Logger;
 public class CheckSessionStatus extends HttpServlet {
   private static Logger LOG = Logger.getLogger(CheckSessionStatus.class);
@@ -43,7 +45,7 @@ public class CheckSessionStatus extends HttpServlet {
    * @exception IOException
    *              Description of the Exception
    */
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  public void doGet(HttpServletWrappedRequest request, HttpServletResponse response) throws ServletException, IOException {
     doPost(request, response);
   }
 
@@ -59,7 +61,7 @@ public class CheckSessionStatus extends HttpServlet {
    * @exception IOException
    *              Description of the Exception
    */
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  public void doPost(HttpServletWrappedRequest request, HttpServletResponse response) throws ServletException, IOException {
     // get the users session
     String xmlResult;
     if (!request.isRequestedSessionIdValid()) {

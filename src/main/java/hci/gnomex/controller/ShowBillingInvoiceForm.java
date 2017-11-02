@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.BillingItem;
@@ -79,7 +79,7 @@ public void validate() {
 }
 
 @Override
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	if (request.getParameter("idLabs") != null && !request.getParameter("idLabs").equals("")) {
 		idLabs = request.getParameter("idLabs");
 
@@ -524,7 +524,7 @@ private static boolean determineContainsPendingItems(Set set, Integer idBillingP
  * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
  */
 @Override
-public HttpServletRequest setRequestState(HttpServletRequest request) {
+public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
 	request.setAttribute("tray", this.tray);
 	return request;
 }

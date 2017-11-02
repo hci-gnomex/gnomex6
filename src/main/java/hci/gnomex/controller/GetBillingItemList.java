@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
 import org.apache.log4j.Logger;
@@ -20,7 +20,7 @@ public class GetBillingItemList extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (!this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_MANAGE_BILLING)) {
       this.addInvalidField("permission", "Insufficient permission to manage billing items");
     }

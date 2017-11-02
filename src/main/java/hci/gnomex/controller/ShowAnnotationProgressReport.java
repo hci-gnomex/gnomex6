@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.AppUser;
@@ -110,7 +110,7 @@ public class ShowAnnotationProgressReport extends ReportCommand implements Seria
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
       idLab = Integer.valueOf(request.getParameter("idLab"));
@@ -716,7 +716,7 @@ public class ShowAnnotationProgressReport extends ReportCommand implements Seria
   /* (non-Javadoc)
    * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
    */
-  public HttpServletRequest setRequestState(HttpServletRequest request) {
+  public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
     request.setAttribute("reportTrayList", this.reportTrayList);
     return request;
   }

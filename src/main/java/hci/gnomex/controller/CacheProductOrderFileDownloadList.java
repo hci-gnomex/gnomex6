@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.utility.ProductOrderFileDescriptorParser;
 
@@ -56,7 +58,7 @@ public class CacheProductOrderFileDownloadList extends GNomExCommand implements 
    *@param  request  The HttpServletRequest object
    *@param  session  The HttpSession object
    */
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     this.validate();
 
     // Get the files XML string
@@ -112,7 +114,7 @@ public class CacheProductOrderFileDownloadList extends GNomExCommand implements 
   /* (non-Javadoc)
    * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
    */
-  public HttpServletRequest setRequestState(HttpServletRequest request) {
+  public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
     request.setAttribute("xmlResult",this.xmlResult);
     return request;
   }

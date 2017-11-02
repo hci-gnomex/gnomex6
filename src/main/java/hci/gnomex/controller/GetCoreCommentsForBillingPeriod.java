@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.BillingItemFilter;
@@ -39,7 +39,7 @@ public class GetCoreCommentsForBillingPeriod extends GNomExCommand implements Se
 
 
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     billingItemFilter = new BillingItemFilter(this.getSecAdvisor());
     HashMap errors = this.loadDetailObject(request, billingItemFilter);

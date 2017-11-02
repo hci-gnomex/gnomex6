@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.PropertyDictionary;
@@ -53,7 +53,7 @@ public final static String ACTION_REQUEST_PASSWORD_RESET = "requestPasswordReset
 public final static String ACTION_FINALIZE_PASSWORD_RESET = "finalizePasswordReset";
 public final static String ACTION_CHANGE_EXPIRED_PASSWORD = "changeExpiredPassword";  // ChangePassword.mxml hard-codes this value
 
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	try {
 		this.launchAppURL = this.getLaunchAppURL(request);
 		this.appURL = this.getAppURL(request);

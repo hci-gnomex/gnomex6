@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingItem;
 import hci.gnomex.model.BillingStatus;
@@ -36,7 +38,7 @@ private Document lineItemDoc;
 private StringBuffer resultMessage = new StringBuffer("");
 private String serverName;
 
-public void loadCommand(HttpServletRequest request, HttpSession sess) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 
 	if (request.getParameter("selectedOrders") != null && !request.getParameter("selectedOrders").equals("")) {
 		selectedOrdersXMLString = request.getParameter("selectedOrders");

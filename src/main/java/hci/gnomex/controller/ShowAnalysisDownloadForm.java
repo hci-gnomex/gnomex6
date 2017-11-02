@@ -1,13 +1,15 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.model.PropertyDictionary;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.Serializable;
@@ -49,7 +51,7 @@ public class ShowAnalysisDownloadForm extends GNomExCommand implements Serializa
 	public void validate() {
 	}
 
-	public void loadCommand(HttpServletRequest request, HttpSession session) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		if (request.getParameter("idAnalysis") != null) {
 			idAnalysis = new Integer(request.getParameter("idAnalysis"));
@@ -93,6 +95,11 @@ public class ShowAnalysisDownloadForm extends GNomExCommand implements Serializa
 
 					// Format an HTML page with links to download the files
 					String baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+					String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+					if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+						baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+								PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+					}
 					Document doc = formatDownloadHTML(analysis, secAdvisor, baseDir, baseURL, emailAddress);
 
 					XMLOutputter out = new org.jdom.output.XMLOutputter();

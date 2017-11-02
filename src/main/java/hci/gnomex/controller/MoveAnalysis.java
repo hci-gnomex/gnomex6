@@ -1,11 +1,11 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AnalysisGroup;
 import hci.gnomex.utility.AnalysisGroupParser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -36,7 +36,7 @@ public class MoveAnalysis extends GNomExCommand implements Serializable {
 	private AnalysisGroupParser analysisGroupParser;
 
 	@Override
-	public void loadCommand(HttpServletRequest request, HttpSession sess) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 		if (request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
 			idLab = Integer.parseInt(request.getParameter("idLab"));
 		} else {

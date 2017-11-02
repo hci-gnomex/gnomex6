@@ -2,7 +2,7 @@ package hci.gnomex.controller;
 
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 
 import java.io.Serializable;
@@ -32,7 +32,7 @@ public class GetFAQ extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if(request.getParameter("isManageMode") != null && !request.getParameter("isManageMode").equals("")) {
       isManageMode = request.getParameter("isManageMode");
     }

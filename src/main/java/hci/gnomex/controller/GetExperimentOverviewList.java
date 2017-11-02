@@ -4,7 +4,7 @@ import hci.gnomex.model.ExperimentOverviewFilter;
 import hci.gnomex.model.Step;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ private static Logger LOG = Logger.getLogger(GetExperimentOverviewList.class);
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     filter = new ExperimentOverviewFilter();
 

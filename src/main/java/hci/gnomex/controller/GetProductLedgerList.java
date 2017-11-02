@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
@@ -29,7 +29,7 @@ public class GetProductLedgerList extends GNomExCommand implements Serializable 
   private Integer idProduct;
 
   @Override
-  public void loadCommand(HttpServletRequest req, HttpSession sess) {
+  public void loadCommand(HttpServletWrappedRequest req, HttpSession sess) {
 
     if(req.getParameter("idLab") != null && !req.getParameter("idLab").equals("")) {
       idLab = Integer.parseInt(req.getParameter("idLab"));

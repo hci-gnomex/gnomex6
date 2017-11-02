@@ -4,10 +4,11 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
+import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.ArchiveHelper;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.ServletUtil;
 
@@ -37,7 +38,7 @@ public void init() {
 
 }
 
-protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response) throws ServletException, IOException {
 
 	serverName = req.getServerName();
 
@@ -68,6 +69,8 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 		if (keys == null || keys.equals("")) {
 			throw new Exception("Cannot perform download due to empty keys parameter.");
 		}
+
+		String username = req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest";
 		sess = HibernateSession.currentReadOnlySession(req.getUserPrincipal() != null ? req.getUserPrincipal()
 				.getName() : "guest");
 
@@ -76,6 +79,11 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 				PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
 		String analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 				PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+		String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+		if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+			analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+					PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,username);
+		}
 
 		// Get security advisor
 		SecurityAdvisor secAdvisor = (SecurityAdvisor) req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);

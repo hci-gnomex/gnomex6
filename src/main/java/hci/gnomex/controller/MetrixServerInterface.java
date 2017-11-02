@@ -3,7 +3,7 @@ package hci.gnomex.controller;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 
 import java.io.Serializable;
@@ -41,7 +41,7 @@ public class MetrixServerInterface extends GNomExCommand implements Serializable
 
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     //filter = new MetrixInterfaceFilter();
     //HashMap errors = this.loadDetailObject(request, filter);
     //this.addInvalidFields(errors);

@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.ProductLedger;
 import hci.gnomex.utility.GNomExRollbackException;
@@ -27,7 +27,7 @@ private static Logger LOG = Logger.getLogger(SaveProductLedgerEntryList.class);
 Document productLedgerEntryListDoc;
 
 @Override
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	String productLedgerEntryListXMLString = "";
 	if (request.getParameter("productLedgerEntryList") != null
 			&& !request.getParameter("productLedgerEntryList").equals("")) {

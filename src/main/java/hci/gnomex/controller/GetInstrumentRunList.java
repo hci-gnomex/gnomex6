@@ -1,7 +1,7 @@
 
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.utilities.XMLReflectException;
@@ -12,6 +12,7 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.ReactionType;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -43,7 +44,7 @@ public class GetInstrumentRunList extends GNomExCommand implements Serializable 
   }
 
 
-  public void loadCommand( HttpServletRequest request, HttpSession session ) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session ) {
 
     runFilter = new InstrumentRunFilter();
     HashMap errors = this.loadDetailObject( request, runFilter );

@@ -1,0 +1,25 @@
+{
+  "hints": [
+    {
+    "command": "SaveProject",
+    "parameter": "projectXMLString",
+    "nodeheader": "",
+    "nodeprefix": "Project",
+    "elementhints": [
+    	{
+    	"elementname": "ExperimentDesignEntries",
+    	"elementheader": "ExperimentDesignEntry"
+    	},
+    	{
+    	"elementname": "ExperimentFactorEntries",
+    	"elementheader": "ExperimentFactorEntry"
+    	}
+    ]
+  }
+ ]
+}
+
+
+    
+    
+    

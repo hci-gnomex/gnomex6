@@ -1,11 +1,11 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.model.DictionaryEntry;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.Serializable;
@@ -35,7 +35,7 @@ private boolean isSecure = false;
 private int serverPort;
 private Integer idCoreFacility;
 
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	try {
 		this.validate();
 		scheme = request.getScheme();
@@ -66,6 +66,7 @@ public Command execute() throws RollBackCommandException {
 		String universityUserAuthorization = (PropertyDictionaryHelper.getInstance(sess).isUniversityUserAuthentication() ? "Y" : "N");
 		String siteLogo = PropertyDictionaryHelper.getSiteLogo(sess, idCoreFacility);
 		String siteSplash = PropertyDictionaryHelper.getSiteSplash(sess, idCoreFacility);
+		String experimentAlias = PropertyDictionaryHelper.getExperimentAlias(sess, idCoreFacility);
 
 		String baseURL = "";
 		if (serverPort == 80 || (serverPort == 443 && isSecure)) {
@@ -94,6 +95,11 @@ public Command execute() throws RollBackCommandException {
 		node = new Element("Property");
 		node.setAttribute("name", "site_splash");
 		node.setAttribute("value", siteSplash);
+		doc.getRootElement().addContent(node);
+
+		node = new Element("Property");
+		node.setAttribute("name", "experiment_alias");
+		node.setAttribute("value", experimentAlias);
 		doc.getRootElement().addContent(node);
 
 		getCoreFacilities(sess, doc);

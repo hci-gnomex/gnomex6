@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Topic;
 
@@ -26,7 +28,7 @@ public class CheckTopicPermission extends GNomExCommand implements Serializable 
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     String topicNumber = "";
     if (request.getParameter("topicNumber") != null && !request.getParameter("topicNumber").equals("")) {
       topicNumber = request.getParameter("topicNumber");

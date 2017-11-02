@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.Lab;
@@ -34,7 +34,7 @@ public class GetQCChipTypePriceList extends GNomExCommand implements Serializabl
 
   private SecurityAdvisor          secAdvisor;
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
       idLab =  new Integer(request.getParameter("idLab"));

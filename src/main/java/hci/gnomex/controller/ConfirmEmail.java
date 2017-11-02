@@ -1,7 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.model.AppUser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.IOException;
 
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
@@ -19,11 +20,11 @@ public class ConfirmEmail extends HttpServlet {
 
 private static Logger LOG = Logger.getLogger(ConfirmEmail.class);
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 	doPost(req, res);
 }
 
-protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+protected void doPost(HttpServletWrappedRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String message = "";
 
 	try {
