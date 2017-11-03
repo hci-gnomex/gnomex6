@@ -19,7 +19,7 @@ import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.BillingItem;
@@ -30,7 +30,7 @@ import hci.gnomex.model.MasterBillingItem;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.BillingTemplateParser;
 import hci.gnomex.utility.GNomExRollbackException;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Order;
 import hci.gnomex.utility.ParserException;
 import org.apache.log4j.Logger;
@@ -45,7 +45,7 @@ public class SaveBillingTemplate extends GNomExCommand implements Serializable {
 	private Document						billingTemplateDoc;
 
 	@Override
-	public void loadCommand(HttpServletRequest request, HttpSession sess) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 		if (request.getParameter("billingTemplateXMLString") != null && !request.getParameter("billingTemplateXMLString").trim().equals("")) {
 			String billingTemplateXMLString = request.getParameter("billingTemplateXMLString");
 			StringReader reader = new StringReader(billingTemplateXMLString);

@@ -1,14 +1,14 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import java.net.URLEncoder;
+
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.UCSCLinkFiles;
 import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.File;
@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.naming.NamingException;
@@ -30,24 +31,25 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
 
   private static Logger LOG = Logger.getLogger(MakeDataTrackLinks.class);
 
-  private Integer idDataTrack;
-  private String baseURL;
-  private String baseDir;
-  private String analysisBaseDir;
-  private String serverName;
-  private String dataTrackFileServerURL;
-  private String dataTrackFileServerWebContext;
-  private String bamiobioviewerURL;
-  private String vcfiobioviewerURL;
-  private Integer idAnalysisFile;
-  private String requestType;
-  private String pathName;
+    private Integer idDataTrack;
+    private String baseURL;
+    private String baseDir;
+    private String analysisBaseDir;
+    private String serverName;
+    private String dataTrackFileServerURL;
+    private String dataTrackFileServerWebContext;
+    private String bamiobioviewerURL;
+    private String vcfiobioviewerURL;
+    private Integer idAnalysisFile;
+    private String requestType;
+    private String pathName;
+    private Integer idAnalysis;
 
 
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	idDataTrack = -1;
     if (request.getParameter("idDataTrack") != null && !request.getParameter("idDataTrack").equals("")) {
       idDataTrack = new Integer(request.getParameter("idDataTrack"));
@@ -59,11 +61,18 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
     	idAnalysisFile = new Integer(request.getParameter("idAnalysisFile"));
       }
 
-    // do we need to do special things for IOBIO?
-    requestType = "NORMAL";
-    if (request.getParameter("requestType") != null && !request.getParameter("requestType").equals("")) {
-    	requestType = request.getParameter("requestType");
-      }
+        // idAnalysis (needed for IOBIO requests)
+        idAnalysis = null;
+        if (request.getParameter("idAnalysis") != null && !request.getParameter("idAnalysis").equals("")) {
+            idAnalysis = new Integer(request.getParameter("idAnalysis"));
+        }
+
+
+        // do we need to do special things for IOBIO?
+        requestType = "NORMAL";
+        if (request.getParameter("requestType") != null && !request.getParameter("requestType").equals("")) {
+            requestType = request.getParameter("requestType");
+        }
 
     // if pathName is a parameter we don't require a datatrack
     pathName = null;
@@ -79,12 +88,17 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
     try {
 
 
-      Session sess = HibernateSession.currentSession(this.getSecAdvisor().getUsername());
-      baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
-      analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
-      dataTrackFileServerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.DATATRACK_FILESERVER_URL);
-      bamiobioviewerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.BAM_IOBIO_VIEWER_URL);
-      vcfiobioviewerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.VCF_IOBIO_VIEWER_URL);
+            Session sess = HibernateSession.currentSession(this.getSecAdvisor().getUsername());
+            baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
+            analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+            String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+            if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+                analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+                        PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+            }
+            dataTrackFileServerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.DATATRACK_FILESERVER_URL);
+            bamiobioviewerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.BAM_IOBIO_VIEWER_URL);
+            vcfiobioviewerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.VCF_IOBIO_VIEWER_URL);
 
       dataTrackFileServerWebContext = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.DATATRACK_FILESERVER_WEB_CONTEXT);
 
@@ -105,27 +119,63 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
 
       if (pathName != null || this.getSecAdvisor().canRead(DataTrack.class.cast(sess.load(DataTrack.class, idDataTrack)))) {
 
-        //make links fetching url(s)
-        ArrayList<String>  urlsToLink = makeURLLinks(sess);
-        StringBuilder sb = new StringBuilder(urlsToLink.get(0));
-        for (int i=1; i< urlsToLink.size(); i++){
-          sb.append("\n\n");
-          sb.append(urlsToLink.get(i));
-        }
+                //make links fetching url(s)
+                ArrayList<String> urlsToLink = makeURLLinks(sess);
+                StringBuilder sb = new StringBuilder(urlsToLink.get(0));
+                for (int i = 1; i < urlsToLink.size(); i++) {
+                    sb.append("\n\n");
+                    sb.append(urlsToLink.get(i));
+                }
 
 
         //post results with link urls
         String theURL = sb.toString().replace("\\", Constants.FILE_SEPARATOR);
 
-        // is this an IOBIO request?
-        if (requestType.equals("IOBIO")) {
-        	// setup the url based on file type
-        	if (theURL.toLowerCase().contains(".vcf.gz")) {
-        		theURL = vcfiobioviewerURL + theURL;
-        	}
-        	else {
-        		theURL = bamiobioviewerURL + theURL;
-        	}
+                String gBN = null;
+                DataTrack dataTrack = null;
+
+                Analysis a = null;
+                if (idAnalysis != null  && idAnalysis > 0) {
+                    a = (Analysis) sess.get(Analysis.class, idAnalysis);
+                    if (a != null) {
+                        Set<GenomeBuild> gbs = a.getGenomeBuilds();
+                        if (gbs != null) {
+                            GenomeBuild gb = gbs.iterator().next();
+                            if (gb != null) {
+                                String genomeBuildName = gb.getGenomeBuildName(); //Just pull the first one, should only be one.
+
+                                gBN = Util.getGRCName(genomeBuildName);
+                            }
+                        }
+                    }
+                } else if (idDataTrack != null && idDataTrack > 0) {
+                    dataTrack = DataTrack.class.cast(sess.load(DataTrack.class, idDataTrack));
+                    Integer idGenomeBuild = null;
+                    if (dataTrack != null) {
+                        idGenomeBuild = dataTrack.getIdGenomeBuild();
+                        if (idGenomeBuild != null && idGenomeBuild > 0) {
+                            GenomeBuild gb = (GenomeBuild) sess.get(GenomeBuild.class, idGenomeBuild);
+                            if (gb != null) {
+                                String genomeBuildName = gb.getGenomeBuildName(); //Just pull the first one, should only be one.
+
+                                gBN = Util.getGRCName(genomeBuildName);
+                            }
+                        }
+                    }
+                }
+
+                if (gBN == null) {
+                    gBN = "";
+                }
+
+                // is this an IOBIO request?
+                if (requestType.equals("IOBIO")) {
+                    // setup the url based on file type
+                    if (theURL.toLowerCase().contains(".vcf.gz")) {
+                        theURL = vcfiobioviewerURL + URLEncoder.encode(theURL, "UTF-8") + "&build=" + gBN;
+                    } else {
+                        theURL = bamiobioviewerURL + URLEncoder.encode(theURL, "UTF-8") + "&build=" + gBN;
+                    }
 
         }
 

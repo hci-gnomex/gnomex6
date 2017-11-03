@@ -1,12 +1,14 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.Lab;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.GNomExRollbackException;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -32,7 +34,7 @@ private Integer idAppUser = null;
 public void validate() {
 }
 
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 	if (request.getParameter("idAppUser") != null && !request.getParameter("idAppUser").equals("")) {
 		idAppUser = new Integer(request.getParameter("idAppUser"));

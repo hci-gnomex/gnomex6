@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AnalysisFile;
@@ -20,7 +20,7 @@ import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.AppUserComparator;
 import hci.gnomex.utility.DataTrackComparator;
 import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.PropertyOptionComparator;
 
@@ -68,7 +68,7 @@ public class LinkDataTrackFile extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idDataTrack") != null && !request.getParameter("idDataTrack").equals("")) {
       idDataTrack = new Integer(request.getParameter("idDataTrack"));
@@ -115,6 +115,11 @@ public class LinkDataTrackFile extends GNomExCommand implements Serializable {
       PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(sess);
       baseDirDataTrack = propertyHelper.getDirectory(serverName, null, propertyHelper.getProperty(PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY));
       baseDirAnalysis = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+      String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+      if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+        baseDirAnalysis = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+                PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+      }
 
       analysisFile = (AnalysisFile)sess.load(AnalysisFile.class, idAnalysisFile);
 

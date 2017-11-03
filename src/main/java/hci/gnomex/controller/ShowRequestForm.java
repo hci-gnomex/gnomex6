@@ -14,7 +14,7 @@ import org.hibernate.Session;
 
 import com.itextpdf.text.*;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.report.constants.ReportFormats;
@@ -49,7 +49,7 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
     }
 
     @Override
-    public void loadCommand(HttpServletRequest request, HttpSession session) {
+    public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
         if (request.getParameter("idRequest") != null) {
             idRequest = new Integer(request.getParameter("idRequest"));
         } else {
@@ -184,7 +184,7 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
      * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
      */
     @Override
-    public HttpServletRequest setRequestState(HttpServletRequest request) {
+    public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
         request.setAttribute("tray", this.tray);
         return request;
     }

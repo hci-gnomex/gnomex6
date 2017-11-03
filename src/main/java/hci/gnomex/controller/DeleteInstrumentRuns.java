@@ -1,7 +1,7 @@
 package hci.gnomex.controller;
 
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Chromatogram;
 import hci.gnomex.model.InstrumentRun;
@@ -11,7 +11,7 @@ import hci.gnomex.model.Request;
 import hci.gnomex.model.RequestStatus;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.ChromatogramParser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -40,7 +40,7 @@ public class DeleteInstrumentRuns extends GNomExCommand implements Serializable 
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("runsToDeleteXMLString") != null && !request.getParameter("runsToDeleteXMLString").equals("")) {
       runsToDeleteXMLString = request.getParameter("runsToDeleteXMLString");

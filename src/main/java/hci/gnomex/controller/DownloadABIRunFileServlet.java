@@ -38,7 +38,7 @@ public void init() {
 
 }
 
-protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response) throws ServletException, IOException {
 	InstrumentRun ir = null;
 	Integer idInstrumentRun = null;
 	String codeReactionType = ReactionType.SEQUENCING_REACTION_TYPE;
@@ -79,12 +79,11 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 		// Get security advisor
 		secAdvisor = (SecurityAdvisor) req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
 
-		username = req.getUserPrincipal().getName();
+		username = req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest";
 
 		if (secAdvisor != null) {
 
-			Session sess = secAdvisor.getHibernateSession(req.getUserPrincipal() != null ? req.getUserPrincipal()
-					.getName() : "guest");
+			Session sess = secAdvisor.getHibernateSession(req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest");
 			ir = (InstrumentRun) sess.load(InstrumentRun.class, idInstrumentRun);
 
 			String runName = ir.getLabel() != null && !ir.getLabel().equals("") ? ir.getLabel() : ir

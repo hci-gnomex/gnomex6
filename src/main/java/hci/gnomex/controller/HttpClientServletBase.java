@@ -1,9 +1,9 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	doGet(req, res);
 }
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 	Session sess = null;
 	try {
 		sess = HibernateSession.currentSession(getNameOfServlet());

@@ -1,13 +1,13 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.GNomExRollbackException;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.MailUtil;
 import hci.gnomex.utility.MailUtilHelper;
 import hci.gnomex.utility.PropertyDictionaryHelper;
@@ -41,7 +41,7 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 	// days
 
 	@Override
-	public void loadCommand(HttpServletRequest request, HttpSession sess) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 		this.requestURL = request.getRequestURL();
 		this.serverName = request.getServerName();
 

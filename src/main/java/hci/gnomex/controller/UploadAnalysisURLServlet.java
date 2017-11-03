@@ -3,7 +3,7 @@ package hci.gnomex.controller;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.ServletUtil;
 
@@ -21,7 +21,7 @@ public class UploadAnalysisURLServlet extends HttpServlet {
 
 private static final Logger LOG = Logger.getLogger(UploadAnalysisURLServlet.class);
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	// Restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(req)) {
@@ -46,7 +46,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse res) throws Ser
 		//
 		//
 
-		sess = HibernateSession.currentReadOnlySession(req.getUserPrincipal().getName());
+		sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 		String portNumber = PropertyDictionaryHelper.getInstance(sess).getQualifiedProperty(
 				PropertyDictionary.HTTP_PORT, req.getServerName());
 		if (portNumber == null) {

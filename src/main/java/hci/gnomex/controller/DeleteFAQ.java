@@ -1,12 +1,12 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.TransferLog;
 import hci.gnomex.model.FAQ;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.Serializable;
@@ -27,7 +27,7 @@ public class DeleteFAQ extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idFAQ") != null && !request.getParameter("idFAQ").equals("")) {
      idFAQ = new Integer(request.getParameter("idFAQ"));

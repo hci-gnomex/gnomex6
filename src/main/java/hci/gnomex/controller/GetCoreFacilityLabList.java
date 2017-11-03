@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
@@ -25,7 +25,7 @@ public class GetCoreFacilityLabList extends GNomExCommand implements Serializabl
 private static Logger LOG = Logger.getLogger(GetCoreFacilityLabList.class);
 
 @Override
-public void loadCommand(HttpServletRequest req, HttpSession sess) {
+public void loadCommand(HttpServletWrappedRequest req, HttpSession sess) {
 	// TODO Auto-generated method stub
 
 }

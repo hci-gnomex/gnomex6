@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
@@ -50,7 +52,7 @@ public Command execute() throws RollBackCommandException {
 }
 
 @Override
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 }
 
 public void validate() {

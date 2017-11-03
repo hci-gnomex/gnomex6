@@ -1,10 +1,10 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 
@@ -33,7 +33,7 @@ public class DeletePrice extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idPrice") != null && !request.getParameter("idPrice").equals("")) {
      idPrice = new Integer(request.getParameter("idPrice"));

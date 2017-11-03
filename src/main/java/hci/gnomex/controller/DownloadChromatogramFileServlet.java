@@ -4,7 +4,7 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Chromatogram;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.ServletUtil;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +29,7 @@ public class DownloadChromatogramFileServlet extends HttpServlet {
 
     }
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse response)
+    protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         Integer     idChromatogram = null;
         String userName = "";
@@ -57,7 +57,7 @@ public class DownloadChromatogramFileServlet extends HttpServlet {
 
         try {
 
-            userName = req.getUserPrincipal().getName();
+            userName = req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest";
 
             // Get security advisor
             secAdvisor = (SecurityAdvisor) req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);

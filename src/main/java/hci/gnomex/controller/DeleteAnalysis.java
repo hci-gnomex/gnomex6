@@ -1,15 +1,14 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AnalysisCollaborator;
 import hci.gnomex.model.AnalysisFile;
 import hci.gnomex.model.TransferLog;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class DeleteAnalysis extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idAnalysis") != null && !request.getParameter("idAnalysis").equals("")) {
      idAnalysis = new Integer(request.getParameter("idAnalysis"));
@@ -61,6 +60,12 @@ public class DeleteAnalysis extends GNomExCommand implements Serializable {
       Session sess = HibernateSession.currentSession(this.getUsername());
       DictionaryHelper dh = DictionaryHelper.getInstance(sess);
       baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+      String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+      if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+        baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+                PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+      }
+
       Analysis analysis = (Analysis)sess.load(Analysis.class, idAnalysis);
       Hibernate.initialize(analysis.getAnalysisGroups());
       analysis.setAnalysisGroups(null);

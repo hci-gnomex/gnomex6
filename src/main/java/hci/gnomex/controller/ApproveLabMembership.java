@@ -3,11 +3,7 @@ package hci.gnomex.controller;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
 
 import java.io.IOException;
 import java.util.Date;
@@ -30,12 +26,12 @@ private static Logger LOG = Logger.getLogger(ApproveLabMembership.class);
 
 private static String serverName;
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 	serverName = req.getServerName();
 	doPost(req, res);
 }
 
-protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+protected void doPost(HttpServletWrappedRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String message = "";
 
 	try {

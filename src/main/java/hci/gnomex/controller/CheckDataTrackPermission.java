@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrack;
 
@@ -25,7 +27,7 @@ public class CheckDataTrackPermission extends GNomExCommand implements Serializa
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     String dataTrackNumber = "";
     if (request.getParameter("dataTrackNumber") != null && !request.getParameter("dataTrackNumber").equals("")) {
       dataTrackNumber = request.getParameter("dataTrackNumber");

@@ -1,7 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.AnalysisGroupFilter;
@@ -80,7 +80,7 @@ public class ShowAnnotationReport extends ReportCommand implements Serializable 
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (request.getParameter("target") != null && !request.getParameter("target").equals("")) {
       target = request.getParameter("target");
     } else {
@@ -157,6 +157,7 @@ public class ShowAnnotationReport extends ReportCommand implements Serializable 
       StringBuffer queryBuf = null;
       if (target.equals(TARGET_SAMPLE)) {
         queryBuf = sampleFilter.getQuery(secAdvisor, IS_CREATE_REPORT, customColumnList);
+        System.out.println ("[ShowAnnotationReport] queryBuf: " + queryBuf);
       } else if (target.equals(TARGET_ANALYSIS)) {
         queryBuf = analysisFilter.getQuery(secAdvisor, IS_CREATE_REPORT);
       } else if (target.equals(TARGET_DATATRACK)) {
@@ -172,6 +173,7 @@ public class ShowAnnotationReport extends ReportCommand implements Serializable 
         // Get the annotations
         if (target.equals(TARGET_SAMPLE)) {
           queryBuf = sampleFilter.getAnnotationQuery(secAdvisor, IS_CREATE_REPORT);
+          System.out.println ("[ShowAnnotationReport] (2) queryBuf: " + queryBuf);
         } else if (target.equals(TARGET_ANALYSIS)) {
           queryBuf = analysisFilter.getAnnotationQuery(secAdvisor, IS_CREATE_REPORT);
         }  else if (target.equals(TARGET_DATATRACK)) {
@@ -524,7 +526,7 @@ public class ShowAnnotationReport extends ReportCommand implements Serializable 
   /* (non-Javadoc)
    * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
    */
-  public HttpServletRequest setRequestState(HttpServletRequest request) {
+  public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
     request.setAttribute("tray", this.tray);
     return request;
   }

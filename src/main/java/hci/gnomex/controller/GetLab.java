@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.AppUser;
@@ -52,7 +52,7 @@ private boolean includeMoreCollaboratorInfo = true;
 public void validate() {
 }
 
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 	lab = new Lab();
 	HashMap errors = this.loadDetailObject(request, lab);

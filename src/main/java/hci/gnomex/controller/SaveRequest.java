@@ -2,7 +2,7 @@ package hci.gnomex.controller;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.billing.BillingPlugin;
 import hci.gnomex.constants.Constants;
@@ -973,7 +973,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	public void validate() {
 	}
 
-	public void loadCommand(HttpServletRequest request, HttpSession session) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		if (request.getParameter("requestXMLString") != null && !request.getParameter("requestXMLString").equals("")) {
 			requestXMLString = request.getParameter("requestXMLString");

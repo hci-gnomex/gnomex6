@@ -13,7 +13,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.ProductOrder;
 import hci.gnomex.model.ProductOrderFilter;
@@ -27,7 +27,7 @@ public class GetProductOrderListForLab extends GNomExCommand implements Serializ
   private ProductOrderFilter productOrderFilter;
 
   @Override
-  public void loadCommand(HttpServletRequest request, HttpSession sess) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
     if(request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
       idLab = Integer.parseInt(request.getParameter("idLab"));
     } else {

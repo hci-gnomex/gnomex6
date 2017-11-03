@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
@@ -11,8 +11,8 @@ import hci.gnomex.model.Lab;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.AnalysisFileParser;
 import hci.gnomex.utility.BatchDataSource;
-import hci.gnomex.utility.HibernateSession;
-
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idAnalysis") != null && !request.getParameter("idAnalysis").equals("")) {
       idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
@@ -225,15 +225,15 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
 	   **************************************/
 	  //Create directory and datatracks for each type
       if (bamFiles.size() > 0 ) {
-    	 this.createDataTrackDriver("bam", parentId, bamFiles);
+    	 this.createDataTrackDriver("bam", parentId, bamFiles,this.getUsername());
       }
 
       if (covFiles.size() > 0){
-    	 this.createDataTrackDriver("useq",parentId,covFiles);
+    	 this.createDataTrackDriver("useq",parentId,covFiles,this.getUsername());
       }
 
       if (vcfFiles.size() > 0) {
-    	 this.createDataTrackDriver("vcf",parentId,vcfFiles);
+    	 this.createDataTrackDriver("vcf",parentId,vcfFiles,this.getUsername());
       }
 
         this.xmlResult = "<SUCCESS idAnalysis=\"" + analysis.getIdAnalysis() + "\"" +  " idAnalysisGroup=\"" + "\"" + "/>";
@@ -252,7 +252,7 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
 	/******************************
 	 * Create enclosing folder
 	 ****************************/
-	private void createDataTrackDriver(String folderName, Integer parentId, ArrayList<AnalysisFile> filesToLink) {
+	private void createDataTrackDriver(String folderName, Integer parentId, ArrayList<AnalysisFile> filesToLink, String username) {
 
 		// get the existing data track folders
 		DataTrackFolder parentFolder = DataTrackFolder.class.cast(sess.load(DataTrackFolder.class, parentId));
@@ -277,7 +277,7 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
 		  }
 
 		  for (AnalysisFile af: filesToLink) {
-			  this.createDataTrack(af.getIdAnalysisFile(),subId);
+			  this.createDataTrack(af.getIdAnalysisFile(),subId,username);
 		  }
 
 	}
@@ -285,7 +285,7 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
 	/*******************************
 	 * Stolen from linkDataTrackFiles.
 	 *********************************/
-	private void createDataTrack(Integer idAnalysisFile, Integer idDataTrackFolder) {
+	private void createDataTrack(Integer idAnalysisFile, Integer idDataTrackFolder, String username) {
 		DataTrack dataTrack = null;
 		AnalysisFile analysisFile = null;
 
@@ -293,6 +293,11 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
 			PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(sess);
 			baseDirDataTrack = propertyHelper.getDirectory(serverName, null, propertyHelper.getProperty(PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY));
 			baseDirAnalysis = propertyHelper.getDirectory(serverName, null, propertyHelper.getProperty(PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY));
+			String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+			if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+				baseDirAnalysis = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+						PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,username);
+			}
 
 			analysisFile = (AnalysisFile)sess.load(AnalysisFile.class, idAnalysisFile);
 			Analysis analysis = (Analysis)sess.load(Analysis.class, analysisFile.getIdAnalysis());

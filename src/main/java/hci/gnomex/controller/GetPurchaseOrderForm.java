@@ -1,7 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.model.BillingAccount;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,13 +19,13 @@ public class GetPurchaseOrderForm extends HttpServlet {
 private static Logger LOG = Logger.getLogger(GetPurchaseOrderForm.class);
 private Integer idBillingAccount;
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 	doPost(req, res);
 }
 
 protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	try {
-		Session sess = HibernateSession.currentSession(req.getUserPrincipal().getName());
+		Session sess = HibernateSession.currentSession(req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest");
 
 		byte[] output = new byte[8000];
 		String fileType = "";

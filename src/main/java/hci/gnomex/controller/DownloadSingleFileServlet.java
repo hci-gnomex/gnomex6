@@ -44,7 +44,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
   
   public void init() { }
 
-  protected void doGet(HttpServletRequest req, HttpServletResponse response)
+  protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
       throws ServletException, IOException {
 
     Integer idRequest = null;
@@ -59,7 +59,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
     String experimentDir = null;
 
     serverName = req.getServerName();
-    String username = req.getUserPrincipal().getName();
+    String username = req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest";
 
       // Restrict commands to local host if request is not secure
       if (!ServletUtil.checkSecureRequest(req, LOG)) {

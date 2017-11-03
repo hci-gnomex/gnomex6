@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AnalysisProtocol;
 import hci.gnomex.model.AnalysisType;
@@ -9,7 +9,7 @@ import hci.gnomex.model.PropertyType;
 import hci.gnomex.model.Visibility;
 import hci.gnomex.utility.AnalysisMatrixLinkInfo;
 import hci.gnomex.utility.ExperimentMatrixLinkInfo;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.MatrixLinkInfoBase;
 import hci.report.utility.ReportCommand;
 
@@ -88,7 +88,7 @@ public class ShowExperimentMatrix extends ReportCommand implements Serializable 
 	public void validate() {
 	}
 
-	public void loadCommand(HttpServletRequest request, HttpSession session) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		if (request.getParameter("scope") != null && !request.getParameter("scope").equals("")) {
 			scope = request.getParameter("scope");
@@ -374,7 +374,7 @@ public class ShowExperimentMatrix extends ReportCommand implements Serializable 
 	 * 
 	 * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
 	 */
-	public HttpServletRequest setRequestState(HttpServletRequest request) {
+	public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
 
 		request.setAttribute("siteName", this.siteName);
 		request.setAttribute("orgMap", this.orgMap);

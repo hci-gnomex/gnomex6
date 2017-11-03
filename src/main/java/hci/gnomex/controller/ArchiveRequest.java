@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.BillingItem;
@@ -8,7 +10,7 @@ import hci.gnomex.model.BillingStatus;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.RequestStatus;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.Serializable;
@@ -30,7 +32,7 @@ public class ArchiveRequest extends GNomExCommand implements Serializable {
 
 
   @Override
-  public void loadCommand(HttpServletRequest req, HttpSession sess) {
+  public void loadCommand(HttpServletWrappedRequest req, HttpSession sess) {
     if(req.getParameter("idRequest") != null && !req.getParameter("idRequest").equals("")){
       this.idRequest = Integer.parseInt(req.getParameter("idRequest"));
     } else{

@@ -10,7 +10,7 @@ import hci.gnomex.model.TransferLog;
 import hci.gnomex.security.InvalidSecurityAdvisorException;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.GnomexFile;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -32,7 +32,7 @@ public abstract class UploadFileServletBase extends HttpServlet {
 
 private static final Logger LOG = Logger.getLogger(UploadFileServletBase.class);
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 }
 
 protected abstract void setParentObjectName(UploadFileServletData data);
@@ -72,7 +72,7 @@ protected SecurityAdvisor getSecurityAdvisor(UploadFileServletData data) throws 
 	SecurityAdvisor secAdvisor = (SecurityAdvisor) data.req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
 	if (secAdvisor == null) {
 		System.out.println(this.getClass().getSimpleName() + ":  Warning - unable to find existing session. Creating security advisor.");
-		secAdvisor = SecurityAdvisor.create(data.sess, data.req.getUserPrincipal().getName());
+		secAdvisor = SecurityAdvisor.create(data.sess, data.req.getUserPrincipal() != null ? data.req.getUserPrincipal().getName() : "guest");
 	}
 	if (secAdvisor == null) {
 		System.out.println(this.getClass().getSimpleName() + ": Error - Unable to find or create security advisor.");
@@ -86,7 +86,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	try {
 		data.req = req;
 		data.res = res;
-		data.sess = HibernateSession.currentSession(data.req.getUserPrincipal().getName());
+		data.sess = HibernateSession.currentSession(data.req.getUserPrincipal() != null ? data.req.getUserPrincipal().getName() : "guest");
 		setParentObjectName(data);
 		setIdFieldName(data);
 		setNumberFieldName(data);

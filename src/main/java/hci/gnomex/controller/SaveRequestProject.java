@@ -1,10 +1,10 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.*;
 import hci.gnomex.utility.BillingTemplateQueryManager;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -43,7 +43,7 @@ public class SaveRequestProject extends GNomExCommand implements Serializable {
   public void validate() {
   }
   
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
     
     

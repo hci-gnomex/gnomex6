@@ -15,7 +15,7 @@ import hci.gnomex.utility.BulkFileUploadException;
 import hci.gnomex.utility.DataTrackComparator;
 import hci.gnomex.utility.DataTrackUtil;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.PropertyOptionComparator;
 
@@ -59,7 +59,7 @@ private static final Pattern BULK_UPLOAD_LINE_SPLITTER = Pattern.compile("([^\\t
 
 private static Logger LOG = Logger.getLogger(UploadDataTrackFileServlet.class);
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 }
 
 /*
@@ -81,7 +81,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	Integer idLab = null;
 	File tempBulkUploadFile = null;
 	try {
-		sess = HibernateSession.currentSession(req.getUserPrincipal().getName());
+		sess = HibernateSession.currentSession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 
 		String baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 				PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
@@ -94,7 +94,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		if (secAdvisor == null) {
 			System.out
 					.println("UploadDataTrackFileServlet:  Warning - unable to find existing session. Creating security advisor.");
-			secAdvisor = SecurityAdvisor.create(sess, req.getUserPrincipal().getName());
+			secAdvisor = SecurityAdvisor.create(sess, (req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 		}
 
 		//

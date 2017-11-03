@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Application;
 import hci.gnomex.model.ArrayCoordinate;
@@ -9,7 +9,7 @@ import hci.gnomex.model.SlideProduct;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.ApplicationParser;
 import hci.gnomex.utility.ArrayCoordinateParser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -64,7 +64,7 @@ public class SaveSlideDesign extends GNomExCommand implements Serializable {
   public void validate() {
   }
   
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
     
     if (request.getParameter("slideSet") != null && !request.getParameter("slideSet").equals("")) {

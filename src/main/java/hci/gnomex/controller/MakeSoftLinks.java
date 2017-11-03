@@ -1,12 +1,12 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.FileDescriptor;
 import hci.gnomex.utility.FileDescriptorParser;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.File;
@@ -38,7 +38,7 @@ public class MakeSoftLinks extends GNomExCommand implements Serializable {
 	public void validate() {
 	}
 
-	public void loadCommand(HttpServletRequest request, HttpSession session) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		// Get the files XML string
 		if (request.getParameter("fileDescriptorXMLString") != null && !request.getParameter("fileDescriptorXMLString").equals("")) {
@@ -88,7 +88,11 @@ public class MakeSoftLinks extends GNomExCommand implements Serializable {
 		String softLinkPath = "";
 
 		// Create the users' soft link directory
-		File dir = new File(directory_bioinformatics_scratch, username);
+		String username1 = username;
+		if (username1 == null) {
+			username1 = "Guest";
+		}
+		File dir = new File(directory_bioinformatics_scratch, username1);
 		if (!dir.exists())
 			dir.mkdir();
 

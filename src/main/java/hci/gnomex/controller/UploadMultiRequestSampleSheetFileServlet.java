@@ -4,7 +4,7 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.MultiRequestSampleSheetFileParser;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
@@ -44,7 +44,7 @@ private static final int ERROR_INVALID_TEMP_DIRECTORY = 901;
 private static final int ERROR_SECURITY_EXCEPTION = 902;
 private static final int ERROR_UPLOAD_MISC = 903;
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 }
 
 /*
@@ -57,7 +57,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	String fileName = null;
 
 	try {
-		Session sess = HibernateSession.currentReadOnlySession(req.getUserPrincipal().getName());
+		Session sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 
 		// Get the dictionary helper
 		DictionaryHelper dh = DictionaryHelper.getInstance(sess);
@@ -68,7 +68,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		if (secAdvisor == null) {
 			System.out
 					.println("UploadSampleSheetFileServlet:  Warning - unable to find existing session. Creating security advisor.");
-			secAdvisor = SecurityAdvisor.create(sess, req.getUserPrincipal().getName());
+			secAdvisor = SecurityAdvisor.create(sess, (req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 		}
 
 		//

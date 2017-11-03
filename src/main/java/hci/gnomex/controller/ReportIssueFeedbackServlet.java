@@ -4,7 +4,7 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.MailUtil;
 import hci.gnomex.utility.MailUtilHelper;
 import hci.gnomex.utility.PropertyDictionaryHelper;
@@ -42,7 +42,7 @@ private static String serverName;
 private static final int STATUS_ERROR = 999;
 private static final Logger LOG = Logger.getLogger(ReportIssueFeedbackServlet.class);
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 	doPost(req, res);
 }
 
@@ -80,7 +80,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		if (secAdvisor == null) {
 			System.out
 					.println("ReportIssueServlet:  Warning - unable to find existing session. Creating security advisor.");
-			secAdvisor = SecurityAdvisor.create(sess, req.getUserPrincipal().getName());
+			secAdvisor = SecurityAdvisor.create(sess, (req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 		}
 
 		//

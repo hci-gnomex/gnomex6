@@ -1,7 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Product;
 import hci.gnomex.model.ProductOrder;
@@ -28,7 +28,7 @@ public class GetProductOrderLineItemList extends GNomExCommand implements Serial
   private ProductOrderFilter productOrderFilter;
 
   @Override
-  public void loadCommand(HttpServletRequest request, HttpSession sess) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
     productOrderFilter = new ProductOrderFilter(this.getSecAdvisor());
     HashMap errors = this.loadDetailObject(request, productOrderFilter);
     this.addInvalidFields(errors);

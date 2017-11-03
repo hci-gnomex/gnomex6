@@ -5,7 +5,7 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Sample;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.ServletUtil;
 
@@ -36,7 +36,7 @@ public void init() {
 
 }
 
-protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response) throws ServletException, IOException {
 
 	// Restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(req, LOG)) {

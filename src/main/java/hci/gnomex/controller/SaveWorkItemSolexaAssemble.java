@@ -3,14 +3,14 @@ package hci.gnomex.controller;
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FlowCellChannelComparator;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.WorkItemSolexaAssembleParser;
 import hci.gnomex.utility.WorkItemSolexaAssembleParser.ChannelContent;
@@ -66,7 +66,7 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
   public void validate() {
   }
   
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
     if (request.getParameter("codeStepNext") != null && !request.getParameter("codeStepNext").equals("")) {
       codeStepNext = request.getParameter("codeStepNext");

@@ -5,7 +5,7 @@ import hci.gnomex.model.Chromatogram;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.ChromatReadUtil;
 import hci.gnomex.utility.ServletUtil;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Util;
 import org.hibernate.Session;
 
@@ -24,7 +24,7 @@ public class DownloadFastaFileServlet extends HttpServlet {
     public void init() {
     }
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse response)
+    protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         Chromatogram chromatogram;
         Integer idChromatogram = null;

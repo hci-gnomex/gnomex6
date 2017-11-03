@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.InstrumentRunStatus;
 import hci.gnomex.model.PlateType;
@@ -39,7 +39,7 @@ public class GetRequestProgressDNASeqList extends GNomExCommand implements Seria
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     filter = new RequestProgressDNASeqFilter();
     HashMap errors = this.loadDetailObject(request, filter);

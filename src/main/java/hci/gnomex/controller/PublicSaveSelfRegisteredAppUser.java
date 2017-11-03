@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AppUser;
@@ -61,7 +61,7 @@ public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Se
 
   private final static int APPROVE_USER_EXPIRATION_TIME = 86400000 * 3; // Three days
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     serverName = request.getServerName();
     this.requestURL = request.getRequestURL();
     appUserScreen = new AppUser();

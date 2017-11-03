@@ -3,7 +3,7 @@ package hci.gnomex.controller;
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.BillingAccount;
@@ -79,7 +79,7 @@ private String launchAppURL;
 public void validate() {
 }
 
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 	labScreen = new Lab();
 	HashMap errors = this.loadDetailObject(request, labScreen);

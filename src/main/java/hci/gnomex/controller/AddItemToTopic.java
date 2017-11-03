@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.DataTrack;
@@ -8,7 +8,7 @@ import hci.gnomex.model.Request;
 import hci.gnomex.model.Topic;
 import hci.gnomex.utility.AnalysisComparator;
 import hci.gnomex.utility.DataTrackComparator;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.RequestComparator;
 
 import java.io.Serializable;
@@ -50,7 +50,7 @@ public class AddItemToTopic extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     int idCnt = 0;
     if (request.getParameter("idRequest0") != null && !request.getParameter("idRequest0").equals("")) {
       idRequest = new Integer(request.getParameter("idRequest0"));

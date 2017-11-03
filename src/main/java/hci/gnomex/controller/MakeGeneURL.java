@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
@@ -8,8 +8,9 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.Util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,7 +34,7 @@ import org.jdom.output.XMLOutputter;
 
 public class MakeGeneURL extends GNomExCommand implements Serializable {
 
-    private static Logger LOG = Logger.getLogger(MakeDataTrackLinks.class);
+    private static Logger LOG = Logger.getLogger(MakeGeneURL.class);
     private static int PEDFILE_MAXLENGTH = 1000;
     private String serverName;
     private String pedpath;
@@ -54,7 +55,12 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
     public void validate() {
     }
 
-    public void loadCommand(HttpServletRequest request, HttpSession session) {
+    @Override
+    public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest httpServletRequest) {
+        return null;
+    }
+
+    public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
         if (request.getParameter("idAnalysis") != null) {
             idAnalysis = new Integer(request.getParameter("idAnalysis"));
@@ -117,6 +123,12 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
             baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
                     PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+            String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+            if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+                baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+                        PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+            }
+
 
             Map<Integer, String> headerMap = new HashMap<Integer, String>();
             Map<String, String[]> peopleMap = new HashMap<String, String[]>();
@@ -127,14 +139,21 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
             Analysis a = (Analysis) sess.get(Analysis.class, idAnalysis);
             analysisDirectory = GetAnalysisDownloadList.getAnalysisDirectory(baseDir, a);
+            System.out.println ("[MakeGeneURL] baseDir: " + baseDir + " analysisDirectory: " + analysisDirectory);
 
             // genome build
-            Set<GenomeBuild> gbs = a.getGenomeBuilds();
-            GenomeBuild gb = gbs.iterator().next();
-            String genomeBuildName = gb.getGenomeBuildName(); //Just pull the first one, should only be one.
+            String gBN = null;
+            if (a != null) {
+                Set<GenomeBuild> gbs = a.getGenomeBuilds();
+                if (gbs != null) {
+                    GenomeBuild gb = gbs.iterator().next();
+                    if (gb != null) {
+                        String genomeBuildName = gb.getGenomeBuildName(); //Just pull the first one, should only be one.
 
-            String gBN = getGRCName(genomeBuildName);
-
+                        gBN = Util.getGRCName(genomeBuildName);
+                    }
+                }
+            }
             String[] theProbands = null;
 
             String status = null;
@@ -697,7 +716,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         if (bamPath != null && !bamPath.equals("")) {
             bamFile = new File(analysisDirectory + "/" + bamPath);
         }
-        if (bamPath == null || !bamFile.exists()) {
+        if (bamPath == null || bamFile == null || !bamFile.exists()) {
             if (bfirstError) {
                 bstatus = bstatusStart + "proband";
                 bfirstError = false;
@@ -804,6 +823,9 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
         System.out.println("[validatePedFile] returning theStatus: " + theStatus);
 
+        if (theStatus.equals("")) {
+            theStatus = null;
+        }
         return theStatus;
     }
 
@@ -841,12 +863,12 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             }
 
             // must have a bam file
-            if (value[BAM] == null || value[BAM].equals("")) {
+            if (value.length < BAM+1 || value[BAM] == null || value[BAM].equals("")) {
                 continue;
             }
 
             // must have a vcf file
-            if (value[VCF] == null || value[VCF].equals("")) {
+            if (value.length < VCF+1 || value[VCF] == null || value[VCF].equals("")) {
                 continue;
             }
 
@@ -885,6 +907,10 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         boolean hasBAMVCF = false;
 
         String[] value = peopleMap.get(sampleId);
+
+        if (value == null || value.length < BAM+1 || value.length < VCF+1) {
+            return hasBAMVCF;
+        }
 
         if (value != null && value[BAM] != null && !value[BAM].equals("") && value[VCF] != null && !value[VCF].equals("")) {
             hasBAMVCF = true;
@@ -982,8 +1008,8 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         }
 
         ArrayList theIds = new ArrayList();
-        String lastline = "";
-
+        String lastline = Util.getVCFHeader(VCFpathName1);
+/*
         String[] cmd = {"tabix", "-H", ""};
         cmd[2] = VCFpathName1;
 
@@ -1005,7 +1031,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             LOG.error("MakeGeneURL error procing tabix", e);
             System.out.println("[addVCFIds] tabix proc error: " + e);
         }
-
+*/
         // parse the ids out of the last line
         String[] pieces = lastline.split("\t");
         int numids = 0;
@@ -1028,7 +1054,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             }
         }
 
-        System.out.println("[addVCFIds] numids: " + numids);
+        System.out.println("[MakeGeneURL:addVCFIds] numids: " + numids);
 
     }
 
@@ -1171,15 +1197,17 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                 }
 
                 // map sex and affection_status to something nice looking
-                if (columnNames[ii].equals("sex")) {
-                    pvalue = mapSex(1, pvalue);
-                }
-                if (columnNames[ii].equals("affection_status")) {
-                    pvalue = mapAffected(1, pvalue);
-                }
+                if (ii < columnNames.length) {
+                    if (columnNames[ii].equals("sex")) {
+                        pvalue = mapSex(1, pvalue);
+                    }
+                    if (columnNames[ii].equals("affection_status")) {
+                        pvalue = mapAffected(1, pvalue);
+                    }
 
 
-                pedEntry.setAttribute(columnNames[ii], pvalue);
+                    pedEntry.setAttribute(columnNames[ii], pvalue);
+                }
             }
             pedFile.addContent(pedEntry);
 

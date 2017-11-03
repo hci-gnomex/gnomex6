@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
@@ -41,7 +41,7 @@ public class GetPriceCategories extends GNomExCommand implements Serializable {
 	public void validate() {
 	}
 
-	public void loadCommand(HttpServletRequest request, HttpSession session) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		if (request.getParameter("idPriceSheet") != null) {
 			idPriceSheet = new Integer(request.getParameter("idPriceSheet"));

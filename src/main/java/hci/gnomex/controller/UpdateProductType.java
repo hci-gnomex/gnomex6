@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.query.Query;
 import org.hibernate.Session;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;
 import hci.gnomex.model.Product;
@@ -26,7 +26,7 @@ public class UpdateProductType extends GNomExCommand implements Serializable {
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idProductType") != null && !request.getParameter("idProductType").trim().equals("")) {
       idProductType = new Integer(request.getParameter("idProductType"));

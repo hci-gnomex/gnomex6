@@ -1,10 +1,10 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.security.EncryptionUtility;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 //import hci.gnomex.utility.HibernateUtil;
 
 import java.io.Serializable;
@@ -45,7 +45,7 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 	public void validate() {
 	}
 
-	public void loadCommand(HttpServletRequest request, HttpSession session) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		appUserScreen = new AppUser();
 		HashMap errors = this.loadDetailObject(request, appUserScreen);

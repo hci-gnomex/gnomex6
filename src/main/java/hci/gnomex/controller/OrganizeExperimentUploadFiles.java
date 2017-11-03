@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
@@ -70,7 +70,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
     public void validate() {
     }
 
-    public void loadCommand(HttpServletRequest request, HttpSession session) {
+    public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
         if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
             idRequest = new Integer(request.getParameter("idRequest"));

@@ -2,7 +2,7 @@ package hci.gnomex.controller;
 
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.lucene.AllObjectsIndexHelper;
@@ -46,7 +46,7 @@ public class GetSearchMetaInformation extends GNomExCommand implements Serializa
   public void validate() {
   }
 
-  public void loadCommand(HttpServletRequest request, HttpSession session) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
   }
 
   public Command execute() throws RollBackCommandException {

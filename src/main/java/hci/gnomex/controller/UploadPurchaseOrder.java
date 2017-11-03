@@ -3,7 +3,7 @@ package hci.gnomex.controller;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.File;
@@ -29,13 +29,13 @@ private static final int ERROR_MISSING_TEMP_DIRECTORY_PROPERTY = 900;
 private static final int ERROR_INVALID_TEMP_DIRECTORY = 901;
 private static Logger LOG = Logger.getLogger(UploadPurchaseOrder.class);
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 }
 
 protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	try {
-		Session sess = HibernateSession.currentSession(req.getUserPrincipal().getName());
+		Session sess = HibernateSession.currentSession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 
 		res.setContentType("text/html");
 		MultipartParser mp = new MultipartParser(req, Integer.MAX_VALUE);
@@ -87,7 +87,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 			} else if (part.isFile()) {
 				FilePart filePart = (FilePart) part;
 				String fileName = filePart.getFileName();
-				fileType = fileName.substring(fileName.indexOf("."));
+				fileType = fileName.substring(fileName.lastIndexOf("."));
 
 				if (fileName != null) {
 					file = new File(directoryName + fileName);

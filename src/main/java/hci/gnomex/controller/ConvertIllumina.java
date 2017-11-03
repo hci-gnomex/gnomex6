@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.RequestCategory;
@@ -8,7 +10,7 @@ import hci.gnomex.model.Sample;
 import hci.gnomex.model.SequenceLane;
 import hci.gnomex.model.Step;
 import hci.gnomex.model.WorkItem;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -28,7 +30,7 @@ public class ConvertIllumina extends GNomExCommand implements Serializable {
 	private String codeApplication;
 	private Integer idSeqLibProtocol;
 
-	public void loadCommand(HttpServletRequest request, HttpSession sess) {
+	public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 		if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
 			this.idRequest = Integer.parseInt(request.getParameter("idRequest"));
 		} else {

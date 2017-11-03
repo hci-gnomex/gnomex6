@@ -1,10 +1,11 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.BufferedReader;
@@ -58,7 +59,7 @@ private Document pedInfoDoc;
 public void validate() {
 }
 
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 	// idAnalysis is required to save a .ped file
 	idAnalysis = null;
@@ -129,6 +130,15 @@ public Command execute() throws RollBackCommandException {
 				PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
 		analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 				PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+		System.out.println ("[ManagePedFile] (1) analysisBaseDir:  " + analysisBaseDir );
+		String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+		System.out.println ("[ManagePedFile] use_altstr:  " + use_altstr );
+		if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+			System.out.println ("[ManagePedFile] username:  " + this.getSecAdvisor().getUsername() );
+			analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+					PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+			System.out.println ("[ManagePedFile] (2) analysisBaseDir:  " + analysisBaseDir );
+		}
 
 		String portNumber = PropertyDictionaryHelper.getInstance(sess).getQualifiedProperty(
 				PropertyDictionary.HTTP_PORT, serverName);
@@ -140,6 +150,7 @@ public Command execute() throws RollBackCommandException {
 		Analysis a = sess.get(Analysis.class, idAnalysis);
 		String analysisDirectory = GetAnalysisDownloadList.getAnalysisDirectory(analysisBaseDir, a);
 
+		System.out.println ("[ManagePedFile] analysisDirectory:  " + analysisDirectory + "analysisBaseDir: " + analysisBaseDir );
 		if (VCFpathName != null) {
 			// parse the header and get the sample id's into XML
 			Document vcfIds = getVCFIds(VCFpathName);
@@ -332,17 +343,18 @@ private String createPedFile(Map<Integer, String> headerMap, Map<String, String[
 }
 
 private String[] makePedEntry(String sample_id, String bamfile, String vcffile) {
-	String[] pedEntry = new String[8];
+	String[] pedEntry = new String[9];
 
 	// since we are making the pedentry we already know the order of the column
 	pedEntry[0] = "";
 	pedEntry[1] = sample_id;
 	pedEntry[2] = "0";
 	pedEntry[3] = "0";
-	pedEntry[4] = "0";
+	pedEntry[4] = "U";
 	pedEntry[5] = "-9";
-	pedEntry[6] = bamfile;
-	pedEntry[7] = vcffile;
+	pedEntry[6] = "";
+	pedEntry[7] = bamfile;
+	pedEntry[8] = vcffile;
 	return pedEntry;
 }
 
@@ -508,6 +520,7 @@ public static Document getVCFIds(String VCFpathName) {
 	ArrayList theIds = new ArrayList();
 	String lastline = "";
 
+/*
 	String[] cmd = { "tabix", "-H", "" };
 	cmd[2] = VCFpathName;
 
@@ -529,7 +542,8 @@ public static Document getVCFIds(String VCFpathName) {
 		LOG.error("ManagePedFile error procing tabix", e);
 		System.out.println("[getVCFIds] tabix proc error: " + e);
 	}
-
+*/
+	lastline = Util.getVCFHeader (VCFpathName);
 	vcfIds = new Document(new Element("VCFIdList"));
 
 	// parse the ids out of the last line

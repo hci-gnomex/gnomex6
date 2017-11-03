@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.ProductOrder;
@@ -29,7 +29,7 @@ public class GetProductOrderList extends GNomExCommand implements Serializable {
   private HashMap<Integer, List<Integer>> labOrders = new HashMap<Integer, List<Integer>>();
   private HashMap<Integer, String> productOrderMap = new HashMap<Integer, String>();
 
-  public void loadCommand(HttpServletRequest request, HttpSession sess) {
+  public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
     productOrderFilter = new ProductOrderFilter(this.getSecAdvisor());
     HashMap errors = this.loadDetailObject(request, productOrderFilter);
     this.addInvalidFields(errors);

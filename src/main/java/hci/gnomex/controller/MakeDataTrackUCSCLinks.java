@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
@@ -51,7 +51,7 @@ private static boolean autoConvertUSeqArchives = true;
 public void validate() {
 }
 
-public void loadCommand(HttpServletRequest request, HttpSession session) {
+public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	idDataTrack = null;
 	if (request.getParameter("idDataTrack") != null && !request.getParameter("idDataTrack").equals("")) {
 		idDataTrack = new Integer(request.getParameter("idDataTrack"));
@@ -87,6 +87,12 @@ public Command execute() throws RollBackCommandException {
 				PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
 		analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 				PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+		String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
+		if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
+			analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+					PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+		}
+
 		dataTrackFileServerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(
 				PropertyDictionary.DATATRACK_FILESERVER_URL);
 		dataTrackFileServerWebContext = PropertyDictionaryHelper.getInstance(sess).getProperty(
