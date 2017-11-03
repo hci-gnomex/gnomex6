@@ -1,13 +1,16 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {
+	AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit,
+	ViewChild
+} from "@angular/core";
 
 import { jqxInputComponent } from "../../../assets/jqwidgets-ts/angular_jqxinput"
 import { jqxWindowComponent } from "../../../assets/jqwidgets-ts/angular_jqxwindow";
 
-import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
+import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component";
 
 @Component({
-	selector: "lab-user-selector",
-	templateUrl: "./lab-user-selector.component.html",
+	selector: "multiple-selector",
+	templateUrl: "./multiple-selector.component.html",
 	styles: [`
 			.t {
 					display: table;
@@ -29,13 +32,16 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
           height: 100%;
       }
 	`]
-}) export class LabUserSelectorComponent implements OnInit, OnDestroy, AfterViewInit {
+}) export class MultipleSelectorComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	@ViewChild('gridReference') grid: GnomexStyledGridComponent;
 	@ViewChild('windowRef') window: jqxWindowComponent;
 
-	private inputDisplayString: string = '';
+	@Input() placeholder: string = 'Click to Edit...';
+	private displayString: string = '';
 	private recordedIndexes: Array<Number> = [];
+
+	@Input() title: string = 'Title';
 
 	private columns: any[] = [
 		{text: "Option", datafield: "name"}
@@ -88,16 +94,16 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 	}
 
 	private saveButtonClicked(): void {
-		this.inputDisplayString = '';
+		this.displayString = '';
 
 		let selectedIndexes: Array<Number> = this.grid.getselectedrowindexes();
 		this.recordedIndexes = [];
 
 		for (let i: number = 0; i < selectedIndexes.length; i++) {
 			if (i > 0) {
-				this.inputDisplayString += ', ';
+				this.displayString += ', ';
 			}
-			this.inputDisplayString += this.source.localdata[i].name;
+			this.displayString += this.source.localdata[i].name;
 
 			this.recordedIndexes.push(selectedIndexes[i]);
 		}
@@ -107,5 +113,34 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 
 	private cancelButtonClicked(): void {
 		this.closeUserSelectPopup();
+	}
+
+	setTitle(title: string): void {
+		this.title = title;
+	}
+	getTitle(): string {
+		return this.title;
+	}
+
+	setSource(source: any): void {
+		this.source = source;
+		this.grid.setDataAdapterSource(this.source);
+	}
+	getSource(): any {
+		return this.source;
+	}
+
+	setLocalData(data: any[]) {
+		let newSource: any = {};
+
+		//FIXME DOES NOT WORK
+		newSource.datatype = this.source.datatype;
+		newSource.datafields = this.source.datafields;
+		newSource.localdata = data;
+
+		this.setSource(this.source);
+	}
+	getLocalData(): any[] {
+		return this.source.localdata;
 	}
 }

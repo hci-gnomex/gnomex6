@@ -92,9 +92,11 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	@ViewChild('myGrid') myGrid: GnomexStyledGridComponent;
 	@ViewChild('statusComboBox') statusCombobox: jqxComboBoxComponent;
 	@ViewChild('errorPopup') errorPopup: jqxWindowComponent;
+	@ViewChild('warningPopup') warningPopup: jqxWindowComponent;
 	@ViewChild('windowReference') window: EmailRelatedUsersPopupComponent;
 
 	private errorMessage: string = '';
+	private warningMessage: string = '';
 
 	private dictionary: any;
 
@@ -310,6 +312,10 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 					"instrument run. The order(s) cannot be deleted.";
 
 			this.errorPopup.open();
+		} else {
+			this.warningMessage = 'Are you sure you want to delete these orders?';
+			let usedProducts: boolean = false;
+
 		}
 	}
 
