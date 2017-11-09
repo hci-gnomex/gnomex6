@@ -44,6 +44,26 @@ export class BillingPeriodPickerComponent implements OnInit {
         this.billingPeriodChange.emit(this.billingPeriodValue);
     }
 
+    private startDateValue: string;
+    @Output() startDateChange = new EventEmitter();
+    @Input() get startDate(): string {
+        return this.startDateValue;
+    }
+    set startDate(value: string) {
+        this.startDateValue = value;
+        this.startDateChange.emit(this.startDateValue);
+    }
+
+    private endDateValue: string;
+    @Output() endDateChange = new EventEmitter();
+    @Input() get endDate(): string {
+        return this.endDateValue;
+    }
+    set endDate(value: string) {
+        this.endDateValue = value;
+        this.endDateChange.emit(this.endDateValue);
+    }
+
     constructor(private dictionaryService: DictionaryService) {
         this.clear();
         this.showPicker = false;
@@ -96,6 +116,8 @@ export class BillingPeriodPickerComponent implements OnInit {
     select(bp: any): void {
         this.billingPeriodObject = bp;
         this.billingPeriod = bp.idBillingPeriod;
+        this.startDate = bp.startDate;
+        this.endDate = bp.endDate;
         this.determineLabel();
     }
 
@@ -110,6 +132,8 @@ export class BillingPeriodPickerComponent implements OnInit {
     clear(): void {
         this.billingPeriodObject = null;
         this.billingPeriod = "";
+        this.startDate = "";
+        this.endDate = "";
         this.monthString = "";
     }
 

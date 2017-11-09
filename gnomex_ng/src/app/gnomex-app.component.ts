@@ -47,26 +47,15 @@ export class GnomexAppComponent implements OnInit {
         let isDone: boolean = false;
         console.log("GnomexAppComponent ngOnInit");
 
-        this.authenticationService.isAuthenticated().subscribe(response => {
-            if (response) {
-                this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
-                    console.log("subscribe createSecurityAdvisor");
-                    isDone = true;
-                    console.log(response);
-                    this.dictionaryService.reload();
-                    this.progressService.displayLoader(80);
-                });
-            }
-        });
         this.authenticationService.isAuthenticated().subscribe((authenticated: boolean) => {
             if (authenticated) {
                 this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
                     console.log("subscribe createSecurityAdvisor");
                     isDone = true;
+                    this.dictionaryService.reload();
                     this.progressService.displayLoader(80);
-                    console.log(response);
                 });
-    }
+            }
         });
     }
 

@@ -20,4 +20,8 @@ export class DataTrackService {
         });
     }
 
+    saveGenomeBuild(params: URLSearchParams):  Observable<Response> {
+        return this.http.get("/gnomex/SaveGenomeBuild.gx", {search: params});
+    }
+
 }
