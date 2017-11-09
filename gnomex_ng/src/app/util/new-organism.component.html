@@ -1,0 +1,29 @@
+<h6 mat-dialog-title><img src="../../assets/organism.jpg">New Species</h6>
+<mat-dialog-content>
+    <div>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="commonName" placeholder="Common Name">
+            <mat-hint align="end">Example: Human</mat-hint>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="binomialName" placeholder="Binomial Name">
+            <mat-hint align="end">Example: Homo sapiens</mat-hint>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="das2Name" placeholder="DAS2 Name">
+            <mat-hint align="end">Example: H_sapiens</mat-hint>
+        </mat-form-field>
+    </div>
+    <div class="dialogDiv">
+        <mat-checkbox [(ngModel)]="activeFlag">Active</mat-checkbox>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button *ngIf="!showSpinner && !(commonName === '') && !(binomialName === '') && !(das2Name === '')" (click)="save()">Save</button>
+    <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
+    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>
