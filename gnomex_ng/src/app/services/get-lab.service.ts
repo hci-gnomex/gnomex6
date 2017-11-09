@@ -10,6 +10,10 @@ export class GetLabService {
     constructor(private http: Http) {
     }
 
+    public getLabCall(params: URLSearchParams): Observable<Response> {
+        return this.http.get("/gnomex/GetLab.gx", {search: params});
+    }
+
     getLab(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/GetLab.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
@@ -26,32 +30,47 @@ export class GetLabService {
         return this.getLab(params);
     }
 
-    getLabByIdOnlyForHistoricalOwnersAndSubmitters(idLab: string): Observable<any> {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idLab", idLab);
-        params.set("includeBillingAccounts", "N");
-        params.set("includeProductCounts", "N");
-        params.set("includeProjects", "N");
-        params.set("includeCoreFacilities", "N");
-        params.set("includeHistoricalOwnersAndSubmitters", "Y");
-        params.set("includeInstitutions", "N");
-        params.set("includeSubmitters", "N");
-        params.set("includeMoreCollaboratorInfo", "N");
+    public getLabByIdOnlyForHistoricalOwnersAndSubmitters(idLab: string): Observable<any> {
+        let params: URLSearchParams = this.makeParams(idLab, false, false, false, false, true, false, false, false);
         return this.getLab(params);
     }
 
-    getLabBillingAccounts(idLab: string): Observable<any> {
+    public getLabBillingAccounts(idLab: string): Observable<any> {
+        let params: URLSearchParams = this.makeParams(idLab, true, false, false, false, false, false, false, false);
+        return this.getLab(params);
+    }
+
+    public getLabBasic(idLab: string): Observable<Response> {
+        let params: URLSearchParams = this.makeParams(idLab, false, false, false, false, false, false, false, false);
+        return this.getLabCall(params);
+    }
+
+    public getLabMembers(idLab: string): Observable<any[]> {
+        return this.getLabBasic(idLab).map((response: Response) => {
+            if (response.status === 200) {
+                let lab = response.json();
+                return lab.Lab.members;
+            } else {
+                return [];
+            }
+        });
+    }
+
+    private makeParams(idLab: string, includeBillingAccounts: boolean, includeProductCounts: boolean,
+                       includeProjects: boolean, includeCoreFacilities: boolean, includeHistoricalOwnersAndSubmitters: boolean,
+                       includeInstitutions: boolean, includeSubmitters: boolean, includeMoreCollaboratorInfo: boolean): URLSearchParams {
+
         let params: URLSearchParams = new URLSearchParams();
         params.set("idLab", idLab);
-        params.set("includeBillingAccounts", "Y");
-        params.set("includeProductCounts", "N");
-        params.set("includeProjects", "N");
-        params.set("includeCoreFacilities", "N");
-        params.set("includeHistoricalOwnersAndSubmitters", "N");
-        params.set("includeInstitutions", "N");
-        params.set("includeSubmitters", "N");
-        params.set("includeMoreCollaboratorInfo", "N");
-        return this.getLab(params);
+        params.set("includeBillingAccounts", includeBillingAccounts ? "Y" : "N");
+        params.set("includeProductCounts", includeProductCounts ? "Y" : "N");
+        params.set("includeProjects", includeProjects ? "Y" : "N");
+        params.set("includeCoreFacilities", includeCoreFacilities ? "Y" : "N");
+        params.set("includeHistoricalOwnersAndSubmitters", includeHistoricalOwnersAndSubmitters ? "Y" : "N");
+        params.set("includeInstitutions", includeInstitutions ? "Y" : "N");
+        params.set("includeSubmitters", includeSubmitters ? "Y" : "N");
+        params.set("includeMoreCollaboratorInfo", includeMoreCollaboratorInfo ? "Y" : "N");
+        return params;
     }
 
 }

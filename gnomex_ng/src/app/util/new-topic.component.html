@@ -1,0 +1,27 @@
+<h6 mat-dialog-title><img src="../../assets/topic_tag.png">{{title}}</h6>
+<mat-dialog-content>
+    <div>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="name" placeholder="Name">
+        </mat-form-field>
+    </div>
+    <div class="dialogDiv">
+        <label>Group</label>
+        <jqxComboBox class="dialogComboBox" [width]="'100%'" [height]="30" [placeHolder]="'...'"
+                     [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                     (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
+        </jqxComboBox>
+    </div>
+    <div class="dialogDiv">
+        <label>Owner</label>
+        <jqxComboBox class="dialogComboBox" [width]="'100%'" [height]="30" [placeHolder]="'...'"
+                     [source]="ownerList" [displayMember]="'displayName'" [valueMember]="'idAppUser'"
+                     (onSelect)="onOwnerSelect($event)" (onUnselect)="onOwnerUnselect()">
+        </jqxComboBox>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button *ngIf="!showSpinner && !(name === '') && !(idLab === '') && !(idOwner === '')" (click)="save()">Save</button>
+    <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
+    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>

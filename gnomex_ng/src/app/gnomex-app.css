@@ -5,7 +5,7 @@
 @footerBack: #f5f5f5;
 @footerBorder: #f5f5f5;
 @footerText: #333;*/
-@import '~@angular/material/prebuilt-themes/pink-bluegrey.css';
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 html {
   position: relative;
@@ -73,6 +73,20 @@ main {
 
 .hci-logo-container {
   width: 113px;
+}
+
+mat-form-field.dialogFormField {
+  width: 100%;
+  margin: 0.4rem 0rem;
+}
+
+div.dialogDiv {
+  width: 100%;
+  margin: 0.4rem 0rem;
+}
+
+jqxComboBox.dialogComboBox {
+  display: inline;
 }
 
 /******************************/
