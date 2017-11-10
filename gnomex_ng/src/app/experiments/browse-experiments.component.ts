@@ -668,7 +668,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         project.projectDescription = this.projectDescription;
         //TODO
         // Need to get idAppUser. Flex did this like: parentApplication.getIdAppUser();
-        params.set("projectXMLString", project);
+        var theProject = JSON.stringify(project);
+        console.log("theProject: " + theProject);
+
+        params.set("projectXMLString", JSON.stringify(project));
         params.set("parseEntries", "Y");
         if (!this.projectName) {
             this.msgEnterProjectName.open();

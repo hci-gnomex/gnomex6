@@ -19,6 +19,7 @@ public class HttpServletWrappedRequest extends HttpServletRequestWrapper
 {
     private final TreeMap<String, String[]> modifiableParameters;
     private TreeMap<String, String[]> allParameters = null;
+    boolean debug = false;
 
     /**
      * Create a new request wrapper that will merge additional parameters into
@@ -47,40 +48,70 @@ public class HttpServletWrappedRequest extends HttpServletRequestWrapper
     @Override
     public String getParameter(final String name)
     {
-        String[] strings = getParameterMap().get(name);
-        if (strings != null)
-        {
+//        if (debug) System.out.println ("[HttpServletWrappedRequest:getParameter] name: " + name);
+        String[] strings = getParameterValues (name);
+        if (strings == null) {
+            if (debug) System.out.println ("[HttpServletWrappedRequest:getParameter] 1st time name: " + name + " WARNING WARNING not found");
+        }
+        else {
+            String shortvalue = strings[0];
+            if (shortvalue.length() > 40) {
+                shortvalue = shortvalue.substring(0, 40);
+            }
+            if (debug) System.out.println("[HttpServletWrappedRequest:getParameter] found: " + name + " size strings: " + strings.length + " short strings[0]: " + shortvalue);
             return strings[0];
         }
-        return super.getParameter(name);
+
+        String superstring = super.getParameter(name);
+        if (debug) System.out.println ("[HttpServletWrappedRequest:getParameter] 2nd time found: " + name + " as superstring: " + superstring);
+        return superstring;
     }
 
     public void setParameter(final String name, final String value)
     {
+        String shortvalue = value;
+        if (value.length() > 40) {
+            shortvalue = value.substring(0,40);
+        }
+        if (debug) System.out.println ("[HttpServletWrappedRequest:setParameter] init size: " +  modifiableParameters.size() + " name: " + name + " shortvalue: " + shortvalue);
         String [] values = new String[1];
         values[0] = value;
         modifiableParameters.put(name,values);
+        if (debug) System.out.println ("[HttpServletWrappedRequest:setParameter] size of modifiableParameters on exit: " + modifiableParameters.size());
     }
 
     @Override
     public Map<String, String[]> getParameterMap()
     {
-        if (allParameters == null)
-        {
+//        if (allParameters == null)
+//        {
             allParameters = new TreeMap<String, String[]>();
             allParameters.putAll(super.getParameterMap());
+            if (debug) System.out.println ("[HttpServletWrappedRequest:getParameterMap] (super) size: " + allParameters.size() + " local size: " + modifiableParameters.size());
             allParameters.putAll(modifiableParameters);
-        }
+            if (debug) System.out.println ("[HttpServletWrappedRequest:getParameterMap] RETURNING (total) size: " + allParameters.size());
+//        }
         //Return an unmodifiable collection because we need to uphold the interface contract.
-        return Collections.unmodifiableMap(allParameters);
+//        if (debug) System.out.println ("[HttpServletWrappedRequest:getParameterMap] RETURNING FINAL size: " + allParameters.size());
+//        return Collections.unmodifiableMap(allParameters);
+          return allParameters;
     }
 
-    @Override
-    public String getHeader(String value) {
-        String theHeader = "";
+    public void dumpParameterMap () {
+        Enumeration params = getParameterNames();
+        while (params.hasMoreElements()) {
+            String paramName = (String) params.nextElement();
+            String parameterValue = (String) getParameter(paramName);
 
-        return theHeader;
+            String shortvalue = parameterValue;
+            if (shortvalue.length() > 40) {
+                shortvalue = shortvalue.substring(0,40);
+            if (debug) System.out.println("[dumpParameterMap] paramName: " + paramName + " parameterValue: " + shortvalue);
+        }
     }
+    }
+
+
 
     @Override
     public Enumeration<String> getParameterNames()
@@ -91,6 +122,13 @@ public class HttpServletWrappedRequest extends HttpServletRequestWrapper
     @Override
     public String[] getParameterValues(final String name)
     {
-        return getParameterMap().get(name);
+        String [] temp = null;
+        temp = getParameterMap().get(name);
+        if (temp == null) {
+            if (debug) System.out.println ("[HttpServletWrappedRequest:getParameterValues] name: " + name + " WARNING WARNING not found");
+            return temp;
+        }
+        if (debug) System.out.println ("[HttpServletWrappedRequest:getParameterValues] found: " + name + " temp size: " + temp.length);
+        return temp;
     }
 }

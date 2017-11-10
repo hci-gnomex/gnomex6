@@ -499,8 +499,7 @@ public class JSONtoXML {
 
                     theXML += "\"" + propertyValue + "\" ";
                     if (debugConvert) System.out.println("[property value string] stackptr: " + nameStackptr);
-                    if (debugConvert)
- //                       System.out.println("[property value string] end of case statement theXML:\n" + theXML);
+//                    if (debugConvert) System.out.println("[property value string] end of case statement theXML:\n" + theXML);
                     break;
                 }
                 case ElementTypes.JSON_ARRAY_END: {

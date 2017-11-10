@@ -1,6 +1,7 @@
 package hci.gnomex.utility;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import org.hibernate.Session;
