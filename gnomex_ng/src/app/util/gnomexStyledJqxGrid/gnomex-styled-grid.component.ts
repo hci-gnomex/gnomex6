@@ -54,7 +54,7 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 		datatype: "json",
 		localdata: [ ],
 		datafields: [ ],
-		pagesize: 1000
+		pagesize: 250
 	};
 	private dataAdapter: any = new jqx.dataAdapter(this.source);
 
@@ -64,6 +64,7 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 
 	ngAfterViewInit(): void {
 		this.interval = setInterval(() => { this.onTimer(); }, 100);
+		this.dataAdapter = new jqx.dataAdapter(this.source);
 	}
 
 	ngOnDestroy(): void {

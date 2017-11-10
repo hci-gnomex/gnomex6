@@ -336,30 +336,55 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	}
 
-	private onLabListSelection(): void {
+	private onLabListSelection(event: any): void {
 		let coreFacilityGridLocalData: any[] = [];
 
-		if (this.labListComboBox != null
-				&& this.labListComboBox.getSelectedItem() != null
-				&& this.labListComboBox.getSelectedItem().originalItem != null
-				&& this.labListComboBox.getSelectedItem().originalItem.coreFacilities != null
-		) {
+		let args = event.args;
+		if (args != undefined && args != null
+				&& args.item != undefined && args.item != null
+				&& args.item.originalItem != undefined && args.item.originalItem != null) {
 
-			// if the coreFacilities element is an array, that is to say there are 2+ entries
-			if (this.labListComboBox.getSelectedItem().originalItem.coreFacilities.length != null) {
-				for (let i: number = 0; i < this.labListComboBox.getSelectedItem().originalItem.coreFacilities.length; i++) {
-					coreFacilityGridLocalData.push({name: this.labListComboBox.getSelectedItem().originalItem.coreFacilities[i].display});
+			let item = event.args.item.originalItem;
+			if (item.coreFacilities != undefined && item.coreFacilities != null) {
+				if (item.coreFacilities[0] != undefined && item.coreFacilities[0] != null) {
+					for (let i: number = 0; i < item.coreFacilities.length; i++) {
+						coreFacilityGridLocalData.push({name: item.coreFacilities[i].display});
+					}
+				} else {
+					if (item.coreFacilities.CoreFacility != undefined && item.coreFacilities.CoreFacility != null) {
+						coreFacilityGridLocalData.push({name: item.coreFacilities.CoreFacility.display});
+					}
 				}
-				this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
-			} // There is 1 entry
-			else if (this.labListComboBox.getSelectedItem().originalItem.coreFacilities.coreFacility != null) {
-				coreFacilityGridLocalData.push({name: this.labListComboBox.getSelectedItem().originalItem.coreFacilities.display});
-				this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
-			} // There are no entries (shouldn't be reachable?)
-			else {
-				// Either error or do nothing, there are no core facilities
 			}
 		}
+
+		this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
+
+		// if (this.labListComboBox != null
+		// 		&& this.labListComboBox.getSelectedItem() != null
+		// 		&& this.labListComboBox.getSelectedItem().originalItem != null
+		// 		&& this.labListComboBox.getSelectedItem().originalItem.coreFacilities != null
+		// ) {
+		//
+		// 	// if the coreFacilities element is an array, that is to say there are 2+ entries
+		// 	if (this.labListComboBox.getSelectedItem().originalItem.coreFacilities.length != null) {
+		// 		for (let i: number = 0; i < this.labListComboBox.getSelectedItem().originalItem.coreFacilities.length; i++) {
+		// 			coreFacilityGridLocalData.push({name: this.labListComboBox.getSelectedItem().originalItem.coreFacilities[i].display});
+		// 		}
+		// 		this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
+		// 	} // There is 1 entry
+		// 	else if (this.labListComboBox.getSelectedItem().originalItem.coreFacilities.coreFacility != null) {
+		// 		coreFacilityGridLocalData.push({name: this.labListComboBox.getSelectedItem().originalItem.coreFacilities.display});
+		// 		this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
+		// 	} // There are no entries (shouldn't be reachable?)
+		// 	else {
+		// 		// Either error or do nothing, there are no core facilities
+		// 	}
+		// }
+	}
+
+	private onLabListUnselect():void {
+		this.coreFacilitiesSelector.setLocalData([{name: 'No lab selected'}]);
 	}
 
 	private onCancelButtonClicked(): void {

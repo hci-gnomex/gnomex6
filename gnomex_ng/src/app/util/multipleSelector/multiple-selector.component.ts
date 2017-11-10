@@ -57,6 +57,7 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 		]
 	};
 
+	private isFirstOpening: boolean = true;
 
 	ngOnInit() {
 		// this.grid.theGrid.showstatusbar(false);
@@ -76,6 +77,25 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 	openUserSelectPopup(): void {
 		// this.grid.selectedrowindexes(this.recordedIndexes);
 		this.window.open();
+
+		// This is needed on the first opening of the selector to refresh the contents of the grid,
+		// which seems not to visually update after it's datasource is changed if it is being hidden at that time.
+		if (this.isFirstOpening) {
+			setTimeout(() => {
+				let tempSource : any = {
+					datatype: "json",
+					localdata: [],
+					datafields: [
+						{name: "name", type: "string"}
+					]
+				};
+				this.grid.setDataAdapterSource(tempSource);
+			}, 100);
+
+			setTimeout(() => { this.grid.setDataAdapterSource(this.source); }, 200);
+
+			this.isFirstOpening = false;
+		}
 	}
 
 	closeUserSelectPopup(): void {
@@ -135,10 +155,22 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 
 		//FIXME DOES NOT WORK
 		newSource.datatype = this.source.datatype;
-		newSource.datafields = this.source.datafields;
-		newSource.localdata = data;
 
-		this.setSource(this.source);
+		newSource.datafields = [];
+		if (this.source != null && this.source.datafields != null) {
+			for (let i = 0; i < this.source.datafields.length; i++) {
+				newSource.datafields.push(this.source.datafields[i]);
+			}
+		}
+
+		newSource.localdata = [];
+		if (data != null) {
+			for (let i = 0; i < data.length; i++) {
+				newSource.localdata.push(data[i]);
+			}
+		}
+
+		this.setSource(newSource);
 	}
 	getLocalData(): any[] {
 		return this.source.localdata;

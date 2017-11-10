@@ -19,7 +19,8 @@
 								Lab
 							</div>
 							<div class="td">
-								<jqxComboBox #labListComboBox (onSelect)="onLabListSelection()"
+								<jqxComboBox #labListComboBox (onSelect)="onLabListSelection($event)"
+														 (onUnselect)="onLabListUnselect()"
 										[width]="'80%'"
 										[placeHolder]="'Select a lab...'"
 										[source]="labList"
