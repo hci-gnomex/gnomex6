@@ -153,8 +153,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     @ViewChild("deleteProjectWindow") deleteProjectWindow: jqxWindowComponent;
     @ViewChild("toggleButton") toggleButton: jqxButtonComponent;
 
-    @ViewChild("deleteProject") deleteProject: jqxButtonComponent;
-    @ViewChild("newProject") newProject: jqxButtonComponent;
     @ViewChild("labComboBox") labComboBox: jqxComboBoxComponent;
     @ViewChild("yesButtonDeleteProject") yesButtonDeleteProject: jqxButtonComponent;
     @ViewChild("deleteProjectNoButtonClicked") deleteProjectNoButton: jqxButtonComponent;
@@ -211,6 +209,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     public experimentCount: number;
     private projectRequestListSubscription: Subscription;
+    public disableNewProject: boolean = true;
+    public disableDelete: boolean = true;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -243,6 +243,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.buildTree(response);
             this.experimentsService.emitExperimentOverviewList(response);
             setTimeout(()=>{
+                this.toggleButton.val("Collapse Projects");
                 this.treeModel.expandAll();
         });
         });
@@ -746,8 +747,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         //Lab
         if (this.selectedItem.level === 1) {
-            this.newProject.disabled(false);
-            this.deleteProject.disabled(true);
+            this.disableNewProject = false;
+            this.disableDelete = true;
 
             this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
             this.experimentService.emitExperimentOverviewList(projectRequestListNode);
@@ -755,8 +756,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             //Project
         } else if (this.selectedItem.level === 2) {
-            this.newProject.disabled(false);
-            this.deleteProject.disabled(false);
+            this.disableNewProject = false;
+            this.disableDelete = false;
 
             this.router.navigate(['/experiments',
                 {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}]);
@@ -766,8 +767,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         } else {
 
             this.router.navigate(['/experiments',{outlets:{'browsePanel':[idRequest]}}]);
-            this.newProject.disabled(true);
-            this.deleteProject.disabled(true);
+            this.disableNewProject = true;
+            this.disableDelete = true;
         }
         this.experimentService.selectedTreeNode = _.cloneDeep(this.selectedItem.data);
 
