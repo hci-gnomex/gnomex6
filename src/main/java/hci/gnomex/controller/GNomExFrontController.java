@@ -314,48 +314,42 @@ public static boolean areWeLite() {
 	LOG.debug("Calling setSessionState on " + commandClass);
 	commandInstance.setSessionState(session);
 
-	// if GNomExLite, convert it to JSON and give it back
-	if (GNomExLite && !requestName.contains("ShowAnnotationProgressReport")) {
-		System.out.println("[GNomExFrontController] requestName: " + requestName);
-		String thexml = (String) request.getAttribute("xmlResult");
-		if (thexml != null && !thexml.equals("")) {
-
-			if (thexml.length() < 80) {
-				System.out.println("WARNING short xml: -->" + thexml + "<--");
-			}
-			XMLSerializer xmlSerializer = new XMLSerializer();
-			JSON json = xmlSerializer.read(thexml);
-			String thejson = json.toString(2);
-
-			// get rid of the "@
-			thejson = thejson.replace("\"@", "\"");
-
-			response.setContentType("application/json");
-			// Get the printwriter object from response to write the required json object to the output stream
-			PrintWriter out = response.getWriter();
-			// Assuming your json object is **jsonObject**, perform the following, it will return your json object
-			out.print(thejson);
-			out.flush();
-			out.close();
-
-			System.out.println("Returned " + thejson.length() + " bytes of JSON for request " + requestName);
-
-		} else {
-			// debug ****************
-			System.out.println("Empty XML for request: " + requestName);
-		}
-	}
-
 	// get our response page
 	String forwardJSP = commandInstance.getResponsePage();
 
-	// if command didn't provide one, default to message.jsp (for error)
+	// if command didn't provide one, default to getJSON.jsp (for error)
 	if (forwardJSP == null || forwardJSP.equals("")) {
 		forwardJSP = "/getJSON.jsp";
 	}
 
-	if (!GNomExLite || (requestName != null && requestName.contains("ShowAnnotationProgressReport"))) {
-		// System.out.println ("requestName: " + requestName + " forwardJSP: " + forwardJSP);
+	// Convert it to JSON and give it back
+	System.out.println("[GNomExFrontController] requestName: " + requestName);
+	String thexml = (String) request.getAttribute("xmlResult");
+	if (thexml != null && !thexml.equals("")) {
+
+		if (thexml.length() < 80) {
+			System.out.println("WARNING short xml: -->" + thexml + "<--");
+		}
+		XMLSerializer xmlSerializer = new XMLSerializer();
+		JSON json = xmlSerializer.read(thexml);
+		String thejson = json.toString(2);
+
+		// get rid of the "@
+		thejson = thejson.replace("\"@", "\"");
+
+		response.setContentType("application/json");
+		// Get the printwriter object from response to write the required json object to the output stream
+		PrintWriter out = response.getWriter();
+		// Assuming your json object is **jsonObject**, perform the following, it will return your json object
+		out.print(thejson);
+		out.flush();
+		out.close();
+
+		System.out.println("Returned " + thejson.length() + " bytes of JSON for request " + requestName);
+
+	} else {
+		// XLS, PDF, etc. reporting controllers route here
+		System.out.println("Empty XML for request: " + requestName);
 
 		if (!commandInstance.isValid()) {
 			String tmpMessage = commandInstance.getInvalidFieldsMessage();

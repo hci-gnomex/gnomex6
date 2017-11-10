@@ -1,0 +1,19 @@
+<h6 mat-dialog-title>{{title}}</h6>
+<mat-dialog-content>
+    <div>
+        <label>For billing periods:</label>
+        <billing-period-picker [(startDate)]="startDate"></billing-period-picker>
+        <label>through</label>
+        <billing-period-picker [(endDate)]="endDate"></billing-period-picker>
+    </div>
+    <div *ngIf="showIsExternalRadioGroup">
+        <input [(ngModel)]="isExternalString" id="radioInternal" value="N" type="radio" name="isExternalRadio">
+        <label for="radioInternal">Internal</label>
+        <input [(ngModel)]="isExternalString" id="radioExternal" value="Y" type="radio" name="isExternalRadio">
+        <label for="radioExternal">External</label>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button *ngIf="!(startDate === '') && !(endDate === '')" mat-button (click)="submit()">OK</button>
+    <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>
