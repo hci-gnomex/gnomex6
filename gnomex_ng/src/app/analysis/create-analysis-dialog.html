@@ -1,0 +1,79 @@
+<form (ngSubmit)="save(createAnalysisForm.value)" [formGroup]="createAnalysisForm" >
+    <h6 mat-dialog-title>Add Analysis</h6>
+    <div mat-dialog-content>
+        <div>
+            <label style="width: 10em">Group</label>
+            <jqxComboBox #labCombo class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
+                         [source]="_labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                         (onSelect)="onLabSelect($event)" formControlName="selectedLab">
+            </jqxComboBox>
+        </div>
+        <div *ngIf="showOwnerComboBox">
+            <label style="width: 10em">Analysis Owner</label>
+            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an Owner...'"
+                         [source]="ownerList" [displayMember]="'displayName'" [valueMember]="'idAppUser'"
+                         (onSelect)="onUserSelect($event)" formControlName="analysisOwner">
+            </jqxComboBox>
+        </div>
+        <div *ngIf="!newAnalysisGroup">
+            <label style="width: 10em">Analysis Group</label>
+            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'...'"
+                         [source]="analysisGroupList" [displayMember]="'name'" [valueMember]="'idAnalysisGroup'"
+                         (onSelect)="onAnalysisGroupSelect($event)" formControlName="analysisGroup">
+            </jqxComboBox>
+            <div>
+                <button mat-icon-button>
+
+                    <mat-icon aria-label="New..." (click)="includeNewGroup()">add</mat-icon>
+                </button>
+            </div>
+        </div>
+        <div *ngIf="newAnalysisGroup">
+            <label style="width: 10em">New Analysis Group Name</label>
+            <mat-form-field class="example-full-width">
+                <input matInput formControlName="analysisGroupName">
+            </mat-form-field>
+            <mat-error *ngIf="newAnalysisGroup && createAnalysisForm.controls['analysisGroupName'].hasError('required')">
+                Analysis Name is <strong>required</strong>
+            </mat-error>
+
+        </div>
+
+        <div>
+            <label style="width: 10em">Analysis Name</label>
+            <mat-form-field class="example-full-width">
+                <input matInput formControlName="analysisName" >
+            </mat-form-field>
+            <mat-error *ngIf="createAnalysisForm.controls['analysisName'].hasError('required')">
+                Analysis Name is <strong>required</strong>
+            </mat-error>
+
+        </div>
+        <div>
+            <label style="width: 10em">Organism</label>
+            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Organism...'"
+                         [source]="activeOrganismList" [displayMember]="'display'" [valueMember]="'idOrganism'"
+                         (onSelect)="onOrganismSelect($event)" formControlName="organism">
+            </jqxComboBox>
+        </div>
+        <div>
+            <label style="width: 10em">Genome Build</label>
+            <jqxComboBox class="inlineComboBox" [width]="170" [multiSelect]="true"
+                         [source]="genomeBuildList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
+                         (onSelect)="onGenomeBuildSelect($event)">
+            </jqxComboBox>
+        </div>
+        <div>
+            <label style="width: 10em">Visibility</label>
+            <jqxComboBox #visibilityCombo class="inlineComboBox" [width]="170" [height]="20"
+                         [source]="visibilityList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
+                         (onSelect)="onVisibilitySelect($event)" formControlName="visibility">
+            </jqxComboBox>
+        </div>
+    </div>
+
+    <mat-dialog-actions>
+        <button #yesButton mat-raised-button color="primary" (click)="createAnalysisYesButtonClicked()" tabindex="2" [disabled]="createAnalysisForm.invalid">Save</button>
+        <button mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+    </mat-dialog-actions>
+</form>

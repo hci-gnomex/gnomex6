@@ -1,0 +1,32 @@
+<form class="example-form">
+    <h6 mat-dialog-title>New Analysis Group</h6>
+    <mat-dialog-content>
+        <div>
+            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20"
+                         [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                         (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
+            </jqxComboBox>
+        </div>
+        <mat-form-field class="full-width" >
+            <label>Analysis Group Name:</label>
+            <div>
+                <input matInput [(ngModel)]="analysisGroupName" name="analysisGroupName" [formControl]="analysisGroupFormControl">
+                <mat-error *ngIf="analysisGroupFormControl.hasError('required')">
+                    Analysis Group Name is <strong>required</strong>
+                </mat-error>
+            </div>
+        </mat-form-field>
+        <mat-form-field class="full-width" >
+            <label>Description:</label>
+            <div>
+                <textarea matInput rows="6" columns="60" [(ngModel)]="analysisGroupDescription" name="analysisGroupDescription"> </textarea>
+            </div>
+        </mat-form-field>
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+        <button #yesButton mat-raised-button color="primary" (click)="createAnalysisGroupSaveButtonClicked()" tabindex="2">Save</button>
+        <button mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+    </mat-dialog-actions>
+
+</form>

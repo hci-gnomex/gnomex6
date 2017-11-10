@@ -51,7 +51,25 @@ export class ExperimentsService {
 		return this.experimentOrdersSubject.asObservable();
 	}
 
-	getExperiments_fromBackend(parameters: URLSearchParams): void {
+    refreshProjectRequestList_fromBackend(): void {
+        this._http.get("/gnomex/GetProjectRequestList.gx", {
+            withCredentials: true,
+            search: this.previousURLParams
+        }).subscribe((response: Response) => {
+            console.log("GetRequestList called");
+
+            if (response.status === 200) {
+                this.projectRequestList = response.json().Lab;
+                this.emitProjectRequestList();
+                //return response.json().Request;
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
+
+    getExperiments_fromBackend(parameters: URLSearchParams): void {
 		if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
 			// do nothing
 			console.log("Experiment Orders already loaded");

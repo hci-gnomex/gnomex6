@@ -32,6 +32,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ServicesModule } from './services/services.module';
+import {AnalysisModule} from "./analysis/analysis.module";
+import {MatIconModule} from "@angular/material";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -60,13 +62,14 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         NgbModule.forRoot(),
         CommonModule,
         UserModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        AnalysisModule,
+        MatIconModule,
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],
     providers: [
         {provide: BROWSE_EXPERIMENTS_ENDPOINT, useValue: "/gnomex/GetExperimentOverviewList.gx"},
-        {provide: VIEW_EXPERIMENT_ENDPOINT, useValue: "/gnomex/GetRequest.gx"},
         {provide: AUTHENTICATED_USER_ENDPOINT, useValue: "/gnomex/api/user/authenticated"},
         {provide: AUTHENTICATION_DIRECT_ENDPOINT, useValue: "/gnomex/api/user-session"},
         {provide: AUTHENTICATION_TOKEN_ENDPOINT, useValue: "/gnomex/api/token"},

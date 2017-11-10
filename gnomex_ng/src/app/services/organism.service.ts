@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
@@ -10,6 +10,7 @@ export class OrganismService {
 
     constructor(private http: Http) {
     }
+
 
     public getOrganismListCall(): Observable<Response> {
         return this.http.get("/gnomex/GetOrganismList.gx");
@@ -32,4 +33,18 @@ export class OrganismService {
         return this.http.get("/gnomex/SaveOrganism.gx", {search: params});
     }
 
+
+
+  getOrganismList(params: URLSearchParams):  Observable<any> {
+        return this.http.get("/gnomex/GetOrganismList.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response;
+            } else {
+                throw new Error("Error");
+            }
+        });
+
+    }
+
 }
+

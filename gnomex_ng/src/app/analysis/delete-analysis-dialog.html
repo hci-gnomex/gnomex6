@@ -1,0 +1,20 @@
+<h6 mat-dialog-title>Delete Analysis</h6>
+<div mat-dialog-content>
+    <p>The following items will be deleted:</p>
+    <div>
+        {{_nodesString}}
+    </div>
+    <div *ngIf="hasAnalysisGroup">
+        <p>One or more analysis groups have been selected.
+            Any analysis contained within
+            the group will also be deleted.
+        </p>
+    </div>
+    <div>
+        Continue?
+    </div>
+</div>
+<mat-dialog-actions>
+    <button mat-raised-button color="primary" (click)="deleteAnalysisYesButtonClicked()" tabindex="2">Yes</button>
+    <button mat-raised-button color="accent" mat-dialog-close tabindex="-1">No</button>
+</mat-dialog-actions>

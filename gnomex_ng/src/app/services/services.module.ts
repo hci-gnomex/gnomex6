@@ -12,8 +12,8 @@ import {BillingService} from "./billing.service";
 import {ExperimentResolverService,ProjectResolverService} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
+import {ProjectService} from "./project.service";
 import {OrganismService} from "./organism.service";
-import {TopicService} from "./topic.service";
 @NgModule({
     imports: [CommonModule],
     declarations: [],
@@ -31,9 +31,8 @@ import {TopicService} from "./topic.service";
         ExperimentResolverService,
         ProjectResolverService,
         LaunchPropertiesService,
-        ConstantsService,
-        OrganismService,
-        TopicService
+        ProjectService,
+        OrganismService
     ]})
 export class ServicesModule {
 }
