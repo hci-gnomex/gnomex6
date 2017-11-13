@@ -36,17 +36,12 @@
                     </div>
                     <div class="br-exp-item br-exp-four">
                         <div class="flex-row-container">
-                            <div class="br-exp-item-row-one">
-                                <jqxButton #newProject [template]="'link'" [disabled]="true" (onClick)="newProjectClicked()"
-                                           [imgSrc]="'assets/folder_add.png'" [imgPosition]="'center'"
-                                           [textImageRelation]="'imageBeforeText'">New Project
-                                </jqxButton>
+
+                            <div class="br-exp-item-row-one" style="position: relative; top: 1em">
+                                <button mat-button [disabled]="disableNewProject" (click)="newProjectClicked()"><img src="../../assets/folder_add.png">New Project</button>
                             </div>
-                            <div class="br-exp-item-row-two">
-                                <jqxButton #deleteProject [template]="'link'" [disabled]="true"
-                                           (onClick)="deleteProjectClicked()" [imgSrc]="'assets/folder_delete.png'"
-                                           [imgPosition]="'center'" [textImageRelation]="'imageBeforeText'">Delete Project
-                                </jqxButton>
+                            <div class="br-exp-item-row-two" style="position: relative; top: 1em">
+                                <button mat-button [disabled]="disableDelete" (click)="deleteProjectClicked()"><img src="../../assets/folder_delete.png">Delete Project</button>
                             </div>
                         </div>
                     </div>

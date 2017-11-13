@@ -9,6 +9,7 @@ import {EXPERIMENTS_ROUTING} from "./experiments.routes";
 
 import { TreeModule } from "angular-tree-component";
 
+import { AngularMaterialModule } from "../../modules/angular-material.module";
 import { ButtonModule } from "../../modules/button.module";
 import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
@@ -99,8 +100,9 @@ export const componentFactories =
         WindowModule,
         ReactiveFormsModule,
         RichEditorModule,
-        DropDownModule
-            ],
+        DropDownModule,
+        AngularMaterialModule
+    ],
     declarations: [
                     BrowseExperimentsComponent,
                     ExperimentOrdersComponent,
