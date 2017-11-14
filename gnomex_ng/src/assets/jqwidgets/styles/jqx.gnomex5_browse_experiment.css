@@ -3,7 +3,7 @@
 .jqx-grid-pager-gnomex5 []
 .jqx-grid-header-gnomex5 {}
 
-.jqx-grid-column-header-gnomex5 {
+.jqx-grid-column-header-gnomex5_browse_experiments {
     font-size: x-small;
     background: #e8e8e8; /* For browsers that do not support gradients */
     background: -webkit-linear-gradient(#ffffff, #e8e8e8); /* For Safari 5.1 to 6.0 */
@@ -12,77 +12,77 @@
     background: linear-gradient(#ffffff, #e8e8e8); /* Standard syntax */
 }
 
-.jqx-widget-header-gnomex5 {}
-.jqx-widget-content-gnomex5 {}
-.jqx-grid-content-gnomex5 {}
-.jqx-grid-toolbar-gnomex5 {}
-.jqx-grid-statusbar-gnomex5 {}
-.jqx-grid-column-menubutton-gnomex5 {}
-.jqx-grid-column-sortascbutton-gnomex5 {}
-.jqx-grid-column-sortdescbutton-gnomex5 {}
-.jqx-grid-column-filterbutton-gnomex5 {}
-.jqx-grid-sortasc-icon-gnomex5 {}
-.jqx-grid-sortdesc-icon-gnomex5 {}
-.jqx-grid-sortremove-icon-gnomex5 {}
-.jqx-grid-groupby-icon-gnomex5 {}
-.jqx-grid-groups-header-gnomex5 {}
-.jqx-grid-group-column-gnomex5 {}
+.jqx-widget-header-gnomex5_browse_experiments {}
+.jqx-widget-content-gnomex5_browse_experiments {}
+.jqx-grid-content-gnomex5_browse_experiments {}
+.jqx-grid-toolbar-gnomex5_browse_experiments {}
+.jqx-grid-statusbar-gnomex5_browse_experiments {}
+.jqx-grid-column-menubutton-gnomex5_browse_experiments {}
+.jqx-grid-column-sortascbutton-gnomex5_browse_experiments {}
+.jqx-grid-column-sortdescbutton-gnomex5_browse_experiments {}
+.jqx-grid-column-filterbutton-gnomex5_browse_experiments {}
+.jqx-grid-sortasc-icon-gnomex5_browse_experiments {}
+.jqx-grid-sortdesc-icon-gnomex5_browse_experiments {}
+.jqx-grid-sortremove-icon-gnomex5_browse_experiments {}
+.jqx-grid-groupby-icon-gnomex5_browse_experiments {}
+.jqx-grid-groups-header-gnomex5_browse_experiments {}
+.jqx-grid-group-column-gnomex5_browse_experiments {}
 
-.jqx-grid-cell-gnomex5 {
+.jqx-grid-cell-gnomex5_browse_experiments {
     background-color: #ffffff;
     border-style: solid;
     border-width: 0 1px 0 0;
     border-color: #cccccc;
     font-size: x-small;
 }
-.jqx-widget-gnomex5 .jqx-grid-cell-gnomex5 {
+.jqx-widget-gnomex5_browse_experiments .jqx-grid-cell-gnomex5_browse_experiments {
     border-color: #cccccc;
 }
 
-.jqx-grid-cell-sort-gnomex5 {
+.jqx-grid-cell-sort-gnomex5_browse_experiments {
     background-color: #ffffff;
 }
 
-.jqx-grid-cell-sort-alt-gnomex5 {
+.jqx-grid-cell-sort-alt-gnomex5_browse_experiments {
     background-color: #e8e8e8;
 }
 
-.jqx-grid-cell-filter-gnomex5 {}
-.jqx-grid-group-cell-gnomex5 {}
-.jqx-grid-details-cell-gnomex5 {}
+.jqx-grid-cell-filter-gnomex5_browse_experiments {}
+.jqx-grid-group-cell-gnomex5_browse_experiments {}
+.jqx-grid-details-cell-gnomex5_browse_experiments {}
 
-.jqx-grid-cell-alt-gnomex5 {
+.jqx-grid-cell-alt-gnomex5_browse_experiments {
     background-color: #e8e8e8;
 }
 
-.jqx-grid-cell-pinned-gnomex5 {}
-.jqx-grid-cell-selected-gnomex5 {
+.jqx-grid-cell-pinned-gnomex5_browse_experiments {}
+.jqx-grid-cell-selected-gnomex5_browse_experiments {
     background-color: #4e9bc2;
 }
-.jqx-fill-state-pressed-gnomex5 {
+.jqx-fill-state-pressed-gnomex5_browse_experiments {
     background-color: #4e9bc2;
 }
-.jqx-grid-cell-hover-gnomex5 {
+.jqx-grid-cell-hover-gnomex5_browse_experiments {
     background-color: #a8cfef;
 }
-.jqx-fill-state-hover-gnomex5 {
+.jqx-fill-state-hover-gnomex5_browse_experiments {
     background-color: #a8cfef;
 }
-.jqx-grid-group-collapse-gnomex5 {}
-.jqx-grid-group-collapse-rtl-gnomex5 {}
-.jqx-grid-group-expand-gnomex5 {}
-.jqx-grid-group-expand-rtl-gnomex5 {}
-.jqx-grid-column-resizeline-gnomex5 {}
-.jqx-grid-column-resizestartline-gnomex5 {}
-.jqx-fill-state-disabled-gnomex5 {}
-.jqx-grid-group-drag-line-gnomex5 {}
-.jqx-grid-group-column-line-gnomex5 {}
+.jqx-grid-group-collapse-gnomex5_browse_experiments {}
+.jqx-grid-group-collapse-rtl-gnomex5_browse_experiments {}
+.jqx-grid-group-expand-gnomex5_browse_experiments {}
+.jqx-grid-group-expand-rtl-gnomex5_browse_experiments {}
+.jqx-grid-column-resizeline-gnomex5_browse_experiments {}
+.jqx-grid-column-resizestartline-gnomex5_browse_experiments {}
+.jqx-fill-state-disabled-gnomex5_browse_experiments {}
+.jqx-grid-group-drag-line-gnomex5_browse_experiments {}
+.jqx-grid-group-column-line-gnomex5_browse_experiments {}
 
 
-.jqx-input-gnomex5 {
+.jqx-input-gnomex5_browse_experiments {
     background-color: #e4e0e0;
 }
 
-.jqx-text-area-element-gnomex5 {
+.jqx-text-area-element-gnomex5_browse_experiments {
     background-color: #e4e0e0;
 }

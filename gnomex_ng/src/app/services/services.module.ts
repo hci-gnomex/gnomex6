@@ -32,7 +32,8 @@ import {OrganismService} from "./organism.service";
         ProjectResolverService,
         LaunchPropertiesService,
         ProjectService,
-        OrganismService
+        OrganismService,
+        ConstantsService
     ]})
 export class ServicesModule {
 }

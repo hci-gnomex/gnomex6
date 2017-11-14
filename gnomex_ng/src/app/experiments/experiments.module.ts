@@ -15,6 +15,7 @@ import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import { ExpanderModule }     from "../../modules/expander.module";
 import { GnomexStyledGridModule } from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
+import {TreeGridModule} from "../../modules/tree-grid.module";
 import { InputModule } from "../../modules/input.module";
 import { LoaderModule }       from "../../modules/loader.module";
 import { PanelModule }        from "../../modules/panel.module";
@@ -61,12 +62,12 @@ export const componentFactories =
     [
         TestComponent,
         DescriptionTab,
-    PrepTab,
-    DownloadsBrowseTab,
-    ExperimentsBrowseTab,
-    ProgressBrowseTab,
-    ProjectBrowseTab,
-    VisiblityBrowseTab
+        PrepTab,
+        DownloadsBrowseTab,
+        ExperimentsBrowseTab,
+        ProgressBrowseTab,
+        ProjectBrowseTab,
+        VisiblityBrowseTab
     ];
 /**/
                                 // need add components that will be tabs here
@@ -99,7 +100,8 @@ export const componentFactories =
         WindowModule,
         ReactiveFormsModule,
         RichEditorModule,
-        DropDownModule
+        DropDownModule,
+        TreeGridModule
             ],
     declarations: [
                     BrowseExperimentsComponent,

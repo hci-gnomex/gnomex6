@@ -12,8 +12,7 @@ export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experim
 export class ExperimentsService {
 
 	private experimentOrders: any[];
-    private projectRequestList: any[];
-    public selectedTreeNode:any;
+    public projectRequestList: any[];
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
@@ -22,9 +21,9 @@ export class ExperimentsService {
     private haveLoadedExperimentOrders: boolean = false;
     private previousURLParams: URLSearchParams = null;
     private changeStatusSubject: Subject<any> = new Subject();
-    private requestProgressList: BehaviorSubject<any>= new BehaviorSubject([]);
-    private requestProgressDNASeqList: BehaviorSubject<any> = new BehaviorSubject([]);
-    private requestProgressSolexaList:BehaviorSubject<any> = new BehaviorSubject([]);
+    private requestProgressList: Subject<any>= new Subject();
+    private requestProgressDNASeqList: Subject<any> = new Subject();
+    private requestProgressSolexaList:Subject<any> = new Subject();
 
     private experimentOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
     private filteredExperimentOverviewListSubject:Subject<any> = new Subject();
@@ -32,6 +31,8 @@ export class ExperimentsService {
     // conditional params
     browsePanelParams:URLSearchParams;
     experimentList:Array<any> =[];
+
+
     constructor(private _http: Http, @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
     getExperiments() {

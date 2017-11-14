@@ -782,9 +782,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.newProject.disabled(true);
             this.deleteProject.disabled(true);
         }
-        this.experimentService.selectedTreeNode = _.cloneDeep(this.selectedItem.data);
-
-
     }
 
     /**

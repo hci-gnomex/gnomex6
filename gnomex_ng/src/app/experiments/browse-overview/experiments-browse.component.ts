@@ -11,7 +11,6 @@ import {Router} from "@angular/router";
 @Component({
     template: `
 
-        
         <!--- <grid dataProvider={} > -->
         <div style="display:block; height:100%; width:100%;">
             <GnomexStyledGrid 
@@ -82,7 +81,8 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
     };
     constructor(protected fb: FormBuilder, private experimentService:ExperimentsService,
                 private dictionary: DictionaryService, private appConstants: ConstantsService,
-                private router:Router) {        super(fb);
+                private router:Router) {
+        super(fb);
     }
 
 
