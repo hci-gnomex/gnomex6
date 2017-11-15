@@ -253,9 +253,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
             this.experimentsService.emitExperimentOverviewList(response);
+            this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+
             setTimeout(()=>{
                 this.treeModel.expandAll();
-        });
+            });
         });
 
 
@@ -756,6 +758,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         let idRequest = this.selectedItem.data.idRequest;
 
         let projectRequestListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
+
 
         //Lab
         if (this.selectedItem.level === 1) {

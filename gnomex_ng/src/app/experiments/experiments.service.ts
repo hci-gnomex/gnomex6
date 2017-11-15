@@ -31,8 +31,6 @@ export class ExperimentsService {
     // conditional params
     browsePanelParams:URLSearchParams;
     experimentList:Array<any> =[];
-
-
     constructor(private _http: Http, @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
     getExperiments() {
@@ -70,7 +68,7 @@ export class ExperimentsService {
     }
 
 
-    getExperiments_fromBackend(parameters: URLSearchParams): void {
+	getExperiments_fromBackend(parameters: URLSearchParams): void {
 		if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
 			// do nothing
 			console.log("Experiment Orders already loaded");

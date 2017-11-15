@@ -3,7 +3,7 @@
  */
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {URLSearchParams} from "@angular/http"
 import {ExperimentsService} from "../experiments.service";
 import {TabContainer} from "../../util/tabs/tab-container.component";
@@ -15,31 +15,31 @@ import {Subscription} from "rxjs/Subscription";
 
 @Component({
     template: `
-        <div class="flex-container">
-            
+            <div class="flex-container">
+
                 <div >
                     {{ this.experimentsService.experimentList.length + " Experiments"}}
                 </div>
                 <div >
                     <label>Experiment #</label>
-                    <jqxComboBox  class="inlineComboBox" 
-                            [width]="170" 
-                            [height]="20"
-                            [source]="orderedExperimentIds"
-                            (onSelect)="onIDSelect($event)" >
+                    <jqxComboBox  class="inlineComboBox"
+                                  [width]="170"
+                                  [height]="20"
+                                  [source]="orderedExperimentIds"
+                            (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
                     </jqxComboBox>
                 </div>
 
-            
-        </div>
-        
-        <div style="height: 100%;width:100%">
-            <tab-container (tabChanged)="changedTab($event)"
-                           [state]="state"
-                           [componentNames]="tabNames">
 
-            </tab-container>
-        </div>
+            </div>
+
+            <div style="height: 100%;width:100%">
+                <tab-container (tabChanged)="changedTab($event)"
+                               [state]="state"
+                               [componentNames]="tabNames">
+
+                </tab-container>
+            </div>
 `,
     styles: [`
        
@@ -53,7 +53,8 @@ import {Subscription} from "rxjs/Subscription";
         }
     `]
 })
-export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any;
+export class BrowseOverviewComponent implements OnInit,OnDestroy{
+    project:any;
     private readonly EXPERIMENT:string = "ExperimentsBrowseTab";
     private readonly PROGRESS:string = "ProgressBrowseTab";
     private readonly VISIBILITY:string = "VisiblityBrowseTab";
@@ -62,17 +63,20 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any
     public orderedExperimentIds: Array<string> = [];
     private overviewListSuscript: Subscription;
     private initialed:boolean = false;
+
+
+
     @ViewChild(TabContainer) tabView: TabContainer;
     state:string = TabContainer.VIEW;
     tabNames:Array<string>;
     constructor(private appConstants:ConstantsService,private route:ActivatedRoute,
-                public experimentsService:ExperimentsService,
+                public experimentsService:ExperimentsService, private router:Router,
                 public dictionary:DictionaryService){
     }
 
     ngOnInit(){
-        //need to reset when switch back from experiment tree node. since it retains its last value
 
+        // This 'data' observable fires when tree node changes because url will change.
         this.route.data.forEach((data) => {
             this.project = data['project']; // this data is carried on route look at browse-experiments.component.ts
             if(!this.tabView.isInitalize()){
@@ -87,7 +91,6 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any
                 if (this.project) { // no projectTab, add it
                     let index = this.tabView.containsTab(this.PROJECT);
                     if (index === -1) {
-
                         this.tabView.addTab(this.PROJECT);
                         this.tabNames.push(this.PROJECT);
                     }
@@ -99,22 +102,26 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any
                         this.tabNames.pop();// will Project will always be the last tab
                     }
                 }
-                this.refresh();
             }
         });
 
 
-    
-
-        this.refreshExperimentIds();
+        this.refreshOverviewData();
         this.initialed = true;
 
+        this.router.events.subscribe(event => {
+            if (event instanceof NavigationEnd) {
+                let something = this.route.snapshot;
+            }
+        });
+
     }
+
     /* The subscribe is fire in the event a tree node of lab or project is select or search button in browse filter is
         selected. This is the first subscriber called and saves experimentList in the service so subsequent subscribers
         can use it.
      */
-    refreshExperimentIds():void{
+    refreshOverviewData():void{
         this.overviewListSuscript = this.experimentsService.getExperimentOverviewListSubject()
             .subscribe(data =>{
                 this.experimentIdSet.clear();
@@ -129,21 +136,27 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any
                     return 0;
                 };
                 this.orderedExperimentIds = Array.from(this.experimentIdSet).sort(sortIdFn);
-
-
-        });
+                if(this.tabView.isInitalize() ) { // incase new lab is being loaded from search
+                   this.refresh(data);
+                }
+            });
     }
 
 
     refreshExperiment():void{
         console.log("refreshing Experiment")
     }
-
-    refreshProgress():void{
+    refreshProgress(data?:any):void{
         let params:URLSearchParams = this.experimentsService.browsePanelParams;
         if(params){
-            let idProject = this.route.snapshot.paramMap.get('idProject');
-            params.set('idProject',idProject);
+
+            if(data){//when user selects from the tree
+                let idProject = data['idProject'];
+                params.set('idProject',idProject);
+            }else{// Use when user changes to tab to progress
+                let idProject = this.route.snapshot.paramMap.get('idProject');
+                params.set('idProject',idProject);
+            }
             this.experimentsService.getRequestProgressList_FromBackend(params);
             this.experimentsService.getRequestProgressDNASeqList_FromBackend(params);
             this.experimentsService.getRequestProgressSolexaList_FromBackend(params);
@@ -151,17 +164,13 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any
         else{
             console.log("check browseFilter.search() to make sure browsePanelParams were set");
         }
-
-
     }
-    refresh():void{
+    refresh(data?:any):void{
             if(this.tabNames[this.tabView.activeId] === this.EXPERIMENT ){
                 this.refreshExperiment();
-
-
             }
             else if(this.tabNames[this.tabView.activeId] === this.PROGRESS){
-                this.refreshProgress();
+                this.refreshProgress(data);
             }
             else if(this.tabNames[this.tabView.activeId] === this.VISIBILITY){
                 //this.refreshVisibility();
@@ -174,25 +183,34 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any
 
     getExperiments(data:any):Array<any>{
         let flatRequestList:Array<any> = [];
-        if(data.length === 0){
+
+        if(Array.isArray(data)){
+            if(data.length > 0){
+                (<Array<any>> data).forEach(rObj =>{
+                    this.experimentIdSet.add(rObj.requestNumber)
+                });
+                flatRequestList = data;
+            }
             return flatRequestList;
         }
 
         if (data.Project) {
             let projectList: Array<any> = Array.isArray(data.Project) ? data.Project : [data.Project];
             projectList.forEach(subData => {
-                let requestList: Array<any> = Array.isArray(subData.Request) ? subData.Request : [subData.Request];
-                requestList.forEach(rObject => {
-                    this.getExperimentKind(rObject);
-                    rObject["ownerFullName"] = rObject.ownerLastName + ', ' + rObject.ownerFirstName;
-                    rObject["analysisChecked"] = rObject.analysisNames !== '' ? this.appConstants.ICON_CHECKED : '';
+                let requestList: Array<any> = Array.isArray(subData.Request) ? subData.Request :  subData.Request ? [subData.Request] : subData.Request;
+                if(requestList){
+                    requestList.forEach(rObject => {
+                        this.getExperimentKind(rObject);
+                        rObject["ownerFullName"] = rObject.ownerLastName + ', ' + rObject.ownerFirstName;
+                        rObject["analysisChecked"] = rObject.analysisNames !== '' ? this.appConstants.ICON_CHECKED : '';
 
-                    flatRequestList.push(rObject);
-                    this.experimentIdSet.add(rObject.requestNumber);
-                });
+                        flatRequestList.push(rObject);
+                        this.experimentIdSet.add(rObject.requestNumber);
+                    });
+                }
             });
         }
-        else{
+        else if(data.Request){
             flatRequestList = Array.isArray(data.Request) ? data.Request : [data.Request];
             flatRequestList.forEach(rObj =>{
                 this.experimentIdSet.add(rObj.requestNumber);
@@ -220,9 +238,9 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any
     }
 
     getRequestKind(item:any):string {
-        var de:Array<any> = this.dictionary.getEntry(DictionaryService.REQUEST_CATEGORY, item.codeRequestCategory);
-        if (de.length == 1) {
-            return de[0].display;
+        var de:any = this.dictionary.getEntry(DictionaryService.REQUEST_CATEGORY, item.codeRequestCategory);
+        if (de) {
+            return de.display;
         } else {
             return "";
         }
@@ -262,9 +280,16 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{    project:any
             this.experimentsService.emitFilteredOverviewList(filteredIdList);
         }
     }
+    private onUnselectID($event:any):void{
+        let eList:Array<any> = this.experimentsService.experimentList;
+        if(eList){
+            this.experimentsService.emitFilteredOverviewList(eList);
+        }
+    }
+
+
 
     ngOnDestroy():void{
-
         this.experimentsService.resetExperimentOverviewListSubject();
         this.overviewListSuscript.unsubscribe();
     }

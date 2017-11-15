@@ -56,8 +56,7 @@ import {CreateProjectComponent} from "./create-project.component";
  * @author mbyrne
  * @since 12/19/16
  */
-
-
+// add components that will be tabs here
 export const componentFactories =
     [
         TestComponent,
@@ -69,8 +68,8 @@ export const componentFactories =
         ProjectBrowseTab,
         VisiblityBrowseTab
     ];
-/**/
-                                // need add components that will be tabs here
+
+
                                                                           // could be put in gnomexFlex as w
 @NgModule({
     imports: [
