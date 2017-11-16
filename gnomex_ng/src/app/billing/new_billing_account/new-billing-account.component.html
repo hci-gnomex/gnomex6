@@ -43,7 +43,12 @@
 								</div>
 							</div>
 							<div class="td">
-								<multiple-selector #coreFacilitiesSelector [title]="'Core Facilities'" [placeholder]="'Select Core Facilities'"></multiple-selector>
+								<multiple-selector
+										#coreFacilitiesSelector
+										[title]="'Core Facilities'"
+										[placeholder]="'Select Core Facilities'"
+										(onSave)="onCoreFacilitiesSelected($event)">
+								</multiple-selector>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -68,7 +73,7 @@
 				</div>
 			</div>
 			<div class="vertical-spacer"></div>
-			<div class="full-width background">
+			<div class="full-width background overflowable">
 				<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
 
 
@@ -199,12 +204,19 @@
 						<div class="tr full-width row-spacer">
 						</div>
 
-						<div class="tr full-width row-content">
+						<div *ngIf="showFundingAgencies" class="tr full-width row-content">
 							<div class="td cell-label">
 								Funding Agency
 							</div>
 							<div class="td">
-								<jqxComboBox #fundingAgencyCombobox_chartfield [theme]="'gnomex5'" [width]="'100%'" [height]="'1.5rem'">
+								<jqxComboBox
+										#fundingAgencyCombobox_chartfield
+										[theme]="'gnomex5'"
+										[source]="fundingAgencies"
+										[valueMember]="'value'"
+										[displayMember]="'fundingAgency'"
+										[width]="'100%'"
+										[height]="'1.5rem'">
 								</jqxComboBox>
 							</div>
 						</div>
@@ -242,16 +254,16 @@
 						</div>
 						<div class="tr full-width row-spacer">
 						</div>
-						<div class="tr full-width row-content">
-							<div class="td cell-label">
-								Approved Users
-							</div>
-							<div class="td">
-								<multiple-selector [title]="'Options'"></multiple-selector>
-							</div>
-						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-content">-->
+							<!--<div class="td cell-label">-->
+								<!--Approved Users-->
+							<!--</div>-->
+							<!--<div class="td">-->
+								<!--<user-multiple-selector [title]="'Options'"></user-multiple-selector>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Submitter Email
@@ -331,16 +343,16 @@
 						</div>
 						<div class="tr full-width row-spacer">
 						</div>
-						<div class="tr full-width row-content">
-							<div class="td cell-label">
-								Approved Users
-							</div>
-							<div class="td">
-								<multiple-selector [title]="'Options'"></multiple-selector>
-							</div>
-						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-content">-->
+							<!--<div class="td cell-label">-->
+								<!--Approved Users-->
+							<!--</div>-->
+							<!--<div class="td">-->
+								<!--<multiple-selector [title]="'Options'"></multiple-selector>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Active
@@ -413,16 +425,16 @@
 						</div>
 						<div class="tr full-width row-spacer">
 						</div>
-						<div class="tr full-width row-content">
-							<div class="td cell-label">
-								Approved Users
-							</div>
-							<div class="td">
-								<multiple-selector [title]="'Options'"></multiple-selector>
-							</div>
-						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-content">-->
+							<!--<div class="td cell-label">-->
+								<!--Approved Users-->
+							<!--</div>-->
+							<!--<div class="td">-->
+								<!--<multiple-selector [title]="'Options'"></multiple-selector>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Active

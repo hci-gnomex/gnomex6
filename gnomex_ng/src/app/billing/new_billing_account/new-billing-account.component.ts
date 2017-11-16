@@ -17,6 +17,7 @@ import { MultipleSelectorComponent } from "../../util/multipleSelector/multiple-
 import { GnomexStyledDatePickerComponent } from "../../util/gnomexStyledDatePicker/gnomex-styled-date-picker.component";
 
 import { Subscription } from "rxjs/Subscription";
+import {DictionaryService} from "../../services/dictionary.service";
 
 // This component is a container for a jqxgrid given a specific style, and equipped to modify the
 // grid's size on the page correctly automatically.
@@ -90,7 +91,6 @@ import { Subscription } from "rxjs/Subscription";
       .background {
           display: block;
           position: relative;
-          overflow: auto;
           background-color: white;
           border: #d2d2d2 solid 1px;
       }
@@ -139,6 +139,10 @@ import { Subscription } from "rxjs/Subscription";
           color: #1601db;
 					font-weight: bold;
 			}
+			
+			.overflowable {
+					overflow: visible;
+			}
 	`]
 })
 export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -173,15 +177,19 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	private labList: any[] = [];
 	private coreFacilityList: any[] = [];
+	private labUsersList: any[] = [];
 
 	private labListSubscription: Subscription = null;
 
+	private fundingAgencies: any;
+
+	private showFundingAgencies: boolean = false;
+
 	constructor(@Inject(ChangeDetectorRef) private changeDetectorRef: ChangeDetectorRef,
+							private dictionaryService: DictionaryService,
 							private labListService: LabListService,
 							private createSecurityAdvisorService: CreateSecurityAdvisorService
-	) {
-
-	}
+	) { }
 
 	ngOnInit(): void {
 		this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
@@ -191,6 +199,17 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 		this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
 		// Also need to load the list of funding agencies from dictionary, in flex, the XMLCollection is
 		// source="{parentApplication.dictionaryManager.xml.Dictionary.(@className=='hci.gnomex.model.FundingAgency').DictionaryEntry}"
+
+		let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
+		this.fundingAgencies = [];
+
+		if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
+			for (let i = 0; i < originalFundingAgencies.length; i++) {
+				if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
+					this.fundingAgencies.push(originalFundingAgencies[i]);
+				}
+			}
+		}
 	}
 
 	ngAfterViewInit(): void {
@@ -203,6 +222,10 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	changeShowField(showField: string) {
 		this.showField = showField;
+		this.resizeWindow();
+	}
+
+	private resizeWindow(): void {
 		this.changeDetectorRef.detectChanges();
 
 		this.window.height(this.windowHeader.nativeElement.offsetHeight + this.windowBody.nativeElement.offsetHeight + 12);
@@ -337,6 +360,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	}
 
 	private onLabListSelection(event: any): void {
+		this.coreFacilitiesSelector.clearSelection();
+
 		let coreFacilityGridLocalData: any[] = [];
 
 		let args = event.args;
@@ -348,11 +373,19 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 			if (item.coreFacilities != undefined && item.coreFacilities != null) {
 				if (item.coreFacilities[0] != undefined && item.coreFacilities[0] != null) {
 					for (let i: number = 0; i < item.coreFacilities.length; i++) {
-						coreFacilityGridLocalData.push({name: item.coreFacilities[i].display});
+						if (item.coreFacilities[i].acceptOnlineWorkAuth != null
+								&& item.coreFacilities[i].acceptOnlineWorkAuth != undefined
+								&& item.coreFacilities[i].acceptOnlineWorkAuth === 'Y') {
+							coreFacilityGridLocalData.push(item.coreFacilities[i]);
+						}
 					}
 				} else {
 					if (item.coreFacilities.CoreFacility != undefined && item.coreFacilities.CoreFacility != null) {
-						coreFacilityGridLocalData.push({name: item.coreFacilities.CoreFacility.display});
+						if (item.coreFacilities.CoreFacility.acceptOnlineWorkAuth != null
+								&& item.coreFacilities.CoreFacility.acceptOnlineWorkAuth != undefined
+								&& item.coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
+							coreFacilityGridLocalData.push(item.coreFacilities.CoreFacility);
+						}
 					}
 				}
 			}
@@ -360,31 +393,19 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 		this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
 
-		// if (this.labListComboBox != null
-		// 		&& this.labListComboBox.getSelectedItem() != null
-		// 		&& this.labListComboBox.getSelectedItem().originalItem != null
-		// 		&& this.labListComboBox.getSelectedItem().originalItem.coreFacilities != null
-		// ) {
-		//
-		// 	// if the coreFacilities element is an array, that is to say there are 2+ entries
-		// 	if (this.labListComboBox.getSelectedItem().originalItem.coreFacilities.length != null) {
-		// 		for (let i: number = 0; i < this.labListComboBox.getSelectedItem().originalItem.coreFacilities.length; i++) {
-		// 			coreFacilityGridLocalData.push({name: this.labListComboBox.getSelectedItem().originalItem.coreFacilities[i].display});
-		// 		}
-		// 		this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
-		// 	} // There is 1 entry
-		// 	else if (this.labListComboBox.getSelectedItem().originalItem.coreFacilities.coreFacility != null) {
-		// 		coreFacilityGridLocalData.push({name: this.labListComboBox.getSelectedItem().originalItem.coreFacilities.display});
-		// 		this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
-		// 	} // There are no entries (shouldn't be reachable?)
-		// 	else {
-		// 		// Either error or do nothing, there are no core facilities
-		// 	}
-		// }
+		this.labUsersList = event.target;
+	}
+
+	private onCoreFacilitiesSelected(event: any): void {
+
+
+		this.showFundingAgencies = true;
+
+		this.resizeWindow();
 	}
 
 	private onLabListUnselect():void {
-		this.coreFacilitiesSelector.setLocalData([{name: 'No lab selected'}]);
+		this.coreFacilitiesSelector.setLocalData([{display: 'No lab selected'}]);
 	}
 
 	private onCancelButtonClicked(): void {

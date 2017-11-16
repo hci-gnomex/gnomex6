@@ -14,6 +14,8 @@ import {MultipleSelectorModule} from "../../util/multipleSelector/multiple-selec
 import {NewBillingAccountComponent} from "./new-billing-account.component";
 import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
 
+import {UserMultipleSelectorModule} from "./user_multiple_selector/user-multiple-selector.module"
+
 @NgModule({
 	imports: [
 		NEW_BILLING_ACCOUNT_ROUTING,
@@ -25,6 +27,7 @@ import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
 		GnomexStyledGridModule,
 		InputModule,
 		MultipleSelectorModule,
+		UserMultipleSelectorModule,
 		WindowModule
 	],
 	declarations: [

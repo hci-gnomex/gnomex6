@@ -20,7 +20,7 @@
 		<div style="height:1em;">{{title}} Title</div>
 	</div>
 	<div>
-		<div class="full-width full-height">
+		<div class="full-width full-height {{addingUsersFromListClasses}}">
 			<div class="t full-width full-height">
 				<div class="tr full-width">
 					<div class="td full-width full-height">
@@ -29,10 +29,33 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="tr full-width">
+					<div class="td full-width">
+						<button (click)="showOtherUserPane()">Add User from Another Lab</button>
+					</div>
+				</div>
+
 				<div class="tr full-width">
 					<div class="td full-width">
 						<button type="button" (click)="saveButtonClicked()" autofocus>Save</button>
 						<button type="button" (click)="cancelButtonClicked()">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="full-width full-height {{addingUsersFromAnotherLabClasses}}">
+			<div class="t full-width full-height">
+				<div class="tr full-width">
+					<div class="td full-width full-height">
+						<button (click)="showUserListPane()">Back</button>
+					</div>
+				</div>
+
+				<div class="tr full-width full-height">
+					<div class="td full-width full-height white-background">
+
 					</div>
 				</div>
 			</div>

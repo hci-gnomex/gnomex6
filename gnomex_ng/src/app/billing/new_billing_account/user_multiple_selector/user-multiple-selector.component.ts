@@ -1,16 +1,16 @@
 import {
-	AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit,
-	Output, ViewChild
+	AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit,
+	ViewChild
 } from "@angular/core";
 
-import { jqxInputComponent } from "../../../assets/jqwidgets-ts/angular_jqxinput"
-import { jqxWindowComponent } from "../../../assets/jqwidgets-ts/angular_jqxwindow";
+import { jqxInputComponent } from "../../../../assets/jqwidgets-ts/angular_jqxinput"
+import { jqxWindowComponent } from "../../../../assets/jqwidgets-ts/angular_jqxwindow";
 
-import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component";
+import { GnomexStyledGridComponent } from "../../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component";
 
 @Component({
-	selector: "multiple-selector",
-	templateUrl: "./multiple-selector.component.html",
+	selector: "user-multiple-selector",
+	templateUrl: "./user-multiple-selector.component.html",
 	styles: [`
 			.t {
 					display: table;
@@ -31,8 +31,13 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 			.full-height {
           height: 100%;
       }
+			
+			.hidden {
+					display: none;
+					visibility: hidden;
+			}
 	`]
-}) export class MultipleSelectorComponent implements OnInit, OnDestroy, AfterViewInit {
+}) export class UserMultipleSelectorComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	@ViewChild('gridReference') grid: GnomexStyledGridComponent;
 	@ViewChild('windowRef') window: jqxWindowComponent;
@@ -43,23 +48,24 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 
 	@Input() title: string = 'Title';
 
-	@Output() onSave: EventEmitter<any> = new EventEmitter();
-
 	private columns: any[] = [
-		{text: "Option", datafield: "display"}
+		{text: "Option", datafield: "name"}
 	];
 
 	private source = {
 		datatype: "json",
 		localdata: [
-			{display: "Testing 1,2,3 Testing"}
+			{name: "Testing 1,2,3 Testing"}
 		],
 		datafields: [
-			{name: "display", type: "string"}
+			{name: "name", type: "string"}
 		]
 	};
 
 	private isFirstOpening: boolean = true;
+	private addingUsersFromAnotherLab = false;
+	private addingUsersFromListClasses: string = ' ';
+	private addingUsersFromAnotherLabClasses: string = ' hidden';
 
 	ngOnInit() {
 		// this.grid.theGrid.showstatusbar(false);
@@ -88,7 +94,7 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 					datatype: "json",
 					localdata: [],
 					datafields: [
-						{name: "display", type: "string"}
+						{name: "name", type: "string"}
 					]
 				};
 				this.grid.setDataAdapterSource(tempSource);
@@ -126,21 +132,16 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 		let selectedIndexes: Array<Number> = this.grid.getselectedrowindexes();
 		this.recordedIndexes = [];
 
-		let selectedData: Array<any> = [];
-
 		for (let i: number = 0; i < selectedIndexes.length; i++) {
-			let selectedIndex: number = selectedIndexes[i] != null ? selectedIndexes[i].valueOf() : -1;
 			if (i > 0) {
 				this.displayString += ', ';
 			}
-			this.displayString += this.source.localdata[selectedIndex].display;
-			selectedData.push(this.source.localdata[selectedIndex]);
+			this.displayString += this.source.localdata[i].name;
 
 			this.recordedIndexes.push(selectedIndexes[i]);
 		}
 
 		this.closeUserSelectPopup();
-		this.onSave.next(selectedData);
 	}
 
 	private cancelButtonClicked(): void {
@@ -187,5 +188,16 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 	}
 	getLocalData(): any[] {
 		return this.source.localdata;
+	}
+
+	showUserListPane(): void {
+		this.addingUsersFromListClasses = ' ';
+		this.addingUsersFromAnotherLabClasses = ' hidden';
+	}
+
+	showOtherUserPane(): void {
+		//this.addingUsersFromAnotherLab = true;
+		this.addingUsersFromListClasses = ' hidden';
+		this.addingUsersFromAnotherLabClasses = ' ';
 	}
 }
