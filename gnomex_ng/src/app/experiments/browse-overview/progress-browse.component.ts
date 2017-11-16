@@ -349,9 +349,7 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
 
                 let rObject = progressList[i];
                 let reqCategory = rObject["codeRequestCategory"];
-                //let eKind:string = this.getExperimentKind(reqCategory); // waiting matt's dictionary fix since it calls getEntry
-
-                let eKind ="Erik";
+                let eKind:string = this.getExperimentKind(reqCategory);
                 rObject["experimentKind"] = eKind;
                 rObject["expID"] = i;
                 this.initCoreData(rObject);
