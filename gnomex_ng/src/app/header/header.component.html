@@ -25,7 +25,7 @@
       <button mat-icon-button class="experiment-menu link" [matMenuTriggerFor]="linksMenu">
         <mat-icon>Links...</mat-icon>
       </button>
-      <mat-menu #linksMenu="matMenu" >
+      <mat-menu #linksMenu="matMenu" [overlapTrigger]="false">
         <button  class="menu" mat-menu-item> Gnomics Core Webpage </button>
         <button  class="menu" mat-menu-item>  DNA Sequencing Webpage </button>
       </mat-menu>
@@ -130,41 +130,41 @@
       <img src="../../assets/flask.png" alt="Bookmark">
       <mat-icon>Experiments</mat-icon>
     </button>
-    <a href="www.google.com" class="experiment-menu link">
-      <img src="../../assets/map.png" alt="Bookmark">
-      Analysis
-    </a>
-    <a href="www.google.com" class="experiment-menu link">
+    <button mat-icon-button class="experiment-menu" [routerLink]="[ '/analysis' ]">
+        <img src="../../assets/map.png" alt="Bookmark">
+      <mat-icon>Analysis</mat-icon>
+    </button>
+    <button mat-icon-button class="experiment-menu">
       <img src="../../assets/datatrack.png" alt="Bookmark">
-      Data Tracks
-    </a>
-    <a href="www.google.com" class="experiment-menu link">
+      <mat-icon>Data Tracks</mat-icon>
+    </button>
+    <button mat-icon-button class="experiment-menu">
       <img src="../../assets/topic_tag.png" alt="Bookmark">
-      Topics
-    </a>
+      <mat-icon>Topics</mat-icon>
+    </button>
     <button class="experiment-menu" mat-icon-button [matMenuTriggerFor]="flowMenu">
       <img src="../../assets/review.png" alt="Bookmark">
-      Workflow
+      <mat-icon>Workflow</mat-icon>
     </button>
     <button class="experiment-menu" mat-icon-button [matMenuTriggerFor]="prodMenu">
       <img src="../../assets/basket.png" alt="Bookmark">
-      Products
+      <mat-icon>Products</mat-icon>
     </button>
-    <a href="www.google.com" class="experiment-menu link">
+    <button mat-icon-button class="experiment-menu">
       <img src="../../assets/money.png" alt="Bookmark">
-      Billing
-    </a>
-    <a href="www.google.com" class="experiment-menu link">
+      <mat-icon>Billing</mat-icon>
+    </button>
+    <button mat-icon-button class="experiment-menu">
       <img src="../../assets/group.png" alt="Bookmark">
-      Users & Groups
-    </a>
+      <mat-icon>Users & Groups</mat-icon>
+    </button>
     <button class="experiment-menu" mat-icon-button [matMenuTriggerFor]="confMenu">
       <img src="../../assets/page_white_wrench.png" alt="Bookmark">
-      Configure
+      <mat-icon>Configure</mat-icon>
     </button>
     <button class="experiment-menu" mat-icon-button [matMenuTriggerFor]="reportsMenu">
       <img src="../../assets/page.png" alt="Bookmark">
-      Reports
+      <mat-icon>Reports</mat-icon>
     </button>
   </mat-toolbar-row>
 </mat-toolbar>

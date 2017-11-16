@@ -1,0 +1,36 @@
+<form (ngSubmit)="save(createProjectForm.value)" [formGroup]="createProjectForm" >
+    <h6 mat-dialog-title>New Project</h6>
+    <div mat-dialog-content>
+        <div>
+            <label style="width: 10em">Group</label>
+            <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
+                         [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                         (onSelect)="onLabSelect($event)" formControlName="selectedLab">
+            </jqxComboBox>
+        </div>
+
+        <div>
+            <label style="width: 10em">Project Name</label>
+            <mat-form-field>
+                <input matInput formControlName="projectName">
+            </mat-form-field>
+            <mat-error *ngIf="createProjectForm.controls['projectName'].hasError('required')">
+                Project name is <strong>required</strong>
+            </mat-error>
+
+        </div>
+        <div>
+            <label style="width: 10em">Project Description</label>
+            <div>
+                <mat-form-field>
+                    <textarea matInput rows="6" columns="60" formControlName="projectDescription"> </textarea>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <mat-dialog-actions>
+        <button #yesButton mat-raised-button color="primary" [disabled]="createProjectForm.invalid" (click)="createProjectSaveButtonClicked()" tabindex="2">Save</button>
+        <button mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+    </mat-dialog-actions>
+</form>

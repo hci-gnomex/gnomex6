@@ -7,7 +7,8 @@ package hci.gnomex.controller;
  *@created    August 17, 2002
  */
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
@@ -119,10 +120,7 @@ public static boolean areWeLite() {
    * @exception ServletException Description of the Exception
    * @exception IOException Description of the Exception
    */
-  public void doGet(HttpServletRequest request1, HttpServletResponse response)
-      throws ServletException, IOException {
-
-//	  HttpServletWrappedRequest request = new HttpServletWrappedRequest(request1);
+  public void doGet(HttpServletRequest request1, HttpServletResponse response) throws ServletException, IOException {
     doPost(request1, response);
   }
 
@@ -136,8 +134,8 @@ public static boolean areWeLite() {
    */
   public void doPost(HttpServletRequest request1, HttpServletResponse response) throws ServletException, IOException {
     // wrap the request so we can modify parameters
-      TreeMap  modifiedParameters = new TreeMap<>();
-      HttpServletWrappedRequest request = new HttpServletWrappedRequest(request1, modifiedParameters);
+//      TreeMap  modifiedParameters = new TreeMap<>();
+      HttpServletWrappedRequest request = new HttpServletWrappedRequest(request1);
 
     // get the users session
     HttpSession session = request.getSession(true);
@@ -192,8 +190,7 @@ public static boolean areWeLite() {
     }
 
     if (commandInstance.getSecurityAdvisor() == null
-        && (requestName.compareTo("ManageDictionaries")
-                != 0 // You can reload dictionary cache without
+        && (requestName.compareTo("ManageDictionaries") != 0 // You can reload dictionary cache without
             // security
             || request.getParameter("action") == null
             || !request.getParameter("action").equals("reload"))
@@ -221,20 +218,19 @@ public static boolean areWeLite() {
         converted[0] = false;
         convertJSONRequesttoXML(request, requestName,converted);
 
+        /*
 		// DEBUG dump the request if we changed anything
         if (converted[0]) {
-			System.out.println("[GNomExFrontController after conversion] converted[0]: " + converted[0]);
+			System.out.println("[GNomExFrontController after conversion] converted[0]: " + converted[0] + " ---> dump request.parameters <---");
 
-				Enumeration headerNames = request.getHeaderNames();
-				while (headerNames.hasMoreElements()) {
-					String headerName = (String) headerNames.nextElement();
-					String theHeader = request.getHeader(headerName);
-					if (theHeader.length() > 40) {
-						theHeader = theHeader.substring(0, 40);
-					}
-					System.out.println("[GNomExFrontController after conversion] headerName: " + headerName + " theHeader: " + theHeader);
+			Enumeration params = request.getParameterNames();
+			while (params.hasMoreElements()) {
+				String paramName = (String) params.nextElement();
+				String parameterValue = (String) request.getParameter(paramName);
+		        System.out.println("[after convertJSONRequesttoXML] paramName: " + paramName + "\nparameterValue: " + parameterValue);
 				}
 		}
+		*/
       commandInstance.loadCommand(request, session);
     }
     // see if it is valid, if so call execute
@@ -412,12 +408,14 @@ private void sendRedirect(HttpServletResponse response, String url) {
    *   Convert all the parameter values in the httpservletrequest from json to xml
    */
   public void convertJSONRequesttoXML(HttpServletWrappedRequest httpRequest, String requestName, boolean [] converted) {
+  	boolean debug = false;
     converted[0] = false;
 
 //    System.out.println("[convertRequesttoJSON] *** starting *** " + requestName);
 
     // are any values XML?
 /*
+	  System.out.println("****************************************************************************************");
             Enumeration headerNames = httpRequest.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String headerName = (String) headerNames.nextElement();
@@ -427,8 +425,10 @@ private void sendRedirect(HttpServletResponse response, String url) {
                 }
                 System.out.println("[convertRequesttoJSON] *BEFORE* headerName: " + headerName + " theHeader: " + theHeader);
             }
+	  System.out.println ("---------------------------------------------------------------------------------------");
 */
-    System.out.println("****************************************************************************************");
+	  if (debug) System.out.println("****************************************************************************************");
+	  if (debug) System.out.println ("---------------------------------------------------------------------------------------");
     Enumeration params = httpRequest.getParameterNames();
     while (params.hasMoreElements()) {
       String paramName = (String) params.nextElement();
@@ -458,7 +458,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
           }
 
           // debug ******
-          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + "\nparameterValue: " + parameterValue + "\nxmlParameterValue:" + xmlParameterValue);
+          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + "\nxmlParameterValue:" + xmlParameterValue);
 
           // Modify the value...
           httpRequest.setParameter(paramName,xmlParameterValue);

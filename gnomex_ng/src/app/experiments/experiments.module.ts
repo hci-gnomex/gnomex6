@@ -45,6 +45,11 @@ import {
     BrowseOverviewComponent,
     VisiblityBrowseTab
 } from "./browse-overview/index"
+import {
+    MatAutocompleteModule, MatButtonModule, MatDialogModule, MatIconModule,
+    MatInputModule
+} from "@angular/material";
+import {CreateProjectComponent} from "./create-project.component";
 
 /**
  * @author mbyrne
@@ -68,6 +73,11 @@ export const componentFactories =
                                                                           // could be put in gnomexFlex as w
 @NgModule({
     imports: [
+        MatDialogModule,
+        MatAutocompleteModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
         EXPERIMENTS_ROUTING,
         ButtonModule,
         CheckBoxModule,
@@ -107,9 +117,11 @@ export const componentFactories =
                     ExperimentsBrowseTab,
                     ProgressBrowseTab,
                     ProjectBrowseTab,
-                    VisiblityBrowseTab
+                    VisiblityBrowseTab,
+                    CreateProjectComponent
     ],
-    entryComponents:[...componentFactories]
+    entryComponents:[...componentFactories, CreateProjectComponent],
+    exports:[CreateProjectComponent]
 })
 export class ExperimentsModule {
 }

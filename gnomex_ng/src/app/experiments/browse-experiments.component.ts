@@ -18,6 +18,10 @@ import { transaction } from 'mobx';
 import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
 import {Router} from "@angular/router";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {CreateProjectComponent} from "./create-project.component";
+import {MatDialog, MatDialogRef} from "@angular/material";
+import {LabListService} from "../services/lab-list.service";
 
 @Component({
     selector: "experiments",
@@ -208,13 +212,17 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private selectedProjectLabIndex: number = -1;
     private idCoreFacility: string = "3";
     private showBillingCombo: boolean = false;
-
+    private labList: any[] = [];
     public experimentCount: number;
     private projectRequestListSubscription: Subscription;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
         this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+        this.labListService.getLabList().subscribe((response: any[]) => {
+            this.labList = response;
+        });
+
     }
 
     ngAfterViewInit(){
@@ -223,7 +231,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
 
-    constructor(private experimentsService: ExperimentsService,private router:Router) {
+    constructor(private experimentsService: ExperimentsService,private router:Router,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private dialog: MatDialog,
+                private labListService: LabListService) {
 
 
         this.experimentService = experimentsService;
@@ -591,22 +602,25 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     newProjectClicked(event: any) {
-        this.setLabName(event);
-        this.newProjectWindow.open();
+        if (this.items.length > 0 ) {
+            var useThisLabList: any[];
+            if (this.createSecurityAdvisorService.isSuperAdmin) {
+                useThisLabList = this.labList;
+            } else {
+                useThisLabList = this.labs;
     }
 
-    /**
-     * Select the lab in the new project window.
-     * @param event
-     */
-    setLabName(event: any) {
-        // Lab
-        if (this.selectedItem.level === 1) {
-            this.labComboBox.selectItem(this.selectedItem.data.label);
-            // Project
-        } else if (this.selectedItem.level === 2) {
-            this.labComboBox.selectItem(this.selectedItem.parent.data.label);
+            let dialogRef: MatDialogRef<CreateProjectComponent> = this.dialog.open(CreateProjectComponent, {
+                data: {
+                    labList: useThisLabList,
+                    items: this.items,
+                    selectedLabItem: this.selectedItem
         }
+            });
+    }
+
+
+//        this.newProjectWindow.open();
     }
 
     /**
@@ -650,10 +664,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     refreshProjectRequestList() {
 
-        var lPromise = this.experimentsService.getExperiments().toPromise();
-        lPromise.then( response => {
-            this.buildTree(response);
-        });
+        this.experimentsService.refreshProjectRequestList_fromBackend();
     }
 
     /**
@@ -662,18 +673,18 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     saveProject(project: any) {
         var params: URLSearchParams = new URLSearchParams();
-
-
+        var stringifiedProject: string;
         project.name = this.projectName;
         project.projectDescription = this.projectDescription;
         //TODO
         // Need to get idAppUser. Flex did this like: parentApplication.getIdAppUser();
-        params.set("projectXMLString", project);
+        stringifiedProject = JSON.stringify(project);
+
+        params.set("projectXMLString", stringifiedProject);
         params.set("parseEntries", "Y");
         if (!this.projectName) {
             this.msgEnterProjectName.open();
         } else {
-
             var lPromise = this.experimentService.saveProject(params).toPromise();
             lPromise.then(response => {
                 this.refreshProjectRequestList();
@@ -708,6 +719,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * in the new project window.
      */
     saveProjectButtonClicked() {
+
+
         this.getProject();
     }
 
