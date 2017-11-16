@@ -1,6 +1,7 @@
-import {EventEmitter, Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import {Injectable} from "@angular/core";
+import {Http} from "@angular/http";
 import {Observable} from "rxjs/Observable";
+import {HttpService} from "./http.service";
 import {ProgressService} from "../home/progress.service";
 
 @Injectable()
@@ -11,6 +12,7 @@ export class DictionaryService {
     public static readonly GENOME_BUILD: string = "hci.gnomex.model.GenomeBuildLite";
     public static readonly OLIGO_BARCODE: string = "hci.gnomex.model.OligoBarcode";
     public static readonly ORGANISM: string = "hci.gnomex.model.OrganismLite";
+    public static readonly PROPERTY_DICTIONARY: string = "hci.gnomex.model.PropertyDictionary";
     public static readonly REQUEST_CATEGORY: string = "hci.gnomex.model.RequestCategory";
     public static readonly SEQ_LIB_PROTOCOL: string = "hci.gnomex.model.SeqLibProtocol";
     public static readonly APPLICATION:string = "hci.gnomex.model.Application";
@@ -37,7 +39,7 @@ export class DictionaryService {
                 }
             });
         } else {
-            this.reloadObservable = this.loadDictionariesObservable();
+            this.reloadObservable = this.loadDictionaries();
             this.reloadObservable.subscribe((response) => {
                 this.cachedDictionaryString = JSON.stringify(response);
                 this.cacheExpirationTime = Date.now() + this.CACHE_EXPIRATION_MILLIS;
@@ -53,35 +55,8 @@ export class DictionaryService {
         }
     }
 
-    /**
-     * Backend call to load all dictionaries from the database
-     * Forces a database call and returns an observable
-     * @returns {Observable<any>}
-     */
-    private loadDictionariesObservable(): Observable<any> {
-        let emitter: EventEmitter<any> = new EventEmitter();
-        this.loadDictionaries().subscribe((response) => {
-            emitter.emit(response);
-            emitter.complete();
-        });
-        return emitter.asObservable();
-    }
-
-    /**
-     * Backend call to load all dictionaries from the database
-     * Follows typical GNomEx backend format, which returns an Observable without forcing a database call
-     * The database call only happens when the caller to this method subscribes to the Observable
-     * @returns {Observable<any>} The dictionary object
-     */
     private loadDictionaries(): Observable<any> {
-        return this._http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-            if (response.status === 200) {
-                console.log("In ManageDictionaries")
-                return response.json();
-            } else {
-                throw new Error("Error in ManageDictionaries");
-            }
-        });
+        return HttpService.getJson(this._http, "/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}, "loadDictionaries");
     }
 
     /**
