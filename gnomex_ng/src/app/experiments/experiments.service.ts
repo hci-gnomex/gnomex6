@@ -12,7 +12,8 @@ export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experim
 export class ExperimentsService {
 
 	private experimentOrders: any[];
-    public projectRequestList: any[];
+    private projectRequestList: any[];
+    public selectedTreeNode:any;
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
@@ -21,9 +22,9 @@ export class ExperimentsService {
     private haveLoadedExperimentOrders: boolean = false;
     private previousURLParams: URLSearchParams = null;
     private changeStatusSubject: Subject<any> = new Subject();
-    private requestProgressList: Subject<any>= new Subject();
-    private requestProgressDNASeqList: Subject<any> = new Subject();
-    private requestProgressSolexaList:Subject<any> = new Subject();
+    private requestProgressList: BehaviorSubject<any>= new BehaviorSubject([]);
+    private requestProgressDNASeqList: BehaviorSubject<any> = new BehaviorSubject([]);
+    private requestProgressSolexaList:BehaviorSubject<any> = new BehaviorSubject([]);
 
     private experimentOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
     private filteredExperimentOverviewListSubject:Subject<any> = new Subject();
@@ -68,7 +69,7 @@ export class ExperimentsService {
     }
 
 
-	getExperiments_fromBackend(parameters: URLSearchParams): void {
+    getExperiments_fromBackend(parameters: URLSearchParams): void {
 		if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
 			// do nothing
 			console.log("Experiment Orders already loaded");
@@ -237,8 +238,8 @@ export class ExperimentsService {
 
     }
 
-    deleteProject(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/DeleteProject.gx", {search: params}).map((response: Response) => {
+    deleteExperiment(params: URLSearchParams):  Observable<any> {
+        return this._http.get("/gnomex/DeleteRequest.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {

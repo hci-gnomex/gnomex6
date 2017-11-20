@@ -48,6 +48,7 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
     private projectDescription: string;
     private selectedProjectLabItem: any;
     private createProjectForm: FormGroup;
+    public showSpinner: boolean = false;
 
     constructor(private dialogRef: MatDialogRef<CreateProjectComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private dialog: MatDialog,
@@ -102,6 +103,7 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
      * @param project
      */
     saveProject(project: any) {
+        this.showSpinner = true;
         var params: URLSearchParams = new URLSearchParams();
         var stringifiedProject: string;
         project.name = this.createProjectForm.controls['projectName'].value;
@@ -112,8 +114,10 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
         var lPromise = this.experimentsService.saveProject(params).toPromise();
         lPromise.then(response => {
             this.refreshProjectRequestList();
+            // this.showSpinner = false;
+            // this.dialogRef.close();
         });
-        this.dialogRef.close();
+
     }
 
     /**

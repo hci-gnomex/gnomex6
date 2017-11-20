@@ -38,6 +38,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
     private analysisName: string;
     private analysisGroupName: string;
     private analysisGroupDescription: string;
+    public showSpinner: boolean = false;
 
     analysisGroupFormControl = new FormControl('', [
         Validators.required
@@ -57,7 +58,9 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
     }
 
     onLabSelect(event: any) {
-        this.idLabString = event.args.item.value;
+        if (event.args.item) {
+            this.idLabString = event.args.item.value;
+        }
     }
 
     onLabUnselect(event: any) {
@@ -68,6 +71,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
      * @param {URLSearchParams} params
      */
     createAnalysisGroupSaveButtonClicked(params: URLSearchParams) {
+        this.showSpinner = true;
         var idAnalysisGroup: any = 0;
         var params: URLSearchParams = new URLSearchParams();
 
@@ -79,9 +83,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
         var lPromise = this.analysisService.saveAnalysisGroup(params).toPromise();
         lPromise.then(response => {
             this.analysisService.refreshAnalysisGroupList_fromBackend();
-            console.log("save analysis group " + response);
         });
-        this.dialogRef.close();
     }
 }
 

@@ -1,5 +1,5 @@
 <form (ngSubmit)="save(createProjectForm.value)" [formGroup]="createProjectForm" >
-    <h6 mat-dialog-title>New Project</h6>
+    <h6 mat-dialog-title><img src="../../assets/folder_add.png">New Project</h6>
     <div mat-dialog-content>
         <div>
             <label style="width: 10em">Group</label>
@@ -30,7 +30,8 @@
     </div>
 
     <mat-dialog-actions>
-        <button #yesButton mat-raised-button color="primary" [disabled]="createProjectForm.invalid" (click)="createProjectSaveButtonClicked()" tabindex="2">Save</button>
-        <button mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+        <button #yesButton *ngIf="!showSpinner" mat-raised-button color="primary" [disabled]="createProjectForm.invalid" (click)="createProjectSaveButtonClicked()" tabindex="2">Save</button>
+        <button mat-raised-button *ngIf="!showSpinner" color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
     </mat-dialog-actions>
 </form>

@@ -1,5 +1,5 @@
 <form (ngSubmit)="save(createAnalysisForm.value)" [formGroup]="createAnalysisForm" >
-    <h6 mat-dialog-title>Add Analysis</h6>
+    <h6 mat-dialog-title><img src="../../assets/map_add.png">Add Analysis</h6>
     <div mat-dialog-content>
         <div>
             <label style="width: 10em">Group</label>
@@ -57,12 +57,24 @@
             </jqxComboBox>
         </div>
         <div>
+            <button mat-icon-button>
+                <mat-icon aria-label="New/Edit..." (click)="newOrganism()">add</mat-icon>
+            </button>
+        </div>
+
+        <div>
             <label style="width: 10em">Genome Build</label>
             <jqxComboBox class="inlineComboBox" [width]="170" [multiSelect]="true"
                          [source]="genomeBuildList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
                          (onSelect)="onGenomeBuildSelect($event)">
             </jqxComboBox>
         </div>
+        <div>
+            <button mat-icon-button>
+                <mat-icon aria-label="New/Edit..." (click)="newGenomeBuild()">add</mat-icon>
+            </button>
+        </div>
+
         <div>
             <label style="width: 10em">Visibility</label>
             <jqxComboBox #visibilityCombo class="inlineComboBox" [width]="170" [height]="20"
@@ -73,7 +85,8 @@
     </div>
 
     <mat-dialog-actions>
-        <button #yesButton mat-raised-button color="primary" (click)="createAnalysisYesButtonClicked()" tabindex="2" [disabled]="createAnalysisForm.invalid">Save</button>
-        <button mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+        <button #yesButton *ngIf="!showSpinner" mat-raised-button color="primary" (click)="createAnalysisYesButtonClicked()" tabindex="2" [disabled]="createAnalysisForm.invalid">Save</button>
+        <button *ngIf="!showSpinner" mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
     </mat-dialog-actions>
 </form>
