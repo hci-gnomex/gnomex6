@@ -12,7 +12,8 @@
     "clean": "npm cache clean && npm run rimraf -- node_modules doc coverage dist compiled dll",
     "karma": "karma",
     "rimraf": "rimraf",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "webpack-defaults": "webpack-defaults"
   },
   "dependencies": {
     "@angular/animations": "^4.2.4",
