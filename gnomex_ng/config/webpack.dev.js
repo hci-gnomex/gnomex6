@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 var commonConfig = require("./webpack.common.js");
 const DefinePlugin = require("webpack/lib/DefinePlugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
@@ -23,7 +20,7 @@ module.exports = function (options) {
 
         output: {
             path: helpers.root("dist"),
-            publicPath: "/gnomex/",
+            publicPath: "/",
             filename: "[name].js",
             chunkFilename: "[id].chunk.js",
             sourceMapFilename: "[file].map"

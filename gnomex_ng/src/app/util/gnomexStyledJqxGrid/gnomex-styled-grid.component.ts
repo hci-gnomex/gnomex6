@@ -24,6 +24,7 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 		return this._selectionSetting;
 	}
 	@Input() styleForTheme:string ="gnomex5";
+	@Input() altRow:boolean=true;
 
 
     @Output() rowDoubleClicked: EventEmitter<any> = new EventEmitter();
@@ -59,7 +60,6 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 	private dataAdapter: any = new jqx.dataAdapter(this.source);
 
 	ngOnInit(): void {
-
 	}
 
 	ngAfterViewInit(): void {

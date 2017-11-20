@@ -38,7 +38,8 @@ import {PropertyService} from "./property.service";
         ProjectResolverService,
         LaunchPropertiesService,
         ProjectService,
-        OrganismService
+        OrganismService,
+        ConstantsService
     ]})
 export class ServicesModule {
 }

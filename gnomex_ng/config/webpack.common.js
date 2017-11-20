@@ -9,6 +9,7 @@ var HtmlWebpackPlugin = require("html-webpack-plugin");
 const LoaderOptionsPlugin = require("webpack/lib/LoaderOptionsPlugin");
 const ProvidePlugin = require("webpack/lib/ProvidePlugin");
 
+
 module.exports = function (options) {
 
     return {
@@ -23,6 +24,17 @@ module.exports = function (options) {
             extensions: [".ts", ".js"],
             modules: [helpers.root("src"), helpers.root("node_modules")]
         },
+
+        devServer: {
+            proxy: {
+                '/gnomex': {
+                    target: 'http://localhost:80',
+                    secure: false
+                }
+            },
+            contentBase: './dist'
+        },
+
 
         module: {
             rules: [
@@ -117,6 +129,8 @@ module.exports = function (options) {
                 }
             ]),
 
+            new webpack.NamedModulesPlugin(),
+
             new webpack.ProvidePlugin({
                 $: "jquery",
                 jQuery: "jquery",
@@ -131,7 +145,8 @@ module.exports = function (options) {
                 Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
                 Tab: "exports-loader?Tab!bootstrap/js/dist/tab",
                 Util: "exports-loader?Util!bootstrap/js/dist/util"
-            }),
+            })
         ]
     };
 }
+

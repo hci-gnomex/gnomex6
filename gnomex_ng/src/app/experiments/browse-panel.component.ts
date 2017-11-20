@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component,OnInit} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
+import {ExperimentsService} from "./experiments.service";
 
 
 
@@ -13,13 +14,16 @@ import {Component,OnInit} from "@angular/core";
         </div>
 `
 })
-export class BrowsePanelComponent implements OnInit{
+export class BrowsePanelComponent implements OnInit, OnDestroy{
 
-    constructor(){
+    constructor(private experimentsService:ExperimentsService){
     }
 
     ngOnInit(){
 
+    }
+    ngOnDestroy(){
+        this.experimentsService.browsePanelParams = null;
     }
     save(){
 

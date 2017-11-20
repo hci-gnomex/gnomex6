@@ -11,7 +11,6 @@ import {Router} from "@angular/router";
 @Component({
     template: `
 
-        
         <!--- <grid dataProvider={} > -->
         <div style="display:block; height:100%; width:100%;">
             <GnomexStyledGrid 
@@ -56,14 +55,14 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
 
 
     private columns: any[] = [
-        {text: "# ",        datafield: "requestNumber", 	width: "4%", cellsrenderer: this.experimentNumberCellsRenderer },
+        {text: "# ",        datafield: "requestNumber", 	width: "7%", cellsrenderer: this.experimentNumberCellsRenderer },
         {text: "Date",      datafield: "requestCreateDateDisplay", 	width: "7%", cellsrenderer: this.textCellsRenderer},
         {text: "Requester", datafield:"ownerFullName", width: "6%", cellsrenderer: this.textCellsRenderer},
         {text: "Project",   datafield: "projectName", width: "8%", cellsrenderer: this.textCellsRenderer},
         {text: "Experiment Kind", datafield:"experimentKind",  width: "31%", cellsrenderer: this.textCellsRenderer},
         {text: "Microarray", datafield: "slideProductName",    width: "7%", cellsrenderer: this.textCellsRenderer},
         {text: "Analysis?",datafield: "analysisChecked", 	  width: "7%", cellsrenderer: this.iconCellRenderer},
-        {text: "Analysis Names",   datafield: "analysisNames", width: "30%", cellsrenderer: this.textCellsRenderer},
+        {text: "Analysis Names",   datafield: "analysisNames", width: "27%", cellsrenderer: this.textCellsRenderer},
     ];
 
     private source = {
@@ -82,7 +81,8 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
     };
     constructor(protected fb: FormBuilder, private experimentService:ExperimentsService,
                 private dictionary: DictionaryService, private appConstants: ConstantsService,
-                private router:Router) {        super(fb);
+                private router:Router) {
+        super(fb);
     }
 
 
