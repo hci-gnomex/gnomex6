@@ -238,8 +238,8 @@ export class ExperimentsService {
 
     }
 
-    deleteProject(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/DeleteProject.gx", {search: params}).map((response: Response) => {
+    deleteExperiment(params: URLSearchParams):  Observable<any> {
+        return this._http.get("/gnomex/DeleteRequest.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {

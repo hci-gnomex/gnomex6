@@ -66,6 +66,7 @@ public class GetProject extends GNomExCommand implements Serializable {
         Lab l = (Lab)sess.load(Lab.class, idLab);
         project.setIdLab(idLab);
         project.setLab(l);
+        project.setIdAppUser(this.getSecAdvisor().getIdAppUser());
       } else {
         project = (Project)sess.get(Project.class, idProject);
         if (!this.getSecAdvisor().canRead(project)) {

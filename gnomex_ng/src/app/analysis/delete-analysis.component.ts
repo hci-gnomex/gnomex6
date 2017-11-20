@@ -19,6 +19,7 @@ export class DeleteAnalysisComponent {
     public _nodesString: string = "";
     hasAnalysisGroup: boolean = false;
     public i:number = 0;
+    public showSpinner: boolean = false;
 
     constructor(private dialogRef: MatDialogRef<DeleteAnalysisComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private analysisService: AnalysisService
@@ -40,6 +41,7 @@ export class DeleteAnalysisComponent {
      * The yes button was selected in the delete dialog.
      */
     deleteAnalysisYesButtonClicked() {
+        this.showSpinner = true;
         this.deleteAnalysis();
     }
 
@@ -48,16 +50,12 @@ export class DeleteAnalysisComponent {
      */
     deleteAnalysis () {
         if (this.i < this._nodes.length) {
-
             var params: URLSearchParams = new URLSearchParams();
             if (this._nodes[this.i].level === 3) {
                 params.set("idAnalysis", this._nodes[this.i].data.idAnalysis);
                 var lPromise = this.analysisService.deleteAnalysis(params).toPromise();
                 lPromise.then(response => {
-                    console.log("Analysis successful delete");
                     this.deleteAnalysis();
-                    if (this.i === this._nodes.length)
-                        this.analysisService.refreshAnalysisGroupList_fromBackend();
                 });
 
             }
@@ -65,15 +63,17 @@ export class DeleteAnalysisComponent {
                 params.set("idAnalysisGroup", this._nodes[this.i].data.idAnalysisGroup);
                 var lPromise = this.analysisService.deleteAnalysisGroup(params).toPromise();
                 lPromise.then(response => {
-                    console.log("Analysis Group successful delete");
                     this.deleteAnalysis();
-                    if (this.i === this._nodes.length)
-                        this.analysisService.refreshAnalysisGroupList_fromBackend();
                 });
 
             }
             this.i++;
         }
-        this.dialogRef.close();
+        else {
+            setTimeout(() => {
+                this.analysisService.refreshAnalysisGroupList_fromBackend();
+            })
+
+        }
     }
 }

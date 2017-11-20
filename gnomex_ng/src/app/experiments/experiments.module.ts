@@ -46,11 +46,11 @@ import {
     BrowseOverviewComponent,
     VisiblityBrowseTab
 } from "./browse-overview/index"
-import {
-    MatAutocompleteModule, MatButtonModule, MatDialogModule, MatIconModule,
-    MatInputModule
-} from "@angular/material";
 import {CreateProjectComponent} from "./create-project.component";
+import {DeleteProjectComponent} from "./delete-project.component";
+import {ReassignExperimentComponent} from "./reassign-experiment.component";
+import {DeleteExperimentComponent} from "./delete-experiment.component";
+import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 
 /**
  * @author mbyrne
@@ -74,11 +74,6 @@ export const componentFactories =
                                                                           // could be put in gnomexFlex as w
 @NgModule({
     imports: [
-        MatDialogModule,
-        MatAutocompleteModule,
-        MatInputModule,
-        MatButtonModule,
-        MatIconModule,
         EXPERIMENTS_ROUTING,
         ButtonModule,
         CheckBoxModule,
@@ -120,10 +115,13 @@ export const componentFactories =
                     ProgressBrowseTab,
                     ProjectBrowseTab,
                     VisiblityBrowseTab,
-                    CreateProjectComponent
+                    CreateProjectComponent,
+                    DeleteProjectComponent,
+                    ReassignExperimentComponent,
+                    DeleteExperimentComponent
     ],
-    entryComponents:[...componentFactories, CreateProjectComponent],
-    exports:[CreateProjectComponent]
+    entryComponents:[...componentFactories, CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent],
+    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent]
 })
 export class ExperimentsModule {
 }

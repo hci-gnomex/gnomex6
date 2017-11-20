@@ -16,10 +16,7 @@
                                 {{experimentCount}} experiments
                             </div>
                             <div class="br-exp-item-row-two">
-                                <jqxButton #dragDropHint [template]="'link'" (onClick)="dragDropHintClicked()"
-                                           [imgSrc]="'assets/information.png'" [imgPosition]="'center'"
-                                           [textImageRelation]="'imageBeforeText'">Drag-and-drop hint
-                                </jqxButton>
+                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"><img src="../../assets/information.png">Drag-and-drop hint</button>
                             </div>
                         </div>
                     </div>
@@ -41,208 +38,31 @@
                                 <button mat-button [disabled]="disableNewProject" (click)="newProjectClicked()"><img src="../../assets/folder_add.png">New Project</button>
                             </div>
                             <div class="br-exp-item-row-two" style="position: relative; top: 1em">
-                                <button mat-button [disabled]="disableDelete" (click)="deleteProjectClicked()"><img src="../../assets/folder_delete.png">Delete Project</button>
+                                <button mat-button [disabled]="disableDeleteProject" (click)="deleteProjectClicked()"><img src="../../assets/folder_delete.png">Delete Project</button>
                             </div>
                         </div>
                     </div>
                     <div class="br-exp-item br-exp-five">
-                        <div class="br-exp-item-row-one">
-                            <jqxToggleButton #toggleButton [template]="'link'" (onClick)="expandCollapseClicked()">Expand
-                                Projects
-                            </jqxToggleButton>
+                        <div class="flex-row-container">
+                            <div class="br-exp-item-row-one" style="position: relative; top: 1em">
+                                <jqxToggleButton #toggleButton [template]="'link'" (onClick)="expandCollapseClicked()">Expand
+                                    Projects
+                                </jqxToggleButton>
+                            </div>
+                            <div class="br-exp-item-row-two" style="position: relative; top: 1em">
+                                <button mat-button [disabled]="disableDeleteExperiment" (click)="deleteExperimentClicked()"><img src="../../assets/delete.png">Delete Experiment</button>
+                            </div>
                         </div>
                     </div>
-
                 </div>
-
             </div> <!-- end tree container -->
             <div  style="padding: 2em" class="br-exp-item experiment-detail-panel ">
                 <browse-panel></browse-panel>
             </div>
-
        </div>
-
-
     </div>
 </div>
 
-<div>
-    <jqxWindow #reassignWindow
-               [width]="600"
-               [height]="220"
-               [maxHeight]="400" [maxWidth]="700" [minHeight]="30" [minWidth]="250"
-               [isModal]="true" [modalOpacity]="0.3"
-               [autoOpen]="false"
-               (onClose)="reassignWindowClose($event)"
-               (onTreeSelect)="treeOnSelect($event)"
-               [cancelButton]="'.cancel'" [okButton]="'.ok'" [resizable]="false"
-    >
-        <div style="width: 100%; background-color: #4cae4c">
-            <div>
-                <img width="14" height="14" src="../../assets/jqwidgets/images/help.png" alt=""/>
-                Reassignment
-            </div>
-        </div>
-
-        <div>
-            <div class="t" style="height: 100%">
-                <div class="tr">
-                    <div class="t">
-                        <div *ngIf="currentItem" class="tr" style="width: 100%;height: 100%">
-                            Reassign experiment {{currentItem.label}} to project {{targetItem.label}}
-                        </div>
-                    </div>
-                </div>
-                <div class="tr">
-
-                </div>
-                <div class="tr">
-                    <div class="td">
-                        <div style="font-size:small">
-                            <div class="t">
-                                <div class="tr" style="vertical-align: middle">
-                                    <div class="td">
-                                        <label style="text-align: center;vertical-align: center">
-                                            Owner
-                                        </label>
-                                    </div>
-                                    <div class="td" style="width: 100%">
-                                        <div style="width: 100%">
-                                            <jqxComboBox #reassignComboBox
-                                                         [width]="'100%'" height="25" [source]="labMembers"
-                                                         [selectedIndex]="-1"
-                                                         (onSelect)="onOwnerSelect($event)"
-                                            >
-                                            </jqxComboBox>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tr" *ngIf="showBillingCombo">
-                    <div class="td">
-                        <div style="font-size:small">
-                            <div class="t">
-                                <div class="tr" style="vertical-align: middle">
-                                    <div class="td">
-                                        <label style="text-align: center;vertical-align: center">
-                                            Account
-                                        </label>
-                                    </div>
-                                    <div class="td" style="width: 100%">
-                                        <div style="width: 100%">
-                                            <jqxComboBox #billingComboBox
-                                                         [width]="'100%'" height="25" [source]="billingAccounts"
-                                                         [selectedIndex]="-1"
-                                                         (onSelect)="onBillingSelect($event)"
-                                            >
-                                            </jqxComboBox>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tr">
-                    <div class="td">
-                        <div class="t">
-                            <div class="tr" style="vertical-align: middle">
-                                <div class="td" style="float: right;">
-                                    <jqxButton #yesButton class="Yes"
-                                               style="display: inline-block"
-                                               [width]="80"
-                                               (onClick)="yesButtonClicked()"
-                                    >
-                                        Yes
-                                    </jqxButton>
-                                    <jqxButton #noButton class="No"
-                                               style="display: inline-block;"
-                                               [width]="80"
-                                               (onClick)="noButtonClicked()"
-
-                                    >
-                                        No
-                                    </jqxButton>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </jqxWindow>
-</div>
-
-<div>
-    <jqxWindow #deleteProjectWindow
-               [width]="250"
-               [height]="100"
-               [maxHeight]="200" [maxWidth]="300" [minHeight]="30" [minWidth]="100"
-               [isModal]="true" [modalOpacity]="0.3"
-               [autoOpen]="false"
-               [cancelButton]="'.cancel'" [okButton]="'.ok'" [resizable]="false"
-    >
-
-        <div style="width: 100%; background-color: #4cae4c">
-            <div>
-                <img width="14" height="14" src="../../assets/jqwidgets/images/help.png" alt=""/>
-                Delete Project
-            </div>
-        </div>
-        <div class="background">
-            <div class="t">
-                <div class="tr">
-                    <div class="td">
-                        <div class="t">
-                            <div class="tr" style="vertical-align: middle">
-                                <div class="td" style="width: 100%">
-                                    <div style="width: 100%">
-                                        <div *ngIf="selectedItem" class="tr" style="text-align: center">
-                                            <!--Delete project {{selectedItem.data.label}}?-->
-                                            Delete project
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tr">
-                    <div class="td">
-                        <div style="font-size:small">
-                            <div class="t">
-                                <div class="tr" style="vertical-align: middle">
-                                    <div class="td" style="float: right">
-                                        <jqxButton #yesButtonDeleteProject class="Yes"
-                                                   style="display: inline-block"
-                                                   [width]="80"
-                                                   (onClick)="deleteProjectYesButtonClicked()"
-                                        >
-                                            Yes
-                                        </jqxButton>
-                                        <jqxButton #noButtonDeleteProject class="No"
-                                                   style="display: inline-block"
-                                                   [width]="80"
-                                                   (onClick)="deleteProjectNoButtonClicked()"
-
-                                        >
-                                            No
-                                        </jqxButton>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </jqxWindow>
-</div>
 <div>
     <jqxWindow #responseMsgWindow
                [width]="250"

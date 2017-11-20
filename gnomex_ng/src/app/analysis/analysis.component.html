@@ -16,10 +16,7 @@
                                 {{analysisCount}} analysis
                             </div>
                             <div class="br-exp-item-row-two" style="left: 1.5em">
-                                <jqxButton #dragDropHint [template]="'link'" (onClick)="dragDropHintClicked()"
-                                           [imgSrc]="'assets/information.png'" [imgPosition]="'center'"
-                                           [textImageRelation]="'imageBeforeText'">Drag-and-drop hint
-                                </jqxButton>
+                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"><img src="../../assets/information.png">Drag-and-drop hint</button>
                             </div>
                         </div>
                     </div>

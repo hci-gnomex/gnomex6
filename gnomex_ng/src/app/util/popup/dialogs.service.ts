@@ -12,7 +12,7 @@ export class DialogsService {
 
         let dialogRef: MatDialogRef<ConfirmDialog>;
 
-        dialogRef = this.dialog.open(ConfirmDialog);
+        dialogRef = this.dialog.open(ConfirmDialog, {width: '30em'});
         dialogRef.componentInstance.title = title;
         dialogRef.componentInstance.message = message;
 

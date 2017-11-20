@@ -21,6 +21,7 @@ import {
     MatFormFieldModule,
 	MatMenuModule, ShowOnDirtyErrorStateMatcher}  from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
+import {AngularMaterialModule} from "../../modules/angular-material.module";
 
 @NgModule({
   imports: [HEADER_ROUTING, CommonModule,
@@ -29,13 +30,7 @@ import {HEADER_ROUTING} from "./header.routes";
       FormsModule,
       CommonModule,
       UserModule,
-      MatButtonModule,
-      MatInputModule,
-      MatListModule,
-      MatGridListModule,
-      MatToolbarModule,
-      MatFormFieldModule,
-      MatMenuModule,
+      AngularMaterialModule,
       BrowserAnimationsModule
   ],
    providers: [
