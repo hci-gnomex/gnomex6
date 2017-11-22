@@ -248,17 +248,6 @@ export class ExperimentsService {
 
     }
 
-    deleteExperiment(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/DeleteRequest.gx", {search: params}).map((response: Response) => {
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error("Error");
-            }
-        });
-
-    }
-
 
     getProjectRequestList(params: URLSearchParams) {
         //return this._http.get("/gnomex/GetProjectRequestList.gx?idLab=1500&showCategory='N'", {withCredentials: true}).map((response: Response) => {
