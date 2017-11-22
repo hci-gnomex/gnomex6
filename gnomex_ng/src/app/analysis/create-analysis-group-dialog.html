@@ -1,5 +1,5 @@
 <form class="example-form">
-    <h6 mat-dialog-title>New Analysis Group</h6>
+    <h6 mat-dialog-title><img src="../../assets/folder_add.png">New Analysis Group</h6>
     <mat-dialog-content>
         <div>
             <jqxComboBox class="inlineComboBox" [width]="170" [height]="20"
@@ -25,8 +25,9 @@
     </mat-dialog-content>
 
     <mat-dialog-actions>
-        <button #yesButton mat-raised-button color="primary" (click)="createAnalysisGroupSaveButtonClicked()" tabindex="2">Save</button>
-        <button mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+        <button *ngIf="!showSpinner" #yesButton mat-raised-button color="primary" (click)="createAnalysisGroupSaveButtonClicked()" tabindex="2">Save</button>
+        <button *ngIf="!showSpinner" mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
+        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
     </mat-dialog-actions>
 
 </form>

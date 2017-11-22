@@ -15,6 +15,7 @@
     </div>
 </div>
 <mat-dialog-actions>
-    <button mat-raised-button color="primary" (click)="deleteAnalysisYesButtonClicked()" tabindex="2">Yes</button>
-    <button mat-raised-button color="accent" mat-dialog-close tabindex="-1">No</button>
+    <button *ngIf="!showSpinner" mat-raised-button color="primary" (click)="deleteAnalysisYesButtonClicked()" tabindex="2">Yes</button>
+    <button *ngIf="!showSpinner" mat-raised-button color="accent" mat-dialog-close tabindex="-1">No</button>
+    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
 </mat-dialog-actions>

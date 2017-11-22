@@ -105,7 +105,7 @@ export class AnalysisService {
             withCredentials: true,
             search: this._previousURLParams
         }).subscribe((response: Response) => {
-            console.log("GetRequestList called");
+            console.log("GetAnalysiisGroupList called");
 
             if (response.status === 200) {
                 this.analysisGroupList = response.json().Lab;

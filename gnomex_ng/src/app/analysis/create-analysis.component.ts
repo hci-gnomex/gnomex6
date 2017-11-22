@@ -17,6 +17,8 @@ import {GetLabService} from "../services/get-lab.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {DialogsService} from '../util/popup/dialogs.service';
+import {NewOrganismComponent} from "../util/new-organism.component";
+import {NewGenomeBuildComponent} from '../util/new-genome-build.component';
 
 @Component({
     selector: 'create-analysis-dialog',
@@ -62,6 +64,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
     private createAnalysisForm: FormGroup;
     private selectedLabLabel: string;
     private codeVisibility: string;
+    public showSpinner: boolean = false;
 
     constructor(private dialogRef: MatDialogRef<CreateAnalysisComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private dictionaryService: DictionaryService,
@@ -152,7 +155,6 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
      * @param event
      */
     onAnalysisGroupSelect(event: any) {
-        console.log("user is "+event);
         if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idAnalysisGroup = event.args.item.value;
             this.analysisGroup = this.analysisGroupList.filter(group=>group.idAnalysisGroup===this.idAnalysisGroup)
@@ -217,26 +219,39 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
      * Setup and call the SaveAnalysis.
      */
     saveAnalysis() {
+        this.showSpinner = true;
+        var idAnalysis: any = 0;
         var params: URLSearchParams = new URLSearchParams();
-        var stringifiedGenomBuild = JSON.stringify(this.genomBuilds);
-
-        var stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
+        var stringifiedGenomBuild;
+        if (this.genomBuilds.length > 0) {
+            stringifiedGenomBuild = JSON.stringify(this.genomBuilds);
+        }
+        var stringifiedAnalysisGroup;
+        if (this.analysisGroup.length > 0) {
+            stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
+        }
         params.set("lanesXMLString", "");
         params.set("samplesXMLString", "");
+        params.set("collaboratorsXMLString", "");
+        params.set("analysisFilesXMLString", "");
         params.set("hybsXMLString", "");
         params.set("idInstitution", "");
         params.set("analysisFilesToDeleteXMLString", "");
         params.set("idOrganism", this.idOrganism);
         params.set("idAppUser", this.idAppUser);
+        params.set("idLab", this.idLabString);
+        params.set("idAnalysis", idAnalysis);
         params.set("codeVisibility", this.codeVisibility);
         params.set("name", this.createAnalysisForm.controls['analysisName'].value);
+        if (this.createAnalysisForm.controls['analysisGroupName']) {
+            params.set("newAnalysisGroupName", this.createAnalysisForm.controls['analysisGroupName'].value);
+        }
         var genomeBuilds = {genomeBuilds};
         params.set("genomeBuildsXMLString", stringifiedGenomBuild);
         params.set("analysisGroupsXMLString", stringifiedAnalysisGroup);
-        //params.set("codeVisibility", this.code)
         var aPromise = this.analysisService.saveAnalysis(params).toPromise();
         aPromise.then(response => {
-            console.log("Saved Analysis");
+            this.analysisService.refreshAnalysisGroupList_fromBackend();
         })
     }
 
@@ -251,14 +266,12 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
                     res => {
                         if (res) {
                             this.saveAnalysis();
-                            this.dialogRef.close();
                         }
                     }
                 );
 
         } else {
             this.saveAnalysis();
-            this.dialogRef.close();
         }
     }
 
@@ -278,7 +291,20 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         this.createAnalysisForm.removeControl("analysisGroup");
     }
 
+    newOrganism() {
+        let dialogRef: MatDialogRef<NewOrganismComponent> = this.dialog.open(NewOrganismComponent, {
+            height: '430px',
+            width: '300px',
+        });
+    }
+
+    newGenomeBuild() {
+        let dialogRef: MatDialogRef<NewGenomeBuildComponent> = this.dialog.open(NewGenomeBuildComponent, {
+            height: '430px',
+            width: '300px',
+        });
+    }
+
     save(formData:any){
-        console.log(formData);
     }
 }

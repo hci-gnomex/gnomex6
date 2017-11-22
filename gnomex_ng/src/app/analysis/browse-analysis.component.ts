@@ -161,7 +161,6 @@ const actionMapping:IActionMapping = {
 export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("analysisTree") treeComponent: TreeComponent;
-    @ViewChild("labComboBox") labComboBox: jqxComboBoxComponent;
 
     private treeModel: TreeModel;
     /*
@@ -197,10 +196,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private billingAccounts: any;
     private dragEndItems: any;
     private selectedItem: ITreeNode;
-    private selectedIndex: number = -1;
-    private selectedAnalysisGroupLabItem: any;
-    private selectedAnalysisGroupLabIndex: number = -1;
-    private idCoreFacility: string = "3";
 
     public analysisCount: number;
     private analysisGroupListSubscription: Subscription;
@@ -213,6 +208,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     public disableDelete: boolean = true;
     public disableNewAnalysisGroup: boolean = true;
     private selectedLabLabel: string;
+    public createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
+    public createAnalysisGroupDialogRef: MatDialogRef<CreateAnalysisGroupComponent>;
+    private parentProject: any;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -220,6 +218,38 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.labList = response;
         });
+
+        this.analysisGroupListSubscription = this.analysisService.getAnalysisGroupListObservable().subscribe(response => {
+            this.items = [].concat([]);
+            this.buildTree(response);
+            if (this.createAnalysisDialogRef != undefined && this.createAnalysisDialogRef.componentInstance != undefined) {
+                if (this.createAnalysisDialogRef.componentInstance.showSpinner) {
+                    this.createAnalysisDialogRef.componentInstance.showSpinner = false;
+                }
+                this.createAnalysisDialogRef.close();
+            }
+            if (this.deleteAnalysisDialogRef != undefined && this.deleteAnalysisDialogRef.componentInstance != undefined) {
+                if (this.deleteAnalysisDialogRef.componentInstance.showSpinner != undefined) {
+                    this.deleteAnalysisDialogRef.componentInstance.showSpinner = false;
+                    if (this.parentProject) {
+                        this.parentProject.collapseAll();
+                    }
+                }
+                this.deleteAnalysisDialogRef.close();
+            }
+            if (this.createAnalysisGroupDialogRef != undefined && this.createAnalysisGroupDialogRef.componentInstance != undefined) {
+                if (this.createAnalysisGroupDialogRef.componentInstance.showSpinner != undefined) {
+                    this.createAnalysisGroupDialogRef.componentInstance.showSpinner = false;
+                }
+                this.createAnalysisGroupDialogRef.close();
+            }
+
+            setTimeout(_ => {
+                this.treeModel.expandAll();
+            })
+
+        });
+
     }
 
     ngAfterViewInit() {
@@ -236,15 +266,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.labMembers = [];
         this.billingAccounts = [];
         this.labs = [];
-
-
-        this.analysisGroupListSubscription = this.analysisService.getAnalysisGroupListObservable().subscribe(response => {
-            this.buildTree(response);
-            setTimeout(_ => {
-                this.treeModel.expandAll();
-            })
-        });
-
     }
 
     go(event: any) {
@@ -258,6 +279,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     buildTree(response: any[]) {
         this.analysisCount = 0;
         this.labs = [];
+        this.items = [].concat(null);
         if (!this.isArray(response)) {
             this.items = [response];
         } else {
@@ -265,47 +287,50 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         }
         this.labs = this.labs.concat(this.items);
         for (var l of this.items) {
-            if (!this.isArray(l.AnalysisGroup)) {
-                l.items = [l.AnalysisGroup];
-            } else {
-                l.items = l.AnalysisGroup;
-            }
             l.id = l.idLab;
             l.parentid = -1;
 
             l.icon = "assets/group.png";
-            for (var p of l.items) {
-                p.icon = "assets/folder.png";
-                p.labId = l.labId;
-                p.id = p.idAnalysis;
-                p.parentid = l.id;
-                if (p.Analysis) {
-                    if (!this.isArray(p.Analysis)) {
-                        p.items = [p.Analysis];
-                    } else {
-                        p.items = p.Analysis;
-                    }
-                    for (var a of p.items) {
-                        if (a) {
-                            if (a.label) {
-                                this.analysisCount++;
-                                var labelString: string = a.number;
-                                labelString = labelString.concat(" (");
-                                labelString = labelString.concat(a.label);
-                                labelString = labelString.concat(")");
-                                a.label = labelString;
-                                a.id = a.idAnalysis;
-                                a.icon = "assets/map.png";
-                                a.parentid = p.id;
-                                if (this.analysisCount % 100 === 0) {
-                                    console.log("experiment count " + this.analysisCount);
+
+            if (l.AnalysisGroup) {
+                if (!this.isArray(l.AnalysisGroup)) {
+                    l.items = [l.AnalysisGroup];
+                } else {
+                    l.items = l.AnalysisGroup;
+                }
+                for (var p of l.items) {
+                    p.icon = "assets/folder.png";
+                    p.idLab = l.idLab;
+                    p.id = p.idAnalysisGroup;
+                    if (p.Analysis) {
+                        if (!this.isArray(p.Analysis)) {
+                            p.items = [p.Analysis];
+                        } else {
+                            p.items = p.Analysis;
+                        }
+                        for (var a of p.items) {
+                            if (a) {
+                                if (a.label) {
+                                    this.analysisCount++;
+                                    var labelString: string = a.number;
+                                    labelString = labelString.concat(" (");
+                                    labelString = labelString.concat(a.label);
+                                    labelString = labelString.concat(")");
+                                    a.label = labelString;
+                                    a.id = a.idAnalysis;
+                                    a.icon = "assets/map.png";
+                                    a.parentid = p.idLab;
+                                    if (this.analysisCount % 100 === 0) {
+                                        console.log("experiment count " + this.analysisCount);
+                                    }
+                                } else {
+                                    console.log("label not defined");
                                 }
                             } else {
-                                console.log("label not defined");
+                                console.log("a is undefined");
                             }
-                        } else {
-                            console.log("a is undefined");
                         }
+
                     }
                 }
             }
@@ -372,8 +397,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         var lPromise = this.analysisService.moveAnalysis(params).toPromise();
         lPromise.then(response => {
             console.log("successful move");
+            this.analysisService.refreshAnalysisGroupList_fromBackend();
         });
-        this.analysisService.refreshAnalysisGroupList_fromBackend();
     }
 
     /**
@@ -382,7 +407,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
      */
     deleteAnalysisClicked(event: any) {
         if (this.selectedItem && this.selectedItem.level != 1 && this.items.length > 0) {
-            let dialogRef: MatDialogRef<DeleteAnalysisComponent> = this.dialog.open(DeleteAnalysisComponent, {
+            this.deleteAnalysisDialogRef = this.dialog.open(DeleteAnalysisComponent, {
                 data: {
                     idAnalysisGroup: this.selectedItem.data.idAnalysisGroup,
                     label: this.selectedItem.data.label,
@@ -410,9 +435,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 useThisLabList = this.labs;
             }
 
-            let dialogRef: MatDialogRef<CreateAnalysisComponent> = this.dialog.open(CreateAnalysisComponent, {
+            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, {
                 data: {
-                    labListString: this.labListString,
                     labList: useThisLabList,
                     items: this.items,
                     selectedLab: this.selectedIdLab,
@@ -438,7 +462,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             } else {
                 useThisLabList = this.labs;
             }
-            let dialogRef: MatDialogRef<CreateAnalysisGroupComponent> = this.dialog.open(CreateAnalysisGroupComponent, {
+            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, {
                 width: '40em',
                 data: {
                     labList: useThisLabList
@@ -475,8 +499,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
 
-            //Experiment
+            //Analysis
         } else if (this.selectedItem.level === 3) {
+            this.parentProject = event.node.parent;
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;

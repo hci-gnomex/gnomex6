@@ -9,13 +9,14 @@ import {EXPERIMENTS_ROUTING} from "./experiments.routes";
 
 import { TreeModule } from "angular-tree-component";
 
+import { AngularMaterialModule } from "../../modules/angular-material.module";
 import { ButtonModule } from "../../modules/button.module";
 import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import { ExpanderModule }     from "../../modules/expander.module";
 import { GnomexStyledGridModule } from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
-import {TreeGridModule} from "../../modules/tree-grid.module";
+import { TreeGridModule } from "../../modules/tree-grid.module";
 import { InputModule } from "../../modules/input.module";
 import { LoaderModule }       from "../../modules/loader.module";
 import { PanelModule }        from "../../modules/panel.module";
@@ -46,38 +47,34 @@ import {
     BrowseOverviewComponent,
     VisiblityBrowseTab
 } from "./browse-overview/index"
-import {
-    MatAutocompleteModule, MatButtonModule, MatDialogModule, MatIconModule,
-    MatInputModule
-} from "@angular/material";
 import {CreateProjectComponent} from "./create-project.component";
+import {DeleteProjectComponent} from "./delete-project.component";
+import {ReassignExperimentComponent} from "./reassign-experiment.component";
+import {DeleteExperimentComponent} from "./delete-experiment.component";
+import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 
 /**
  * @author mbyrne
  * @since 12/19/16
  */
-// add components that will be tabs here
+
+
 export const componentFactories =
     [
         TestComponent,
         DescriptionTab,
-        PrepTab,
-        DownloadsBrowseTab,
-        ExperimentsBrowseTab,
-        ProgressBrowseTab,
-        ProjectBrowseTab,
-        VisiblityBrowseTab
+    PrepTab,
+    DownloadsBrowseTab,
+    ExperimentsBrowseTab,
+    ProgressBrowseTab,
+    ProjectBrowseTab,
+    VisiblityBrowseTab
     ];
-
-
+/**/
+                                // need add components that will be tabs here
                                                                           // could be put in gnomexFlex as w
 @NgModule({
     imports: [
-        MatDialogModule,
-        MatAutocompleteModule,
-        MatInputModule,
-        MatButtonModule,
-        MatIconModule,
         EXPERIMENTS_ROUTING,
         ButtonModule,
         CheckBoxModule,
@@ -91,6 +88,7 @@ export const componentFactories =
         LoaderModule,
         NotificationModule,
         PanelModule,
+        
         ServicesModule,
         TextAreaModule,
         ToggleButtonModule,
@@ -100,8 +98,9 @@ export const componentFactories =
         ReactiveFormsModule,
         RichEditorModule,
         DropDownModule,
+        AngularMaterialModule,
         TreeGridModule
-            ],
+    ],
     declarations: [
                     BrowseExperimentsComponent,
                     ExperimentOrdersComponent,
@@ -119,10 +118,13 @@ export const componentFactories =
                     ProgressBrowseTab,
                     ProjectBrowseTab,
                     VisiblityBrowseTab,
-                    CreateProjectComponent
+                    CreateProjectComponent,
+                    DeleteProjectComponent,
+                    ReassignExperimentComponent,
+                    DeleteExperimentComponent
     ],
-    entryComponents:[...componentFactories, CreateProjectComponent],
-    exports:[CreateProjectComponent]
+    entryComponents:[...componentFactories, CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent],
+    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent]
 })
 export class ExperimentsModule {
 }

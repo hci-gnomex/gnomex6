@@ -26,7 +26,7 @@ import {ServicesModule} from "../services/services.module";
 import {BrowseAnalysisComponent} from "./browse-analysis.component";
 import {ANALYSIS_ROUTING} from "./analysis.routes";
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
-import {MatDialogModule, MatInputModule, MatButtonModule, MatIconModule} from "@angular/material";
+import { AngularMaterialModule} from "../../modules/angular-material.module";
 import {MatAutocompleteModule} from "@angular/material";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {DragDropHintComponent} from "./drag-drop-hint.component";
@@ -42,11 +42,8 @@ import {DialogsModule} from "../util/popup/dialogs.module";
 
 @NgModule({
     imports: [
-        MatDialogModule,
         MatAutocompleteModule,
-        MatInputModule,
-        MatButtonModule,
-        MatIconModule,
+        AngularMaterialModule,
         DialogsModule,
         BrowserAnimationsModule,
         ANALYSIS_ROUTING,
