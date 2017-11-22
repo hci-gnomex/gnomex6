@@ -9,10 +9,12 @@ import {WindowModule} from "../../../modules/window.module";
 
 import {GnomexStyledDatePickerModule} from "../../util/gnomexStyledDatePicker/gnomex-styled-date-picker.module";
 import {GnomexStyledGridModule} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
+import {MultipleSelectorModule} from "../../util/multipleSelector/multiple-selector.module";
 
-import {LabUserSelectorComponent} from "./lab-user-selector.component";
 import {NewBillingAccountComponent} from "./new-billing-account.component";
 import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
+
+import {UserMultipleSelectorModule} from "./user_multiple_selector/user-multiple-selector.module"
 
 @NgModule({
 	imports: [
@@ -24,11 +26,12 @@ import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
 		GnomexStyledDatePickerModule,
 		GnomexStyledGridModule,
 		InputModule,
+		MultipleSelectorModule,
+		UserMultipleSelectorModule,
 		WindowModule
 	],
 	declarations: [
-		NewBillingAccountComponent,
-		LabUserSelectorComponent
+		NewBillingAccountComponent
 	],
 	exports: [
 		NewBillingAccountComponent

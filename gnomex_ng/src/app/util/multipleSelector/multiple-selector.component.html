@@ -1,9 +1,9 @@
 <jqxInput
-		[placeHolder]="'Click to edit'"
+		[placeHolder]="placeholder"
 		[theme]="'gnomex5'"
 		[width]="'calc(100% - 6px)'"
 		[height]="'1.5rem'"
-		[value]="inputDisplayString"
+		[value]="displayString"
 		(click)="openUserSelectPopup()"
 		[disabled]="true">
 </jqxInput>
@@ -16,7 +16,9 @@
 		[isModal]="true"
 		[resizable]="false"
 		(onClose)="resetSelected()">
-	<div>Users</div>
+	<div>
+		<div style="height:1em;">{{title}} Title</div>
+	</div>
 	<div>
 		<div class="full-width full-height">
 			<div class="t full-width full-height">

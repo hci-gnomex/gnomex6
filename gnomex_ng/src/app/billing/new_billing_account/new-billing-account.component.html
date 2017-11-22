@@ -19,9 +19,14 @@
 								Lab
 							</div>
 							<div class="td">
-								<jqxComboBox
-										[placeHolder]="'Select a lab...'"
+								<jqxComboBox #labListComboBox (onSelect)="onLabListSelection($event)"
+														 (onUnselect)="onLabListUnselect()"
 										[width]="'80%'"
+										[placeHolder]="'Select a lab...'"
+										[source]="labList"
+										[multiSelect]="false"
+										[valueMember]="'idLab'"
+										[displayMember]="'name'"
 										[theme]="'gnomex5'">
 								</jqxComboBox>
 							</div>
@@ -38,10 +43,12 @@
 								</div>
 							</div>
 							<div class="td">
-								<jqxComboBox
-										[width]="'100%'"
-										[theme]="'gnomex5'">
-								</jqxComboBox>
+								<multiple-selector
+										#coreFacilitiesSelector
+										[title]="'Core Facilities'"
+										[placeholder]="'Select Core Facilities'"
+										(onSave)="onCoreFacilitiesSelected($event)">
+								</multiple-selector>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -52,13 +59,13 @@
 							</div>
 							<div class="td center-vertical-align">
 								<div class="inline-block radio-button">
-									<input type="radio" name="AccountType" value="chartfield" checked> Chartfield
+									<input type="radio" name="AccountType" value="chartfield" (change)="changeShowField('chartfield')" checked> Chartfield
 								</div>
 								<div class="inline-block radio-button">
-									<input type="radio" name="AccountType" value="po"> PO
+									<input type="radio" name="AccountType" value="po"         (change)="changeShowField('po')" > PO
 								</div>
 								<div class="inline-block radio-button">
-									<input type="radio" name="AccountType" value="creditcard"> Credit Card
+									<input type="radio" name="AccountType" value="creditcard" (change)="changeShowField('creditcard')" > Credit Card
 								</div>
 							</div>
 						</div>
@@ -66,15 +73,17 @@
 				</div>
 			</div>
 			<div class="vertical-spacer"></div>
-			<div class="full-width background">
+			<div class="full-width background overflowable">
 				<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
-					<div class="t full-width">
+
+
+					<div *ngIf="showField === 'chartfield'" class="t full-width">
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Account Name
 							</div>
 							<div class="td">
-								<jqxInput [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								<jqxInput #accountNameInput_chartfield [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
@@ -85,7 +94,7 @@
 								Short Account Name
 							</div>
 							<div class="td">
-								<jqxInput [theme]="'gnomex5'" [width]="'15em'" [height]="'1.5rem'">
+								<jqxInput #shortNameInput_chartfield [theme]="'gnomex5'" [width]="'15em'" [height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
@@ -103,7 +112,7 @@
 										Bus
 									</div>
 									<div>
-										<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
+										<jqxInput #accountNumberBusInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
 										</jqxInput>
 									</div>
 									<div>
@@ -116,7 +125,7 @@
 										Org
 									</div>
 									<div>
-										<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
+										<jqxInput #accountNumberOrgInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
 										</jqxInput>
 									</div>
 									<div>
@@ -129,7 +138,7 @@
 										Fund
 									</div>
 									<div>
-										<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
+										<jqxInput #accountNumberFundInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
 										</jqxInput>
 									</div>
 									<div>
@@ -146,12 +155,12 @@
 										</div>
 										<div class="tr">
 											<div class="td">
-												<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
+												<jqxInput #accountNumberActivityInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
 												</jqxInput>
 											</div>
 											<div class="td sub-header" style="width:2.5em; text-align:center;">OR</div>
 											<div class="td">
-												<jqxInput [theme]="'gnomex5'" [width]="'4rem'" [height]="'1.5rem'">
+												<jqxInput #accountNumberProjectInput [theme]="'gnomex5'" [width]="'4rem'" [height]="'1.5rem'">
 												</jqxInput>
 											</div>
 										</div>
@@ -168,7 +177,7 @@
 										Account
 									</div>
 									<div>
-										<jqxInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'" [value]="'64300'">
+										<jqxInput #accountNumberAccountInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'" [value]="'64300'">
 										</jqxInput>
 									</div>
 									<div>
@@ -181,7 +190,7 @@
 										A/U
 									</div>
 									<div>
-										<jqxInput [theme]="'gnomex5'" [width]="'2rem'" [height]="'1.5rem'" [value]="1" [disabled]="true">
+										<jqxInput #accountNumberAUInput [theme]="'gnomex5'" [width]="'2rem'" [height]="'1.5rem'" [value]="1" [disabled]="true">
 										</jqxInput>
 									</div>
 									<div>
@@ -190,6 +199,117 @@
 								</div>
 							</div>
 						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+
+						<div *ngIf="showFundingAgencies" class="tr full-width row-content">
+							<div class="td cell-label">
+								Funding Agency
+							</div>
+							<div class="td">
+								<jqxComboBox
+										#fundingAgencyCombobox_chartfield
+										[theme]="'gnomex5'"
+										[source]="fundingAgencies"
+										[valueMember]="'value'"
+										[displayMember]="'fundingAgency'"
+										[width]="'100%'"
+										[height]="'1.5rem'">
+								</jqxComboBox>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Start Date
+							</div>
+							<div class="td">
+								<span>
+									<GnomexStyledDatePicker #startDatePicker_chartfield [defaultToToday]="true"></GnomexStyledDatePicker>
+								</span>
+								<div class="inline-block" style="width:7em;">
+								</div>
+								<span class="cell-label">
+									Effective Until
+								</span>
+								<span>
+									<GnomexStyledDatePicker #effectiveUntilDatePicker_chartfield [defaultToToday]="false"></GnomexStyledDatePicker>
+								</span>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Total Dollar Amount
+							</div>
+							<div class="td">
+								<jqxInput #totalDollarAmountInput_chartfield [theme]="'gnomex5'" [width]="'10em'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<!--<div class="tr full-width row-content">-->
+							<!--<div class="td cell-label">-->
+								<!--Approved Users-->
+							<!--</div>-->
+							<!--<div class="td">-->
+								<!--<user-multiple-selector [title]="'Options'"></user-multiple-selector>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Submitter Email
+							</div>
+							<div class="td">
+								<jqxInput #submitterEmailInput_checkbox [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Active
+							</div>
+							<div class="td center-vertical-align">
+								<div class="checkbox-container">
+									<jqxCheckBox #activeCheckBox_chartfield></jqxCheckBox>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<div *ngIf="showField === 'po'" class="t full-width">
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Account Name
+							</div>
+							<div class="td">
+								<jqxInput [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Purchase Order form
+							</div>
+							<div class="td">
+								Upload View Delete
+							</div>
+						</div>
+
 						<div class="tr full-width row-spacer">
 						</div>
 						<div class="tr full-width row-content">
@@ -223,27 +343,16 @@
 						</div>
 						<div class="tr full-width row-spacer">
 						</div>
-						<div class="tr full-width row-content">
-							<div class="td cell-label">
-								Approved Users
-							</div>
-							<div class="td">
-								<lab-user-selector></lab-user-selector>
-							</div>
-						</div>
-						<div class="tr full-width row-spacer">
-						</div>
-						<div class="tr full-width row-content">
-							<div class="td cell-label">
-								Submitter Email
-							</div>
-							<div class="td">
-								<jqxInput [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
-								</jqxInput>
-							</div>
-						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-content">-->
+							<!--<div class="td cell-label">-->
+								<!--Approved Users-->
+							<!--</div>-->
+							<!--<div class="td">-->
+								<!--<multiple-selector [title]="'Options'"></multiple-selector>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Active
@@ -255,6 +364,90 @@
 							</div>
 						</div>
 					</div>
+
+
+					<div *ngIf="showField === 'creditcard'" class="t full-width">
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Last four digits of <br/> Credit Card Number
+							</div>
+							<div class="td">
+								<jqxInput [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Expiration Date
+							</div>
+							<div class="td">
+								<span>
+									<GnomexStyledDatePicker [defaultToToday]="true"></GnomexStyledDatePicker>
+								</span>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Zip Code
+							</div>
+							<div class="td">
+								<jqxInput [theme]="'gnomex5'" [width]="'10em'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Credit Card Company
+							</div>
+							<div class="td">
+								<jqxComboBox
+										[width]="'40%'"
+										[theme]="'gnomex5'">
+								</jqxComboBox>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Total Dollar Amount
+							</div>
+							<div class="td">
+								<jqxInput [theme]="'gnomex5'" [width]="'10em'" [height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<!--<div class="tr full-width row-content">-->
+							<!--<div class="td cell-label">-->
+								<!--Approved Users-->
+							<!--</div>-->
+							<!--<div class="td">-->
+								<!--<multiple-selector [title]="'Options'"></multiple-selector>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
+								Active
+							</div>
+							<div class="td center-vertical-align">
+								<div class="checkbox-container">
+									<jqxCheckBox></jqxCheckBox>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
 				</div>
 			</div>
 			<div class="vertical-spacer"></div>
@@ -289,12 +482,12 @@
 			</div>
 			<div class="full-width" style="text-align:right; padding-top:4px; padding-right:0.6em;">
 				<div class="inline-block">
-					<button type="button" class="save-button" style="text-align: center;" autofocus>
+					<button (click)="onSaveButtonClicked()" type="button" class="save-button" style="text-align: center;" autofocus>
 						<img src="../../../assets/save.png" alt=""/> Save
 					</button>
 				</div>
 				<div class="inline-block">
-					<button type="button" class="cancel-button">Cancel</button>
+					<button (click)="onCancelButtonClicked()" type="button" class="cancel-button">Cancel</button>
 				</div>
 			</div>
 		</div>
