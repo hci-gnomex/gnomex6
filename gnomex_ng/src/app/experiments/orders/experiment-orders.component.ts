@@ -398,10 +398,11 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		}
 
 		let wrapper: any = {requests: selectedOrders};
+		let stringified: string = JSON.stringify(wrapper);
 
 		let parameters: URLSearchParams = new URLSearchParams();
 
-		parameters.set('requestsToDeleteXMLString', wrapper);
+		parameters.set('requestsToDeleteXMLString', stringified);
 
 		this.experimentsService.deleteExperiment(parameters).subscribe((response) => {
 			this.experimentsService.repeatGetExperiments_fromBackend();

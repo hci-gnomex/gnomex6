@@ -97,18 +97,6 @@ export class ExperimentsService {
     this.getExperiments_fromBackend(this.previousURLParams);
   }
 
-
-  deleteExperiment(params: URLSearchParams):  Observable<any> {
-		return this._http.get("/gnomex/DeleteRequest.gx", {search: params}).map((response: Response) => {
-			if (response.status === 200) {
-				return response;
-			} else {
-				throw new Error("Error");
-			}
-		});
-	}
-
-
 	getChangeExperimentStatusObservable(): Observable<any> {
 		return this.changeStatusSubject.asObservable();
 	}
@@ -257,7 +245,6 @@ export class ExperimentsService {
                 throw new Error("Error");
             }
         });
-
     }
 
 
