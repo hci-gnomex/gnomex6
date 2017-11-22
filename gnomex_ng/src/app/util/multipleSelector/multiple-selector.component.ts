@@ -83,7 +83,7 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 		// This is needed on the first opening of the selector to refresh the contents of the grid,
 		// which seems not to visually update after it's datasource is changed if it is being hidden at that time.
 		if (this.isFirstOpening) {
-			setTimeout(() => {
+			// setTimeout(() => {
 				let tempSource : any = {
 					datatype: "json",
 					localdata: [],
@@ -91,10 +91,10 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 						{name: "display", type: "string"}
 					]
 				};
-				this.grid.setDataAdapterSource(tempSource);
-			}, 100);
+			// 	this.grid.setDataAdapterSource(tempSource);
+			// }, 200);
 
-			setTimeout(() => { this.grid.setDataAdapterSource(this.source); }, 200);
+			setTimeout(() => { this.grid.setDataAdapterSource(this.source); }, 400);
 
 			this.isFirstOpening = false;
 		}

@@ -12,6 +12,7 @@ import {BrowseFilterComponent} from "../../util/browse-filter.component";
 import {DictionaryService} from "../../services/dictionary.service";
 import {EmailRelatedUsersPopupComponent} from "../../util/emailRelatedUsersPopup/email-related-users-popup.component"
 import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
+import {PropertyService} from "../../services/property.service";
 import {Alert} from "selenium-webdriver";
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
@@ -93,6 +94,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	@ViewChild('statusComboBox') statusCombobox: jqxComboBoxComponent;
 	@ViewChild('errorPopup') errorPopup: jqxWindowComponent;
 	@ViewChild('warningPopup') warningPopup: jqxWindowComponent;
+	@ViewChild('confirmationPopup') confirmationPopup: jqxWindowComponent;
 	@ViewChild('windowReference') window: EmailRelatedUsersPopupComponent;
 
 	private errorMessage: string = '';
@@ -221,7 +223,9 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	};
 
 
-	constructor(private experimentsService: ExperimentsService, private dictionaryService: DictionaryService) {
+	constructor (private experimentsService: ExperimentsService,
+							 private dictionaryService: DictionaryService,
+							 private propertyService: PropertyService) {
 	}
 
 	ngOnInit(): void {
@@ -298,7 +302,9 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		let experimentHasBeenRun: boolean = false;
 
 		for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
-			if (this.source.localdata[i].requestStatus != 'new' && this.source.localdata[i].requestStatus != 'submitted') {
+			let j:number = gridSelectedIndexes[i].valueOf();
+
+			if (this.source.localdata[j].requestStatus != 'new' && this.source.localdata[j].requestStatus != 'submitted') {
 				experimentHasBeenRun = true;
 				break;
 			}
@@ -316,7 +322,96 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 			this.warningMessage = 'Are you sure you want to delete these orders?';
 			let usedProducts: boolean = false;
 
+			for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
+				let j: number = gridSelectedIndexes[i].valueOf();
+
+				let request = this.source.localdata[j];
+
+				// Most of the time, requests are not given the below property, so the if is skipped.
+
+				var statusToUseProducts: string = this.propertyService.getProperty('status_to_use_products', request.idCoreFacility, request.codeRequestCategory);
+
+				if (statusToUseProducts != undefined
+						&& statusToUseProducts != null
+						&& statusToUseProducts != ''
+						&& request.codeRequestStatus != undefined
+						&& request.codeRequestStatus != null
+						&& request.codeRequestStatus != '') {
+					if (this.compareStatuses(request.codeRequestStatus, statusToUseProducts) >= 0) {
+						usedProducts = true;
+						break;
+					}
+				}
+			}
+
+			if (usedProducts) {
+				this.warningMessage += "\n\n" +
+						"WARNING: One or more of the selected orders may have used products. " +
+						"If the products were not actually consumed, please revert the status " +
+						"of the order to an earlier status or manually return the products to " +
+						"the lab before deleting.\n\n";
+			}
+
+			this.confirmationPopup.open();
 		}
+	}
+
+	private compareStatuses (status1: string, status2: string) {
+		let value1 = this.compareStatusesHelper(status1);
+		let value2 = this.compareStatusesHelper(status2);
+
+		if (value1 == -1 && value2 == -1) {
+			return 0;
+		} else if (value1 == -1 && value2 != -1) {
+			return -1;
+		} else if (value1 != -1 && value2 == -1) {
+			return 1;
+		} else {
+			return value1 - value2;
+		}
+	}
+
+	private compareStatusesHelper (status: string): number {
+		var value: number = -1;
+
+		if (status != null && status != undefined && status != '') {
+			switch (status) {
+				case 'NEW'       : value = 0; break;
+				case 'SUBMITTED' : value = 1; break;
+				case 'PROCESSING': value = 2; break;
+				case 'COMPLETE'  : value = 3; break;
+				case 'FAILED'    : value = 3; break;
+			}
+		}
+
+		return value;
+	}
+
+	private onConfirmDelete(): void {
+		let selectedIndices: Number[] = this.myGrid.getselectedrowindexes();
+		let selectedOrders: any[] = [];
+
+		for (let i: number = 0; i < selectedIndices.length; i++) {
+			let j: number = selectedIndices[i].valueOf();
+
+			selectedOrders.push(this.source.localdata[j]);
+		}
+
+		let wrapper: any = {requests: selectedOrders};
+
+		let parameters: URLSearchParams = new URLSearchParams();
+
+		parameters.set('requestsToDeleteXMLString', wrapper);
+
+		this.experimentsService.deleteExperiment(parameters).subscribe((response) => {
+			this.experimentsService.repeatGetExperiments_fromBackend();
+
+			this.confirmationPopup.close();
+		});
+	}
+
+	private onCancelDelete(): void {
+		this.confirmationPopup.close();
 	}
 
 	errorPopupOkClicked(): void {

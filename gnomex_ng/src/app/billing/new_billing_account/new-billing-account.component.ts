@@ -9,8 +9,8 @@ import { jqxComboBoxComponent } from "../../../assets/jqwidgets-ts/angular_jqxco
 import { jqxInputComponent } from "../../../assets/jqwidgets-ts/angular_jqxinput"
 import { jqxWindowComponent } from "../../../assets/jqwidgets-ts/angular_jqxwindow";
 
-import { LabListService } from "../../../app/services/lab-list.service";
-import { CreateSecurityAdvisorService } from "../../../app/services/create-security-advisor.service";
+import { LabListService } from "../../services/lab-list.service";
+import { CreateSecurityAdvisorService } from "../../services/create-security-advisor.service";
 
 import { MultipleSelectorComponent } from "../../util/multipleSelector/multiple-selector.component";
 
