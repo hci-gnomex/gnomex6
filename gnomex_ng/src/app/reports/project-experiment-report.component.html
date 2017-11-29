@@ -1,0 +1,20 @@
+<h6>Project/Experiment Report</h6>
+<div *ngIf="isAdmin">
+    <label style="width: 6rem">Core</label>
+    <jqxComboBox style="display: inline-block" [width]="250" [height]="30" [placeHolder]="'All Cores...'"
+                 [source]="coreList" [displayMember]="'display'" [valueMember]="'idCoreFacility'"
+                 (onSelect)="onCoreSelect($event)" (onUnselect)="onCoreUnselect()">
+    </jqxComboBox>
+</div>
+<div>
+    <label style="width: 6rem">Lab Group</label>
+    <jqxComboBox style="display: inline-block" [width]="250" [height]="30" [placeHolder]="'All Labs...'"
+                 [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                 (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
+    </jqxComboBox>
+</div>
+<div>
+    <img src="../../assets/excel_wrap_text.png">
+    <label>In Excel, select the 'Description' column and then click on 'Wrap Text' so that line breaks are shown.</label>
+</div>
+<button mat-button (click)="run()"><img src="../../assets/accept.png" style="margin: 0 0.2rem 0 0">Run</button>

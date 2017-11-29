@@ -115,6 +115,11 @@ export class CreateSecurityAdvisorService {
         return false;
     }
 
+    public isCoreFacilityIManage(idCoreFacility: string): boolean {
+        let ids: string[] = this.extractCoreFacilityIds(this.coreFacilitiesICanManage);
+        return ids.indexOf(idCoreFacility) >= 0;
+    }
+
     createSecurityAdvisor(): Observable<any> {
         console.log("createSecurityAdvisor new");
         this.progressService.displayLoader(20);

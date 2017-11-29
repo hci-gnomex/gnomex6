@@ -34,6 +34,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServicesModule } from './services/services.module';
 import {AnalysisModule} from "./analysis/analysis.module";
 import {MatIconModule} from "@angular/material";
+import {ReportsModule} from "./reports/reports.module";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -65,6 +66,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         BrowserAnimationsModule,
         AnalysisModule,
         MatIconModule,
+        ReportsModule
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],

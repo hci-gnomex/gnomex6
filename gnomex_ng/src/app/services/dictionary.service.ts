@@ -16,6 +16,7 @@ export class DictionaryService {
     public static readonly REQUEST_CATEGORY: string = "hci.gnomex.model.RequestCategory";
     public static readonly SEQ_LIB_PROTOCOL: string = "hci.gnomex.model.SeqLibProtocol";
     public static readonly APPLICATION:string = "hci.gnomex.model.Application";
+    public static readonly ANNOTATION_REPORT_FIELD = "hci.gnomex.model.AnnotationReportField";
     static VISIBILTY: string = "hci.gnomex.model.Visibility";
 
     private cachedDictionaryString: any;
