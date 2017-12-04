@@ -1,0 +1,56 @@
+<h6>Annotation Report</h6>
+<div>
+    <label style="width: 6rem">Core</label>
+    <jqxComboBox style="display: inline-block" [width]="250" [height]="30" [placeHolder]="'All Cores...'"
+                 [source]="coreList" [displayMember]="'display'" [valueMember]="'idCoreFacility'"
+                 (onSelect)="onCoreSelect($event)" (onUnselect)="onCoreUnselect()">
+    </jqxComboBox>
+</div>
+<div>
+    <label style="width: 6rem">Lab Group</label>
+    <jqxComboBox style="display: inline-block" [width]="250" [height]="30" [placeHolder]="'All Labs...'"
+                 [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                 (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
+    </jqxComboBox>
+</div>
+<div>
+    <label style="width: 8rem">Annotations For</label>
+    <input [(ngModel)]="annotationsFor" id="samplesRadio" value="SAMPLE" type="radio" name="annotationsForRadio" (change)="onAnnotationsForRadioChange()">
+    <label for="samplesRadio">Experiment Samples</label>
+    <input [(ngModel)]="annotationsFor" id="analysesRadio" value="ANALYSIS" type="radio" name="annotationsForRadio" (change)="onAnnotationsForRadioChange()">
+    <label for="analysesRadio">Analyses</label>
+    <input [(ngModel)]="annotationsFor" id="dataTracksRadio" value="DATATRACK" type="radio" name="annotationsForRadio" (change)="onAnnotationsForRadioChange()">
+    <label for="dataTracksRadio">Data Tracks</label>
+</div>
+<div *ngIf="annotationsFor === FOR_SAMPLES">
+    <label style="width: 11rem">Experiment Platform(s)</label>
+    <jqxComboBox #requestCategoryCombo style="display: inline-block" [width]="400" [multiSelect]="true"
+                 [source]="requestCategoryList" [displayMember]="'display'" [valueMember]="'codeRequestCategory'"
+                 (onSelect)="onRequestCategorySelect($event)" (onUnselect)="onRequestCategoryUnselect($event)">
+    </jqxComboBox>
+</div>
+<div *ngIf="annotationsFor === FOR_SAMPLES">
+    <date-range-picker-custom [(from)]="dateFromString" [(to)]="dateToString"></date-range-picker-custom>
+</div>
+<div>
+    <label>Check the annotations you want to see on the report.</label>
+</div>
+<div>
+    <ag-grid-angular style="width: 550px; height: 500px;"
+                     class="ag-fresh"
+                     (gridReady)="onAnnotationGridReady($event)"
+                     (rowDataChanged)="onAnnotationGridRowDataChanged($event)"
+                     [rowSelection]="'multiple'"
+                     [rowData]="annotationRowData"
+                     [columnDefs]="annotationColumnDefs">
+    </ag-grid-angular>
+    <ag-grid-angular *ngIf="annotationsFor === FOR_SAMPLES"
+                     style="width: 550px; height: 500px;"
+                     class="ag-fresh"
+                     (gridReady)="onCustomColumnsGridReady($event)"
+                     [rowSelection]="'multiple'"
+                     [rowData]="customColumnsRowData"
+                     [columnDefs]="customColumnsColumnDefs">
+    </ag-grid-angular>
+</div>
+<button mat-button (click)="run()"><img src="../../assets/accept.png" style="margin: 0 0.2rem 0 0">Run</button>

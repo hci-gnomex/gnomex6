@@ -1,0 +1,9 @@
+<h6>Annotation Progress Report</h6>
+<div>
+    <label style="width: 6rem">Lab Group</label>
+    <jqxComboBox style="display: inline-block" [width]="250" [height]="30" [placeHolder]="'All Labs...'"
+                 [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                 (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
+    </jqxComboBox>
+</div>
+<button mat-button (click)="run()"><img src="../../assets/accept.png" style="margin: 0rem 0.2rem 0rem 0rem">Run</button>
