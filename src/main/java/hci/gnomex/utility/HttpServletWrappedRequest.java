@@ -70,6 +70,10 @@ public class HttpServletWrappedRequest extends HttpServletRequestWrapper
     public void setParameter(final String name, final String value)
     {
         String shortvalue = value;
+        if (value == null) {
+            System.out.println("[HttpServletWrappedRequest]:setParameter]  ERROR ERROR value is null!");
+            return;
+        }
         if (value.length() > 40) {
             shortvalue = value.substring(0,40);
         }

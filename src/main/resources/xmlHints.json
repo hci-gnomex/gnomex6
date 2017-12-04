@@ -1,25 +1,85 @@
 {
   "hints": [
     {
-    "command": "SaveProject",
-    "parameter": "projectXMLString",
-    "nodeheader": "",
-    "nodeprefix": "Project",
-    "elementhints": [
-    	{
-    	"elementname": "ExperimentDesignEntries",
-    	"elementheader": "ExperimentDesignEntry"
-    	},
-    	{
-    	"elementname": "ExperimentFactorEntries",
-    	"elementheader": "ExperimentFactorEntry"
-    	}
-    ]
-  }
- ]
+      "command": "SaveProject",
+      "parameter": "projectXMLString",
+      "nodeheader": "",
+      "nodeprefix": "Project",
+      "elementhints": [
+        {
+          "elementname": "ExperimentDesignEntries",
+          "elementheader": "ExperimentDesignEntry"
+        },
+        {
+          "elementname": "ExperimentFactorEntries",
+          "elementheader": "ExperimentFactorEntry"
+        }
+      ]
+    },
+    {
+      "command": "DeleteRequest",
+      "parameter": "requestsToDeleteXMLString",
+      "nodeheader": "",
+      "nodeprefix": "requests",
+      "elementhints": [
+        {
+          "elementname": "someEntries",
+          "elementheader": "someEntry"
+        }
+      ]
+    },
+    {
+      "command": "SaveAnalysis",
+      "parameter": "genomeBuildsXMLString",
+      "nodeheader": "GenomeBuild",
+      "nodeprefix": "genomeBuilds",
+      "elementhints": [
+        {
+          "elementname": "someEntries1",
+          "elementheader": "someEntry1"
+        }
+      ]
+    },
+    {
+      "command": "SaveAnalysis",
+      "parameter": "analysisGroupsXMLString",
+      "nodeheader": "",
+      "nodeprefix": "analysisGroups",
+      "elementhints": [
+        {
+          "elementname": "AnalysisGroup",
+          "elementheader": "Analysis"
+        }
+      ]
+    },
+    {
+      "command": "SubmitWorkAuthForm",
+      "parameter": "coreFacilitiesXMLString",
+      "nodeheader": "coreFacilities",
+      "nodeprefix": "CoreFacility",
+      "elementhints": [
+        {
+          "elementname": "someEntries2",
+          "elementheader": "someEntry2"
+        }
+      ]
+    },
+    {
+      "command": "SaveVisibility",
+      "parameter": "visibilityXMLString",
+      "nodeheader": "requests",
+      "nodeprefix": "Request",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    }
+
+  ]
 }
 
 
-    
     
     

@@ -22,6 +22,8 @@ public class JsonParser {
 
         this.jsonTokenizer.reinit(dataBuffer, this.tokenBuffer);
 
+        // we could see object start { or array start [ here, cope with either
+
         parseObject(this.jsonTokenizer);
 
         this.elementBuffer.count = this.elementIndex;
@@ -30,6 +32,14 @@ public class JsonParser {
     private void parseObject(JsonTokenizer tokenizer) {
         assertHasMoreTokens(tokenizer);
         tokenizer.parseToken();
+
+        // if we have an array start deal with it
+        if (tokenizer.tokenType() == TokenTypes.JSON_SQUARE_BRACKET_LEFT) {
+            // we have an array start, not an object start
+            System.out.println ("[parseObject] NOTE THIS NOTE THIS NOTE THIS found '[' when expecting '{', just pretend...");
+            parseArray (tokenizer);
+            return;
+        }
         assertThisTokenType(tokenizer.tokenType(), TokenTypes.JSON_CURLY_BRACKET_LEFT);
         setElementData     (tokenizer, ElementTypes.JSON_OBJECT_START);
 
@@ -113,12 +123,13 @@ public class JsonParser {
         this.elementBuffer.position[this.elementIndex] = tokenizer.tokenPosition();
         this.elementBuffer.length  [this.elementIndex] = tokenizer.tokenLength();
         this.elementBuffer.type    [this.elementIndex] = elementType;
+        System.out.println ("[setElementData] elementIndex: " + elementIndex + " token position: " + tokenizer.tokenPosition() + " token length: " + tokenizer.tokenLength() + " elementType: " + elementType + " -->" + ElementTypes.toString(elementType));
         this.elementIndex++;
     }
 
     private final void assertThisTokenType(byte tokenType, byte expectedTokenType) {
         if(tokenType != expectedTokenType) {
-            throw new ParserException("Token type mismatch: Expected " + expectedTokenType + " but found " + tokenType);
+            throw new ParserException("Token type mismatch: Expected " + ElementTypes.toString(expectedTokenType) + " but found " + ElementTypes.toString(tokenType));
         }
     }
 
