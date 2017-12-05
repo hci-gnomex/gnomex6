@@ -39,7 +39,7 @@
 														</div>
 														<div class="td button-container">
 															<jqxButton
-																	[disabled]="myGrid.getselectedrowindexes().length === 0 || (this.statusCombobox.getSelectedItem() === null || this.statusCombobox.getSelectedItem().value === '')"
+																	[disabled]="!enableChanges || (myGrid.getselectedrowindexes().length === 0 || (this.statusCombobox.getSelectedItem() === null || this.statusCombobox.getSelectedItem().value === ''))"
 																	[template]="'link'"
 																	(onClick)="goButtonClicked()">
 																<img
@@ -55,7 +55,7 @@
 														</div>
 														<div class="td button-container">
 															<jqxButton
-																	[disabled]="myGrid.getselectedrowindexes().length === 0"
+																	[disabled]="!enableChanges || myGrid.getselectedrowindexes().length === 0"
 																	[template]="'link'"
 																	(onClick)="deleteButtonClicked()">
 																<img *ngIf="myGrid.getselectedrowindexes().length != 0" src="../../../assets/delete.png" alt="" style="margin-right:0.2em;"/>

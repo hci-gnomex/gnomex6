@@ -14,6 +14,7 @@ import {EmailRelatedUsersPopupComponent} from "../../util/emailRelatedUsersPopup
 import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
 import {PropertyService} from "../../services/property.service";
 import {Alert} from "selenium-webdriver";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
  *	the navigation bar.
@@ -107,6 +108,8 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
 	private selectedRequestNumbers: string[];
 	private changeStatusResponsesRecieved: number;
+
+	private enableChanges: boolean = false;
 
 
 	private actionCellsRenderer = (row: number, column: any, value: any): any => {
@@ -224,6 +227,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
 
 	constructor (private experimentsService: ExperimentsService,
+							 private createSecurityAdvisorService: CreateSecurityAdvisorService,
 							 private dictionaryService: DictionaryService,
 							 private propertyService: PropertyService) {
 	}
@@ -255,6 +259,8 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 			}
 		});
 
+		this.enableChanges = this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin;
+
 		let params: URLSearchParams = new URLSearchParams();
 		params.append("status", "SUBMITTED");
 
@@ -269,6 +275,11 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	}
 
 	goButtonClicked(): void {
+
+		if (!this.enableChanges) {
+			return;
+		}
+
 		// The "go" button should be disabled in this case, but if we get a click without a valid status,
 		// stop.
 		if (this.statusCombobox.getSelectedItem().value === "") {
@@ -297,6 +308,11 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	}
 
 	deleteButtonClicked(): void {
+
+		if (!this.enableChanges) {
+			return;
+		}
+
 		let gridSelectedIndexes: Array<Number> = this.myGrid.getselectedrowindexes();
 
 		let experimentHasBeenRun: boolean = false;
@@ -397,9 +413,6 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 			let Request = this.source.localdata[j];
 			selectedOrders.push(Request);
 		}
-
-		// let wrapper: any = {requests: selectedOrders};
-		// let stringified: string = JSON.stringify(wrapper);
 
 		let stringified: string = JSON.stringify(selectedOrders);
 
