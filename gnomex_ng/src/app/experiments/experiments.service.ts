@@ -3,6 +3,7 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {HttpHeaders, HttpParams} from "@angular/common/http";
 //import {Observer} from "rxjs/Observer";
 
 export let BROWSE_EXPERIMENTS_ENDPOINT: OpaqueToken = new OpaqueToken("browse_experiments_url");
@@ -189,6 +190,26 @@ export class ExperimentsService {
         });
 
     }
+
+    saveVisibility(body: any, idProject?: string): Observable<any> {
+
+        let params: HttpParams = new HttpParams();
+        if (idProject) {
+            params = params.append( 'idProject', idProject );
+        }
+        let strBody:string = JSON.stringify(body);
+        //const headers = new HttpHeaders().set('Content-Type', 'application/json');
+        return this._http.post("/gnomex/SaveVisibility.gx", strBody, {params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response;
+            } else {
+                throw new Error("Error: In SaveVisibility");
+            }
+        });
+
+
+    }
+
 
 
     getProjectObsevable():Observable<any>{

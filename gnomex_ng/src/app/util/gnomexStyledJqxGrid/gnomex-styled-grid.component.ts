@@ -25,6 +25,7 @@ export class GnomexStyledGridComponent implements OnInit, OnDestroy, AfterViewIn
 	}
 	@Input() styleForTheme:string ="gnomex5";
 	@Input() altRow:boolean=true;
+	@Input() editable:boolean = false;
 
 
     @Output() rowDoubleClicked: EventEmitter<any> = new EventEmitter();
