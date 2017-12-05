@@ -394,11 +394,14 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		for (let i: number = 0; i < selectedIndices.length; i++) {
 			let j: number = selectedIndices[i].valueOf();
 
-			selectedOrders.push(this.source.localdata[j]);
+			let Request = this.source.localdata[j];
+			selectedOrders.push(Request);
 		}
 
-		let wrapper: any = {requests: selectedOrders};
-		let stringified: string = JSON.stringify(wrapper);
+		// let wrapper: any = {requests: selectedOrders};
+		// let stringified: string = JSON.stringify(wrapper);
+
+		let stringified: string = JSON.stringify(selectedOrders);
 
 		let parameters: URLSearchParams = new URLSearchParams();
 
