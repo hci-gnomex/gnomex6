@@ -70,7 +70,6 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
     private selectedTreeNodeSubscript: Subscription;
     private visList:Array<any>;
     private instList:Array<any>;
-    testing = "";
     private dirty: boolean = false;
     private gridOpt:GridOptions = {};
 

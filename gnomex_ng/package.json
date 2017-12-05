@@ -36,6 +36,8 @@
     "@hci/style": "1.0.0-alpha.2",
     "@hci/user": "^3.0.0",
     "@ng-bootstrap/ng-bootstrap": "1.0.0-alpha.20",
+    "ag-grid": "^13.0.0",
+    "ag-grid-angular": "^13.0.0",
     "angular-2-local-storage": "1.0.1",
     "angular-tree-component": "^4.1.0",
     "angular2-jwt": "^0.2.3",

@@ -20,7 +20,10 @@ import { ExperimentResolverService, ProjectResolverService } from "../services/r
 const ROUTES: Routes = [
 
 
-    { path: "experiments", component: BrowseExperimentsComponent },
+    { path: "experiments", component: BrowseExperimentsComponent , children:[
+        {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
+        {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}]
+    },
     { path: "experiments/new", component:NewExperimentComponent},
     { path: "experiments-orders", component:ExperimentOrdersComponent}
 ];
