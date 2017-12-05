@@ -11,8 +11,12 @@ import {GnomexStyledDatePickerModule} from "../../util/gnomexStyledDatePicker/gn
 import {GnomexStyledGridModule} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import {MultipleSelectorModule} from "../../util/multipleSelector/multiple-selector.module";
 
+import {AccountFieldsConfigurationService} from "./account-fields-configuration.service";
+import {NewBillingAccountService} from "./new-billing-account.service";
+
 import {NewBillingAccountComponent} from "./new-billing-account.component";
 import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
+import {NumberJqxInputComponent} from "./number-jqxinput/number-jqxinput.component";
 
 import {UserMultipleSelectorModule} from "./user_multiple_selector/user-multiple-selector.module"
 
@@ -31,10 +35,16 @@ import {UserMultipleSelectorModule} from "./user_multiple_selector/user-multiple
 		WindowModule
 	],
 	declarations: [
-		NewBillingAccountComponent
+		NewBillingAccountComponent,
+		NumberJqxInputComponent
+	],
+	providers: [
+		AccountFieldsConfigurationService,
+		NewBillingAccountService
 	],
 	exports: [
-		NewBillingAccountComponent
+		NewBillingAccountComponent,
+		NumberJqxInputComponent
 	]
 })
 export class NewBillingAccountModule {
