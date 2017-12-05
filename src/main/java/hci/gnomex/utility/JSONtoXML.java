@@ -9,9 +9,8 @@ import java.io.*;
 
 
 public class JSONtoXML {
-//    public static HashMap xmlHintMap = new HashMap();
     public static boolean debugHint = false;
-    public static boolean debugConvert = false;
+    public static boolean debugConvert = true;
 
     public HashMap initHints(String fileName) throws Exception {
         HashMap xmlHintMap = new HashMap();
@@ -24,7 +23,7 @@ public class JSONtoXML {
         String line = null;
         StringBuilder sb = new StringBuilder(1024000);
 
-        String[] nameStack = new String[35];
+        String[] nameStack = new String[350];
 
         int numlines = 0;
 
@@ -51,7 +50,7 @@ public class JSONtoXML {
         HintInformation hintInformation = null;
 
         while (true) {
-            int theType = jsonNavigator.type();
+            byte theType = jsonNavigator.type();
             int thePosition = jsonNavigator.position();
             int theLength = jsonNavigator.length();
             String text = jsonNavigator.asStringDecoded();
@@ -71,16 +70,16 @@ public class JSONtoXML {
                     System.out.println("\t--->" + theTypeAsStringFixed + " at " + thePosition + " length: " + theLength + " " + text);
             }
 
-            if (debugHint) System.out.println("***before switch*** theType: " + theType);
+            if (debugHint) System.out.println("***before switch*** theType: " + theType + " -->" + ElementTypes.toString(theType));
             switch (theType) {
                 case ElementTypes.JSON_OBJECT_START: {
-                    if (debugHint) System.out.println("[object start] stackptr: " + stackptr);
+                    if (debugHint) System.out.println("                     --->[object start] stackptr: " + stackptr);
                     prevArrayStart = false;
                     // previous token array start?
                     if (jsonNavigator.hasPrevious()) {
                         jsonNavigator.previous();
-                        int theType1 = jsonNavigator.type();
-                        if (debugHint) System.out.println("[object start] theType1: " + theType1);
+                        byte theType1 = jsonNavigator.type();
+                        if (debugHint) System.out.println("                 --->[object start] theType1: " + theType1 + " -->" + ElementTypes.toString(theType1));
 
                         if (theType1 == ElementTypes.JSON_ARRAY_START) {
                             prevArrayStart = true;
@@ -100,24 +99,24 @@ public class JSONtoXML {
                 }
                 case ElementTypes.JSON_PROPERTY_NAME: {
                     if (debugHint)
-                        System.out.println("[property name] stackptr: " + stackptr + " text: " + jsonNavigator.asStringDecoded());
+                        System.out.println("                --->[property name] stackptr: " + stackptr + " text: " + jsonNavigator.asStringDecoded());
                     if (stackptr == 0) {
                         prevPropertyName = "";
                     } else if (stackptr == 1) {
                         if (!jsonNavigator.hasNext()) {
                             System.out.println("Error: property name followed by EOF");
-                            System.exit(1);
+                            return xmlHintMap;
                         }
                         text = jsonNavigator.asStringDecoded();
                         propertyName = text;
                         if (debugHint)
-                            System.out.println("[property name] stackptr == 1 propertyName: " + propertyName);
+                            System.out.println("[property name] stackptr == 1 propertyName: " + propertyName + " stackptr: " + stackptr );
 
                         jsonNavigator.next();
-                        int theType1 = jsonNavigator.type();
+                        byte theType1 = jsonNavigator.type();
                         if (theType1 == ElementTypes.JSON_PROPERTY_VALUE_STRING) {
                             text = jsonNavigator.asStringDecoded();
-                            if (debugHint) System.out.println("[property name] stackptr == 1 text: " + text);
+                            if (debugHint) System.out.println("[property name] stackptr == 1 text: " + text + " theType1: " + theType1 + " -->" + ElementTypes.toString(theType1));
 
                             // remember it
                             if (propertyName.equals("command")) {
@@ -141,7 +140,7 @@ public class JSONtoXML {
                     } else if (stackptr == 2) {
                         if (!jsonNavigator.hasNext()) {
                             System.out.println("Error: property name followed by EOF");
-                            System.exit(1);
+                            return xmlHintMap;
                         }
 
                         if (debugHint)
@@ -152,7 +151,7 @@ public class JSONtoXML {
                                 System.out.println("[property name] stackptr: " + stackptr + " text: " + propertyName);
 
                             jsonNavigator.next();
-                            int theType1 = jsonNavigator.type();
+                            byte theType1 = jsonNavigator.type();
                             if (theType1 == ElementTypes.JSON_PROPERTY_VALUE_STRING) {
                                 text = jsonNavigator.asStringDecoded();
 
@@ -192,6 +191,7 @@ public class JSONtoXML {
                     if (stackptr == 0) {
                         // we are done save what we have
                         String hintName = hintInformation.getCommand() + "." + hintInformation.getParameter();
+                        if (debugHint) System.out.println("[object end] stackptr == 0 saving hintinformation, hintName: " + hintName);
                         xmlHintMap.put(hintName, hintInformation);
                         hintInformation = new HintInformation();
                     }
@@ -203,7 +203,7 @@ public class JSONtoXML {
             } // end of switch
             if (debugHint) System.out.println("                    *** after switch ***");
             if (!jsonNavigator.hasNext()) {
-                if (debugHint) System.out.println("jsonNavigator.hasNext failed: " + stackptr);
+                if (debugHint) System.out.println("jsonNavigator.hasNext failed at stackptr: " + stackptr);
                 break;
             }
 
@@ -240,13 +240,13 @@ public class JSONtoXML {
 
         jsonNavigator.previous();
 
-        if (theType1 == nextElementType) {
+//        if (theType1 == nextElementType) {
             // emit nodePrefix
-            result = "<" + nodePrefix + " ";
+            result = "<" + nodePrefix + ">";
 
-        } else {
-            if (debugConvert) System.out.println("[addNodePrefix] *FAILED nextElement was not property value string*");
-        }
+ //       } else {
+ //           if (debugConvert) System.out.println("[addNodePrefix] *FAILED nextElement was not property value string*");
+ //       }
         if (debugConvert) System.out.println("[addNodePrefix] result: " + result);
         return result;
 
@@ -359,13 +359,15 @@ public class JSONtoXML {
 
 
     public String convertJSONtoXML(String hintKey, String theJson, HashMap xmlHashMap) throws Exception {
+
+        boolean debugConvert = true;
         // the end result will be here:
         String theXML = "";
 
         DataCharBuffer dataBuffer = new DataCharBuffer();
 
-        String[] nameStack = new String[35];
-        String[] nodeStack = new String[35];
+        String[] nameStack = new String[350];
+        String[] nodeStack = new String[350];
 
         dataBuffer.data = theJson.toCharArray();
         dataBuffer.length = dataBuffer.data.length;
@@ -379,7 +381,7 @@ public class JSONtoXML {
 
         JsonNavigator jsonNavigator = new JsonNavigator(dataBuffer, elementBuffer);
         if (debugConvert)
-            System.out.println("**************** Starting size ******************* " + jsonNavigator.size());
+            System.out.println("[convertJSONtoXML] **************** Starting size ******************* " + jsonNavigator.size());
 
         int stackptr = -1;
 
@@ -439,6 +441,15 @@ public class JSONtoXML {
                     } else {
                         // add any inner nodePrefix
                         String thisNodePrefix = nameStack[nameStackptr];
+                        if (thisNodePrefix == null ) {
+                            if (theHint == null) {
+                                System.out.println ("[convertJSONtoXML] ERROR ERROR ERROR theHint is null!!!!");
+                                return "<bad Invalid JSON /bad>";
+                            }
+                            thisNodePrefix = theHint.getNodeHeader();
+                            System.out.println ("[convertJSONtoXML] new nodeprefix: " + thisNodePrefix);
+
+                        }
                         if (debugConvert)
                             System.out.println("[convertJSONtoXML:object start] (had previous) stackptr: " + stackptr + " thisNodePrefix: " + thisNodePrefix + " namestack: " + nameStack[nameStackptr] + " nodeStack: " + nodeStack[nameStackptr]);
                         theXML += "<" + thisNodePrefix + " ";
@@ -466,6 +477,8 @@ public class JSONtoXML {
                         // saw array start so it's compound
                         text = jsonNavigator.asStringDecoded();
                         propertyName = text;
+                        if (debugConvert)
+                            System.out.println("[convertJSONtoXML:JSON array strart] propertyName: " + propertyName);
 
                         // if we are finishing a non-compound property name, end the line with ">\n"
                         if (previousElement(ElementTypes.JSON_PROPERTY_VALUE_STRING, jsonNavigator)) {
@@ -488,7 +501,35 @@ public class JSONtoXML {
                     break;
                 }
                 case ElementTypes.JSON_ARRAY_START: {
-                    if (debugConvert) System.out.println("[array start] stackptr: " + nameStackptr);
+                    if (debugConvert) System.out.println("[array start]2  stackptr: " + nameStackptr);
+
+                    if (!jsonNavigator.hasPrevious()) {
+
+                        nameStackptr = 0;
+                        nameStack[nameStackptr] = nodePrefix;
+                        // add the outer most nodePrefix
+                        if (debugConvert)
+                            System.out.println("[convertJSONtoXML:object start] 2 (0) stackptr: " + stackptr + " nodePrefix: " + nodePrefix + " namestack: " + nameStack[nameStackptr] + " nodeStack: " + nodeStack[nameStackptr]);
+                        theXML += addNodePrefix(0, nodePrefix, ElementTypes.JSON_PROPERTY_NAME, jsonNavigator);
+//                        if (debugConvert) System.out.println("[convertJSONtoXML] theXML:\n" + theXML);
+                        nameStackptr++;
+                    } else {
+                        // add any inner nodePrefix
+                        String thisNodePrefix = nameStack[nameStackptr];
+                        if (thisNodePrefix == null ) {
+                            if (theHint == null) {
+                                System.out.println ("[convertJSONtoXML] 2 ERROR ERROR ERROR theHint is null!!!!");
+                                return "<bad 2 Invalid JSON /bad>";
+                            }
+                            thisNodePrefix = theHint.getNodeHeader();
+                            System.out.println ("[convertJSONtoXML] 2 new nodeprefix: " + thisNodePrefix);
+
+                        }
+                        if (debugConvert)
+                            System.out.println("[convertJSONtoXML:object start] 2 (had previous) stackptr: " + stackptr + " thisNodePrefix: " + thisNodePrefix + " namestack: " + nameStack[nameStackptr] + " nodeStack: " + nodeStack[nameStackptr]);
+                        theXML += "<" + thisNodePrefix + " ";
+                    }
+
                     if (debugConvert) System.out.println("[end of array start case statement]");
                     break;
                 }
@@ -585,7 +626,7 @@ public class JSONtoXML {
         System.out.println ("[GNomExFrontController] xmlHintMap size: " + xmlHintMap.size());
 
         try {
-            debugConvert = false;
+            debugConvert = true;
             debugHint = false;
 
             // setup hintKey, the json to convert

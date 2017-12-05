@@ -17,6 +17,7 @@ import {GetLabService} from "./get-lab.service";
 import {HttpService} from "./http.service";
 import {LabListService} from "./lab-list.service";
 import {PropertyService} from "./property.service";
+import {AnnotationService} from "./annotation.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -39,7 +40,8 @@ import {PropertyService} from "./property.service";
         LaunchPropertiesService,
         ProjectService,
         OrganismService,
-        ConstantsService
+        ConstantsService,
+        AnnotationService,
     ]})
 export class ServicesModule {
 }

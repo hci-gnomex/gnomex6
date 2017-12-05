@@ -11,7 +11,7 @@ public class HintInformation {
 
     private String command = "";
     private String parameter = "";
-    private String [][] elementHints = new String[256][2];
+    private String [][] elementHints = new String[2560][2];
     private int nxtHint = -1;
     private String nodeHeader = "";
     private String nodePrefix = "";
@@ -31,7 +31,7 @@ public class HintInformation {
 		outstr += "nodePrefix: " + nodePrefix + "\n";
 		outstr += "Element Hints:\n";
 
-		for (int ii = 0; ii < 256; ii++) {
+		for (int ii = 0; ii < 2560; ii++) {
 			if (elementHints[ii][0] == null)
 			{
 				break;
