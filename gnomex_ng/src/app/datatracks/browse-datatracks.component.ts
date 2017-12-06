@@ -189,14 +189,10 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     private dragEndItems: any;
     private selectedItem: ITreeNode;
     public datatracksCount: number;
-    private analysisGroupListSubscription: Subscription;
+    private dataTracksListSubscription: Subscription;
     private labList: any[] = [];
-    private selectedIdLab;
     public disabled: boolean = true;
-    public disableNewAnalysis: boolean = true;
     public disableDelete: boolean = true;
-    public disableNewAnalysisGroup: boolean = true;
-    private selectedLabLabel: string;
     public showSpinner: boolean = false;
     public searchText: string;
 
@@ -222,7 +218,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.organisms = [];
 
 
-        this.analysisGroupListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
+        this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
             this.buildTree(response);
         });
         this.datatracksService.startSearchSubject.subscribe((value) =>{
@@ -421,24 +417,16 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     treeOnSelect(event: any) {
         this.selectedItem = event.node;
         this.selItem.emit(this.selectedItem);
-        this.selectedIdLab = this.selectedItem.data.idLab;
-        this.selectedLabLabel = this.selectedItem.data.labName;
 
         //Lab
         if (this.selectedItem.level === 1) {
-            this.disableNewAnalysis = false;
-            this.disableNewAnalysisGroup = false;
             this.disableDelete = true;
         } else if (this.selectedItem.level === 2) {
-            this.disableNewAnalysis = false;
             this.disableDelete = false;
-            this.disableNewAnalysisGroup = false;
 
             //datatrack
         } else if (this.selectedItem.level === 3) {
-            this.disableNewAnalysis = false;
             this.disableDelete = false;
-            this.disableNewAnalysisGroup = false;
         }
     }
 
@@ -451,6 +439,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     ngOnDestroy(): void {
-        this.analysisGroupListSubscription.unsubscribe();
+        this.dataTracksListSubscription.unsubscribe();
     }
 }
