@@ -20,9 +20,11 @@
                             </div>
                         </div>
                     </div>
+                    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
                     <div class="br-exp-item br-exp-three">
                         <tree-root #analysisTree (moveNode)="onMoveNode($event)"
                                    (activate)="treeOnSelect($event)"
+                                   (updateData)="treeUpdateData($event)"
                                    [nodes]="items" [options]="options">
                             <ng-template #treeNodeTemplate let-node let-index="index">
                                 <img src="{{node.data.icon}}" height="16" width="16">

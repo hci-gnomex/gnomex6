@@ -14,6 +14,8 @@ export class ExperimentsService {
 
 	private experimentOrders: any[];
     public projectRequestList: any[];
+    public selectedTreeNode:any;
+    public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
@@ -52,6 +54,8 @@ export class ExperimentsService {
 	}
 
     refreshProjectRequestList_fromBackend(): void {
+        this.startSearchSubject.next(true);
+
         this._http.get("/gnomex/GetProjectRequestList.gx", {
             withCredentials: true,
             search: this.previousURLParams
@@ -69,8 +73,9 @@ export class ExperimentsService {
     }
 
 
-	getExperiments_fromBackend(parameters: URLSearchParams): void {
-		if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
+    getExperiments_fromBackend(parameters: URLSearchParams): void {
+
+        if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
 			// do nothing
 			console.log("Experiment Orders already loaded");
 			// return Observable.of(this.experimentOrders);
@@ -93,9 +98,10 @@ export class ExperimentsService {
 	}
 
 	repeatGetExperiments_fromBackend(): void {
-    this.haveLoadedExperimentOrders = false;
-    this.getExperiments_fromBackend(this.previousURLParams);
-  }
+        this.haveLoadedExperimentOrders = false;
+        this.getExperiments_fromBackend(this.previousURLParams);
+    }
+
 
 	getChangeExperimentStatusObservable(): Observable<any> {
 		return this.changeStatusSubject.asObservable();
@@ -134,6 +140,8 @@ export class ExperimentsService {
     }
 
     getProjectRequestList_fromBackend(params: URLSearchParams): void {
+        this.startSearchSubject.next(true);
+
         if (this.haveLoadedExperimentOrders && this.previousURLParams === params) {
             // do nothing
             console.log("Experiment Orders already loaded");
@@ -265,7 +273,9 @@ export class ExperimentsService {
                 throw new Error("Error");
             }
         });
+
     }
+
 
     getProjectRequestList(params: URLSearchParams) {
         //return this._http.get("/gnomex/GetProjectRequestList.gx?idLab=1500&showCategory='N'", {withCredentials: true}).map((response: Response) => {
