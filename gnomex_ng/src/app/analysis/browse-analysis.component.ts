@@ -281,7 +281,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     go(event: any) {
-        console.log("event " + event);
     }
 
     /*
@@ -332,9 +331,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                                     a.id = "a"+a.idAnalysis;
                                     a.icon = "assets/map.png";
                                     a.parentid = p.idLab;
-                                    if (this.analysisCount % 100 === 0) {
-                                        console.log("experiment count " + this.analysisCount);
-                                    }
                                 } else {
                                     console.log("label not defined");
                                 }
