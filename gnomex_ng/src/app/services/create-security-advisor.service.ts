@@ -10,6 +10,8 @@ import {ProgressService} from "../home/progress.service";
 @Injectable()
 export class CreateSecurityAdvisorService {
     private result: any;
+    static readonly CAN_ACCESS_ANY_OBJECT : string = "canAccessAnyObject";
+
 
     private idAppUserValue: number;
     public get idAppUser(): number {

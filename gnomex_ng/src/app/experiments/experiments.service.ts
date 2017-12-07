@@ -3,6 +3,7 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {HttpHeaders, HttpParams} from "@angular/common/http";
 
 export let BROWSE_EXPERIMENTS_ENDPOINT: OpaqueToken = new OpaqueToken("browse_experiments_url");
 export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experiment_url");
@@ -41,6 +42,23 @@ export class ExperimentsService {
 		return this._http.get("/gnomex/GetProjectRequestList.gx?showEmptyProjectFolders=N&allExperiments=Y&showSamples=N&showCategory=N&idCoreFacility=3&showEmptyProjectFolders=N", {withCredentials: true}).map((response: Response) => {
 			if (response.status === 200) {
 				return response.json().Lab;
+			} else {
+				throw new Error("Error");
+			}
+		});
+	}
+
+	refreshProjectRequestList_fromBackend(): void {
+		this._http.get("/gnomex/GetProjectRequestList.gx", {
+			withCredentials: true,
+			search: this.previousURLParams
+		}).subscribe((response: Response) => {
+			console.log("GetRequestList called");
+
+			if (response.status === 200) {
+				this.projectRequestList = response.json().Lab;
+				this.emitProjectRequestList();
+				//return response.json().Request;
 			} else {
 				throw new Error("Error");
 			}
@@ -103,7 +121,6 @@ export class ExperimentsService {
 		});
 	}
 
-
 	emitExperimentOrders(): void {
 		this.experimentOrdersSubject.next(this.experimentOrders);
 	}
@@ -121,6 +138,7 @@ export class ExperimentsService {
 		if (this.haveLoadedExperimentOrders && this.previousURLParams === params) {
 			// do nothing
 			console.log("Experiment Orders already loaded");
+			// return Observable.of(this.experimentOrders);
 		} else {
 			this.haveLoadedExperimentOrders = true;
 			this.previousURLParams = params;
@@ -129,31 +147,17 @@ export class ExperimentsService {
 				withCredentials: true,
 				search: params
 			}).subscribe((response: Response) => {
+				console.log("GetRequestList called");
+
 				if (response.status === 200) {
 					this.projectRequestList = response.json().Lab;
 					this.emitProjectRequestList();
+					//return response.json().Request;
 				} else {
 					throw new Error("Error");
 				}
 			});
 		}
-	}
-
-	refreshProjectRequestList_fromBackend(): void {
-		this._http.get("/gnomex/GetProjectRequestList.gx", {
-			withCredentials: true,
-			search: this.previousURLParams
-		}).subscribe((response: Response) => {
-			console.log("GetRequestList called");
-
-			if (response.status === 200) {
-				this.projectRequestList = response.json().Lab;
-				this.emitProjectRequestList();
-				//return response.json().Request;
-			} else {
-				throw new Error("Error");
-			}
-		});
 	}
 
 	getExperiment(id: string): Observable<any> {
@@ -174,7 +178,6 @@ export class ExperimentsService {
 				throw new Error("Error");
 			}
 		});
-
 	}
 
 	saveRequestProject(params: URLSearchParams): Observable<any> {
@@ -185,7 +188,23 @@ export class ExperimentsService {
 				throw new Error("Error");
 			}
 		});
+	}
 
+	saveVisibility(body: any, idProject?: string): Observable<any> {
+
+		let params: HttpParams = new HttpParams();
+		if (idProject) {
+			params = params.append('idProject', idProject);
+		}
+		let strBody: string = JSON.stringify(body);
+		//const headers = new HttpHeaders().set('Content-Type', 'application/json');
+		return this._http.post("/gnomex/SaveVisibility.gx", strBody, {params}).map((response: Response) => {
+			if (response.status === 200) {
+				return response;
+			} else {
+				throw new Error("Error: In SaveVisibility");
+			}
+		});
 	}
 
 
@@ -211,7 +230,6 @@ export class ExperimentsService {
 				});
 	}
 
-
 	getProject(params: URLSearchParams): Observable<any> {
 		return this._http.get("/gnomex/GetProject.gx", {search: params}).map((response: Response) => {
 			if (response.status === 200) {
@@ -221,7 +239,6 @@ export class ExperimentsService {
 				throw new Error("Error");
 			}
 		});
-
 	}
 
 	saveProject(params: URLSearchParams): Observable<any> {
@@ -232,7 +249,6 @@ export class ExperimentsService {
 				throw new Error("Error");
 			}
 		});
-
 	}
 
 	deleteExperiment(params: URLSearchParams): Observable<any> {
@@ -335,6 +351,4 @@ export class ExperimentsService {
 	getFilteredOverviewListObservable(): Observable<any> {
 		return this.filteredExperimentOverviewListSubject.asObservable();
 	}
-
-
 }

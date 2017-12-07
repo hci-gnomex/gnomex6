@@ -31,6 +31,8 @@ import {BrowseExperimentsComponent} from "./browse-experiments.component";
 import {ExperimentOrdersComponent} from "./orders/experiment-orders.component";
 import {ViewExperimentComponent} from "./view-experiment.component";
 import {BrowsePanelComponent} from "./browse-panel.component";
+import {AgGridModule} from 'ag-grid-angular/main';
+
 
 import {TestComponent,DescriptionTab,PrepTab,ExperimentDetail,NewExperimentComponent} from './experiment-detail/index'
 import {
@@ -52,6 +54,7 @@ import {DeleteProjectComponent} from "./delete-project.component";
 import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
 import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
+import {AgGridRendererModule,IconTextRendererComponent} from "../util/grid-renderers/index";
 
 /**
  * @author mbyrne
@@ -88,7 +91,6 @@ export const componentFactories =
         LoaderModule,
         NotificationModule,
         PanelModule,
-        
         ServicesModule,
         TextAreaModule,
         ToggleButtonModule,
@@ -99,7 +101,9 @@ export const componentFactories =
         RichEditorModule,
         DropDownModule,
         AngularMaterialModule,
-        TreeGridModule
+        TreeGridModule,
+        AgGridRendererModule,
+        AgGridModule.withComponents([IconTextRendererComponent])
     ],
     declarations: [
                     BrowseExperimentsComponent,
