@@ -55,8 +55,8 @@
     {
       "command": "SubmitWorkAuthForm",
       "parameter": "coreFacilitiesXMLString",
-      "nodeheader": "coreFacilities",
-      "nodeprefix": "CoreFacility",
+      "nodeheader": "CoreFacility",
+      "nodeprefix": "coreFacilities",
       "elementhints": [
         {
           "elementname": "someEntries2",

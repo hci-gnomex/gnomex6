@@ -203,6 +203,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	private usersEmail: string;
 
+	private errorTitle: string;
+	private errorMessage: string;
+
 	constructor(@Inject(ChangeDetectorRef) private changeDetectorRef: ChangeDetectorRef,
 							private dictionaryService: DictionaryService,
 							private labListService: LabListService,
@@ -317,7 +320,14 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 			this.selectedCoreFacilitiesString = '';
 
 			for (let i: number = 0; i < selectedIndices.length; i++) {
-				coreFacilities.push(possibleCoreFacilities[selectedIndices[i].valueOf()]);
+				let coreFacility: any = {
+					idCoreFacility: possibleCoreFacilities[selectedIndices[i].valueOf()].idCoreFacility,
+					facilityName: possibleCoreFacilities[selectedIndices[i].valueOf()].display
+				};
+
+				// coreFacilities.push(possibleCoreFacilities[selectedIndices[i].valueOf()]);
+				// TODO : Last change
+				coreFacilities.push(coreFacility);
 
 				if (i > 0 && i + 1 < selectedIndices.length) {
 					this.selectedCoreFacilitiesString += ', ';
@@ -326,6 +336,11 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 				}
 
 				this.selectedCoreFacilitiesString += possibleCoreFacilities[selectedIndices[i].valueOf()].display;
+			}
+
+			if (coreFacilities.length == 0) {
+				this.errorTitle = 'Please fix the following errors with this form before proceeding:';
+				this.errorMessage = '- Please select at least one core facility';
 			}
 
 			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
@@ -396,7 +411,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 				"    accountNumberActivity    : " + accountNumberActivity + "\n" +
 				"    accountNumberProject     : " + accountNumberProject + "\n" +
 				"    accountNumberAccount     : " + accountNumberAccount + "\n" +
-				"    accountNumberAU          : " + accountNumberAu + "\n" +
+				"    accountNumberAu          : " + accountNumberAu + "\n" +
 				"    idFundingAgency          : " + idFundingAgency + "\n" +
 				"    custom1                  : " + custom1 + "\n" +
 				"    custom2                  : " + custom2 + "\n" +
