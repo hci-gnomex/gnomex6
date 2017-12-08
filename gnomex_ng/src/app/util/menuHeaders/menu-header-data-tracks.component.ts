@@ -142,7 +142,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             type = DATATRACK;
         } else if (this.selectedNode.data.binomialName) {
             if (this.selectedNode.data.GenomeBuild) {
-                level = "Unable to remove organism. Please remove the genome builds for organism BlueWhale first.";
+                level = "Unable to remove organism. Please remove the genome builds for organism "
+                    + this.selectedNode.data.label + " first.";
                 confirmString = "";
             }
             else {
