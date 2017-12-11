@@ -147,6 +147,9 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
             if (this.analysisLabList.length == 1) {
                 this.analysisGroupList = this.analysisLabList[0].AnalysisGroup;
             }
+            if (!this.isArray(this.analysisGroupList)) {
+                this.analysisGroupList = [this.analysisGroupList];
+            }
         }
     }
 
@@ -157,9 +160,15 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
     onAnalysisGroupSelect(event: any) {
         if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idAnalysisGroup = event.args.item.value;
+
             this.analysisGroup = this.analysisGroupList.filter(group=>group.idAnalysisGroup===this.idAnalysisGroup)
         }
     }
+
+    isArray(what) {
+        return Object.prototype.toString.call(what) === "[object Array]";
+    };
+
 
     /**
      * Set the idAppUser on user select.
@@ -228,7 +237,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         }
         var stringifiedAnalysisGroup;
         if (this.analysisGroup.length > 0) {
-            stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
+            stringifiedAnalysisGroup = JSON.stringify(this.analysisLabList);
         }
         params.set("lanesXMLString", "");
         params.set("samplesXMLString", "");

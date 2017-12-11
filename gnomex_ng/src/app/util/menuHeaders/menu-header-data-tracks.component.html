@@ -1,9 +1,8 @@
 <div>
-    <button mat-button (click)="makeNewDataTrack()"><img src="../../../assets/datatrack_new.png">New Data Track</button>
-    <button mat-button (click)="makeNewFolder()"><img src="../../../assets/folder_new.png">New Folder</button>
+    <button mat-button [disabled]="newDTisDisabled" (click)="makeNewDataTrack()"><img src="../../../assets/datatrack_new.png">New Data Track</button>
+    <button mat-button [disabled]="newGenomeBuildisDisabled" (click)="makeNewFolder()"><img src="../../../assets/folder_new.png">New Folder</button>
     <button *ngIf="showMenuItemNewGenomeBuild" mat-button (click)="makeNewGenomeBuild()"><img src="../../../assets/genome_build_new.png">New Genome Build</button>
     <button *ngIf="showMenuItemNewOrganism" mat-button (click)="makeNewOrganism()"><img src="../../../assets/organism_new.png">New Organism</button>
     <button mat-button (click)="doDuplicate()"><img src="../../../assets/duplicate.png">Duplicate</button>
     <button mat-button (click)="doRemove()"><img src="../../../assets/crossout.png">Remove</button>
-    <button mat-button (click)="doDownload()"><img src="../../../assets/download.png">Download</button>
 </div>
