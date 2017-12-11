@@ -33,6 +33,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ServicesModule } from './services/services.module';
 import {AnalysisModule} from "./analysis/analysis.module";
+import {DatatracksModule} from "./datatracks/datatracks.module";
 import {MatIconModule} from "@angular/material";
 import {ReportsModule} from "./reports/reports.module";
 
@@ -65,6 +66,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         UserModule,
         BrowserAnimationsModule,
         AnalysisModule,
+        DatatracksModule,
         MatIconModule,
         ReportsModule
     ],

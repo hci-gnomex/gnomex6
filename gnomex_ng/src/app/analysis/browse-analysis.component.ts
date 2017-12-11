@@ -1,7 +1,10 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from "@angular/core";
+import {
+    AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 
 import { URLSearchParams } from "@angular/http";
 
@@ -211,6 +214,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     public createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
     public createAnalysisGroupDialogRef: MatDialogRef<CreateAnalysisGroupComponent>;
     private parentProject: any;
+    public showSpinner: boolean = false;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -258,6 +262,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     constructor(private analysisService: AnalysisService, private router: Router,
                 private dialog: MatDialog,
                 private labListService: LabListService,
+                private changeDetectorRef: ChangeDetectorRef,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService) {
 
 
@@ -266,10 +271,16 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.labMembers = [];
         this.billingAccounts = [];
         this.labs = [];
+
+        this.analysisService.startSearchSubject.subscribe((value) =>{
+            if (value) {
+                this.showSpinner = true;
+            }
+        })
+
     }
 
     go(event: any) {
-        console.log("event " + event);
     }
 
     /*
@@ -287,7 +298,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         }
         this.labs = this.labs.concat(this.items);
         for (var l of this.items) {
-            l.id = l.idLab;
+            l.id = "l"+l.idLab;
             l.parentid = -1;
 
             l.icon = "assets/group.png";
@@ -301,7 +312,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 for (var p of l.items) {
                     p.icon = "assets/folder.png";
                     p.idLab = l.idLab;
-                    p.id = p.idAnalysisGroup;
+                    p.id = "p"+p.idAnalysisGroup;
                     if (p.Analysis) {
                         if (!this.isArray(p.Analysis)) {
                             p.items = [p.Analysis];
@@ -317,12 +328,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                                     labelString = labelString.concat(a.label);
                                     labelString = labelString.concat(")");
                                     a.label = labelString;
-                                    a.id = a.idAnalysis;
+                                    a.id = "a"+a.idAnalysis;
                                     a.icon = "assets/map.png";
                                     a.parentid = p.idLab;
-                                    if (this.analysisCount % 100 === 0) {
-                                        console.log("experiment count " + this.analysisCount);
-                                    }
                                 } else {
                                     console.log("label not defined");
                                 }
@@ -337,10 +345,14 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         }
     };
 
-    /*
+    treeUpdateData(event) {
+        if (this.analysisService.startSearchSubject.getValue() === true) {
+            this.showSpinner = false;
+            this.analysisService.startSearchSubject.next(false);
+            this.changeDetectorRef.detectChanges();
+        }
+    }
 
-    Start of Ng2 tree
-     */
 
     onMoveNode($event) {
         console.log(

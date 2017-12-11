@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {Response, URLSearchParams} from "@angular/http";
-import {MatDialogRef} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {OrganismService} from "../services/organism.service";
 import {DataTrackService} from "../services/data-track.service";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Component({
     selector: 'new-genome-build',
@@ -10,6 +11,7 @@ import {DataTrackService} from "../services/data-track.service";
 })
 
 export class NewGenomeBuildComponent {
+    private selectedItem: ITreeNode;
 
     public idOrganism: string = "";
     public name: string = "";
@@ -22,7 +24,9 @@ export class NewGenomeBuildComponent {
 
     constructor(public dialogRef: MatDialogRef<NewGenomeBuildComponent>,
                 private organismService: OrganismService,
-                private dataTrackService: DataTrackService) {
+                private dataTrackService: DataTrackService,
+                @Inject(MAT_DIALOG_DATA) private data: any) {
+        this.selectedItem = data.selectedItem;
         this.organismService.getDas2OrganismList().subscribe((response: any[]) => {
             this.das2OrganismList = response;
         });
@@ -61,6 +65,9 @@ export class NewGenomeBuildComponent {
         params.set("idOrganism", this.idOrganism);
         params.set("isActive", this.activeFlag ? "Y" : "N");
         this.dataTrackService.saveGenomeBuild(params).subscribe((response: Response) => {
+            if (this.selectedItem) {
+                this.dataTrackService.refreshDatatracksList_fromBackend();
+            }
             this.showSpinner = false;
             this.dialogRef.close();
         });
