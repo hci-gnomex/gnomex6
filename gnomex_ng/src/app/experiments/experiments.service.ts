@@ -13,6 +13,8 @@ export class ExperimentsService {
 
 	private experimentOrders: any[];
 	public projectRequestList: any[];
+	public selectedTreeNode: any;
+	public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
 	private experimentOrdersSubject: Subject<any[]> = new Subject();
 	private projectRequestListSubject: Subject<any[]> = new Subject();
@@ -32,7 +34,8 @@ export class ExperimentsService {
 	browsePanelParams: URLSearchParams;
 	experimentList: Array<any> = [];
 
-	constructor(private _http: Http, @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {
+	constructor(private _http: Http,
+							@Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {
 	}
 
 	getExperiments() {
@@ -49,6 +52,8 @@ export class ExperimentsService {
 	}
 
 	refreshProjectRequestList_fromBackend(): void {
+		this.startSearchSubject.next(true);
+
 		this._http.get("/gnomex/GetProjectRequestList.gx", {
 			withCredentials: true,
 			search: this.previousURLParams
@@ -70,6 +75,7 @@ export class ExperimentsService {
 	}
 
 	getExperiments_fromBackend(parameters: URLSearchParams): void {
+
 		if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
 			// do nothing
 			console.log("Experiment Orders already loaded");
@@ -129,12 +135,9 @@ export class ExperimentsService {
 		return this.projectRequestListSubject.asObservable();
 	}
 
-
-	emitProjectRequestList(): void {
-		this.projectRequestListSubject.next(this.projectRequestList);
-	}
-
 	getProjectRequestList_fromBackend(params: URLSearchParams): void {
+		this.startSearchSubject.next(true);
+
 		if (this.haveLoadedExperimentOrders && this.previousURLParams === params) {
 			// do nothing
 			console.log("Experiment Orders already loaded");
@@ -158,6 +161,10 @@ export class ExperimentsService {
 				}
 			});
 		}
+	}
+
+	emitProjectRequestList(): void {
+		this.projectRequestListSubject.next(this.projectRequestList);
 	}
 
 	getExperiment(id: string): Observable<any> {
