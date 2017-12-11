@@ -217,8 +217,8 @@
 										5 digits
 									</div>
 								</div>
-								<div class="horizontal-break"></div>
-								<div class="inline-block" style="vertical-align: top">
+								<div *ngIf="isActivity" class="horizontal-break"></div>
+								<div *ngIf="isActivity" class="inline-block" style="vertical-align: top">
 									<div class="sub-header">
 										A/U
 									</div>
@@ -507,7 +507,7 @@
 							<div class="tr">
 								<div class="td">
 									<div class="checkbox-container">
-										<jqxCheckBox></jqxCheckBox>
+										<jqxCheckBox #agreementCheckbox></jqxCheckBox>
 									</div>
 									<div class="inline-block center-vertical-align agreement">
 										I agree
@@ -550,5 +550,33 @@
 		<br>
 		<br>
 		<button (click)="successOkButtonClicked()">OK</button>
+	</div>
+</jqxWindow>
+
+<jqxWindow
+		#errorWindow
+		[resizable]="false"
+		[autoOpen]="false"
+		[isModal]="true"
+		[width]="'40em'"
+		[height]="'20em'">
+	<div>
+		<p class="error-header">Please fix the following errors with this form before proceeding:</p>
+	</div>
+	<div>
+		<div class="t full-width full-height">
+			<div class="tr full-width">
+				<div class="td full-width full-height">
+					<div style="padding: 0 15%;">
+						<pre style="text-align: left;">{{errorMessage}}</pre>
+					</div>
+				</div>
+			</div>
+			<div class="tr full-width">
+				<div class="td full-width center">
+					<button style="text-align: center;" (click)="errorOkButtonClicked()">OK</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </jqxWindow>

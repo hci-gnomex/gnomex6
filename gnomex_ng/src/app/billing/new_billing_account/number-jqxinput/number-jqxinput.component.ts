@@ -9,6 +9,10 @@ import {jqxInputComponent} from "../../../../assets/jqwidgets-ts/angular_jqxinpu
 			.warning {
 					background-color: #ffff3f;
 			}
+			
+			.selected {
+					background-color: lightskyblue;
+			}
 	`]
 })
 export class NumberJqxInputComponent {
@@ -27,11 +31,12 @@ export class NumberJqxInputComponent {
 
 	@Output('(input)') input: EventEmitter<string> = new EventEmitter<string>();
 
-	private divClasses: string = ' warning '; //'';
+	divClasses: string = ' ';
 
 	private previouslyAcceptedValue: string = '';
 
 	private warning: boolean = false;
+	private isSelected: boolean = false;
 
 	warningActive(warningOn?: boolean): boolean {
 		if (warningOn == undefined || warningOn == null) {
@@ -39,13 +44,31 @@ export class NumberJqxInputComponent {
 		}
 
 		this.warning = warningOn;
-		this.processWarning();
+		this.processDisplayState();
 	}
 
 	clearData(): void {
 		this.previouslyAcceptedValue = '';
 		this.numberInput.value('');
 		this.divClasses = ' ';
+	}
+
+	private onFocusIn() {
+		this.isSelected = true;
+		this.processDisplayState();
+	}
+
+	private onFocusOut() {
+		this.isSelected = false;
+		let newInputContents: string = '' + this.numberInput.val();
+		let regex: RegExp = new RegExp('^\\d{' + this.minimumDigits + ',' + this.maximumDigits + '}$');
+
+		if(newInputContents.match(regex) || newInputContents === '') {
+			this.warning = false;
+		} else {
+			this.warning = true;
+		}
+		this.processDisplayState();
 	}
 
 	private onInputAccountNumberInput() {
@@ -60,8 +83,10 @@ export class NumberJqxInputComponent {
 		}
 	}
 
-	private processWarning(): void {
-		if (this.warning) {
+	private processDisplayState(): void {
+		if (this.isSelected) {
+			this.divClasses = ' selected ';
+		} else if (this.warning) {
 			this.divClasses = ' warning ';
 		} else {
 			this.divClasses = ' ';
