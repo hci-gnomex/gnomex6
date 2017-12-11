@@ -44,30 +44,17 @@ export class MoveDataTrackComponent {
         this.noButton = true;
     }
 
-    public doMove(): void {
+    public doMoveCopy(mode: any): void {
         this.showSpinner = true;
         let params: URLSearchParams = new URLSearchParams();
         params.set("idDataTrack", this.currentItem.idDataTrack);
         params.set("idGenomeBuild", this.currentItem.idGenomeBuild);
         params.set("idDataTrackFolder", this.targetItem.idDataTrackFolder);
         params.set("idDataTrackFolderOld", this.currentItem.idDataTrackFolder);
-        params.set("isMove", "Y");
-        params.set("name", "DataTrack");
-        this.dataTrackService.moveDataTrack(params).subscribe((response: Response) => {
-            this.showSpinner = false;
-            this.dialogRef.close();
-            this.dataTrackService.refreshDatatracksList_fromBackend();
-        });
-    }
-
-    public doCopy(): void {
-        this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idDataTrack", this.currentItem.idDataTrack);
-        params.set("idGenomeBuild", this.currentItem.idGenomeBuild);
-        params.set("idDataTrackFolder", this.targetItem.idDataTrackFolder);
-        params.set("idDataTrackFolderOld", this.currentItem.idDataTrackFolder);
-        params.set("isMove", "N");
+        if (mode ==="M")
+            params.set("isMove", "Y");
+        else
+            params.set("isMove", "N");
         params.set("name", "DataTrack");
         this.dataTrackService.moveDataTrack(params).subscribe((response: Response) => {
             this.showSpinner = false;
