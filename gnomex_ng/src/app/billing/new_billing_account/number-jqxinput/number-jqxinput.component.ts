@@ -4,7 +4,12 @@ import {jqxInputComponent} from "../../../../assets/jqwidgets-ts/angular_jqxinpu
 
 @Component({
 	selector: 'number-jqxinput',
-	templateUrl: './number-jqxinput.component.html'
+	templateUrl: './number-jqxinput.component.html',
+	styles: [`
+			.warning {
+					background-color: #ffff3f;
+			}
+	`]
 })
 export class NumberJqxInputComponent {
 
@@ -18,13 +23,29 @@ export class NumberJqxInputComponent {
 
 	@Input('value') value: string;
 
+	@Input('warningColor') warningColor: string = 'ffff3f';
+
 	@Output('(input)') input: EventEmitter<string> = new EventEmitter<string>();
 
+	private divClasses: string = ' warning '; //'';
+
 	private previouslyAcceptedValue: string = '';
+
+	private warning: boolean = false;
+
+	warningActive(warningOn?: boolean): boolean {
+		if (warningOn == undefined || warningOn == null) {
+			return this.warning;
+		}
+
+		this.warning = warningOn;
+		this.processWarning();
+	}
 
 	clearData(): void {
 		this.previouslyAcceptedValue = '';
 		this.numberInput.value('');
+		this.divClasses = ' ';
 	}
 
 	private onInputAccountNumberInput() {
@@ -36,6 +57,14 @@ export class NumberJqxInputComponent {
 			this.input.emit('newInputContents');
 		} else {
 			this.numberInput.val(this.previouslyAcceptedValue);
+		}
+	}
+
+	private processWarning(): void {
+		if (this.warning) {
+			this.divClasses = ' warning ';
+		} else {
+			this.divClasses = ' ';
 		}
 	}
 }

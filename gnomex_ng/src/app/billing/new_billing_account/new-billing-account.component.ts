@@ -241,6 +241,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 				this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
 					this.internalAccountFieldsConfiguration = response;
 				});
+
+		// this.accountNumberBusInput.warningActive(true);
 	}
 
 	ngAfterViewInit(): void {
