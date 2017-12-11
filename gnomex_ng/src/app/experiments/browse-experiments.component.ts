@@ -196,11 +196,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private billingAccounts: any;
     private dragEndItems: any;
     private selectedItem: any;
-    private selectedIndex: number = -1;
-    private selectedBillingItem: string;
-    private selectedBillingIndex: number = -1;
-    private selectedProjectLabItem: any;
-    private selectedProjectLabIndex: number = -1;
     private showBillingCombo: boolean = false;
     private labList: any[] = [];
     private selectedExperiment: any;
@@ -297,38 +292,38 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.items = response;
         }
         this.labs = this.labs.concat(this.items);
-        for( var l of this.items) {
-            l.id = "l"+l.idLab;
-            l.parentid = -1;
+        for( var lab of this.items) {
+            lab.id = "l"+lab.idLab;
+            lab.parentid = -1;
 
-            l.icon = "assets/group.png";
+            lab.icon = "assets/group.png";
             // If there is a lab with no Project skip
-            if (l.Project) {
-                if (!this.isArray(l.Project)) {
-                    l.items = [l.Project];
+            if (lab.Project) {
+                if (!this.isArray(lab.Project)) {
+                    lab.items = [lab.Project];
                 } else {
-                    l.items = l.Project;
+                    lab.items = lab.Project;
                 }
-                for (var p of l.items) {
-                    p.icon = "assets/folder.png";
-                    p.labId = l.labId;
-                    p.id = "p"+p.idProject;
-                    p.parentid = l.id;
-                    if (p.Request) {
-                        if (!this.isArray(p.Request)) {
-                            p.items = [p.Request];
+                for (var project of lab.items) {
+                    project.icon = "assets/folder.png";
+                    project.labId = lab.labId;
+                    project.id = "p"+project.idProject;
+                    project.parentid = lab.id;
+                    if (project.Request) {
+                        if (!this.isArray(project.Request)) {
+                            project.items = [project.Request];
                         } else {
-                            p.items = p.Request;
+                            project.items = project.Request;
                         }
-                        for (var r of p.items) {
-                            if (r) {
-                                if (r.label) {
-                                    var shortLabel = r.label.substring(0, (r.label.lastIndexOf("-")));
+                        for (var request of project.items) {
+                            if (request) {
+                                if (request.label) {
+                                    var shortLabel = request.label.substring(0, (request.label.lastIndexOf("-")));
                                     var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
-                                    r.label = shorterLabel;
+                                    request.label = shorterLabel;
                                     this.experimentCount++;
-                                    r.id = "r"+r.idRequest;
-                                    r.parentid = p.id;
+                                    request.id = "r"+request.idRequest;
+                                    request.parentid = project.id;
                                 } else {
                                     console.log("label not defined");
                                 }
@@ -625,5 +620,5 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     ngOnDestroy(): void {
         this.projectRequestListSubscription.unsubscribe();
-}
+    }
 }
