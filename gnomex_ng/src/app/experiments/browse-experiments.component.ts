@@ -196,11 +196,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private billingAccounts: any;
     private dragEndItems: any;
     private selectedItem: any;
-    private selectedIndex: number = -1;
-    private selectedBillingItem: string;
-    private selectedBillingIndex: number = -1;
-    private selectedProjectLabItem: any;
-    private selectedProjectLabIndex: number = -1;
     private showBillingCombo: boolean = false;
     private labList: any[] = [];
     private selectedExperiment: any;
@@ -298,11 +293,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }
         this.labs = this.labs.concat(this.items);
         for( var l of this.items) {
-            l.id = "l"+l.idLab;
+            l.id = l.idLab;
             l.parentid = -1;
 
             l.icon = "assets/group.png";
             // If there is a lab with no Project skip
+
             if (l.Project) {
             if (!this.isArray(l.Project)) {
                 l.items = [l.Project];
@@ -329,6 +325,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                                 this.experimentCount++;
                                 r.id = "r"+r.idRequest;
                                 r.parentid = p.id;
+
                             } else {
                                 console.log("label not defined");
                             }
@@ -622,5 +619,5 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     ngOnDestroy(): void {
         this.projectRequestListSubscription.unsubscribe();
-}
+    }
 }

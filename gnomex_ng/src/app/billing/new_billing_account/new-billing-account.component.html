@@ -107,39 +107,54 @@
 								</div>
 							</div>
 							<div class="td">
-								<div class="inline-block">
+								<div class="inline-block" style="vertical-align: top">
 									<div class="sub-header">
 										Bus
 									</div>
 									<div>
-										<jqxInput #accountNumberBusInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
-										</jqxInput>
+										<number-jqxinput
+												#accountNumberBusInput
+												[minimumDigits]="2"
+												[maximumDigits]="2"
+												[width]="'3rem'"
+												[height]="'1.5rem'">
+										</number-jqxinput>
 									</div>
 									<div>
 										2 digits
 									</div>
 								</div>
 								<div class="horizontal-break"></div>
-								<div class="inline-block">
+								<div class="inline-block" style="vertical-align: top">
 									<div class="sub-header">
 										Org
 									</div>
 									<div>
-										<jqxInput #accountNumberOrgInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
-										</jqxInput>
+										<number-jqxinput
+												#accountNumberOrgInput
+												[minimumDigits]="5"
+												[maximumDigits]="5"
+												[width]="'3rem'"
+												[height]="'1.5rem'">
+										</number-jqxinput>
 									</div>
 									<div>
 										5 digits
 									</div>
 								</div>
 								<div class="horizontal-break"></div>
-								<div class="inline-block">
+								<div class="inline-block" style="vertical-align: top">
 									<div class="sub-header">
 										Fund
 									</div>
 									<div>
-										<jqxInput #accountNumberFundInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
-										</jqxInput>
+										<number-jqxinput
+												#accountNumberFundInput
+												[minimumDigits]="4"
+												[maximumDigits]="4"
+												[width]="'3rem'"
+												[height]="'1.5rem'">
+										</number-jqxinput>
 									</div>
 									<div>
 										4 digits
@@ -155,13 +170,25 @@
 										</div>
 										<div class="tr">
 											<div class="td">
-												<jqxInput #accountNumberActivityInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'">
-												</jqxInput>
+												<number-jqxinput
+														#accountNumberActivityInput
+														(input)="clearAccountNumberProjectInput()"
+														[minimumDigits]="5"
+														[maximumDigits]="5"
+														[width]="'3rem'"
+														[height]="'1.5rem'">
+												</number-jqxinput>
 											</div>
 											<div class="td sub-header" style="width:2.5em; text-align:center;">OR</div>
 											<div class="td">
-												<jqxInput #accountNumberProjectInput [theme]="'gnomex5'" [width]="'4rem'" [height]="'1.5rem'">
-												</jqxInput>
+												<number-jqxinput
+														#accountNumberProjectInput
+														(input)="clearAccountNumberActivityInput()"
+														[minimumDigits]="8"
+														[maximumDigits]="8"
+														[width]="'4.5rem'"
+														[height]="'1.5rem'">
+												</number-jqxinput>
 											</div>
 										</div>
 										<div class="tr">
@@ -172,24 +199,30 @@
 									</div>
 								</div>
 								<div class="horizontal-break"></div>
-								<div class="inline-block">
+								<div class="inline-block" style="vertical-align: top">
 									<div class="sub-header">
 										Account
 									</div>
 									<div>
-										<jqxInput #accountNumberAccountInput [theme]="'gnomex5'" [width]="'3rem'" [height]="'1.5rem'" [value]="'64300'">
-										</jqxInput>
+										<number-jqxinput
+												#accountNumberAccountInput
+												[minimumDigits]="5"
+												[maximumDigits]="5"
+												[width]="'3rem'"
+												[height]="'1.5rem'"
+												[value]="'64300'">
+										</number-jqxinput>
 									</div>
 									<div>
 										5 digits
 									</div>
 								</div>
-								<div class="horizontal-break"></div>
-								<div class="inline-block">
+								<div *ngIf="isActivity" class="horizontal-break"></div>
+								<div *ngIf="isActivity" class="inline-block" style="vertical-align: top">
 									<div class="sub-header">
 										A/U
 									</div>
-									<div>
+									<div style="padding:2px;">
 										<jqxInput #accountNumberAUInput [theme]="'gnomex5'" [width]="'2rem'" [height]="'1.5rem'" [value]="1" [disabled]="true">
 										</jqxInput>
 									</div>
@@ -266,10 +299,15 @@
 						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
-								Submitter Email
+								Your email address
 							</div>
 							<div class="td">
-								<jqxInput #submitterEmailInput_checkbox [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								<jqxInput
+										#submitterEmailInput_chartfield
+										[value]="usersEmail"
+										[theme]="'gnomex5'"
+										[width]="'calc(100% - 6px)'"
+										[height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
@@ -469,7 +507,7 @@
 							<div class="tr">
 								<div class="td">
 									<div class="checkbox-container">
-										<jqxCheckBox></jqxCheckBox>
+										<jqxCheckBox #agreementCheckbox></jqxCheckBox>
 									</div>
 									<div class="inline-block center-vertical-align agreement">
 										I agree
@@ -488,6 +526,55 @@
 				</div>
 				<div class="inline-block">
 					<button (click)="onCancelButtonClicked()" type="button" class="cancel-button">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</jqxWindow>
+
+<jqxWindow
+		#successWindow
+		[resizable]="false"
+		[autoOpen]="false"
+		[isModal]="true"
+		[width]="'40em'"
+		[height]="'30em'">
+	<div>Billing Account Added</div>
+	<div>
+		<p>{{successMessage}}</p>
+		<br>
+		<p>
+			After the account information is reviewed and approved, you will be notified by email when
+			experiment requests may be submitted using this account.
+		</p>
+		<br>
+		<br>
+		<button (click)="successOkButtonClicked()">OK</button>
+	</div>
+</jqxWindow>
+
+<jqxWindow
+		#errorWindow
+		[resizable]="false"
+		[autoOpen]="false"
+		[isModal]="true"
+		[width]="'40em'"
+		[height]="'20em'">
+	<div>
+		<p class="error-header">Please fix the following errors with this form before proceeding:</p>
+	</div>
+	<div>
+		<div class="t full-width full-height">
+			<div class="tr full-width">
+				<div class="td full-width full-height">
+					<div style="padding: 0 15%;">
+						<pre style="text-align: left;">{{errorMessage}}</pre>
+					</div>
+				</div>
+			</div>
+			<div class="tr full-width">
+				<div class="td full-width center">
+					<button style="text-align: center;" (click)="errorOkButtonClicked()">OK</button>
 				</div>
 			</div>
 		</div>
