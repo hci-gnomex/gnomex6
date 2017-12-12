@@ -2,6 +2,7 @@ import {
 	Component, ElementRef, OnDestroy, OnInit, AfterViewInit, ViewChild,
 	ChangeDetectorRef, Inject
 } from "@angular/core";
+import { URLSearchParams } from "@angular/http";
 
 import { jqxButtonComponent } from "../../../assets/jqwidgets-ts/angular_jqxbuttons"
 import { jqxCheckBoxComponent } from "../../../assets/jqwidgets-ts/angular_jqxcheckbox"
@@ -15,9 +16,13 @@ import { CreateSecurityAdvisorService } from "../../services/create-security-adv
 import { MultipleSelectorComponent } from "../../util/multipleSelector/multiple-selector.component";
 
 import { GnomexStyledDatePickerComponent } from "../../util/gnomexStyledDatePicker/gnomex-styled-date-picker.component";
+import { NumberJqxInputComponent } from "./number-jqxinput/number-jqxinput.component";
 
 import { Subscription } from "rxjs/Subscription";
-import {DictionaryService} from "../../services/dictionary.service";
+import { DictionaryService } from "../../services/dictionary.service";
+
+import { AccountFieldsConfigurationService } from "./account-fields-configuration.service";
+import { NewBillingAccountService } from "./new-billing-account.service";
 
 // This component is a container for a jqxgrid given a specific style, and equipped to modify the
 // grid's size on the page correctly automatically.
@@ -68,6 +73,10 @@ import {DictionaryService} from "../../services/dictionary.service";
 			
 			.full-width {
 					width: 100%;
+			}
+			
+			.center {
+					text-align: center;
 			}
 			
 			.cell-label {
@@ -143,35 +152,45 @@ import {DictionaryService} from "../../services/dictionary.service";
 			.overflowable {
 					overflow: visible;
 			}
+			
+			.error-header {
+					font-size: small;
+					font-weight: bold;
+			}
 	`]
 })
 export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewInit {
 
-	@ViewChild('windowRef') window: jqxWindowComponent;
+	@ViewChild('windowRef')     window:        jqxWindowComponent;
+	@ViewChild('successWindow') successWindow: jqxWindowComponent;
+	@ViewChild('errorWindow')   errorWindow:   jqxWindowComponent;
 
 	@ViewChild('windowHeader') windowHeader: ElementRef;
-	@ViewChild('windowBody') windowBody: ElementRef;
+	@ViewChild('windowBody')   windowBody:   ElementRef;
 
 	@ViewChild('labListComboBox') labListComboBox: jqxComboBoxComponent;
 	@ViewChild('coreFacilitiesSelector')      coreFacilitiesSelector:      MultipleSelectorComponent;
 	@ViewChild('accountNameInput_chartfield') accountNameInput_chartfield: jqxInputComponent;
 	@ViewChild('shortNameInput_chartfield')   shortNameInput_chartfield:   jqxInputComponent;
 
-	@ViewChild('accountNumberBusInput')      accountNumberBusInput:      jqxInputComponent;
-	@ViewChild('accountNumberOrgInput')      accountNumberOrgInput:      jqxInputComponent;
-	@ViewChild('accountNumberFundInput')     accountNumberFundInput:     jqxInputComponent;
-	@ViewChild('accountNumberActivityInput') accountNumberActivityInput: jqxInputComponent;
-	@ViewChild('accountNumberProjectInput')  accountNumberProjectInput:  jqxInputComponent;
-	@ViewChild('accountNumberAccountInput')  accountNumberAccountInput:  jqxInputComponent;
+	@ViewChild('accountNumberBusInput')      accountNumberBusInput:      NumberJqxInputComponent;
+	@ViewChild('accountNumberOrgInput')      accountNumberOrgInput:      NumberJqxInputComponent;
+	@ViewChild('accountNumberFundInput')     accountNumberFundInput:     NumberJqxInputComponent;
+	@ViewChild('accountNumberActivityInput') accountNumberActivityInput: NumberJqxInputComponent;
+	@ViewChild('accountNumberProjectInput')  accountNumberProjectInput:  NumberJqxInputComponent;
+	@ViewChild('accountNumberAccountInput')  accountNumberAccountInput:  NumberJqxInputComponent;
 	@ViewChild('accountNumberAUInput')       accountNumberAUInput:       jqxInputComponent;
 
 	@ViewChild('startDatePicker_chartfield') startDatePicker_chartfield: GnomexStyledDatePickerComponent;
 	@ViewChild('effectiveUntilDatePicker_chartfield') effectiveUntilDatePicker_chartfield: GnomexStyledDatePickerComponent;
 
+	@ViewChild('fundingAgencyCombobox_chartfield') fundingAgencyCombobox_chartfield: jqxComboBoxComponent;
+
 	@ViewChild('totalDollarAmountInput_chartfield') totalDollarAmountInput_chartfield: jqxInputComponent;
-	@ViewChild('submitterEmailInput_checkbox')      submitterEmailInput_checkbox:      jqxInputComponent;
+	@ViewChild('submitterEmailInput_chartfield')    submitterEmailInput_chartfield:    jqxInputComponent;
 
 	@ViewChild('activeCheckBox_chartfield') activeCheckBox_chartfield: jqxCheckBoxComponent;
+	@ViewChild('agreementCheckbox')         agreementCheckbox:         jqxCheckBoxComponent;
 
 	private showField: string = 'chartfield';
 
@@ -185,10 +204,26 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	private showFundingAgencies: boolean = false;
 
+	private accountName: string = "";
+	private selectedCoreFacilitiesString: string = "";
+
+	private internalAccountFieldsConfiguration: any;
+	private internalAccountFieldsConfigurationSubscription: any;
+
+	private successMessage: string = '';
+
+	private usersEmail: string;
+
+	private errorMessage: string = '';
+
+	private isActivity: boolean = false;
+
 	constructor(@Inject(ChangeDetectorRef) private changeDetectorRef: ChangeDetectorRef,
 							private dictionaryService: DictionaryService,
 							private labListService: LabListService,
-							private createSecurityAdvisorService: CreateSecurityAdvisorService
+							private createSecurityAdvisorService: CreateSecurityAdvisorService,
+							private accountFieldsConfigurationService: AccountFieldsConfigurationService,
+							private newBillingAccountService: NewBillingAccountService
 	) { }
 
 	ngOnInit(): void {
@@ -197,6 +232,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 		});
 
 		this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
+
+		this.usersEmail = this.createSecurityAdvisorService.userEmail;
+
 		// Also need to load the list of funding agencies from dictionary, in flex, the XMLCollection is
 		// source="{parentApplication.dictionaryManager.xml.Dictionary.(@className=='hci.gnomex.model.FundingAgency').DictionaryEntry}"
 
@@ -210,6 +248,13 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 				}
 			}
 		}
+
+		this.internalAccountFieldsConfigurationSubscription =
+				this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
+					this.internalAccountFieldsConfiguration = response;
+				});
+
+		// this.accountNumberBusInput.warningActive(true);
 	}
 
 	ngAfterViewInit(): void {
@@ -218,6 +263,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	ngOnDestroy(): void {
 		this.labListSubscription.unsubscribe();
+		this.internalAccountFieldsConfigurationSubscription.unsubscribe();
 	}
 
 	changeShowField(showField: string) {
@@ -232,65 +278,162 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	}
 
 	private onSaveButtonClicked(): void {
+		this.errorMessage = '';
 
-		let accountName: string = "";
 		let shortAcct: string = "";
 
-		let isPO: boolean = false;
+		let isPO: string = (this.showField === 'po') ? 'Y' : 'N';
 		let idLab: string = this.labListComboBox.val();
+		let idLabRegex = /^\d+$/;
+
 		let coreFacilitiesXMLString: string = "";
+		let coreFacilities:any[] = [];
 
 		let accountNumberBus: string = "";
+		let accountNumberBusRegex = /^\d{2,2}$/;
 		let accountNumberOrg: string = "";
+		let accountNumberOrgRegex = /^\d{5,5}$/;
 		let accountNumberFund: string = "";
+		let accountNumberFundRegex = /^\d{4,4}$/;
 		let accountNumberActivity: string = "";
+		let accountNumberActivityRegex = /^\d{5,5}$/;
 		let accountNumberProject: string = "";
+		let accountNumberProjectRegex = /^\d{8,8}$/;
 		let accountNumberAccount: string = "";
+		let accountNumberAccountRegex = /^\d{5,5}$/;
 		let accountNumberAu: string = "";
 
 		let startDate: string = "";
 		let expirationDate: string = "";
 
+		let idFundingAgency: string = "";
+
 		let totalDollarAmountDisplay: string = "";
 		let submitterEmail: string = "";
+		let submitterEmailRegex = /^[A-z]([\.\dA-z]*)@([A-z]+)((\.[A-z]+)+)$/;
 		let activeAccount: string = "";
 
+		// The custom fields only displayed in the flex version of GNomEx if there were certain entries in the
+		// "InternalAccountFieldsConfiguration" or "OtherAccountFieldsConfiguration" tables.  However, at time
+		// of development this feature seems to be unused, so its implementation is delayed.
+		// As a note for the future, the "AccountFieldsConfigurationService" is intended to provide access to
+		// those fields.
+		let custom1: string = '';
+		let custom2: string = '';
+		let custom3: string = '';
+
+		if (this.labListComboBox != null) {
+			idLab = this.labListComboBox.val();
+
+			if (!idLab.match(idLabRegex)) {
+				if (idLab.length == 0) {
+					this.errorMessage += '- Please select a lab\n';
+				} else {
+					this.errorMessage += '- Unknown error reading lab\n';
+				}
+			}
+		}
+
 		if (this.accountNameInput_chartfield != null) {
-			accountName = this.accountNameInput_chartfield.val();
+			this.accountName = this.accountNameInput_chartfield.val();
+			if (this.accountName == '') {
+				this.errorMessage += '- Please provide a name for your account\n';
+			}
 		}
 		if (this.shortNameInput_chartfield != null) {
 			shortAcct = this.shortNameInput_chartfield.val();
 		}
 
+		if (this.coreFacilitiesSelector != undefined
+				&& this.coreFacilitiesSelector != null
+				&& this.coreFacilitiesSelector.grid != undefined
+				&& this.coreFacilitiesSelector.grid != null
+				&& this.coreFacilitiesSelector.grid.theGrid != undefined
+				&& this.coreFacilitiesSelector.grid.theGrid != null
+				&& this.coreFacilitiesSelector.grid.getselectedrowindexes() != null) {
 
-		if (this.accountNumberBusInput!= null) {
-			accountNumberBus = this.accountNumberBusInput.val();
+			let selectedIndices = this.coreFacilitiesSelector.grid.getselectedrowindexes();
+			let possibleCoreFacilities = this.coreFacilitiesSelector.grid.theGrid.source().loadedData;
+
+			this.selectedCoreFacilitiesString = '';
+
+			for (let i: number = 0; i < selectedIndices.length; i++) {
+				let coreFacility: any = {
+					idCoreFacility: possibleCoreFacilities[selectedIndices[i].valueOf()].idCoreFacility,
+					facilityName: possibleCoreFacilities[selectedIndices[i].valueOf()].display
+				};
+
+				coreFacilities.push(coreFacility);
+
+				if (i > 0 && i + 1 < selectedIndices.length) {
+					this.selectedCoreFacilitiesString += ', ';
+				} else if (i + 1 === selectedIndices.length && selectedIndices.length != 1) {
+					this.selectedCoreFacilitiesString += ' and ';
+				}
+
+				this.selectedCoreFacilitiesString += possibleCoreFacilities[selectedIndices[i].valueOf()].display;
+			}
+
+			if (coreFacilities.length == 0) {
+				this.errorMessage += '- Please select at least one core facility\n';
+			}
+
+			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
 		}
-		if (this.accountNumberOrgInput!= null) {
-			accountNumberOrg = this.accountNumberOrgInput.val();
+
+		if (this.accountNumberBusInput != null && this.accountNumberBusInput.numberInput != null) {
+			accountNumberBus = this.accountNumberBusInput.numberInput.val();
+			if (!accountNumberBus.match(accountNumberBusRegex)) {
+				this.errorMessage += "- The \"Bus\" entry must be two digits\n";
+			}
 		}
-		if (this.accountNumberFundInput!= null) {
-			accountNumberFund = this.accountNumberFundInput.val();
+		if (this.accountNumberOrgInput != null && this.accountNumberOrgInput.numberInput != null) {
+			accountNumberOrg = this.accountNumberOrgInput.numberInput.val();
+			if (!accountNumberOrg.match(accountNumberOrgRegex)) {
+				this.errorMessage += "- The \"Org\" entry must be five digits\n";
+			}
 		}
-		if (this.accountNumberActivityInput!= null) {
-			accountNumberActivity = this.accountNumberActivityInput.val();
+		if (this.accountNumberFundInput != null && this.accountNumberFundInput.numberInput != null) {
+			accountNumberFund = this.accountNumberFundInput.numberInput.val();
+			if (!accountNumberFund.match(accountNumberFundRegex)) {
+				this.errorMessage += "- The \"Fund\" entry must be four digits\n";
+			}
 		}
-		if (this.accountNumberProjectInput!= null) {
-			accountNumberProject = this.accountNumberProjectInput.val();
+		if (this.accountNumberActivityInput != null && this.accountNumberActivityInput.numberInput != null) {
+			accountNumberActivity = this.accountNumberActivityInput.numberInput.val();
+			if (accountNumberProject.length == 0) {
+				if (!accountNumberActivity.match(accountNumberActivityRegex)) {
+					this.errorMessage += "- The \"Activity\" entry must be five digits\n";
+				}
+			}
 		}
-		if (this.accountNumberAccountInput!= null) {
-			accountNumberAccount = this.accountNumberAccountInput.val();
+		if (this.accountNumberProjectInput != null && this.accountNumberProjectInput.numberInput != null) {
+			accountNumberProject = this.accountNumberProjectInput.numberInput.val();
+			if (accountNumberActivity.length == 0) {
+				if (!accountNumberProject.match(accountNumberProjectRegex)) {
+					this.errorMessage += "- The \"Project\" entry must be eight digits\n";
+				}
+			}
 		}
-		if (this.accountNumberAUInput!= null) {
+		if (this.accountNumberAccountInput != null && this.accountNumberAccountInput.numberInput != null) {
+			accountNumberAccount = this.accountNumberAccountInput.numberInput.val();
+			if (!accountNumberAccount.match(accountNumberAccountRegex)) {
+				this.errorMessage += "- The \"Account\" entry must be five digits\n";
+			}
+		}
+		if (this.accountNumberAUInput != null) {
 			accountNumberAu = this.accountNumberAUInput.val();
 		}
-
 
 		if (this.startDatePicker_chartfield != null) {
 			startDate = this.startDatePicker_chartfield.inputReference.val();
 		}
 		if (this.effectiveUntilDatePicker_chartfield != null) {
 			expirationDate = this.effectiveUntilDatePicker_chartfield.inputReference.val();
+
+			if (expirationDate.length == 0) {
+				this.errorMessage += '- Please pick an expiration date.\n';
+			}
 		}
 
 		if(this.totalDollarAmountInput_chartfield != null) {
@@ -298,8 +441,11 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 		}
 
 
-		if (this.submitterEmailInput_checkbox != null) {
-			submitterEmail = this.submitterEmailInput_checkbox.val();
+		if (this.submitterEmailInput_chartfield != null) {
+			submitterEmail = '' + this.submitterEmailInput_chartfield.val();
+			if (!submitterEmail.match(submitterEmailRegex)) {
+				this.errorMessage += '- Please enter a valid email address.\n'
+			}
 		}
 
 		if (this.activeCheckBox_chartfield != null && this.activeCheckBox_chartfield.val() != null) {
@@ -310,53 +456,104 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 			}
 		}
 
-		console.log("" +
-				"You clicked the save button with parameters : \n" +
-				"    isPO                     : " + isPO + "\n" +
-				"    idLab                    : " + idLab + "\n" +
-				"    accountName              : " + accountName + "\n" +
-				"    shortAcct                : " + shortAcct + "\n" +
-				"    coreFacilitiesXMLString  : " + "This should probably be replaced, possibly idCoreFacility?" + "\n" +
-				"    accountNumberBus         : " + accountNumberBus + "\n" +
-				"    accountNumberOrg         : " + accountNumberOrg + "\n" +
-				"    accountNumberFund        : " + accountNumberFund + "\n" +
-				"    accountNumberActivity    : " + accountNumberActivity + "\n" +
-				"    accountNumberProject     : " + accountNumberProject + "\n" +
-				"    accountNumberAccount     : " + accountNumberAccount + "\n" +
-				"    accountNumberAU          : " + accountNumberAu + "\n" +
-				"    startDate                : " + startDate + "\n" +
-				"    expirationDate           : " + expirationDate + "\n" +
-				"    totalDollarAmountDisplay : " + totalDollarAmountDisplay + "\n" +
-				"    submitterEmail           : " + submitterEmail + "\n" +
-				"    activeAccount            : " + activeAccount + "\n"
-		);
+		if (this.fundingAgencyCombobox_chartfield != undefined
+				&& this.fundingAgencyCombobox_chartfield != null
+				&& this.fundingAgencyCombobox_chartfield.val() != null) {
+			idFundingAgency = '' + this.fundingAgencyCombobox_chartfield.val();
+		}
+
+		if (this.agreementCheckbox != null) {
+			if (!this.agreementCheckbox.val()) {
+				this.errorMessage += '- Please agree to the terms and conditions'
+			}
+		}
+
+		// console.log("" +
+		// 		"You clicked the save button with parameters : \n" +
+		// 		"    idLab                    : " + idLab + "\n" +
+		// 		"    coreFacilitiesXMLString  : " + coreFacilitiesXMLString + "\n" +
+		// 		"    accountName              : " + this.accountName + "\n" +
+		// 		"    shortAcct                : " + shortAcct + "\n" +
+		// 		"    accountNumberBus         : " + accountNumberBus + "\n" +
+		// 		"    accountNumberOrg         : " + accountNumberOrg + "\n" +
+		// 		"    accountNumberFund        : " + accountNumberFund + "\n" +
+		// 		"    accountNumberActivity    : " + accountNumberActivity + "\n" +
+		// 		"    accountNumberProject     : " + accountNumberProject + "\n" +
+		// 		"    accountNumberAccount     : " + accountNumberAccount + "\n" +
+		// 		"    accountNumberAu          : " + accountNumberAu + "\n" +
+		// 		"    idFundingAgency          : " + idFundingAgency + "\n" +
+		// 		"    custom1                  : " + custom1 + "\n" +
+		// 		"    custom2                  : " + custom2 + "\n" +
+		// 		"    custom3                  : " + custom3 + "\n" +
+		// 		"    submitterEmail           : " + submitterEmail + "\n" +
+		// 		"    startDate                : " + startDate + "\n" +
+		// 		"    expirationDate           : " + expirationDate + "\n" +
+		// 		"    totalDollarAmountDisplay : " + totalDollarAmountDisplay + "\n" +
+		// 		"    activeAccount            : " + activeAccount + "\n" +
+		// 		"    isPO                     : " + isPO + "\n"
+		// );
+
+		if (this.errorMessage.length == 0) {
+			let parameters: URLSearchParams = new URLSearchParams();
+
+			parameters.set('idLab', idLab);
+			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
+			parameters.set('accountName', this.accountName);
+			parameters.set('shortAcct', shortAcct);
+			parameters.set('accountNumberBus', accountNumberBus);
+			parameters.set('accountNumberOrg', accountNumberOrg);
+			parameters.set('accountNumberFund', accountNumberFund);
+			parameters.set('accountNumberActivity', accountNumberActivity);
+			parameters.set('accountNumberProject', accountNumberProject);
+			parameters.set('accountNumberAccount', accountNumberAccount);
+			parameters.set('accountNumberAu', accountNumberAu);
+			parameters.set('idFundingAgency', idFundingAgency);
+			parameters.set('custom1', custom1);
+			parameters.set('custom2', custom2);
+			parameters.set('custom3', custom3);
+			parameters.set('submitterEmail', submitterEmail);
+			parameters.set('startDate', startDate);
+			parameters.set('expirationDate', expirationDate);
+			parameters.set('totalDollarAmountDisplay', totalDollarAmountDisplay);
+			parameters.set('activeAccount', activeAccount);
+			parameters.set('isPO', isPO);
 
 
-		// in original, called SubmitWorkAuthForm.gx with params :
-		//   x  accountNumberProject: ""
-		//   x  accountNumberBus: "01"
-		//     idFundingAgency: ""
-		//     custom1: ""
-		//   x  accountNumberOrg: "12345"
-		//     custom2: ""
-		//   x  accountName: "tempAccount"
-		//   x  submitterEmail: "John.Hofer@hci.utah.edu"
-		//     custom3: ""
-		//   x  accountNumberActivity: "12345"
-		//   x  accountNumberAu: "1"
-		//   x  accountNumberFund: "1234"
-		//   x  isPO: "N"
-		//   x  activeAccount: "Y"
-		//   x  shortAcct: ""
-		//   ?  coreFacilitiesXMLString: "<coreFacilities> <CoreFacility ... /> </coreFacilities>"
-		//   x  idLab: "1507"
-		//   x  startDate: "11/01/2017"
-		//   x  expirationDate: "03/01/2018"
-		//     totalDollarAmountDisplay: ""
-		//   x  accountNumberAccount: "64300"
+			// in original, called SubmitWorkAuthForm.gx with params :
+			//   x  idLab: "1507"
+			//   x? coreFacilitiesXMLString: "<coreFacilities> <CoreFacility ... /> </coreFacilities>"
+			//   x  accountName: "tempAccount"
+			//   x  shortAcct: ""
+			//   x  accountNumberBus: "01"
+			//   x  accountNumberOrg: "12345"
+			//   x  accountNumberFund: "1234"
+			//   x  accountNumberActivity: "12345"
+			//   x  accountNumberProject: ""
+			//   x  accountNumberAccount: "64300"
+			//   x  accountNumberAu: "1"
+			//   x  idFundingAgency: ""
+			//   x  custom1: ""
+			//   x  custom2: ""
+			//   x  custom3: ""
+			//   x  submitterEmail: "John.Hofer@hci.utah.edu"
+			//   x  startDate: "11/01/2017"
+			//   x  expirationDate: "03/01/2018"
+			//   x  totalDollarAmountDisplay: ""
+			//   x  activeAccount: "Y"
+			//   x  isPO: "N"
 
-		//  On the groups screen, the saving is done by SaveLab.gx
+			//  On the groups screen, the saving is done by SaveLab.gx
 
+			this.successMessage = 'Billing Account \"' + this.accountName + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
+
+			this.window.close();
+			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe((response) => {
+				this.successWindow.open();
+			});
+		} else {
+			// validation has caught problems - report them.
+			this.errorWindow.open();
+		}
 	}
 
 	private onLabListSelection(event: any): void {
@@ -393,12 +590,16 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 		this.coreFacilitiesSelector.setLocalData(coreFacilityGridLocalData);
 
+		if (this.coreFacilitiesSelector
+				&& this.coreFacilitiesSelector.grid
+				&& this.coreFacilitiesSelector.grid.theGrid) {
+			this.coreFacilitiesSelector.grid.theGrid.sortby('display', "asc");
+		}
+
 		this.labUsersList = event.target;
 	}
 
 	private onCoreFacilitiesSelected(event: any): void {
-
-
 		this.showFundingAgencies = true;
 
 		this.resizeWindow();
@@ -410,5 +611,31 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	private onCancelButtonClicked(): void {
 		this.window.destroy();
+	}
+
+	private successOkButtonClicked(): void {
+		this.successWindow.close();
+	}
+
+	private errorOkButtonClicked(): void {
+		this.errorWindow.close();
+	}
+
+	private clearAccountNumberActivityInput(): void {
+		if (this.accountNumberActivityInput && this.accountNumberActivityInput.numberInput
+				&& this.accountNumberProjectInput && this.accountNumberProjectInput.numberInput
+				&& this.accountNumberProjectInput.numberInput.val() != '') {
+			this.accountNumberActivityInput.clearData();
+			this.isActivity = false;
+		}
+	}
+
+	private clearAccountNumberProjectInput(): void {
+		if (this.accountNumberProjectInput && this.accountNumberProjectInput.numberInput
+				&& this.accountNumberActivityInput && this.accountNumberActivityInput.numberInput
+				&& this.accountNumberActivityInput.numberInput.val() != '')  {
+			this.accountNumberProjectInput.clearData();
+			this.isActivity = true;
+		}
 	}
 }
