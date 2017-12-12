@@ -28,6 +28,7 @@ import {BrowseDatatracksComponent} from "./browse-datatracks.component";
 import {DATATRACKS_ROUTING} from "./datatracks.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {UtilModule} from "../util/util.module";
+import {MoveDataTrackComponent} from "./move-datatrack.component";
 
 /**
  * @author jdewell
@@ -62,10 +63,10 @@ import {UtilModule} from "../util/util.module";
         ReactiveFormsModule
     ],
     declarations: [
-        BrowseDatatracksComponent
+        BrowseDatatracksComponent, MoveDataTrackComponent
     ],
-    entryComponents: [],
-    exports: []
+    entryComponents: [MoveDataTrackComponent],
+    exports: [MoveDataTrackComponent]
 })
 export class DatatracksModule {
 

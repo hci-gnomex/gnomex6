@@ -34,7 +34,7 @@ import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
     ],
     declarations: [DateRangePickerComponent, BrowseFilterComponent, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent,
                     MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent, NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent],
-    entryComponents: [BillingUsageReportComponent, NewGenomeBuildComponent, NewOrganismComponent, NewTopicComponent, NewDataTrackFolderComponent, NewDataTrackComponent],
+    entryComponents: [BillingUsageReportComponent, NewGenomeBuildComponent, NewOrganismComponent, NewTopicComponent, NewDataTrackFolderComponent, NewDataTrackComponent, DeleteDataTrackComponent],
     exports: [DateRangePickerComponent, BrowseFilterComponent, TabsModule, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent,
                     MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent, NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent]
 

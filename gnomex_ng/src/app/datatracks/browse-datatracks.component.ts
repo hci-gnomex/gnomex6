@@ -19,6 +19,10 @@ import {Router} from "@angular/router";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {LabListService} from "../services/lab-list.service";
 import {DataTrackService} from "../services/data-track.service";
+import {MoveDataTrackComponent} from "./move-datatrack.component";
+import {MatDialog, MatDialogRef} from "@angular/material";
+import * as _ from "lodash";
+import {ReassignExperimentComponent} from "../experiments/reassign-experiment.component";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -157,6 +161,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     @ViewChild("labComboBox") labComboBox: jqxComboBoxComponent;
     @Output() selItem: EventEmitter<ITreeNode> = new EventEmitter();
     private treeModel: TreeModel;
+    public moveDatatrackDialogRef: MatDialogRef<MoveDataTrackComponent>;
+
     /*
     angular2-tree options
      */
@@ -167,8 +173,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             return "icon-" + node.data.icon;
         },
         allowDrop: (element, {parent, index}) => {
-            //this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1) {
+            this.dragEndItems = _.cloneDeep(this.items);
+            if (parent.data.parentid === -1 || parent.data.isGenomeBuild) {
                 return false;
             } else {
                 return true;
@@ -186,7 +192,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     public labMembers: any;
     private billingAccounts: any;
-    private dragEndItems: any;
     private selectedItem: ITreeNode;
     public datatracksCount: number;
     private dataTracksListSubscription: Subscription;
@@ -195,6 +200,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     public disableDelete: boolean = true;
     public showSpinner: boolean = false;
     public searchText: string;
+    private dragEndItems: any[] = [];
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -208,11 +214,11 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     constructor(private datatracksService: DataTrackService, private router: Router,
                 private labListService: LabListService,
+                private dialog: MatDialog,
                 private changeDetectorRef: ChangeDetectorRef) {
 
 
         this.items = [];
-        this.dragEndItems = [];
         this.labMembers = [];
         this.billingAccounts = [];
         this.organisms = [];
@@ -232,6 +238,43 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     treeChangeFilter(event) {
+    }
+
+    /**
+     * Reset the tree to the initial state.
+     */
+    resetTree() {
+        this.items = this.dragEndItems;
+    }
+
+
+    onMoveNode($event) {
+        console.log(
+            "Moved",
+            $event.node.name,
+            "to",
+            $event.to.parent.name,
+            "at index",
+            $event.to.index);
+        this.currentItem = $event.node;
+        this.targetItem = $event.to.parent;
+        this.doMove($event);
+    }
+
+    doMove(event) {
+        this.moveDatatrackDialogRef= this.dialog.open(MoveDataTrackComponent, {
+            data: {
+                currentItem: this.currentItem,
+                targetItem: this.targetItem
+            }
+        });
+        this.moveDatatrackDialogRef.afterClosed()
+            .subscribe(result => {
+                if (this.moveDatatrackDialogRef.componentInstance.noButton) {
+                    this.resetTree();
+                }
+            })
+
     }
 
     treeUpdateData(event) {
@@ -272,35 +315,35 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 this.items = response;
             }
             this.organisms = this.organisms.concat(this.items);
-            for (var o of this.items) {
-                o.id = "o"+o.idOrganism;
-                o.parentid = -1;
+            for (var org of this.items) {
+                org.id = "o"+org.idOrganism;
+                org.parentid = -1;
 
-                o.icon = "assets/organism.png";
-                if (o.GenomeBuild) {
-                    if (!this.isArray(o.GenomeBuild)) {
-                        o.items = [o.GenomeBuild];
+                org.icon = "assets/organism.png";
+                if (org.GenomeBuild) {
+                    if (!this.isArray(org.GenomeBuild)) {
+                        org.items = [org.GenomeBuild];
                     } else {
-                        o.items = o.GenomeBuild;
+                        org.items = org.GenomeBuild;
                     }
 
-                    for (var g of o.items) {
-                        if (g) {
-                            this.assignIconToGenomeBuild(g);
-                            g.labId = o.labId;
-                            g.id = "g"+g.idGenomeBuild;
-                            g.parentid = o.id;
-                            if (g.DataTrack) {
-                                if (!this.isArray(g.DataTrack)) {
-                                    g.items = [g.DataTrack];
+                    for (var gNomeBuild of org.items) {
+                        if (gNomeBuild) {
+                            this.assignIconToGenomeBuild(gNomeBuild);
+                            gNomeBuild.labId = org.labId;
+                            gNomeBuild.id = "g"+gNomeBuild.idGenomeBuild;
+                            gNomeBuild.parentid = org.id;
+                            if (gNomeBuild.DataTrack) {
+                                if (!this.isArray(gNomeBuild.DataTrack)) {
+                                    gNomeBuild.items = [gNomeBuild.DataTrack];
                                 } else {
-                                    g.items = g.DataTrack;
+                                    gNomeBuild.items = gNomeBuild.DataTrack;
                                 }
-                                for (var d of g.items) {
-                                    if (d) {
-                                        if (d.label) {
-                                            this.assignIconToDT(d);
-                                            d.parentid = g.id;
+                                for (var dataTrack of gNomeBuild.items) {
+                                    if (dataTrack) {
+                                        if (dataTrack.label) {
+                                            this.assignIconToDT(dataTrack);
+                                            dataTrack.parentid = gNomeBuild.id;
                                         } else {
                                             console.log("label not defined");
                                         }
@@ -309,8 +352,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                                     }
                                 }
                             }
-                            if (g.DataTrackFolder) {
-                                this.addDataTracksFromFolder(g, g.items);
+                            if (gNomeBuild.DataTrackFolder) {
+                                this.addDataTracksFromFolder(gNomeBuild, gNomeBuild.items);
                             }
                         }
                     }
@@ -370,6 +413,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         } else {
             genomeBuild.icon = "assets/genome_build_faded.png"
         }
+        genomeBuild.isGenomeBuild = true;
     }
 
     assignIconToDTFolder(dtf: any): void {

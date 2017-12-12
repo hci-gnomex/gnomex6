@@ -1,9 +1,9 @@
-<h6 mat-dialog-title><img src="../../assets/folder_group.png">{{title}}</h6>
+<h6 mat-dialog-title><img src="../../assets/folder_group.png">Confirm</h6>
 <mat-dialog-content>
-
+{{deletePrompt}}
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-button *ngIf="!showSpinner && !(name === '') && !(idLab === '')" (click)="save()">Yes</button>
+    <button mat-button *ngIf="!showSpinner" (click)="delete()">Yes</button>
     <button mat-button *ngIf="!showSpinner" mat-dialog-close>No</button>
     <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
 </mat-dialog-actions>

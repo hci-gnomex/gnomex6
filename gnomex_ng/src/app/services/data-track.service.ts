@@ -17,6 +17,16 @@ export class DataTrackService {
     constructor(private http: Http) {
     }
 
+    getDataTrack(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/GetDataTrack.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
     getDataTrackList(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/GetDataTrackList.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
@@ -57,8 +67,28 @@ export class DataTrackService {
         });
     }
 
+    unlinkDataTrack(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/UnlinkDataTrack.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
     duplicateDataTrack(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/DuplicateDataTrack.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
+    moveDataTrack(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/MoveDataTrack.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {

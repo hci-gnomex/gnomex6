@@ -9,6 +9,7 @@ import {DialogsService} from "../popup/dialogs.service";
 import {DataTrackService} from "../../services/data-track.service";
 import {Response, URLSearchParams} from "@angular/http";
 import {NewDataTrackComponent} from "../../datatracks/new-datatrack.component";
+import {DeleteDataTrackComponent} from "../../datatracks/delete-datatrack.component";
 
 const DATATRACK = "DATATRACK";
 const GENOMEBUILD = "GENOMEBUILD";
@@ -74,7 +75,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     public makeNewDataTrack(): void {
         let dialogRef: MatDialogRef<NewDataTrackComponent> = this.dialog.open(NewDataTrackComponent, {
-            height: '430px',
+            height: '390px',
             width: '300px',
             data: {
                 selectedItem: this.selectedNode
@@ -136,59 +137,65 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         var params: URLSearchParams = new URLSearchParams();
 
         if (this.selectedNode.data.idDataTrack) {
-            level = "Confirm";
-            confirmString = "Delete dataTrack "+this.selectedNode.data.label +"?";
-            params.set("idDataTrack", this.selectedNode.data.idDataTrack);
-            type = DATATRACK;
-        } else if (this.selectedNode.data.binomialName) {
-            if (this.selectedNode.data.GenomeBuild) {
-                level = "Unable to remove organism. Please remove the genome builds for organism "
-                    + this.selectedNode.data.label + " first.";
-                confirmString = "";
-            }
-            else {
-                level = "Confirm";
-                confirmString = "Remove organism "+this.selectedNode.data.label +"?";
-                type = ORGANISM;
-                params.set("idOrganism", this.selectedNode.data.idOrganism);
-            }
-        }
-        else if (this.selectedNode.data.isDataTrackFolder) {
-            type=DATATRACKFOLDER;
-            params.set("idDataTrackFolder", this.selectedNode.data.idDataTrackFolder);
-            if (this.selectedNode.data.DataTrack || this.selectedNode.data.DataTrackFolder) {
-                // TODO
-                level = "Warning";
-                confirmString = "Removing folder "+this.selectedNode.data.name+" will also remove all descendant folders and dataTracks.";
-                confirmString += " Are you sure you want to delete the folder and all of its contents?"
-            } else {
-                level = "Confirm";
-                confirmString = "Removing DataTrack Folder "+this.selectedNode.data.name+"?";
-            }
-        }
-        else if (this.selectedNode.level === 2) {
-            if (this.selectedNode.data.DataTrack || this.selectedNode.data.DataTrackFolder) {
-                level = "Please remove folders and data tracks for the "+this.selectedNode.data.label;
-                level += "first.";
-                confirmString = "";
-            }
-            else {
-                level = "Confirm";
-                confirmString = "Remove genome build "+this.selectedNode.data.label +"?";
-                type = GENOMEBUILD;
-                params.set("idGenomeBuild", this.selectedNode.data.idGenomeBuild);
-            }
-        }
-
-        this.dialogsService
-            .confirm(level, confirmString)
-            .subscribe(
-                res => {
-                    if (res) {
-                        this.deleteDataTrack(type, params);
-                    }
+            let dialogRef: MatDialogRef<DeleteDataTrackComponent> = this.dialog.open(DeleteDataTrackComponent, {
+                height: '210px',
+                width: '300px',
+                data: {
+                    selectedItem: this.selectedNode
                 }
-            );
+            });
+        }
+        else {
+            if (this.selectedNode.data.binomialName) {
+                if (this.selectedNode.data.GenomeBuild) {
+                    level = "Unable to remove organism. Please remove the genome builds for organism "
+                        + this.selectedNode.data.label + " first.";
+                    confirmString = "";
+                }
+                else {
+                    level = "Confirm";
+                    confirmString = "Remove organism " + this.selectedNode.data.label + "?";
+                    type = ORGANISM;
+                    params.set("idOrganism", this.selectedNode.data.idOrganism);
+                }
+            }
+            else if (this.selectedNode.data.isDataTrackFolder) {
+                type = DATATRACKFOLDER;
+                params.set("idDataTrackFolder", this.selectedNode.data.idDataTrackFolder);
+                if (this.selectedNode.data.DataTrack || this.selectedNode.data.DataTrackFolder) {
+                    // TODO
+                    level = "Warning";
+                    confirmString = "Removing folder " + this.selectedNode.data.name + " will also remove all descendant folders and dataTracks.";
+                    confirmString += " Are you sure you want to delete the folder and all of its contents?"
+                } else {
+                    level = "Confirm";
+                    confirmString = "Removing DataTrack Folder " + this.selectedNode.data.name + "?";
+                }
+            }
+            else if (this.selectedNode.level === 2) {
+                if (this.selectedNode.data.DataTrack || this.selectedNode.data.DataTrackFolder) {
+                    level = "Please remove folders and data tracks for the " + this.selectedNode.data.label;
+                    level += "first.";
+                    confirmString = "";
+                }
+                else {
+                    level = "Confirm";
+                    confirmString = "Remove genome build " + this.selectedNode.data.label + "?";
+                    type = GENOMEBUILD;
+                    params.set("idGenomeBuild", this.selectedNode.data.idGenomeBuild);
+                }
+            }
+
+            this.dialogsService
+                .confirm(level, confirmString)
+                .subscribe(
+                    res => {
+                        if (res) {
+                            this.deleteDataTrack(type, params);
+                        }
+                    }
+                );
+        }
     }
 
     private makeNewGenomeBuild(): void {
