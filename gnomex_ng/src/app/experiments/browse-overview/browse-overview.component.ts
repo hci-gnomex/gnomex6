@@ -99,7 +99,10 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
                     let index = this.tabView.containsTab(this.PROJECT);
                     if (index !== -1) {
                         this.tabView.removeTab(index);
-                        this.tabNames.pop();// will Project will always be the last tab
+                        this.tabNames.pop();//Project will always be the last tab
+                        if(index === this.tabView.activeId){
+                            this.tabView.select(0);
+                        }
                     }
                 }
             }
@@ -185,13 +188,21 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
 
         if(Array.isArray(data)){
             if(data.length > 0){
-                (<Array<any>> data).forEach(rObj =>{
-                    this.experimentIdSet.add(rObj.requestNumber)
-                });
-                flatRequestList = data;
+                if(data[0].Project){ // array of labs(more complex parsing)
+                    data = data[0];
+                }else{ //
+                    (<Array<any>> data).forEach(rObj =>{
+                        this.experimentIdSet.add(rObj.requestNumber)
+                    });
+                    flatRequestList = data;
+                    return flatRequestList;
+
+                }
+            }else{
+                return flatRequestList;
             }
-            return flatRequestList;
         }
+
 
         if (data.Project) {
             let projectList: Array<any> = Array.isArray(data.Project) ? data.Project : [data.Project];
