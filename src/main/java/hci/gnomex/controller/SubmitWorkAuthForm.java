@@ -110,17 +110,37 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
       String configurable = pdh.getProperty(PropertyDictionary.CONFIGURABLE_BILLING_ACCOUNTS);
       boolean hasActivity = (billingAccountScreen.getAccountNumberActivity() != null && billingAccountScreen.getAccountNumberActivity().length() > 0);
       if (configurable == null || configurable.equals("N")) {
-        if(billingAccountScreen.getAccountNumberBus() == null || billingAccountScreen.getAccountNumberBus().length() != 2 || 
-            billingAccountScreen.getAccountNumberOrg() == null || billingAccountScreen.getAccountNumberOrg().length() != 5 ||
-            billingAccountScreen.getAccountNumberFund() == null || billingAccountScreen.getAccountNumberFund().length() != 4 || 
-            billingAccountScreen.getAccountNumberAccount() == null || billingAccountScreen.getAccountNumberAccount().length() != 5 ||
-            (hasActivity && (billingAccountScreen.getAccountNumberAu() == null || billingAccountScreen.getAccountNumberAu().length() != 1)) || 
-            ((billingAccountScreen.getAccountNumberProject() == null || billingAccountScreen.getAccountNumberProject().equals("")) && (billingAccountScreen.getAccountNumberActivity() == null || billingAccountScreen.getAccountNumberActivity().length() !=5)) ||
-            ((billingAccountScreen.getAccountNumberActivity() == null || billingAccountScreen.getAccountNumberActivity().equals("")) && (billingAccountScreen.getAccountNumberProject() == null || billingAccountScreen.getAccountNumberProject().length() !=8)) ||
-            billingAccountScreen.getExpirationDate() == null || billingAccountScreen.getStartDate() == null) {
+        if((billingAccountScreen.getIsPO() == null || billingAccountScreen.getIsPO().equals("N"))
+            && (billingAccountScreen.getIsCreditCard() == null || billingAccountScreen.getIsCreditCard().equals("N"))) {
 
-          this.addInvalidField("Billing Account Error", "Please make sure all fields are entered and that the correct number of digits are used for each account number field.");
-          this.setResponsePage(this.ERROR_JSP);
+          if(billingAccountScreen.getAccountNumberBus() == null || billingAccountScreen.getAccountNumberBus().length() != 2 ||
+              billingAccountScreen.getAccountNumberOrg() == null || billingAccountScreen.getAccountNumberOrg().length() != 5 ||
+              billingAccountScreen.getAccountNumberFund() == null || billingAccountScreen.getAccountNumberFund().length() != 4 ||
+              billingAccountScreen.getAccountNumberAccount() == null || billingAccountScreen.getAccountNumberAccount().length() != 5 ||
+              (hasActivity && (billingAccountScreen.getAccountNumberAu() == null || billingAccountScreen.getAccountNumberAu().length() != 1)) ||
+              ((billingAccountScreen.getAccountNumberProject() == null || billingAccountScreen.getAccountNumberProject().equals("")) && (billingAccountScreen.getAccountNumberActivity() == null || billingAccountScreen.getAccountNumberActivity().length() !=5)) ||
+              ((billingAccountScreen.getAccountNumberActivity() == null || billingAccountScreen.getAccountNumberActivity().equals("")) && (billingAccountScreen.getAccountNumberProject() == null || billingAccountScreen.getAccountNumberProject().length() !=8)) ||
+              billingAccountScreen.getExpirationDate() == null || billingAccountScreen.getStartDate() == null) {
+
+            this.addInvalidField("Billing Account Error", "Please make sure all fields are entered and that the correct number of digits are used for each account number field.");
+            this.setResponsePage(this.ERROR_JSP);
+          }
+        }
+        else if ((billingAccountScreen.getIsPO() == null || billingAccountScreen.getIsPO().equals("N"))
+            && (billingAccountScreen.getIsCreditCard() != null && billingAccountScreen.getIsCreditCard().equals("Y"))) {
+
+          if (billingAccountScreen.getExpirationDate() == null || billingAccountScreen.getStartDate() == null) {
+            this.addInvalidField("Billing Account Error", "Please make sure all fields are entered and that the correct number of digits are used for each account number field.");
+            this.setResponsePage(this.ERROR_JSP);
+          }
+        }
+        else if ((billingAccountScreen.getIsPO() != null && billingAccountScreen.getIsPO().equals("Y"))
+            && (billingAccountScreen.getIsCreditCard() == null || billingAccountScreen.getIsCreditCard().equals("N"))) {
+
+          if (billingAccountScreen.getExpirationDate() == null || billingAccountScreen.getStartDate() == null) {
+            this.addInvalidField("Billing Account Error", "Please make sure all fields are entered and that the correct number of digits are used for each account number field.");
+            this.setResponsePage(this.ERROR_JSP);
+          }
         }
       }
 

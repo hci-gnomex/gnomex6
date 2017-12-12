@@ -173,6 +173,10 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	@ViewChild('accountNameInput_chartfield') accountNameInput_chartfield: jqxInputComponent;
 	@ViewChild('shortNameInput_chartfield')   shortNameInput_chartfield:   jqxInputComponent;
 
+	@ViewChild('accountName_creditCard')      accountName_creditCard:      jqxInputComponent;
+
+	@ViewChild('submitterEmailInput') submitterEmailInput: jqxInputComponent;
+
 	@ViewChild('accountNumberBusInput')      accountNumberBusInput:      NumberJqxInputComponent;
 	@ViewChild('accountNumberOrgInput')      accountNumberOrgInput:      NumberJqxInputComponent;
 	@ViewChild('accountNumberFundInput')     accountNumberFundInput:     NumberJqxInputComponent;
@@ -181,15 +185,22 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	@ViewChild('accountNumberAccountInput')  accountNumberAccountInput:  NumberJqxInputComponent;
 	@ViewChild('accountNumberAUInput')       accountNumberAUInput:       jqxInputComponent;
 
-	@ViewChild('startDatePicker_chartfield') startDatePicker_chartfield: GnomexStyledDatePickerComponent;
+	@ViewChild('zipCodeInput_creditCard')           zipCodeInput_creditCard:           jqxInputComponent;
+	@ViewChild('totalDollarAmountInput_creditCard') totalDollarAmountInput_creditCard: jqxInputComponent;
+
+	@ViewChild('startDatePicker_chartfield')          startDatePicker_chartfield:          GnomexStyledDatePickerComponent;
 	@ViewChild('effectiveUntilDatePicker_chartfield') effectiveUntilDatePicker_chartfield: GnomexStyledDatePickerComponent;
 
-	@ViewChild('fundingAgencyCombobox_chartfield') fundingAgencyCombobox_chartfield: jqxComboBoxComponent;
+	@ViewChild('startDatePicker_creditcard')          startDatePicker_creditcard:          GnomexStyledDatePickerComponent;
+	@ViewChild('expirationDatePicker_creditcard')     expirationDatePicker_creditcard:     GnomexStyledDatePickerComponent;
+
+	@ViewChild('fundingAgencyCombobox_chartfield')     fundingAgencyCombobox_chartfield:     jqxComboBoxComponent;
+	@ViewChild('creditCardCompanyComboBox_creditCard') creditCardCompanyComboBox_creditCard: jqxComboBoxComponent;
 
 	@ViewChild('totalDollarAmountInput_chartfield') totalDollarAmountInput_chartfield: jqxInputComponent;
-	@ViewChild('submitterEmailInput_chartfield')    submitterEmailInput_chartfield:    jqxInputComponent;
 
 	@ViewChild('activeCheckBox_chartfield') activeCheckBox_chartfield: jqxCheckBoxComponent;
+	@ViewChild('activeCheckBox_creditcard') activeCheckBox_creditcard: jqxCheckBoxComponent;
 	@ViewChild('agreementCheckbox')         agreementCheckbox:         jqxCheckBoxComponent;
 
 	private showField: string = 'chartfield';
@@ -201,6 +212,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	private labListSubscription: Subscription = null;
 
 	private fundingAgencies: any;
+	private creditCardCompanies: any;
 
 	private showFundingAgencies: boolean = false;
 
@@ -209,6 +221,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	private internalAccountFieldsConfiguration: any;
 	private internalAccountFieldsConfigurationSubscription: any;
+
+	private lastValid_zipCodeCreditCard: string = '';
+	private lastValid_totalDollarAmountCreditCard: string = '';
 
 	private successMessage: string = '';
 
@@ -235,9 +250,6 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 		this.usersEmail = this.createSecurityAdvisorService.userEmail;
 
-		// Also need to load the list of funding agencies from dictionary, in flex, the XMLCollection is
-		// source="{parentApplication.dictionaryManager.xml.Dictionary.(@className=='hci.gnomex.model.FundingAgency').DictionaryEntry}"
-
 		let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
 		this.fundingAgencies = [];
 
@@ -249,12 +261,21 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 			}
 		}
 
+		let originalCreditCardCompanies = this.dictionaryService.getEntries('hci.gnomex.model.CreditCardCompany');
+		this.creditCardCompanies = [];
+
+		if (originalCreditCardCompanies.length != undefined && originalCreditCardCompanies.length != null) {
+			for (let i = 0; i < originalCreditCardCompanies.length; i++) {
+				if (originalCreditCardCompanies[i].display != null) {
+					this.creditCardCompanies.push(originalCreditCardCompanies[i]);
+				}
+			}
+		}
+
 		this.internalAccountFieldsConfigurationSubscription =
 				this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
 					this.internalAccountFieldsConfiguration = response;
 				});
-
-		// this.accountNumberBusInput.warningActive(true);
 	}
 
 	ngAfterViewInit(): void {
@@ -278,6 +299,18 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	}
 
 	private onSaveButtonClicked(): void {
+		this.errorMessage = '';
+
+		if (this.showField == 'chartfield') {
+			this.saveChartfield();
+		} else if (this.showField == 'po') {
+			this.savePo();
+		} else if (this.showField == 'creditcard') {
+			this.saveCreditCard();
+		}
+	}
+
+	private saveChartfield(): void {
 		this.errorMessage = '';
 
 		let shortAcct: string = "";
@@ -425,7 +458,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 			accountNumberAu = this.accountNumberAUInput.val();
 		}
 
-		if (this.startDatePicker_chartfield != null) {
+		if (this.startDatePicker_chartfield != null && this.startDatePicker_chartfield.inputReference != null) {
 			startDate = this.startDatePicker_chartfield.inputReference.val();
 		}
 		if (this.effectiveUntilDatePicker_chartfield != null) {
@@ -441,8 +474,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 		}
 
 
-		if (this.submitterEmailInput_chartfield != null) {
-			submitterEmail = '' + this.submitterEmailInput_chartfield.val();
+		if (this.submitterEmailInput != null) {
+			submitterEmail = '' + this.submitterEmailInput.val();
 			if (!submitterEmail.match(submitterEmailRegex)) {
 				this.errorMessage += '- Please enter a valid email address.\n'
 			}
@@ -556,6 +589,179 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 		}
 	}
 
+	private savePo(): void {
+		// TODO : write this!
+	}
+
+	private saveCreditCard(): void {
+		this.errorMessage = '';
+
+		let shortAcct: string = "";
+
+		let isPO: string = (this.showField === 'po') ? 'Y' : 'N';
+		let isCreditCard: string = (this.showField === 'creditcard') ? 'Y' : 'N';
+		let idLab: string = this.labListComboBox.val();
+		let idLabRegex = /^\d+$/;
+
+		let coreFacilitiesXMLString: string = "";
+		let coreFacilities:any[] = [];
+
+		let idCreditCardCompany: string;
+		let zipCode: string;
+		let zipCodeRegex = /^(\d{5,5})|(\d{5,5}-\d{4,4})$/;
+
+		let startDate: string = "";
+		let expirationDate: string = "";
+
+		let totalDollarAmountDisplay: string = "";
+		let submitterEmail: string = "";
+		let submitterEmailRegex = /^[A-z]([\.\dA-z]*)@([A-z]+)((\.[A-z]+)+)$/;
+		let activeAccount: string = "";
+
+		// The custom fields only displayed in the flex version of GNomEx if there were certain entries in the
+		// "InternalAccountFieldsConfiguration" or "OtherAccountFieldsConfiguration" tables.  However, at time
+		// of development this feature seems to be unused, so its implementation is delayed.
+		// As a note for the future, the "AccountFieldsConfigurationService" is intended to provide access to
+		// those fields.
+		let custom1: string = '';
+		let custom2: string = '';
+		let custom3: string = '';
+
+		if (this.labListComboBox != null) {
+			idLab = this.labListComboBox.val();
+
+			if (!idLab.match(idLabRegex)) {
+				if (idLab.length == 0) {
+					this.errorMessage += '- Please select a lab\n';
+				} else {
+					this.errorMessage += '- Unknown error reading lab\n';
+				}
+			}
+		}
+
+		if (this.accountName_creditCard != null) {
+			this.accountName = this.accountName_creditCard.val();
+			if (this.accountName == '') {
+				this.errorMessage += '- Please provide a name for your account\n';
+			}
+		}
+
+		if (this.coreFacilitiesSelector != undefined
+				&& this.coreFacilitiesSelector != null
+				&& this.coreFacilitiesSelector.grid != undefined
+				&& this.coreFacilitiesSelector.grid != null
+				&& this.coreFacilitiesSelector.grid.theGrid != undefined
+				&& this.coreFacilitiesSelector.grid.theGrid != null
+				&& this.coreFacilitiesSelector.grid.getselectedrowindexes() != null) {
+
+			let selectedIndices = this.coreFacilitiesSelector.grid.getselectedrowindexes();
+			let possibleCoreFacilities = this.coreFacilitiesSelector.grid.theGrid.source().loadedData;
+
+			this.selectedCoreFacilitiesString = '';
+
+			for (let i: number = 0; i < selectedIndices.length; i++) {
+				let coreFacility: any = {
+					idCoreFacility: possibleCoreFacilities[selectedIndices[i].valueOf()].idCoreFacility,
+					facilityName: possibleCoreFacilities[selectedIndices[i].valueOf()].display
+				};
+
+				coreFacilities.push(coreFacility);
+
+				if (i > 0 && i + 1 < selectedIndices.length) {
+					this.selectedCoreFacilitiesString += ', ';
+				} else if (i + 1 === selectedIndices.length && selectedIndices.length != 1) {
+					this.selectedCoreFacilitiesString += ' and ';
+				}
+
+				this.selectedCoreFacilitiesString += possibleCoreFacilities[selectedIndices[i].valueOf()].display;
+			}
+
+			if (coreFacilities.length == 0) {
+				this.errorMessage += '- Please select at least one core facility\n';
+			}
+
+			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
+		}
+
+		if (this.creditCardCompanyComboBox_creditCard != null && this.creditCardCompanyComboBox_creditCard.getSelectedIndex() != null) {
+			idCreditCardCompany = this.creditCardCompanies[this.creditCardCompanyComboBox_creditCard.getSelectedIndex().valueOf()].idCreditCardCompany;
+		}
+
+		if (this.zipCodeInput_creditCard != null && this.zipCodeInput_creditCard.val() != null) {
+			if (this.zipCodeInput_creditCard.val().match(zipCodeRegex)) {
+				zipCode = this.zipCodeInput_creditCard.val();
+			}
+		}
+
+		if (this.startDatePicker_creditcard != null && this.startDatePicker_creditcard.inputReference != null) {
+			startDate = this.startDatePicker_creditcard.inputReference.val();
+		}
+		if (this.expirationDatePicker_creditcard != null) {
+			expirationDate = this.expirationDatePicker_creditcard.inputReference.val();
+
+			if (expirationDate.length == 0) {
+				this.errorMessage += '- Please pick an expiration date.\n';
+			}
+		}
+
+		if(this.totalDollarAmountInput_creditCard != null) {
+			totalDollarAmountDisplay = this.totalDollarAmountInput_creditCard.val();
+		}
+
+
+		if (this.submitterEmailInput != null) {
+			submitterEmail = '' + this.submitterEmailInput.val();
+			if (!submitterEmail.match(submitterEmailRegex)) {
+				this.errorMessage += '- Please enter a valid email address.\n'
+			}
+		}
+
+		if (this.activeCheckBox_creditcard != null && this.activeCheckBox_creditcard.val() != null) {
+			if (this.activeCheckBox_creditcard.val()) {
+				activeAccount = 'Y';
+			} else {
+				activeAccount = 'N';
+			}
+		}
+
+		if (this.agreementCheckbox != null) {
+			if (!this.agreementCheckbox.val()) {
+				this.errorMessage += '- Please agree to the terms and conditions'
+			}
+		}
+
+		if (this.errorMessage.length == 0) {
+			let parameters: URLSearchParams = new URLSearchParams();
+
+			parameters.set('idLab', idLab);
+			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
+			parameters.set('accountName', this.accountName);
+			parameters.set('shortAcct', shortAcct);
+			parameters.set('custom1', custom1);
+			parameters.set('custom2', custom2);
+			parameters.set('custom3', custom3);
+			parameters.set('submitterEmail', submitterEmail);
+			parameters.set('idCreditCardCompany', idCreditCardCompany);
+			parameters.set('zipCode', zipCode);
+			parameters.set('startDate', startDate);
+			parameters.set('expirationDate', expirationDate);
+			parameters.set('totalDollarAmountDisplay', totalDollarAmountDisplay);
+			parameters.set('activeAccount', activeAccount);
+			parameters.set('isPO', isPO);
+			parameters.set('isCreditCard', isCreditCard);
+
+			this.successMessage = 'Billing Account \"' + this.accountName + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
+
+			this.window.close();
+			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe((response) => {
+				this.successWindow.open();
+			});
+		} else {
+			// validation has caught problems - report them.
+			this.errorWindow.open();
+		}
+	}
+
 	private onLabListSelection(event: any): void {
 		this.coreFacilitiesSelector.clearSelection();
 
@@ -636,6 +842,48 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 				&& this.accountNumberActivityInput.numberInput.val() != '')  {
 			this.accountNumberProjectInput.clearData();
 			this.isActivity = true;
+		}
+	}
+
+	private onCreditCardZipCodeSelected(): void {
+		if (this.zipCodeInput_creditCard != null) {
+			this.lastValid_zipCodeCreditCard = '' + this.zipCodeInput_creditCard.val();
+		}
+	}
+
+	private onCreditCardZipCodeChanged(): void {
+		if (this.zipCodeInput_creditCard == null) {
+			return;
+		}
+
+		let zipCodeRegex = /^\d{0,5}(-\d{0,4})?$/;
+
+		if (this.zipCodeInput_creditCard.val().match(zipCodeRegex)) {
+			this.lastValid_zipCodeCreditCard = this.zipCodeInput_creditCard.val();
+		}
+		else {
+			this.zipCodeInput_creditCard.val(this.lastValid_zipCodeCreditCard);
+		}
+	}
+
+	private onCreditCardTotalDollarAmountSelected(): void {
+		if (this.totalDollarAmountInput_creditCard != null) {
+			this.lastValid_totalDollarAmountCreditCard = '' + this.totalDollarAmountInput_creditCard.val();
+		}
+	}
+
+	private onCreditCardTotalDollarAmountChanged(): void {
+		if (this.totalDollarAmountInput_creditCard == null) {
+			return;
+		}
+
+		let dollarAmountRegex = /^\d*(\.\d{0,2})?$/;
+
+		if (this.totalDollarAmountInput_creditCard.val().match(dollarAmountRegex)) {
+			this.lastValid_totalDollarAmountCreditCard = this.totalDollarAmountInput_creditCard.val();
+		}
+		else {
+			this.totalDollarAmountInput_creditCard.val(this.lastValid_totalDollarAmountCreditCard);
 		}
 	}
 }

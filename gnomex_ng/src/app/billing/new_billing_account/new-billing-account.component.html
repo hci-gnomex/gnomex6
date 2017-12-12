@@ -55,6 +55,22 @@
 						</div>
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
+								Your email address
+							</div>
+							<div class="td">
+								<jqxInput
+										#submitterEmailInput
+										[value]="usersEmail"
+										[theme]="'gnomex5'"
+										[width]="'calc(100% - 6px)'"
+										[height]="'1.5rem'">
+								</jqxInput>
+							</div>
+						</div>
+						<div class="tr full-width row-spacer">
+						</div>
+						<div class="tr full-width row-content">
+							<div class="td cell-label">
 								Account Type
 							</div>
 							<div class="td center-vertical-align">
@@ -236,7 +252,6 @@
 						</div>
 						<div class="tr full-width row-spacer">
 						</div>
-
 						<div *ngIf="showFundingAgencies" class="tr full-width row-content">
 							<div class="td cell-label">
 								Funding Agency
@@ -255,7 +270,6 @@
 						</div>
 						<div class="tr full-width row-spacer">
 						</div>
-
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Start Date
@@ -297,22 +311,6 @@
 						<!--</div>-->
 						<!--<div class="tr full-width row-spacer">-->
 						<!--</div>-->
-						<div class="tr full-width row-content">
-							<div class="td cell-label">
-								Your email address
-							</div>
-							<div class="td">
-								<jqxInput
-										#submitterEmailInput_chartfield
-										[value]="usersEmail"
-										[theme]="'gnomex5'"
-										[width]="'calc(100% - 6px)'"
-										[height]="'1.5rem'">
-								</jqxInput>
-							</div>
-						</div>
-						<div class="tr full-width row-spacer">
-						</div>
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Active
@@ -410,7 +408,11 @@
 								Last four digits of <br/> Credit Card Number
 							</div>
 							<div class="td">
-								<jqxInput [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								<jqxInput
+										#accountName_creditCard
+										[theme]="'gnomex5'"
+										[width]="'calc(100% - 6px)'"
+										[height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
@@ -418,11 +420,19 @@
 						</div>
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
-								Expiration Date
+								Start Date
 							</div>
 							<div class="td">
 								<span>
-									<GnomexStyledDatePicker [defaultToToday]="true"></GnomexStyledDatePicker>
+									<GnomexStyledDatePicker #startDatePicker_creditcard [defaultToToday]="true"></GnomexStyledDatePicker>
+								</span>
+								<div class="inline-block" style="width:7em;">
+								</div>
+								<span class="cell-label">
+									Expiration Date
+								</span>
+								<span>
+									<GnomexStyledDatePicker #expirationDatePicker_creditcard [defaultToToday]="false"></GnomexStyledDatePicker>
 								</span>
 							</div>
 						</div>
@@ -433,7 +443,13 @@
 								Zip Code
 							</div>
 							<div class="td">
-								<jqxInput [theme]="'gnomex5'" [width]="'10em'" [height]="'1.5rem'">
+								<jqxInput
+										#zipCodeInput_creditCard
+										(focusin)="onCreditCardZipCodeSelected()"
+										(input)="onCreditCardZipCodeChanged()"
+										[theme]="'gnomex5'"
+										[width]="'10em'"
+										[height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
@@ -445,6 +461,10 @@
 							</div>
 							<div class="td">
 								<jqxComboBox
+										#creditCardCompanyComboBox_creditCard
+										[source]="creditCardCompanies"
+										[valueMember]="'value'"
+										[displayMember]="'display'"
 										[width]="'40%'"
 										[theme]="'gnomex5'">
 								</jqxComboBox>
@@ -457,7 +477,13 @@
 								Total Dollar Amount
 							</div>
 							<div class="td">
-								<jqxInput [theme]="'gnomex5'" [width]="'10em'" [height]="'1.5rem'">
+								<jqxInput
+										#totalDollarAmountInput_creditCard
+										(focusin)="onCreditCardTotalDollarAmountSelected()"
+										(input)="onCreditCardTotalDollarAmountChanged()"
+										[theme]="'gnomex5'"
+										[width]="'10em'"
+										[height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
@@ -479,7 +505,7 @@
 							</div>
 							<div class="td center-vertical-align">
 								<div class="checkbox-container">
-									<jqxCheckBox></jqxCheckBox>
+									<jqxCheckBox #activeCheckBox_creditcard></jqxCheckBox>
 								</div>
 							</div>
 						</div>
