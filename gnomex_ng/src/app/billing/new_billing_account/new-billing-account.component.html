@@ -295,7 +295,13 @@
 								Total Dollar Amount
 							</div>
 							<div class="td">
-								<jqxInput #totalDollarAmountInput_chartfield [theme]="'gnomex5'" [width]="'10em'" [height]="'1.5rem'">
+								<jqxInput
+										#totalDollarAmountInput_chartfield
+										(focusin)="onChartfieldTotalDollarAmountSelected()"
+										(input)="onChartfieldTotalDollarAmountChanged()"
+										[theme]="'gnomex5'"
+										[width]="'10em'"
+										[height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
@@ -330,22 +336,14 @@
 								Account Name
 							</div>
 							<div class="td">
-								<jqxInput [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
+								<jqxInput
+										#accountName_po
+										[theme]="'gnomex5'"
+										[width]="'calc(100% - 6px)'"
+										[height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
-
-						<div class="tr full-width row-content">
-							<div class="td cell-label">
-								Purchase Order form
-							</div>
-							<div class="td">
-								Upload View Delete
-							</div>
-						</div>
-
 						<div class="tr full-width row-spacer">
 						</div>
 						<div class="tr full-width row-content">
@@ -354,7 +352,7 @@
 							</div>
 							<div class="td">
 								<span>
-									<GnomexStyledDatePicker [defaultToToday]="true"></GnomexStyledDatePicker>
+									<GnomexStyledDatePicker #startDatePicker_po [defaultToToday]="true"></GnomexStyledDatePicker>
 								</span>
 								<div class="inline-block" style="width:7em;">
 								</div>
@@ -362,7 +360,7 @@
 									Effective Until
 								</span>
 								<span>
-									<GnomexStyledDatePicker [defaultToToday]="false"></GnomexStyledDatePicker>
+									<GnomexStyledDatePicker #expirationDatePicker_po [defaultToToday]="false"></GnomexStyledDatePicker>
 								</span>
 							</div>
 						</div>
@@ -373,7 +371,13 @@
 								Total Dollar Amount
 							</div>
 							<div class="td">
-								<jqxInput [theme]="'gnomex5'" [width]="'10em'" [height]="'1.5rem'">
+								<jqxInput
+										#totalDollarAmountInput_po
+										(focusin)="onPoTotalDollarAmountSelected()"
+										(input)="onPoTotalDollarAmountChanged()"
+										[theme]="'gnomex5'"
+										[width]="'10em'"
+										[height]="'1.5rem'">
 								</jqxInput>
 							</div>
 						</div>
@@ -395,7 +399,7 @@
 							</div>
 							<div class="td center-vertical-align">
 								<div class="checkbox-container">
-									<jqxCheckBox></jqxCheckBox>
+									<jqxCheckBox #activeCheckBox_po></jqxCheckBox>
 								</div>
 							</div>
 						</div>

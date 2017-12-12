@@ -170,10 +170,12 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	@ViewChild('labListComboBox') labListComboBox: jqxComboBoxComponent;
 	@ViewChild('coreFacilitiesSelector')      coreFacilitiesSelector:      MultipleSelectorComponent;
-	@ViewChild('accountNameInput_chartfield') accountNameInput_chartfield: jqxInputComponent;
-	@ViewChild('shortNameInput_chartfield')   shortNameInput_chartfield:   jqxInputComponent;
 
+	@ViewChild('accountNameInput_chartfield') accountNameInput_chartfield: jqxInputComponent;
+	@ViewChild('accountName_po')              accountName_po:              jqxInputComponent;
 	@ViewChild('accountName_creditCard')      accountName_creditCard:      jqxInputComponent;
+
+	@ViewChild('shortNameInput_chartfield')   shortNameInput_chartfield:   jqxInputComponent;
 
 	@ViewChild('submitterEmailInput') submitterEmailInput: jqxInputComponent;
 
@@ -186,21 +188,26 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	@ViewChild('accountNumberAUInput')       accountNumberAUInput:       jqxInputComponent;
 
 	@ViewChild('zipCodeInput_creditCard')           zipCodeInput_creditCard:           jqxInputComponent;
+
+	@ViewChild('totalDollarAmountInput_chartfield') totalDollarAmountInput_chartfield: jqxInputComponent;
+	@ViewChild('totalDollarAmountInput_po')         totalDollarAmountInput_po:         jqxInputComponent;
 	@ViewChild('totalDollarAmountInput_creditCard') totalDollarAmountInput_creditCard: jqxInputComponent;
 
-	@ViewChild('startDatePicker_chartfield')          startDatePicker_chartfield:          GnomexStyledDatePickerComponent;
-	@ViewChild('effectiveUntilDatePicker_chartfield') effectiveUntilDatePicker_chartfield: GnomexStyledDatePickerComponent;
+	@ViewChild('startDatePicker_chartfield') startDatePicker_chartfield: GnomexStyledDatePickerComponent;
+	@ViewChild('startDatePicker_po')         startDatePicker_po:         GnomexStyledDatePickerComponent;
+	@ViewChild('startDatePicker_creditcard') startDatePicker_creditcard: GnomexStyledDatePickerComponent;
 
-	@ViewChild('startDatePicker_creditcard')          startDatePicker_creditcard:          GnomexStyledDatePickerComponent;
+	@ViewChild('effectiveUntilDatePicker_chartfield') effectiveUntilDatePicker_chartfield: GnomexStyledDatePickerComponent;
+	@ViewChild('expirationDatePicker_po')             expirationDatePicker_po:             GnomexStyledDatePickerComponent;
 	@ViewChild('expirationDatePicker_creditcard')     expirationDatePicker_creditcard:     GnomexStyledDatePickerComponent;
 
 	@ViewChild('fundingAgencyCombobox_chartfield')     fundingAgencyCombobox_chartfield:     jqxComboBoxComponent;
 	@ViewChild('creditCardCompanyComboBox_creditCard') creditCardCompanyComboBox_creditCard: jqxComboBoxComponent;
 
-	@ViewChild('totalDollarAmountInput_chartfield') totalDollarAmountInput_chartfield: jqxInputComponent;
-
 	@ViewChild('activeCheckBox_chartfield') activeCheckBox_chartfield: jqxCheckBoxComponent;
+	@ViewChild('activeCheckBox_po')         activeCheckBox_po:         jqxCheckBoxComponent;
 	@ViewChild('activeCheckBox_creditcard') activeCheckBox_creditcard: jqxCheckBoxComponent;
+
 	@ViewChild('agreementCheckbox')         agreementCheckbox:         jqxCheckBoxComponent;
 
 	private showField: string = 'chartfield';
@@ -223,6 +230,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	private internalAccountFieldsConfigurationSubscription: any;
 
 	private lastValid_zipCodeCreditCard: string = '';
+
+	private lastValid_totalDollarAmountChartfield: string = '';
+	private lastValid_totalDollarAmountPo: string = '';
 	private lastValid_totalDollarAmountCreditCard: string = '';
 
 	private successMessage: string = '';
@@ -590,7 +600,155 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	}
 
 	private savePo(): void {
-		// TODO : write this!
+		this.errorMessage = '';
+
+		let shortAcct: string = "";
+
+		let isPO: string = (this.showField === 'po') ? 'Y' : 'N';
+		let isCreditCard: string = (this.showField === 'creditcard') ? 'Y' : 'N';
+		let idLab: string = this.labListComboBox.val();
+		let idLabRegex = /^\d+$/;
+
+		let coreFacilitiesXMLString: string = "";
+		let coreFacilities:any[] = [];
+
+		let startDate: string = "";
+		let expirationDate: string = "";
+
+		let totalDollarAmountDisplay: string = "";
+		let submitterEmail: string = "";
+		let submitterEmailRegex = /^[A-z]([\.\dA-z]*)@([A-z]+)((\.[A-z]+)+)$/;
+		let activeAccount: string = "";
+
+		// The custom fields only displayed in the flex version of GNomEx if there were certain entries in the
+		// "InternalAccountFieldsConfiguration" or "OtherAccountFieldsConfiguration" tables.  However, at time
+		// of development this feature seems to be unused, so its implementation is delayed.
+		// As a note for the future, the "AccountFieldsConfigurationService" is intended to provide access to
+		// those fields.
+		let custom1: string = '';
+		let custom2: string = '';
+		let custom3: string = '';
+
+		if (this.labListComboBox != null) {
+			idLab = this.labListComboBox.val();
+
+			if (!idLab.match(idLabRegex)) {
+				if (idLab.length == 0) {
+					this.errorMessage += '- Please select a lab\n';
+				} else {
+					this.errorMessage += '- Unknown error reading lab\n';
+				}
+			}
+		}
+
+		if (this.accountName_po != null) {
+			this.accountName = this.accountName_po.val();
+			if (this.accountName == '') {
+				this.errorMessage += '- Please provide a name for your account\n';
+			}
+		}
+
+		if (this.coreFacilitiesSelector != undefined
+				&& this.coreFacilitiesSelector != null
+				&& this.coreFacilitiesSelector.grid != undefined
+				&& this.coreFacilitiesSelector.grid != null
+				&& this.coreFacilitiesSelector.grid.theGrid != undefined
+				&& this.coreFacilitiesSelector.grid.theGrid != null
+				&& this.coreFacilitiesSelector.grid.getselectedrowindexes() != null) {
+
+			let selectedIndices = this.coreFacilitiesSelector.grid.getselectedrowindexes();
+			let possibleCoreFacilities = this.coreFacilitiesSelector.grid.theGrid.source().loadedData;
+
+			this.selectedCoreFacilitiesString = '';
+
+			for (let i: number = 0; i < selectedIndices.length; i++) {
+				let coreFacility: any = {
+					idCoreFacility: possibleCoreFacilities[selectedIndices[i].valueOf()].idCoreFacility,
+					facilityName: possibleCoreFacilities[selectedIndices[i].valueOf()].display
+				};
+
+				coreFacilities.push(coreFacility);
+
+				if (i > 0 && i + 1 < selectedIndices.length) {
+					this.selectedCoreFacilitiesString += ', ';
+				} else if (i + 1 === selectedIndices.length && selectedIndices.length != 1) {
+					this.selectedCoreFacilitiesString += ' and ';
+				}
+
+				this.selectedCoreFacilitiesString += possibleCoreFacilities[selectedIndices[i].valueOf()].display;
+			}
+
+			if (coreFacilities.length == 0) {
+				this.errorMessage += '- Please select at least one core facility\n';
+			}
+
+			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
+		}
+
+		if (this.startDatePicker_po != null && this.startDatePicker_po.inputReference != null) {
+			startDate = this.startDatePicker_po.inputReference.val();
+		}
+		if (this.expirationDatePicker_po != null) {
+			expirationDate = this.expirationDatePicker_po.inputReference.val();
+
+			if (expirationDate.length == 0) {
+				this.errorMessage += '- Please pick an expiration date.\n';
+			}
+		}
+
+		if(this.totalDollarAmountInput_po != null) {
+			totalDollarAmountDisplay = this.totalDollarAmountInput_po.val();
+		}
+
+		if (this.submitterEmailInput != null) {
+			submitterEmail = '' + this.submitterEmailInput.val();
+			if (!submitterEmail.match(submitterEmailRegex)) {
+				this.errorMessage += '- Please enter a valid email address.\n'
+			}
+		}
+
+		if (this.activeCheckBox_po != null && this.activeCheckBox_po.val() != null) {
+			if (this.activeCheckBox_po.val()) {
+				activeAccount = 'Y';
+			} else {
+				activeAccount = 'N';
+			}
+		}
+
+		if (this.agreementCheckbox != null) {
+			if (!this.agreementCheckbox.val()) {
+				this.errorMessage += '- Please agree to the terms and conditions'
+			}
+		}
+
+		if (this.errorMessage.length == 0) {
+			let parameters: URLSearchParams = new URLSearchParams();
+
+			parameters.set('idLab', idLab);
+			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
+			parameters.set('accountName', this.accountName);
+			parameters.set('shortAcct', shortAcct);
+			parameters.set('custom1', custom1);
+			parameters.set('custom2', custom2);
+			parameters.set('custom3', custom3);
+			parameters.set('submitterEmail', submitterEmail);
+			parameters.set('startDate', startDate);
+			parameters.set('expirationDate', expirationDate);
+			parameters.set('totalDollarAmountDisplay', totalDollarAmountDisplay);
+			parameters.set('activeAccount', activeAccount);
+			parameters.set('isPO', isPO);
+			parameters.set('isCreditCard', isCreditCard);
+
+			this.successMessage = 'Billing Account \"' + this.accountName + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
+
+			this.window.close();
+			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe((response) => {
+				this.successWindow.open();
+			});
+		} else {
+			// validation has caught problems - report them.
+			this.errorWindow.open();
+		}
 	}
 
 	private saveCreditCard(): void {
@@ -842,6 +1000,48 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 				&& this.accountNumberActivityInput.numberInput.val() != '')  {
 			this.accountNumberProjectInput.clearData();
 			this.isActivity = true;
+		}
+	}
+
+	private onChartfieldTotalDollarAmountSelected(): void {
+		if (this.totalDollarAmountInput_chartfield != null) {
+			this.lastValid_totalDollarAmountChartfield = '' + this.totalDollarAmountInput_chartfield.val();
+		}
+	}
+
+	private onChartfieldTotalDollarAmountChanged(): void {
+		if (this.totalDollarAmountInput_chartfield == null) {
+			return;
+		}
+
+		let dollarAmountRegex = /^\d*(\.\d{0,2})?$/;
+
+		if (this.totalDollarAmountInput_chartfield.val().match(dollarAmountRegex)) {
+			this.lastValid_totalDollarAmountChartfield = this.totalDollarAmountInput_chartfield.val();
+		}
+		else {
+			this.totalDollarAmountInput_chartfield.val(this.lastValid_totalDollarAmountChartfield);
+		}
+	}
+
+	private onPoTotalDollarAmountSelected(): void {
+		if (this.totalDollarAmountInput_po != null) {
+			this.lastValid_totalDollarAmountPo = '' + this.totalDollarAmountInput_po.val();
+		}
+	}
+
+	private onPoTotalDollarAmountChanged(): void {
+		if (this.totalDollarAmountInput_po == null) {
+			return;
+		}
+
+		let dollarAmountRegex = /^\d*(\.\d{0,2})?$/;
+
+		if (this.totalDollarAmountInput_po.val().match(dollarAmountRegex)) {
+			this.lastValid_totalDollarAmountPo = this.totalDollarAmountInput_po.val();
+		}
+		else {
+			this.totalDollarAmountInput_po.val(this.lastValid_totalDollarAmountPo);
 		}
 	}
 
