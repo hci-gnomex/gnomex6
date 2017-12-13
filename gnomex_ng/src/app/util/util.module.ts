@@ -17,7 +17,9 @@ import {NewGenomeBuildComponent} from "./new-genome-build.component";
 import {NewOrganismComponent} from "./new-organism.component";
 import {MenuHeaderTopicsComponent} from "./menuHeaders/menu-header-topics.component";
 import {NewTopicComponent} from "./new-topic.component";
-
+import {NewDataTrackFolderComponent} from "../datatracks/new-datatrackfolder.component";
+import {DeleteDataTrackComponent} from "../datatracks/delete-datatrack.component";
+import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
 
 @NgModule({
     imports: [
@@ -28,10 +30,14 @@ import {NewTopicComponent} from "./new-topic.component";
         ComboBoxModule,
         FormsModule,
         AngularMaterialModule
+
     ],
-    declarations: [DateRangePickerComponent, BrowseFilterComponent, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent, MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent],
-    entryComponents: [BillingUsageReportComponent, NewGenomeBuildComponent, NewOrganismComponent, NewTopicComponent],
-    exports: [DateRangePickerComponent, BrowseFilterComponent, TabsModule, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent, MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent]
+    declarations: [DateRangePickerComponent, BrowseFilterComponent, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent,
+                    MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent, NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent],
+    entryComponents: [BillingUsageReportComponent, NewGenomeBuildComponent, NewOrganismComponent, NewTopicComponent, NewDataTrackFolderComponent, NewDataTrackComponent, DeleteDataTrackComponent],
+    exports: [DateRangePickerComponent, BrowseFilterComponent, TabsModule, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent,
+                    MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent, NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent]
+
 })
 export class UtilModule {
 }

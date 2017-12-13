@@ -114,8 +114,6 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
         var lPromise = this.experimentsService.saveProject(params).toPromise();
         lPromise.then(response => {
             this.refreshProjectRequestList();
-            // this.showSpinner = false;
-            // this.dialogRef.close();
         });
 
     }

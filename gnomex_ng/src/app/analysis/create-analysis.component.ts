@@ -19,6 +19,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {DialogsService} from '../util/popup/dialogs.service';
 import {NewOrganismComponent} from "../util/new-organism.component";
 import {NewGenomeBuildComponent} from '../util/new-genome-build.component';
+import * as _ from "lodash";
 
 @Component({
     selector: 'create-analysis-dialog',
@@ -65,6 +66,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
     private selectedLabLabel: string;
     private codeVisibility: string;
     public showSpinner: boolean = false;
+    private analGroupListForXML: any[] = [];
 
     constructor(private dialogRef: MatDialogRef<CreateAnalysisComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private dictionaryService: DictionaryService,
@@ -147,6 +149,9 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
             if (this.analysisLabList.length == 1) {
                 this.analysisGroupList = this.analysisLabList[0].AnalysisGroup;
             }
+            if (!this.isArray(this.analysisGroupList)) {
+                this.analysisGroupList = [this.analysisGroupList];
+            }
         }
     }
 
@@ -157,9 +162,18 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
     onAnalysisGroupSelect(event: any) {
         if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idAnalysisGroup = event.args.item.value;
-            this.analysisGroup = this.analysisGroupList.filter(group=>group.idAnalysisGroup===this.idAnalysisGroup)
+            this.analysisGroup = this.analysisGroupList.filter(group=>group.idAnalysisGroup===this.idAnalysisGroup);
+            this.analGroupListForXML = _.cloneDeep(this.analysisLabList);
+            delete this.analysisGroup[0].items;
+            this.analGroupListForXML[0].AnalysisGroup = this.analysisGroup;
+            delete this.analGroupListForXML[0].items;
         }
     }
+
+    isArray(what) {
+        return Object.prototype.toString.call(what) === "[object Array]";
+    };
+
 
     /**
      * Set the idAppUser on user select.
@@ -223,12 +237,16 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         var idAnalysis: any = 0;
         var params: URLSearchParams = new URLSearchParams();
         var stringifiedGenomBuild;
+        var analysisGroupListObject: any = {};
+        analysisGroupListObject.analysisCount = this.analysisGroup[0].Analysis.length;
+        analysisGroupListObject.message = "";
+        analysisGroupListObject.Lab = this.analGroupListForXML;
         if (this.genomBuilds.length > 0) {
             stringifiedGenomBuild = JSON.stringify(this.genomBuilds);
         }
         var stringifiedAnalysisGroup;
         if (this.analysisGroup.length > 0) {
-            stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
+            stringifiedAnalysisGroup = JSON.stringify(analysisGroupListObject);
         }
         params.set("lanesXMLString", "");
         params.set("samplesXMLString", "");

@@ -22,24 +22,24 @@
       <a class="links lookup problem" href="www.google.com">
         Report Problem
       </a>
-      <button mat-icon-button class="experiment-menu link" [matMenuTriggerFor]="linksMenu">
-        <mat-icon>Links...</mat-icon>
+      <button mat-button class="experiment-menu link" [matMenuTriggerFor]="linksMenu">
+        Links...
       </button>
       <mat-menu #linksMenu="matMenu" [overlapTrigger]="false">
         <button  class="menu" mat-menu-item> Gnomics Core Webpage </button>
         <button  class="menu" mat-menu-item>  DNA Sequencing Webpage </button>
       </mat-menu>
 
-      <button mat-icon-button class="experiment-menu link" [matMenuTriggerFor]="helpMenu">
-        <mat-icon>Help...</mat-icon>
+      <button mat-button class="experiment-menu link" [matMenuTriggerFor]="helpMenu">
+        Help...
       </button>
       <mat-menu #helpMenu="matMenu" [overlapTrigger]="false">
         <button  class="menu" mat-menu-item> <img src="../../assets/white_information.png"> Enable Help Edit </button>
         <button  class="menu" mat-menu-item>  User Guide </button>
       </mat-menu>
 
-      <button mat-icon-button class="experiment-menu link" [matMenuTriggerFor]="accountMenu">
-        <mat-icon>Account...</mat-icon>
+      <button mat-button class="experiment-menu link" [matMenuTriggerFor]="accountMenu">
+        Account...
       </button>
       <mat-menu #accountMenu="matMenu" [overlapTrigger]="false">
         <button  class="menu" mat-menu-item>  My Account </button>
@@ -126,45 +126,45 @@
       <button mat-menu-item class="menu" [routerLink]="[ '/ProjectExperimentReport' ]"> <img src="../../assets/flask.png"> Project/Experiment Report </button>
       <button mat-menu-item class="menu"> <img src="../../assets/email_go.png"> Send email to all GNomEx users </button>
     </mat-menu>
-    <button mat-icon-button class="experiment-menu" [matMenuTriggerFor]="expMenu">
+    <button mat-button class="experiment-menu" [matMenuTriggerFor]="expMenu">
       <img src="../../assets/flask.png" alt="Bookmark">
-      <mat-icon>Experiments</mat-icon>
+      Experiments
     </button>
-    <button mat-icon-button class="experiment-menu" [routerLink]="[ '/analysis' ]">
-        <img src="../../assets/map.png" alt="Bookmark">
-      <mat-icon>Analysis</mat-icon>
+    <button mat-button class="experiment-menu" [routerLink]="[ '/analysis' ]">
+      <img src="../../assets/map.png" alt="Bookmark">
+      Analysis
     </button>
-    <button mat-icon-button class="experiment-menu">
+    <button mat-button class="experiment-menu" [routerLink]="[ '/datatracks' ]">
       <img src="../../assets/datatrack.png" alt="Bookmark">
-      <mat-icon>Data Tracks</mat-icon>
+      Data Tracks
     </button>
-    <button mat-icon-button class="experiment-menu">
+    <button mat-button class="experiment-menu">
       <img src="../../assets/topic_tag.png" alt="Bookmark">
-      <mat-icon>Topics</mat-icon>
+      Topics
     </button>
-    <button class="experiment-menu" mat-icon-button [matMenuTriggerFor]="flowMenu">
+    <button mat-button class="experiment-menu" [matMenuTriggerFor]="flowMenu">
       <img src="../../assets/review.png" alt="Bookmark">
-      <mat-icon>Workflow</mat-icon>
+      Workflow
     </button>
-    <button class="experiment-menu" mat-icon-button [matMenuTriggerFor]="prodMenu">
+    <button mat-button class="experiment-menu" [matMenuTriggerFor]="prodMenu">
       <img src="../../assets/basket.png" alt="Bookmark">
-      <mat-icon>Products</mat-icon>
+      Products
     </button>
-    <button mat-icon-button class="experiment-menu">
+    <button mat-button class="experiment-menu">
       <img src="../../assets/money.png" alt="Bookmark">
-      <mat-icon>Billing</mat-icon>
+      Billing
     </button>
-    <button mat-icon-button class="experiment-menu">
+    <button mat-button class="experiment-menu">
       <img src="../../assets/group.png" alt="Bookmark">
-      <mat-icon>Users & Groups</mat-icon>
+      Users & Groups
     </button>
-    <button class="experiment-menu" mat-icon-button [matMenuTriggerFor]="confMenu">
+    <button class="experiment-menu" mat-button [matMenuTriggerFor]="confMenu">
       <img src="../../assets/page_white_wrench.png" alt="Bookmark">
-      <mat-icon>Configure</mat-icon>
+      Configure
     </button>
-    <button class="experiment-menu" mat-icon-button [matMenuTriggerFor]="reportsMenu">
+    <button class="experiment-menu" mat-button [matMenuTriggerFor]="reportsMenu">
       <img src="../../assets/page.png" alt="Bookmark">
-      <mat-icon>Reports</mat-icon>
+      Reports
     </button>
   </mat-toolbar-row>
 </mat-toolbar>

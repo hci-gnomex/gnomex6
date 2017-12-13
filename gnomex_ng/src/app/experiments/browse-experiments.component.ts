@@ -1,7 +1,10 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from "@angular/core";
+import {
+    AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 
 import { URLSearchParams } from "@angular/http";
 
@@ -154,8 +157,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     @ViewChild("msgNoAuthUsersForLab") msgNoAuthUsersForLab: jqxNotificationComponent;
     @ViewChild("toggleButton") toggleButton: jqxButtonComponent;
 
-    @ViewChild("jqxLoader") jqxLoader: jqxLoaderComponent;
-    @ViewChild("jqxConstructorLoader") jqxConstructorLoader: jqxLoaderComponent;
     @ViewChild(BrowseFilterComponent)
 
     private treeModel: TreeModel;
@@ -195,11 +196,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private billingAccounts: any;
     private dragEndItems: any;
     private selectedItem: any;
-    private selectedIndex: number = -1;
-    private selectedBillingItem: string;
-    private selectedBillingIndex: number = -1;
-    private selectedProjectLabItem: any;
-    private selectedProjectLabIndex: number = -1;
     private showBillingCombo: boolean = false;
     private labList: any[] = [];
     private selectedExperiment: any;
@@ -224,8 +220,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     ngAfterViewInit(){
-        this.jqxLoader.close();
-        this.jqxConstructorLoader.close();
     }
 
 
@@ -233,6 +227,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
+                private changeDetectorRef: ChangeDetectorRef,
                 private labListService: LabListService) {
 
 
@@ -263,7 +258,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.reassignExperimentDialogRef.componentInstance.showSpinner = false;
                 this.reassignExperimentDialogRef.close();
             }
-
             this.experimentsService.emitExperimentOverviewList(response);
             this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
 
@@ -273,11 +267,16 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             });
         });
 
+        this.experimentsService.startSearchSubject.subscribe((value) =>{
+            if (value) {
+                this.showSpinner = true;
+            }
+        })
+
 
     }
 
     go(event: any) {
-        console.log("event " + event);
     }
 
     /*
@@ -299,6 +298,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             l.icon = "assets/group.png";
             // If there is a lab with no Project skip
+
             if (l.Project) {
             if (!this.isArray(l.Project)) {
                 l.items = [l.Project];
@@ -308,7 +308,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             for( var p of l.items) {
                 p.icon = "assets/folder.png";
                 p.labId = l.labId;
-                p.id = p.idProject;
+                p.id = "p"+p.idProject;
                 p.parentid = l.id;
                 if (p.Request) {
                     if (!this.isArray(p.Request)) {
@@ -323,11 +323,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                                 var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
                                 r.label = shorterLabel;
                                 this.experimentCount++;
-                                r.id = r.idRequest;
+                                r.id = "r"+r.idRequest;
                                 r.parentid = p.id;
-                                if (this.experimentCount % 100 === 0) {
-                                    console.log("experiment count " + this.experimentCount);
-                                }
+
                             } else {
                                 console.log("label not defined");
                             }
@@ -342,6 +340,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }
         }
     };
+
+    treeUpdateData(event) {
+        if (this.experimentsService.startSearchSubject.getValue() === true) {
+            this.showSpinner = false;
+            this.experimentsService.startSearchSubject.next(false);
+            this.changeDetectorRef.detectChanges();
+        }
+    }
+
 
     /*
 
@@ -533,7 +540,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     treeOnSelect(event: any) {
-        console.log("event");
         this.selectedItem = event.node;
         let idLab = this.selectedItem.data.idLab;
         let idProject = this.selectedItem.data.idProject;
@@ -613,5 +619,5 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     ngOnDestroy(): void {
         this.projectRequestListSubscription.unsubscribe();
-}
+    }
 }

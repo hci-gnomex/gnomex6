@@ -4,10 +4,12 @@ import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
 import {Subject} from "rxjs/Subject";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Injectable()
 export class AnalysisService {
     public analysisGroupList: any[];
+    public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     private analysisGroupListSubject: Subject<any[]> = new Subject();
     private _haveLoadedAnalysisGroupList: boolean = false;
@@ -75,10 +77,11 @@ export class AnalysisService {
         return this.analysisGroupListSubject.asObservable();
     }
     getAnalysisGroupList_fromBackend(params: URLSearchParams): void {
+        this.startSearchSubject.next(true);
+
         if (this._haveLoadedAnalysisGroupList && this._previousURLParams === params) {
             // do nothing
             console.log("Analysis already loaded");
-            // return Observable.of(this.experimentOrders);
         } else {
             this._haveLoadedAnalysisGroupList = true;
             this._previousURLParams = params;
@@ -92,7 +95,6 @@ export class AnalysisService {
                 if (response.status === 200) {
                     this.analysisGroupList = response.json().Lab;
                     this.emitAnalysisGroupList();
-                    //return response.json().Request;
                 } else {
                     throw new Error("Error");
                 }
@@ -101,6 +103,8 @@ export class AnalysisService {
     }
 
     refreshAnalysisGroupList_fromBackend(): void {
+        this.startSearchSubject.next(true);
+
         this.http.get("/gnomex/GetAnalysisGroupList.gx", {
             withCredentials: true,
             search: this._previousURLParams
