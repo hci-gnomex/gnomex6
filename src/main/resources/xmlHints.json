@@ -20,13 +20,9 @@
       "command": "DeleteRequest",
       "parameter": "requestsToDeleteXMLString",
       "nodeheader": "",
-      "nodeprefix": "requests",
-      "nodeheader": "",
       "nodeprefix": "",
       "elementhints": [
         {
-          "elementname": "someEntries",
-          "elementheader": "someEntry"
           "elementname": "requests",
           "elementheader": "Request"
         }
@@ -35,8 +31,6 @@
     {
       "command": "SaveAnalysis",
       "parameter": "genomeBuildsXMLString",
-      "nodeheader": "GenomeBuild",
-      "nodeprefix": "genomeBuilds",
       "nodeheader": "genomeBuilds",
       "nodeprefix": "GenomeBuild",
       "elementhints": [
@@ -49,16 +43,12 @@
     {
       "command": "SaveAnalysis",
       "parameter": "analysisGroupsXMLString",
-      "nodeheader": "",
-      "nodeprefix": "analysisGroups",
       "nodeheader": "analysisGroups",
       "nodeprefix": "analysisGroup",
       "elementhints": [
         {
-          "elementname": "AnalysisGroup",
-          "elementheader": "Analysis"
-          "elementname": "items",
-          "elementheader": "item"
+          "elementname": "itemsnotthere",
+          "elementheader": "itemnotthere1"
         }
       ]
     },
@@ -85,8 +75,19 @@
           "elementheader": "someEntry3"
         }
       ]
+    },
+    {
+      "command": "MoveAnalysis",
+      "parameter": "analysisGroupsXMLString",
+      "nodeheader": "analysisGroups",
+      "nodeprefix": "analysisGroup",
+      "elementhints": [
+        {
+          "elementname": "notpresent",
+          "elementheader": "notpresent1"
+        }
+      ]
     }
-
   ]
 }
 
