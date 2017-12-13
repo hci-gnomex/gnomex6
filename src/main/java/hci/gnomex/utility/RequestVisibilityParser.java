@@ -48,6 +48,8 @@ public class RequestVisibilityParser implements Serializable {
         }
         
         request.setCodeVisibility(codeVisibility);
+//        System.out.println ("[parse] codeVisibility: " + codeVisibility);
+
         requests.add(request);
       } else if ((request.getRequestCategory().getIsOwnerOnly() != null && request.getRequestCategory().getIsOwnerOnly().equals("Y"))) {
         request.setCodeVisibility(Visibility.VISIBLE_TO_OWNER);

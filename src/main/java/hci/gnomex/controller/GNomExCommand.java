@@ -81,6 +81,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
 
     request.setAttribute("xmlResult",this.xmlResult);
 
+    //System.out.println ("[GNomExFrontControler] this.xmlResult: " + this.xmlResult);
     // Garbage collect
     this.xmlResult = null;
     System.gc();
