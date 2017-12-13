@@ -61,7 +61,7 @@
       <button  class="menu" mat-menu-item> <img src="../../assets/flask_edit.png"> Add Additional Illumina Sequencing Lanes </button>
       <button  class="menu" mat-menu-item> <img src="../../assets/folder_add.png"> New Project </button>
       <button  class="menu" mat-menu-item> <img src="../../assets/experiment_register.png"> Upload Experiment data generated at at third party facility </button>
-      <button  class="menu" mat-menu-item [routerLink]="[ '/NewBillingAccount' ]">  <img src="../../assets/money.png"> New Billing Account </button>
+      <button  class="menu" mat-menu-item (click)="openNewBillingAccountsPopup()">  <img src="../../assets/money.png"> New Billing Account </button>
       <button  class="menu" mat-menu-item [routerLink]="[ '/experiments-orders' ]"> <img src="../../assets/review.png"> Orders </button>
       <button  class="menu" mat-menu-item> <img src="../../assets/review.png"> Bulk Sample Sheet Import </button>
 

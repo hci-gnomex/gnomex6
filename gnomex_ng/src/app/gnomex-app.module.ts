@@ -37,6 +37,8 @@ import {DatatracksModule} from "./datatracks/datatracks.module";
 import {MatIconModule} from "@angular/material";
 import {ReportsModule} from "./reports/reports.module";
 
+import {WindowService} from "./window-service";
+
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
     storageType: "localStorage"
@@ -84,7 +86,8 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         UserService,
         AuthenticationService,
         ExperimentsService,
-        ProgressService
+        ProgressService,
+        WindowService
     ]
 })
 export class GnomexAppModule {

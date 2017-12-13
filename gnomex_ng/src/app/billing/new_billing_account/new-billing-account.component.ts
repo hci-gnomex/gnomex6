@@ -177,7 +177,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	@ViewChild('shortNameInput_chartfield')   shortNameInput_chartfield:   jqxInputComponent;
 
-	@ViewChild('submitterEmailInput') submitterEmailInput: jqxInputComponent;
+	@ViewChild('submitterEmailInput_chartfield') submitterEmailInput_chartfield: jqxInputComponent;
+	@ViewChild('submitterEmailInput_po')         submitterEmailInput_po:         jqxInputComponent;
+	@ViewChild('submitterEmailInput_creditcard') submitterEmailInput_creditcard: jqxInputComponent;
 
 	@ViewChild('accountNumberBusInput')      accountNumberBusInput:      NumberJqxInputComponent;
 	@ViewChild('accountNumberOrgInput')      accountNumberOrgInput:      NumberJqxInputComponent;
@@ -210,18 +212,18 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	@ViewChild('agreementCheckbox')         agreementCheckbox:         jqxCheckBoxComponent;
 
-	private showField: string = 'chartfield';
+	showField: string = 'chartfield';
 
-	private labList: any[] = [];
+	labList: any[] = [];
 	private coreFacilityList: any[] = [];
 	private labUsersList: any[] = [];
 
 	private labListSubscription: Subscription = null;
 
-	private fundingAgencies: any;
-	private creditCardCompanies: any;
+	fundingAgencies: any;
+	creditCardCompanies: any;
 
-	private showFundingAgencies: boolean = false;
+	showFundingAgencies: boolean = false;
 
 	private accountName: string = "";
 	private selectedCoreFacilitiesString: string = "";
@@ -235,13 +237,17 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	private lastValid_totalDollarAmountPo: string = '';
 	private lastValid_totalDollarAmountCreditCard: string = '';
 
-	private successMessage: string = '';
+	successMessage: string = '';
 
-	private usersEmail: string;
+	usersEmail: string;
 
-	private errorMessage: string = '';
+	errorMessage: string = '';
 
-	private isActivity: boolean = false;
+	isActivity: boolean = false;
+
+	disableCoreFacilitiesSelector = true;
+
+	private isOpen = false;
 
 	constructor(@Inject(ChangeDetectorRef) private changeDetectorRef: ChangeDetectorRef,
 							private dictionaryService: DictionaryService,
@@ -252,6 +258,57 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 	) { }
 
 	ngOnInit(): void {
+		// this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
+		// 	this.labList = response;
+		// });
+		//
+		// this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
+		//
+		// this.usersEmail = this.createSecurityAdvisorService.userEmail;
+		//
+		// let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
+		// this.fundingAgencies = [];
+		//
+		// if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
+		// 	for (let i = 0; i < originalFundingAgencies.length; i++) {
+		// 		if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
+		// 			this.fundingAgencies.push(originalFundingAgencies[i]);
+		// 		}
+		// 	}
+		// }
+		//
+		// let originalCreditCardCompanies = this.dictionaryService.getEntries('hci.gnomex.model.CreditCardCompany');
+		// this.creditCardCompanies = [];
+		//
+		// if (originalCreditCardCompanies.length != undefined && originalCreditCardCompanies.length != null) {
+		// 	for (let i = 0; i < originalCreditCardCompanies.length; i++) {
+		// 		if (originalCreditCardCompanies[i].display != null) {
+		// 			this.creditCardCompanies.push(originalCreditCardCompanies[i]);
+		// 		}
+		// 	}
+		// }
+		//
+		// this.internalAccountFieldsConfigurationSubscription =
+		// 		this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
+		// 			this.internalAccountFieldsConfiguration = response;
+		// 		});
+	}
+
+	ngAfterViewInit(): void {
+		this.window.height(this.windowHeader.nativeElement.offsetHeight + this.windowBody.nativeElement.offsetHeight + 12);
+	}
+
+	ngOnDestroy(): void {
+		this.labListSubscription.unsubscribe();
+		this.internalAccountFieldsConfigurationSubscription.unsubscribe();
+	}
+
+	open(): void {
+
+		if (this.isOpen) {
+			return;
+		}
+
 		this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
 			this.labList = response;
 		});
@@ -286,15 +343,18 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 				this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
 					this.internalAccountFieldsConfiguration = response;
 				});
-	}
 
-	ngAfterViewInit(): void {
+		this.isOpen = true;
+		this.window.open();
+
 		this.window.height(this.windowHeader.nativeElement.offsetHeight + this.windowBody.nativeElement.offsetHeight + 12);
 	}
 
-	ngOnDestroy(): void {
-		this.labListSubscription.unsubscribe();
-		this.internalAccountFieldsConfigurationSubscription.unsubscribe();
+	close(): void {
+		this.isOpen = false;
+		this.window.close();
+		this.successWindow.close();
+		this.errorWindow.close();
 	}
 
 	changeShowField(showField: string) {
@@ -484,8 +544,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 		}
 
 
-		if (this.submitterEmailInput != null) {
-			submitterEmail = '' + this.submitterEmailInput.val();
+		if (this.submitterEmailInput_chartfield != null) {
+			submitterEmail = '' + this.submitterEmailInput_chartfield.val();
 			if (!submitterEmail.match(submitterEmailRegex)) {
 				this.errorMessage += '- Please enter a valid email address.\n'
 			}
@@ -700,8 +760,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 			totalDollarAmountDisplay = this.totalDollarAmountInput_po.val();
 		}
 
-		if (this.submitterEmailInput != null) {
-			submitterEmail = '' + this.submitterEmailInput.val();
+		if (this.submitterEmailInput_po != null) {
+			submitterEmail = '' + this.submitterEmailInput_po.val();
 			if (!submitterEmail.match(submitterEmailRegex)) {
 				this.errorMessage += '- Please enter a valid email address.\n'
 			}
@@ -867,8 +927,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 		}
 
 
-		if (this.submitterEmailInput != null) {
-			submitterEmail = '' + this.submitterEmailInput.val();
+		if (this.submitterEmailInput_creditcard != null) {
+			submitterEmail = '' + this.submitterEmailInput_creditcard.val();
 			if (!submitterEmail.match(submitterEmailRegex)) {
 				this.errorMessage += '- Please enter a valid email address.\n'
 			}
@@ -961,6 +1021,12 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 		}
 
 		this.labUsersList = event.target;
+
+		if (coreFacilityGridLocalData.length > 0) {
+			this.disableCoreFacilitiesSelector = false;
+		} else {
+			this.disableCoreFacilitiesSelector = true;
+		}
 	}
 
 	private onCoreFacilitiesSelected(event: any): void {
@@ -971,10 +1037,19 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy, AfterViewI
 
 	private onLabListUnselect():void {
 		this.coreFacilitiesSelector.setLocalData([{display: 'No lab selected'}]);
+		this.disableCoreFacilitiesSelector = true;
+	}
+
+	private onLabListClosed(): void {
+		if (this.labListComboBox != null
+				&& this.labListComboBox.val() != null
+				&& this.labListComboBox.val() === '') {
+			this.disableCoreFacilitiesSelector = true;
+		}
 	}
 
 	private onCancelButtonClicked(): void {
-		this.window.destroy();
+		this.close();
 	}
 
 	private successOkButtonClicked(): void {

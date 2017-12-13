@@ -22,16 +22,20 @@ import {
 	MatMenuModule, ShowOnDirtyErrorStateMatcher}  from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
+import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
 
 @NgModule({
-  imports: [HEADER_ROUTING, CommonModule,
+  imports: [
+      HEADER_ROUTING,
+      CommonModule,
       BrowserModule,
       NgbModule.forRoot(),
       FormsModule,
       CommonModule,
       UserModule,
       AngularMaterialModule,
-      BrowserAnimationsModule
+      BrowserAnimationsModule,
+      NewBillingAccountModule
   ],
    providers: [
        // {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}

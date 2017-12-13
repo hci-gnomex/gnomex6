@@ -1,13 +1,14 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, ElementRef, OnInit, ViewEncapsulation} from "@angular/core";
+import {Component, ElementRef, OnInit, ViewChild, ViewEncapsulation} from "@angular/core";
 import { ExperimentsService } from '../experiments/experiments.service';
 import {ProgressService} from "../home/progress.service";
 import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {Observable} from "rxjs/Observable";
 import {LocalStorageService} from "angular-2-local-storage";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {WindowService} from "../window-service";
 
 @Component({
     selector: "gnomex-header",
@@ -71,13 +72,15 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 })
 
 export class HeaderComponent implements OnInit{
+
     isLoggedIn: Observable<boolean>;
     options: FormGroup;
 
     constructor(private authenticationService: AuthenticationService,
                 private progressService: ProgressService,
                 private localStorageService: LocalStorageService,
-                private formBuilder: FormBuilder) {
+                private formBuilder: FormBuilder,
+                private windowService: WindowService) {
         this.options = this.formBuilder.group({
             hideRequired: false,
             floatPlaceholder: 'auto',
@@ -103,6 +106,10 @@ export class HeaderComponent implements OnInit{
         console.log(this.searchText);
     }
     public browseExp() {
+    }
+
+    public openNewBillingAccountsPopup(): void {
+        this.windowService.openNewBillingAccountWindow();
     }
 
     onLogout() {

@@ -41,6 +41,8 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 	private displayString: string = '';
 	private recordedIndexes: Array<Number> = [];
 
+	@Input() disable: boolean = false;
+
 	@Input() title: string = 'Title';
 
 	@Output() onSave: EventEmitter<any> = new EventEmitter();
@@ -78,6 +80,11 @@ import { GnomexStyledGridComponent } from "../../util/gnomexStyledJqxGrid/gnomex
 
 	openUserSelectPopup(): void {
 		// this.grid.selectedrowindexes(this.recordedIndexes);
+
+		if (this.disable) {
+			return;
+		}
+
 		this.window.open();
 
 		// This is needed on the first opening of the selector to refresh the contents of the grid,
