@@ -42,7 +42,7 @@ const actionMapping:IActionMapping = {
 
 @Component({
     selector: "analysis",
-    templateUrl: "./analysis.component.html",
+    templateUrl: "./browse-analysis.component.html",
     styles: [`
         .inlineComboBox {
             display: inline-block;
