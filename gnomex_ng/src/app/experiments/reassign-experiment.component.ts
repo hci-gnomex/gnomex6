@@ -88,7 +88,7 @@ export class ReassignExperimentComponent {
         var lPromise = this.experimentsService.saveRequestProject(params).toPromise();
         lPromise.then(response => {
             this.experimentsService.refreshProjectRequestList_fromBackend();
-            console.log("saveprojectrequest " + response);
+            console.log("saveprojectrequest ");
         });
 
     }
@@ -115,7 +115,7 @@ export class ReassignExperimentComponent {
 
 
     save(formData:any){
-    console.log(formData);
+//    console.log(formData);
 }
 
 }

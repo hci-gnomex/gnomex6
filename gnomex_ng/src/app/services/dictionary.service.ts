@@ -46,9 +46,9 @@ export class DictionaryService {
                 this.cachedDictionaryString = JSON.stringify(response);
                 this.cacheExpirationTime = Date.now() + this.CACHE_EXPIRATION_MILLIS;
                 this.reloadObservable = null;
-                console.log("************RELOAD************");
-                console.log(JSON.stringify(this.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY)));
-                console.log("******************************");
+                console.log("************RELOAD************ the dictionaries");
+//                console.log(JSON.stringify(this.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY)));
+//                console.log("******************************");
                 this.progressService.displayLoader(100);
                 if (callback) {
                     callback();

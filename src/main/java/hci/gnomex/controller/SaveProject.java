@@ -53,7 +53,7 @@ public class SaveProject extends GNomExCommand implements Serializable {
     
     if (request.getParameter("projectXMLString") != null && !request.getParameter("projectXMLString").equals("")) {
       projectXMLString = request.getParameter("projectXMLString");
-      System.out.println ("[SaveProject] projectXMLString: " + projectXMLString);
+//      System.out.println ("[SaveProject] projectXMLString: " + projectXMLString);
     }
     
     if (request.getParameter("parseEntries") != null && !request.getParameter("parseEntries").equals("")) {

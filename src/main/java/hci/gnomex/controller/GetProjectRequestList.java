@@ -126,6 +126,8 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
         }
         else isLite = "N";
 
+        System.out.println ("[GetProjectRequestlist] isLite: " + isLite);
+
         HashMap myLabMap = new HashMap();
         if (showMyLabsAlways.equals("Y")) {
           for(Iterator i = this.getSecAdvisor().getAllMyGroups().iterator(); i.hasNext();) {
@@ -149,12 +151,12 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
         results = (List)query.list();
 
         // if isLite don't get the analysis stuff
-        HashMap analysisMap = new HashMap();
+        HashMap analysisMap = new HashMap(40000);
         if (isLite.equals("N")) {
           buf = filter.getAnalysisExperimentQuery(this.getSecAdvisor());
           LOG.info("Query for GetProjectRequestList: " + buf.toString());
           List analysisResults = (List) sess.createQuery(buf.toString()).list();
-          analysisMap = new HashMap();
+          analysisMap = new HashMap(40000);
           for (Iterator i = analysisResults.iterator(); i.hasNext(); ) {
             Object[] row = (Object[]) i.next();
             Integer idRequest = (Integer) row[0];
@@ -286,6 +288,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
 
       XMLOutputter out = new org.jdom.output.XMLOutputter();
       this.xmlResult = out.outputString(doc);
+      System.out.println ("[GetProjectRequestList] this.xmlResult.length(): " + this.xmlResult.length());
 
       // Garbage collect
       out = null;
@@ -322,6 +325,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
     if (prop != null && prop.length() > 0) {
       try {
         maxExperiments = Integer.parseInt(prop);
+        System.out.println ("[GetProjectRequestList] maxExperiments: " + maxExperiments);
       }
       catch(NumberFormatException e) {
         LOG.error("Error in GetProjectRequestList", e);

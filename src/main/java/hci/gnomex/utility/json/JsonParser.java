@@ -1,5 +1,7 @@
 package hci.gnomex.utility.json;
 
+import static hci.gnomex.utility.JSONtoXML.debugHint;
+
 /**
  *
  */
@@ -102,7 +104,6 @@ public class JsonParser {
                 case TokenTypes.JSON_BOOLEAN_TOKEN      : { setElementData(tokenizer, ElementTypes.JSON_ARRAY_VALUE_BOOLEAN);   } break;
                 case TokenTypes.JSON_NULL_TOKEN         : { setElementData(tokenizer, ElementTypes.JSON_ARRAY_VALUE_NULL);      } break;
                 case TokenTypes.JSON_CURLY_BRACKET_LEFT : { parseObject(tokenizer); } break;
-                // todo add arrays in arrays support
             }
 
 
@@ -123,12 +124,13 @@ public class JsonParser {
         this.elementBuffer.position[this.elementIndex] = tokenizer.tokenPosition();
         this.elementBuffer.length  [this.elementIndex] = tokenizer.tokenLength();
         this.elementBuffer.type    [this.elementIndex] = elementType;
-        System.out.println ("[setElementData] elementIndex: " + elementIndex + " token position: " + tokenizer.tokenPosition() + " token length: " + tokenizer.tokenLength() + " elementType: " + elementType + " -->" + ElementTypes.toString(elementType));
+        if (debugHint) System.out.println ("[setElementData] elementIndex: " + elementIndex + " token position: " + tokenizer.tokenPosition() + " token length: " + tokenizer.tokenLength() + " elementType: " + elementType + " -->" + ElementTypes.toString(elementType));
         this.elementIndex++;
     }
 
     private final void assertThisTokenType(byte tokenType, byte expectedTokenType) {
         if(tokenType != expectedTokenType) {
+            System.out.println ("Token type mismatch: Expected " + ElementTypes.toString(expectedTokenType) + " but found " + ElementTypes.toString(tokenType));
             throw new ParserException("Token type mismatch: Expected " + ElementTypes.toString(expectedTokenType) + " but found " + ElementTypes.toString(tokenType));
         }
     }
@@ -136,6 +138,7 @@ public class JsonParser {
 
     private void assertHasMoreTokens(JsonTokenizer tokenizer) {
         if(! tokenizer.hasMoreTokens()) {
+            System.out.println ("Expected more tokens available in the tokenizer");
             throw new ParserException("Expected more tokens available in the tokenizer");
         }
     }
