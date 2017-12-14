@@ -7,6 +7,7 @@ import {ExperimentsService} from "../experiments.service";
 import { ActivatedRoute} from '@angular/router'
 
 import {TabsStatusEvent,TabContainer} from "../../util/tabs/"
+import {ExperimentViewService} from "../../services/experiment-view.service";
 
 @Component({
     selector: "experiment-detail",
@@ -50,14 +51,16 @@ export class ExperimentDetail implements OnInit {
     data: Array<string>;
     state:string = TabContainer.VIEW;
     buttonDisabled: boolean = true;
-    @ViewChild(TabContainer) theTabs: TabContainer
+    @ViewChild(TabContainer) theTabs: TabContainer;
     private visStr:string = "Edit";
     viewSize:number = -1;
 
 
 
-    constructor(private experimentsService: ExperimentsService,private route:ActivatedRoute) {
-        this.cNames = ["PrepTab","TestComponent","DescriptionTab"]
+    constructor(private experimentsService: ExperimentsService,
+                private route:ActivatedRoute,
+                private experimentViewService: ExperimentViewService) {
+        this.cNames = ["PrepTab","TestComponent","DescriptionTab","SamplesTabComponent","SequenceLanesTabComponent"]
     }
 
     changeStatus($event:TabsStatusEvent){
@@ -75,11 +78,21 @@ export class ExperimentDetail implements OnInit {
             this.state = TabContainer.VIEW;
         }
     }
+    private subscription;
     ngOnInit(): void {
-        this.route.data.forEach((data) =>{
-            this.experiment = data['experiment']; // this data is carried on route look at browse-experiments.component.ts
-                                                 // & experiment-resolver.service.ts
+        // this data is carried on route look at browse-experiments.component.ts & experiment-resolver.service.ts
+        this.subscription = this.route.data.subscribe((data) => {
+            this.experiment = data.experiment.Request;
             console.log(this.experiment);
+            this.experimentViewService.setExperiment(this.experiment);
+        });
+    }
+    ngOnInit_DELETEME(): void {
+        this.route.data.forEach((data) =>{
+            // this data is carried on route look at browse-experiments.component.ts & experiment-resolver.service.ts
+            this.experiment = data['experiment'];
+            console.log(this.experiment);
+            this.experimentViewService.setExperiment(this.experiment);
         });
     }
     next(){

@@ -1,31 +1,42 @@
-import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {EventEmitter, Injectable} from "@angular/core";
+import {Http, Response} from "@angular/http";
 import {Observable} from "rxjs/Observable";
-import {HttpService} from "./http.service";
 import {ProgressService} from "../home/progress.service";
 
 @Injectable()
 export class DictionaryService {
 
+    public static readonly APPLICATION:string = "hci.gnomex.model.Application";
+    public static readonly ANNOTATION_REPORT_FIELD = "hci.gnomex.model.AnnotationReportField";
     public static readonly BILLING_PERIOD: string = "hci.gnomex.model.BillingPeriod";
     public static readonly CORE_FACILITY: string = "hci.gnomex.model.CoreFacility";
     public static readonly GENOME_BUILD: string = "hci.gnomex.model.GenomeBuildLite";
+    public static readonly INSTITUTION: string = "hci.gnomex.model.Institution";
+    public static readonly NUMBER_SEQUENCING_CYCLES_ALLOWED: string = "hci.gnomex.model.NumberSequencingCyclesAllowed";
     public static readonly OLIGO_BARCODE: string = "hci.gnomex.model.OligoBarcode";
     public static readonly ORGANISM: string = "hci.gnomex.model.OrganismLite";
     public static readonly PROPERTY_DICTIONARY: string = "hci.gnomex.model.PropertyDictionary";
     public static readonly REQUEST_CATEGORY: string = "hci.gnomex.model.RequestCategory";
     public static readonly SEQ_LIB_PROTOCOL: string = "hci.gnomex.model.SeqLibProtocol";
-    public static readonly APPLICATION:string = "hci.gnomex.model.Application";
-    public static readonly ANNOTATION_REPORT_FIELD = "hci.gnomex.model.AnnotationReportField";
     public static readonly VISIBILTY: string = "hci.gnomex.model.Visibility";
-    public static readonly INSTITUTION: string = "hci.gnomex.model.Institution";
 
-    private cachedDictionaryString: any;
+    private cachedDictionaries: any;
+    private cachedEntries: any;
     private cacheExpirationTime: number = 0;
     private reloadObservable: Observable<any> = null;
     private CACHE_EXPIRATION_MILLIS = 600000;   // ten minutes = 600000 millis
 
     constructor(private _http: Http, private progressService: ProgressService) {}
+
+    private cacheDictionaryData(dictionaryData) {
+        this.cachedDictionaries = [];
+        this.cachedEntries = {};
+        for (let dictionary of dictionaryData) {
+            this.cachedEntries[dictionary.className] = dictionary.DictionaryEntry;
+            delete dictionary.DictionaryEntry;
+            this.cachedDictionaries.push(dictionary);
+        }
+    }
 
     /**
      * Forces a full reload of the dictionary, returns an observable of an empty object when it is done.
@@ -35,20 +46,17 @@ export class DictionaryService {
      */
     reload(callback?): void {
         if (this.reloadObservable) {
-            this.reloadObservable.subscribe((response) => {
-                if (callback) {
+            if (callback) {
+                this.reloadObservable.subscribe((response) => {
                     callback();
-                }
-            });
+                });
+            }
         } else {
-            this.reloadObservable = this.loadDictionaries();
+            this.reloadObservable = this.loadDictionariesObservable();
             this.reloadObservable.subscribe((response) => {
-                this.cachedDictionaryString = JSON.stringify(response);
+                this.cacheDictionaryData(response);
                 this.cacheExpirationTime = Date.now() + this.CACHE_EXPIRATION_MILLIS;
                 this.reloadObservable = null;
-                console.log("************RELOAD************");
-                console.log(JSON.stringify(this.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY)));
-                console.log("******************************");
                 this.progressService.displayLoader(100);
                 if (callback) {
                     callback();
@@ -57,20 +65,64 @@ export class DictionaryService {
         }
     }
 
-    private loadDictionaries(): Observable<any> {
-        return HttpService.getJson(this._http, "/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}, "loadDictionaries");
+    /**
+     * Backend call to load all dictionaries from the database
+     * Forces a database call and returns an observable
+     * @returns {Observable<any>}
+     */
+    private loadDictionariesObservable(): Observable<any> {
+        let emitter: EventEmitter<any> = new EventEmitter();
+        this.loadDictionaries().subscribe((response) => {
+            emitter.emit(response);
+            emitter.complete();
+        });
+        return emitter.asObservable();
     }
 
     /**
-     * Internal method to get a copy of the current cached dictionary
-     * If the cached dictionary has expired this will initiate a reload but not wait for the newest version
+     * Backend call to load all dictionaries from the database
+     * Follows typical GNomEx backend format, which returns an Observable without forcing a database call
+     * The database call only happens when the caller to this method subscribes to the Observable
+     * @returns {Observable<any>} The dictionary object
+     */
+    private loadDictionaries(): Observable<any> {
+        return this._http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error in ManageDictionaries");
+            }
+        });
+    }
+
+    /**
+     * Internal method to get the current list of cached dictionary objects without the entries
+     * If the cache has expired this will initiate a reload but not wait for the newest version
      * @returns {any[]}
      */
-    private getDictionaries(): any[] {
+    private getCachedDictionaries(): any[] {
         if (Date.now() > this.cacheExpirationTime) {
             this.reload();
         }
-        return JSON.parse(this.cachedDictionaryString);
+        return this.cachedDictionaries;
+    }
+
+    /**
+     * Internal method to get the current list of cached dictionary entries for the given className
+     * If the cache has expired this will initiate a reload but not wait for the newest version
+     * If there is no dictionary for the given className, returns an empty array
+     * @param {string} className
+     * @returns {any[]}
+     */
+    private getCachedEntries(className: string): any[] {
+        if (Date.now() > this.cacheExpirationTime) {
+            this.reload();
+        }
+        if (this.cachedEntries[className]) {
+            return this.cachedEntries[className]
+        } else {
+            return [];
+        }
     }
 
     private sortArrayByField(array: any[], fieldName: string) {
@@ -90,10 +142,7 @@ export class DictionaryService {
      * @returns {any[]}
      */
     getAllDictionaries(): any[] {
-        let dictionaries: any[] = this.getDictionaries();
-        for (let dictionary of dictionaries) {
-            delete dictionary.DictionaryEntry;
-        }
+        let dictionaries: any[] = this.cloneObject(this.getCachedDictionaries());
         return this.sortArrayByField(dictionaries, "displayName");
     }
 
@@ -111,7 +160,7 @@ export class DictionaryService {
      * @returns {any}
      */
     getDictionary(className: string): any {
-        return this.getAllDictionaries().find((value) => (value.className == className));
+        return this.getCachedDictionaries().find((value) => (value.className == className));
     }
 
     /**
@@ -121,13 +170,8 @@ export class DictionaryService {
      * @returns {any[]}
      */
     getEntries(className: string): any[] {
-        let dictionaries: any[] = this.getDictionaries();
-        let dictionary: any = dictionaries.find((value) => (value.className == className));
-        if (dictionary) {
-            return this.sortArrayByField(dictionary.DictionaryEntry, "display");
-        } else {
-            return [];
-        }
+        let entries = this.cloneObject(this.getCachedEntries(className));
+        return this.sortArrayByField(entries, "display");
     }
 
     /**
@@ -155,7 +199,8 @@ export class DictionaryService {
      * @returns {any}
      */
     getEntry(className: string, value: string): any {
-        return this.getEntries(className).find((entry) => entry.value == value);
+        let entry = this.getCachedEntries(className).find((entry) => entry.value == value);
+        return this.cloneObject(entry);
     }
 
     /**
@@ -175,6 +220,16 @@ export class DictionaryService {
         }
     }
 
+    getMetaData(className: string): Observable<any> {
+        return this._http.get("/gnomex/ManageDictionaries.gx?action=metadata&className=" + className, {withCredentials: true}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error in metaDataClass");
+            }
+        });
+    }
+
     /**
      * Returns the display text for the dictionary entry matching the className and value provided.
      * Returns an empty string if no match is found.
@@ -189,6 +244,14 @@ export class DictionaryService {
         } else {
             return "";
         }
+    }
+
+    private cloneObject(object: any): any {
+        if (!object) {
+            // leave null and undefined unchanged
+            return object;
+        }
+        return JSON.parse(JSON.stringify(object));
     }
 
 }

@@ -111,7 +111,7 @@
       <mat-divider></mat-divider>
     </mat-menu>
     <mat-menu #confMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item class="menu"> <img src="../../assets/book.png"> Add/Edit Dictionaries </button>
+      <button mat-menu-item class="menu" [routerLink]="[ '/browse-dictionary' ]"> <img src="../../assets/book.png"> Add/Edit Dictionaries </button>
       <button mat-menu-item class="menu"> <img src="../../assets/page_white_wrench.png"> Configure Core Facilities </button>
       <button mat-menu-item class="menu"> <img src="../../assets/page_white_wrench.png"> Configure Annotations </button>
       <button mat-menu-item class="menu"> <img src="../../assets/page_white_wrench.png"> Configure Experiment Platform </button>

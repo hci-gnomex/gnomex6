@@ -12,6 +12,7 @@ import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
+import {ConfigurationModule} from "./configuration/configuration.module";
 import {NewBillingAccountModule} from "./billing/new_billing_account/new-billing-account.module";
 import {ProgressService} from "./home/progress.service";
 import {RouterModule} from "@angular/router";
@@ -58,6 +59,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AuthenticationModule,
         NavigationModule,
         ExperimentsModule,
+        ConfigurationModule,
         NewBillingAccountModule,
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig),
