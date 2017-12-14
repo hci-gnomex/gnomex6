@@ -122,7 +122,7 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			&& !request.getParameter("analysisGroupsXMLString").equals("")) {
 		analysisGroupsXMLString = request.getParameter("analysisGroupsXMLString");
 
-		// System.out.println("[SaveAnalysis] analysisGroupsXMLString: " + analysisGroupsXMLString);
+		System.out.println("[SaveAnalysis] ****************** analysisGroupsXMLString: " + analysisGroupsXMLString);
 
 		reader = new StringReader(analysisGroupsXMLString);
 		try {
@@ -130,8 +130,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			analysisGroupsDoc = sax.build(reader);
 			analysisGroupParser = new AnalysisGroupParser(analysisGroupsDoc);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse analysisGroupsXMLString", je);
 			this.addInvalidField("analysisGroupsXMLString", "Invalid analysisGroupsXMLString");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse analysisGroupsXMLString ", je);
 		}
 	}
 
@@ -147,8 +147,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 
 			analysisFileParser = new AnalysisFileParser(analysisFilesDoc, null);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse analysisFilesXMLString", je);
 			this.addInvalidField("analysisFilesXMLString", "Invalid analysisFilesXMLString");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse analysisFilesXMLString ", je);
 		}
 	}
 
@@ -163,8 +163,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			hybsDoc = sax.build(reader);
 			hybParser = new AnalysisHybParser(hybsDoc);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse hybsXMLString", je);
 			this.addInvalidField("hybsXMLString", "Invalid hybsXMLString");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse hybsXMLString ", je);
 		}
 	}
 
@@ -183,8 +183,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			lanesDoc = sax.build(reader);
 			laneParser = new AnalysisLaneParser(lanesDoc);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse lanesXMLString", je);
 			this.addInvalidField("lanesXMLString", "Invalid lanesXMLString");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse lanesXMLString ", je);
 		}
 	}
 
@@ -197,8 +197,9 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			samplesDoc = sax.build(reader);
 			sampleParser = new AnalysisSampleParser(samplesDoc);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse samplesXMLString", je);
 			this.addInvalidField("samplesXMLString", "Invalid samplesXMLString");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse samplesXMLString ", je);
+
 		}
 	}
 
@@ -212,15 +213,16 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			collaboratorsDoc = sax.build(reader);
 			collaboratorParser = new AnalysisCollaboratorParser(collaboratorsDoc);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse collaboratorsXMLString", je);
 			this.addInvalidField("collaboratorsXMLString", "Invalid collaboratorsXMLString");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse collaboratorsXMLString ", je);
+
 		}
 	}
 
 	if (request.getParameter("genomeBuildsXMLString") != null
 			&& !request.getParameter("genomeBuildsXMLString").equals("")) {
 		genomeBuildsXMLString = request.getParameter("genomeBuildsXMLString");
-		// System.out.println("[SaveAnalysis] genomeBuildsXMLString: " + genomeBuildsXMLString);
+		System.out.println("[SaveAnalysis] **** in SaveAnalysis **** genomeBuildsXMLString: " + genomeBuildsXMLString);
 
 		reader = new StringReader(genomeBuildsXMLString);
 		try {
@@ -228,8 +230,9 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			genomeBuildsDoc = sax.build(reader);
 			genomeBuildParser = new AnalysisGenomeBuildParser(genomeBuildsDoc);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse genomeBuildsXMLString", je);
 			this.addInvalidField("genomeBuildsXMLString", "Invalid genomeBuildsXMLString");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse genomeBuildsXMLString ", je);
+
 		}
 	}
 

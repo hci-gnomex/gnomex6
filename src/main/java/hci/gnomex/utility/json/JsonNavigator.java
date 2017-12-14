@@ -33,7 +33,16 @@ public class JsonNavigator {
     }
 
     public boolean hasPrevious() {
-        return this.elementIndex > 0;
+        if (this.elementIndex == 0) {
+            return false;
+        }
+
+//        if (this.elementIndex == 1 && this.elementBuffer.type[0] == ElementTypes.JSON_ARRAY_START) {
+//            return false;
+//        }
+
+        return true;
+//        return this.elementIndex > 0;
     }
 
     /* Parser element location methods */

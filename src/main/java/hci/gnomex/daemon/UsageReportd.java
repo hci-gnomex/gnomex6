@@ -113,7 +113,7 @@ public class UsageReportd extends TimerTask {
         schemaPath = args[++i];
       }
     } 
-    
+
     try {
       mailProps = new BatchMailer(orionPath).getMailProperties();
     } catch (Exception e){

@@ -32,7 +32,8 @@ public class AnalysisGenomeBuildParser extends DetailObject implements Serializa
       
       String idGenomeBuildString = node.getAttributeValue("idGenomeBuild");
       Integer idGenomeBuild = Integer.valueOf(idGenomeBuildString);
-          
+
+//      System.out.println ("[parse AnalysisGenomeBuildParser] idGenomeBuild: " + idGenomeBuild);
       idGenomeBuildList.add(idGenomeBuild);
     }
   }

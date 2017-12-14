@@ -35,7 +35,7 @@ export class ProjectService {
     getProject(params: URLSearchParams):  Observable<any> {
         return this.http.get("/gnomex/GetProject.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
-                console.log("&&&&&&&&&&&&&&&&&& getProject " + response);
+//                console.log("&&&&&&&&&&&&&&&&&& getProject " + response);
                 return response.json();
             } else {
                 throw new Error("Error");

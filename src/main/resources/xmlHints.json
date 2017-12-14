@@ -19,20 +19,20 @@
     {
       "command": "DeleteRequest",
       "parameter": "requestsToDeleteXMLString",
-      "nodeheader": "requests",
-      "nodeprefix": "Request",
+      "nodeheader": "",
+      "nodeprefix": "",
       "elementhints": [
         {
-          "elementname": "someEntries",
-          "elementheader": "someEntry"
+          "elementname": "requests",
+          "elementheader": "Request"
         }
       ]
     },
     {
       "command": "SaveAnalysis",
       "parameter": "genomeBuildsXMLString",
-      "nodeheader": "GenomeBuild",
-      "nodeprefix": "genomeBuilds",
+      "nodeheader": "genomeBuilds",
+      "nodeprefix": "GenomeBuild",
       "elementhints": [
         {
           "elementname": "someEntries1",
@@ -43,20 +43,20 @@
     {
       "command": "SaveAnalysis",
       "parameter": "analysisGroupsXMLString",
-      "nodeheader": "",
-      "nodeprefix": "analysisGroups",
+      "nodeheader": "analysisGroups",
+      "nodeprefix": "analysisGroup",
       "elementhints": [
         {
-          "elementname": "AnalysisGroup",
-          "elementheader": "Analysis"
+          "elementname": "itemsnotthere",
+          "elementheader": "itemnotthere1"
         }
       ]
     },
     {
       "command": "SubmitWorkAuthForm",
       "parameter": "coreFacilitiesXMLString",
-      "nodeheader": "CoreFacility",
-      "nodeprefix": "coreFacilities",
+      "nodeheader": "coreFacilities",
+      "nodeprefix": "CoreFacility",
       "elementhints": [
         {
           "elementname": "someEntries2",
@@ -75,8 +75,19 @@
           "elementheader": "someEntry3"
         }
       ]
+    },
+    {
+      "command": "MoveAnalysis",
+      "parameter": "analysisGroupsXMLString",
+      "nodeheader": "analysisGroups",
+      "nodeprefix": "analysisGroup",
+      "elementhints": [
+        {
+          "elementname": "notpresent",
+          "elementheader": "notpresent1"
+        }
+      ]
     }
-
   ]
 }
 
