@@ -52,10 +52,8 @@ export class ExperimentDetail implements OnInit {
     state:string = TabContainer.VIEW;
     buttonDisabled: boolean = true;
     @ViewChild(TabContainer) theTabs: TabContainer;
-    private visStr:string = "Edit";
+    visStr:string = "Edit";
     viewSize:number = -1;
-
-
 
     constructor(private experimentsService: ExperimentsService,
                 private route:ActivatedRoute,
@@ -78,35 +76,27 @@ export class ExperimentDetail implements OnInit {
             this.state = TabContainer.VIEW;
         }
     }
-    private subscription;
+
     ngOnInit(): void {
         // this data is carried on route look at browse-experiments.component.ts & experiment-resolver.service.ts
-        this.subscription = this.route.data.subscribe((data) => {
+        this.route.data.subscribe((data) => {
             this.experiment = data.experiment.Request;
-            console.log(this.experiment);
             this.experimentViewService.setExperiment(this.experiment);
         });
     }
-    ngOnInit_DELETEME(): void {
-        this.route.data.forEach((data) =>{
-            // this data is carried on route look at browse-experiments.component.ts & experiment-resolver.service.ts
-            this.experiment = data['experiment'];
-            console.log(this.experiment);
-            this.experimentViewService.setExperiment(this.experiment);
-        });
-    }
+
     next(){
         this.theTabs.select(this.theTabs.activeId + 1);
 
     }
+
     previous(){
         this.theTabs.select(this.theTabs.activeId - 1);
 
     }
+
     checkIfNewState():boolean{
         return (TabContainer.NEW === this.state)
     }
-
-
 
 }
