@@ -86,6 +86,7 @@ const actionMapping:IActionMapping = {
         }
 
         .br-exp-item {
+            width: 100%;
             flex: 1 1 auto;
             font-size: small;
         }
@@ -103,7 +104,7 @@ const actionMapping:IActionMapping = {
 
         .br-exp-three {
             width: 100%;
-            height: 6em;
+            height: 48em;
             flex-grow: 8;
         }
 
@@ -179,7 +180,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         },
         allowDrop: (element, {parent, index}) => {
             this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1) {
+            if (parent.data.parentid === -1 || parent.data.idAnalysis) {
                 return false;
             } else {
                 return true;
@@ -390,20 +391,16 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         var params: URLSearchParams = new URLSearchParams();
         params.set("idLab", event.to.parent.idLab);
         var analysisGroupXMLString: string = "";
-        var idAnalysisString: string = "";
-        for (let n of event.treeModel.activeNodes) {
-            idAnalysisString = idAnalysisString.concat(n.data.idAnalysis);
-            idAnalysisString = idAnalysisString.concat(",");
-        }
-        analysisGroupXMLString = analysisGroupXMLString.concat('<analysisGroups><AnalysisGroup idAnalysisGroup=');
-        analysisGroupXMLString = analysisGroupXMLString.concat('"');
+        var idAnalysisString = event.node.idAnalysis;
+        var analysisGroup = event.to.parent;
+        delete event.to.parent.items;
+        // Tree doesnt support multiple drag/drop. It actually woould work, just no visual indication.
+        // for (let n of event.treeModel.activeNodes) {
+        //     idAnalysisString = idAnalysisString.concat(n.data.idAnalysis);
+        //     idAnalysisString = idAnalysisString.concat(",");
+        // }
+        analysisGroupXMLString = JSON.stringify(analysisGroup);
 
-        analysisGroupXMLString = analysisGroupXMLString.concat(event.to.parent.idAnalysisGroup);
-        analysisGroupXMLString = analysisGroupXMLString.concat('"');
-        analysisGroupXMLString = analysisGroupXMLString.concat(' name="');
-        analysisGroupXMLString = analysisGroupXMLString.concat(event.to.parent.name);
-        analysisGroupXMLString = analysisGroupXMLString.concat('"');
-        analysisGroupXMLString = analysisGroupXMLString.concat("/></analysisGroups>");
         params.set("analysisGroupsXMLString", analysisGroupXMLString);
         params.set("idAnalysisString", idAnalysisString);
         var lPromise = this.analysisService.moveAnalysis(params).toPromise();

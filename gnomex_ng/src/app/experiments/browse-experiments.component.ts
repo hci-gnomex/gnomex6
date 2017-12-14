@@ -30,6 +30,7 @@ import {DeleteProjectComponent} from "./delete-project.component";
 import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
 import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
+import {DictionaryService} from "../services/dictionary.service";
 
 @Component({
     selector: "experiments",
@@ -94,7 +95,7 @@ import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 
         .br-exp-three {
             width: 100%;
-            height: 6em;
+            height: 48em;
             flex-grow: 8;
         }
 
@@ -228,6 +229,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
                 private changeDetectorRef: ChangeDetectorRef,
+                private dictionaryService: DictionaryService,
                 private labListService: LabListService) {
 
 
@@ -292,52 +294,50 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.items = response;
         }
         this.labs = this.labs.concat(this.items);
-        for( var l of this.items) {
-            l.id = l.idLab;
-            l.parentid = -1;
+        for( var lab of this.items) {
+            lab.id = "l"+lab.idLab;
+            lab.parentid = -1;
 
-            l.icon = "assets/group.png";
+            lab.icon = "assets/group.png";
             // If there is a lab with no Project skip
-
-            if (l.Project) {
-            if (!this.isArray(l.Project)) {
-                l.items = [l.Project];
-            } else {
-                l.items = l.Project;
-            }
-            for( var p of l.items) {
-                p.icon = "assets/folder.png";
-                p.labId = l.labId;
-                p.id = "p"+p.idProject;
-                p.parentid = l.id;
-                if (p.Request) {
-                    if (!this.isArray(p.Request)) {
-                        p.items = [p.Request];
-                    } else {
-                        p.items = p.Request;
-                    }
-                    for (var r of p.items) {
-                        if (r) {
-                            if (r.label) {
-                                var shortLabel = r.label.substring(0, (r.label.lastIndexOf("-")));
-                                var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
-                                r.label = shorterLabel;
-                                this.experimentCount++;
-                                r.id = "r"+r.idRequest;
-                                r.parentid = p.id;
-
-                            } else {
-                                console.log("label not defined");
-                            }
-                        } else {
-                            console.log("r is undefined");
-                        }
-                    }
+            if (lab.Project) {
+                if (!this.isArray(lab.Project)) {
+                    lab.items = [lab.Project];
                 } else {
-                    console.log("");
+                    lab.items = lab.Project;
+                }
+                for (var project of lab.items) {
+                    project.icon = "assets/folder.png";
+                    project.labId = lab.labId;
+                    project.id = "p"+project.idProject;
+                    project.parentid = lab.id;
+                    if (project.Request) {
+                        if (!this.isArray(project.Request)) {
+                            project.items = [project.Request];
+                        } else {
+                            project.items = project.Request;
+                        }
+                        for (var request of project.items) {
+                            if (request) {
+                                if (request.label) {
+                                    var shortLabel = request.label.substring(0, (request.label.lastIndexOf("-")));
+                                    var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
+                                    request.label = shorterLabel;
+                                    this.experimentCount++;
+                                    request.id = "r"+request.idRequest;
+                                    request.parentid = project.id;
+                                } else {
+                                    console.log("label not defined");
+                                }
+                            } else {
+                                console.log("r is undefined");
+                            }
+                        }
+                    } else {
+                        console.log("");
+                    }
                 }
             }
-        }
         }
     };
 
@@ -393,7 +393,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 targetItem: this.targetItem,
                 showBillingCombo: this.showBillingCombo
 
-    }
+            }
         });
         this.reassignExperimentDialogRef.afterClosed()
             .subscribe(result => {
@@ -433,38 +433,39 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     buildLabMembers(response: any, event: any) {
         this.labMembers = [];
         this.billingAccounts = [];
+        var requestCategoryCoreFacility: any =
+            this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY, this.currentItem.codeRequestCategory).idCoreFacility;
+
         var i: number = 0;
-        for (let u of response.members) {
-            if (u.isActive === "Y") {
-                this.labMembers[i] = u;
-                u.label = u.firstLastDisplayName;
+        for (let user of response.possibleCollaborators) {
+            if (user.isActive === "Y") {
+                this.labMembers[i] = user;
+                user.label = user.firstLastDisplayName;
                 i++;
             }
         }
 
-        for (let b of response.authorizedBillingAccounts) {
-            // TODO Use dictionary service for corefacility
-            //if (b.idCoreFacility === this.idCoreFacility &&
-                if (b.isApproved === "Y" && b.isActive === "Y") {
-                b.label = b.accountName;
-                this.billingAccounts.push(b);
+        for (let billingAccount of response.authorizedBillingAccounts) {
+            if (billingAccount.isApproved === "Y" && billingAccount.isActive === "Y" && billingAccount.idCoreFacility === requestCategoryCoreFacility) {
+                billingAccount.label = billingAccount.accountName;
+                this.billingAccounts.push(billingAccount);
             }
         }
 
-        for (let u of response.managers) {
+        for (let manager of response.managers) {
             var found = false;
 
-            for (let fl of this.labMembers) {
-                if (u.firstLastDisplayName.indexOf(fl.firstLastDisplayName) > 0 ) {
+            for (let firstLastName of this.labMembers) {
+                if (manager.firstLastDisplayName.indexOf(firstLastName.firstLastDisplayName) > 0 ) {
                     found = true;
                     break;
                 }
 
             }
             if (!found) {
-                if(u.isActive === "Y") {
-                    u.label = u.firstLastDisplayName;
-                    this.labMembers.push(u);
+                if(manager.isActive === "Y") {
+                    manager.label = manager.firstLastDisplayName;
+                    this.labMembers.push(manager);
                 }
             }
         }
@@ -474,7 +475,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     'you do not have permission to access the member list for this lab. Please contact an administrator.', null)
                 .subscribe(
                     res => {
-            this.resetTree();
+                        this.resetTree();
                     }
                 );
         } else {
@@ -501,16 +502,16 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 useThisLabList = this.labList;
             } else {
                 useThisLabList = this.labs;
-    }
+            }
 
             this.createProjectDialogRef= this.dialog.open(CreateProjectComponent, {
                 data: {
                     labList: useThisLabList,
                     items: this.items,
                     selectedLabItem: this.selectedItem
-        }
+                }
             });
-    }
+        }
     }
 
     /**
@@ -522,7 +523,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.deleteProjectDialogRef = this.dialog.open(DeleteProjectComponent, {
             data: {
                 selectedItem: this.selectedItem,
-    }
+            }
         });
     }
 
@@ -530,11 +531,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.deleteExperimentDialogRef = this.dialog.open(DeleteExperimentComponent, {
             data: {
                 selectedExperiment: this.selectedExperiment
+            }
+        });
+
+
     }
-            });
-
-
-        }
     /**
      * A node is selected in the tree.
      * @param event
@@ -583,6 +584,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             });
 
         }
+        this.experimentsService.selectedTreeNode = _.cloneDeep(this.selectedItem.data);
+
+
     }
 
     /**

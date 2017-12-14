@@ -76,7 +76,6 @@ export class HeaderComponent implements OnInit{
 
     constructor(private authenticationService: AuthenticationService,
                 private progressService: ProgressService,
-                private localStorageService: LocalStorageService,
                 private formBuilder: FormBuilder) {
         this.options = this.formBuilder.group({
             hideRequired: false,

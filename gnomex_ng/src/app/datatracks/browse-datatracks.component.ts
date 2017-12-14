@@ -36,7 +36,7 @@ const actionMapping:IActionMapping = {
 
 @Component({
     selector: "datatracks",
-    templateUrl: "./datatracks.component.html",
+    templateUrl: "./browse-datatracks.component.html",
     styles: [`
         .inlineComboBox {
             display: inline-block;
@@ -76,7 +76,6 @@ const actionMapping:IActionMapping = {
 
         .br-exp-item-row-two {
             flex-grow: 1;
-            position: relative;
         }
 
         .br-exp-item {
@@ -97,7 +96,7 @@ const actionMapping:IActionMapping = {
 
         .br-exp-three {
             width: 100%;
-            height: 6em;
+            height: 48em;
             flex-grow: 8;
         }
 
@@ -184,7 +183,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         allowDrag: (node) => node.isLeaf,
         actionMapping
     };
-
     public items: any;
     public organisms: any;
     public currentItem: any;
@@ -418,7 +416,11 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     assignIconToDTFolder(dtf: any): void {
         dtf.id = "df"+dtf.idDataTrackFolder;
-        dtf.icon = "assets/folder_group.png";
+        if (dtf.idLab) {
+            dtf.icon = "assets/folder_group.png";
+        } else {
+            dtf.icon = "assets/folder.png";
+        }
         dtf.isDataTrackFolder = true;
     }
 

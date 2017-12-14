@@ -21,7 +21,7 @@ import { TextAreaModule }     from "../../modules/textarea.module";
 import { ToggleButtonModule } from "../../modules/togglebutton.module";
 import {WindowModule}       from "../../modules/window.module";
 import {ServicesModule} from "../services/services.module";
-
+import { AngularSplitModule } from 'angular-split';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {DialogsModule} from "../util/popup/dialogs.module";
 import {BrowseDatatracksComponent} from "./browse-datatracks.component";
@@ -60,7 +60,8 @@ import {MoveDataTrackComponent} from "./move-datatrack.component";
         TreeModule,
         UtilModule,
         WindowModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        AngularSplitModule
     ],
     declarations: [
         BrowseDatatracksComponent, MoveDataTrackComponent
@@ -69,5 +70,4 @@ import {MoveDataTrackComponent} from "./move-datatrack.component";
     exports: [MoveDataTrackComponent]
 })
 export class DatatracksModule {
-
 }

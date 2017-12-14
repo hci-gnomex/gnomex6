@@ -24,8 +24,9 @@ import { NotificationModule } from "../../modules/notification.module";
 import { TextAreaModule }     from "../../modules/textarea.module";
 import { ToggleButtonModule } from "../../modules/togglebutton.module";
 import { WindowModule }       from "../../modules/window.module";
-import { UtilModule } from "../util/util.module";
-import { ServicesModule } from "../services/services.module";
+import {UtilModule} from "../util/util.module";
+import {ServicesModule} from "../services/services.module";
+import { AngularSplitModule } from 'angular-split';
 
 import {BrowseExperimentsComponent} from "./browse-experiments.component";
 import {ExperimentOrdersComponent} from "./orders/experiment-orders.component";
@@ -103,6 +104,7 @@ export const componentFactories =
         AngularMaterialModule,
         TreeGridModule,
         AgGridRendererModule,
+        AngularSplitModule,
         AgGridModule.withComponents([IconTextRendererComponent])
     ],
     declarations: [

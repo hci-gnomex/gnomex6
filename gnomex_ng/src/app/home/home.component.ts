@@ -52,7 +52,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild("loadingProgress") loadingProgress: jqxProgressBarComponent;
     private showProgressSubscription:Subscription;
     private hideLoader: BehaviorSubject<boolean>;
-    private colorRanges = [{ stop: 100, color: '#3fca15' }];
     private launchProperties: any[] = [];
     private site_splash: string;
 
