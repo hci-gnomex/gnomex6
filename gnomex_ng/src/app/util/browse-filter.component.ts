@@ -742,6 +742,7 @@ export class BrowseFilterComponent implements OnInit {
         if (this.mode === this.EXPERIMENT_BROWSE) {
             let params: URLSearchParams = this.getExperimentBrowseParameters();
             this.experimentsService.browsePanelParams = params;
+            this.experimentsService.browsePanelParams["refreshParams"] = true;
             this.experimentsService.getProjectRequestList_fromBackend(params);
         } else if (this.mode === this.ORDER_BROWSE) {
             let params: URLSearchParams = this.getOrderBrowseParameters();

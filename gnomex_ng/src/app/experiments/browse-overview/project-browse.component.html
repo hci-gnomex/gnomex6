@@ -1,0 +1,46 @@
+<form style=" height:100%; width:100%" (ngSubmit)="save()" [formGroup]="projectBrowseForm">
+    <div style="display:block; height:100%; width:100%" >
+        <div class="has-error">
+            <label for="projectNameId">Project Name </label>
+            <br>
+            <input class="form-control"
+                   style="width:100%"
+                   formControlName="projectName"
+                   id="projectNameId"
+                   type="text"
+                   placeholder="Project Name"/>
+            <span *ngIf="projectBrowseForm.get('projectName').errors?.required" class="error-message">
+                Project Name is required
+            </span>
+        </div>
+        <div  style="height:90%; width:100%;" >
+            <label for="projectDescriptionId">Project Description </label>
+            <br>
+            <textarea formControlName="description"
+                      id="projectDescriptionId">
+                </textarea>
+            <span *ngIf="projectBrowseForm.get('description').errors?.maxlength" class="error-message">
+                Description exceeded 5000 characters
+            </span>
+
+            <div class="diryWithSave">
+                <span></span>
+                <div>
+                <span *ngIf="dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
+                    Your changes have not been saved
+                </span>
+                    <span style="margin-left:1em; ">
+                    <button type="submit"
+                            mat-button
+                            [disabled]="!projectBrowseForm.valid"
+                            color="primary">
+                        <img src="../../../assets/action_save.gif">Save
+                    </button>
+                </span>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
