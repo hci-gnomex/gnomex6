@@ -121,10 +121,10 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
         FileDescriptor.setupFileType(2);
 
         // use fast mode?
-        if (useFastMode(sess)) {
-          isLite = "Y";
+        isLite = "Y";
+        if (!useSlowMode(sess)) {
+          isLite = "N";
         }
-        else isLite = "N";
 
         System.out.println ("[GetProjectRequestlist] isLite: " + isLite);
 
@@ -307,14 +307,14 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
     return this;
   }
 
-  private boolean useFastMode (Session sess) {
+  private boolean useSlowMode (Session sess) {
     boolean fast = false;
 
     String prop = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.FAST_BROWSE_EXPERIMENTS);
     if (prop != null && prop.length() > 0) {
-      if (prop.equalsIgnoreCase("ON") || prop.equalsIgnoreCase("YES") || prop.equalsIgnoreCase("TRUE")) {
+      if (prop.equalsIgnoreCase("OFF") || prop.equalsIgnoreCase("NO") || prop.equalsIgnoreCase("FALSE")) {
         fast = true;
-      } else fast = false;
+      }
     }
     return fast;
   }

@@ -63,9 +63,9 @@ export class ReassignExperimentComponent {
     reassignYesButtonClicked() {
         this.noButton = false;
         var params: URLSearchParams = new URLSearchParams();
-        params.set("idRequest", this.currentItem.id);
-        params.set("idProject", this.targetItem.id);
-
+        params.set("idRequest", this.currentItem.idRequest);
+        params.set("idProject", this.targetItem.idProject);
+        params.set("isExtermal", this.currentItem.isExternal);
         params.set("idAppUser", this.selectedOwnerItem.idAppUser);
         var idBillingAccount =  null;
         if (this.showBillingCombo === true) {
@@ -88,7 +88,7 @@ export class ReassignExperimentComponent {
         var lPromise = this.experimentsService.saveRequestProject(params).toPromise();
         lPromise.then(response => {
             this.experimentsService.refreshProjectRequestList_fromBackend();
-            console.log("saveprojectrequest ");
+            console.log("saveprojectrequest " + response);
         });
 
     }

@@ -12,10 +12,10 @@ export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experim
 export class ExperimentsService {
 
 	private experimentOrders: any[];
-
     public projectRequestList: any[];
     public selectedTreeNode:any;
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
     private projectSubject:Subject<any> = new Subject();
@@ -48,26 +48,24 @@ export class ExperimentsService {
         });
     }
 
-
-
-    refreshProjectRequestList_fromBackend(): void {
+	refreshProjectRequestList_fromBackend(): void {
 		this.startSearchSubject.next(true);
 
-        this._http.get("/gnomex/GetProjectRequestList.gx", {
-            withCredentials: true,
-            search: this.previousURLParams
-        }).subscribe((response: Response) => {
-            console.log("GetRequestList called");
+		this._http.get("/gnomex/GetProjectRequestList.gx", {
+			withCredentials: true,
+			search: this.previousURLParams
+		}).subscribe((response: Response) => {
+			console.log("GetRequestList called");
 
-            if (response.status === 200) {
-                this.projectRequestList = response.json().Lab;
-                this.emitProjectRequestList();
-                //return response.json().Request;
-            } else {
-                throw new Error("Error");
-            }
-        });
-    }
+			if (response.status === 200) {
+				this.projectRequestList = response.json().Lab;
+				this.emitProjectRequestList();
+				//return response.json().Request;
+			} else {
+				throw new Error("Error");
+			}
+		});
+	}
 
 	getExperimentsObservable(): Observable<any> {
 		return this.experimentOrdersSubject.asObservable();
@@ -126,9 +124,10 @@ export class ExperimentsService {
 		});
 	}
 
-    emitExperimentOrders(): void {
-        this.experimentOrdersSubject.next(this.experimentOrders);
-    }
+	emitExperimentOrders(): void {
+		this.experimentOrdersSubject.next(this.experimentOrders);
+	}
+
 
     getProjectRequestListObservable(): Observable<any> {
         return this.projectRequestListSubject.asObservable();
@@ -141,12 +140,6 @@ export class ExperimentsService {
 
     getProjectRequestList_fromBackend(params: URLSearchParams,allowRefresh?:boolean): void { 
        this.startSearchSubject.next(true);
-
-//        if (!allowRefresh && this.haveLoadedExperimentOrders && this.previousURLParams === params) {
-//            // do nothing
-//            console.log("Experiment Orders already loaded");
-//            // return Observable.of(this.experimentOrders);
-//        } else {
 
             this.haveLoadedExperimentOrders = true;
             this.previousURLParams = params;
@@ -350,5 +343,6 @@ export class ExperimentsService {
     getFilteredOverviewListObservable():Observable<any>{
         return this.filteredExperimentOverviewListSubject.asObservable();
     }
+
 
 }
