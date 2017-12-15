@@ -22,6 +22,7 @@ import { ToggleButtonModule } from "../../modules/togglebutton.module";
 import { WindowModule }       from "../../modules/window.module";
 import {UtilModule} from "../util/util.module";
 import {ServicesModule} from "../services/services.module";
+import { AngularSplitModule } from 'angular-split';
 
 import {BrowseAnalysisComponent} from "./browse-analysis.component";
 import {ANALYSIS_ROUTING} from "./analysis.routes";
@@ -65,7 +66,8 @@ import {DialogsModule} from "../util/popup/dialogs.module";
         TreeModule,
         UtilModule,
         WindowModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        AngularSplitModule
             ],
     declarations: [
         BrowseAnalysisComponent, DeleteAnalysisComponent, DragDropHintComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent
