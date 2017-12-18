@@ -122,7 +122,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
 
         // use fast mode?
         isLite = "Y";
-        if (!useSlowMode(sess)) {
+        if (useSlowMode(sess)) {
           isLite = "N";
         }
 
@@ -308,15 +308,15 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
   }
 
   private boolean useSlowMode (Session sess) {
-    boolean fast = false;
+    boolean slow = false;
 
     String prop = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.FAST_BROWSE_EXPERIMENTS);
     if (prop != null && prop.length() > 0) {
       if (prop.equalsIgnoreCase("OFF") || prop.equalsIgnoreCase("NO") || prop.equalsIgnoreCase("FALSE")) {
-        fast = true;
+        slow = true;
       }
     }
-    return fast;
+    return slow;
   }
 
   private Integer getMaxExperiments(Session sess) {
