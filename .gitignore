@@ -20,6 +20,3 @@ classes/
 /node_modules/
 
 *.map
-
-**.js
-**.js.map
