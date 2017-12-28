@@ -1,0 +1,141 @@
+<div #sidenav class="sidenav">
+    <div style="display: flex; justify-content: flex-end;">
+        <button mat-button style="margin-right: 5px" color="primary" (click)="closeSidenav()">Close</button>
+    </div>
+    <div>
+        <h5><img src="../../assets/chart_bar.png" style="margin: 0 5px">Usage</h5>
+    </div>
+    <div>
+        <mat-radio-group [(ngModel)]="usageType" style="display: inline-flex; flex-direction: column;">
+            <mat-radio-button [value]="MODE_EXPERIMENTS" class="type">Experiments</mat-radio-button>
+            <mat-radio-button [value]="MODE_ANALYSIS" class="type">Analysis</mat-radio-button>
+            <mat-radio-button [value]="MODE_FILES" class="type">Files</mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <div style="display: inline-flex; flex-direction: column; width: 100%;">
+        <mat-form-field *ngIf="usageType === MODE_EXPERIMENTS" style="margin: 0 5px; width: 90%">
+            <mat-select [(value)]="idCoreFacility" placeholder="Core Facility">
+                <mat-option *ngFor="let core of coreFacilities" [value]="core.idCoreFacility">
+                    {{ core.display }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <label class="header">Lab Activity</label>
+        <button class="option" *ngIf="usageType === MODE_EXPERIMENTS" mat-button (click)="showExperiments()" [disabled]="idCoreFacility === ''">Experiments</button>
+        <button class="option" *ngIf="usageType === MODE_ANALYSIS" mat-button (click)="showAnalysis()">Analysis</button>
+        <button class="option" *ngIf="usageType === MODE_FILES" mat-button (click)="showFilesDaysSinceLastUpload()">Days Since Last Upload</button>
+        <button class="option" *ngIf="usageType === MODE_FILES" mat-button (click)="showFilesUploads()">Uploads</button>
+        <button class="option" *ngIf="usageType === MODE_FILES" mat-button (click)="showFilesDownloads()">Downloads</button>
+        <button class="option" *ngIf="usageType === MODE_FILES" mat-button (click)="showFilesDiskSpace()">Disk Space</button>
+        <label class="header">Overall Activity</label>
+        <button class="option" *ngIf="usageType === MODE_EXPERIMENTS" mat-button (click)="showExperimentsByType()" [disabled]="idCoreFacility === ''">Experiments By Type</button>
+        <button class="option" *ngIf="usageType === MODE_EXPERIMENTS" mat-button (click)="showExperimentsIllumina()" [disabled]="idCoreFacility === ''">Illumina Sequencing Experiment Type</button>
+        <button class="option" *ngIf="usageType === MODE_EXPERIMENTS" mat-button (click)="showExperimentsActivityByWeek()" [disabled]="idCoreFacility === ''">Activity By Week</button>
+        <button class="option" *ngIf="usageType === MODE_EXPERIMENTS" mat-button (click)="showDiskSpaceByYear()" [disabled]="idCoreFacility === ''">Disk Space By Year</button>
+        <button class="option" *ngIf="usageType === MODE_ANALYSIS" mat-button (click)="showAnalysisByType()">Analysis By Type</button>
+        <button class="option" *ngIf="usageType === MODE_ANALYSIS" mat-button (click)="showAnalysisByWeek()">Activity By Week</button>
+        <button class="option" *ngIf="usageType === MODE_ANALYSIS" mat-button (click)="showDiskSpaceByYear()">Disk Space By Year</button>
+        <button class="option" *ngIf="usageType === MODE_FILES" mat-button (click)="showFilesDiskSpaceByCategory()">Disk Space By Category</button>
+    </div>
+</div>
+<div #mainnav class="mainnav">
+    <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%">
+        <button mat-button color="primary" (click)="openSidenav()">Select Usage</button>
+        <button *ngIf="show" mat-button color="primary" (click)="print()"><img style="margin-right: 0.5rem" src="../../assets/printer.png">Print</button>
+    </div>
+    <div *ngIf="show" style="display: flex; flex-direction: row; justify-content: space-between; width: 100%">
+        <label>{{label}}</label>
+        <label *ngIf="showTotal">Total: {{total}}{{totalUnits}}</label>
+    </div>
+    <div *ngIf="showLoading" style="display: flex; justify-content: center; align-items: center; width: 100%; height: 80%">
+        <mat-spinner strokeWidth="10" [diameter]="80"></mat-spinner>
+    </div>
+    <div *ngIf="showBarChart" style="width: 100%; height: 90%; position: relative">
+        <canvas #barChart baseChart width="100%" height="100%"
+                [datasets]="barChartData"
+                [labels]="barChartLabels"
+                [options]="barChartOptions"
+                [legend]="barChartLegend"
+                [chartType]="barChartType"></canvas>
+    </div>
+    <div *ngIf="showPieChart" style="width: 100%; height: 90%; position: relative">
+        <canvas #pieChart baseChart width="100%" height="100%"
+                [data]="pieChartData"
+                [labels]="pieChartLabels"
+                [options]="pieChartOptions"
+                [legend]="pieChartLegend"
+                [chartType]="pieChartType"></canvas>
+    </div>
+    <div *ngIf="showLineChart" style="width: 100%; height: 42%; position: relative">
+        <canvas #lineChart baseChart width="100%" height="100%"
+                [datasets]="lineChartData"
+                [labels]="lineChartLabels"
+                [options]="lineChartOptions"
+                [legend]="lineChartLegend"
+                [chartType]="lineChartType"></canvas>
+    </div>
+    <div *ngIf="showLabel2">
+        <label>{{label2}}</label>
+    </div>
+    <div *ngIf="showLineChart2" style="width: 100%; height: 42%; position: relative">
+        <canvas #lineChart2 baseChart width="100%" height="100%"
+                [datasets]="lineChart2Data"
+                [labels]="lineChart2Labels"
+                [options]="lineChart2Options"
+                [legend]="lineChart2Legend"
+                [chartType]="lineChart2Type"></canvas>
+    </div>
+    <div *ngIf="showPieChart2" style="width: 100%; height: 45%; position: relative">
+        <label>{{pieChart2Label}}</label>
+        <canvas #pieChart2 baseChart width="100%" height="100%"
+                [data]="pieChart2Data"
+                [labels]="pieChart2Labels"
+                [options]="pieChart2Options"
+                [legend]="pieChart2Legend"
+                [chartType]="pieChart2Type"></canvas>
+    </div>
+    <div *ngIf="showPieChart3" style="width: 100%; height: 45%; position: relative">
+        <label>{{pieChart3Label}}</label>
+        <canvas #pieChart3 baseChart width="100%" height="100%"
+                [data]="pieChart3Data"
+                [labels]="pieChart3Labels"
+                [options]="pieChart3Options"
+                [legend]="pieChart3Legend"
+                [chartType]="pieChart3Type"></canvas>
+    </div>
+    <div *ngIf="showIntervalFilter">
+        <mat-radio-group [(ngModel)]="interval" class="filter" (change)="onFilterChange()">
+            <mat-radio-button [value]="INTERVAL_10" class="filterOption">Top 10</mat-radio-button>
+            <mat-radio-button [value]="INTERVAL_20" class="filterOption">Top 20</mat-radio-button>
+            <mat-radio-button [value]="INTERVAL_50" class="filterOption">Top 50</mat-radio-button>
+            <mat-radio-button [value]="INTERVAL_ALL" class="filterOption">All</mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <div *ngIf="showAsOfFilter">
+        <mat-radio-group [(ngModel)]="asOf" class="filter" (change)="onFilterChange()">
+            <mat-radio-button [value]="AS_OF_6_MONTHS" class="filterOption">Last 6 Months</mat-radio-button>
+            <mat-radio-button [value]="AS_OF_YEAR" class="filterOption">Last Year</mat-radio-button>
+            <mat-radio-button [value]="AS_OF_2_YEARS" class="filterOption">Last 2 Years</mat-radio-button>
+            <mat-radio-button [value]="AS_OF_ALL" class="filterOption">All</mat-radio-button>
+        </mat-radio-group>
+    </div>
+</div>
+<style>
+    mat-radio-button.type {
+        margin: 5px;
+    }
+    label.header {
+        font-weight: bold;
+        margin: 0 5px;
+    }
+    button.option {
+        margin: 0 5px;
+    }
+    mat-radio-group.filter {
+        display: inline-flex;
+        flex-direction: row;
+    }
+    mat-radio-button.filterOption {
+        margin: 0 5px;
+    }
+</style>

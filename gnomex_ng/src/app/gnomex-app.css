@@ -90,6 +90,23 @@ jqxComboBox.dialogComboBox {
   display: inline;
 }
 
+div.sidenav {
+  transition: 0.5s;
+  padding: 1% 0;
+  height: 100%;
+  width: 0; /* 0 width - change this in Typescript */
+  position: fixed; /* Stay in place */
+  left: 0;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  border-right: 5px solid lightgray;
+}
+
+div.mainnav {
+  transition: 0.5s;
+  padding: 1%;
+  height: 100%;
+}
+
 /******************************/
 /**** Primary Nav / Header ****/
 /******************************/
