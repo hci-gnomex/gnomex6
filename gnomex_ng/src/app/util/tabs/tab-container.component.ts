@@ -33,7 +33,8 @@ export class TabContainer implements OnInit, OnDestroy{
     static readonly EDIT: string = "edit";
 
 
-    @Output() tabChanged: EventEmitter<TabChangeEvent> = new EventEmitter();
+    @Output() tabChanging: EventEmitter<TabChangeEvent> = new EventEmitter();
+    @Output() tabChanged:EventEmitter<any> = new EventEmitter();
     @Output() tabStatusChanged: EventEmitter<TabsStatusEvent> = new EventEmitter();
     private tabsRef: ComponentRef<Tabs>;
     private intialized: boolean = false;
@@ -159,7 +160,10 @@ export class TabContainer implements OnInit, OnDestroy{
         tabs.map(tab => {
             tab.getComp().changeStatus.subscribe(event => this.communicate(event,tabs)); // for when form become valid
         });
-        this.tabsRef.instance.tabChange.subscribe(event => {
+        this.tabsRef.instance.tabChanging.subscribe(event => {
+            this.tabChanging.emit(event);
+        });
+        this.tabsRef.instance.tabChanged.subscribe(event => {
             this.tabChanged.emit(event);
         });
 
@@ -268,6 +272,7 @@ export class TabContainer implements OnInit, OnDestroy{
         this.tabsRef = null;
         this.tabChanged.unsubscribe();
         this.tabStatusChanged.unsubscribe();
+        this.tabChanging.unsubscribe();
     }
 
 

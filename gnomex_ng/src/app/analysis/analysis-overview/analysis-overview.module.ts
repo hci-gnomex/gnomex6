@@ -35,7 +35,7 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
         AnalysisVisibleTabComponent
     ],
     providers: [],
-    entryComponents: [AnalysisTab],
+    entryComponents: [AnalysisTab,AnalysisVisibleTabComponent],
     exports: [AnalysisPanelComponent]
 })
 export class AnalysisOverviewModule { }
