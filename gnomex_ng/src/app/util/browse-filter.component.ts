@@ -749,6 +749,8 @@ export class BrowseFilterComponent implements OnInit {
             this.experimentsService.getExperiments_fromBackend(params);
         } else if (this.mode === this.ANALYSIS_BROWSE) {
             let params: URLSearchParams = this.getAnalysisBrowseParameters();
+            this.analysisService.analysisPanelParams = params;
+            this.analysisService.analysisPanelParams["refreshParams"] = true;
             this.analysisService.getAnalysisGroupList_fromBackend(params);
                 console.log("GetAnalysisGroupList called");
         } else if (this.mode === this.DATA_TRACK_BROWSE) {

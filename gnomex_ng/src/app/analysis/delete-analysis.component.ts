@@ -29,7 +29,11 @@ export class DeleteAnalysisComponent {
         this._selectedItem = data.selectedItem;
         this._nodes = data.nodes;
         for (let n of this._nodes) {
-            this._nodesString = this._nodesString.concat(n.data.name);
+            if(n.data){
+                this._nodesString = this._nodesString.concat(n.data.name);
+            }else{
+                this._nodesString = this._nodesString.concat(n.name);
+            }
             this._nodesString = this._nodesString.concat(",");
             if (n.level === 2) {
                 this.hasAnalysisGroup = true;
@@ -51,7 +55,15 @@ export class DeleteAnalysisComponent {
     deleteAnalysis () {
         if (this.i < this._nodes.length) {
             var params: URLSearchParams = new URLSearchParams();
-            if (this._nodes[this.i].level === 3) {
+
+            if(!this._nodes[this.i].data){ // delete analysis from grid case
+                params.set("idAnalysis", this._nodes[this.i].idAnalysis);
+                var lPromise = this.analysisService.deleteAnalysis(params).toPromise();
+                lPromise.then(response => {
+                    this.deleteAnalysis();
+                });
+            }
+            else if (this._nodes[this.i].level === 3) {
                 params.set("idAnalysis", this._nodes[this.i].data.idAnalysis);
                 var lPromise = this.analysisService.deleteAnalysis(params).toPromise();
                 lPromise.then(response => {
@@ -59,7 +71,7 @@ export class DeleteAnalysisComponent {
                 });
 
             }
-            else if (this._nodes[this.i].level === 2) {
+            else if (this._nodes[this.i].level === 2 || !this._nodes[this.i].data) {
                 params.set("idAnalysisGroup", this._nodes[this.i].data.idAnalysisGroup);
                 var lPromise = this.analysisService.deleteAnalysisGroup(params).toPromise();
                 lPromise.then(response => {

@@ -19,6 +19,8 @@ export class DictionaryService {
     public static readonly ANNOTATION_REPORT_FIELD = "hci.gnomex.model.AnnotationReportField";
     public static readonly VISIBILTY: string = "hci.gnomex.model.Visibility";
     public static readonly INSTITUTION: string = "hci.gnomex.model.Institution";
+    public static readonly ANALYSIS_TYPE:string = "hci.gnomex.model.AnalysisType";
+    public static readonly ANALYSIS_PROTOCOL:string = "hci.gnomex.model.AnalysisProtocol";
 
     private cachedDictionaryString: any;
     private cacheExpirationTime: number = 0;
