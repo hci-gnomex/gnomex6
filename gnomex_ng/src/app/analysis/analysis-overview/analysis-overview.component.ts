@@ -34,7 +34,7 @@ import {AnalysisService} from "../../services/analysis.service";
             </div>
 
             <div style="height: 100%;width:100%">
-                <tab-container (tabChanged)="changedTab($event)"
+                <tab-container (tabChanging)="tabChanging($event)"
                                [state]="state"
                                [componentNames]="tabNames">
 
@@ -56,7 +56,7 @@ import {AnalysisService} from "../../services/analysis.service";
 export class AnalysisOverviewComponent implements OnInit,OnDestroy{
     project:any;
     private readonly ANALYSIS:string = "AnalysisTab";
-    private readonly VISIBILITY:string = "VisiblityTab";
+    private readonly VISIBILITY:string = "AnalysisVisibleTabComponent";
     private readonly PROJECT:string = "ProjectTab";
     private analysisIdSet: Set<string> = new Set();
     public orderedAnalysisIds: Array<string> = [];
@@ -83,7 +83,7 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
                     this.tabNames = [this.ANALYSIS,this.ANALYSIS,this.ANALYSIS];
                 }
                 else{
-                    this.tabNames = [this.ANALYSIS,this.ANALYSIS];
+                    this.tabNames = [this.ANALYSIS,this.VISIBILITY];
                 }
             }
             else{
@@ -222,7 +222,7 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
     }
 
 
-    changedTab(event:TabChangeEvent){
+     tabChanging(event:TabChangeEvent){
 
         if(this.tabNames[event.nextId] === this.ANALYSIS ){
             this.refreshAnalysis();

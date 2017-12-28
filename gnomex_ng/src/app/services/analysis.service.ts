@@ -98,10 +98,10 @@ export class AnalysisService {
     getAnalysisGroupListObservable(): Observable<any> {
         return this.analysisGroupListSubject.asObservable();
     }
-    getAnalysisGroupList_fromBackend(params: URLSearchParams): void {
+    getAnalysisGroupList_fromBackend(params: URLSearchParams,allowRefresh?:boolean): void {
         this.startSearchSubject.next(true);
 
-        if (this._haveLoadedAnalysisGroupList && this._previousURLParams === params) {
+        if (this._haveLoadedAnalysisGroupList && this._previousURLParams === params && !allowRefresh) {
             // do nothing
             console.log("Analysis already loaded");
         } else {
@@ -211,6 +211,15 @@ export class AnalysisService {
     }
     getCreateAnaylsisDataSubject():Subject<any>{
         return this.createAnalysisDataSubject;
+    }
+    saveVisibility(params:URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/SaveVisibilityAnalysis.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response;
+            } else {
+                throw new Error("Error: In SaveVisibility");
+            }
+        });
     }
 
 
