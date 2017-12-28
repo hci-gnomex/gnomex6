@@ -48,7 +48,7 @@ export class IconTextRendererComponent implements ICellRendererAngularComp, Afte
     }
 
     private setIconWithText(params) {
-        this.text = params.value? params.value: '';
+        this.text = params.value ? params.value: '';
         this.iconSource = params.data.icon? params.data.icon : '';
     };
 
