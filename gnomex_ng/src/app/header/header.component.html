@@ -120,7 +120,7 @@
       <button mat-menu-item class="menu"> <img src="../../assets/brick.png"> Manage Protocols </button>
     </mat-menu>
     <mat-menu #reportsMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item class="menu"> <img src="../../assets/chart_bar.png"> Track Usage </button>
+      <button mat-menu-item class="menu" [routerLink]="[ '/TrackUsage' ]"> <img src="../../assets/chart_bar.png"> Track Usage </button>
       <button mat-menu-item class="menu" [routerLink]="[ '/AnnotationReport' ]"> <img src="../../assets/page.png"> Annotation Report </button>
       <button mat-menu-item class="menu" [routerLink]="[ '/AnnotationProgressReport' ]"> <img src="../../assets/page.png"> Annotation Progress Report </button>
       <button mat-menu-item class="menu" [routerLink]="[ '/ProjectExperimentReport' ]"> <img src="../../assets/flask.png"> Project/Experiment Report </button>
