@@ -3,7 +3,7 @@
     <div mat-dialog-content>
         <div>
             <label style="width: 10em">Owner</label>
-            <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a owner...'"
+            <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an owner...'"
                          [source]="labMembers" [displayMember]="'name'" [valueMember]="'idAppUser'"
                          (onSelect)="onOwnerSelect($event)" formControlName="selectedOwner">
             </jqxComboBox>
@@ -11,7 +11,7 @@
 
         <div *ngIf="showBillingCombo">
             <label style="width: 10em">Account</label>
-            <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a account...'"
+            <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an account...'"
                          [source]="billingAccounts" [displayMember]="'name'" [valueMember]="'idBillingAccount'"
                          (onSelect)="onAccountSelect($event)" formControlName="selectedAccount">
             </jqxComboBox>
