@@ -11,7 +11,7 @@ import {URLSearchParams} from "@angular/http";
     templateUrl: './project-browse.component.html',
     styles:[`
       
-        .diryWithSave{
+        .dirtyWithSave{
 
             display: flex;
             justify-content: space-between;
