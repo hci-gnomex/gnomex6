@@ -81,7 +81,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             this.launchProperties = response;
             this.getProps(response);
             console.log("launch properties");
-            this.progressService.displayLoader(40);
+            this.progressService.displayLoader(10);
         });
 
     }
@@ -99,6 +99,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                     break;
                 }
             }
+        }
+        if (!this.site_splash) {
+            this.site_splash = "./assets/gnomex_splash_logo.png";
+        }
+        if (!this.site_logo) {
+            this.site_logo = "./assets/gnomex_logo.png";
         }
     }
 
