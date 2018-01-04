@@ -54,10 +54,10 @@ import {AnalysisService} from "../../services/analysis.service";
     `]
 })
 export class AnalysisOverviewComponent implements OnInit,OnDestroy{
-    analysisGroup:any;
+    project:any;
     private readonly ANALYSIS:string = "AnalysisTab";
     private readonly VISIBILITY:string = "AnalysisVisibleTabComponent";
-    private readonly GROUP:string = "AnalysisGroupComponent";
+    private readonly PROJECT:string = "ProjectTab";
     private analysisIdSet: Set<string> = new Set();
     public orderedAnalysisIds: Array<string> = [];
     private overviewListSuscript: Subscription;
@@ -77,25 +77,25 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
 
         // This 'data' observable fires when tree node changes because url will change.
         this.route.data.forEach((data) => {
-            this.analysisGroup = data['analysisGroup']; // this data is carried on route look at browse-analysis.component.ts
+            this.project = data['project']; // this data is carried on route look at browse-analysis.component.ts
             if(!this.tabView.isInitalize()){
-                if(this.analysisGroup){
-                    this.tabNames = [this.ANALYSIS,this.ANALYSIS,this.GROUP];
+                if(this.project){
+                    this.tabNames = [this.ANALYSIS,this.ANALYSIS,this.ANALYSIS];
                 }
                 else{
                     this.tabNames = [this.ANALYSIS,this.VISIBILITY];
                 }
             }
             else{
-                if (this.analysisGroup) { // no projectTab, add it
-                    let index = this.tabView.containsTab(this.GROUP);
+                if (this.project) { // no projectTab, add it
+                    let index = this.tabView.containsTab(this.PROJECT);
                     if (index === -1) {
-                        this.tabView.addTab(this.GROUP);
-                        this.tabNames.push(this.GROUP);
+                        this.tabView.addTab(this.PROJECT);
+                        this.tabNames.push(this.PROJECT);
                     }
                 }
                 else {
-                    let index = this.tabView.containsTab(this.GROUP);
+                    let index = this.tabView.containsTab(this.PROJECT);
                     if (index !== -1) {
                         this.tabView.removeTab(index);
                         this.tabNames.pop();//Project will always be the last tab

@@ -1,39 +1,35 @@
 <form style=" height:100%; width:100%" (ngSubmit)="save()" [formGroup]="projectBrowseForm">
+    <div style="display:block; height:100%; width:100%" >
+        <div class="has-error">
+            <label for="projectNameId">Project Name </label>
+            <br>
+            <input class="form-control"
+                   style="width:100%"
+                   formControlName="projectName"
+                   id="projectNameId"
+                   type="text"
+                   placeholder="Project Name"/>
+            <span *ngIf="projectBrowseForm.get('projectName').errors?.required" class="error-message">
+                Project Name is required
+            </span>
+        </div>
+        <div  style="height:90%; width:100%;" >
+            <label for="projectDescriptionId">Project Description </label>
+            <br>
+            <textarea formControlName="description"
+                      id="projectDescriptionId">
+                </textarea>
+            <span *ngIf="projectBrowseForm.get('description').errors?.maxlength" class="error-message">
+                Description exceeded 5000 characters
+            </span>
 
-    <mat-form-field class="project-field">
-        <input class="form-control"
-               style="width:90%"
-               matInput
-               formControlName="projectName"
-               type="text"
-               placeholder="Project Name"/>
-
-        <mat-error *ngIf="projectBrowseForm.get('projectName').hasError('required')">
-            Project Name is required
-        </mat-error>
-    </mat-form-field>
-
-    <mat-form-field class="project-field">
-            <textarea matInput
-                      formControlName="description"
-                      matTextareaAutosize
-                      matAutosizeMinRows="20"
-                      matAutosizeMaxRows="20"
-                      placeholder="Description">
-            </textarea>
-        <mat-error *ngIf="projectBrowseForm.get('description').hasError('maxlength')">
-            Description exceeded 500 characters
-        </mat-error>
-    </mat-form-field>
-
-
-    <div class="dirtyWithSave">
-        <span></span>
-        <div>
+            <div class="diryWithSave">
+                <span></span>
+                <div>
                 <span *ngIf="dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
                     Your changes have not been saved
                 </span>
-            <span style="margin-left:1em; ">
+                    <span style="margin-left:1em; ">
                     <button type="submit"
                             mat-button
                             [disabled]="!projectBrowseForm.valid"
@@ -42,7 +38,9 @@
                     </button>
                 </span>
 
+                </div>
+            </div>
         </div>
-    </div>
 
+    </div>
 </form>

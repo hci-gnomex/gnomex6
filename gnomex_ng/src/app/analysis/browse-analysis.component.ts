@@ -506,7 +506,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.selectedLabLabel = this.selectedItem.data.labName;
         let idAnalysis = this.selectedItem.data.idAnalysis;
         let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
-        let idLab = this.selectedItem.data.idLab;
         let analysisGroupListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
 
 
@@ -525,7 +524,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
             this.router.navigate(['/analysis',
-                    {outlets:{'analysisPanel':['overview',{'idAnalysisGroup':idAnalysisGroup,'idLab':idLab}]}}
+                    {outlets:{'analysisPanel':['overview',{'idAnalysisGroup':idAnalysisGroup}]}}
                 ]);
             this.analysisService.emitAnalysisOverviewList(analysisGroupListNode)
 

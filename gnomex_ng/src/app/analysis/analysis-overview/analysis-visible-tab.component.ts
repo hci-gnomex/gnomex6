@@ -75,7 +75,6 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
     private instList:Array<any>;
     private dirty: boolean = false;
     private gridOpt:GridOptions = {};
-    public rowSelection:string = "single";
 
 
 
@@ -133,6 +132,8 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
         {
             headerName: "Name",
             field: "name",
+            //cellEditorFramework: SelectEditorComponent,
+            //valueGetter: nameValueGetter,
             editable: false,
             width: 100
         },
@@ -155,7 +156,7 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
             headerName:  "Organism",
             field: "organism",
             editable: false,
-            width: 175
+            width: 400
         },
         {
             headerName:  "Description",
@@ -167,7 +168,7 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
             headerName:  "Visibility",
             field: "visStr",
             editable: true,
-            width: 150,
+            width: 300,
             cellEditor: 'select',
             cellEditorParams: {
                 values: this.prepVisList()
@@ -179,7 +180,7 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
             headerName:  "Insitution",
             field: "instStr",
             editable: true,
-            width: 315,
+            width: 300,
             cellEditor: 'select',
             cellEditorParams: {
                 values: this.prepInstitutionList()
