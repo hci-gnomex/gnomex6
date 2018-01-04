@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { RouterModule } from '@angular/router'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 import {
     AnalysisPanelComponent,
     AnalysisOverviewComponent,
     AnalysisTab,
-    AnalysisVisibleTabComponent
+    AnalysisVisibleTabComponent,
+    AnalysisGroupComponent
 } from './index'
 import {ANALYSIS_ROUTING} from "../analysis.routes";
 import {ComboBoxModule} from "../../../modules/combobox.module";
@@ -25,17 +25,20 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
         ComboBoxModule,
         AgGridModule.withComponents([IconTextRendererComponent]),
         TabsModule,
-        AngularMaterialModule
+        AngularMaterialModule,
+        FormsModule,
+        ReactiveFormsModule
     ],
 
     declarations: [
         AnalysisPanelComponent,
         AnalysisOverviewComponent,
         AnalysisTab,
-        AnalysisVisibleTabComponent
+        AnalysisVisibleTabComponent,
+        AnalysisGroupComponent
     ],
     providers: [],
-    entryComponents: [AnalysisTab,AnalysisVisibleTabComponent],
+    entryComponents: [AnalysisTab,AnalysisVisibleTabComponent,AnalysisGroupComponent],
     exports: [AnalysisPanelComponent]
 })
 export class AnalysisOverviewModule { }
