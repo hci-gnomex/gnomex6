@@ -371,7 +371,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Track Usage',
                         context: 'usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Report',
@@ -381,12 +381,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Annotation Progress Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/ProjectExperimentReport'
                     }
                 ]
             }
@@ -523,17 +523,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Annotation Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/ProjectExperimentReport'
                     }
                 ]
             }
@@ -865,17 +865,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Annotation Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/ProjectExperimentReport'
                     },
                     {
                         displayName: 'Send email to all GNomEx users',
@@ -1201,17 +1201,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Annotation Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/ProjectExperimentReport'
                     }
                 ]
             }
@@ -1275,17 +1275,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Annotation Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/ProjectExperimentReport'
                     }
                 ]
             }
@@ -1365,17 +1365,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Annotation Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/ProjectExperimentReport'
                     }
                 ]
             }
@@ -1494,17 +1494,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Annotation Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/ProjectExperimentReport'
                     }
                 ]
             }
@@ -1590,17 +1590,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Annotation Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/ProjectExperimentReport'
                     }
                 ]
             }
