@@ -630,37 +630,37 @@ export class HeaderComponent implements OnInit{
                     },
                     {
                         displayName: 'HiSeq - Lib Prep',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/flask.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - Lib Prep QC',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/flask.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - FlowCell Assembly',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - Finalize Flow Cell',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - Data Pipeline',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/page_go.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - Flow Cells',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/rectangle.png',
                         route: ''
                     },
@@ -674,7 +674,7 @@ export class HeaderComponent implements OnInit{
                         children: [
                             {
                                 displayName: 'Lib Prep',
-                                contex: 'MISEQ',
+                                context: 'MISEQ',
                                 iconName: '../../assets/flask.png',
                                 route: ''
                             },
@@ -972,37 +972,37 @@ export class HeaderComponent implements OnInit{
                     },
                     {
                         displayName: 'HiSeq - Lib Prep',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/flask.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - Lib Prep QC',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/flask.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - FlowCell Assembly',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - Finalize Flow Cell',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - Data Pipeline',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/page_go.png',
                         route: ''
                     },
                     {
                         displayName: 'HiSeq - Flow Cells',
-                        contex: 'HISEQ',
+                        context: 'HISEQ',
                         iconName: '../../assets/rectangle.png',
                         route: ''
                     },
