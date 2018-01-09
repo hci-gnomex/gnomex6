@@ -9,6 +9,8 @@ import {AnnotationReportComponent} from "./annotation-report.component";
 import {FormsModule} from "@angular/forms";
 import {UtilModule} from "../util/util.module";
 import {AgGridModule} from "ag-grid-angular/main";
+import {TrackUsageComponent} from "./track-usage.component";
+import {ChartsModule} from "ng2-charts";
 
 @NgModule({
     imports: [
@@ -19,16 +21,19 @@ import {AgGridModule} from "ag-grid-angular/main";
         FormsModule,
         UtilModule,
         AgGridModule.withComponents([]),
+        ChartsModule,
     ],
     declarations: [
         AnnotationProgressReportComponent,
         ProjectExperimentReportComponent,
         AnnotationReportComponent,
+        TrackUsageComponent,
     ],
     exports: [
         AnnotationProgressReportComponent,
         ProjectExperimentReportComponent,
         AnnotationReportComponent,
+        TrackUsageComponent,
     ],
 })
 

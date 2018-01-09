@@ -67,12 +67,12 @@ export const componentFactories =
     [
         TestComponent,
         DescriptionTab,
-    PrepTab,
-    DownloadsBrowseTab,
-    ExperimentsBrowseTab,
-    ProgressBrowseTab,
-    ProjectBrowseTab,
-    VisiblityBrowseTab
+        PrepTab,
+        DownloadsBrowseTab,
+        ExperimentsBrowseTab,
+        ProgressBrowseTab,
+        ProjectBrowseTab,
+        VisiblityBrowseTab
     ];
 /**/
                                 // need add components that will be tabs here
@@ -119,7 +119,6 @@ export const componentFactories =
                     DownloadsBrowseTab,
                     BrowsePanelComponent,
                     BrowseOverviewComponent,
-                    DownloadsBrowseTab,
                     ExperimentsBrowseTab,
                     ProgressBrowseTab,
                     ProjectBrowseTab,

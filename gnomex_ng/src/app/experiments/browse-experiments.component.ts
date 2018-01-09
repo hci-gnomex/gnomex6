@@ -143,8 +143,8 @@ import {DictionaryService} from "../services/dictionary.service";
             flex-direction: column;
         }
         .experiment-detail-panel {
-            width:75%;
-            margin-left: 2em;
+            height:98%;
+            width:100%;
             border: #C8C8C8 solid thin;
             overflow: auto;
         }
@@ -260,8 +260,13 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.reassignExperimentDialogRef.componentInstance.showSpinner = false;
                 this.reassignExperimentDialogRef.close();
             }
+
             this.experimentsService.emitExperimentOverviewList(response);
-            this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+            if(this.experimentsService.browsePanelParams["refreshParams"]){
+                this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+                this.experimentsService.browsePanelParams["refreshParams"] = false;
+            }
+
 
             setTimeout(()=>{
                 this.toggleButton.val("Collapse Projects");
@@ -303,9 +308,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             if (lab.Project) {
                 if (!this.isArray(lab.Project)) {
                     lab.items = [lab.Project];
-                } else {
+            } else {
                     lab.items = lab.Project;
-                }
+            }
                 for (var project of lab.items) {
                     project.icon = "assets/folder.png";
                     project.labId = lab.labId;
@@ -314,30 +319,30 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     if (project.Request) {
                         if (!this.isArray(project.Request)) {
                             project.items = [project.Request];
-                        } else {
+                    } else {
                             project.items = project.Request;
-                        }
+                    }
                         for (var request of project.items) {
                             if (request) {
                                 if (request.label) {
                                     var shortLabel = request.label.substring(0, (request.label.lastIndexOf("-")));
-                                    var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
+                                var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
                                     request.label = shorterLabel;
-                                    this.experimentCount++;
+                                this.experimentCount++;
                                     request.id = "r"+request.idRequest;
                                     request.parentid = project.id;
-                                } else {
-                                    console.log("label not defined");
-                                }
                             } else {
-                                console.log("r is undefined");
+                                console.log("label not defined");
                             }
+                        } else {
+                            console.log("r is undefined");
                         }
-                    } else {
-                        console.log("");
                     }
+                } else {
+                    console.log("");
                 }
             }
+        }
         }
     };
 
@@ -393,7 +398,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 targetItem: this.targetItem,
                 showBillingCombo: this.showBillingCombo
 
-            }
+    }
         });
         this.reassignExperimentDialogRef.afterClosed()
             .subscribe(result => {
@@ -475,7 +480,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     'you do not have permission to access the member list for this lab. Please contact an administrator.', null)
                 .subscribe(
                     res => {
-                        this.resetTree();
+            this.resetTree();
                     }
                 );
         } else {
@@ -523,7 +528,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.deleteProjectDialogRef = this.dialog.open(DeleteProjectComponent, {
             data: {
                 selectedItem: this.selectedItem,
-            }
+    }
         });
     }
 
@@ -531,11 +536,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.deleteExperimentDialogRef = this.dialog.open(DeleteExperimentComponent, {
             data: {
                 selectedExperiment: this.selectedExperiment
-            }
-        });
-
-
     }
+            });
+
+
+        }
     /**
      * A node is selected in the tree.
      * @param event
@@ -574,7 +579,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.router.navigate(['/experiments',{outlets:{'browsePanel':[idRequest]}}]);
             this.disableNewProject = true;
             this.disableDeleteProject = true;
-            this.experimentsService.getExperiment(this.selectedItem.data.idRequest).subscribe((response: any) => {
+            this.experimentsService.getExperiment(idRequest).subscribe((response: any) => {
                 this.selectedExperiment = response.Request;
                 if (response.Request.canDelete === "Y") {
                     this.disableDeleteExperiment = false;
@@ -584,9 +589,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             });
 
         }
-        this.experimentsService.selectedTreeNode = _.cloneDeep(this.selectedItem.data);
-
-
     }
 
     /**
@@ -623,5 +625,5 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     ngOnDestroy(): void {
         this.projectRequestListSubscription.unsubscribe();
-    }
+}
 }
