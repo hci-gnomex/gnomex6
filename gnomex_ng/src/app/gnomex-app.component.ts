@@ -14,10 +14,6 @@ import {CreateSecurityAdvisorService} from "./services/create-security-advisor.s
 import {ProgressService} from "./home/progress.service";
 import {DictionaryService} from "./services/dictionary.service";
 
-import {NewBillingAccountComponent} from "./billing/new_billing_account/new-billing-account.component";
-
-import {WindowService} from "./window-service";
-
 /**
  * The gnomex application component.
  *
@@ -30,7 +26,6 @@ import {WindowService} from "./window-service";
 })
 
 export class GnomexAppComponent implements OnInit {
-	@ViewChild('newBillingAccountWindow') newBillingAccountWindow: NewBillingAccountComponent;
 
     public isCollapsed: boolean = true;
     public status: {isopen: boolean} = {isopen: false};
@@ -45,8 +40,7 @@ export class GnomexAppComponent implements OnInit {
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
                 private http: Http,
-                private progressService: ProgressService,
-                private windowService: WindowService) {
+                private progressService: ProgressService) {
     }
 
 
@@ -64,10 +58,6 @@ export class GnomexAppComponent implements OnInit {
                 });
             }
         });
-
-        this.windowService.getNewBillingAccountWindowOpenObservable().subscribe(() => {
-					this.newBillingAccountWindow.open();
-        })
     }
 
     searchFn(): (keywords: string) => void {

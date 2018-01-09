@@ -94,11 +94,11 @@ export class EmailRelatedUsersPopupComponent implements OnInit, OnDestroy {
 	}
 
 	sendEmailButtonClicked(): void {
-		console.log("sendEmailButton clicked!");
-		console.log("Current values :");
-		console.log("  Subject    : " + this.subject.val());
-		console.log("  Body       : " + this.body.val());
-		console.log("  idRequests : " + this.idRequests);
+		// console.log("sendEmailButton clicked!");
+		// console.log("Current values :");
+		// console.log("  Subject    : " + this.subject.val());
+		// console.log("  Body       : " + this.body.val());
+		// console.log("  idRequests : " + this.idRequests);
 
 		this.emailRelatedUsersService.sendEmailToRequestRelatedUsers(this.idRequests, this.subject.val(), this.body.val());
 	}

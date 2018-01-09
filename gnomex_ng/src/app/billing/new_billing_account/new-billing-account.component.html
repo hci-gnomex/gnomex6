@@ -1,15 +1,15 @@
-<jqxWindow
-		#windowRef
-		[resizable]="false"
-		[autoOpen]="false"
-		[isModal]="true"
-		[width]="'60em'"
-		[height]="'45em'">
-	<div #windowHeader style="background-color: #84b278; color: white;">
+<!--<jqxWindow-->
+		<!--#windowRef-->
+		<!--[resizable]="false"-->
+		<!--[autoOpen]="false"-->
+		<!--[isModal]="true"-->
+		<!--[width]="'60em'"-->
+		<!--[height]="'45em'">-->
+	<div mat-dialog-title style="background-color: #84b278; color: white; display: inline-block; width: 100%;">
 		<img src="../../../assets/work_auth_form.png" alt="Image not found" style="margin-right:0.2em;"/>
-		Submit Campus Billing Account
+		<h5 style="display: inline-block;">Submit Campus Billing Account</h5>
 	</div>
-	<div style="background-color: #eeeeeb">
+	<div mat-dialog-content style="background-color: #eeeeeb">
 		<div #windowBody style="width:calc(100% - 2px); font-size:x-small;">
 			<div class="full-width background">
 				<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
@@ -19,16 +19,24 @@
 								Lab
 							</div>
 							<div class="td">
-								<jqxComboBox #labListComboBox (onSelect)="onLabListSelection($event)"
-														 (onUnselect)="onLabListUnselect()"
-										[width]="'80%'"
-										[placeHolder]="'Select a lab...'"
-										[source]="labList"
-										[multiSelect]="false"
-										[valueMember]="'idLab'"
-										[displayMember]="'name'"
-										[theme]="'gnomex5'">
-								</jqxComboBox>
+								<!--<jqxComboBox #labListComboBox (onSelect)="onLabListSelection($event)"-->
+														 <!--(onUnselect)="onLabListUnselect()"-->
+										<!--[width]="'80%'"-->
+										<!--[placeHolder]="'Select a lab...'"-->
+										<!--[source]="labList"-->
+										<!--[multiSelect]="false"-->
+										<!--[valueMember]="'idLab'"-->
+										<!--[displayMember]="'name'"-->
+										<!--[theme]="'gnomex5'">-->
+								<!--</jqxComboBox>-->
+								<mat-form-field style="width: 100%; font-size: small;">
+									<mat-select placeholder="Select a lab..." [(value)]="selectedLab" (change)="onLabListSelection($event)">
+										<mat-option>--</mat-option>
+										<mat-option *ngFor="let lab of labList" [value]="lab">
+											{{ lab.name }}
+										</mat-option>
+									</mat-select>
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -43,13 +51,24 @@
 								</div>
 							</div>
 							<div class="td">
-								<multiple-selector
-										#coreFacilitiesSelector
-										[title]="'Core Facilities'"
-										[disable]="disableCoreFacilitiesSelector"
-										[placeholder]="'Select Core Facilities'"
-										(onSave)="onCoreFacilitiesSelected($event)">
-								</multiple-selector>
+								<!--<multiple-selector-->
+										<!--#coreFacilitiesSelector-->
+										<!--[title]="'Core Facilities'"-->
+										<!--[disable]="disableCoreFacilitiesSelector"-->
+										<!--[placeholder]="'Select Core Facilities'"-->
+										<!--(onSave)="onCoreFacilitiesSelected($event)">-->
+								<!--</multiple-selector>-->
+								<mat-form-field style="width: 100%; font-size: small;">
+									<mat-select
+											style="width: 100%;"
+											placeholder="Select Core Facilities"
+											(change)="onCoreFacilitiesSelected($event)"
+											multiple>
+										<mat-option *ngFor="let coreFacility of coreFacilityReducedList" [value]="coreFacility.idCoreFacility">
+											{{ coreFacility.display }}
+										</mat-option>
+									</mat-select>
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -59,15 +78,20 @@
 								Account Type
 							</div>
 							<div class="td center-vertical-align">
-								<div class="inline-block radio-button">
-									<input type="radio" name="AccountType" value="chartfield" (change)="changeShowField('chartfield')" checked> Chartfield
-								</div>
-								<div class="inline-block radio-button">
-									<input type="radio" name="AccountType" value="po"         (change)="changeShowField('po')" > PO
-								</div>
-								<div class="inline-block radio-button">
-									<input type="radio" name="AccountType" value="creditcard" (change)="changeShowField('creditcard')" > Credit Card
-								</div>
+								<!--<div class="inline-block radio-button">-->
+									<!--<input type="radio" name="AccountType" value="chartfield" (change)="changeShowField('chartfield')" checked> Chartfield-->
+								<!--</div>-->
+								<!--<div class="inline-block radio-button">-->
+									<!--<input type="radio" name="AccountType" value="po"         (change)="changeShowField('po')" > PO-->
+								<!--</div>-->
+								<!--<div class="inline-block radio-button">-->
+									<!--<input type="radio" name="AccountType" value="creditcard" (change)="changeShowField('creditcard')" > Credit Card-->
+								<!--</div>-->
+								<mat-radio-group [(ngModel)]="showField">
+									<mat-radio-button [value]="'chartfield'">Chartfield</mat-radio-button>
+									<mat-radio-button [value]="'po'">PO</mat-radio-button>
+									<mat-radio-button [value]="'creditcard'">Credit Card</mat-radio-button>
+								</mat-radio-group>
 							</div>
 						</div>
 					</div>
@@ -84,8 +108,11 @@
 								Account Name
 							</div>
 							<div class="td">
-								<jqxInput #accountNameInput_chartfield [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput #accountNameInput_chartfield [theme]="'gnomex5'" [width]="'calc(100% - 6px)'" [height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field class="full-width">
+									<input matInput placeholder="Account Name" [(value)]="accountName_Chartfield">
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -95,8 +122,11 @@
 								Short Account Name
 							</div>
 							<div class="td">
-								<jqxInput #shortNameInput_chartfield [theme]="'gnomex5'" [width]="'15em'" [height]="'1.5rem'">
-								</jqxInput>
+								<mat-form-field class="full-width">
+									<input matInput placeholder="Short Account Name" [(value)]="shortAccountName_Chartfield">
+								</mat-form-field>
+								<!--<jqxInput #shortNameInput_chartfield [theme]="'gnomex5'" [width]="'15em'" [height]="'1.5rem'">-->
+								<!--</jqxInput>-->
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -107,129 +137,162 @@
 									Chartfield to be charged
 								</div>
 							</div>
-							<div class="td">
-								<div class="inline-block" style="vertical-align: top">
-									<div class="sub-header">
-										Bus
-									</div>
-									<div>
-										<number-jqxinput
-												#accountNumberBusInput
-												[minimumDigits]="2"
-												[maximumDigits]="2"
-												[width]="'3rem'"
-												[height]="'1.5rem'">
-										</number-jqxinput>
-									</div>
-									<div>
-										2 digits
-									</div>
+							<div class="td" style="font-size: small;">
+								<div class="inline-block" style="vertical-align: top; font-size: small;">
+									<!--<div class="sub-header">-->
+										<!--Bus-->
+									<!--</div>-->
+									<!--<div>-->
+										<!--<number-jqxinput-->
+												<!--#accountNumberBusInput-->
+												<!--[minimumDigits]="2"-->
+												<!--[maximumDigits]="2"-->
+												<!--[width]="'3rem'"-->
+												<!--[height]="'1.5rem'">-->
+										<!--</number-jqxinput>-->
+										<mat-form-field style="width: 3rem; height: 1.5rem;">
+											<input matInput placeholder="Bus" [(value)]="accountNumberBus_Chartfield">
+											<mat-hint>2 digits</mat-hint>
+										</mat-form-field>
+									<!--</div>-->
+									<!--<div>-->
+										<!--2 digits-->
+									<!--</div>-->
 								</div>
 								<div class="horizontal-break"></div>
 								<div class="inline-block" style="vertical-align: top">
-									<div class="sub-header">
-										Org
-									</div>
-									<div>
-										<number-jqxinput
-												#accountNumberOrgInput
-												[minimumDigits]="5"
-												[maximumDigits]="5"
-												[width]="'3rem'"
-												[height]="'1.5rem'">
-										</number-jqxinput>
-									</div>
-									<div>
-										5 digits
-									</div>
+									<!--<div class="sub-header">-->
+										<!--Org-->
+									<!--</div>-->
+									<!--<div>-->
+										<!--<number-jqxinput-->
+												<!--#accountNumberOrgInput-->
+												<!--[minimumDigits]="5"-->
+												<!--[maximumDigits]="5"-->
+												<!--[width]="'3rem'"-->
+												<!--[height]="'1.5rem'">-->
+										<!--</number-jqxinput>-->
+									<mat-form-field style="width: 3rem; height: 1.5rem;">
+										<input matInput placeholder="Org" [(value)]="accountNumberOrg_Chartfield">
+										<mat-hint>5 digits</mat-hint>
+									</mat-form-field>
+									<!--</div>-->
+									<!--<div>-->
+										<!--5 digits-->
+									<!--</div>-->
 								</div>
 								<div class="horizontal-break"></div>
 								<div class="inline-block" style="vertical-align: top">
-									<div class="sub-header">
-										Fund
-									</div>
-									<div>
-										<number-jqxinput
-												#accountNumberFundInput
-												[minimumDigits]="4"
-												[maximumDigits]="4"
-												[width]="'3rem'"
-												[height]="'1.5rem'">
-										</number-jqxinput>
-									</div>
-									<div>
-										4 digits
-									</div>
+									<!--<div class="sub-header">-->
+										<!--Fund-->
+									<!--</div>-->
+									<!--<div>-->
+										<!--<number-jqxinput-->
+												<!--#accountNumberFundInput-->
+												<!--[minimumDigits]="4"-->
+												<!--[maximumDigits]="4"-->
+												<!--[width]="'3rem'"-->
+												<!--[height]="'1.5rem'">-->
+										<!--</number-jqxinput>-->
+										<mat-form-field style="width: 3rem; height: 1.5rem;">
+											<input matInput placeholder="Fund" [(value)]="accountNumberFund_Chartfield">
+											<mat-hint>4 digits</mat-hint>
+										</mat-form-field>
+									<!--</div>-->
+									<!--<div>-->
+										<!--4 digits-->
+									<!--</div>-->
 								</div>
 								<div class="horizontal-break"></div>
 								<div class="inline-block" style="vertical-align: top">
-									<div class="t">
-										<div class="tr">
-											<div class="td sub-header">Activity</div>
-											<div class="td sub-header"></div>
-											<div class="td sub-header">Project</div>
-										</div>
-										<div class="tr">
-											<div class="td">
-												<number-jqxinput
-														#accountNumberActivityInput
-														(input)="clearAccountNumberProjectInput()"
-														[minimumDigits]="5"
-														[maximumDigits]="5"
-														[width]="'3rem'"
-														[height]="'1.5rem'">
-												</number-jqxinput>
-											</div>
-											<div class="td sub-header" style="width:2.5em; text-align:center;">OR</div>
-											<div class="td">
-												<number-jqxinput
-														#accountNumberProjectInput
-														(input)="clearAccountNumberActivityInput()"
-														[minimumDigits]="8"
-														[maximumDigits]="8"
-														[width]="'4.5rem'"
-														[height]="'1.5rem'">
-												</number-jqxinput>
-											</div>
-										</div>
-										<div class="tr">
-											<div class="td">5 digits</div>
-											<div class="td"></div>
-											<div class="td">8 digits</div>
-										</div>
-									</div>
+									<!--<div class="t">-->
+										<!--<div class="tr">-->
+											<!--<div class="td sub-header">Activity</div>-->
+											<!--<div class="td sub-header"></div>-->
+											<!--<div class="td sub-header">Project</div>-->
+										<!--</div>-->
+										<!--<div class="tr">-->
+											<!--<div class="td">-->
+												<!--<number-jqxinput-->
+														<!--#accountNumberActivityInput-->
+														<!--(input)="clearAccountNumberProjectInput()"-->
+														<!--[minimumDigits]="5"-->
+														<!--[maximumDigits]="5"-->
+														<!--[width]="'3rem'"-->
+														<!--[height]="'1.5rem'">-->
+												<!--</number-jqxinput>-->
+											<!--</div>-->
+											<!--<div class="td sub-header" style="width:2.5em; text-align:center;">OR</div>-->
+											<!--<div class="td">-->
+												<!--<number-jqxinput-->
+														<!--#accountNumberProjectInput-->
+														<!--(input)="clearAccountNumberActivityInput()"-->
+														<!--[minimumDigits]="8"-->
+														<!--[maximumDigits]="8"-->
+														<!--[width]="'4.5rem'"-->
+														<!--[height]="'1.5rem'">-->
+												<!--</number-jqxinput>-->
+											<!--</div>-->
+										<!--</div>-->
+										<!--<div class="tr">-->
+											<!--<div class="td">5 digits</div>-->
+											<!--<div class="td"></div>-->
+											<!--<div class="td">8 digits</div>-->
+										<!--</div>-->
+									<!--</div>-->
+									<mat-form-field style="width: 3rem; height: 1.5rem;">
+										<input matInput placeholder="Activity" [(value)]="accountNumberActivity_Chartfield">
+										<mat-hint>5 digits</mat-hint>
+									</mat-form-field>
+								</div>
+								<div class="inline-block" style="vertical-align: top">
+									<p>OR</p>
+								</div>
+								<div class="inline-block" style="vertical-align: top">
+									<mat-form-field style="width: 4.5rem; height: 1.5rem;">
+										<input matInput placeholder="Project" [(value)]="accountNumberProject_Chartfield">
+										<mat-hint>8 digits</mat-hint>
+									</mat-form-field>
 								</div>
 								<div class="horizontal-break"></div>
 								<div class="inline-block" style="vertical-align: top">
-									<div class="sub-header">
-										Account
-									</div>
-									<div>
-										<number-jqxinput
-												#accountNumberAccountInput
-												[minimumDigits]="5"
-												[maximumDigits]="5"
-												[width]="'3rem'"
-												[height]="'1.5rem'"
-												[value]="'64300'">
-										</number-jqxinput>
-									</div>
-									<div>
-										5 digits
-									</div>
+									<!--<div class="sub-header">-->
+										<!--Account-->
+									<!--</div>-->
+									<!--<div>-->
+										<!--<number-jqxinput-->
+												<!--#accountNumberAccountInput-->
+												<!--[minimumDigits]="5"-->
+												<!--[maximumDigits]="5"-->
+												<!--[width]="'3rem'"-->
+												<!--[height]="'1.5rem'"-->
+												<!--[value]="'64300'">-->
+										<!--</number-jqxinput>-->
+									<!--</div>-->
+									<!--<div>-->
+										<!--5 digits-->
+									<!--</div>-->
+									<mat-form-field style="width: 3rem; height: 1.5rem;">
+										<input matInput placeholder="Account" [(value)]="accountNumberAccount_Chartfield">
+										<mat-hint>5 digits</mat-hint>
+									</mat-form-field>
 								</div>
 								<div *ngIf="isActivity" class="horizontal-break"></div>
 								<div *ngIf="isActivity" class="inline-block" style="vertical-align: top">
-									<div class="sub-header">
-										A/U
-									</div>
-									<div style="padding:2px;">
-										<jqxInput #accountNumberAUInput [theme]="'gnomex5'" [width]="'2rem'" [height]="'1.5rem'" [value]="1" [disabled]="true">
-										</jqxInput>
-									</div>
-									<div>
-										1 digit
-									</div>
+									<!--<div class="sub-header">-->
+										<!--A/U-->
+									<!--</div>-->
+									<!--<div style="padding:2px;">-->
+										<!--<jqxInput #accountNumberAUInput [theme]="'gnomex5'" [width]="'2rem'" [height]="'1.5rem'" [value]="1" [disabled]="true">-->
+										<!--</jqxInput>-->
+									<!--</div>-->
+									<!--<div>-->
+										<!--1 digit-->
+									<!--</div>-->
+									<mat-form-field style="width: 3rem; height: 1.5rem;">
+										<input matInput placeholder="A/U" [(value)]="accountNumberAU_Chartfield" disabled>
+										<mat-hint>1 digits</mat-hint>
+									</mat-form-field>
 								</div>
 							</div>
 						</div>
@@ -242,15 +305,14 @@
 								Funding Agency
 							</div>
 							<div class="td">
-								<jqxComboBox
-										#fundingAgencyCombobox_chartfield
-										[theme]="'gnomex5'"
-										[source]="fundingAgencies"
-										[valueMember]="'value'"
-										[displayMember]="'fundingAgency'"
-										[width]="'100%'"
-										[height]="'1.5rem'">
-								</jqxComboBox>
+								<mat-form-field style="width: 100%; font-size: small;">
+									<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency">
+										<mat-option>--</mat-option>
+										<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
+											{{ fundingAgency.display }}
+										</mat-option>
+									</mat-select>
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -261,15 +323,17 @@
 							</div>
 							<div class="td">
 								<span>
-									<GnomexStyledDatePicker #startDatePicker_chartfield [defaultToToday]="true"></GnomexStyledDatePicker>
+									<!--<GnomexStyledDatePicker #startDatePicker_chartfield [defaultToToday]="true"></GnomexStyledDatePicker>-->
+									<GnomexStyledDatePicker #startDatePicker_chartfield></GnomexStyledDatePicker>
 								</span>
 								<div class="inline-block" style="width:7em;">
 								</div>
-								<span class="cell-label">
+								<div class="inline-block cell-label">
 									Effective Until
-								</span>
+								</div>
 								<span>
-									<GnomexStyledDatePicker #effectiveUntilDatePicker_chartfield [defaultToToday]="false"></GnomexStyledDatePicker>
+									<!--<GnomexStyledDatePicker #effectiveUntilDatePicker_chartfield [defaultToToday]="false"></GnomexStyledDatePicker>-->
+									<GnomexStyledDatePicker #effectiveUntilDatePicker_chartfield></GnomexStyledDatePicker>
 								</span>
 							</div>
 						</div>
@@ -280,14 +344,17 @@
 								Total Dollar Amount
 							</div>
 							<div class="td">
-								<jqxInput
-										#totalDollarAmountInput_chartfield
-										(focusin)="onChartfieldTotalDollarAmountSelected()"
-										(input)="onChartfieldTotalDollarAmountChanged()"
-										[theme]="'gnomex5'"
-										[width]="'10em'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#totalDollarAmountInput_chartfield-->
+										<!--(focusin)="onChartfieldTotalDollarAmountSelected()"-->
+										<!--(input)="onChartfieldTotalDollarAmountChanged()"-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'10em'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field style="width: 10em; height: 1.5em;">
+									<input matInput placeholder="Total Dollar Amount" [(value)]="totalDollarAmount_Chartfield">
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -297,13 +364,16 @@
 								Your email address
 							</div>
 							<div class="td">
-								<jqxInput
-										#submitterEmailInput_chartfield
-										[value]="usersEmail"
-										[theme]="'gnomex5'"
-										[width]="'calc(100% - 6px)'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#submitterEmailInput_chartfield-->
+										<!--[value]="usersEmail"-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'calc(100% - 6px)'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field style="width: 100%; height: 1.5em;">
+									<input matInput placeholder="Your Email Address" [(value)]="submitterEmail_chartfield" (input)="testingFn($event)">
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -353,7 +423,8 @@
 							</div>
 							<div class="td">
 								<span>
-									<GnomexStyledDatePicker #startDatePicker_po [defaultToToday]="true"></GnomexStyledDatePicker>
+									<!--<GnomexStyledDatePicker #startDatePicker_po [defaultToToday]="true"></GnomexStyledDatePicker>-->
+									<GnomexStyledDatePicker #startDatePicker_po></GnomexStyledDatePicker>
 								</span>
 								<div class="inline-block" style="width:7em;">
 								</div>
@@ -361,7 +432,8 @@
 									Effective Until
 								</span>
 								<span>
-									<GnomexStyledDatePicker #expirationDatePicker_po [defaultToToday]="false"></GnomexStyledDatePicker>
+									<!--<GnomexStyledDatePicker #expirationDatePicker_po [defaultToToday]="false"></GnomexStyledDatePicker>-->
+									<GnomexStyledDatePicker #expirationDatePicker_po></GnomexStyledDatePicker>
 								</span>
 							</div>
 						</div>
@@ -372,14 +444,17 @@
 								Total Dollar Amount
 							</div>
 							<div class="td">
-								<jqxInput
-										#totalDollarAmountInput_po
-										(focusin)="onPoTotalDollarAmountSelected()"
-										(input)="onPoTotalDollarAmountChanged()"
-										[theme]="'gnomex5'"
-										[width]="'10em'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#totalDollarAmountInput_po-->
+										<!--(focusin)="onPoTotalDollarAmountSelected()"-->
+										<!--(input)="onPoTotalDollarAmountChanged()"-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'10em'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field style="width: 10em; height: 1.5em;">
+									<input matInput placeholder="Total Dollar Amount" [(value)]="totalDollarAmount_po">
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -389,13 +464,16 @@
 								Your email address
 							</div>
 							<div class="td">
-								<jqxInput
-										#submitterEmailInput_po
-										[value]="usersEmail"
-										[theme]="'gnomex5'"
-										[width]="'calc(100% - 6px)'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#submitterEmailInput_po-->
+										<!--[value]="usersEmail"-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'calc(100% - 6px)'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field style="width: 100%; height: 1.5em;">
+									<input matInput placeholder="Your Email Address" [(value)]="submitterEmail_po">
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -445,7 +523,8 @@
 							</div>
 							<div class="td">
 								<span>
-									<GnomexStyledDatePicker #startDatePicker_creditcard [defaultToToday]="true"></GnomexStyledDatePicker>
+									<!--<GnomexStyledDatePicker #startDatePicker_creditcard [defaultToToday]="true"></GnomexStyledDatePicker>-->
+									<GnomexStyledDatePicker #startDatePicker_creditcard></GnomexStyledDatePicker>
 								</span>
 								<div class="inline-block" style="width:7em;">
 								</div>
@@ -453,7 +532,8 @@
 									Expiration Date
 								</span>
 								<span>
-									<GnomexStyledDatePicker #expirationDatePicker_creditcard [defaultToToday]="false"></GnomexStyledDatePicker>
+									<!--<GnomexStyledDatePicker #expirationDatePicker_creditcard [defaultToToday]="false"></GnomexStyledDatePicker>-->
+									<GnomexStyledDatePicker #expirationDatePicker_creditcard></GnomexStyledDatePicker>
 								</span>
 							</div>
 						</div>
@@ -498,14 +578,17 @@
 								Total Dollar Amount
 							</div>
 							<div class="td">
-								<jqxInput
-										#totalDollarAmountInput_creditCard
-										(focusin)="onCreditCardTotalDollarAmountSelected()"
-										(input)="onCreditCardTotalDollarAmountChanged()"
-										[theme]="'gnomex5'"
-										[width]="'10em'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#totalDollarAmountInput_creditCard-->
+										<!--(focusin)="onCreditCardTotalDollarAmountSelected()"-->
+										<!--(input)="onCreditCardTotalDollarAmountChanged()"-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'10em'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field style="width: 10em; height: 1.5em;">
+									<input matInput placeholder="Total Dollar Amount" [(value)]="totalDollarAmount_creditCard">
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -515,13 +598,16 @@
 								Your email address
 							</div>
 							<div class="td">
-								<jqxInput
-										#submitterEmailInput_creditcard
-										[value]="usersEmail"
-										[theme]="'gnomex5'"
-										[width]="'calc(100% - 6px)'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#submitterEmailInput_creditcard-->
+										<!--[value]="usersEmail"-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'calc(100% - 6px)'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field style="width: 100%; height: 1.5em;">
+									<input matInput placeholder="Your Email Address" [(value)]="submitterEmail_creditcard">
+								</mat-form-field>
 							</div>
 						</div>
 						<div class="tr full-width row-spacer">
@@ -581,6 +667,10 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+  <div mat-dialog-actions>
+		<div>
 			<div class="full-width" style="text-align:right; padding-top:4px; padding-right:0.6em;">
 				<div class="inline-block">
 					<button (click)="onSaveButtonClicked()" type="button" class="save-button" style="text-align: center;" autofocus>
@@ -593,7 +683,7 @@
 			</div>
 		</div>
 	</div>
-</jqxWindow>
+<!--</jqxWindow>-->
 
 <jqxWindow
 		#successWindow
