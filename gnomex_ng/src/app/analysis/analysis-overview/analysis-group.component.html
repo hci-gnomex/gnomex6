@@ -1,31 +1,29 @@
-<form style=" height:100%; width:100%" (ngSubmit)="save()" [formGroup]="projectBrowseForm">
+<form style=" height:100%; width:100%; position: relative" (ngSubmit)="save()" [formGroup]="projectBrowseForm">
 
-    <mat-form-field class="project-field">
+    <mat-form-field class="group-field">
         <input class="form-control"
                style="width:90%"
                matInput
-               formControlName="projectName"
+               formControlName="name"
                type="text"
-               placeholder="Project Name"/>
-
-        <mat-error *ngIf="projectBrowseForm.get('projectName').hasError('required')">
-            Project Name is required
+               placeholder="Name"/>
+        <mat-error *ngIf="projectBrowseForm.get('name').hasError('required')">
+            Analysis Group Name is required
         </mat-error>
     </mat-form-field>
-
-    <mat-form-field class="project-field">
-            <textarea matInput
-                      formControlName="description"
-                      matTextareaAutosize
-                      matAutosizeMinRows="20"
-                      matAutosizeMaxRows="20"
-                      placeholder="Description">
-            </textarea>
-        <mat-error *ngIf="projectBrowseForm.get('description').hasError('maxlength')">
+    <mat-form-field class="group-field" >
+        <textarea matTextareaAutosize
+                  matAutosizeMinRows="20"
+                  matAutosizeMaxRows="20"
+                  matInput
+                  formControlName="description"
+                  placeholder="Description">
+        </textarea>
+        <mat-error  *ngIf="projectBrowseForm.get('description')?.hasError('maxlength')">
             Description exceeded 500 characters
         </mat-error>
-    </mat-form-field>
 
+    </mat-form-field>
 
     <div class="dirtyWithSave">
         <span></span>

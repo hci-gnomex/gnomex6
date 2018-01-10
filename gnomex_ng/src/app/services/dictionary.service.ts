@@ -91,10 +91,10 @@ export class DictionaryService {
     reload(callback?): void {
         if (this.reloadObservable) {
             if (callback) {
-                this.reloadObservable.subscribe((response) => {
+            this.reloadObservable.subscribe((response) => {
                     callback();
                 });
-            }
+                }
         } else {
             this.reloadObservable = this.loadDictionariesObservable();
             this.reloadObservable.subscribe((response) => {
