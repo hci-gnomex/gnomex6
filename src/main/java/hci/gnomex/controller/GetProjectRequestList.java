@@ -14,7 +14,6 @@ import hci.gnomex.model.Visibility;
 import hci.gnomex.model.WorkItem;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.query.Query;
@@ -50,7 +47,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
 
 
   private int                  experimentCount = 0;
-  private String               message = "";
+//  private String               message = "";
 
   private static final int     DEFAULT_MAX_REQUESTS_COUNT = 100;
 
@@ -106,6 +103,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
     Document doc = new Document(new Element(listKind));
     rootNode = doc.getRootElement();
     List results = null;
+    String message = "";
 
     try {
       if (!filter.hasSufficientCriteria(this.getSecAdvisor())) {
@@ -126,7 +124,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
           isLite = "N";
         }
 
-        System.out.println ("[GetProjectRequestlist] isLite: " + isLite);
+//        System.out.println ("[GetProjectRequestlist] isLite: " + isLite);
 
         HashMap myLabMap = new HashMap();
         if (showMyLabsAlways.equals("Y")) {
@@ -138,7 +136,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
           }
         }
 
-        String message = "";
+        message = "";
         StringBuffer buf = null;
         if (isLite.equals("N")) {
           buf = filter.getQuery(this.getSecAdvisor(), dictionaryHelper);
@@ -148,14 +146,16 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
         }
 //        System.out.println ("[GetProjectRequestList] isLite: " + isLite + " Query for GetProjectRequestList: " + buf.toString());
         Query query = sess.createQuery(buf.toString());
-        results = (List)query.list();
+        results = query.list();
+
+        /// convert myString to int
 
         // if isLite don't get the analysis stuff
         HashMap analysisMap = new HashMap(40000);
         if (isLite.equals("N")) {
           buf = filter.getAnalysisExperimentQuery(this.getSecAdvisor());
           LOG.info("Query for GetProjectRequestList: " + buf.toString());
-          List analysisResults = (List) sess.createQuery(buf.toString()).list();
+          List analysisResults =  sess.createQuery(buf.toString()).list();
           analysisMap = new HashMap(40000);
           for (Iterator i = analysisResults.iterator(); i.hasNext(); ) {
             Object[] row = (Object[]) i.next();
