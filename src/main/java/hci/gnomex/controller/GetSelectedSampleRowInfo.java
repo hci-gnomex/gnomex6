@@ -20,8 +20,7 @@ import org.apache.log4j.Logger;
 
 
 public class GetSelectedSampleRowInfo extends GNomExCommand implements Serializable {
-
-
+  protected String errorDetails = "";
 
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger(GetSelectedSampleRowInfo.class);
@@ -70,8 +69,8 @@ public class GetSelectedSampleRowInfo extends GNomExCommand implements Serializa
 
 
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse selectedSampleXMLString " + selectedSampleXMLString, je );
         this.addInvalidField( "SampleRowXML", "Invalidselect row sample XML");
+        this.errorDetails = Util.GNLOG(LOG,"SampleRowXML", je);
       }
 
       XMLOutputter out = new org.jdom.output.XMLOutputter();

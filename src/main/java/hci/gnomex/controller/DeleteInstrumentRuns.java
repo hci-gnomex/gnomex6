@@ -49,8 +49,8 @@ public class DeleteInstrumentRuns extends GNomExCommand implements Serializable 
         SAXBuilder sax = new SAXBuilder();
         runsToDeleteDoc = sax.build(reader);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse runsToDeleteXMLString", je );
         this.addInvalidField( "runsToDeleteXMLString", "Invalid runsToDeleteXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse runsToDeleteXMLString", je);
       }
     }
 

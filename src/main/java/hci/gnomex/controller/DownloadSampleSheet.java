@@ -1,7 +1,8 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.Lab;
@@ -52,6 +53,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
   private SampleSheetColumnNamesParser  parser = null;
   private RequestParser                 requestParser = null;
   private String                        labName = "";
+  protected String errorDetails = "";
  
   public void validate() {
   }
@@ -71,6 +73,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
     } catch (JDOMException je ) {
       LOG.error( "Cannot parse names", je );
       this.addInvalidField( "names", "Invalid sample name xml");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse names", je);
     }
 
     String requestXMLString = request.getParameter("requestXMLString");
@@ -80,8 +83,8 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
       Document doc = sax.build(requestReader);
       requestParser = new RequestParser(doc, secAdvisor, true);
     } catch (JDOMException je ) {
-      LOG.error( "Cannot parse requestXMLString", je );
       this.addInvalidField( "requestXMLString", "Invalid request xml");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", je);
     }
 
     today = new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());

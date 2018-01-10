@@ -52,8 +52,8 @@ public class MakeSoftLinks extends GNomExCommand implements Serializable {
 				Document doc = sax.build(reader);
 				parser = new FileDescriptorParser(doc);
 			} catch (JDOMException je) {
-				LOG.error("Cannot parse fileDescriptorXMLString", je);
 				System.out.println("[MakeSoftLinks] Error: Cannot parse fileDescriptorXMLString, " + je);
+				this.errorDetails = Util.GNLOG(LOG,"Cannot parse fileDescriptorXMLString", je);
 
 			}
 		}

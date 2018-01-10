@@ -42,9 +42,9 @@ public class SaveInstitution extends GNomExCommand implements Serializable {
         SAXBuilder sax = new SAXBuilder();
         institutionsDoc = sax.build(reader);
       } catch (JDOMException je) {
-        LOG.error("Cannot parse institutionsXMLString", je);
         this.addInvalidField("institutionsXMLString",
         "Invalid institutionsXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse institutionsXMLString", je);
       }
     }
     if (institutionsDoc == null) {

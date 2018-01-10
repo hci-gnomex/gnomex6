@@ -64,8 +64,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			filesDoc = sax.build(reader);
 			parser = new ProductOrderFileDescriptorUploadParser(filesDoc);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse filesXMLString", je);
 			this.addInvalidField("FilesLXMLString", "Invalid files xml");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesXMLString", je);
 		}
 	}
 
@@ -80,8 +80,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			filesToRemoveDoc = sax.build(reader);
 			filesToRemoveParser = new ProductOrderFileDescriptorUploadParser(filesToRemoveDoc);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse filesToRemoveXMLString", je);
 			this.addInvalidField("FilesToRemoveXMLString", "Invalid filesToRemove xml");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveXMLString", je);
 		}
 	}
 

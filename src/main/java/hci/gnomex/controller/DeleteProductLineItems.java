@@ -52,8 +52,8 @@ public class DeleteProductLineItems extends GNomExCommand implements Serializabl
         SAXBuilder sax = new SAXBuilder();
         productOrdersToDeleteDoc = sax.build(reader);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse productOrdersToDeleteXMLString", je );
         this.addInvalidField( "productOrdersToDeleteXMLString", "Invalid productOrdersToDeleteXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse productOrdersToDeleteXMLString", je);
       }
     } else if (request.getParameter("productLineItemsToDeleteXMLString") != null && !request.getParameter("productLineItemsToDeleteXMLString").equals("")) {
       productLineItemsToDeleteXMLString = request.getParameter("productLineItemsToDeleteXMLString");
@@ -62,8 +62,8 @@ public class DeleteProductLineItems extends GNomExCommand implements Serializabl
         SAXBuilder sax = new SAXBuilder();
         productLineItemsToDeleteDoc = sax.build(reader);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse productLineItemsToDeleteXMLString", je );
         this.addInvalidField( "productLineItemsToDeleteXMLString", "Invalid productLineItemsToDeleteXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse productLineItemsToDeleteXMLString", je);
       }
     } else {
       this.addInvalidField("xmlString", "Missing line items to delete XML String");

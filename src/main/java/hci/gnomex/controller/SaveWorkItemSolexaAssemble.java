@@ -114,8 +114,8 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
         SAXBuilder sax = new SAXBuilder();
         workItemDoc = sax.build(reader);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse workItemXMLString", je );
         this.addInvalidField( "WorkItemXMLString", "Invalid work item xml");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse workItemXMLString", je);
       }
     }
     
@@ -127,8 +127,8 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
         SAXBuilder sax = new SAXBuilder();
         dirtyWorkItemDoc = sax.build(dirtyReader);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse dirtyWorkItemXMLString", je );
-        this.addInvalidField( "DirtyWorkItemXMLString", "Invalid work item xml");
+          this.addInvalidField( "DirtyWorkItemXMLString", "Invalid work item xml");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse dirtyWorkItemXMLString", je);
       }
 
     }

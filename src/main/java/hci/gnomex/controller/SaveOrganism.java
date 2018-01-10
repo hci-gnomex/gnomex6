@@ -77,6 +77,7 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
       } catch (JDOMException je) {
         LOG.error("Cannot parse genomeBuildsXMLString", je);
         this.addInvalidField("genomeBuildsXMLString", "Invalid genomeBuildsXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse genomeBuildsXMLString", je);
       }
     }
 

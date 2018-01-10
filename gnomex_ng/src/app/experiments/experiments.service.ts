@@ -4,6 +4,7 @@ import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {HttpHeaders, HttpParams} from "@angular/common/http";
+//import {Observer} from "rxjs/Observer";
 
 export let BROWSE_EXPERIMENTS_ENDPOINT: OpaqueToken = new OpaqueToken("browse_experiments_url");
 export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experiment_url");
@@ -13,8 +14,6 @@ export class ExperimentsService {
 
 	private experimentOrders: any[];
     public projectRequestList: any[];
-    public selectedTreeNode:any;
-    public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
@@ -48,28 +47,27 @@ export class ExperimentsService {
         });
     }
 
-	refreshProjectRequestList_fromBackend(): void {
-		this.startSearchSubject.next(true);
-
-		this._http.get("/gnomex/GetProjectRequestList.gx", {
-			withCredentials: true,
-			search: this.previousURLParams
-		}).subscribe((response: Response) => {
-			console.log("GetRequestList called");
-
-			if (response.status === 200) {
-				this.projectRequestList = response.json().Lab;
-				this.emitProjectRequestList();
-				//return response.json().Request;
-			} else {
-				throw new Error("Error");
-			}
-		});
-	}
-
 	getExperimentsObservable(): Observable<any> {
 		return this.experimentOrdersSubject.asObservable();
 	}
+
+    refreshProjectRequestList_fromBackend(): void {
+        this._http.get("/gnomex/GetProjectRequestList.gx", {
+            withCredentials: true,
+            search: this.previousURLParams
+        }).subscribe((response: Response) => {
+            console.log("GetRequestList called");
+
+            if (response.status === 200) {
+                this.projectRequestList = response.json().Lab;
+                this.emitProjectRequestList();
+                //return response.json().Request;
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
 
 	getExperiments_fromBackend(parameters: URLSearchParams): void {
 //		if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
@@ -80,13 +78,13 @@ export class ExperimentsService {
 			this.haveLoadedExperimentOrders = true;
 			this.previousURLParams = parameters;
 
-			this._http.get("/gnomex/GetRequestList.gx", {
-				withCredentials: true,
-				search: parameters
-			}).subscribe((response: Response) => {
+			this._http.get("/gnomex/GetRequestList.gx", {withCredentials: true, search: parameters}).subscribe((response: Response) => {
+				// console.log("GetRequestList called");
+
 				if (response.status === 200) {
 					this.experimentOrders = response.json().Request;
 					this.emitExperimentOrders();
+					//return response.json().Request;
 				} else {
 					throw new Error("Error");
 				}
@@ -111,10 +109,7 @@ export class ExperimentsService {
 
 		// console.log("Changing Experiment numbers: " + parameters.get("idRequest") + " status to " + parameters.get("codeRequestStatus"));
 
-		this._http.get("/gnomex/ChangeRequestStatus.gx", {
-			withCredentials: true,
-			search: parameters
-		}).subscribe((response: Response) => {
+		this._http.get("/gnomex/ChangeRequestStatus.gx", {withCredentials: true, search: parameters}).subscribe((response: Response) => {
 			if (response.status === 200) {
 				this.changeStatusSubject.next(response.json());
 				//return response.json().Request;
@@ -124,10 +119,10 @@ export class ExperimentsService {
 		});
 	}
 
-	emitExperimentOrders(): void {
-		this.experimentOrdersSubject.next(this.experimentOrders);
-	}
 
+    emitExperimentOrders(): void {
+        this.experimentOrdersSubject.next(this.experimentOrders);
+    }
 
     getProjectRequestListObservable(): Observable<any> {
         return this.projectRequestListSubject.asObservable();
@@ -138,9 +133,14 @@ export class ExperimentsService {
         this.projectRequestListSubject.next(this.projectRequestList);
     }
 
-    getProjectRequestList_fromBackend(params: URLSearchParams,allowRefresh?:boolean): void { 
-       this.startSearchSubject.next(true);
-
+    getProjectRequestList_fromBackend(params: URLSearchParams): void {
+ /*
+        if (this.haveLoadedExperimentOrders && this.previousURLParams === params) {
+            // do nothing
+            console.log("Experiment Orders already loaded");
+            // return Observable.of(this.experimentOrders);
+        } else {
+*/
             this.haveLoadedExperimentOrders = true;
             this.previousURLParams = params;
 
@@ -193,10 +193,14 @@ export class ExperimentsService {
 
     }
 
-    saveVisibility(params:URLSearchParams): Observable<any> {
-        //let params: HttpParams = new HttpParams();
-        //const headers = new HttpHeaders().set('Content-Type', 'application/json');
-        return this._http.get("/gnomex/SaveVisibility.gx", {search: params}).map((response: Response) => {
+    saveVisibility(body: any, idProject?: string): Observable<any> {
+
+        let parameters: URLSearchParams = new URLSearchParams;
+
+        let strBody:string = JSON.stringify(body);
+        parameters.set("visibilityXMLString", strBody);
+
+        return this._http.get("/gnomex/SaveVisibility.gx", {search: parameters}).map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
@@ -234,7 +238,7 @@ export class ExperimentsService {
     getProject(params: URLSearchParams):  Observable<any> {
         return this._http.get("/gnomex/GetProject.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
-                console.log("&&&&&&&&&&&&&&&&&& getProject OK");
+                console.log("&&&&&&&&&&&&&&&&&& getProject " + response);
                 return response.json();
             } else {
                 throw new Error("Error");
@@ -343,6 +347,7 @@ export class ExperimentsService {
     getFilteredOverviewListObservable():Observable<any>{
         return this.filteredExperimentOverviewListSubject.asObservable();
     }
+
 
 
 }

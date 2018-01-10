@@ -51,6 +51,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
     private String PEDFileXMLString = null;
     private String PEDInfoXMLString = null;
     private String analysisDirectory = null;
+    protected String errorDetails = "";
 
     public void validate() {
     }
@@ -987,6 +988,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
         } catch (JDOMException je) {
             LOG.error("MakeGeneURL Cannot parse BAMInfoXMLString", je);
+//            errorDetails = Util.GNLOG(LOG,"Cannot parse selectedSampleXMLString ", je);
         }
     }
 
