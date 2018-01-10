@@ -26,6 +26,7 @@ import { ToggleButtonModule } from "../../modules/togglebutton.module";
 import { WindowModule }       from "../../modules/window.module";
 import {UtilModule} from "../util/util.module";
 import {ServicesModule} from "../services/services.module";
+import { AngularSplitModule } from 'angular-split';
 
 import {BrowseExperimentsComponent} from "./browse-experiments.component";
 import {ExperimentOrdersComponent} from "./orders/experiment-orders.component";
@@ -66,12 +67,12 @@ export const componentFactories =
     [
         TestComponent,
         DescriptionTab,
-    PrepTab,
-    DownloadsBrowseTab,
-    ExperimentsBrowseTab,
-    ProgressBrowseTab,
-    ProjectBrowseTab,
-    VisiblityBrowseTab
+        PrepTab,
+        DownloadsBrowseTab,
+        ExperimentsBrowseTab,
+        ProgressBrowseTab,
+        ProjectBrowseTab,
+        VisiblityBrowseTab
     ];
 /**/
                                 // need add components that will be tabs here
@@ -103,6 +104,7 @@ export const componentFactories =
         AngularMaterialModule,
         TreeGridModule,
         AgGridRendererModule,
+        AngularSplitModule,
         AgGridModule.withComponents([IconTextRendererComponent])
     ],
     declarations: [
@@ -117,7 +119,6 @@ export const componentFactories =
                     DownloadsBrowseTab,
                     BrowsePanelComponent,
                     BrowseOverviewComponent,
-                    DownloadsBrowseTab,
                     ExperimentsBrowseTab,
                     ProgressBrowseTab,
                     ProjectBrowseTab,

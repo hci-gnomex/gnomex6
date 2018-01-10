@@ -79,7 +79,7 @@ export class ExperimentDetail implements OnInit {
         this.route.data.forEach((data) =>{
             this.experiment = data['experiment']; // this data is carried on route look at browse-experiments.component.ts
                                                  // & experiment-resolver.service.ts
-            console.log(this.experiment);
+//            console.log(this.experiment);
         });
     }
     next(){

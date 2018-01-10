@@ -19,6 +19,8 @@ export class DictionaryService {
     public static readonly ANNOTATION_REPORT_FIELD = "hci.gnomex.model.AnnotationReportField";
     public static readonly VISIBILTY: string = "hci.gnomex.model.Visibility";
     public static readonly INSTITUTION: string = "hci.gnomex.model.Institution";
+    public static readonly ANALYSIS_TYPE:string = "hci.gnomex.model.AnalysisType";
+    public static readonly ANALYSIS_PROTOCOL:string = "hci.gnomex.model.AnalysisProtocol";
 
     private cachedDictionaryString: any;
     private cacheExpirationTime: number = 0;
@@ -46,9 +48,9 @@ export class DictionaryService {
                 this.cachedDictionaryString = JSON.stringify(response);
                 this.cacheExpirationTime = Date.now() + this.CACHE_EXPIRATION_MILLIS;
                 this.reloadObservable = null;
-                console.log("************RELOAD************");
-                console.log(JSON.stringify(this.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY)));
-                console.log("******************************");
+                console.log("************RELOAD************ the dictionaries");
+//                console.log(JSON.stringify(this.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY)));
+//                console.log("******************************");
                 this.progressService.displayLoader(100);
                 if (callback) {
                     callback();

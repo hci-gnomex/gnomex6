@@ -34,7 +34,7 @@ import {Subscription} from "rxjs/Subscription";
             </div>
 
             <div style="height: 100%;width:100%">
-                <tab-container (tabChanged)="changedTab($event)"
+                <tab-container (tabChanging)="tabChanging($event)"
                                [state]="state"
                                [componentNames]="tabNames">
 
@@ -99,7 +99,10 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
                     let index = this.tabView.containsTab(this.PROJECT);
                     if (index !== -1) {
                         this.tabView.removeTab(index);
-                        this.tabNames.pop();// will Project will always be the last tab
+                        this.tabNames.pop();//Project will always be the last tab
+                        if(index === this.tabView.activeId){
+                            this.tabView.select(0);
+                        }
                     }
                 }
             }
@@ -183,17 +186,20 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
     getExperiments(data:any):Array<any>{
         let flatRequestList:Array<any> = [];
 
-        if(Array.isArray(data)){
-            if(data.length > 0){
+        if(Array.isArray(data) ){
+            if(data.length > 0 && !data[0].Project){
                 (<Array<any>> data).forEach(rObj =>{
                     this.experimentIdSet.add(rObj.requestNumber)
                 });
                 flatRequestList = data;
             }
-            return flatRequestList;
+            else{
+                return this.initAllLabs(data,flatRequestList);
+            }
         }
 
-        if (data.Project) {
+
+        if (data.Project) { // for Lab level
             let projectList: Array<any> = Array.isArray(data.Project) ? data.Project : [data.Project];
             projectList.forEach(subData => {
                 let requestList: Array<any> = Array.isArray(subData.Request) ? subData.Request :  subData.Request ? [subData.Request] : subData.Request;
@@ -220,7 +226,35 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
     }
 
 
-    changedTab(event:TabChangeEvent){
+    initAllLabs(data:any ,flatRList:Array<any>):Array<any>{
+
+        if(data.length > 0 && data[0].Project){ // array of labs(more complex parsing)
+            for(let i = 0; i < data.length; i++){
+                if(data[i].Project){
+                    let projectList = Array.isArray(data[i].Project) ? data[i].Project : [data[i].Project] ;
+                    for(let j = 0; j < projectList.length; j++){
+                        if(projectList[j].Request){
+                            let requestList =  Array.isArray(projectList[j].Request) ? projectList[j].Request : [projectList[j].Request];
+                            for(let k = 0; k < requestList.length; k++){
+                                if(i === 0 && j === 0){
+                                    flatRList.push(requestList[k]);
+                                    this.experimentIdSet.add(requestList[k].requestNumber);
+                                }
+                                this.getExperimentKind(requestList[k]);
+                                requestList[k]["ownerFullName"] = requestList[k].ownerLastName + ', ' + requestList[k].ownerFirstName;
+                                requestList[k]["analysisChecked"] = requestList[k].analysisNames !== '' ? this.appConstants.ICON_CHECKED : '';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return flatRList;
+
+    }
+
+
+    tabChanging(event:TabChangeEvent){
 
         if(this.tabNames[event.nextId] === this.EXPERIMENT ){
             this.refreshExperiment();

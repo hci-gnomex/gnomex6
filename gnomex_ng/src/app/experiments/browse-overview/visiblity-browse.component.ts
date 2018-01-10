@@ -12,6 +12,7 @@ import {ActivatedRoute} from "@angular/router";
 import {SelectEditorComponent} from "../../util/grid-editors/select-editor.component";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {GridOptions} from "ag-grid/main";
+import {URLSearchParams} from "@angular/http"
 
 
 @Component({
@@ -28,22 +29,22 @@ import {GridOptions} from "ag-grid/main";
                              [enableSorting]="true"
                              [enableColResize]="true">
             </ag-grid-angular>
-            
+
             <div class="flex-container">
                 <span></span>
                 <div>
                 <span *ngIf="dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
-                    You're changes have not been saved
+                    Your changes have not been saved
                 </span>
                     <span style="margin-left:1em; ">
-                    <button style="background:lightblue"  mat-button (click)="save()"> <img src="../../../assets/action_save.gif">Save</button>
+                    <button  mat-button  color="primary" (click)="save()"> <img src="../../../assets/action_save.gif">Save</button>
                 </span>
 
                 </div>
             </div>
             
         </div>
-        <div> {{experimentService.experimentList[0] | json}} </div>
+        <!--<div> {{experimentService.experimentList[0] | json}} </div> -->
 
         
         
@@ -273,9 +274,16 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
 
 
         let idProject =  this.route.snapshot.params["idProject"];
-        this.experimentService.saveVisibility(dirtyRequests,idProject)
+        let params: URLSearchParams = new URLSearchParams();
+        let strBody:string = JSON.stringify(dirtyRequests);
+
+        params.set("idProject",idProject);
+        params.set("visibilityXMLString", strBody );
+
+
+        this.experimentService.saveVisibility(params)
             .subscribe(resp =>{
-                this.experimentService.getProjectRequestList_fromBackend(this.experimentService.browsePanelParams);
+                this.experimentService.getProjectRequestList_fromBackend(this.experimentService.browsePanelParams,true);
             });
     }
 
@@ -299,8 +307,6 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
         if(!this.instList){ // for first time you need to set it, this code runs before ngOinit
             this.instList = this.dictionaryService.getEntries(DictionaryService.INSTITUTION);
         }
-
-        console.log("The institution List: ", this.instList);
         let instDisplays = [];
 
         if(this.instList) {

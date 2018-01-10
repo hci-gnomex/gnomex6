@@ -1,0 +1,64 @@
+<div class="background">
+    <div class="flex-column-container">
+        <div style="flex-grow: .01;" class="br-exp-item br-exp-one">
+            <div style="margin-bottom: 0.3em;">
+                <browse-filter [label]="'Analysis'" [iconSource]="'assets/flask.png'"
+                               [mode]="'analysisBrowse'"></browse-filter>
+            </div>
+        </div>
+
+        <div style="flex:1;"class="flex-row-container">
+            <split>
+                <split-area size="20">
+                    <div class="br-exp-item"> <!-- start tree container -->
+                        <div class="flex-column-container" style="height:100%;">
+                            <div class="br-exp-item br-exp-help-drag-drop">
+                                <div class="flex-row-container">
+                                    <div class="br-exp-item-row-one" style="position: relative;top: .65em; left: .25em ">
+                                        {{analysisCount}} analysis
+                                    </div>
+                                    <div class="br-exp-item-row-two" style="left: 1.5em">
+                                        <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"><img src="../../assets/information.png">Drag-and-drop hint</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+                            <div class="br-exp-item br-exp-three">
+                                <tree-root #analysisTree (moveNode)="onMoveNode($event)"
+                                           (activate)="treeOnSelect($event)"
+                                           (updateData)="treeUpdateData($event)"
+                                           [nodes]="items" [options]="options">
+                                    <ng-template #treeNodeTemplate let-node let-index="index">
+                                        <img src="{{node.data.icon}}" height="16" width="16">
+                                        <span>{{ node.data.label }}</span>
+                                    </ng-template>
+                                </tree-root>
+                            </div>
+                            <div class="br-exp-item br-exp-four">
+                                <div class="flex-row-container">
+                                    <div class="br-exp-item-row-one" style="position: relative; top: 1em">
+                                        <button mat-button [disabled]="disableNewAnalysis" (click)="createAnalysisClicked()"><img src="../../assets/map.png">New Analysis</button>
+                                    </div>
+                                    <div class="br-exp-item-row-two" style="position: relative; top: 1em">
+                                        <button mat-button [disabled]="disableDelete" (click)="deleteAnalysisClicked()"><img src="../../assets/delete.png">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="br-exp-item br-exp-five">
+                                <div class="br-exp-item-row-two">
+                                    <button mat-button [disabled]="disableNewAnalysisGroup" (click)="createAnalysisGroupClicked()"><img src="../../assets/folder_add.png">New analysis group</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- end tree container -->
+                </split-area>
+                <split-area size="80">
+                    <div  style="padding: 2em" class="br-exp-item analysis-panel ">
+                        <analysis-panel></analysis-panel>
+                    </div>
+                </split-area>
+            </split>
+        </div>
+    </div>
+</div>
+

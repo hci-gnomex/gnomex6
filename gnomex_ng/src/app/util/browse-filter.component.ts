@@ -742,19 +742,20 @@ export class BrowseFilterComponent implements OnInit {
         if (this.mode === this.EXPERIMENT_BROWSE) {
             let params: URLSearchParams = this.getExperimentBrowseParameters();
             this.experimentsService.browsePanelParams = params;
+            this.experimentsService.browsePanelParams["refreshParams"] = true;
             this.experimentsService.getProjectRequestList_fromBackend(params);
         } else if (this.mode === this.ORDER_BROWSE) {
             let params: URLSearchParams = this.getOrderBrowseParameters();
             this.experimentsService.getExperiments_fromBackend(params);
         } else if (this.mode === this.ANALYSIS_BROWSE) {
             let params: URLSearchParams = this.getAnalysisBrowseParameters();
+            this.analysisService.analysisPanelParams = params;
+            this.analysisService.analysisPanelParams["refreshParams"] = true;
             this.analysisService.getAnalysisGroupList_fromBackend(params);
                 console.log("GetAnalysisGroupList called");
         } else if (this.mode === this.DATA_TRACK_BROWSE) {
             let params: URLSearchParams = this.getDataTrackBrowseParameters();
-            this.dataTrackService.getDataTrackList(params).subscribe((response: any) => {
-                console.log("GetDataTrackList called");
-            });
+            this.dataTrackService.getDatatracksList_fromBackend(params);
         } else if (this.mode === this.BILLING_BROWSE) {
             let billingRequestListParams: URLSearchParams = this.getBillingRequestListParameters();
             this.billingService.getBillingRequestList(billingRequestListParams).subscribe((response: any) => {

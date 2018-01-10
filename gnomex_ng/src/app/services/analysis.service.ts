@@ -4,16 +4,40 @@ import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
 import {Subject} from "rxjs/Subject";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Injectable()
 export class AnalysisService {
     public analysisGroupList: any[];
+    public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     private analysisGroupListSubject: Subject<any[]> = new Subject();
     private _haveLoadedAnalysisGroupList: boolean = false;
     private _previousURLParams: URLSearchParams = null;
+    private _analysisPanelParams:URLSearchParams;
+    private _analysisList:Array<any> =[];
+    private analysisOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
+    private filteredAnalysisListSubject:Subject<any> = new Subject();
+    private createAnalysisDataSubject:Subject<any> = new Subject();
+
+
 
     constructor(private http: Http) {
+    }
+
+
+    get analysisList(): Array<any>{
+        return this._analysisList;
+    }
+    set analysisList(data:Array<any>){
+        this._analysisList = data;
+    }
+
+    get analysisPanelParams(): URLSearchParams{
+        return this._analysisPanelParams;
+    }
+    set analysisPanelParams(data:URLSearchParams){
+        this._analysisPanelParams = data;
     }
 
     getAnalysis(params: URLSearchParams): Observable<any> {
@@ -74,11 +98,12 @@ export class AnalysisService {
     getAnalysisGroupListObservable(): Observable<any> {
         return this.analysisGroupListSubject.asObservable();
     }
-    getAnalysisGroupList_fromBackend(params: URLSearchParams): void {
-        if (this._haveLoadedAnalysisGroupList && this._previousURLParams === params) {
+    getAnalysisGroupList_fromBackend(params: URLSearchParams,allowRefresh?:boolean): void {
+        this.startSearchSubject.next(true);
+
+        if (this._haveLoadedAnalysisGroupList && this._previousURLParams === params && !allowRefresh) {
             // do nothing
             console.log("Analysis already loaded");
-            // return Observable.of(this.experimentOrders);
         } else {
             this._haveLoadedAnalysisGroupList = true;
             this._previousURLParams = params;
@@ -92,7 +117,6 @@ export class AnalysisService {
                 if (response.status === 200) {
                     this.analysisGroupList = response.json().Lab;
                     this.emitAnalysisGroupList();
-                    //return response.json().Request;
                 } else {
                     throw new Error("Error");
                 }
@@ -101,6 +125,8 @@ export class AnalysisService {
     }
 
     refreshAnalysisGroupList_fromBackend(): void {
+        this.startSearchSubject.next(true);
+
         this.http.get("/gnomex/GetAnalysisGroupList.gx", {
             withCredentials: true,
             search: this._previousURLParams
@@ -160,6 +186,42 @@ export class AnalysisService {
         });
 
     }
+
+
+    resetAnalysisOverviewListSubject(){
+        this.analysisOverviewListSubject = new BehaviorSubject([]);
+    }
+
+    emitAnalysisOverviewList(data:any):void{
+        this.analysisOverviewListSubject.next(data);
+    }
+    getAnalysisOverviewListSubject():BehaviorSubject<any>{
+        return this.analysisOverviewListSubject;
+    }
+
+    emitFilteredOverviewList(data:any):void{
+        this.filteredAnalysisListSubject.next(data);
+    }
+    getFilteredOverviewListObservable():Observable<any>{
+        return this.filteredAnalysisListSubject.asObservable();
+    }
+
+    emitCreateAnalysisDataSubject(data:any):void{
+        this.createAnalysisDataSubject.next(data);
+    }
+    getCreateAnaylsisDataSubject():Subject<any>{
+        return this.createAnalysisDataSubject;
+    }
+    saveVisibility(params:URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/SaveVisibilityAnalysis.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response;
+            } else {
+                throw new Error("Error: In SaveVisibility");
+            }
+        });
+    }
+
 
 
 }
