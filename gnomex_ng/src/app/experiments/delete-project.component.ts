@@ -35,7 +35,7 @@ export class DeleteProjectComponent {
     deleteProject() {
         this.showSpinner = true;
         var params: URLSearchParams = new URLSearchParams();
-        params.set("idProject", this.selectedItem.id);
+        params.set("idProject", this.selectedItem.data.idProject);
 
         var lPromise = this.projectService.deleteProject(params).toPromise();
         lPromise.then( response => {
