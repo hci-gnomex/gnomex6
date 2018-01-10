@@ -9,6 +9,14 @@ import {ProgressService} from "../home/progress.service";
 
 @Injectable()
 export class CreateSecurityAdvisorService {
+    private groupsToManageValue: any[];
+    public get groupsToManage(): any[] {
+        return this.groupsToManageValue;
+    }
+
+    public set groupsToManage(value: any[]) {
+        this.groupsToManageValue = value;
+    }
     private result: any;
     static readonly CAN_ACCESS_ANY_OBJECT : string = "canAccessAnyObject";
     static readonly CAN_WRITE_ANY_OBJECT : string = "canWriteAnyObject";
@@ -143,8 +151,12 @@ export class CreateSecurityAdvisorService {
                 this.isUserActiveValue = this.result.isUserActive == "Y";
                 this.isExternalUserValue = this.result.isExternalUser == "Y";
                 this.versionValue = this.result.version;
-
                 this.isSuperAdminValue = this.hasPermission("canAdministerAllCoreFacilities");
+                if (!this.isArray(this.result.groupsToManage.Lab)) {
+                    this.groupsToManage = [this.result.groupsToManage.Lab];
+                } else {
+                    this.groupsToManage = this.result.groupsToManage.Lab;
+                }
 
                 if (this.hasPermission("canAccessAnyObject")) {
                     if (this.hasPermission("canWriteAnyObject")) {
@@ -169,6 +181,14 @@ export class CreateSecurityAdvisorService {
             }
         });
     }
+
+    /*
+    Determine if the object is an array
+    @param what
+    */
+    isArray(what) {
+        return Object.prototype.toString.call(what) === "[object Array]";
+    };
 
     private determineUsersCoreFacilities(): void {
         if (this.isSuperAdmin) {

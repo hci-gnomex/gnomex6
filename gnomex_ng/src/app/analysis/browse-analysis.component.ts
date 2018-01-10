@@ -104,8 +104,8 @@ const actionMapping:IActionMapping = {
 
         .br-exp-three {
             width: 100%;
-            height: 48em;
-            flex-grow: 8;
+            height: 5px;
+            flex-grow: 2;
         }
 
         .br-exp-four {

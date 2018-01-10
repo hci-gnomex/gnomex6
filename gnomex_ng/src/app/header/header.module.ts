@@ -20,7 +20,8 @@ import {
     MatInputModule,
     MatListModule,
     MatFormFieldModule,
-	MatMenuModule, ShowOnDirtyErrorStateMatcher}  from '@angular/material';
+    MatMenuModule, ShowOnDirtyErrorStateMatcher, MatDialogModule
+} from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {LogoutComponent} from "./logout.component";
@@ -33,7 +34,8 @@ import {LogoutComponent} from "./logout.component";
       CommonModule,
       UserModule,
       AngularMaterialModule,
-      BrowserAnimationsModule
+      BrowserAnimationsModule,
+      MatDialogModule
   ],
    providers: [
        // {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}
