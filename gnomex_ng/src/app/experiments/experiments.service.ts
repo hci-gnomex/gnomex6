@@ -4,7 +4,7 @@ import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {HttpHeaders, HttpParams} from "@angular/common/http";
-//import {Observer} from "rxjs/Observer";
+
 
 export let BROWSE_EXPERIMENTS_ENDPOINT: OpaqueToken = new OpaqueToken("browse_experiments_url");
 export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experiment_url");
@@ -14,6 +14,7 @@ export class ExperimentsService {
 
 	private experimentOrders: any[];
     public projectRequestList: any[];
+    public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
@@ -51,22 +52,22 @@ export class ExperimentsService {
 		return this.experimentOrdersSubject.asObservable();
 	}
 
-    refreshProjectRequestList_fromBackend(): void {
-        this._http.get("/gnomex/GetProjectRequestList.gx", {
-            withCredentials: true,
-            search: this.previousURLParams
-        }).subscribe((response: Response) => {
-            console.log("GetRequestList called");
+	refreshProjectRequestList_fromBackend(): void {
+		this._http.get("/gnomex/GetProjectRequestList.gx", {
+			withCredentials: true,
+			search: this.previousURLParams
+		}).subscribe((response: Response) => {
+			console.log("GetRequestList called");
 
-            if (response.status === 200) {
-                this.projectRequestList = response.json().Lab;
-                this.emitProjectRequestList();
-                //return response.json().Request;
-            } else {
-                throw new Error("Error");
-            }
-        });
-    }
+			if (response.status === 200) {
+				this.projectRequestList = response.json().Lab;
+				this.emitProjectRequestList();
+				//return response.json().Request;
+			} else {
+				throw new Error("Error");
+			}
+		});
+	}
 
 
 	getExperiments_fromBackend(parameters: URLSearchParams): void {
@@ -120,9 +121,9 @@ export class ExperimentsService {
 	}
 
 
-    emitExperimentOrders(): void {
-        this.experimentOrdersSubject.next(this.experimentOrders);
-    }
+	emitExperimentOrders(): void {
+		this.experimentOrdersSubject.next(this.experimentOrders);
+	}
 
     getProjectRequestListObservable(): Observable<any> {
         return this.projectRequestListSubject.asObservable();
@@ -196,8 +197,11 @@ export class ExperimentsService {
     saveVisibility(body: any, idProject?: string): Observable<any> {
 
         let parameters: URLSearchParams = new URLSearchParams;
-
         let strBody:string = JSON.stringify(body);
+
+        if(idProject){
+            parameters.set("idProject",idProject);
+        }
         parameters.set("visibilityXMLString", strBody);
 
         return this._http.get("/gnomex/SaveVisibility.gx", {search: parameters}).map((response: Response) => {
