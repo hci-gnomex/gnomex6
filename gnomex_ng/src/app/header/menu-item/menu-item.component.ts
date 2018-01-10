@@ -1,6 +1,5 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
-//import {NavItem} from '../nav-item';
 
 @Component({
     selector: 'app-menu-item',
