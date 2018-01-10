@@ -61,8 +61,9 @@ public class GetMultiplexLaneList extends GNomExCommand implements Serializable 
         requestDoc = sax.build(reader);
         requestParser = new RequestParser(requestDoc, this.getSecAdvisor());
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse requestXMLString", je );
-        this.addInvalidField( "RequestXMLString", "Invalid request xml");
+         this.addInvalidField( "RequestXMLString", "Invalid request xml");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", je);
+
       }
     }
 

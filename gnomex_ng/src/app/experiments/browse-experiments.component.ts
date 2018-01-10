@@ -144,8 +144,7 @@ import {DictionaryService} from "../services/dictionary.service";
         }
         .experiment-detail-panel {
             height:98%;
-            width:75%;
-            margin-left: 2em;
+            width:100%;
             border: #C8C8C8 solid thin;
             overflow: auto;
         }
@@ -580,7 +579,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.router.navigate(['/experiments',{outlets:{'browsePanel':[idRequest]}}]);
             this.disableNewProject = true;
             this.disableDeleteProject = true;
-            this.experimentsService.getExperiment(this.selectedItem.data.idRequest).subscribe((response: any) => {
+            this.experimentsService.getExperiment(idRequest).subscribe((response: any) => {
                 this.selectedExperiment = response.Request;
                 if (response.Request.canDelete === "Y") {
                     this.disableDeleteExperiment = false;

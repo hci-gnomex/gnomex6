@@ -1,6 +1,6 @@
 import {
     Component, EventEmitter, Output, Input, ViewChild, ViewContainerRef, ComponentFactory, ComponentRef,
-    ComponentFactoryResolver, Type
+    ComponentFactoryResolver, Type, OnDestroy
 } from '@angular/core';
 import { Tab } from './tab.component';
 import { TabChangeEvent } from './tab-change-event'
@@ -24,13 +24,14 @@ import {Form, FormGroup} from "@angular/forms";
     styles: [require("./tabs.component.less").toString()]
 
 })
-export class Tabs {
+export class Tabs implements OnDestroy {
     tabs: Tab[];
     activeTabId: number;
     state:string;
     @ViewChild('container', {read: ViewContainerRef}) tabsContainer:ViewContainerRef;
 
-    @Output() tabChange = new EventEmitter<TabChangeEvent>();
+    @Output() tabChanging = new EventEmitter<TabChangeEvent>();
+    @Output() tabChanged = new EventEmitter<any>();
 
     constructor(private compFR:ComponentFactoryResolver, private vcRef:ViewContainerRef){
 
@@ -133,7 +134,7 @@ export class Tabs {
 
             let defaultPrevented = false;
 
-            this.tabChange.emit(
+            this.tabChanging.emit(
                 { activeTabId: this.activeTabId, nextId: selectedTabIndex, preventDefault: () => { defaultPrevented = true; } });
 
             if (!defaultPrevented) {
@@ -142,6 +143,7 @@ export class Tabs {
                 tab.getComp().tabIsActive= true;
                 setTimeout(() => {
                     tab.getComp().setState(this.state);// need to run state actions like disable components when tab becomes active
+                    this.tabChanged.emit();
                 });
 
             }
@@ -163,6 +165,11 @@ export class Tabs {
         else{
             return false;
         }
+    }
+
+    ngOnDestroy():void{
+        this.tabChanging.unsubscribe();
+        this.tabChanged.unsubscribe();
     }
 
 }

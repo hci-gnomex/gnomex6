@@ -79,8 +79,8 @@ public class DeleteRequest extends GNomExCommand implements Serializable {
         SAXBuilder sax = new SAXBuilder();
         requestsToDeleteDoc = sax.build(reader);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse requestsToDeleteXMLString", je );
         this.addInvalidField( "requestsToDeleteXMLString", "Invalid requestsToDeleteXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestsToDeleteXMLString", je);
       }
     }
     if ( requestsToDeleteXMLString == null && idRequest == null ) {

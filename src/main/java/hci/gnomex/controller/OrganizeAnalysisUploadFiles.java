@@ -65,8 +65,8 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                 filesDoc = sax.build(reader);
                 parser = new AnalysisFileDescriptorUploadParser(filesDoc);
             } catch (JDOMException je) {
-                LOG.error("Cannot parse filesXMLString", je);
                 this.addInvalidField("FilesLXMLString", "Invalid files xml");
+                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesXMLString", je);
             }
         }
 
@@ -83,8 +83,8 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                 filesToRemoveDoc = sax.build(reader);
                 filesToRemoveParser = new AnalysisFileDescriptorUploadParser(filesToRemoveDoc);
             } catch (JDOMException je) {
-                LOG.error("Cannot parse filesToRemoveXMLString", je);
                 this.addInvalidField("FilesToRemoveXMLString", "Invalid filesToRemove xml");
+                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveXMLString", je);
             }
         }
 

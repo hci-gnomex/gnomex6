@@ -34,7 +34,7 @@ import {Subscription} from "rxjs/Subscription";
             </div>
 
             <div style="height: 100%;width:100%">
-                <tab-container (tabChanged)="changedTab($event)"
+                <tab-container (tabChanging)="tabChanging($event)"
                                [state]="state"
                                [componentNames]="tabNames">
 
@@ -254,7 +254,7 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
     }
 
 
-    changedTab(event:TabChangeEvent){
+    tabChanging(event:TabChangeEvent){
 
         if(this.tabNames[event.nextId] === this.EXPERIMENT ){
             this.refreshExperiment();

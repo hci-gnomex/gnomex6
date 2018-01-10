@@ -57,8 +57,8 @@ public class SaveExperimentPlatformSortOrderList extends GNomExCommand implement
         SAXBuilder sax = new SAXBuilder();
         categoriesDoc = sax.build(reader);     
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse requestCategoriesXMLString", je );
         this.addInvalidField( "requestCategoriesXMLString", "Invalid requestCategoriesXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestCategoriesXMLString", je);
       }
     } else {
       this.addInvalidField("requestCategoriesXMLString", "requestCategoriesXMLString is required");

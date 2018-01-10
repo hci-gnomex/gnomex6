@@ -34,6 +34,8 @@ import {DragDropHintComponent} from "./drag-drop-hint.component";
 import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {DialogsModule} from "../util/popup/dialogs.module";
+import {AnalysisOverviewModule} from "./analysis-overview/analysis-overview.module";
+import {AnalysisDetailComponent} from "./analysis-detail/analysis-detail.component";
 
 /**
  * @author jdewell
@@ -55,7 +57,6 @@ import {DialogsModule} from "../util/popup/dialogs.module";
         EmailRelatedUsersPopupModule,
         ExpanderModule,
         FormsModule,
-        GnomexStyledGridModule,
         InputModule,
         LoaderModule,
         NotificationModule,
@@ -67,10 +68,16 @@ import {DialogsModule} from "../util/popup/dialogs.module";
         UtilModule,
         WindowModule,
         ReactiveFormsModule,
-        AngularSplitModule
+        AngularSplitModule,
+        AnalysisOverviewModule
             ],
     declarations: [
-        BrowseAnalysisComponent, DeleteAnalysisComponent, DragDropHintComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent
+        BrowseAnalysisComponent,
+        DeleteAnalysisComponent,
+        DragDropHintComponent,
+        CreateAnalysisComponent,
+        CreateAnalysisGroupComponent,
+        AnalysisDetailComponent
     ],
     entryComponents: [DeleteAnalysisComponent, DragDropHintComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent],
     exports: [DeleteAnalysisComponent, DragDropHintComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent]

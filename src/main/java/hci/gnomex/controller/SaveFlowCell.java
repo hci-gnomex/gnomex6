@@ -89,6 +89,7 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
     catch (JDOMException je) {
       LOG.error("Cannot parse channelsXMLString", je);
       this.addInvalidField("channelsXMLString", "Invalid channelsXMLString");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse channelsXMLString", je);
     }
   }
 

@@ -14,8 +14,30 @@ export class AnalysisService {
     private analysisGroupListSubject: Subject<any[]> = new Subject();
     private _haveLoadedAnalysisGroupList: boolean = false;
     private _previousURLParams: URLSearchParams = null;
+    private _analysisPanelParams:URLSearchParams;
+    private _analysisList:Array<any> =[];
+    private analysisOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
+    private filteredAnalysisListSubject:Subject<any> = new Subject();
+    private createAnalysisDataSubject:Subject<any> = new Subject();
+
+
 
     constructor(private http: Http) {
+    }
+
+
+    get analysisList(): Array<any>{
+        return this._analysisList;
+    }
+    set analysisList(data:Array<any>){
+        this._analysisList = data;
+    }
+
+    get analysisPanelParams(): URLSearchParams{
+        return this._analysisPanelParams;
+    }
+    set analysisPanelParams(data:URLSearchParams){
+        this._analysisPanelParams = data;
     }
 
     getAnalysis(params: URLSearchParams): Observable<any> {
@@ -76,10 +98,10 @@ export class AnalysisService {
     getAnalysisGroupListObservable(): Observable<any> {
         return this.analysisGroupListSubject.asObservable();
     }
-    getAnalysisGroupList_fromBackend(params: URLSearchParams): void {
+    getAnalysisGroupList_fromBackend(params: URLSearchParams,allowRefresh?:boolean): void {
         this.startSearchSubject.next(true);
 
-        if (this._haveLoadedAnalysisGroupList && this._previousURLParams === params) {
+        if (this._haveLoadedAnalysisGroupList && this._previousURLParams === params && !allowRefresh) {
             // do nothing
             console.log("Analysis already loaded");
         } else {
@@ -164,6 +186,42 @@ export class AnalysisService {
         });
 
     }
+
+
+    resetAnalysisOverviewListSubject(){
+        this.analysisOverviewListSubject = new BehaviorSubject([]);
+    }
+
+    emitAnalysisOverviewList(data:any):void{
+        this.analysisOverviewListSubject.next(data);
+    }
+    getAnalysisOverviewListSubject():BehaviorSubject<any>{
+        return this.analysisOverviewListSubject;
+    }
+
+    emitFilteredOverviewList(data:any):void{
+        this.filteredAnalysisListSubject.next(data);
+    }
+    getFilteredOverviewListObservable():Observable<any>{
+        return this.filteredAnalysisListSubject.asObservable();
+    }
+
+    emitCreateAnalysisDataSubject(data:any):void{
+        this.createAnalysisDataSubject.next(data);
+    }
+    getCreateAnaylsisDataSubject():Subject<any>{
+        return this.createAnalysisDataSubject;
+    }
+    saveVisibility(params:URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/SaveVisibilityAnalysis.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response;
+            } else {
+                throw new Error("Error: In SaveVisibility");
+            }
+        });
+    }
+
 
 
 }
