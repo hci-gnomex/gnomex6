@@ -14,7 +14,7 @@ import {LaunchPropertiesService} from "../services/launch-properites.service";
   imports: [HOME_ROUTING, CommonModule,
       WindowModule, ProgressBarModule],
   declarations: [HomeComponent],
-  providers: [ProgressService, LaunchPropertiesService
+  providers: [LaunchPropertiesService
 
   ]
 })

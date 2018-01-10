@@ -2,8 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {Routes, RouterModule} from "@angular/router";
-import {HeaderComponent} from "./header.component";
-import {RouteGuardService} from "@hci/authentication";
+import {LogoutComponent} from "./logout.component";
 
 /**
  * A file defining and exporting the router configuration for the home module.
@@ -12,7 +11,7 @@ import {RouteGuardService} from "@hci/authentication";
  * @since 7/10/16
  */
 const ROUTES: Routes = [
-    {path: "header", component: HeaderComponent, canActivate: [RouteGuardService]}
+    {path: "logout", component: LogoutComponent}
 ];
 
 export const HEADER_ROUTING = RouterModule.forChild(ROUTES);

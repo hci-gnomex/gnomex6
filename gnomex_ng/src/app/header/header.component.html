@@ -1,8 +1,8 @@
 <mat-toolbar class="header-one" *ngIf="isLoggedIn | async">
-  <span class="experiment-menu">
+  <span class="top-menu-item">
         <img src="../../assets/gnomex_logo_hdr.png">
     </span>
-  <span class="experiment-menu lookup">
+  <span class="top-menu-item lookup">
       <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
                       [floatPlaceholder]="options.value.floatPlaceholder"
               >
@@ -19,152 +19,46 @@
       </button>
     </span>
   <span class="links-menu">
-      <a class="links lookup problem" href="www.google.com">
-        Report Problem
-      </a>
-      <button mat-button class="experiment-menu link" [matMenuTriggerFor]="linksMenu">
-        Links...
-      </button>
-      <mat-menu #linksMenu="matMenu" [overlapTrigger]="false">
-        <button  class="menu" mat-menu-item> Gnomics Core Webpage </button>
-        <button  class="menu" mat-menu-item>  DNA Sequencing Webpage </button>
-      </mat-menu>
+      <span class="top-menu-item" *ngFor="let item of linkNavItems">
+        <!-- Handle branch node buttons here -->
+        <span *ngIf="item.children && item.children.length > 0">
+          <button [ngClass]="item.class" mat-button [matMenuTriggerFor]="menu.childMenu"
+                  [disabled]="item.disabled">
+          <img *ngIf="item.iconName" src="{{item.iconName}}">
+          <span> {{item.displayName}} </span>
+          </button>
+          <app-menu-item #menu [items]="item.children"></app-menu-item>
+        </span>
+        <!-- Leaf node buttons here -->
+        <span *ngIf="!item.children || item.children.length === 0">
+        <button [ngClass]="item.class" mat-button [routerLink]="item.route">
+        <img *ngIf="item.iconName" src="{{item.iconName}}">
+        <span>{{item.displayName}}</span>
+        </button>
+        </span>
+      </span>
 
-      <button mat-button class="experiment-menu link" [matMenuTriggerFor]="helpMenu">
-        Help...
-      </button>
-      <mat-menu #helpMenu="matMenu" [overlapTrigger]="false">
-        <button  class="menu" mat-menu-item> <img src="../../assets/white_information.png"> Enable Help Edit </button>
-        <button  class="menu" mat-menu-item>  User Guide </button>
-      </mat-menu>
-
-      <button mat-button class="experiment-menu link" [matMenuTriggerFor]="accountMenu">
-        Account...
-      </button>
-      <mat-menu #accountMenu="matMenu" [overlapTrigger]="false">
-        <button  class="menu" mat-menu-item>  My Account </button>
-        <button class="menu" (click)="onLogout()" class="menu" mat-menu-item>  Sign out </button>
-      </mat-menu>
-    <!---->
     </span>
   <mat-list></mat-list>
-  <mat-toolbar-row class="header-two">
+    <mat-toolbar-row class="header-two">
+      <span [ngClass]="item.class" *ngFor="let item of navItems">
+        <!-- Handle branch node buttons here -->
+        <span *ngIf="item.children && item.children.length > 0">
+          <button mat-button class="top-menu-item" [hidden]="item.hidden" [matMenuTriggerFor]="menu.childMenu"
+          [disabled]="item.disabled">
+          <img *ngIf="item.iconName" src="{{item.iconName}}">
+          <span> {{item.displayName}} </span>
+          </button>
+          <app-menu-item #menu [items]="item.children"></app-menu-item>
+        </span>
+        <!-- Leaf node buttons here -->
+        <span *ngIf="!item.children || item.children.length === 0">
+        <button mat-button class="top-menu-item" [hidden]="item.hidden" [routerLink]="item.route">
+        <img *ngIf="item.iconName" src="{{item.iconName}}">
+        <span>{{item.displayName}}</span>
+        </button>
+        </span>
+      </span>
+    </mat-toolbar-row>
+  </mat-toolbar>
 
-    <mat-menu #expMenu="matMenu" [overlapTrigger]="false">
-      <button  class="menu" mat-menu-item [routerLink]="[ '/experiments' ]"> <img src="../../assets/flask.png">Browse Experiments </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/flask_add.png"> New Experiment Order for Proteomics </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/flask_add.png"> New Experiment for High Throughput Genomics </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/flask_add.png"> New Experiment for Molecular Diagnostics </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/flask_add.png"> New Experiment for  DNA Sequencing</button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/flask_add.png"> New Experiment for Genomics Core </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/flask_add.png"> New Experiment for Bioinformatics </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/flask_edit.png"> Add Additional Illumina Sequencing Lanes </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/folder_add.png"> New Project </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/experiment_register.png"> Upload Experiment data generated at at third party facility </button>
-      <button  class="menu" mat-menu-item [routerLink]="[ '/NewBillingAccount' ]">  <img src="../../assets/money.png"> New Billing Account </button>
-      <button  class="menu" mat-menu-item [routerLink]="[ '/experiments-orders' ]"> <img src="../../assets/review.png"> Orders </button>
-      <button  class="menu" mat-menu-item> <img src="../../assets/review.png"> Bulk Sample Sheet Import </button>
-
-    </mat-menu>
-
-    <mat-menu #flowMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item class="menu"> <img src="../../assets/data-accept.png"> QC </button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item class="menu"> <img src="../../assets/flask.png"> HiSeq - Lib Prep </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/flask.png"> HiSeq - Lib Prep QC </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/DNA_diag_lightening.png"> HiSeq - FlowCell Assembly </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/DNA_diag_lightening.png"> HiSeq - Finalize Flow Cell </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/page_go.png"> HiSeq - Data Pipeline </button>
-      <button mat-menu-item class="menu" > <img src="../../assets/rectangle.png"> HiSeq - Flow Cells </button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item [matMenuTriggerFor]="subIllumMiseq" class="menu"> <img src="../../assets/DNA_diag_miseq.png"> Illumina MiSeq... </button>
-      <button mat-menu-item [matMenuTriggerFor]="subMicroArray" class="menu" > <img src="../../assets/microarray_small.png"> Microarray... </button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item class="menu"> <img src="../../assets/flask.png"> Workflow (all) </button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item class="menu" > <img src="../../assets/plate_add.png"> Fill Plate </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/run_add.png"> Build Run </button>
-      <button mat-menu-item class="menu" > <img src="../../assets/run_review.png"> Plates & Runs </button>
-      <button mat-menu-item class="menu" > <img src="../../assets/tv_chart_review.png"> Results </button>
-    </mat-menu>
-    <mat-menu #subIllumMiseq="matMenu">
-      <button mat-menu-item class="menu"> <img src="../../assets/flask.png"> Lib Prep</button>
-      <button mat-menu-item class="menu"> <img src="../../assets/flask.png"> Lib Prep QC</button>
-      <button mat-menu-item class="menu"> <img src="../../assets/DNA_diag_miseq.png"> Flow Cell Assembly</button>
-      <button mat-menu-item class="menu"> <img src="../../assets/DNA_diag_miseq.png"> Finalize Flow Cell</button>
-      <button mat-menu-item class="menu"> <img src="../../assets/server_go.png"> Pipeline</button>
-      <button mat-menu-item class="menu"> <img src="../../assets/rectangle.png"> Flow Cells</button>
-    </mat-menu>
-    <mat-menu #subMicroArray="matMenu">
-      <button mat-menu-item class="menu"> <img src="../../assets/asterisk_yellow.png"> Labeling</button>
-      <button mat-menu-item class="menu"> <img src="../../assets/basket_put.png"> Hyb </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/microarray_small.png"> Extraction </button>
-    </mat-menu>
-
-    <mat-menu #prodMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item class="menu"> <img src="../../assets/review.png"> Order Products for Molecular Diagnostics </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/review.png"> Order Products for Genomics Core </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/review.png"> Order Products for Genomics Core </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/review.png"> Product Orders </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/review.png"> Product Ledger </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/page_white_wrench.png"> Configure Products </button>
-      <mat-divider></mat-divider>
-    </mat-menu>
-    <mat-menu #confMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item class="menu"> <img src="../../assets/book.png"> Add/Edit Dictionaries </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/page_white_wrench.png"> Configure Core Facilities </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/page_white_wrench.png"> Configure Annotations </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/page_white_wrench.png"> Configure Experiment Platform </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/page_white_wrench.png"> Configure Organisms and Genome Builds </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/image.png"> Manage Microarray Catalog </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/brick.png"> Manage Protocols </button>
-    </mat-menu>
-    <mat-menu #reportsMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item class="menu" [routerLink]="[ '/TrackUsage' ]"> <img src="../../assets/chart_bar.png"> Track Usage </button>
-      <button mat-menu-item class="menu" [routerLink]="[ '/AnnotationReport' ]"> <img src="../../assets/page.png"> Annotation Report </button>
-      <button mat-menu-item class="menu" [routerLink]="[ '/AnnotationProgressReport' ]"> <img src="../../assets/page.png"> Annotation Progress Report </button>
-      <button mat-menu-item class="menu" [routerLink]="[ '/ProjectExperimentReport' ]"> <img src="../../assets/flask.png"> Project/Experiment Report </button>
-      <button mat-menu-item class="menu"> <img src="../../assets/email_go.png"> Send email to all GNomEx users </button>
-    </mat-menu>
-    <button mat-button class="experiment-menu" [matMenuTriggerFor]="expMenu">
-      <img src="../../assets/flask.png" alt="Bookmark">
-      Experiments
-    </button>
-    <button mat-button class="experiment-menu" [routerLink]="[ '/analysis' ]">
-      <img src="../../assets/map.png" alt="Bookmark">
-      Analysis
-    </button>
-    <button mat-button class="experiment-menu" [routerLink]="[ '/datatracks' ]">
-      <img src="../../assets/datatrack.png" alt="Bookmark">
-      Data Tracks
-    </button>
-    <button mat-button class="experiment-menu">
-      <img src="../../assets/topic_tag.png" alt="Bookmark">
-      Topics
-    </button>
-    <button mat-button class="experiment-menu" [matMenuTriggerFor]="flowMenu">
-      <img src="../../assets/review.png" alt="Bookmark">
-      Workflow
-    </button>
-    <button mat-button class="experiment-menu" [matMenuTriggerFor]="prodMenu">
-      <img src="../../assets/basket.png" alt="Bookmark">
-      Products
-    </button>
-    <button mat-button class="experiment-menu">
-      <img src="../../assets/money.png" alt="Bookmark">
-      Billing
-    </button>
-    <button mat-button class="experiment-menu">
-      <img src="../../assets/group.png" alt="Bookmark">
-      Users & Groups
-    </button>
-    <button class="experiment-menu" mat-button [matMenuTriggerFor]="confMenu">
-      <img src="../../assets/page_white_wrench.png" alt="Bookmark">
-      Configure
-    </button>
-    <button class="experiment-menu" mat-button [matMenuTriggerFor]="reportsMenu">
-      <img src="../../assets/page.png" alt="Bookmark">
-      Reports
-    </button>
-  </mat-toolbar-row>
-</mat-toolbar>
