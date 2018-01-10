@@ -70,11 +70,11 @@ export class ExperimentsService {
 
 
 	getExperiments_fromBackend(parameters: URLSearchParams): void {
-		if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
-			// do nothing
-			console.log("Experiment Orders already loaded");
-			// return Observable.of(this.experimentOrders);
-		} else {
+//		if (this.haveLoadedExperimentOrders && this.previousURLParams === parameters) {
+//			// do nothing
+//			console.log("Experiment Orders already loaded");
+//			// return Observable.of(this.experimentOrders);
+//		} else {
 			this.haveLoadedExperimentOrders = true;
 			this.previousURLParams = parameters;
 
@@ -89,7 +89,7 @@ export class ExperimentsService {
 					throw new Error("Error");
 				}
 			});
-		}
+//		}
 	}
 
 	repeatGetExperiments_fromBackend(): void {
@@ -134,11 +134,13 @@ export class ExperimentsService {
     }
 
     getProjectRequestList_fromBackend(params: URLSearchParams): void {
+ /*
         if (this.haveLoadedExperimentOrders && this.previousURLParams === params) {
             // do nothing
             console.log("Experiment Orders already loaded");
             // return Observable.of(this.experimentOrders);
         } else {
+*/
             this.haveLoadedExperimentOrders = true;
             this.previousURLParams = params;
 
@@ -156,7 +158,7 @@ export class ExperimentsService {
                     throw new Error("Error");
                 }
             });
-        }
+      //  }
     }
 
         getExperiment(id: string): Observable<any> {
@@ -193,13 +195,12 @@ export class ExperimentsService {
 
     saveVisibility(body: any, idProject?: string): Observable<any> {
 
-        let params: HttpParams = new HttpParams();
-        if (idProject) {
-            params = params.append( 'idProject', idProject );
-        }
+        let parameters: URLSearchParams = new URLSearchParams;
+
         let strBody:string = JSON.stringify(body);
-        //const headers = new HttpHeaders().set('Content-Type', 'application/json');
-        return this._http.post("/gnomex/SaveVisibility.gx", strBody, {params}).map((response: Response) => {
+        parameters.set("visibilityXMLString", strBody);
+
+        return this._http.get("/gnomex/SaveVisibility.gx", {search: parameters}).map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {

@@ -64,8 +64,8 @@ public class SaveGroupMembership extends GNomExCommand implements Serializable {
       membersDoc = sax.build(reader);
       labMemberParser = new LabMemberParser(membersDoc);
     } catch (JDOMException je ) {
-      LOG.error( "Cannot parse membersXMLString", je );
       this.addInvalidField( "membersXMLString", "Invalid membersXMLString");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse membersXMLString", je);
     }
     
     if (request.getParameter("collaboratorsXMLString") != null && !request.getParameter("collaboratorsXMLString").equals("")) {
@@ -78,8 +78,8 @@ public class SaveGroupMembership extends GNomExCommand implements Serializable {
       collaboratorsDoc = sax.build(reader);
       collaboratorParser = new LabMemberParser(collaboratorsDoc);
     } catch (JDOMException je ) {
-      LOG.error( "Cannot parse collaboratorsXMLString", je );
       this.addInvalidField( "collaboratorsXMLString", "Invalid collaboratorsXMLString");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse collaboratorsXMLString", je);
     }
    
   }

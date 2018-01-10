@@ -71,7 +71,7 @@ public class CacheProductOrderFileDownloadList extends GNomExCommand implements 
         Document doc = sax.build(reader);
         parser = new ProductOrderFileDescriptorParser(doc);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse fileDescriptorXMLString", je );
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse fileDescriptorXMLString", je);
       
       }
     }

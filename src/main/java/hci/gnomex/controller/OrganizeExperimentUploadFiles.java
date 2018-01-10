@@ -88,8 +88,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                 filesDoc = sax.build(reader);
                 parser = new FileDescriptorUploadParser(filesDoc);
             } catch (JDOMException je) {
-                LOG.error("Cannot parse filesXMLString", je);
                 this.addInvalidField("FilesLXMLString", "Invalid files xml");
+                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesXMLString", je);
             }
         }
 
@@ -104,8 +104,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                 SAXBuilder sax = new SAXBuilder();
                 experimentFileDoc = sax.build(reader);
             } catch (JDOMException je) {
-                LOG.error("Cannot parse experimentFileXMLString", je);
                 this.addInvalidField("experimentFileXMLString", "Invalid experimentFileXMLString xml");
+                this.errorDetails = Util.GNLOG(LOG,"Cannot parse experimentFileXMLString", je);
             }
         }
 
@@ -121,8 +121,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                 filesToRemoveDoc = sax.build(reader);
                 filesToRemoveParser = new FileDescriptorUploadParser(filesToRemoveDoc);
             } catch (JDOMException je) {
-                LOG.error("Cannot parse filesToRemoveXMLString", je);
                 this.addInvalidField("FilesToRemoveXMLString", "Invalid filesToRemove xml");
+                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveXMLString", je);
             }
         }
 
@@ -137,8 +137,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                 SAXBuilder sax = new SAXBuilder();
                 filesToUnlinkDoc = sax.build(reader);
             } catch (JDOMException je) {
-                LOG.error("Cannot parse filesToUnlinkXMLString", je);
                 this.addInvalidField("FilesToUnlinkXMLString", "Invalid filesToUnlink xml");
+                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToUnlinkXMLString", je);
             }
         }
 
@@ -153,8 +153,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                 SAXBuilder sax = new SAXBuilder();
                 linkedSampleFileDoc = sax.build(reader);
             } catch (JDOMException je) {
-                LOG.error("Cannot parse linkedSampleFileXMLString", je);
                 this.addInvalidField("linkedSampleFileXMLString", "Invalid linkedSampleFiles xml");
+                this.errorDetails = Util.GNLOG(LOG,"Cannot parse linkedSampleFileXMLString", je);
             }
         }
 

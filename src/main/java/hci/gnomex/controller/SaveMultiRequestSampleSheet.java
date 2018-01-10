@@ -42,8 +42,8 @@ public class SaveMultiRequestSampleSheet extends GNomExCommand implements Serial
         SAXBuilder sax = new SAXBuilder();
         hdrDoc = sax.build(reader);
       } catch (JDOMException je ) {
-        LOG.error( "SaveMultiRequestSampleSheet: Cannot parse headers", je );
         this.addInvalidField( "Headers", "Invalid headers xml");
+        this.errorDetails = Util.GNLOG(LOG,"SaveMultiRequestSampleSheet: Cannot parse headers", je);
       }
     } else {
       LOG.error("SaveMultiRequestSampleSheet: sampleSheetHeaderXMLString not specified.");
@@ -57,8 +57,8 @@ public class SaveMultiRequestSampleSheet extends GNomExCommand implements Serial
         SAXBuilder sax = new SAXBuilder();
         rowDoc = sax.build(reader);
       } catch (JDOMException je ) {
-        LOG.error( "SaveMultiRequestSampleSheet: Cannot parse rows", je );
         this.addInvalidField( "Rows", "Invalid rows xml");
+        this.errorDetails = Util.GNLOG(LOG,"SaveMultiRequestSampleSheet: Cannot parse rows", je);
       }
     } else {
       LOG.error("SaveMultiRequestSampleSheet: sampleSheetRowXMLString not specified.");

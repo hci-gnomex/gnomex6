@@ -54,8 +54,8 @@ public class SaveWorkItemHyb extends GNomExCommand implements Serializable {
         workItemDoc = sax.build(reader);
         parser = new WorkItemHybParser(workItemDoc);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse workItemXMLString", je );
         this.addInvalidField( "WorkItemXMLString", "Invalid work item xml");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse workItemXMLString", je);
       }
     }
     

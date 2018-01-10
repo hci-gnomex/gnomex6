@@ -99,6 +99,7 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 		} catch (JDOMException je) {
 			LOG.error("Cannot parse billingTemplateXMLString", je);
 			this.addInvalidField("billingTemplateXMLString", "Invalid billingTemplate xml");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse billingTemplateXMLString", je);
 		}
 	}
 
@@ -143,8 +144,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 		SAXBuilder sax = new SAXBuilder();
 		productDoc = sax.build(reader);
 	} catch (JDOMException je) {
-		LOG.error("Cannot parse producListXMLString", je);
 		this.addInvalidField("productListXMLString", "Invalid producList xml");
+		this.errorDetails = Util.GNLOG(LOG,"Cannot parse producListXMLString", je);
 	}
 
 }

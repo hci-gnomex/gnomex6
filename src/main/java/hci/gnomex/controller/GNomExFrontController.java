@@ -148,8 +148,8 @@ public static boolean areWeLite() {
 
 	// restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(request, LOG)) {
-		System.out.println(request.getRemoteAddr());
-		System.out.println(InetAddress.getLocalHost().getHostAddress());
+//		System.out.println(request.getRemoteAddr());
+//		System.out.println(InetAddress.getLocalHost().getHostAddress());
 		LOG.error("Accessing secure command over non-secure line from remote host is not allowed");
 		this.forwardWithError(request, response, "Secure connection is required. Prefix your request with 'https:'");
 		return;
@@ -218,19 +218,6 @@ public static boolean areWeLite() {
         converted[0] = false;
         convertJSONRequesttoXML(request, requestName,converted);
 
-        /*
-		// DEBUG dump the request if we changed anything
-        if (converted[0]) {
-			System.out.println("[GNomExFrontController after conversion] converted[0]: " + converted[0] + " ---> dump request.parameters <---");
-
-			Enumeration params = request.getParameterNames();
-			while (params.hasMoreElements()) {
-				String paramName = (String) params.nextElement();
-				String parameterValue = (String) request.getParameter(paramName);
-		        System.out.println("[after convertJSONRequesttoXML] paramName: " + paramName + "\nparameterValue: " + parameterValue);
-				}
-		}
-		*/
       commandInstance.loadCommand(request, session);
     }
     // see if it is valid, if so call execute
@@ -345,7 +332,16 @@ public static boolean areWeLite() {
 		out.flush();
 		out.close();
 
-		System.out.println("Returned " + thejson.length() + " bytes of JSON for request " + requestName);
+		System.out.println("[GNomExFrontController] Returned " + thejson.length() + " bytes of JSON for request " + requestName);
+		if (requestName.startsWith("Save")) {
+			if (thejson.length() < 1500) {
+				System.out.println("[GNomExFrontController] JSON returned: " + thejson + "\n");
+			} else {
+				String only8k = new String();
+				only8k = thejson.substring(0, 1500);
+				System.out.println("[GNomExFrontController] JSON returned (1st 1.5K):" + thejson + "\n");
+			}
+		}
 
 	} else {
 		// XLS, PDF, etc. reporting controllers route here
@@ -427,8 +423,8 @@ private void sendRedirect(HttpServletResponse response, String url) {
             }
 	  System.out.println ("---------------------------------------------------------------------------------------");
 */
-	  if (debug) System.out.println("****************************************************************************************");
-	  if (debug) System.out.println ("---------------------------------------------------------------------------------------");
+//	  if (debug) System.out.println("****************************************************************************************");
+//	  if (debug) System.out.println ("---------------------------------------------------------------------------------------");
     Enumeration params = httpRequest.getParameterNames();
     while (params.hasMoreElements()) {
       String paramName = (String) params.nextElement();
@@ -442,7 +438,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
           // yes convert it
           String hintKey = requestName + "." + paramName;
 
-          System.out.println("[convertJSONRequesttoXML] **** found a parameterValue to convert **** " + hintKey + " paramName: " + paramName + " parameterValue: " + parameterValue);
+          System.out.println("[convertJSONRequesttoXML] **** found a parameterValue to convert **** " + hintKey + " paramName: " + paramName + " parameterValue:\n " + parameterValue);
 
           JSONtoXML jsonTOxml = new JSONtoXML();
 
@@ -458,7 +454,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
           }
 
           // debug ******
-          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + "\nxmlParameterValue:" + xmlParameterValue);
+          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + " xmlParameterValue:\n" + xmlParameterValue);
 
           // Modify the value...
           httpRequest.setParameter(paramName,xmlParameterValue);

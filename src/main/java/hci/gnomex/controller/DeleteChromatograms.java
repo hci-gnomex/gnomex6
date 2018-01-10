@@ -44,8 +44,8 @@ public class DeleteChromatograms extends GNomExCommand implements Serializable {
         SAXBuilder sax = new SAXBuilder();
         chromatsToDeleteDoc = sax.build(reader);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse chromatsToDeleteXMLString", je );
         this.addInvalidField( "chromatsToDeleteXMLString", "Invalid chromatsToDeleteXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse chromatsToDeleteXMLString", je);
       }
     }
 

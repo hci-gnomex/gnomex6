@@ -42,7 +42,8 @@ public class SaveVisibility extends GNomExCommand implements Serializable {
 
     
     if (request.getParameter("visibilityXMLString") != null && !request.getParameter("visibilityXMLString").equals("")) {
-      visibilityXMLString = "<ProjectRequestVisibilityList>" + request.getParameter("visibilityXMLString") + "</ProjectRequestVisibilityList>";
+//      visibilityXMLString = "<ProjectRequestVisibilityList>" + request.getParameter("visibilityXMLString") + "</ProjectRequestVisibilityList>";
+      visibilityXMLString = request.getParameter("visibilityXMLString");
 
       StringReader reader = new StringReader(visibilityXMLString);
       try {
@@ -50,8 +51,8 @@ public class SaveVisibility extends GNomExCommand implements Serializable {
         visibilityDoc = sax.build(reader);
         parser = new RequestVisibilityParser(visibilityDoc);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse visibilityXMLString", je );
         this.addInvalidField( "visibilityXMLString", "Invalid visibilityXMLString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse visibilityXMLString ", je);
       }
     }
     

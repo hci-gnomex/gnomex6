@@ -46,8 +46,8 @@ public class SaveChromatogramList extends GNomExCommand implements Serializable 
         chromatogramDoc = sax.build(reader);
         parser = new ChromatogramParser(chromatogramDoc);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse chromatogramXMLString", je );
-        this.addInvalidField( "ChromatogramXMLString", "Invalid xml");
+         this.addInvalidField( "ChromatogramXMLString", "Invalid xml");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse chromatogramXMLString", je);
       }
     }
 

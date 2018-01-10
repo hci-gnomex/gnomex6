@@ -102,8 +102,8 @@ public class SavePlate extends GNomExCommand implements Serializable {
       wellParser = new PlateWellParser(wellsDoc);
     }
     catch (JDOMException je) {
-      LOG.error("Cannot parse wellXMLString", je);
-      this.addInvalidField("wellXMLString", "Invalid wellXMLString");
+       this.addInvalidField("wellXMLString", "Invalid wellXMLString");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse wellXMLString", je);
     }
 
   }
