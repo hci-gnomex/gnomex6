@@ -99,4 +99,6 @@ export class ExperimentDetail implements OnInit {
         return (TabContainer.NEW === this.state)
     }
 
+
+
 }

@@ -272,18 +272,13 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
             }
         }
 
-
         let idProject =  this.route.snapshot.params["idProject"];
-        let params: URLSearchParams = new URLSearchParams();
         let strBody:string = JSON.stringify(dirtyRequests);
 
-        params.set("idProject",idProject);
-        params.set("visibilityXMLString", strBody );
 
-
-        this.experimentService.saveVisibility(params)
+        this.experimentService.saveVisibility(strBody,idProject)
             .subscribe(resp =>{
-                this.experimentService.getProjectRequestList_fromBackend(this.experimentService.browsePanelParams,true);
+                this.experimentService.getProjectRequestList_fromBackend(this.experimentService.browsePanelParams);
             });
     }
 

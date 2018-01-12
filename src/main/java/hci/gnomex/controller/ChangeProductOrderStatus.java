@@ -48,8 +48,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 			SAXBuilder sax = new SAXBuilder();
 			orderDoc = sax.build(reader);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse selectedOrdersXMLString", je);
 			this.addInvalidField("selectedOrdersXMLString", "Invalid selectedOrders xml");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse selectedOrdersXMLString", je);
 		}
 
 	} else if (request.getParameter("selectedLineItems") != null
@@ -60,8 +60,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
 			SAXBuilder sax = new SAXBuilder();
 			lineItemDoc = sax.build(reader);
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse selectedlineItemsXMLString", je);
 			this.addInvalidField("selectedlineItemsXMLString", "Invalid selectedlineItems xml");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse selectedlineItemsXMLString", je);
 		}
 	} else {
 		this.addInvalidField("lineItemsXMLString", "Missing line item list");

@@ -67,7 +67,7 @@ dependencies {
     //Realm stuff
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
     providedCompile group: 'log4j', name: 'log4j', version: '1.2.12'
-    providedCompile group: 'javax.mail', name: 'mail', version: '1.4.7'
+    //providedCompile group: 'javax.mail', name: 'mail', version: '1.4.7'
     providedCompile 'org.apache.tomcat:tomcat-jdbc:9.0.0.M10'
     providedCompile 'org.apache.tomcat:tomcat-catalina:7.0.68'
 

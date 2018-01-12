@@ -11,6 +11,7 @@ import {UserModule} from "@hci/user";
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {HeaderComponent} from "./header.component";
+import {MenuItemComponent} from './menu-item/menu-item.component';
 
 import {
     MatGridListModule,
@@ -22,6 +23,7 @@ import {
 	MatMenuModule, ShowOnDirtyErrorStateMatcher}  from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
+import {LogoutComponent} from "./logout.component";
 
 @NgModule({
   imports: [HEADER_ROUTING, CommonModule,
@@ -37,8 +39,9 @@ import {AngularMaterialModule} from "../../modules/angular-material.module";
        // {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}
     ],
 
-    declarations: [HeaderComponent],
-    exports: [HeaderComponent]
+    declarations: [HeaderComponent, MenuItemComponent, LogoutComponent],
+    exports: [HeaderComponent, LogoutComponent
+    ]
 })
 export class HeaderModule {
 }

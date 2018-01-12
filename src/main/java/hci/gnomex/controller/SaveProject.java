@@ -53,7 +53,7 @@ public class SaveProject extends GNomExCommand implements Serializable {
     
     if (request.getParameter("projectXMLString") != null && !request.getParameter("projectXMLString").equals("")) {
       projectXMLString = request.getParameter("projectXMLString");
-      System.out.println ("[SaveProject] projectXMLString: " + projectXMLString);
+//      System.out.println ("[SaveProject] projectXMLString: " + projectXMLString);
     }
     
     if (request.getParameter("parseEntries") != null && !request.getParameter("parseEntries").equals("")) {
@@ -65,7 +65,6 @@ public class SaveProject extends GNomExCommand implements Serializable {
       SAXBuilder sax = new SAXBuilder();
       projectDoc = sax.build(reader);
     } catch (JDOMException je ) {
-      System.out.println ( "Cannot parse projectXMLString" + je );
       this.addInvalidField( "RequestXMLString", "Invalid request xml");
       this.errorDetails = Util.GNLOG(LOG,"Cannot parse projectXMLString ", je);
     }

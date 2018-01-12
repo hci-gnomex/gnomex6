@@ -8,7 +8,8 @@ import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {DataTrackService} from "./data-track.service";
 import {DictionaryService} from "./dictionary.service";
 import {ExperimentViewService} from "./experiment-view.service";
-import {ExperimentResolverService,ProjectResolverService} from "./resolvers/index";
+import {ExperimentResolverService,ProjectResolverService,AnalysisGroupResolverService,
+        AnalysisResolverService} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
 import {ProjectService} from "./project.service";
@@ -18,6 +19,9 @@ import {HttpService} from "./http.service";
 import {LabListService} from "./lab-list.service";
 import {PropertyService} from "./property.service";
 import {AnnotationService} from "./annotation.service";
+import {UsageService} from "./usage.service";
+import {GnomexStringUtilService} from "./gnomex-string-util.service"
+import {GnomexService} from "./gnomex.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -42,6 +46,11 @@ import {AnnotationService} from "./annotation.service";
         OrganismService,
         ConstantsService,
         AnnotationService,
+        UsageService,
+        GnomexStringUtilService,
+        AnalysisGroupResolverService,
+        AnalysisResolverService,
+        GnomexService
     ]})
 export class ServicesModule {
 }

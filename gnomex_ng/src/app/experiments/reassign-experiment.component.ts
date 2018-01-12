@@ -63,9 +63,9 @@ export class ReassignExperimentComponent {
     reassignYesButtonClicked() {
         this.noButton = false;
         var params: URLSearchParams = new URLSearchParams();
-        params.set("idRequest", this.currentItem.id);
-        params.set("idProject", this.targetItem.id);
-
+        params.set("idRequest", this.currentItem.idRequest);
+        params.set("idProject", this.targetItem.idProject);
+        params.set("isExtermal", this.currentItem.isExternal);
         params.set("idAppUser", this.selectedOwnerItem.idAppUser);
         var idBillingAccount =  null;
         if (this.showBillingCombo === true) {
@@ -115,7 +115,7 @@ export class ReassignExperimentComponent {
 
 
     save(formData:any){
-    console.log(formData);
+//    console.log(formData);
 }
 
 }

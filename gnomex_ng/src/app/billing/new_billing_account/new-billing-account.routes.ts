@@ -11,7 +11,7 @@ import { NewBillingAccountComponent } from "./new-billing-account.component";
  * @since 12/19/16
  */
 const ROUTES: Routes = [
-	{ path: "NewBillingAccount", component: NewBillingAccountComponent }
+    { path: "NewBillingAccountModal", component: NewBillingAccountComponent, outlet: 'modal' }
 ];
 
 export const NEW_BILLING_ACCOUNT_ROUTING = RouterModule.forChild(ROUTES);

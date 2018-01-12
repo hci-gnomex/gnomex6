@@ -61,8 +61,8 @@ public class SavePriceSheet extends GNomExCommand implements Serializable {
       requestCategoryDoc = sax.build(reader);
       requestCategoryParser = new PriceSheetCategoryParser(requestCategoryDoc);
     } catch (JDOMException je ) {
-      LOG.error( "Cannot parse requestCategoriesXMLString", je );
       this.addInvalidField( "requestCategoriesXMLString", "Invalid requestCategoriesXMLString");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestCategoriesXMLString", je);
     }
 
   }

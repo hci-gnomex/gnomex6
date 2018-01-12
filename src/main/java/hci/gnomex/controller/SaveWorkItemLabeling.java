@@ -56,8 +56,8 @@ public class SaveWorkItemLabeling extends GNomExCommand implements Serializable 
         workItemDoc = sax.build(reader);
         parser = new WorkItemLabelingParser(workItemDoc);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse workItemXMLString", je );
         this.addInvalidField( "WorkItemXMLString", "Invalid work item xml");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse workItemXMLString", je);
       }
     }
     

@@ -218,19 +218,6 @@ public static boolean areWeLite() {
         converted[0] = false;
         convertJSONRequesttoXML(request, requestName,converted);
 
-        /*
-		// DEBUG dump the request if we changed anything
-        if (converted[0]) {
-			System.out.println("[GNomExFrontController after conversion] converted[0]: " + converted[0] + " ---> dump request.parameters <---");
-
-			Enumeration params = request.getParameterNames();
-			while (params.hasMoreElements()) {
-				String paramName = (String) params.nextElement();
-				String parameterValue = (String) request.getParameter(paramName);
-		        System.out.println("[after convertJSONRequesttoXML] paramName: " + paramName + "\nparameterValue: " + parameterValue);
-				}
-		}
-		*/
       commandInstance.loadCommand(request, session);
     }
     // see if it is valid, if so call execute
@@ -352,7 +339,7 @@ public static boolean areWeLite() {
 			} else {
 				String only8k = new String();
 				only8k = thejson.substring(0, 1500);
-				System.out.println("[GNomExFrontController] JSON returned (1st 8K):" + thejson + "\n");
+				System.out.println("[GNomExFrontController] JSON returned (1st 1.5K):" + thejson + "\n");
 			}
 		}
 
@@ -467,7 +454,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
           }
 
           // debug ******
-          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + "\nxmlParameterValue:" + xmlParameterValue);
+          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + " xmlParameterValue:\n" + xmlParameterValue);
 
           // Modify the value...
           httpRequest.setParameter(paramName,xmlParameterValue);

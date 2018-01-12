@@ -42,7 +42,7 @@ const actionMapping:IActionMapping = {
 
 @Component({
     selector: "analysis",
-    templateUrl: "./analysis.component.html",
+    templateUrl: "./browse-analysis.component.html",
     styles: [`
         .inlineComboBox {
             display: inline-block;
@@ -86,6 +86,7 @@ const actionMapping:IActionMapping = {
         }
 
         .br-exp-item {
+            width: 100%;
             flex: 1 1 auto;
             font-size: small;
         }
@@ -103,7 +104,7 @@ const actionMapping:IActionMapping = {
 
         .br-exp-three {
             width: 100%;
-            height: 6em;
+            height: 48em;
             flex-grow: 8;
         }
 
@@ -150,11 +151,9 @@ const actionMapping:IActionMapping = {
             display: flex;
             flex-direction: column;
         }
-        .experiment-detail-panel {
-            width:75%;
-            padding: 2em;
-            margin-left: 2em;
-            background-color: #0b97c4;
+        .analysis-panel {
+            height:98%;
+            width:100%;
             border: #C8C8C8 solid thin;
             overflow: auto;
         }
@@ -179,7 +178,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         },
         allowDrop: (element, {parent, index}) => {
             this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1) {
+            if (parent.data.parentid === -1 || parent.data.idAnalysis) {
                 return false;
             } else {
                 return true;
@@ -218,7 +217,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
-        this.router.navigate(['/analysis', {outlets: {'browsePanel': 'overview'}}]);
+        this.router.navigate(['/analysis', {outlets: {'analysisPanel': 'overview'}}]);
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.labList = response;
         });
@@ -247,6 +246,13 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 }
                 this.createAnalysisGroupDialogRef.close();
             }
+
+            this.analysisService.emitAnalysisOverviewList(response);
+            if(this.analysisService.analysisPanelParams["refreshParams"]){
+                this.router.navigate(['/analysis',{outlets:{'analysisPanel':'overview'}}]);
+                this.analysisService.analysisPanelParams["refreshParams"] = false;
+            }
+
 
             setTimeout(_ => {
                 this.treeModel.expandAll();
@@ -296,7 +302,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         } else {
             this.items = response;
         }
+
         this.labs = this.labs.concat(this.items);
+        this.analysisService.emitCreateAnalysisDataSubject({labs:this.labs,items:this.items});
         for (var l of this.items) {
             l.id = "l"+l.idLab;
             l.parentid = -1;
@@ -390,20 +398,16 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         var params: URLSearchParams = new URLSearchParams();
         params.set("idLab", event.to.parent.idLab);
         var analysisGroupXMLString: string = "";
-        var idAnalysisString: string = "";
-        for (let n of event.treeModel.activeNodes) {
-            idAnalysisString = idAnalysisString.concat(n.data.idAnalysis);
-            idAnalysisString = idAnalysisString.concat(",");
-        }
-        analysisGroupXMLString = analysisGroupXMLString.concat('<analysisGroups><AnalysisGroup idAnalysisGroup=');
-        analysisGroupXMLString = analysisGroupXMLString.concat('"');
+        var idAnalysisString = event.node.idAnalysis;
+        var analysisGroup = event.to.parent;
+        delete event.to.parent.items;
+        // Tree doesnt support multiple drag/drop. It actually woould work, just no visual indication.
+        // for (let n of event.treeModel.activeNodes) {
+        //     idAnalysisString = idAnalysisString.concat(n.data.idAnalysis);
+        //     idAnalysisString = idAnalysisString.concat(",");
+        // }
+        analysisGroupXMLString = JSON.stringify(analysisGroup);
 
-        analysisGroupXMLString = analysisGroupXMLString.concat(event.to.parent.idAnalysisGroup);
-        analysisGroupXMLString = analysisGroupXMLString.concat('"');
-        analysisGroupXMLString = analysisGroupXMLString.concat(' name="');
-        analysisGroupXMLString = analysisGroupXMLString.concat(event.to.parent.name);
-        analysisGroupXMLString = analysisGroupXMLString.concat('"');
-        analysisGroupXMLString = analysisGroupXMLString.concat("/></analysisGroups>");
         params.set("analysisGroupsXMLString", analysisGroupXMLString);
         params.set("idAnalysisString", idAnalysisString);
         var lPromise = this.analysisService.moveAnalysis(params).toPromise();
@@ -500,25 +504,42 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.selectedItem = event.node;
         this.selectedIdLab = this.selectedItem.data.idLab;
         this.selectedLabLabel = this.selectedItem.data.labName;
+        let idAnalysis = this.selectedItem.data.idAnalysis;
+        let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
+        let idLab = this.selectedItem.data.idLab;
+        let analysisGroupListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
+
 
         //Lab
         if (this.selectedItem.level === 1) {
             this.disableNewAnalysis = false;
             this.disableNewAnalysisGroup = false;
             this.disableDelete = true;
+            this.router.navigate(['/analysis',{outlets:{'analysisPanel':'overview'}}]);
+            this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
+
+
+            //AnalysisGroup
         } else if (this.selectedItem.level === 2) {
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
+            this.router.navigate(['/analysis',
+                    {outlets:{'analysisPanel':['overview',{'idAnalysisGroup':idAnalysisGroup,'idLab':idLab}]}}
+                ]);
+            this.analysisService.emitAnalysisOverviewList(analysisGroupListNode)
+
+
 
             //Analysis
         } else if (this.selectedItem.level === 3) {
+            this.router.navigate(['/analysis',{outlets:{'analysisPanel':[idAnalysis]}}]);
             this.parentProject = event.node.parent;
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
             var params: URLSearchParams = new URLSearchParams();
-            params.set("idAnalysis", this.selectedItem.data.idAnalysis);
+            params.set("idAnalysis", idAnalysis);
             this.analysisService.getAnalysis(params).subscribe((response) => {
                 if (response.Analysis.canDelete ==="Y") {
                     this.disableDelete = false;
