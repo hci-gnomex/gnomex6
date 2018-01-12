@@ -38,9 +38,9 @@ export class DictionaryService {
             delete dictionary.DictionaryEntry;
             this.cachedDictionaries.push(dictionary);
         }
-        this.fixRequestCategories();
+//        this.fixRequestCategories();
     }
-
+/*
     private fixRequestCategories() {
         let entries = this.cachedEntries[DictionaryService.REQUEST_CATEGORY];
         for (let entry of entries) {
@@ -81,7 +81,7 @@ export class DictionaryService {
             if (entry.codeRequestCategory == 'SEQUENOM') {entry.type = 'SEQUENOM';}
         }
     }
-
+*/
     /**
      * Forces a full reload of the dictionary, returns an observable of an empty object when it is done.
      * Provide a callback function to query the dictionary if you need it to run after the reload is complete
