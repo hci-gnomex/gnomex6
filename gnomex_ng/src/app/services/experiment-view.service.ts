@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import {Injectable, EventEmitter} from '@angular/core'
 import {ValidatorFn, Validators} from "@angular/forms";
 import {emailMatcher} from "../util/validators/email-matcher.validator"
 import {Subject} from "rxjs/Subject";
@@ -64,7 +64,11 @@ export class ExperimentViewService {
                 'expDescript': true,
                 'notesForCore': true,
             }
-        }
+        },
+       'SamplesTabComponent': {
+       },
+       'SequenceLanesTabComponent': {
+       },
     };
 
     controlValidators: {} = {
@@ -94,6 +98,24 @@ export class ExperimentViewService {
         return this.controlSubject.asObservable();
     }
 
-    constructor() { }
+    constructor() {
+        this.experimentEmitter = new EventEmitter();
+    }
+
+    private experiment: any;
+    private experimentEmitter: EventEmitter<any>;
+
+    setExperiment(experiment: any) {
+        this.experiment = experiment;
+        this.experimentEmitter.emit(experiment);
+    }
+
+    getExperiment(): any {
+        return this.experiment;
+    }
+
+    getExperimentObservable(): Observable<any> {
+        return this.experimentEmitter.asObservable();
+    }
 
 }

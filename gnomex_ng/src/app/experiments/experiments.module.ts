@@ -34,8 +34,15 @@ import {ViewExperimentComponent} from "./view-experiment.component";
 import {BrowsePanelComponent} from "./browse-panel.component";
 import {AgGridModule} from 'ag-grid-angular/main';
 
-
-import {TestComponent,DescriptionTab,PrepTab,ExperimentDetail,NewExperimentComponent} from './experiment-detail/index'
+import {
+    TestComponent,
+    DescriptionTab,
+    PrepTab,
+    ExperimentDetail,
+    NewExperimentComponent,
+    SamplesTabComponent,
+    SequenceLanesTabComponent,
+} from './experiment-detail/index'
 import {
     RichEditorModule,
     DropDownModule
@@ -72,7 +79,9 @@ export const componentFactories =
         ExperimentsBrowseTab,
         ProgressBrowseTab,
         ProjectBrowseTab,
-        VisiblityBrowseTab
+        VisiblityBrowseTab,
+        SamplesTabComponent,
+        SequenceLanesTabComponent,
     ];
 /**/
                                 // need add components that will be tabs here
@@ -113,12 +122,15 @@ export const componentFactories =
                     ViewExperimentComponent,
                     TestComponent,
                     DescriptionTab,
+                    SamplesTabComponent,
+                    SequenceLanesTabComponent,
                     ExperimentDetail,
                     PrepTab,
                     NewExperimentComponent,
                     DownloadsBrowseTab,
                     BrowsePanelComponent,
                     BrowseOverviewComponent,
+                    DownloadsBrowseTab,
                     ExperimentsBrowseTab,
                     ProgressBrowseTab,
                     ProjectBrowseTab,
