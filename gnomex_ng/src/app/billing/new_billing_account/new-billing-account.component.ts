@@ -24,7 +24,7 @@ import { DictionaryService } from "../../services/dictionary.service";
 import { AccountFieldsConfigurationService } from "./account-fields-configuration.service";
 import { NewBillingAccountService } from "./new-billing-account.service";
 
-import { FormBuilder, FormGroup } from "@angular/forms";
+import {ControlValueAccessor, FormBuilder, FormGroup} from "@angular/forms";
 
 import {MatDialogRef, MatDialog} from "@angular/material";
 
@@ -51,28 +51,52 @@ export class NewBillingAccountLauncher implements OnInit {
 	}
 }
 
+// export class LimitedDigitsControlValueAccessor implements ControlValueAccessor{
+// 	writeValue(obj: any): void {
+// 		let stringValue: string = obj.toString();
+// 		let minimumLength: number = 2;
+// 		let maximumLength: number = 2;
+//
+// 		let pattern = /^\d{2,2}$/;
+// 		if (stringValue.match(pattern)) {
+//
+// 		}
+// 	}
+// }
+
 @Component({
 	selector: "new-billing-account-window",
 	templateUrl: "./new-billing-account.component.html",
 	styles: [`
-			button {
-          height: 1.6em;
-          width: 4.5em;
-          border-radius: 4px;
-          text-align: center;
-					
-					font-size: small;
+			/*button {*/
+          /*height: 1.6em;*/
+          /*width: 4.5em;*/
+          /*border-radius: 4px;*/
+          /*text-align: center;*/
+					/**/
+					/*font-size: small;*/
+          
+          /*background: #e4e0e0;*/
+          /*background: -webkit-linear-gradient(white, #e4e0e0);*/
+          /*background: -o-linear-gradient(white, #e4e0e0);*/
+          /*background: -moz-linear-gradient(white, #e4e0e0);*/
+          /*background: linear-gradient(white, #e4e0e0);*/
+			/*}*/
 
-          background: #e4e0e0;
-          background: -webkit-linear-gradient(white, #e4e0e0);
-          background: -o-linear-gradient(white, #e4e0e0);
-          background: -moz-linear-gradient(white, #e4e0e0);
-          background: linear-gradient(white, #e4e0e0);
-			}
-			
-			.save-button {
-					
-			}
+      .mat-dialog-title {
+          margin: 0;
+          padding: 0;
+      }
+
+      .mat-dialog-content {
+          margin: 0;
+          padding: 0;
+      }
+
+      .mat-dialog-actions {
+          margin: 0;
+          padding: 0;
+      }
 			
 			.save-button:focus {
 					border-style: solid;
@@ -112,12 +136,13 @@ export class NewBillingAccountLauncher implements OnInit {
           height: 2.6em;
 					vertical-align: middle;
 					font-style: italic;
+					font-size: x-small;
 					color: #1601db;
 			}
 
       .radio-button {
-          min-width: 3em;
-          padding: 0.5em;
+          margin: 0 4em 0 0;
+          padding: 0;
       }
 
       .vertical-spacer {
@@ -130,6 +155,18 @@ export class NewBillingAccountLauncher implements OnInit {
           position: relative;
           background-color: white;
           border: #d2d2d2 solid 1px;
+      }
+
+      .background-sideless {
+          display: block;
+          position: relative;
+          background-color: white;
+          border-color: #d2d2d2;
+					border-style: solid;
+					border-top-width: 1px;
+					border-bottom-width: 1px;
+          border-left-width: 0;
+          border-right-width: 0;
       }
 			
 			.inline-block {
@@ -195,11 +232,6 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 	@ViewChild('coreFacilitiesSelector')      coreFacilitiesSelector:      MultipleSelectorComponent;
 
-	@ViewChild('accountName_po')              accountName_po:              jqxInputComponent;
-	@ViewChild('accountName_creditCard')      accountName_creditCard:      jqxInputComponent;
-
-	@ViewChild('zipCodeInput_creditCard')           zipCodeInput_creditCard:           jqxInputComponent;
-
 	@ViewChild('startDatePicker_chartfield') startDatePicker_chartfield: GnomexStyledDatePickerComponent;
 	@ViewChild('startDatePicker_po')         startDatePicker_po:         GnomexStyledDatePickerComponent;
 	@ViewChild('startDatePicker_creditcard') startDatePicker_creditcard: GnomexStyledDatePickerComponent;
@@ -211,15 +243,12 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	@ViewChild('fundingAgencyCombobox_chartfield')     fundingAgencyCombobox_chartfield:     jqxComboBoxComponent;
 	@ViewChild('creditCardCompanyComboBox_creditCard') creditCardCompanyComboBox_creditCard: jqxComboBoxComponent;
 
-	@ViewChild('activeCheckBox_chartfield') activeCheckBox_chartfield: jqxCheckBoxComponent;
-	@ViewChild('activeCheckBox_po')         activeCheckBox_po:         jqxCheckBoxComponent;
-	@ViewChild('activeCheckBox_creditcard') activeCheckBox_creditcard: jqxCheckBoxComponent;
-
-	@ViewChild('agreementCheckbox')         agreementCheckbox:         jqxCheckBoxComponent;
-
 	showField: string = 'chartfield';
 
 	accountName_Chartfield: string = '';
+	accountName_po: string = '';
+	accountName_creditCard: string = '';
+
 	shortAccountName_Chartfield: string = '';
 
 	accountNumberBus_Chartfield: string = '';
@@ -238,6 +267,12 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	submitterEmail_po: string = '';
 	submitterEmail_creditcard: string = '';
 
+	activeCheckBox_chartfield: boolean = false;
+	activeCheckBox_po: boolean = false;
+	activeCheckBox_creditcard: boolean = false;
+
+	agreementCheckbox: boolean = false;
+
 	labList: any[] = [];
 	coreFacilityReducedList: any[] = [];
 	// private coreFacilityList: any[] = [];
@@ -251,6 +286,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	creditCardCompanies: any;
 
 	showFundingAgencies: boolean = false;
+
+	zipCodeInput_creditCard: string = "";
 
 	private accountName: string = "";
 	private selectedCoreFacilitiesString: string = "";
@@ -276,7 +313,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 	private isOpen = false;
 
-	constructor(@Inject(ChangeDetectorRef) private changeDetectorRef: ChangeDetectorRef,
+	constructor(//@Inject(ChangeDetectorRef) private changeDetectorRef: ChangeDetectorRef,
 							private dictionaryService: DictionaryService,
 							private labListService: LabListService,
 							private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -310,7 +347,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 		if (originalCreditCardCompanies.length != undefined && originalCreditCardCompanies.length != null) {
 			for (let i = 0; i < originalCreditCardCompanies.length; i++) {
-				if (originalCreditCardCompanies[i].display != null) {
+				if (originalCreditCardCompanies[i].display != null && originalCreditCardCompanies[i].display != '') {
 					this.creditCardCompanies.push(originalCreditCardCompanies[i]);
 				}
 			}
@@ -573,8 +610,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		if (this.activeCheckBox_chartfield != null && this.activeCheckBox_chartfield.val() != null) {
-			if (this.activeCheckBox_chartfield.val()) {
+		if (this.activeCheckBox_chartfield != null) {
+			if (this.activeCheckBox_chartfield) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
@@ -592,7 +629,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		// }
 
 		if (this.agreementCheckbox != null) {
-			if (!this.agreementCheckbox.val()) {
+			if (!this.agreementCheckbox) {
 				this.errorMessage += '- Please agree to the terms and conditions'
 			}
 		}
@@ -726,9 +763,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		// 		}
 		// 	}
 		// }
-
 		if (this.accountName_po != null) {
-			this.accountName = this.accountName_po.val();
+			this.accountName = this.accountName_po;
 			if (this.accountName == '') {
 				this.errorMessage += '- Please provide a name for your account\n';
 			}
@@ -793,8 +829,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		if (this.activeCheckBox_po != null && this.activeCheckBox_po.val() != null) {
-			if (this.activeCheckBox_po.val()) {
+		if (this.activeCheckBox_po != null) {
+			if (this.activeCheckBox_po) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
@@ -802,7 +838,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		}
 
 		if (this.agreementCheckbox != null) {
-			if (!this.agreementCheckbox.val()) {
+			if (!this.agreementCheckbox) {
 				this.errorMessage += '- Please agree to the terms and conditions'
 			}
 		}
@@ -884,7 +920,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		// }
 
 		if (this.accountName_creditCard != null) {
-			this.accountName = this.accountName_creditCard.val();
+			this.accountName = this.accountName_creditCard;
 			if (this.accountName == '') {
 				this.errorMessage += '- Please provide a name for your account\n';
 			}
@@ -931,9 +967,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			idCreditCardCompany = this.creditCardCompanies[this.creditCardCompanyComboBox_creditCard.getSelectedIndex().valueOf()].idCreditCardCompany;
 		}
 
-		if (this.zipCodeInput_creditCard != null && this.zipCodeInput_creditCard.val() != null) {
-			if (this.zipCodeInput_creditCard.val().match(zipCodeRegex)) {
-				zipCode = this.zipCodeInput_creditCard.val();
+		if (this.zipCodeInput_creditCard != null) {
+			if (this.zipCodeInput_creditCard.match(zipCodeRegex)) {
+				zipCode = this.zipCodeInput_creditCard;
 			}
 		}
 
@@ -960,8 +996,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		if (this.activeCheckBox_creditcard != null && this.activeCheckBox_creditcard.val() != null) {
-			if (this.activeCheckBox_creditcard.val()) {
+		if (this.activeCheckBox_creditcard != null) {
+			if (this.activeCheckBox_creditcard) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
@@ -969,7 +1005,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		}
 
 		if (this.agreementCheckbox != null) {
-			if (!this.agreementCheckbox.val()) {
+			if (!this.agreementCheckbox) {
 				this.errorMessage += '- Please agree to the terms and conditions'
 			}
 		}
@@ -1136,7 +1172,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 	private onCreditCardZipCodeSelected(): void {
 		if (this.zipCodeInput_creditCard != null) {
-			this.lastValid_zipCodeCreditCard = '' + this.zipCodeInput_creditCard.val();
+			this.lastValid_zipCodeCreditCard = '' + this.zipCodeInput_creditCard;
 		}
 	}
 
@@ -1147,11 +1183,11 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 		let zipCodeRegex = /^\d{0,5}(-\d{0,4})?$/;
 
-		if (this.zipCodeInput_creditCard.val().match(zipCodeRegex)) {
-			this.lastValid_zipCodeCreditCard = this.zipCodeInput_creditCard.val();
+		if (this.zipCodeInput_creditCard.match(zipCodeRegex)) {
+			this.lastValid_zipCodeCreditCard = this.zipCodeInput_creditCard;
 		}
 		else {
-			this.zipCodeInput_creditCard.val(this.lastValid_zipCodeCreditCard);
+			this.zipCodeInput_creditCard = this.lastValid_zipCodeCreditCard;
 		}
 	}
 

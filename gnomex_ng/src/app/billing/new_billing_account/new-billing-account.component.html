@@ -9,9 +9,9 @@
 		<img src="../../../assets/work_auth_form.png" alt="Image not found" style="margin-right:0.2em;"/>
 		<h5 style="display: inline-block;">Submit Campus Billing Account</h5>
 	</div>
-	<div mat-dialog-content style="background-color: #eeeeeb">
-		<div #windowBody style="width:calc(100% - 2px); font-size:x-small;">
-			<div class="full-width background">
+	<div mat-dialog-content style="background-color: #eeeeeb; overflow: hidden;">
+		<div #windowBody style="width: 100%; font-size: small;">
+			<div class="full-width background-sideless">
 				<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
 					<div class="t full-width">
 						<div class="tr full-width row-content">
@@ -39,8 +39,8 @@
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								<div>
@@ -71,8 +71,8 @@
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Account Type
@@ -88,17 +88,17 @@
 									<!--<input type="radio" name="AccountType" value="creditcard" (change)="changeShowField('creditcard')" > Credit Card-->
 								<!--</div>-->
 								<mat-radio-group [(ngModel)]="showField">
-									<mat-radio-button [value]="'chartfield'">Chartfield</mat-radio-button>
-									<mat-radio-button [value]="'po'">PO</mat-radio-button>
-									<mat-radio-button [value]="'creditcard'">Credit Card</mat-radio-button>
+									<mat-radio-button class="radio-button" [value]="'chartfield'">Chartfield</mat-radio-button>
+									<mat-radio-button class="radio-button" [value]="'po'">PO</mat-radio-button>
+									<mat-radio-button class="radio-button" [value]="'creditcard'">Credit Card</mat-radio-button>
 								</mat-radio-group>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="vertical-spacer"></div>
-			<div class="full-width background overflowable">
+			<!--<div class="vertical-spacer"></div>-->
+			<div class="full-width background overflowable" style="width: calc(100% - 8px); margin: 3px 4px;">
 				<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
 
 
@@ -115,8 +115,8 @@
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Short Account Name
@@ -129,13 +129,11 @@
 								<!--</jqxInput>-->
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
-							<div class="td" style="vertical-align:top;">
-								<div class="td cell-label">
-									Chartfield to be charged
-								</div>
+							<div class="td cell-label">
+								Chartfield to be charged
 							</div>
 							<div class="td" style="font-size: small;">
 								<div class="inline-block" style="vertical-align: top; font-size: small;">
@@ -150,7 +148,7 @@
 												<!--[width]="'3rem'"-->
 												<!--[height]="'1.5rem'">-->
 										<!--</number-jqxinput>-->
-										<mat-form-field style="width: 3rem; height: 1.5rem;">
+										<mat-form-field style="width: 3rem;">
 											<input matInput placeholder="Bus" [(value)]="accountNumberBus_Chartfield">
 											<mat-hint>2 digits</mat-hint>
 										</mat-form-field>
@@ -172,7 +170,7 @@
 												<!--[width]="'3rem'"-->
 												<!--[height]="'1.5rem'">-->
 										<!--</number-jqxinput>-->
-									<mat-form-field style="width: 3rem; height: 1.5rem;">
+									<mat-form-field style="width: 3rem;">
 										<input matInput placeholder="Org" [(value)]="accountNumberOrg_Chartfield">
 										<mat-hint>5 digits</mat-hint>
 									</mat-form-field>
@@ -194,7 +192,7 @@
 												<!--[width]="'3rem'"-->
 												<!--[height]="'1.5rem'">-->
 										<!--</number-jqxinput>-->
-										<mat-form-field style="width: 3rem; height: 1.5rem;">
+										<mat-form-field style="width: 3rem;">
 											<input matInput placeholder="Fund" [(value)]="accountNumberFund_Chartfield">
 											<mat-hint>4 digits</mat-hint>
 										</mat-form-field>
@@ -240,7 +238,7 @@
 											<!--<div class="td">8 digits</div>-->
 										<!--</div>-->
 									<!--</div>-->
-									<mat-form-field style="width: 3rem; height: 1.5rem;">
+									<mat-form-field style="width: 3rem;">
 										<input matInput placeholder="Activity" [(value)]="accountNumberActivity_Chartfield">
 										<mat-hint>5 digits</mat-hint>
 									</mat-form-field>
@@ -249,7 +247,7 @@
 									<p>OR</p>
 								</div>
 								<div class="inline-block" style="vertical-align: top">
-									<mat-form-field style="width: 4.5rem; height: 1.5rem;">
+									<mat-form-field style="width: 4.5rem;">
 										<input matInput placeholder="Project" [(value)]="accountNumberProject_Chartfield">
 										<mat-hint>8 digits</mat-hint>
 									</mat-form-field>
@@ -272,7 +270,7 @@
 									<!--<div>-->
 										<!--5 digits-->
 									<!--</div>-->
-									<mat-form-field style="width: 3rem; height: 1.5rem;">
+									<mat-form-field style="width: 3rem;">
 										<input matInput placeholder="Account" [(value)]="accountNumberAccount_Chartfield">
 										<mat-hint>5 digits</mat-hint>
 									</mat-form-field>
@@ -289,17 +287,17 @@
 									<!--<div>-->
 										<!--1 digit-->
 									<!--</div>-->
-									<mat-form-field style="width: 3rem; height: 1.5rem;">
+									<mat-form-field style="width: 3rem;">
 										<input matInput placeholder="A/U" [(value)]="accountNumberAU_Chartfield" disabled>
 										<mat-hint>1 digits</mat-hint>
 									</mat-form-field>
 								</div>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div *ngIf="showFundingAgencies" class="tr full-width row-content">
 							<div class="td cell-label">
 								Funding Agency
@@ -315,8 +313,8 @@
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Start Date
@@ -328,7 +326,7 @@
 								</span>
 								<div class="inline-block" style="width:7em;">
 								</div>
-								<div class="inline-block cell-label">
+								<div class="inline-block cell-label" style="height: 100%;">
 									Effective Until
 								</div>
 								<span>
@@ -337,8 +335,8 @@
 								</span>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Total Dollar Amount
@@ -352,12 +350,10 @@
 										<!--[width]="'10em'"-->
 										<!--[height]="'1.5rem'">-->
 								<!--</jqxInput>-->
-								<mat-form-field style="width: 10em; height: 1.5em;">
+								<mat-form-field style="width: 18em;">
 									<input matInput placeholder="Total Dollar Amount" [(value)]="totalDollarAmount_Chartfield">
 								</mat-form-field>
 							</div>
-						</div>
-						<div class="tr full-width row-spacer">
 						</div>
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
@@ -371,13 +367,13 @@
 										<!--[width]="'calc(100% - 6px)'"-->
 										<!--[height]="'1.5rem'">-->
 								<!--</jqxInput>-->
-								<mat-form-field style="width: 100%; height: 1.5em;">
+								<mat-form-field style="width: 100%;">
 									<input matInput placeholder="Your Email Address" [(value)]="submitterEmail_chartfield" (input)="testingFn($event)">
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<!--<div class="tr full-width row-content">-->
 							<!--<div class="td cell-label">-->
 								<!--Approved Users-->
@@ -394,7 +390,8 @@
 							</div>
 							<div class="td center-vertical-align">
 								<div class="checkbox-container">
-									<jqxCheckBox #activeCheckBox_chartfield></jqxCheckBox>
+									<!--<jqxCheckBox #activeCheckBox_chartfield></jqxCheckBox>-->
+									<mat-checkbox [(ngModel)]="activeCheckBox_chartfield"></mat-checkbox>
 								</div>
 							</div>
 						</div>
@@ -407,16 +404,19 @@
 								Account Name
 							</div>
 							<div class="td">
-								<jqxInput
-										#accountName_po
-										[theme]="'gnomex5'"
-										[width]="'calc(100% - 6px)'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#accountName_po-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'calc(100% - 6px)'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field class="full-width">
+									<input matInput placeholder="Account Name" [(value)]="accountName_po">
+								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Start Date
@@ -428,17 +428,17 @@
 								</span>
 								<div class="inline-block" style="width:7em;">
 								</div>
-								<span class="cell-label">
+								<div class="inline-block cell-label" style="height: 100%;">
 									Effective Until
-								</span>
+								</div>
 								<span>
 									<!--<GnomexStyledDatePicker #expirationDatePicker_po [defaultToToday]="false"></GnomexStyledDatePicker>-->
 									<GnomexStyledDatePicker #expirationDatePicker_po></GnomexStyledDatePicker>
 								</span>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Total Dollar Amount
@@ -452,13 +452,13 @@
 										<!--[width]="'10em'"-->
 										<!--[height]="'1.5rem'">-->
 								<!--</jqxInput>-->
-								<mat-form-field style="width: 10em; height: 1.5em;">
+								<mat-form-field style="width: 10em;">
 									<input matInput placeholder="Total Dollar Amount" [(value)]="totalDollarAmount_po">
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Your email address
@@ -471,13 +471,13 @@
 										<!--[width]="'calc(100% - 6px)'"-->
 										<!--[height]="'1.5rem'">-->
 								<!--</jqxInput>-->
-								<mat-form-field style="width: 100%; height: 1.5em;">
+								<mat-form-field style="width: 100%;">
 									<input matInput placeholder="Your Email Address" [(value)]="submitterEmail_po">
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<!--<div class="tr full-width row-content">-->
 							<!--<div class="td cell-label">-->
 								<!--Approved Users-->
@@ -494,7 +494,8 @@
 							</div>
 							<div class="td center-vertical-align">
 								<div class="checkbox-container">
-									<jqxCheckBox #activeCheckBox_po></jqxCheckBox>
+									<!--<jqxCheckBox #activeCheckBox_po></jqxCheckBox>-->
+									<mat-checkbox [(ngModel)]="activeCheckBox_po"></mat-checkbox>
 								</div>
 							</div>
 						</div>
@@ -507,16 +508,19 @@
 								Last four digits of <br/> Credit Card Number
 							</div>
 							<div class="td">
-								<jqxInput
-										#accountName_creditCard
-										[theme]="'gnomex5'"
-										[width]="'calc(100% - 6px)'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#accountName_creditCard-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'calc(100% - 6px)'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field class="full-width">
+									<input matInput placeholder="Last four digits of Credit Card Number" [(value)]="accountName_creditCard">
+								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Start Date
@@ -528,7 +532,7 @@
 								</span>
 								<div class="inline-block" style="width:7em;">
 								</div>
-								<span class="cell-label">
+								<span class="inline-block cell-label" style="height: 100%;">
 									Expiration Date
 								</span>
 								<span>
@@ -537,42 +541,53 @@
 								</span>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Zip Code
 							</div>
 							<div class="td">
-								<jqxInput
-										#zipCodeInput_creditCard
-										(focusin)="onCreditCardZipCodeSelected()"
-										(input)="onCreditCardZipCodeChanged()"
-										[theme]="'gnomex5'"
-										[width]="'10em'"
-										[height]="'1.5rem'">
-								</jqxInput>
+								<!--<jqxInput-->
+										<!--#zipCodeInput_creditCard-->
+										<!--(focusin)="onCreditCardZipCodeSelected()"-->
+										<!--(input)="onCreditCardZipCodeChanged()"-->
+										<!--[theme]="'gnomex5'"-->
+										<!--[width]="'10em'"-->
+										<!--[height]="'1.5rem'">-->
+								<!--</jqxInput>-->
+								<mat-form-field style="width: 10em;">
+									<input matInput placeholder="Zip Code" [(value)]="zipCodeInput_creditCard">
+								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Credit Card Company
 							</div>
 							<div class="td">
-								<jqxComboBox
-										#creditCardCompanyComboBox_creditCard
-										[source]="creditCardCompanies"
-										[valueMember]="'value'"
-										[displayMember]="'display'"
-										[width]="'40%'"
-										[theme]="'gnomex5'">
-								</jqxComboBox>
+								<!--<jqxComboBox-->
+										<!--#creditCardCompanyComboBox_creditCard-->
+										<!--[source]="creditCardCompanies"-->
+										<!--[valueMember]="'value'"-->
+										<!--[displayMember]="'display'"-->
+										<!--[width]="'40%'"-->
+										<!--[theme]="'gnomex5'">-->
+								<!--</jqxComboBox>-->
+								<mat-form-field style="width: 40%;">
+									<mat-select placeholder="Credit Card Company" [(value)]="selectedLab" (change)="onLabListSelection($event)">
+										<mat-option>--</mat-option>
+										<mat-option *ngFor="let company of creditCardCompanies" [value]="'value'">
+											{{ company.display }}
+										</mat-option>
+									</mat-select>
+								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Total Dollar Amount
@@ -586,13 +601,13 @@
 										<!--[width]="'10em'"-->
 										<!--[height]="'1.5rem'">-->
 								<!--</jqxInput>-->
-								<mat-form-field style="width: 10em; height: 1.5em;">
+								<mat-form-field style="width: 10em;">
 									<input matInput placeholder="Total Dollar Amount" [(value)]="totalDollarAmount_creditCard">
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<div class="tr full-width row-content">
 							<div class="td cell-label">
 								Your email address
@@ -605,13 +620,13 @@
 										<!--[width]="'calc(100% - 6px)'"-->
 										<!--[height]="'1.5rem'">-->
 								<!--</jqxInput>-->
-								<mat-form-field style="width: 100%; height: 1.5em;">
+								<mat-form-field style="width: 100%;">
 									<input matInput placeholder="Your Email Address" [(value)]="submitterEmail_creditcard">
 								</mat-form-field>
 							</div>
 						</div>
-						<div class="tr full-width row-spacer">
-						</div>
+						<!--<div class="tr full-width row-spacer">-->
+						<!--</div>-->
 						<!--<div class="tr full-width row-content">-->
 							<!--<div class="td cell-label">-->
 								<!--Approved Users-->
@@ -628,7 +643,8 @@
 							</div>
 							<div class="td center-vertical-align">
 								<div class="checkbox-container">
-									<jqxCheckBox #activeCheckBox_creditcard></jqxCheckBox>
+									<!--<jqxCheckBox #activeCheckBox_creditcard></jqxCheckBox>-->
+									<mat-checkbox [(ngModel)]="activeCheckBox_creditcard"></mat-checkbox>
 								</div>
 							</div>
 						</div>
@@ -637,10 +653,10 @@
 
 				</div>
 			</div>
-			<div class="vertical-spacer"></div>
-			<div class="full-width background">
-				<div style="position:relative; width:calc(100% - 1.6em); margin:0.8em 1.2em;">
-					<div style="font-size:small;">
+			<!--<div class="vertical-spacer"></div>-->
+			<div class="full-width background-sideless">
+				<div class="full-width" style="position: relative; padding: 0.4em 1.2em 0 1.2em;">
+					<div style="font-size: small;">
 						As the Principal Investigator (P.I.) or authorized personnel of the account listed
 						above I authorize the Core Facility to charge the account for work performed on my
 						laboratory’s behalf during the dates indicated, not to exceed the dollar amount.
@@ -649,17 +665,18 @@
 					</div>
 					<div style="text-align: center">
 						<div class="t full-width">
-							<div class="tr row-spacer">
-							</div>
-							<div class="tr row-spacer">
-							</div>
+							<!--<div class="tr row-spacer">-->
+							<!--</div>-->
+							<!--<div class="tr row-spacer">-->
+							<!--</div>-->
 							<div class="tr">
 								<div class="td">
 									<div class="checkbox-container">
-										<jqxCheckBox #agreementCheckbox></jqxCheckBox>
-									</div>
-									<div class="inline-block center-vertical-align agreement">
-										I agree
+										<mat-checkbox [(ngModel)]="agreementCheckbox">I agree</mat-checkbox>
+										<!--<jqxCheckBox #agreementCheckbox></jqxCheckBox>-->
+									<!--</div>-->
+									<!--<div class="inline-block center-vertical-align agreement">-->
+										<!--I agree-->
 									</div>
 								</div>
 							</div>
@@ -671,14 +688,14 @@
 	</div>
   <div mat-dialog-actions>
 		<div>
-			<div class="full-width" style="text-align:right; padding-top:4px; padding-right:0.6em;">
+			<div class="full-width" style="text-align:right; padding:0.4em;">
 				<div class="inline-block">
-					<button (click)="onSaveButtonClicked()" type="button" class="save-button" style="text-align: center;" autofocus>
+					<button mat-raised-button (click)="onSaveButtonClicked()" autofocus>
 						<img src="../../../assets/save.png" alt=""/> Save
 					</button>
 				</div>
 				<div class="inline-block">
-					<button (click)="onCancelButtonClicked()" type="button" class="cancel-button">Cancel</button>
+					<button mat-raised-button (click)="onCancelButtonClicked()">Cancel</button>
 				</div>
 			</div>
 		</div>

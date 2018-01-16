@@ -10,7 +10,7 @@ import {LocalStorageService} from "angular-2-local-storage";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {WindowService} from "../window-service";
 
-// import {MatDialogRef, MatDialog} from "@angular/material";
+import {MatDialogRef, MatDialog} from "@angular/material";
 
 import {NewBillingAccountComponent} from "../billing/new_billing_account/new-billing-account.component"
 
@@ -23,6 +23,10 @@ import {NewBillingAccountComponent} from "../billing/new_billing_account/new-bil
         // This fills the remaining space, by using flexbox.
         // Every toolbar row uses a flexbox row layout.
         flex: 1 1 auto;
+        }
+        
+        .no-padding-dialog .mat-dialog-container {
+            padding: 0;
         }
 
         .lookup {
@@ -81,7 +85,7 @@ export class HeaderComponent implements OnInit{
     options: FormGroup;
 
     constructor(private authenticationService: AuthenticationService,
-								// private dialog: MatDialog,
+								private dialog: MatDialog,
                 private progressService: ProgressService,
                 private localStorageService: LocalStorageService,
                 private formBuilder: FormBuilder,
@@ -113,17 +117,17 @@ export class HeaderComponent implements OnInit{
     public browseExp() {
     }
 
-    // public openNewBillingAccountsPopup(): void {
-		//
-			// let dialogRef = this.dialog.open(NewBillingAccountComponent, { width: '60em' });
-		//
-			// dialogRef.afterClosed().subscribe((result) => {
-			// 	console.log('Test dialog closed!');
-			// });
-		//
-		//
-			// // this.windowService.openNewBillingAccountWindow();
-    // }
+    public openNewBillingAccountsPopup(): void {
+
+			let dialogRef = this.dialog.open(NewBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+
+			dialogRef.afterClosed().subscribe((result) => {
+				console.log('Test dialog closed!');
+			});
+
+
+			// this.windowService.openNewBillingAccountWindow();
+    }
 
     onLogout() {
         this.authenticationService.logout();
