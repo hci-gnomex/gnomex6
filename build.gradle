@@ -49,6 +49,7 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'jdom', name: 'jdom', version: '1.0b8'
+    compile group: 'org.glassfish', name: 'javax.json', version: '1.0.4'
 
     //xml to json stuff for gnomexlite
     compile group: 'jline', name: 'jline', version: '0.9.94'
@@ -63,6 +64,7 @@ dependencies {
     compile fileTree(dir: 'libEnv', include: 'HCIReport.jar')
     compile fileTree(dir: 'libEnv', include: 'jdom-2.0.6.jar')
     compile fileTree(dir: 'libEnv', include: 'poi-3.10-FINAL.jar')
+    compile fileTree(dir: 'libEnv', include: 'javax.json-api-1.0.jar')
 
     //Realm stuff
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'

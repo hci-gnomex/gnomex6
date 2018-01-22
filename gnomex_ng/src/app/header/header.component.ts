@@ -370,14 +370,13 @@ export class HeaderComponent implements OnInit{
                 children: [
                     {
                         displayName: 'Track Usage',
-                        context: 'usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: '/AnnotationReport'
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
                         iconName: '../../assets/page.png',
-                        route: ''
+                        route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
@@ -519,7 +518,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Track Usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
@@ -629,7 +628,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Track Usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
@@ -974,7 +973,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Track Usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
@@ -994,7 +993,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Send email to all GNomEx users',
                         iconName: '../../assets/email_go.png',
-                        route: ''
+                        route: [{outlets: {modal: ['EmailAll']}}]
                     }
                 ]
             }
@@ -1265,7 +1264,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Send email to all GNomEx users',
                         iconName: '../../assets/email_go.png',
-                        route: ''
+                        route: [{outlets: {modal: ['EmailAll']}}]
                     }
                 ]
             },
@@ -1310,7 +1309,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Track Usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
@@ -1384,7 +1383,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Track Usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
@@ -1474,7 +1473,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Track Usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
@@ -1603,7 +1602,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Track Usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
@@ -1699,7 +1698,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Track Usage',
                         iconName: '../../assets/chart_bar.png',
-                        route: ''
+                        route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',

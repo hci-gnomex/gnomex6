@@ -357,7 +357,7 @@ export class GnomexService {
         if (this.hasPermission(CAN_ADMINISTER_ALL_CORE_FACILITIES)) {
             let found: boolean = false;
             for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-                if (rc.type.toLowerCase() === experimentType.toLowerCase() &&
+                if (rc && rc.type && rc.type.toLowerCase() === experimentType.toLowerCase() &&
                     rc.isActive === 'Y') {
                     found = true;
                     break;
@@ -368,7 +368,8 @@ export class GnomexService {
         //TODO Is myCoreFacilities equiv. to createSecurityAdvisor.lastResult..CoreFacility
         for (let cf of this.createSecurityAdvisorService.myCoreFacilities) {
             for (let requestCategory of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-                if (requestCategory.idCoreFacility === cf.idCoreFacility &&
+                if (requestCategory && requestCategory.type &&
+                    requestCategory.idCoreFacility === cf.idCoreFacility &&
                     requestCategory.type.toLowerCase() === experimentType.toLowerCase() &&
                     requestCategory.isActive === 'Y') {
                     return true;
