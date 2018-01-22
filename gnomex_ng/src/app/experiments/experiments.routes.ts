@@ -9,6 +9,8 @@ import { ExperimentOrdersComponent } from "./orders/experiment-orders.component"
 import { BrowseOverviewComponent } from "./browse-overview/browse-overview.component";
 import { ExperimentDetail } from "./experiment-detail/experiment-detail.component";
 import { ExperimentResolverService, ProjectResolverService } from "../services/resolvers/index";
+import {ReassignExperimentComponent} from "./reassign-experiment.component";
+import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
 
 
 /**
@@ -25,7 +27,9 @@ const ROUTES: Routes = [
         {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}]
     },
     { path: "experiments/new", component:NewExperimentComponent},
-    { path: "experiments-orders", component:ExperimentOrdersComponent}
+    { path: "experiments-orders", component:ExperimentOrdersComponent},
+    { path: "newProject", component: CreateProjectLauncherComponent, outlet: 'modal' }
+
 ];
 
 export const EXPERIMENTS_ROUTING = RouterModule.forChild(ROUTES);

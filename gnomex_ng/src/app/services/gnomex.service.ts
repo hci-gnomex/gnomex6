@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core'
 import {DictionaryService} from "./dictionary.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
+import {LabListService} from "./lab-list.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CORE_FACILITY_GENOMICS: string = "High Throughput Genomics";
@@ -35,9 +36,15 @@ export class GnomexService {
     public showUsage: boolean = false;
     public isInternalExperimentSubmission: boolean = true;
     public uploadSampleSheetURL: string = "";
+    public labList: any[] = [];
+    public submitRequestLabList: any[] = [];
+    public manageLabList: any[] = [];
+    public workAuthLabList: any[] = [];
+    public promptedWorkAuthLabList: any[] = [];
 
     constructor(private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
+                private labListService: LabListService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService) {}
 
     /**
@@ -108,6 +115,9 @@ export class GnomexService {
         this.managesPlateBasedWorkflow = this.doesManagePlateBasedWorkflow();
         this.setShowUsage();
         this.setDefaultSubmissionState();
+        this.labListService.getLabList().subscribe((response: any[]) => {
+            this.onGetLabList(response);
+        })
         return new Promise((resolve) => {
             resolve()
         });
@@ -347,7 +357,7 @@ export class GnomexService {
         if (this.hasPermission(CAN_ADMINISTER_ALL_CORE_FACILITIES)) {
             let found: boolean = false;
             for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-                if (rc.type.toLowerCase() == experimentType.toLowerCase() &&
+                if (rc.type.toLowerCase() === experimentType.toLowerCase() &&
                     rc.isActive === 'Y') {
                     found = true;
                     break;
@@ -386,19 +396,56 @@ export class GnomexService {
         return myCoresThatUseProducts;
     }
 
-    // TODO Need to add groupsToManage in the security advisor.
-    // hasGroupsToManage(): boolean {
-    //     return getGroupsToManage().length > 0;
-    // }
-    //
-    // getGroupsToManage(): any[] {
-    //     if (this.isGuestState) {
-    //         return [];
-    //     } else {
-    //         return new XMLListCollection(this.createSecurityAdvisorService createSecurityAdvisor.lastResult.groupsToManage.Lab);
-    //     }
-    // }
+    private onGetLabList(labs: any[]):void {
+        this.labList = labs;
+
+        this.submitRequestLabList = this.labList.filter(lab => {
+            return lab.canGuestSubmit === 'Y' || lab.canSubmitRequests === 'Y';
+        });
+        this.manageLabList = this.labList.filter(lab => {
+            return lab.canManage === 'Y';
+        });
 
 
+        // For submitting work auth forms online, a non-gnomex university user will
+        // select from a list of all labs.  A guest user doesn't have this feature.
+        // A normal gnomex user will select from a list of their labs. (Admins
+        // will have a full list since they can submit a request on behalf
+        // of any lab.
+        if (this.createSecurityAdvisorService.isUniversityOnlyUser) {
+            this.workAuthLabList = labs;
+            this.promptedWorkAuthLabList = labs;
+        } else if (this.isGuestState) {
+        } else if (this.canSubmitRequestForALab()) {
+            this.workAuthLabList = this.submitRequestLabList;
+            this.promptedWorkAuthLabList = this.submitRequestLabList;
+        } else {
+            this.workAuthLabList = labs;
+            this.promptedWorkAuthLabList = labs;
+        }
+    }
+
+    hasGroupsToManage(): boolean {
+        return this.getGroupsToManage().length > 0;
+    }
+
+    getGroupsToManage(): any[] {
+        if (this.isGuestState) {
+            return [];
+        } else {
+            return this.createSecurityAdvisorService.groupsToManage;
+        }
+    }
+
+    public canSubmitRequestForALab():  boolean {
+        let hasLab: boolean = false;
+        for (let lab of this.labList) {
+            if (lab.canSubmitRequests === 'Y') {
+                hasLab = true;
+                break;
+            }
+        }
+        return hasLab;
+    }
 
 }

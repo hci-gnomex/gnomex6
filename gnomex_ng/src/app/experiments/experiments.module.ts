@@ -63,6 +63,8 @@ import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
 import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {AgGridRendererModule,IconTextRendererComponent} from "../util/grid-renderers/index";
+import {MatDialogModule} from "@angular/material";
+import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
 
 /**
  * @author mbyrne
@@ -114,7 +116,8 @@ export const componentFactories =
         TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
-        AgGridModule.withComponents([IconTextRendererComponent])
+        AgGridModule.withComponents([IconTextRendererComponent]),
+        MatDialogModule
     ],
     declarations: [
                     BrowseExperimentsComponent,
@@ -138,10 +141,11 @@ export const componentFactories =
                     CreateProjectComponent,
                     DeleteProjectComponent,
                     ReassignExperimentComponent,
-                    DeleteExperimentComponent
+                    DeleteExperimentComponent,
+                    CreateProjectLauncherComponent
     ],
-    entryComponents:[...componentFactories, CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent],
-    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent]
+    entryComponents:[...componentFactories, CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent],
+    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent]
 })
 export class ExperimentsModule {
 }

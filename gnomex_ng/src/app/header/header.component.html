@@ -1,6 +1,8 @@
 <mat-toolbar class="header-one" *ngIf="isLoggedIn | async">
   <span class="top-menu-item">
-        <img src="../../assets/gnomex_logo_hdr.png">
+        <a [routerLink]="['/home']">
+            <img src="../../assets/gnomex_logo_hdr.png">
+        </a>
     </span>
   <span class="top-menu-item lookup">
       <mat-form-field [hideRequiredMarker]="options.value.hideRequired"

@@ -99,6 +99,7 @@ export class HeaderComponent implements OnInit{
     private adminPlateBasedNavItems: any[];
     private billingAdminESNavItems: any[];
     private managerNavItems: any[];
+    private managerESNavItems: any[];
     private userESNavItems: any[];
     private guestNavItems: any[];
     private currentState: string;
@@ -279,7 +280,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'New Project',
                         iconName: '../../assets/folder_add.png',
-                        route: ''
+                        route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
@@ -421,7 +422,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'New Project',
                         iconName: '../../assets/folder_add.png',
-                        route: ''
+                        route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
@@ -541,8 +542,121 @@ export class HeaderComponent implements OnInit{
 
         ]
 
+        this.managerESNavItems = [
+            {
+                displayName: 'Experiments',
+                iconName: '../../assets/flask.png',
+                class: 'top-menu-item',
+                children: [
+                    {
+                        displayName: 'Browse Experiments',
+                        iconName: '../../assets/flask.png',
+                        route: '/experiments',
+                    },
+                    {
+                        displayName: 'Create New Experiments and Upload Files',
+                        context: 'newExperimentOrder',
+                        iconName: '../../assets/flask.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'New Project',
+                        iconName: '../../assets/folder_add.png',
+                        route: [{outlets: {modal: ['newProject']}}]
+                    }
+                ]
+            },
+            {
+                displayName: 'Analysis',
+                context: 'bioinformatics',
+                class: 'top-menu-item',
+                iconName: '../../assets/map.png',
+                route: '/analysis'
+            },
+
+            {
+                displayName: 'Data Tracks',
+                context: 'bioinformatics',
+                class: 'top-menu-item',
+                iconName: '../../assets/datatrack.png',
+                route: '/datatracks'
+            },
+            {
+                displayName: 'Topics',
+                context: 'bioinformatics',
+                class: 'top-menu-item',
+                iconName: '../../assets/topic_tag.png',
+                route: ''
+            },
+            {
+                displayName: 'Users & Groups',
+                class: 'top-menu-item',
+                iconName: '../../assets/group.png',
+                route: ''
+            },
+            {
+                displayName: 'Configure',
+                class: 'top-menu-item',
+                iconName: '../../assets/page_white_wrench.png',
+                children: [
+                    {
+                        displayName: 'Configure Annotations',
+                        iconName: '../../assets/page_white_wrench.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'Configure Organisms and Genome Builds',
+                        iconName: '../../assets/page_white_wrench.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'Manage Microarray Catalog',
+                        iconName: '../../assets/image.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'Protocols',
+                        iconName: '../../assets/brick.png',
+                        route: ''
+                    }
+                ]
+            },
+            {
+                displayName: 'Reports',
+                class: 'top-menu-item',
+                iconName: '../../assets/page.png',
+                children: [
+                    {
+                        displayName: 'Track Usage',
+                        iconName: '../../assets/chart_bar.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'Annotation Report',
+                        iconName: '../../assets/page.png',
+                        route: '/AnnotationReport'
+                    },
+                    {
+                        displayName: 'Annotation Progress Report',
+                        iconName: '../../assets/page.png',
+                        route: '/AnnotationProgressReport'
+                    },
+                    {
+                        displayName: 'Project/Experiment Report',
+                        iconName: '../../assets/flask.png',
+                        route: '/ProjectExperimentReport'
+                    }
+                ]
+            }
+        ]
+
         // Admin menu
         this.adminNavItems = [
+            {
+                displayName: 'Orders',
+                iconName: '../../assets/review.png',
+                route: '/experiments-orders',
+            },
             {
                 displayName: 'Experiments',
                 iconName: '../../assets/flask.png',
@@ -568,7 +682,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'New Project',
                         iconName: '../../assets/folder_add.png',
-                        route: ''
+                        route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
@@ -939,7 +1053,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'New Project',
                         iconName: '../../assets/folder_add.png',
-                        route: ''
+                        route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
@@ -1403,7 +1517,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'New Project',
                         iconName: '../../assets/folder_add.png',
-                        route: ''
+                        route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Bulk Sample Sheet Import',
@@ -1532,7 +1646,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'New Project',
                         iconName: '../../assets/folder_add.png',
-                        route: ''
+                        route: [{outlets: {modal: ['newProject']}}]
                     }
                 ]
             },
@@ -1940,10 +2054,8 @@ export class HeaderComponent implements OnInit{
                     this.currentState = "BillingAdminState";
                 }
             }
-
-            // TODO handle hasGroupsToManage()
-            // } else if (hasGroupsToManage()) {
-            //     currentState = this.isExternalDataSharingSite ? "ManagerESState" : "ManagerState";
+        } else if (this.gnomexService.hasGroupsToManage()) {
+                this.currentState = this.gnomexService.isExternalDataSharingSite ? "ManagerESState" : "ManagerState";
         } else if ((this.gnomexService.hasPermission("canSubmitRequests") && this.canSubmitRequestForALab()) ||
                     this.gnomexService.hasPermission("canSubmitForOtherCores")) {
             this.currentState = this.gnomexService.isExternalDataSharingSite ? "UserESState" : "UserState";
@@ -1982,6 +2094,14 @@ export class HeaderComponent implements OnInit{
             }
             case "AdminESState" : {
                 this.navItems = this.billingAdminESNavItems;
+                break;
+            }
+            case "ManagerState" : {
+                this.navItems = this.managerNavItems;
+                break;
+            }
+            case "ManagerESState" : {
+                this.navItems = this.managerESNavItems;
                 break;
             }
         }

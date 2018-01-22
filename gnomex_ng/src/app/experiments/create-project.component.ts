@@ -2,12 +2,11 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {
-    MatDialogRef, MAT_DIALOG_DATA, MatOptionSelectionChange, MatAutocompleteTrigger, MatInput,
-    MatDialog
+    MatDialogRef, MAT_DIALOG_DATA
 } from '@angular/material';
 import { URLSearchParams } from "@angular/http";
 import {
-    AfterViewInit, Component, ElementRef, Inject, OnInit, ViewChild
+    AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild
 } from "@angular/core";
 import { jqxComboBoxComponent } from "jqwidgets-framework";
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
@@ -51,8 +50,6 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
     public showSpinner: boolean = false;
 
     constructor(private dialogRef: MatDialogRef<CreateProjectComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
-                private dialog: MatDialog,
-                private getLabService: GetLabService,
                 private experimentsService: ExperimentsService,
                 private formBuilder: FormBuilder
     ) {
@@ -113,7 +110,10 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
         params.set("parseEntries", "Y");
         var lPromise = this.experimentsService.saveProject(params).toPromise();
         lPromise.then(response => {
-            this.refreshProjectRequestList();
+            if (this.items.length === 0)
+                this.dialogRef.close();
+            else
+                this.refreshProjectRequestList();
         });
 
     }
@@ -157,5 +157,9 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
     save(formData:any){
         console.log(formData);
     }
+
+}
+
+export class CreateProjectComponentLauncher {
 
 }
