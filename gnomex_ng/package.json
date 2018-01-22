@@ -41,6 +41,7 @@
     "angular-2-local-storage": "1.0.1",
     "angular-split": "^1.0.0-rc.0",
     "angular-tree-component": "^4.1.0",
+    "angular2-cookie": "^1.2.6",
     "angular2-jwt": "^0.2.3",
     "bootstrap": "4.0.0-alpha.6",
     "chart.js": "^2.7.1",

@@ -37,6 +37,7 @@ import {AnalysisModule} from "./analysis/analysis.module";
 import {DatatracksModule} from "./datatracks/datatracks.module";
 import {MatIconModule} from "@angular/material";
 import {ReportsModule} from "./reports/reports.module";
+import {CookieService} from "angular2-cookie/core";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -86,7 +87,8 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         UserService,
         AuthenticationService,
         ExperimentsService,
-        ProgressService
+        ProgressService,
+        CookieService,
     ]
 })
 export class GnomexAppModule {
