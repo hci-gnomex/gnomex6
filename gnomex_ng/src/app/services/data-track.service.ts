@@ -97,6 +97,16 @@ export class DataTrackService {
         });
     }
 
+    moveDataTrackFolder(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/MoveDataTrackFolder.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
     deleteDataTrackFolder(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/DeleteDataTrackFolder.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {

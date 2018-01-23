@@ -178,7 +178,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         },
         allowDrop: (element, {parent, index}) => {
             this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1 || parent.data.idAnalysis) {
+            if (parent.data.parentid === -1 || parent.data.idAnalysis ||
+                element.data.idAnalysisGroup) {
                 return false;
             } else {
                 return true;

@@ -38,6 +38,7 @@ import {DatatracksModule} from "./datatracks/datatracks.module";
 import {MatIconModule} from "@angular/material";
 import {ReportsModule} from "./reports/reports.module";
 import {CookieService} from "angular2-cookie/core";
+import {TopicsModule} from "./topics/topics.module";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -70,6 +71,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         BrowserAnimationsModule,
         AnalysisModule,
         DatatracksModule,
+        TopicsModule,
         MatIconModule,
         ReportsModule
     ],
