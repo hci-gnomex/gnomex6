@@ -4,6 +4,8 @@ import hci.framework.control.Command;
 import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
+import net.sf.json.JSON;
+import net.sf.json.xml.XMLSerializer;
 import org.hibernate.Session;
 
 import javax.servlet.http.HttpServletRequest;
@@ -555,6 +557,40 @@ public class Util {
 
         String directoryName = baseDir + createYear + Constants.FILE_SEPARATOR + analysis.getNumber();
         return directoryName;
+    }
+    /*
+     * Converts xml to json the same way that GNomExFrontController does
+     */
+    public static String xmlToJson (String thexml) {
+        String thejson = "";
+
+        if (thexml == null || thexml.equals("")) {
+            return thexml;
+        }
+
+            if (thexml.length() < 80) {
+                System.out.println("WARNING short xml: -->" + thexml + "<--");
+            }
+            XMLSerializer xmlSerializer = new XMLSerializer();
+
+            boolean hasType = false;
+            if (thexml.indexOf("type=") >= 0) {
+                hasType = true;
+                thexml = thexml.replace(" type="," notype=");
+            }
+            JSON json = xmlSerializer.read(thexml);
+            thejson = json.toString(2);
+
+            // get rid of the "@
+            thejson = thejson.replace("\"@", "\"");
+
+            // if we dealt with the "type" being a JSON keyword then changes things back
+            if (hasType) {
+                hasType = false;
+                thejson = thejson.replace("\"notype\":","\"type\":");
+            }
+
+        return thejson;
     }
 
 }

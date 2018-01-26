@@ -3,9 +3,7 @@ package hci.gnomex.controller;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.*;
 
 import java.io.IOException;
 
@@ -21,7 +19,7 @@ public class UploadAnalysisURLServlet extends HttpServlet {
 
 private static final Logger LOG = Logger.getLogger(UploadAnalysisURLServlet.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	// Restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(req)) {
@@ -59,10 +57,15 @@ protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) thr
 		String URL = baseURL + Constants.FILE_SEPARATOR + "UploadAnalysisFileServlet.gx";
 		// Encode session id in URL so that session maintains for upload servlet when called from
 		// Flex upload component inside FireFox, Safari
-		URL += ";jsessionid=" + req.getRequestedSessionId();
-
 		res.setContentType("application/xml");
-		res.getOutputStream().println("<UploadAnalysisURL url='" + URL + "'/>");
+
+		URL += ";jsessionid=" + req.getRequestedSessionId();
+		String theURL = "<UploadAnalysisURL url='" + URL + "'/>";
+		String result = Util.xmlToJson(theURL);
+		if (!result.equals(theURL)) {
+			res.setContentType("application/json");
+		}
+		res.getOutputStream().println(result);
 
 	} catch (Exception e) {
 		LOG.error("An exception has occurred in UploadAnalysisURLServlet ", e);

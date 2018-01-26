@@ -2,9 +2,7 @@ package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.*;
 
 import java.io.IOException;
 
@@ -19,7 +17,7 @@ import org.hibernate.Session;
 public class ReportIssueFeedbackServletGetURL extends HttpServlet {
 private static final Logger LOG = Logger.getLogger(ReportIssueFeedbackServletGetURL.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	// Restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(req)) {
@@ -62,7 +60,11 @@ protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) thr
 
 		// res.setContentType("application/xml");
 		res.setContentType("application/x-www-form-urlencoded");
-		res.getOutputStream().println("<ReportIssueServlet url='" + URL + "'/>");
+		String theURL = "<ReportIssueServlet url='" + URL + "'/>";
+		String result = Util.xmlToJson (theURL);
+		System.out.println ("[ReportIssueFeedbackServletGetURL] theURL: " + theURL + "\nresult: " + result);
+
+		res.getOutputStream().println(result);
 
 	} catch (Exception e) {
 		LOG.error("An error has occured in ReportIssueServletGetURL - ");
