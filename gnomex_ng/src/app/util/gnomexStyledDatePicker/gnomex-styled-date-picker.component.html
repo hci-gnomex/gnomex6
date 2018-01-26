@@ -1,27 +1,4 @@
 <div style="display:inline-block; overflow:visible; font-size:small;">
-	<!--<div (focus)="openCalendar()" style="display:inline-block">-->
-		<!--<jqxInput #inputReference-->
-				<!--[width]="'7em'"-->
-				<!--[height]="'2em'"-->
-				<!--[value]="displayDate"-->
-				<!--[disabled]="true"-->
-				<!--[theme]="'gnomex5'"-->
-				<!--(click)="toggleCalendarOpen()"-->
-				<!--(focusout)="closeCalendar()"-->
-				<!--(blur)="closeCalendar()"-->
-				<!--contenteditable="true"></jqxInput>-->
-	<!--</div>-->
-	<!--<div class="{{open ? 'inline-block' : 'hiding'}}" style="position:absolute; z-index:9999; ">-->
-		<!--&lt;!&ndash; For some reason, you need to give the jqxCalendar a width in pixels or it loses the other day names... &ndash;&gt;-->
-		<!--<jqxCalendar-->
-				<!--#calendarReference-->
-				<!--[width]="'200px'"-->
-				<!--[showOtherMonthDays]="false"-->
-				<!--[showDayNames]="true"-->
-				<!--(onChange)="updateDate()"></jqxCalendar>-->
-	<!--</div>-->
-	<!--<img (click)="onImageClicked()" (blur)="closeCalendar()" (focusout)="closeCalendar()" contenteditable="true" src="../../../assets/calendar_date.png" alt=""/>-->
-
 	<mat-form-field>
 		<input matInput [matDatepicker]="myDatepicker" placeholder="Choose a date" disabled>
 		<mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
