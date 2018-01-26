@@ -1,6 +1,6 @@
 <div class="background">
     <div class="flex-column-container">
-        <div style="flex-grow: .01;" class="br-exp-item br-exp-one">
+        <div style="flex-grow: .01;" class="br-topic-item br-topic-one">
             <div style="margin-bottom: 0.3em;">
                 <menu-header-topics [selectedNode]="selectedItem"></menu-header-topics>
             </div>
@@ -8,9 +8,9 @@
         <div style="flex:1;"class="flex-row-container">
             <split>
                 <split-area size="20">
-                <div class="br-exp-item" style="height:100%">
+                <div class="br-topic-item" style="height:100%">
                     <div class="flex-column-container" style="height:100%;">
-                        <div class="br-exp-item br-exp-three">
+                        <div class="br-topic-item br-topic-three">
                             <tree-root #topicsTree (moveNode)="onMoveNode($event)"
                                        [nodes]="items" [options]="options"
                                        (activate)="treeOnSelect($event)"
@@ -24,12 +24,12 @@
                             </tree-root>
                         </div>
 
-                        <div class="br-exp-item br-exp-four">
+                        <div class="br-topic-item br-topic-four">
                             <div class="flex-row-container">
-                                <div class="br-exp-item-row-one" style="position: relative; top: 1em">
+                                <div class="br-topic-item-row-one" style="position: relative; top: 1em">
                                     <button mat-button (click)="expandClicked()">Expand</button>
                                 </div>
-                                <div class="br-exp-item-row-two" style="position: relative; top: 1em">
+                                <div class="br-topic-item-row-two" style="position: relative; top: 1em">
                                     <button mat-button (click)="collapseClicked()">Collapse</button>
                                 </div>
                             </div>
@@ -39,7 +39,7 @@
                 </split-area>
 
                 <split-area size="80">
-                <div  style="padding: 2em" class="br-exp-item experiment-detail-panel ">
+                <div  style="padding: 2em" class="br-topic-item experiment-detail-panel ">
                 </div>
                 </split-area>
             </split>

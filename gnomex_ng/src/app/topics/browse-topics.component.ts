@@ -42,26 +42,6 @@ const actionMapping:IActionMapping = {
     selector: "analysis",
     templateUrl: "./browse-topics.component.html",
     styles: [`
-        .inlineComboBox {
-            display: inline-block;
-        }
-
-        .hintLink {
-            fontSize: 9;
-            paddingLeft: 1;
-            paddingRight: 1;
-            paddingBottom: 1;
-            paddingTop: 1;
-        }
-
-        .sidebar {
-            width: 25%;
-            position: relative;
-            left: 0;
-            background-color: #ccc;
-            transition: all .25s;
-        }
-
         .flex-column-container {
             display: flex;
             flex-direction: column;
@@ -74,60 +54,46 @@ const actionMapping:IActionMapping = {
             flex-direction: row;
         }
 
-        .br-exp-row-one {
+        .br-topic-row-one {
             flex-grow: 1;
         }
 
-        .br-exp-item-row-two {
+        .br-topic-item-row-two {
             flex-grow: 1;
             position: relative;
         }
 
-        .br-exp-item {
+        .br-topic-item {
             width: 100%;
             flex: 1 1 auto;
             font-size: small;
         }
 
-        .br-exp-one {
+        .br-topic-one {
             width: 100%;
             flex-grow: .25;
 
         }
 
-        .br-exp-help-drag-drop {
+        .br-topic-help-drag-drop {
             width: 100%;
             flex-grow: .10;
         }
 
-        .br-exp-three {
+        .br-topic-three {
             width: 100%;
             height: 5px;
             flex-grow: 2;
         }
 
-        .br-exp-four {
+        .br-topic-four {
             width: 100%;
             flex-grow: .10;
         }
 
-        .br-exp-five {
+        .br-topic-five {
             width: 100%;            
             flex-grow: .10;
-        }
-
-        .t {
-            display: table;
-            width: 100%;
-        }
-
-        .tr {
-            display: table-row;
-            width: 100%;
-        }
-
-        .td {
-            display: table-cell;
         }
 
         .jqx-tree {
@@ -148,12 +114,6 @@ const actionMapping:IActionMapping = {
             border: 1px solid darkgrey;
             display: flex;
             flex-direction: column;
-        }
-        .analysis-panel {
-            height:98%;
-            width:100%;
-            border: #C8C8C8 solid thin;
-            overflow: auto;
         }
     `]
 })

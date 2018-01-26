@@ -49,10 +49,12 @@ export class MoveDataTrackComponent {
         this.noButton = false;
         let params: URLSearchParams = new URLSearchParams();
         params.set("idGenomeBuild", this.currentItem.idGenomeBuild);
-        if (mode ==="M")
+        if (mode ==="M") {
             params.set("isMove", "Y");
-        else
+        }
+        else {
             params.set("isMove", "N");
+        }
         if (this.currentItem.isDataTrackFolder) {
             params.set("idDataTrackFolder", this.currentItem.idDataTrackFolder);
             params.set("idParentDataTrackFolder", this.targetItem.idDataTrackFolder);
