@@ -3,6 +3,7 @@
  */
 import {Routes, RouterModule} from "@angular/router";
 import {LogoutComponent} from "./logout.component";
+import {ExternalRoute} from "./external-routes.module";
 
 /**
  * A file defining and exporting the router configuration for the home module.

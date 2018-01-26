@@ -13,6 +13,7 @@ import {LabListService} from "../services/lab-list.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
 import {Subscription} from "rxjs/Subscription";
 import {GnomexService} from "../services/gnomex.service";
+import {ExternalRoute} from "./external-routes.module";
 
 
 @Component({
@@ -236,7 +237,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Topics',
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
-                route: ''
+                route: '/topics'
             },
             {
                 displayName: 'Protocols',
@@ -315,7 +316,7 @@ export class HeaderComponent implements OnInit{
                 context: 'bioinformatics',
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
-                route: ''
+                route: '/topics'
             },
             {
                 displayName: 'Products',
@@ -370,6 +371,7 @@ export class HeaderComponent implements OnInit{
                 children: [
                     {
                         displayName: 'Track Usage',
+                        context: 'usage',
                         iconName: '../../assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
@@ -456,7 +458,7 @@ export class HeaderComponent implements OnInit{
                 context: 'bioinformatics',
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
-                route: ''
+                route: '/topics'
             },
             {
                 displayName: 'Products',
@@ -585,7 +587,7 @@ export class HeaderComponent implements OnInit{
                 context: 'bioinformatics',
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
-                route: ''
+                route: '/topics'
             },
             {
                 displayName: 'Users & Groups',
@@ -725,7 +727,7 @@ export class HeaderComponent implements OnInit{
                 context: 'bioinformatics',
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
-                route: ''
+                route: '/topics'
             },
             {
                 displayName: 'Workflow...',
@@ -1544,7 +1546,7 @@ export class HeaderComponent implements OnInit{
                 context: 'bioinformatics',
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
-                route: ''
+                route: '/topics'
             },
             {
                 displayName: 'Users & Groups',
@@ -1666,7 +1668,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Topics',
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
-                route: ''
+                route: '/topics'
             },
             {
                 displayName: 'Configure',
@@ -1758,6 +1760,25 @@ export class HeaderComponent implements OnInit{
         return obj;
     }
 
+    createLinkMenuItem(displayName: string, context: string, icon: string, route: string, idCoreFacility: string, children: any[]): object {
+        let indx = displayName.indexOf(' ');
+        let startRoute: string = "";
+        if (indx === -1) {
+            startRoute = displayName;
+        } else {
+            startRoute = displayName.substring(0, displayName.indexOf(' '));
+        }
+        let obj = {
+            displayName: displayName,
+            context: context,
+            iconName: icon,
+            route: '/' + startRoute,
+            children: children
+        }
+        this.router.config.push(new ExternalRoute(startRoute, route))
+        return obj;
+    }
+
     /**
      * Build the quick links menu items.
      */
@@ -1767,7 +1788,7 @@ export class HeaderComponent implements OnInit{
                 lni.children = [];
                 let lniCtr = 0;
                 for (let item of this.faqList) {
-                    let menuItem = this.createMenuItem(item.title, "", "", item.url, "", []);
+                    let menuItem = this.createLinkMenuItem(item.title, "", "", item.url, "", []);
                     lni.children[lniCtr] = menuItem;
                     lniCtr++;
                 }

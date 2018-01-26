@@ -5,6 +5,7 @@ import {GetLabService} from "../services/get-lab.service";
 import {TopicService} from "../services/topic.service";
 import {LabListService} from "../services/lab-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Component({
     selector: 'new-topic',
@@ -25,6 +26,7 @@ export class NewTopicComponent {
     public ownerList: any[] = [];
 
     public showSpinner: boolean = false;
+    private selectedItem: ITreeNode;
 
     constructor(public dialogRef: MatDialogRef<NewTopicComponent>,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -35,9 +37,10 @@ export class NewTopicComponent {
         if (this.data != null) {
             this.idParentTopic = data.idParentTopic;
             this.parentTopicLabel = data.parentTopicLabel;
+            this.selectedItem = data.selectedItem;
         }
-        if (!(this.idParentTopic === "")) {
-            this.title = "Add Subtopic of " + this.parentTopicLabel;
+        if (!(this.selectedItem.data.idParentTopic === "")) {
+            this.title = "Add Subtopic of " + this.selectedItem.parent.data.label;
         } else {
             this.title = "Add New Top Level Topic";
         }

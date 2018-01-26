@@ -20,6 +20,16 @@ const PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE: string = "hci.gnomex.model.In
 
 @Injectable()
 export class GnomexService {
+    public iconTopic: string = "assets/topic_tag.png";
+    public iconTopicPublic: string = "assets/topic_tag_public.png";
+    public iconTopicMember: string = "assets/topic_tag_members.png";
+    public iconTopicOwner: string = "assets/topic_tag_owner.png";
+    public iconTopicInstitution: string = "assets/topic_tag_institution.png";
+
+    public iconDataTrackMember = "assets/datatrack_member.png";
+    public iconDataTrackOwner = "assets/datatrack_owner.png";
+    public iconDataTrackPublic = "assets/datatrack_world.png";
+
     public properties: Map<string, string> = new Map<string, string>();
     private requestCategoryTypeMap: Map<string, string> = new Map<string, string>();
     public isExternalDataSharingSite: boolean = false;

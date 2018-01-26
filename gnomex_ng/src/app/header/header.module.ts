@@ -12,7 +12,8 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {HeaderComponent} from "./header.component";
 import {MenuItemComponent} from './menu-item/menu-item.component';
-
+import {ExternalLinkResolver} from './external-routes.module';
+import {ExternalLinkComponent} from './external-routes.module';
 import {
     MatGridListModule,
     MatToolbarModule,
@@ -38,12 +39,12 @@ import {LogoutComponent} from "./logout.component";
       MatDialogModule
   ],
    providers: [
-       // {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}
+       ExternalLinkResolver
     ],
 
-    declarations: [HeaderComponent, MenuItemComponent, LogoutComponent],
-    exports: [HeaderComponent, LogoutComponent
-    ]
+    declarations: [HeaderComponent, MenuItemComponent, LogoutComponent, ExternalLinkComponent],
+    entryComponents:[ExternalLinkComponent],
+    exports: [HeaderComponent, LogoutComponent]
 })
 export class HeaderModule {
 }
