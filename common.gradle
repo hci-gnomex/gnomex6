@@ -11,7 +11,9 @@ ext{
     rescDir="$projectDir/src/main/resources"
     webrootDir="$projectDir/src/main/webapp"
     sandboxDir="${buildDir}/sandbox"
-    gnomex_version=5.37
+    gnomex_version=6.0
+    gnomexServerHome="c:/Users/u0974549/apache-tomcat-7.0.53-windows-x64/apache-tomcat-7.0.53"
+    gnomexDeployDir="webapps"
     openSourceZipName="gnomex_tomcat_${gnomex_version}.zip"
     openSourceName="gnomex_${gnomex_version}"
 }

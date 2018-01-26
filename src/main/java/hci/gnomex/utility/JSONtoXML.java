@@ -240,8 +240,8 @@ public class JSONtoXML {
 
         jsonNavigator.previous();
 
-            // emit nodeHeader
-            result = "<" + nodeHeader + ">\n";
+        // emit nodeHeader
+        result = "<" + nodeHeader + ">\n";
 
         if (debugConvert) System.out.println("[addNodeHeader] result: " + result);
         return result;
@@ -440,7 +440,7 @@ public class JSONtoXML {
 
     public String convertJSONtoXML(String hintKey, String theJson, HashMap xmlHashMap) throws Exception {
 
-//        boolean debugConvert = true;
+        boolean debugConvert = false;
         // the end result will be here:
         String theXML = "";
 
@@ -537,20 +537,20 @@ public class JSONtoXML {
                         break;
                     }
 
-                        // previous token is property name
-                        String thisNodePrefix = nameStack[nameStackptr];
-                        if (thisNodePrefix == null ) {
-                            if (theHint == null) {
-                                System.out.println ("[convertJSONtoXML] 2 ERROR ERROR ERROR theHint is null!!!!");
-                                return "<bad 2 Invalid JSON /bad>";
-                            }
-                            thisNodePrefix = theHint.getNodeHeader();
-                            if (debugConvert) System.out.println ("[convertJSONtoXML] 2 new nodeprefix: " + thisNodePrefix);
-
+                    // previous token is property name
+                    String thisNodePrefix = nameStack[nameStackptr];
+                    if (thisNodePrefix == null ) {
+                        if (theHint == null) {
+                            System.out.println ("[convertJSONtoXML] 2 ERROR ERROR ERROR theHint is null!!!!");
+                            return "<bad 2 Invalid JSON /bad>";
                         }
-                        if (debugConvert)
-                            System.out.println("[convertJSONtoXML:object start] *** addding <" + thisNodePrefix + " 2 (had previous) nameStackptr: " + nameStackptr + " thisNodePrefix: " + thisNodePrefix + " namestack: " + nameStack[nameStackptr] + " nodeStack: " + nodeStack[nameStackptr]);
-                        theXML += "<" + thisNodePrefix + " ";
+                        thisNodePrefix = theHint.getNodeHeader();
+                        if (debugConvert) System.out.println ("[convertJSONtoXML] 2 new nodeprefix: " + thisNodePrefix);
+
+                    }
+                    if (debugConvert)
+                        System.out.println("[convertJSONtoXML:object start] *** addding <" + thisNodePrefix + " 2 (had previous) nameStackptr: " + nameStackptr + " thisNodePrefix: " + thisNodePrefix + " namestack: " + nameStack[nameStackptr] + " nodeStack: " + nodeStack[nameStackptr]);
+                    theXML += "<" + thisNodePrefix + " ";
 
 
                     if (debugConvert) System.out.println("[end of array start case statement]");
@@ -587,7 +587,7 @@ public class JSONtoXML {
                     } // end of !hasPrevious
 
 
-                        // add any inner nodePrefix if we haven't already done that
+                    // add any inner nodePrefix if we haven't already done that
                     if (!prevPrevElement(ElementTypes.JSON_ARRAY_START, ElementTypes.JSON_PROPERTY_NAME,jsonNavigator)) {
                         String thisNodePrefix = nameStack[nameStackptr];
                         if (thisNodePrefix == null) {
@@ -724,7 +724,7 @@ public class JSONtoXML {
                     break;
                 }
                 case ElementTypes.JSON_OBJECT_END: {
-                objectDepth--;
+                    objectDepth--;
                     if (debugConvert)
                         System.out.println("[object end] objectDepth: " + objectDepth + " arrayDepth: " + arrayDepth + " nameStackptr: " + nameStackptr + " nameStack: " + nameStack[nameStackptr] + " nodeStack: " + nodeStack[nameStackptr]);
 
@@ -755,6 +755,14 @@ public class JSONtoXML {
                         }
 
                         if (!nodeheader.equals("")) {
+                            if (debugConvert) System.out.println("[convertJSONtoXML nodePrefix is : " + theHint.getNodePrefix());
+                            if (theHint.getNodePrefix().equals("analysisGroup")) {
+                                // end this up
+                                theXML += "</" + theHint.getNodePrefix() + ">\n";
+                                if (debugConvert) System.out.println("[convertJSONtoXML ** after switch ** *** ADDING nodeprefix <" + theHint.getNodePrefix() + "> *** the end] theXML:\n" + theXML);
+//                                nameStackptr--;
+
+                            }
                             // end this up
                             theXML += "</" + nodeheader + ">\n";
                             if (debugConvert) System.out.println("[convertJSONtoXML ** after switch ** *** ADDING <" + nodeheader + "> *** the end] theXML:\n" + theXML);
@@ -765,7 +773,7 @@ public class JSONtoXML {
                             if (!nodePrefix.equals("")) {
                                 theXML += "</" + nodePrefix + ">\n";
                                 if (debugConvert) System.out.println("[convertJSONtoXML ** after switch ** *** ADDING <nodeprefix> *** the end] theXML:\n" + theXML);
-                            nameStackptr--;
+                                nameStackptr--;
                             }
 
                         }
