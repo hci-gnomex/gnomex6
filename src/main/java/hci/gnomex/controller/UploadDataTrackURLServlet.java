@@ -2,9 +2,7 @@ package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.*;
 
 import java.io.IOException;
 
@@ -68,8 +66,12 @@ protected void doGet(HttpServletRequest req, HttpServletResponse res) throws Ser
 		}
 
 		res.setContentType("application/xml");
-		res.getOutputStream().println(
-				"<UploadURL url='" + URL + "'" + " fileExtensions='" + fileExtensions.toString() + "'" + "/>");
+		String xmlResult = "<UploadURL url='" + URL + "'" + " fileExtensions='" + fileExtensions.toString() + "'" + "/>";
+		String jsonResult = Util.xmlToJson(xmlResult);
+		if (!jsonResult.equals(xmlResult)) {
+			res.setContentType("application/json");
+		}
+		res.getOutputStream().println(jsonResult);
 
 	} catch (Exception e) {
 		LOG.error("Error in UploadDataTrackFileServlet", e);

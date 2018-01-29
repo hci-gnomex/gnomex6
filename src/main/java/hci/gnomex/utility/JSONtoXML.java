@@ -440,7 +440,7 @@ public class JSONtoXML {
 
     public String convertJSONtoXML(String hintKey, String theJson, HashMap xmlHashMap) throws Exception {
 
-        boolean debugConvert = false;
+        boolean debugConvert = true;
         // the end result will be here:
         String theXML = "";
 

@@ -32,7 +32,7 @@ public abstract class UploadFileServletBase extends HttpServlet {
 
 private static final Logger LOG = Logger.getLogger(UploadFileServletBase.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 }
 
 protected abstract void setParentObjectName(UploadFileServletData data);

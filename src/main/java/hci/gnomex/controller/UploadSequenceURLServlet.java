@@ -2,9 +2,7 @@ package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.*;
 
 import java.io.IOException;
 
@@ -19,7 +17,7 @@ import org.hibernate.Session;
 public class UploadSequenceURLServlet extends HttpServlet {
 private static Logger LOG = Logger.getLogger(UploadSequenceURLServlet.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	// Restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(req)) {
@@ -66,9 +64,10 @@ protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) thr
 			fileExtensions.append("*" + Constants.SEQUENCE_FILE_EXTENSIONS[x]);
 		}
 
-		res.setContentType("application/xml");
-		res.getOutputStream().println(
-				"<UploadURL url='" + URL + "'" + " fileExtensions='" + fileExtensions.toString() + "'" + "/>");
+		res.setContentType("application/json");
+		String xmlResult = "<UploadURL url='" + URL + "'" + " fileExtensions='" + fileExtensions.toString() + "'" + "/>";
+		String jsonResult = Util.xmlToJson(xmlResult);
+		res.getOutputStream().println(jsonResult);
 
 	} catch (Exception e) {
 		LOG.error("Error in UploadSequenceURLServlet", e);

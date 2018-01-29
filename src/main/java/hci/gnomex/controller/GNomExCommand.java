@@ -128,6 +128,14 @@ public abstract class GNomExCommand extends Command implements Serializable {
     return request.getRemoteAddr();
   }
 
+  public static String getRemoteIP(HttpServletRequest request) {
+    String xff = request.getHeader("X-Forwarded-For");
+    if (xff != null) {
+      return xff.split("[\\s,]+")[0];
+    }
+    return request.getRemoteAddr();
+  }
+
   public String getAppURL(HttpServletWrappedRequest request) throws Exception {
     String requestURL = request.getRequestURL().toString();
     String appURL = requestURL.substring(0, requestURL.indexOf("/gnomex"));

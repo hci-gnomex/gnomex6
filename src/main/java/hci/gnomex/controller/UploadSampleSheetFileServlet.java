@@ -3,9 +3,7 @@ package hci.gnomex.controller;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,7 +40,7 @@ private static final int ERROR_SECURITY_EXCEPTION = 902;
 private static final int ERROR_UPLOAD_MISC = 903;
 private static final Logger LOG = Logger.getLogger(UploadSampleSheetFileServlet.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 }
 
 /*
@@ -210,10 +208,13 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		res.setHeader("Cache-Control", "cache, must-revalidate, proxy-revalidate, s-maxage=0, max-age=0");
 		res.setHeader("Pragma", "public");
 		res.setDateHeader("Expires", 0);
-		res.setContentType("application/xml");
+		res.setContentType("application/json");
 
 		XMLOutputter xmlOut = new XMLOutputter();
-		responseOut.println(xmlOut.outputString(doc));
+		String xmlResult = xmlOut.outputString(doc);
+		String jsonResult = Util.xmlToJson(xmlResult);
+		responseOut.println(jsonResult);
+
 
 	} catch (ServletException e) {
 

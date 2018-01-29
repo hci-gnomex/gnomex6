@@ -10,19 +10,9 @@ import hci.gnomex.model.PropertyEntry;
 import hci.gnomex.model.PropertyEntryValue;
 import hci.gnomex.model.PropertyOption;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.AppUserComparator;
-import hci.gnomex.utility.BulkFileUploadException;
-import hci.gnomex.utility.DataTrackComparator;
-import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.PropertyOptionComparator;
+import hci.gnomex.utility.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,10 +34,15 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.hibernate.Session;
 
+//import org.jdom.Document;
+//import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
+
 import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.ParamPart;
 import com.oreilly.servlet.multipart.Part;
+import org.jdom.output.XMLOutputter;
 
 public class UploadDataTrackFileServlet extends HttpServlet {
 
@@ -59,7 +54,7 @@ private static final Pattern BULK_UPLOAD_LINE_SPLITTER = Pattern.compile("([^\\t
 
 private static Logger LOG = Logger.getLogger(UploadDataTrackFileServlet.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 }
 
 /*
@@ -287,8 +282,17 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		root.addAttribute("idDataTrack", dataTrack.getIdDataTrack().toString());
 		root.addAttribute("idDataTrackFolder", idDataTrackFolder.toString());
 		root.addAttribute("idGenomeBuild", idGenomeBuild.toString());
-		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
-		writer.write(doc);
+//		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
+
+		PrintWriter responseOut = res.getWriter();
+		res.setContentType("application/json");
+		XMLOutputter xmlOut = new XMLOutputter();
+		String xmlResult = xmlOut.outputString(doc.toString());
+		String jsonResult = Util.xmlToJson(xmlResult);
+		responseOut.println(jsonResult);
+
+
+//		writer.write(doc);
 
 	} catch (Exception e) {
 		LOG.error("Error in UploadDataTrackFileServlet", e);
@@ -299,8 +303,16 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		Document doc = DocumentHelper.createDocument();
 		Element root = doc.addElement("ERROR");
 		root.addAttribute("message", e.getMessage());
-		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
-		writer.write(doc);
+		PrintWriter responseOut = res.getWriter();
+		res.setContentType("application/json");
+		XMLOutputter xmlOut = new XMLOutputter();
+		String xmlResult = xmlOut.outputString(doc.toString());
+		String jsonResult = Util.xmlToJson(xmlResult);
+		responseOut.println(jsonResult);
+
+
+//		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
+//		writer.write(doc);
 
 	} finally {
 		if (tempBulkUploadFile != null && tempBulkUploadFile.exists())

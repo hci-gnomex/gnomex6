@@ -37,7 +37,7 @@ public class DownloadFileServlet extends HttpServlet {
 
   }
 
-  protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
+  protected void doGet(HttpServletRequest req, HttpServletResponse response)
           throws ServletException, IOException {
 
     String serverName = req.getServerName();
@@ -62,7 +62,7 @@ public class DownloadFileServlet extends HttpServlet {
       emailAddress = req.getParameter("emailAddress");
     }
 
-    String ipAddress = GNomExCommand.getRemoteIP(req);
+    String ipAddress = GNomExCommand.getRemoteIP (req);
 
     //  Get cached file descriptor parser
     FileDescriptorParser parser = (FileDescriptorParser) req.getSession().getAttribute(CacheFileDownloadList.SESSION_KEY_FILE_DESCRIPTOR_PARSER);

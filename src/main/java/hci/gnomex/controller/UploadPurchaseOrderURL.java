@@ -2,9 +2,7 @@ package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.*;
 
 import java.io.IOException;
 
@@ -19,7 +17,7 @@ import org.hibernate.Session;
 public class UploadPurchaseOrderURL extends HttpServlet {
 private static Logger LOG = Logger.getLogger(UploadPurchaseOrderURL.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	// Restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(req)) {
@@ -57,8 +55,11 @@ protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) thr
 		// Flex upload component inside FireFox, Safari
 		URL += ";jsessionid=" + req.getRequestedSessionId();
 
-		res.setContentType("application/xml");
-		res.getOutputStream().println("<UploadPurchaseOrderURL url='" + URL + "'/>");
+		res.setContentType("application/json");
+		String xmlResult = "<UploadPurchaseOrderURL url='" + URL + "'/>";
+		String jsonResult = Util.xmlToJson(xmlResult);
+
+		res.getOutputStream().println(jsonResult);
 
 	} catch (Exception e) {
 		LOG.error("An error has occured in UploadPurchaseOrderURL - " + e.toString(), e);

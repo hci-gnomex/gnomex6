@@ -29,7 +29,7 @@ private static final int ERROR_MISSING_TEMP_DIRECTORY_PROPERTY = 900;
 private static final int ERROR_INVALID_TEMP_DIRECTORY = 901;
 private static Logger LOG = Logger.getLogger(UploadPurchaseOrder.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 }
 
