@@ -24,13 +24,13 @@
 	<classpathentry kind="lib" path="libEnv/jdom-2.0.6.jar"/>
 	<classpathentry kind="lib" path="libEnv/hci_framework.jar"/>
 	<classpathentry kind="lib" path="libEnv/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="c:/Users/u0974549/apache-tomcat-7.0.53-windows-x64/apache-tomcat-7.0.53/lib/mail.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 7.0/lib/mail.jar"/>
 	<classpathentry kind="lib" path="libEnv/hci_utils.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/itextpdf-5.4.2.jar"/>
 	<classpathentry kind="lib" path="libEnv/freemarker.jar"/>
-	<classpathentry kind="lib" path="c:/Users/u0974549/apache-tomcat-7.0.53-windows-x64/apache-tomcat-7.0.53/lib/lib/catalina.jar"/>
-	<classpathentry kind="lib" path="c:/Users/u0974549/apache-tomcat-7.0.53-windows-x64/apache-tomcat-7.0.53/lib/lib/tomcat-jdbc.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 7.0/lib/lib/catalina.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 7.0/lib/lib/tomcat-jdbc.jar"/>
 	<classpathentry kind="lib" path="libEnv/ant-1.7.0.jar"/>
 	<classpathentry kind="lib" path="libEnv/ant-launcher-1.7.0.jar"/>
 	<classpathentry kind="lib" path="libEnv/commons-beanutils-1.8.0.jar"/>
@@ -47,8 +47,8 @@
 	<classpathentry kind="lib" path="libEnv/xmlParserAPIs-2.6.2.jar"/>
 	<classpathentry kind="lib" path="libEnv/xom-1.2.5.jar"/>
 	<classpathentry kind="lib" path="libEnv/ejb.jar"/>
-	<classpathentry kind="lib" path="c:/Users/u0974549/apache-tomcat-7.0.53-windows-x64/apache-tomcat-7.0.53/lib/lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="c:/Users/u0974549/apache-tomcat-7.0.53-windows-x64/apache-tomcat-7.0.53/lib/lib/log4j-1.2.12.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 7.0/lib/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 7.0/lib/lib/log4j-1.2.12.jar"/>
 	<classpathentry kind="lib" path="libEnv/antlr-2.7.7.jar"/>
 	<classpathentry kind="lib" path="libEnv/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
 	<classpathentry kind="lib" path="libEnv/javassist-3.18.1-GA.jar"/>
