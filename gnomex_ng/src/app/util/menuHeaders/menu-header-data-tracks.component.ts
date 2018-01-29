@@ -175,7 +175,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             else if (this.selectedNode.level === 2) {
                 if (this.selectedNode.data.DataTrack || this.selectedNode.data.DataTrackFolder) {
                     level = "Please remove folders and data tracks for the " + this.selectedNode.data.label;
-                    level += "first.";
+                    level += " first.";
                     confirmString = "";
                 }
                 else {

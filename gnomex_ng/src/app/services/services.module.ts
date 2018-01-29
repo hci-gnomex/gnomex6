@@ -22,6 +22,7 @@ import {AnnotationService} from "./annotation.service";
 import {UsageService} from "./usage.service";
 import {GnomexStringUtilService} from "./gnomex-string-util.service"
 import {GnomexService} from "./gnomex.service";
+import {TopicService} from "./topic.service";
 import {CookieUtilService} from "./cookie-util.service";
 import {BroadcastEmailService} from "./broadcast-email.service";
 
@@ -53,6 +54,7 @@ import {BroadcastEmailService} from "./broadcast-email.service";
         AnalysisGroupResolverService,
         AnalysisResolverService,
         GnomexService,
+        TopicService,
         BroadcastEmailService,
         CookieUtilService,
     ]})

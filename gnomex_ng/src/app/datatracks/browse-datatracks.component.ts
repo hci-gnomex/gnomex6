@@ -173,14 +173,15 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         },
         allowDrop: (element, {parent, index}) => {
             this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1 || parent.data.isGenomeBuild) {
+            if (parent.data.parentid === -1 || parent.data.isGenomeBuild ||
+                element.data.idDataTrackFolder === parent.data.idDataTrackFolder) {
                 return false;
             } else {
                 return true;
             }
         },
 
-        allowDrag: (node) => node.isLeaf,
+        allowDrag: (node) => node.data.isDataTrackFolder || node.data.idDataTrack,
         actionMapping
     };
     public items: any;
@@ -440,7 +441,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             }
         }
         this.datatracksCount++;
-        datatrack.id = "d"+datatrack.idDataTrack;
+        datatrack.id = "d"+datatrack.idDataTrack + datatrack.idDataTrackFolder;
     }
     /*
         Determine if the object is an array

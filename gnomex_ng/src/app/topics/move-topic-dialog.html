@@ -1,0 +1,12 @@
+<h6 mat-dialog-title><img src="../../assets/datatrack.png">Move/Copy to {{targetFolder}}</h6>
+<mat-dialog-content>
+    <div>
+        Do you want to move or copy items to {{targetFolder}}?
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button *ngIf="!showSpinner" (click)="doMoveCopy('M')" mat-dialog-close>Move</button>
+    <button mat-button *ngIf="!showSpinner" (click)="doMoveCopy('C')" mat-dialog-close>Copy</button>
+    <button mat-button *ngIf="!showSpinner" (click)="doCancel()" mat-dialog-close>Cancel</button>
+    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>
