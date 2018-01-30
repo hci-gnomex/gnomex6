@@ -77,6 +77,42 @@
       ]
     },
     {
+      "command": "SaveGenomeBuild",
+      "parameter": "segmentsXML",
+      "nodeheader": "segments",
+      "nodeprefix": "Segment",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveGenomeBuild",
+      "parameter": "sequenceFilesToRemoveXML",
+      "nodeheader": "sequenceFilesToRemove",
+      "nodeprefix": "File",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveFAQ",
+      "parameter": "faqXMLString",
+      "nodeheader": "FaqCollection",
+      "nodeprefix": "FAQ",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
       "command": "MoveAnalysis",
       "parameter": "analysisGroupsXMLString",
       "nodeheader": "analysisGroups",

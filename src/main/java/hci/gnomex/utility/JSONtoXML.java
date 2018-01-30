@@ -10,7 +10,7 @@ import java.io.*;
 
 public class JSONtoXML {
     public static boolean debugHint = false;
-    public static boolean debugConvert = false;
+    public static boolean debugConvert = true;
 
     public HashMap initHints(String fileName) throws Exception {
         HashMap xmlHintMap = new HashMap();
@@ -827,7 +827,7 @@ public class JSONtoXML {
         System.out.println ("[GNomExFrontController] xmlHintMap size: " + xmlHintMap.size());
 
         try {
-            debugConvert = false;
+            debugConvert = true;
             debugHint = false;
 
             // setup hintKey, the json to convert
