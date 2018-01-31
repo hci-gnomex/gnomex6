@@ -10,12 +10,8 @@ import {URLSearchParams} from "@angular/http";
 @Component({
     templateUrl: './project-browse.component.html',
     styles:[`
-        div div textarea {
-            resize: none;
-            height: 100%;
-            width: 100%;
-        }
-        .diryWithSave{
+      
+        .dirtyWithSave{
 
             display: flex;
             justify-content: space-between;
@@ -26,6 +22,12 @@ import {URLSearchParams} from "@angular/http";
         }
         .error-message{
             color: red;
+        }
+        .project-field{
+            margin: 1em 1em 1em 1em;
+            font-size: 1.1rem;
+            width:100%;
+            resize:none;
         }
         
         
@@ -56,7 +58,7 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit{
     ngOnInit(){
         this.projectBrowseForm = this.fb.group({
             projectName: ['', Validators.required],
-            description: ['', Validators.maxLength(5000)]
+            description: ['', Validators.maxLength(500)]
         });
         this.projectBrowseForm.valueChanges.distinctUntilChanged()
             .subscribe(value => {

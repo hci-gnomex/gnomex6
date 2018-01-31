@@ -36,7 +36,7 @@ public void init() {
 
 }
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
 
 	// Restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(req, LOG)) {

@@ -3,11 +3,7 @@ package hci.gnomex.controller;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -35,6 +31,7 @@ import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.ParamPart;
 import com.oreilly.servlet.multipart.Part;
+import org.jdom.output.XMLOutputter;
 
 public class ReportIssueFeedbackServlet extends HttpServlet {
 private static String serverName;
@@ -252,6 +249,13 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		h3.addCDATA("The issue has been successfully reported. Thank you.");
 		body1.addElement("BR");
 		body1.addElement("BR");
+
+//		XMLOutputter xmlOut = new XMLOutputter();
+//		String xmlResult = xmlOut.outputString(doc.toString());
+//		String jsonResult = Util.xmlToJson(xmlResult);
+//		res.getOutputStream().println(jsonResult);
+
+
 		writer = new org.dom4j.io.HTMLWriter(res.getWriter(), format1);
 		writer.write(doc);
 		writer.flush();

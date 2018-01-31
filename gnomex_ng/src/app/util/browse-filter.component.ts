@@ -314,23 +314,25 @@ export class BrowseFilterComponent implements OnInit {
     }
 
     onLabSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.idLabString = event.args.item.value;
-            if (this.showOwnerComboBox) {
-                this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
-                    this.ownerList = response.Lab.historicalOwnersAndSubmitters;
-                });
-            }
-            if (this.showBillingAccountComboBox && this.mode === this.BILLING_BROWSE) {
-                this.getLabService.getLabBillingAccounts(this.idLabString).subscribe((response: any) => {
-                    let allBillingAccounts: any[] = response.Lab.billingAccounts;
-                    this.billingAccountList = allBillingAccounts.filter(account => {
-                        return account.idCoreFacility === this.idCoreFacilityString;
+        if (event.args) {
+            if (event.args.item && event.args.item.value) {
+                this.idLabString = event.args.item.value;
+                if (this.showOwnerComboBox) {
+                    this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
+                        this.ownerList = response.Lab.historicalOwnersAndSubmitters;
                     });
-                });
+                }
+                if (this.showBillingAccountComboBox && this.mode === this.BILLING_BROWSE) {
+                    this.getLabService.getLabBillingAccounts(this.idLabString).subscribe((response: any) => {
+                        let allBillingAccounts: any[] = response.Lab.billingAccounts;
+                        this.billingAccountList = allBillingAccounts.filter(account => {
+                            return account.idCoreFacility === this.idCoreFacilityString;
+                        });
+                    });
+                }
+            } else {
+                this.resetLabSelection();
             }
-        } else {
-            this.resetLabSelection();
         }
     }
 

@@ -44,7 +44,7 @@ private static final int ERROR_INVALID_TEMP_DIRECTORY = 901;
 private static final int ERROR_SECURITY_EXCEPTION = 902;
 private static final int ERROR_UPLOAD_MISC = 903;
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 }
 
 /*

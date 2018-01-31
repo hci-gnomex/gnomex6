@@ -2,13 +2,11 @@ package hci.gnomex.controller;
 
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,18 +20,20 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.hibernate.Session;
+import org.jdom.*;
 
 import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.ParamPart;
 import com.oreilly.servlet.multipart.Part;
+import org.jdom.output.XMLOutputter;
 
 public class UploadSequenceFileServlet extends HttpServlet {
 private static Logger LOG = Logger.getLogger(UploadSampleSheetURLServlet.class);
 
 private static String serverName;
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 }
 
 /*
@@ -166,8 +166,16 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		Document doc = DocumentHelper.createDocument();
 		Element root = doc.addElement("SUCCESS");
 		root.addAttribute("idGenomeBuild", idGenomeBuild.toString());
-		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
-		writer.write(doc);
+
+//		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
+//		writer.write(doc);
+		// return json
+		PrintWriter responseOut = res.getWriter();
+		res.setContentType("application/json");
+		XMLOutputter xmlOut = new XMLOutputter();
+		String xmlResult = xmlOut.outputString(doc.toString());
+		String jsonResult = Util.xmlToJson(xmlResult);
+		responseOut.println(jsonResult);
 
 	} catch (Exception e) {
 		LOG.error("An error occurred in UploadSequenceFileServlet", e);
@@ -178,8 +186,16 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		Document doc = DocumentHelper.createDocument();
 		Element root = doc.addElement("ERROR");
 		root.addAttribute("message", e.getMessage());
-		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
-		writer.write(doc);
+
+		PrintWriter responseOut = res.getWriter();
+		res.setContentType("application/json");
+		XMLOutputter xmlOut = new XMLOutputter();
+		String xmlResult = xmlOut.outputString(doc.toString());
+		String jsonResult = Util.xmlToJson(xmlResult);
+		responseOut.println(jsonResult);
+
+//		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
+//		writer.write(doc);
 
 	} finally {
 		if (tempBulkUploadFile != null && tempBulkUploadFile.exists())

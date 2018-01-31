@@ -63,8 +63,8 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 				userNotificationLabsDoc = sax.build(reader);
 
 			} catch (JDOMException je) {
-				LOG.error("Cannot parse userNotificationLabsXMLString", je);
 				this.addInvalidField("userNotificationLabsXMLString", "Invalid userNotificationLabsXMLString");
+				this.errorDetails = Util.GNLOG(LOG,"Cannot parse userNotificationLabsXMLString", je);
 			}
 		}
 	}

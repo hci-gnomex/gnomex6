@@ -61,6 +61,8 @@ protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) thr
 		URL += ";jsessionid=" + req.getRequestedSessionId();
 
 		res.setContentType("application/xml");
+
+
 		res.getOutputStream().println("<UploadProductOrderURL url='" + URL + "'/>");
 
 	} catch (Exception e) {

@@ -29,7 +29,7 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
   
   }
     
-  protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
+  protected void doGet(HttpServletRequest req, HttpServletResponse response)
       throws ServletException, IOException {
 
       Integer idPlate = null;

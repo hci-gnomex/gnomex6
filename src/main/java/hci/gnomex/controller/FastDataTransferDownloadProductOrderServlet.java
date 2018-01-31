@@ -41,7 +41,7 @@ public class FastDataTransferDownloadProductOrderServlet extends HttpServlet {
 
     }
 
-    protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
 
         serverName = req.getServerName();
@@ -164,7 +164,7 @@ public class FastDataTransferDownloadProductOrderServlet extends HttpServlet {
 
                             // Write file with info for the TransferLoggerMain daemon
                             String theFileTransferLogFile = "fdtDownloadTransferLog_" + uuid.toString();
-                            UploadDownloadHelper.writeDownloadInfoFile(softlinks_dir, emailAddress, secAdvisor, req, "", "","",theFileTransferLogFile);
+                            UploadDownloadHelper.writeDownloadInfoFile(softlinks_dir, emailAddress, secAdvisor, (HttpServletWrappedRequest) req, "", "","",theFileTransferLogFile);
 
                             // change ownership to HCI_fdt user
                             String fdtUser = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.FDT_USER);

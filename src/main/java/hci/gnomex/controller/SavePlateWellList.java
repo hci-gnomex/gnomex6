@@ -55,8 +55,8 @@ public class SavePlateWellList extends GNomExCommand implements Serializable {
         plateWellDoc = sax.build(reader);
         parser = new PlateWellParser(plateWellDoc);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse plateWellXMLString", je );
         this.addInvalidField( "PlateWellXMLString", "Invalid xml");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse plateWellXMLString", je);
       }
     }
 

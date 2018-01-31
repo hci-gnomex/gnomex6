@@ -20,7 +20,7 @@
 	<classpathentry kind="lib" path="libEnv/HCIDictionary.jar"/>
 	<classpathentry kind="lib" path="libEnv/HCIReport.jar"/>
 	<classpathentry kind="lib" path="libEnv/Hibernate3Utils.jar"/>
-	<classpathentry kind="lib" path="libEnv/jdom.jar"/>
+	<classpathentry kind="lib" path="libEnv/jdom-2.0.6.jar"/>
 	<classpathentry kind="lib" path="libEnv/hci_framework.jar"/>
 	<classpathentry kind="lib" path="libEnv/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 7.0/lib/mail.jar"/>

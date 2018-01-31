@@ -29,7 +29,7 @@ public class DownloadChromatogramFileServlet extends HttpServlet {
 
     }
 
-    protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         Integer     idChromatogram = null;
         String userName = "";

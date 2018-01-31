@@ -24,7 +24,7 @@ public class DownloadFastaFileServlet extends HttpServlet {
     public void init() {
     }
 
-    protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         Chromatogram chromatogram;
         Integer idChromatogram = null;

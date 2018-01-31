@@ -26,12 +26,12 @@ public static Logger LOG = Logger.getLogger(ApproveUser.class);
 private static String serverName;
 
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	serverName = req.getServerName();
 	doPost(req, res);
 }
 
-protected void doPost(HttpServletWrappedRequest request, HttpServletResponse response) throws ServletException, IOException {
+protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String guid = "";
 	String idAppUser = "";
 	AppUser au;

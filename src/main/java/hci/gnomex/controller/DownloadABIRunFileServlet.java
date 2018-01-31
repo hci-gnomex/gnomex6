@@ -38,7 +38,7 @@ public void init() {
 
 }
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
 	InstrumentRun ir = null;
 	Integer idInstrumentRun = null;
 	String codeReactionType = ReactionType.SEQUENCING_REACTION_TYPE;

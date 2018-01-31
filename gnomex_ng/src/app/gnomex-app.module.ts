@@ -12,6 +12,7 @@ import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
+import {ConfigurationModule} from "./configuration/configuration.module";
 import {NewBillingAccountModule} from "./billing/new_billing_account/new-billing-account.module";
 import {ProgressService} from "./home/progress.service";
 import {RouterModule} from "@angular/router";
@@ -37,8 +38,8 @@ import {AnalysisModule} from "./analysis/analysis.module";
 import {DatatracksModule} from "./datatracks/datatracks.module";
 import {MatIconModule} from "@angular/material";
 import {ReportsModule} from "./reports/reports.module";
-
-import {WindowService} from "./window-service";
+import {CookieService} from "angular2-cookie/core";
+import {TopicsModule} from "./topics/topics.module";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -61,6 +62,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AuthenticationModule,
         NavigationModule,
         ExperimentsModule,
+        ConfigurationModule,
         NewBillingAccountModule,
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig),
@@ -70,6 +72,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         BrowserAnimationsModule,
         AnalysisModule,
         DatatracksModule,
+        TopicsModule,
         MatIconModule,
         ReportsModule,
         TestPageModule
@@ -89,7 +92,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AuthenticationService,
         ExperimentsService,
         ProgressService,
-        WindowService
+        CookieService,
     ]
 })
 export class GnomexAppModule {

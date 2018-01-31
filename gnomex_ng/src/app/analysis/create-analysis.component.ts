@@ -67,6 +67,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
     private codeVisibility: string;
     public showSpinner: boolean = false;
     private analGroupListForXML: any[] = [];
+    private analysisGroups: any;
 
     constructor(private dialogRef: MatDialogRef<CreateAnalysisComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private dictionaryService: DictionaryService,
@@ -93,6 +94,9 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
             analysisName: ['', [
                 Validators.required
             ]],
+            // analysisGroupName: ['', [
+            //     Validators.required
+            // ]],
             selectedLab: ['', [
                 Validators.required
             ]],
@@ -165,7 +169,18 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
             this.analysisGroup = this.analysisGroupList.filter(group=>group.idAnalysisGroup===this.idAnalysisGroup);
             this.analGroupListForXML = _.cloneDeep(this.analysisLabList);
             delete this.analysisGroup[0].items;
-            this.analGroupListForXML[0].AnalysisGroup = this.analysisGroup;
+            delete this.analysisGroup[0].icon;
+            delete this.analysisGroup[0].id;
+            this.analGroupListForXML[0].AnalysisGroups = [];
+            this.analGroupListForXML[0].AnalysisGroups[0] = [];
+            this.analGroupListForXML[0].AnalysisGroups[0].AnalysisGroup = this.analysisGroup;
+
+            this.analysisGroups = {"AnalysisGroups": {"AnalysisGroup":""}};
+            this.analysisGroups.AnalysisGroups.AnalysisGroup = this.analysisGroup[0];
+
+            delete this.analGroupListForXML[0].AnalysisGroup;
+
+
             delete this.analGroupListForXML[0].items;
         }
     }
@@ -238,15 +253,16 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         var params: URLSearchParams = new URLSearchParams();
         var stringifiedGenomBuild;
         var analysisGroupListObject: any = {};
-        analysisGroupListObject.analysisCount = this.analysisGroup[0].Analysis.length;
-        analysisGroupListObject.message = "";
-        analysisGroupListObject.Lab = this.analGroupListForXML;
+        // analysisGroupListObject.analysisCount = this.analysisGroup[0].Analysis.length;
+        //analysisGroupListObject = this.analysisGroup[0];
+        // analysisGroupListObject.message = "";
+        // analysisGroupListObject.Lab = this.analGroupListForXML;
         if (this.genomBuilds.length > 0) {
             stringifiedGenomBuild = JSON.stringify(this.genomBuilds);
         }
         var stringifiedAnalysisGroup;
         if (this.analysisGroup.length > 0) {
-            stringifiedAnalysisGroup = JSON.stringify(analysisGroupListObject);
+            stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
         }
         params.set("lanesXMLString", "");
         params.set("samplesXMLString", "");

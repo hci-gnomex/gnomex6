@@ -106,8 +106,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		institutionsDoc = sax.build(reader);
 		labInstitutionParser = new LabInstitutionParser(institutionsDoc);
 	} catch (JDOMException je) {
-		LOG.error("Cannot parse institutionsXMLString", je);
 		this.addInvalidField("institutionsXMLString", "Invalid institutionsXMLString");
+		this.errorDetails = Util.GNLOG(LOG,"Cannot parse institutionsXMLString", je);
 	}
 
 	if (request.getParameter("membersXMLString") != null && !request.getParameter("membersXMLString").equals("")) {
@@ -120,8 +120,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		membersDoc = sax.build(reader);
 		labMemberParser = new LabMemberParser(membersDoc);
 	} catch (JDOMException je) {
-		LOG.error("Cannot parse membersXMLString", je);
 		this.addInvalidField("membersXMLString", "Invalid membersXMLString");
+		this.errorDetails = Util.GNLOG(LOG,"Cannot parse membersXMLString", je);
 	}
 
 	if (request.getParameter("collaboratorsXMLString") != null
@@ -135,8 +135,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		collaboratorsDoc = sax.build(reader);
 		collaboratorParser = new LabMemberParser(collaboratorsDoc);
 	} catch (JDOMException je) {
-		LOG.error("Cannot parse collaboratorsXMLString", je);
 		this.addInvalidField("collaboratorsXMLString", "Invalid collaboratorsXMLString");
+		this.errorDetails = Util.GNLOG(LOG,"Cannot parse collaboratorsXMLString", je);
 	}
 
 	if (request.getParameter("managersXMLString") != null && !request.getParameter("managersXMLString").equals("")) {
@@ -149,8 +149,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		managersDoc = sax.build(reader);
 		managerParser = new LabMemberParser(managersDoc);
 	} catch (JDOMException je) {
-		LOG.error("Cannot parse managersXMLString", je);
-		this.addInvalidField("managersXMLString", "Invalid managersXMLString");
+			this.addInvalidField("managersXMLString", "Invalid managersXMLString");
+		this.errorDetails = Util.GNLOG(LOG,"Cannot parse managersXMLString", je);
 	}
 
 	if (request.getParameter("accountsXMLString") != null && !request.getParameter("accountsXMLString").equals("")) {
@@ -164,8 +164,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		accountParser = new BillingAccountParser(accountsDoc);
 
 	} catch (JDOMException je) {
-		LOG.error("Cannot parse accountsXMLString", je);
 		this.addInvalidField("accountsXMLString", "Invalid accountsXMLString");
+		this.errorDetails = Util.GNLOG(LOG,"Cannot parse accountsXMLString", je);
 	}
 
 	String coreFacilitiesXMLString = "";
@@ -180,8 +180,8 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			coreFacilityParser = new LabCoreFacilityParser(coreFacilitiesDoc);
 
 		} catch (JDOMException je) {
-			LOG.error("Cannot parse coreFacilitiesXMLString", je);
 			this.addInvalidField("coreFacilitiesXMLString", "Invalid coreFacilitiesXMLString");
+			this.errorDetails = Util.GNLOG(LOG,"Cannot parse coreFacilitiesXMLString", je);
 		}
 	}
 

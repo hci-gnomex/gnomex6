@@ -95,8 +95,8 @@ import {DictionaryService} from "../services/dictionary.service";
 
         .br-exp-three {
             width: 100%;
-            height: 48em;
-            flex-grow: 8;
+            height: 5px;
+            flex-grow: 2;
         }
 
         .br-exp-four {
@@ -242,23 +242,27 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
-            if (this.createProjectDialogRef != undefined) {
+            if (this.createProjectDialogRef) {
                 this.createProjectDialogRef.componentInstance.showSpinner = false;
                 this.createProjectDialogRef.close();
+                this.createProjectDialogRef = null;
             }
-            if (this.deleteProjectDialogRef != undefined) {
+            if (this.deleteProjectDialogRef) {
                 this.deleteProjectDialogRef.componentInstance.showSpinner = false;
                 this.deleteProjectDialogRef.close();
+                this.deleteProjectDialogRef = null;
             }
 
-            if (this.deleteExperimentDialogRef != undefined) {
+            if (this.deleteExperimentDialogRef) {
                 this.deleteExperimentDialogRef.componentInstance.showSpinner = false;
                 this.deleteExperimentDialogRef.close();
+                this.deleteExperimentDialogRef = null;
             }
 
-            if (this.reassignExperimentDialogRef != undefined) {
+            if (this.reassignExperimentDialogRef) {
                 this.reassignExperimentDialogRef.componentInstance.showSpinner = false;
                 this.reassignExperimentDialogRef.close();
+                this.reassignExperimentDialogRef = null;
             }
 
             this.experimentsService.emitExperimentOverviewList(response);
@@ -319,16 +323,16 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     if (project.Request) {
                         if (!this.isArray(project.Request)) {
                             project.items = [project.Request];
-                    } else {
+                        } else {
                             project.items = project.Request;
-                    }
+                        }
                         for (var request of project.items) {
                             if (request) {
                                 if (request.label) {
                                     var shortLabel = request.label.substring(0, (request.label.lastIndexOf("-")));
-                                var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
+                                    var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
                                     request.label = shorterLabel;
-                                this.experimentCount++;
+                                    this.experimentCount++;
                                     request.id = "r"+request.idRequest;
                                     request.parentid = project.id;
                             } else {
@@ -579,7 +583,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.router.navigate(['/experiments',{outlets:{'browsePanel':[idRequest]}}]);
             this.disableNewProject = true;
             this.disableDeleteProject = true;
-            this.experimentsService.getExperiment(idRequest).subscribe((response: any) => {
+            this.experimentsService.getExperiment(this.selectedItem.data.idRequest).subscribe((response: any) => {
                 this.selectedExperiment = response.Request;
                 if (response.Request.canDelete === "Y") {
                     this.disableDeleteExperiment = false;

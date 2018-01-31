@@ -10,7 +10,7 @@
         <div style="flex:1;"class="flex-row-container">
             <split>
                 <split-area size="20">
-                    <div class="br-exp-item"> <!-- start tree container -->
+                    <div class="br-exp-item" style="height:100%"> <!-- start tree container -->
                         <div class="flex-column-container" style="height:100%;">
                             <div class="br-exp-item br-exp-help-drag-drop">
                                 <div class="flex-row-container">
@@ -32,6 +32,7 @@
                                         <img src="{{node.data.icon}}" height="16" width="16">
                                         <span>{{ node.data.label }}</span>
                                     </ng-template>
+                                    <ng-template #loadingTemplate></ng-template>
                                 </tree-root>
                             </div>
                             <div class="br-exp-item br-exp-four">

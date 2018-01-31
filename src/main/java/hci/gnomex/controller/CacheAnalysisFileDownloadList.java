@@ -36,7 +36,7 @@ public class CacheAnalysisFileDownloadList extends GNomExCommand implements Seri
   private AnalysisFileDescriptorParser parser = null;
 
   
-  protected final static String   SESSION_KEY_FILE_DESCRIPTOR_PARSER = "GNomExAnalysisFileDescriptorParser";
+  protected static final String   SESSION_KEY_FILE_DESCRIPTOR_PARSER = "GNomExAnalysisFileDescriptorParser";
   
 
   /**
@@ -70,7 +70,7 @@ public class CacheAnalysisFileDownloadList extends GNomExCommand implements Seri
         Document doc = sax.build(reader);
         parser = new AnalysisFileDescriptorParser(doc);
       } catch (JDOMException je ) {
-        LOG.error( "Cannot parse fileDescriptorXMLString", je );
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse fileDescriptorXMLString", je);
       
       }
     }
@@ -113,6 +113,7 @@ public class CacheAnalysisFileDownloadList extends GNomExCommand implements Seri
   /* (non-Javadoc)
    * @see hci.framework.control.Command#setRequestState(javax.servlet.http.HttpServletRequest)
    */
+  @Override
   public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request) {
     request.setAttribute("xmlResult",this.xmlResult);
     return request;
@@ -121,6 +122,7 @@ public class CacheAnalysisFileDownloadList extends GNomExCommand implements Seri
   /* (non-Javadoc)
    * @see hci.framework.control.Command#setResponseState(javax.servlet.http.HttpServletResponse)
    */
+  @Override
   public HttpServletResponse setResponseState(HttpServletResponse response) {
     // TODO Auto-generated method stub
     return response;
@@ -129,6 +131,7 @@ public class CacheAnalysisFileDownloadList extends GNomExCommand implements Seri
   /* (non-Javadoc)
    * @see hci.framework.control.Command#setSessionState(javax.servlet.http.HttpSession)
    */
+  @Override
   public HttpSession setSessionState(HttpSession session) {
     session.setAttribute(this.SESSION_KEY_FILE_DESCRIPTOR_PARSER, this.parser);
     return session;

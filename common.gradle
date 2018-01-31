@@ -11,7 +11,7 @@ ext{
     rescDir="$projectDir/src/main/resources"
     webrootDir="$projectDir/src/main/webapp"
     sandboxDir="${buildDir}/sandbox"
-    gnomex_version=5.37
+    gnomex_version=6.0
     openSourceZipName="gnomex_tomcat_${gnomex_version}.zip"
     openSourceName="gnomex_${gnomex_version}"
 }

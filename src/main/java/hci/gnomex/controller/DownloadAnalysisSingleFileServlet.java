@@ -39,7 +39,7 @@ public class DownloadAnalysisSingleFileServlet extends HttpServlet {
 
     }
 
-    protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
 
         String baseDir = null;

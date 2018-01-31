@@ -19,7 +19,7 @@ public class GetPurchaseOrderForm extends HttpServlet {
 private static Logger LOG = Logger.getLogger(GetPurchaseOrderForm.class);
 private Integer idBillingAccount;
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	doPost(req, res);
 }
 

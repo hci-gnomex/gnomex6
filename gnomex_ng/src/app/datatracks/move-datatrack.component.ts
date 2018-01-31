@@ -46,21 +46,34 @@ export class MoveDataTrackComponent {
 
     public doMoveCopy(mode: any): void {
         this.showSpinner = true;
+        this.noButton = false;
         let params: URLSearchParams = new URLSearchParams();
-        params.set("idDataTrack", this.currentItem.idDataTrack);
         params.set("idGenomeBuild", this.currentItem.idGenomeBuild);
-        params.set("idDataTrackFolder", this.targetItem.idDataTrackFolder);
-        params.set("idDataTrackFolderOld", this.currentItem.idDataTrackFolder);
-        if (mode ==="M")
+        if (mode ==="M") {
             params.set("isMove", "Y");
-        else
+        }
+        else {
             params.set("isMove", "N");
-        params.set("name", "DataTrack");
-        this.dataTrackService.moveDataTrack(params).subscribe((response: Response) => {
-            this.showSpinner = false;
-            this.dialogRef.close();
-            this.dataTrackService.refreshDatatracksList_fromBackend();
-        });
+        }
+        if (this.currentItem.isDataTrackFolder) {
+            params.set("idDataTrackFolder", this.currentItem.idDataTrackFolder);
+            params.set("idParentDataTrackFolder", this.targetItem.idDataTrackFolder);
+            params.set("name", "DataTrackFolder");
+            this.dataTrackService.moveDataTrackFolder(params).subscribe((response: Response) => {
+                this.showSpinner = false;
+                this.dialogRef.close();
+                this.dataTrackService.refreshDatatracksList_fromBackend();
+            });
+        } else {
+            params.set("idDataTrack", this.currentItem.idDataTrack);
+            params.set("idDataTrackFolder", this.targetItem.idDataTrackFolder);
+            params.set("idDataTrackFolderOld", this.currentItem.idDataTrackFolder);
+            this.dataTrackService.moveDataTrack(params).subscribe((response: Response) => {
+                this.showSpinner = false;
+                this.dialogRef.close();
+                this.dataTrackService.refreshDatatracksList_fromBackend();
+            });
+        }
     }
 
 }

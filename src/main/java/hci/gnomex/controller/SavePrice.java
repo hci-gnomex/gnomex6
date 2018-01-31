@@ -65,8 +65,8 @@ public class SavePrice extends GNomExCommand implements Serializable {
       criteriaDoc = sax.build(reader);
       criteriaParser = new PriceCriteriaParser(criteriaDoc);
     } catch (JDOMException je ) {
-      LOG.error( "Cannot parse priceCriteriasXMLString", je );
       this.addInvalidField( "priceCriteriasXMLString", "Invalid priceCriteriasXMLString");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse priceCriteriasXMLString", je);
     }
 
   }

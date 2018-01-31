@@ -11,7 +11,9 @@ import {UserModule} from "@hci/user";
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {HeaderComponent} from "./header.component";
-
+import {MenuItemComponent} from './menu-item/menu-item.component';
+import {ExternalLinkResolver} from './external-routes.module';
+import {ExternalLinkComponent} from './external-routes.module';
 import {
     MatGridListModule,
     MatToolbarModule,
@@ -19,10 +21,12 @@ import {
     MatInputModule,
     MatListModule,
     MatFormFieldModule,
-	MatMenuModule, ShowOnDirtyErrorStateMatcher}  from '@angular/material';
+    MatMenuModule, ShowOnDirtyErrorStateMatcher, MatDialogModule
+} from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
+import {LogoutComponent} from "./logout.component";
 
 @NgModule({
   imports: [
@@ -35,14 +39,16 @@ import {NewBillingAccountModule} from "../billing/new_billing_account/new-billin
       UserModule,
       AngularMaterialModule,
       BrowserAnimationsModule,
-      NewBillingAccountModule
+      NewBillingAccountModule,
+      MatDialogModule
   ],
    providers: [
-       // {provide: MD_ERROR_GLOBAL_OPTIONS, useValue: {errorStateMatcher: showOnDirtyErrorStateMatcher}}
+       ExternalLinkResolver
     ],
 
-    declarations: [HeaderComponent],
-    exports: [HeaderComponent]
+    declarations: [HeaderComponent, MenuItemComponent, LogoutComponent, ExternalLinkComponent],
+    entryComponents:[ExternalLinkComponent],
+    exports: [HeaderComponent, LogoutComponent]
 })
 export class HeaderModule {
 }

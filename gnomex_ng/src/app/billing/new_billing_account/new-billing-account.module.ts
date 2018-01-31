@@ -47,6 +47,9 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
 		NewBillingAccountComponent,
 		NumberJqxInputComponent
 	],
+	entryComponents: [
+		NewBillingAccountComponent
+	],
 	providers: [
 		AccountFieldsConfigurationService,
 		NewBillingAccountService

@@ -26,7 +26,7 @@ private static Logger LOG = Logger.getLogger(ApproveLabMembership.class);
 
 private static String serverName;
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	serverName = req.getServerName();
 	doPost(req, res);
 }

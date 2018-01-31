@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
 public class CheckSessionStatus extends HttpServlet {
   private static Logger LOG = Logger.getLogger(CheckSessionStatus.class);
@@ -45,7 +46,7 @@ public class CheckSessionStatus extends HttpServlet {
    * @exception IOException
    *              Description of the Exception
    */
-  public void doGet(HttpServletWrappedRequest request, HttpServletResponse response) throws ServletException, IOException {
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     doPost(request, response);
   }
 
@@ -88,9 +89,11 @@ public class CheckSessionStatus extends HttpServlet {
       }
       LOG.debug(xmlResult);
     }
+
+    String jsonResult = Util.xmlToJson(xmlResult);
     response.setContentType("text/html");
     PrintWriter out = response.getWriter();
-    out.println(xmlResult);
+    out.println(jsonResult);
     out.close();
   }
 }

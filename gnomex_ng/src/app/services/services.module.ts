@@ -21,6 +21,10 @@ import {PropertyService} from "./property.service";
 import {AnnotationService} from "./annotation.service";
 import {UsageService} from "./usage.service";
 import {GnomexStringUtilService} from "./gnomex-string-util.service"
+import {GnomexService} from "./gnomex.service";
+import {TopicService} from "./topic.service";
+import {CookieUtilService} from "./cookie-util.service";
+import {BroadcastEmailService} from "./broadcast-email.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -49,6 +53,10 @@ import {GnomexStringUtilService} from "./gnomex-string-util.service"
         GnomexStringUtilService,
         AnalysisGroupResolverService,
         AnalysisResolverService,
+        GnomexService,
+        TopicService,
+        BroadcastEmailService,
+        CookieUtilService,
     ]})
 export class ServicesModule {
 }

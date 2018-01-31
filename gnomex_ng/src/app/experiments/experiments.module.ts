@@ -34,8 +34,15 @@ import {ViewExperimentComponent} from "./view-experiment.component";
 import {BrowsePanelComponent} from "./browse-panel.component";
 import {AgGridModule} from 'ag-grid-angular/main';
 
-
-import {TestComponent,DescriptionTab,PrepTab,ExperimentDetail,NewExperimentComponent} from './experiment-detail/index'
+import {
+    TestComponent,
+    DescriptionTab,
+    PrepTab,
+    ExperimentDetail,
+    NewExperimentComponent,
+    SamplesTabComponent,
+    SequenceLanesTabComponent,
+} from './experiment-detail/index'
 import {
     RichEditorModule,
     DropDownModule
@@ -56,6 +63,8 @@ import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
 import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {AgGridRendererModule,IconTextRendererComponent} from "../util/grid-renderers/index";
+import {MatDialogModule} from "@angular/material";
+import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
 
 /**
  * @author mbyrne
@@ -72,7 +81,9 @@ export const componentFactories =
         ExperimentsBrowseTab,
         ProgressBrowseTab,
         ProjectBrowseTab,
-        VisiblityBrowseTab
+        VisiblityBrowseTab,
+        SamplesTabComponent,
+        SequenceLanesTabComponent,
     ];
 /**/
                                 // need add components that will be tabs here
@@ -105,7 +116,8 @@ export const componentFactories =
         TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
-        AgGridModule.withComponents([IconTextRendererComponent])
+        AgGridModule.withComponents([IconTextRendererComponent]),
+        MatDialogModule
     ],
     declarations: [
                     BrowseExperimentsComponent,
@@ -113,12 +125,15 @@ export const componentFactories =
                     ViewExperimentComponent,
                     TestComponent,
                     DescriptionTab,
+                    SamplesTabComponent,
+                    SequenceLanesTabComponent,
                     ExperimentDetail,
                     PrepTab,
                     NewExperimentComponent,
                     DownloadsBrowseTab,
                     BrowsePanelComponent,
                     BrowseOverviewComponent,
+                    DownloadsBrowseTab,
                     ExperimentsBrowseTab,
                     ProgressBrowseTab,
                     ProjectBrowseTab,
@@ -126,10 +141,11 @@ export const componentFactories =
                     CreateProjectComponent,
                     DeleteProjectComponent,
                     ReassignExperimentComponent,
-                    DeleteExperimentComponent
+                    DeleteExperimentComponent,
+                    CreateProjectLauncherComponent
     ],
-    entryComponents:[...componentFactories, CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent],
-    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent]
+    entryComponents:[...componentFactories, CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent],
+    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent]
 })
 export class ExperimentsModule {
 }

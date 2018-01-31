@@ -104,8 +104,8 @@ const actionMapping:IActionMapping = {
 
         .br-exp-three {
             width: 100%;
-            height: 48em;
-            flex-grow: 8;
+            height: 5px;
+            flex-grow: 2;
         }
 
         .br-exp-four {
@@ -178,7 +178,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         },
         allowDrop: (element, {parent, index}) => {
             this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1 || parent.data.idAnalysis) {
+            if (parent.data.parentid === -1 || parent.data.idAnalysis ||
+                element.data.idAnalysisGroup) {
                 return false;
             } else {
                 return true;
@@ -506,6 +507,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.selectedLabLabel = this.selectedItem.data.labName;
         let idAnalysis = this.selectedItem.data.idAnalysis;
         let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
+        let idLab = this.selectedItem.data.idLab;
         let analysisGroupListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
 
 
@@ -524,7 +526,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
             this.router.navigate(['/analysis',
-                    {outlets:{'analysisPanel':['overview',{'idAnalysisGroup':idAnalysisGroup}]}}
+                    {outlets:{'analysisPanel':['overview',{'idAnalysisGroup':idAnalysisGroup,'idLab':idLab}]}}
                 ]);
             this.analysisService.emitAnalysisOverviewList(analysisGroupListNode)
 

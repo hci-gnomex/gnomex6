@@ -5,6 +5,7 @@ import hci.dictionary.model.NullDictionaryEntry;
 import hci.framework.security.SecurityAdvisor;
 import hci.framework.security.UnknownPermissionException;
 import hci.framework.utilities.XMLReflectException;
+import hci.gnomex.utility.Util;
 import hci.hibernate5utils.HibernateDetailObject;
 
 import java.io.InputStream;
@@ -73,6 +74,9 @@ private TreeMap<String, Dictionary> dictionaries;
 
 private static Logger LOG = Logger.getLogger(DictionaryManager.class);
 private transient ClassLoader loader;
+	protected String errorDetails = "";
+
+
 
 private DictionaryManager() {
 	dictionaries = new TreeMap<>();
@@ -135,7 +139,7 @@ void registerDictionaries(String dictionaryXmlFile, ClassLoader loader) {
 			Document doc = builder.build(is);
 			registerDictionaries(doc);
 		} catch (JDOMException e) {
-			LOG.error("Error loading dictionaries: ", e);
+			this.errorDetails = Util.GNLOG(LOG,"Error loading dictionaries: ", e);
 		}
 	}
 }
@@ -402,8 +406,7 @@ public String getValue(String className, String display) {
  * &nbsp;&nbsp;...<br>
  * &lt;/DICTIONARIES&gt;
  *
- * @param includeNullEntry
- *            is a boolean that is true if a null option is to be included in each dictionary
+  *            is a boolean that is true if a null option is to be included in each dictionary
  * @return A String containing an XML representation of all registered dictionaries
  */
 private String getAllXML(SecurityAdvisor securityAdvisor) {
@@ -958,7 +961,6 @@ private String parseFilterDisplay(String display) {
 /**
  * Formats a date object as a string, according to the specified format
  *
- * @param object
  *            The date object to be formatted as a String
  * @param outputStyle
  *            The style in which to forat the date, as specified in DetailObject

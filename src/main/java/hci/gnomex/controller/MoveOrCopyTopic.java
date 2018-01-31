@@ -101,54 +101,61 @@ public class MoveOrCopyTopic extends GNomExCommand implements Serializable {
     return this;
   }
 
-  private Topic copyTopic(Session sess, Topic topic, Integer idParentTopic) {
+  private Topic copyTopic(Session sess, Topic topic, Integer idParentTopic) throws RollBackCommandException {
     Topic topicCopy = new Topic();
-    topicCopy.setName(topic.getName());
-    topicCopy.setDescription(topic.getDescription());
-    topicCopy.setIdParentTopic(idParentTopic);
-    topicCopy.setIdLab(topic.getIdLab());
-    topicCopy.setCreatedBy(this.getSecAdvisor().getUID());
-    topicCopy.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
-    topicCopy.setIdAppUser(this.getSecAdvisor().getIdAppUser());
+    try {
+      topicCopy.setName(topic.getName());
+      topicCopy.setDescription(topic.getDescription());
+      topicCopy.setIdParentTopic(idParentTopic);
+      topicCopy.setIdLab(topic.getIdLab());
+      topicCopy.setCreatedBy(this.getSecAdvisor().getUID());
+      topicCopy.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
+      topicCopy.setIdAppUser(this.getSecAdvisor().getIdAppUser());
+      topicCopy.setCodeVisibility(topic.getCodeVisibility());
 
-    // Save copy of requests
-    Set<Request> newRequests = new TreeSet<Request>(new RequestComparator());
-    for(Iterator<?> i = topic.getRequests().iterator(); i.hasNext();) {
-      Request r = (Request) i.next();
-      newRequests.add(r);
-    }
-    topicCopy.setRequests(newRequests);
-
-    // Save copy of analyses
-    Set<Analysis> newAnalyses = new TreeSet<Analysis>(new AnalysisComparator());
-    for(Iterator<?> i = topic.getAnalyses().iterator(); i.hasNext();) {
-      Analysis a = (Analysis) i.next();
-      newAnalyses.add(a);
-    }
-    topicCopy.setAnalyses(newAnalyses);
-
-    // Save copy of datatracks
-    Set<DataTrack> newDataTracks = new TreeSet<DataTrack>(new DataTrackComparator());
-    for(Iterator<?> i = topic.getDataTracks().iterator(); i.hasNext();) {
-      DataTrack dt = (DataTrack) i.next();
-      newDataTracks.add(dt);
-    }
-    topicCopy.setDataTracks(newDataTracks);
-
-    // Create and save any child topics
-    Set<Topic> newTopics = new TreeSet<Topic>(new TopicComparator());
-    for(Iterator<?> i = topic.getTopics().iterator(); i.hasNext();) {
-      Topic t = (Topic) i.next();
-      Topic newChildTopic = copyTopic(sess, t, null);
-      if(newChildTopic != null) {
-        newTopics.add(newChildTopic);
+      // Save copy of requests
+      Set<Request> newRequests = new TreeSet<Request>(new RequestComparator());
+      for (Iterator<?> i = topic.getRequests().iterator(); i.hasNext(); ) {
+        Request r = (Request) i.next();
+        newRequests.add(r);
       }
+      topicCopy.setRequests(newRequests);
+
+      // Save copy of analyses
+      Set<Analysis> newAnalyses = new TreeSet<Analysis>(new AnalysisComparator());
+      for (Iterator<?> i = topic.getAnalyses().iterator(); i.hasNext(); ) {
+        Analysis a = (Analysis) i.next();
+        newAnalyses.add(a);
+      }
+      topicCopy.setAnalyses(newAnalyses);
+
+      // Save copy of datatracks
+      Set<DataTrack> newDataTracks = new TreeSet<DataTrack>(new DataTrackComparator());
+      for (Iterator<?> i = topic.getDataTracks().iterator(); i.hasNext(); ) {
+        DataTrack dt = (DataTrack) i.next();
+        newDataTracks.add(dt);
+      }
+      topicCopy.setDataTracks(newDataTracks);
+
+      // Create and save any child topics
+      Set<Topic> newTopics = new TreeSet<Topic>(new TopicComparator());
+      for (Iterator<?> i = topic.getTopics().iterator(); i.hasNext(); ) {
+        Topic t = (Topic) i.next();
+        Topic newChildTopic = copyTopic(sess, t, null);
+        if (newChildTopic != null) {
+          newTopics.add(newChildTopic);
+        }
+      }
+      topicCopy.setTopics(newTopics);
+
+      sess.save(topicCopy);
+      sess.flush();
+    } catch (Exception e){
+      this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in MoveDataTrack ", e);
+
+      throw new RollBackCommandException(e.getMessage());
+
     }
-    topicCopy.setTopics(newTopics);
-
-    sess.save(topicCopy);
-    sess.flush();
-
     return topicCopy;
   }
 }

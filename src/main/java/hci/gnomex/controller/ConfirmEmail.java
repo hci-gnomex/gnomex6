@@ -20,11 +20,11 @@ public class ConfirmEmail extends HttpServlet {
 
 private static Logger LOG = Logger.getLogger(ConfirmEmail.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	doPost(req, res);
 }
 
-protected void doPost(HttpServletWrappedRequest request, HttpServletResponse response) throws ServletException, IOException {
+protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String message = "";
 
 	try {

@@ -59,8 +59,8 @@ public class MoveAnalysis extends GNomExCommand implements Serializable {
 				analysisGroupsDoc = sax.build(reader);
 				analysisGroupParser = new AnalysisGroupParser(analysisGroupsDoc);
 			} catch (JDOMException je) {
-				LOG.error("Cannot parse analysisGroupsXMLString", je);
 				this.addInvalidField("analysisGroupsXMLString", "Invalid analysisGroupsXMLString");
+				this.errorDetails = Util.GNLOG(LOG,"Cannot parse analysisGroupsXMLString", je);
 			}
 		}
 

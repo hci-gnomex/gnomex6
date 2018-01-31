@@ -1,6 +1,11 @@
 import {
-	Component, ElementRef, OnDestroy, OnInit, AfterViewInit, ViewChild,
-	ChangeDetectorRef, Inject
+	Component,
+	ElementRef,
+	OnDestroy,
+	OnInit,
+	ViewChild,
+	ChangeDetectorRef,
+	Inject
 } from "@angular/core";
 import { URLSearchParams } from "@angular/http";
 import {Router} from "@angular/router";
@@ -31,17 +36,13 @@ import {PropertyService} from "../../services/property.service";
 
 @Component({
 	selector: "new-billing-account-launcher",
-	template: ` `,
+	template: `<div></div>`,
 	styles: [``]
 })
-export class NewBillingAccountLauncher implements OnInit {
+export class NewBillingAccountLauncher {
 
-	constructor(private dialog: MatDialog,
-							private router: Router
-	) { }
-
-	ngOnInit(): void {
-		let dialogRef = this.dialog.open(NewBillingAccountComponent, { width: '60em' });
+	constructor(private dialog: MatDialog, private router: Router) {
+		let dialogRef = this.dialog.open(NewBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log('Test dialog closed!');
@@ -51,14 +52,6 @@ export class NewBillingAccountLauncher implements OnInit {
 		});
 	}
 }
-
-
-//
-// export class AccountNumberStateMatcher implements ErrorStateMatcher {
-// 	isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-// 		return !!(control && control.invalid && (control.dirty || control.touched || (form && form.submitted)));
-// 	}
-// }
 
 export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 	isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -70,31 +63,15 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 	selector: "new-billing-account-window",
 	templateUrl: "./new-billing-account.component.html",
 	styles: [`
-			/*button {*/
-          /*height: 1.6em;*/
-          /*width: 4.5em;*/
-          /*border-radius: 4px;*/
-          /*text-align: center;*/
-					/**/
-					/*font-size: small;*/
-          
-          /*background: #e4e0e0;*/
-          /*background: -webkit-linear-gradient(white, #e4e0e0);*/
-          /*background: -o-linear-gradient(white, #e4e0e0);*/
-          /*background: -moz-linear-gradient(white, #e4e0e0);*/
-          /*background: linear-gradient(white, #e4e0e0);*/
-			/*}*/
 
       .mat-dialog-title {
           margin: 0;
           padding: 0;
       }
-
       .mat-dialog-content {
           margin: 0;
           padding: 0;
       }
-
       .mat-dialog-actions {
           margin: 0;
           padding: 0;
@@ -108,11 +85,9 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
       div.t {
           display: table;
       }
-
       div.tr {
           display: table-row;
       }
-
       div.td {
           display: table-cell;
       }
@@ -124,7 +99,6 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 			.full-height {
 					height: 100%;
 			}
-			
 			.full-width {
 					width: 100%;
 			}
@@ -180,9 +154,6 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 					padding-bottom: 0.2rem;
 			}
 			
-			.row-content {
-			}
-
       .row-spacer {
 					height: 0.4em;
 			}
@@ -1287,7 +1258,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	private onLabListSelection(event: any): void {
 		let coreFacilityGridLocalData: any[] = [];
 
-		if (event) {
+		if (event && event.value && event.value.coreFacilities) {
 			let coreFacilities = event.value.coreFacilities;
 
 			if (coreFacilities != undefined && coreFacilities != null) {

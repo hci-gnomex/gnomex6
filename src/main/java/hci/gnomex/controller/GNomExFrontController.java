@@ -318,11 +318,23 @@ public static boolean areWeLite() {
 			System.out.println("WARNING short xml: -->" + thexml + "<--");
 		}
 		XMLSerializer xmlSerializer = new XMLSerializer();
+
+		boolean hasType = false;
+		if (thexml.indexOf("type=") >= 0) {
+			hasType = true;
+			thexml = thexml.replace(" type="," notype=");
+		}
 		JSON json = xmlSerializer.read(thexml);
 		String thejson = json.toString(2);
 
 		// get rid of the "@
 		thejson = thejson.replace("\"@", "\"");
+
+		// if we dealt with the "type" being a JSON keyword then changes things back
+		if (hasType) {
+			hasType = false;
+			thejson = thejson.replace("\"notype\":","\"type\":");
+		}
 
 		response.setContentType("application/json");
 		// Get the printwriter object from response to write the required json object to the output stream
