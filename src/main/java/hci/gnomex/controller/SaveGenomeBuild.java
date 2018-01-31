@@ -54,11 +54,13 @@ public class SaveGenomeBuild extends GNomExCommand implements Serializable {
     
     // Get segments XML string
     if (request.getParameter("segmentsXML") != null && !request.getParameter("segmentsXML").equals("")) {
-      segmentsXML = request.getParameter("segmentsXML");      
+      segmentsXML = request.getParameter("segmentsXML");
+      System.out.println ("[SaveGenomeBuild] segmentsXML: " + segmentsXML);
     }
     // Get sequenceFilesToRemove XML string
     if (request.getParameter("sequenceFilesToRemoveXML") != null && !request.getParameter("sequenceFilesToRemoveXML").equals("")) {
-      sequenceFilesToRemoveXML = request.getParameter("sequenceFilesToRemoveXML");      
+      sequenceFilesToRemoveXML = request.getParameter("sequenceFilesToRemoveXML");
+      System.out.println ("[SaveGenomeBuild] sequenceFilesToRemoveXML: " + sequenceFilesToRemoveXML);
     }
 
     if (isValid()) {
@@ -145,6 +147,8 @@ public class SaveGenomeBuild extends GNomExCommand implements Serializable {
       }
     } catch (DocumentException e) {
       addInvalidField("segmentsXML", "Unable to process segments");
+      this.addInvalidField("segmentsXML", "Invalid segmentsXML");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse segmentsXML ", e);
     }
   }
 
