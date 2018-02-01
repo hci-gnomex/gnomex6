@@ -3,7 +3,7 @@
  */
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {UserModule} from "@hci/user";
@@ -26,6 +26,12 @@ import {
 import {HEADER_ROUTING} from "./header.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {LogoutComponent} from "./logout.component";
+import {CreateReportProblemLauncherComponent} from "./reportProblem/report-problem-launcher.component";
+import {ReportProblemComponent} from "./reportProblem/report-problem.component";
+import {ManageLinksComponent} from "./manageLinks/manage-links.component";
+import {AgGridModule} from 'ag-grid-angular/main';
+import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
+import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
 
 @NgModule({
   imports: [HEADER_ROUTING, CommonModule,
@@ -33,18 +39,22 @@ import {LogoutComponent} from "./logout.component";
       NgbModule.forRoot(),
       FormsModule,
       CommonModule,
+      FormsModule,
+      ReactiveFormsModule,
       UserModule,
       AngularMaterialModule,
       BrowserAnimationsModule,
-      MatDialogModule
+      MatDialogModule,
+      AgGridModule.withComponents([IconTextRendererComponent])
   ],
    providers: [
        ExternalLinkResolver
     ],
 
-    declarations: [HeaderComponent, MenuItemComponent, LogoutComponent, ExternalLinkComponent],
-    entryComponents:[ExternalLinkComponent],
-    exports: [HeaderComponent, LogoutComponent]
+    declarations: [HeaderComponent, MenuItemComponent, LogoutComponent, ExternalLinkComponent, CreateReportProblemLauncherComponent, ReportProblemComponent,
+        ManageLinksComponent, ManageLinksLauncherComponent],
+    entryComponents:[ExternalLinkComponent, ReportProblemComponent, ManageLinksComponent],
+    exports: [HeaderComponent, LogoutComponent, ReportProblemComponent, ManageLinksComponent]
 })
 export class HeaderModule {
 }

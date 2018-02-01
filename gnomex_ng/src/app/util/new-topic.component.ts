@@ -35,14 +35,12 @@ export class NewTopicComponent {
                 private labListService: LabListService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
         if (this.data != null) {
-            this.idParentTopic = data.idParentTopic;
-            this.parentTopicLabel = data.parentTopicLabel;
             this.selectedItem = data.selectedItem;
         }
-        if (!(this.selectedItem.data.idParentTopic === "")) {
-            this.title = "Add Subtopic of " + this.selectedItem.parent.data.label;
+        if (!this.selectedItem.data.idTopic) {
+            this.title = " Add New Top Level Topic";
         } else {
-            this.title = "Add New Top Level Topic";
+            this.title = " Add Subtopic of " + this.selectedItem.parent.data.label;
         }
 
         this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
@@ -100,7 +98,7 @@ export class NewTopicComponent {
     public save(): void {
         this.showSpinner = true;
         let params: URLSearchParams = new URLSearchParams();
-        params.set("idParentTopic", this.idParentTopic);
+        params.set("idParentTopic", this.selectedItem.data.idTopic);
         params.set("name", this.name);
         params.set("description", "");
         params.set("idLab", this.idLab);
@@ -109,6 +107,7 @@ export class NewTopicComponent {
         this.topicService.saveTopic(params).subscribe((response: Response) => {
             this.showSpinner = false;
             this.dialogRef.close();
+            this.topicService.refreshTopicsList_fromBackend();
         });
     }
 

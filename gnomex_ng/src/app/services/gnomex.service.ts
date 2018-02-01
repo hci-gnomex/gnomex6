@@ -3,6 +3,7 @@ import {DictionaryService} from "./dictionary.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
 import {LabListService} from "./lab-list.service";
+import {Subject} from "rxjs/Subject";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CORE_FACILITY_GENOMICS: string = "High Throughput Genomics";
@@ -51,6 +52,7 @@ export class GnomexService {
     public manageLabList: any[] = [];
     public workAuthLabList: any[] = [];
     public promptedWorkAuthLabList: any[] = [];
+    public faqUpdateObservable: Subject<boolean> = new Subject();
 
     constructor(private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
@@ -87,6 +89,10 @@ export class GnomexService {
             return "";
         }
         return this.properties[name];
+    }
+
+    emitFaqUpdateObservable(): void {
+        this.faqUpdateObservable.next();
     }
 
     /**
