@@ -324,7 +324,7 @@ export class DictionaryService {
      * @param {string} className
      * @returns {Observable<any>}
      */
-    getMetadata(className: string): Observable<any> {
+    getMetaData(className: string): Observable<any> {
         return this._http.get("/gnomex/ManageDictionaries.gx?action=metadata&className=" + className, {withCredentials: true}).map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
