@@ -143,13 +143,10 @@ const actionMapping:IActionMapping = {
             display: flex;
             flex-direction: column;
         }
-        .experiment-detail-panel {
-            width:75%;
-            padding: 2em;
-            margin-left: 2em;
-            background-color: #0b97c4;
+        .datatracks-panel {
+            height:100%;
+            width:100%;
             border: #C8C8C8 solid thin;
-            overflow: auto;
         }
     `]
 })
@@ -225,6 +222,24 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
             this.buildTree(response);
+
+
+            if(this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
+                this.router.navigate(['/datatracks', { outlets: { datatracksPanel: null }}]);
+                this.datatracksService.previousURLParams["refreshParams"] = false;
+                this.datatracksService.datatrackListTreeNode = response;
+            }
+            let id = null;
+            if(this.datatracksService.datatrackListTreeNode){
+                id = this.datatracksService.datatrackListTreeNode.id;
+                if(this.treeModel && id){
+                    this.treeModel.getNodeById(id).setIsActive(true);
+                }
+            }
+
+
+
+
         });
         this.datatracksService.startSearchSubject.subscribe((value) =>{
             if (value) {
@@ -465,16 +480,35 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.selectedItem = event.node;
         this.selItem.emit(this.selectedItem);
 
-        //Lab
-        if (this.selectedItem.level === 1) {
-            this.disableDelete = true;
-        } else if (this.selectedItem.level === 2) {
-            this.disableDelete = false;
+        let datatrackListNode =  _.cloneDeep(this.selectedItem.data);
+        this.datatracksService.datatrackListTreeNode = datatrackListNode;
 
-            //datatrack
-        } else if (this.selectedItem.level === 3) {
+
+
+        if(datatrackListNode.isGenomeBuild){
+            datatrackListNode["treeNodeType"] = "GenomeBuild";
+            this.disableDelete = false;
+            let idGenomeBuild:string = datatrackListNode.idGenomeBuild;
+            this.router.navigate(['/datatracks', {outlets:{'datatracksPanel':['genomeBuild',{'idGenomeBuild':idGenomeBuild}]}}
+            ]);
+
+        }else if (datatrackListNode.isDataTrackFolder){
+            datatrackListNode["treeNodeType"] = "Folder";
+            //idDataTrackFolder
+            this.disableDelete = false;
+        }else if (this.selectedItem.isRoot){
+            datatrackListNode["treeNodeType"] = "Organism";
+            this.disableDelete = true;
+            let idOrganism:string = datatrackListNode.idOrganism;
+            this.router.navigate(['/datatracks', {outlets:{'datatracksPanel':['organism',{'idOrganism':idOrganism}]}}
+            ]);
+        }
+        else{ // isLeaf
+            //idDataTrack
+            datatrackListNode["treeNodeType"] = "Datatrack";
             this.disableDelete = false;
         }
+
     }
 
     expandClicked() {

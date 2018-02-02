@@ -1,0 +1,92 @@
+<form (ngSubmit)="save()" style="" [formGroup]="gbFormGroup">
+    <p>
+        <mat-form-field >
+            <input  matInput
+                   formControlName="das2Name"
+                   type="text"
+                   placeholder="DAS2 name"/>
+            <mat-error *ngIf="gbFormGroup.get('das2Name').hasError('maxlength')">
+                Your field exceeds 200 characters
+            </mat-error>
+            <mat-error *ngIf="gbFormGroup.get('das2Name').hasError('specialChars')">
+                DAS2 Name cannot have spaces or special characters
+            </mat-error>
+
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field >
+            <input matInput formControlName="genomeBuildName" type="text" placeholder="Name"/>
+            <mat-error *ngIf="gbFormGroup.get('genomeBuildName').hasError('maxlength')">
+                Your field exceeds 200 characters
+            </mat-error>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field >
+            <input matInput [matDatepicker]="picker1" placeholder="Build date" formControlName="buildDate"/>
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1 ></mat-datepicker>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field >
+            <input  matInput formControlName="ucscName" type="text" placeholder="UCSC name"/>
+            <mat-error *ngIf="gbFormGroup.get('ucscName').hasError('maxlength')">
+                Your field exceeds 200 characters
+            </mat-error>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field >
+            <input matInput formControlName="igvName" type="text" placeholder="IGV name"/>
+            <mat-error *ngIf="gbFormGroup.get('igvName').hasError('maxlength')">
+                Your field exceeds 200 characters
+            </mat-error>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field >
+            <input matInput formControlName="coordURI" type="text" placeholder="Coord URI"/>
+            <mat-error *ngIf="gbFormGroup.get('coordURI').hasError('maxlength')">
+                Your field exceeds 2000 characters
+            </mat-error>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field>
+            <input matInput formControlName="coordVersion" type="text" placeholder="Coord version"/>
+            <mat-error *ngIf="gbFormGroup.get('coordVersion').hasError('maxlength')">
+                Your field exceeds 50 characters
+            </mat-error>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field>
+            <input matInput formControlName="coordSource" type="text" placeholder="Coord source"/>
+            <mat-error *ngIf="gbFormGroup.get('coordSource').hasError('maxlength')">
+                Your field exceeds 50 characters
+            </mat-error>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field>
+            <input matInput formControlName="coordTestRange" type="text" placeholder="Coord test range"/>
+            <mat-error *ngIf="gbFormGroup.get('coordTestRange').hasError('maxlength')">
+                Your field exceeds 100 characters
+            </mat-error>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field >
+            <input matInput formControlName="coordAuthority" type="text" placeholder="Coord authority"/>
+            <mat-error *ngIf="gbFormGroup.get('coordAuthority').hasError('maxlength')">
+                Your field exceeds 50 characters
+            </mat-error>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-checkbox matInput class="example-margin" formControlName="isActive">Active </mat-checkbox>
+    </p>
+</form>
+
