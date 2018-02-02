@@ -1,10 +1,11 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
+import {Http,Headers, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
 import {Subject} from "rxjs/Subject";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class DataTrackService {
@@ -13,8 +14,23 @@ export class DataTrackService {
     private datatracksListSubject: Subject<any[]> = new Subject();
     private _haveLoadedDatatracksList: boolean = false;
     private _previousURLParams: URLSearchParams = null;
+    private _datatrackListTreeNode: any;
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private cookieUtilService: CookieUtilService ) {
+    }
+
+
+    set datatrackListTreeNode(data:any){
+        this._datatrackListTreeNode = data;
+    }
+    get datatrackListTreeNode():any{
+        return this._datatrackListTreeNode;
+    }
+    set previousURLParams(data:URLSearchParams){
+        this._previousURLParams  = data;
+    }
+    get previousURLParams():URLSearchParams{
+        return this._previousURLParams;
     }
 
     getDataTrack(params: URLSearchParams): Observable<any> {
@@ -146,26 +162,23 @@ export class DataTrackService {
     }
     getDatatracksList_fromBackend(params: URLSearchParams): void {
         this.startSearchSubject.next(true);
-        if (this._haveLoadedDatatracksList && this._previousURLParams === params) {
-            // do nothing
-        } else {
-            this._haveLoadedDatatracksList = true;
-            this._previousURLParams = params;
+        this._haveLoadedDatatracksList = true;
+        this._previousURLParams = params;
 
-            this.http.get("/gnomex/GetDataTrackList.gx", {
-                withCredentials: true,
-                search: params
-            }).subscribe((response: Response) => {
-                console.log("GetRequestList called");
+        this.http.get("/gnomex/GetDataTrackList.gx", {
+            withCredentials: true,
+            search: params
+        }).subscribe((response: Response) => {
+            console.log("GetRequestList called");
 
-                if (response.status === 200) {
-                    this.datatracksList = response.json().Organism;
-                    this.emitDatatracksList();
-                } else {
-                    throw new Error("Error");
-                }
-            });
-        }
+            if (response.status === 200) {
+                this.datatracksList = response.json().Organism;
+                this.emitDatatracksList();
+            } else {
+                throw new Error("Error");
+            }
+        });
+
     }
 
     refreshDatatracksList_fromBackend(): void {
@@ -185,8 +198,64 @@ export class DataTrackService {
         });
     }
 
-    saveGenomeBuild(params: URLSearchParams):  Observable<Response> {
-        return this.http.get("/gnomex/SaveGenomeBuild.gx", {search: params});
+    getGenomeBuild(params:URLSearchParams):Observable<any>{
+            return this.http.get("/gnomex/GetGenomeBuild.gx", {search: params}).map((response: Response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error("Error");
+                }
+            });
     }
+
+    saveGenomeBuild(params: URLSearchParams):  Observable<Response> {
+        this.cookieUtilService.formatXSRFCookie();
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/SaveGenomeBuild.gx",params,{headers:headers})
+            .map((response: Response) => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            }).catch((err) =>{
+
+                console.log(err);
+                return Observable.throw(err);
+            });
+    }
+    getImportSegments(params: URLSearchParams):Observable<any>{
+        this.cookieUtilService.formatXSRFCookie();
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/ImportSegments.gx",params.toString(), {headers: headers})
+            .map((response: Response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error("Error");
+                }
+            });
+
+    }
+    getImportSeqFiles(formData: FormData):Observable<any>{
+        this.cookieUtilService.formatXSRFCookie();
+        let headers: Headers = new Headers();
+        //headers.set("Content-Type", "application/x-www-form-urlencoded");
+        //, {headers: headers})
+        return this.http.post("/gnomex/UploadSequenceFileServlet.gx",formData)
+            .map((response: Response) => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            }).catch((err) =>{
+
+                console.log(err);
+                return Observable.throw(err);
+            });
+
+    }
+
+
+
 
 }

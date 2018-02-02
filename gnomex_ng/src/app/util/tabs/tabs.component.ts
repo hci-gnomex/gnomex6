@@ -19,7 +19,8 @@ import {Form, FormGroup} from "@angular/forms";
                         {{tab.title}}</a>
                 </li>
             </ul>
-            <ng-content></ng-content>
+            <!-- note the screens for the tabs will be inserted here dynamically -->
+            <!-- the  ref '#container' tells the viewContainerRef where to place the screen  -->
   `,
     styles: [require("./tabs.component.less").toString()]
 
@@ -144,6 +145,7 @@ export class Tabs implements OnDestroy {
                 setTimeout(() => {
                     tab.getComp().setState(this.state);// need to run state actions like disable components when tab becomes active
                     this.tabChanged.emit();
+                    tab.getComp().tabVisibleHook();
                 });
 
             }

@@ -9,6 +9,12 @@ export class ConstantsService {
     public readonly SEGMENGT_REMOVE = "assets/segment_remove.png";
     public readonly SEGMENGT_NEW_DISABLE = "assets/segment_new_disable.png";
     public readonly SEGMENGT_REMOVE_DISABLE = "assets/segment_remove_disable.png";
+    public readonly SEGMENGT_IMPORT ="assets/segment_import.png";
+    public readonly SEGMENGT_IMPORT_DISABLE ="assets/segment_remove_disable.png";
+    public readonly PAGE_REMOVE = "assets/page_remove.png";
+    public readonly PAGE_REMOVE_DISABLE = "assets/page_remove_disable.png";
+    public readonly PAGE_NEW = "assets/page_new.png"
+    public readonly PAGE_NEW_DISABLE = "assets/page_new_disable.png";
     public readonly X_XSRF_TOKEN_COOKIE_NAME: string = "XSRF-TOKEN";
     public readonly X_XSRF_TOKEN_HEADER: string = "X-XSRF-TOKEN";
     public readonly X_XSRF_TOKEN_SESSION_KEY: string = "X-XSRF-SESSION-TOKEN";

@@ -1,0 +1,45 @@
+
+<h6 mat-dialog-title> Upload sequence files for: {{dtName}} </h6>
+<mat-dialog-content>
+    <div style="background-color: #eeeeeb;border:thin;">
+        <label class="fileContainer">
+            Select
+            <input  type="file" (change)="fileChange($event)" style="width: 70%;" accept=".bnib,.fasta" multiple>
+
+        </label>
+
+
+        <div style="height:25em; width:30em; margin-top:0.5em;">
+            <ag-grid-angular style="width: 100%; height: 100%;" class="ag-fresh"
+                             [rowData]="rowData"
+                             [columnDefs]="columnDefs"
+                             [rowSelection]="'single'"
+                             [enableSorting]="true"
+                             [enableColResize]="true"
+                             [rowDeselection]="true"
+                             (gridReady)="onGridReady($event)">
+            </ag-grid-angular>
+
+        </div>
+    </div>
+    <div style="margin-top: 1em">
+        <mat-progress-bar
+                color="'primary'"
+                mode="'determinate'"
+                [value]="progressVal">
+
+        </mat-progress-bar>
+
+    </div>
+
+
+</mat-dialog-content>
+<mat-dialog-actions>
+    <div class="dirtyWithSave" >
+        <span></span>
+        <span>
+                <button mat-button (click)="setUpSave()"> Upload </button>
+                <button mat-button  mat-dialog-close tabindex="-1"> Cancel </button>
+            </span>
+    </div>
+</mat-dialog-actions>
