@@ -121,10 +121,10 @@ import {Observable} from "rxjs/Observable";
 		} else {
 			this._http.get('GetAccountFieldsConfiguration.gx').subscribe((response) => {
 				if (response.status === 200) {
-					// this.internalAccountFieldsConfiguration = response.json().InternalAccountFieldsConfigurationList;
-					// this.otherAccountFieldsConfiguration    = response.json().OtherAccountFieldsConfigurationList;
-					this.internalAccountFieldsConfiguration = this.spoofedInternalData;
-					this.otherAccountFieldsConfiguration    = this.spoofedData;
+					this.internalAccountFieldsConfiguration = response.json().InternalAccountFieldsConfigurationList;
+					this.otherAccountFieldsConfiguration    = response.json().OtherAccountFieldsConfigurationList;
+					// this.internalAccountFieldsConfiguration = this.spoofedInternalData;
+					// this.otherAccountFieldsConfiguration    = this.spoofedData;
 
 					this.internalAccountFieldsConfigurationSubject.next(this.internalAccountFieldsConfiguration);
 					this.otherAccountFieldsConfigurationSubject.next(this.otherAccountFieldsConfiguration);

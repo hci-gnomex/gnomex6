@@ -7,7 +7,6 @@ import {ComboBoxModule} from "../../../modules/combobox.module";
 import {InputModule} from "../../../modules/input.module";
 import {WindowModule} from "../../../modules/window.module";
 
-import {GnomexStyledDatePickerModule} from "../../util/gnomexStyledDatePicker/gnomex-styled-date-picker.module";
 import {GnomexStyledGridModule} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import {MultipleSelectorModule} from "../../util/multipleSelector/multiple-selector.module";
 
@@ -34,7 +33,6 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
 		CommonModule,
 		ComboBoxModule,
 		FormsModule,
-		GnomexStyledDatePickerModule,
 		GnomexStyledGridModule,
 		InputModule,
 		MultipleSelectorModule,
