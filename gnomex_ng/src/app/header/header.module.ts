@@ -25,10 +25,13 @@ import {
 } from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
+import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
 import {LogoutComponent} from "./logout.component";
 
 @NgModule({
-  imports: [HEADER_ROUTING, CommonModule,
+  imports: [
+      HEADER_ROUTING,
+      CommonModule,
       BrowserModule,
       NgbModule.forRoot(),
       FormsModule,
@@ -36,6 +39,7 @@ import {LogoutComponent} from "./logout.component";
       UserModule,
       AngularMaterialModule,
       BrowserAnimationsModule,
+      NewBillingAccountModule,
       MatDialogModule
   ],
    providers: [

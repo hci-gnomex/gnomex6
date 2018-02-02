@@ -4,6 +4,8 @@ import {DictionaryService} from "./dictionary.service";
 @Injectable()
 export class PropertyService {
 
+    readonly SHOW_FUNDING_AGENCY: string = 'show_funding_agency';
+
     constructor(private dictionaryService: DictionaryService) {}
 
     /**

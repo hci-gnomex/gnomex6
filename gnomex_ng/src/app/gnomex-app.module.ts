@@ -16,6 +16,7 @@ import {ConfigurationModule} from "./configuration/configuration.module";
 import {NewBillingAccountModule} from "./billing/new_billing_account/new-billing-account.module";
 import {ProgressService} from "./home/progress.service";
 import {RouterModule} from "@angular/router";
+import {TestPageModule} from "./testing/test-page.module";
 import {FormsModule} from "@angular/forms";
 import {
     AUTHENTICATED_USER_ENDPOINT, UserModule, UserService
@@ -73,7 +74,8 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         DatatracksModule,
         TopicsModule,
         MatIconModule,
-        ReportsModule
+        ReportsModule,
+        TestPageModule
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],

@@ -15,12 +15,18 @@ import {Subscription} from "rxjs/Subscription";
 import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
 
-
 @Component({
     selector: "gnomex-header",
     templateUrl: "./header.component.html",
     // template: require("./header.component.html"),
     styles: [`
+        .no-padding-dialog .mat-dialog-container {
+            padding: 0;
+        }
+        .no-padding-dialog .mat-dialog-container .mat-dialog-actions{
+            background-color: #eeeeeb;
+        }
+        
         .lookup {
             font-size: small;
             text-decoration: none;
@@ -71,11 +77,12 @@ import {ExternalRoute} from "./external-routes.module";
 })
 
 export class HeaderComponent implements OnInit{
+
     isLoggedIn: Observable<boolean>;
     options: FormGroup;
 
     constructor(private authenticationService: AuthenticationService,
-                private progressService: ProgressService,
+				        private progressService: ProgressService,
                 private dictionaryService: DictionaryService,
                 private launchPropertiesService: LaunchPropertiesService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -83,6 +90,7 @@ export class HeaderComponent implements OnInit{
                 private labListService: LabListService,
                 private gnomexService: GnomexService,
                 private formBuilder: FormBuilder) {
+
         this.options = this.formBuilder.group({
             hideRequired: false,
             floatPlaceholder: 'auto',
