@@ -9,7 +9,7 @@ import {DataTrackService} from "./data-track.service";
 import {DictionaryService} from "./dictionary.service";
 import {ExperimentViewService} from "./experiment-view.service";
 import {ExperimentResolverService,ProjectResolverService,AnalysisGroupResolverService,
-        AnalysisResolverService} from "./resolvers/index";
+        AnalysisResolverService,GenomeBuildResolverService} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
 import {ProjectService} from "./project.service";
@@ -25,6 +25,7 @@ import {GnomexService} from "./gnomex.service";
 import {TopicService} from "./topic.service";
 import {CookieUtilService} from "./cookie-util.service";
 import {BroadcastEmailService} from "./broadcast-email.service";
+import {GenomeBuildValidateService} from "./genome-build-validate.service"
 
 @NgModule({
     imports: [CommonModule],
@@ -57,6 +58,8 @@ import {BroadcastEmailService} from "./broadcast-email.service";
         TopicService,
         BroadcastEmailService,
         CookieUtilService,
+        GenomeBuildResolverService,
+        GenomeBuildValidateService
     ]})
 export class ServicesModule {
 }
