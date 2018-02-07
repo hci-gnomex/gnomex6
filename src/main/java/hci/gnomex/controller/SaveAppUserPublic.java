@@ -4,42 +4,34 @@ import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappe
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.security.EncryptionUtility;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-//import hci.gnomex.utility.HibernateUtil;
+import hci.gnomex.utility.HibernateSession;
 
 import java.io.Serializable;
 import java.io.StringReader;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.*;
 import javax.servlet.http.HttpSession;
 
 import hci.gnomex.utility.PasswordUtil;
 import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.apache.log4j.Logger;
 public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 
 	// the static field for logging in Log4J
 	private static Logger LOG = Logger.getLogger(SaveAppUserPublic.class);
 
-	private static String LAB_USER = "USER";
-	private static String LAB_MANAGER = "MANAGER";
-	private static String LAB_COLLABORATOR = "COLLABORATOR";
+	//private static String LAB_USER = "USER";
+	//private static String LAB_MANAGER = "MANAGER";
+	//private static String LAB_COLLABORATOR = "COLLABORATOR";
 
 	private AppUser appUserScreen;
-	private Document userNotificationLabsDoc;
+	private JsonArray userNotificationLabs = null;
 	private EncryptionUtility passwordEncrypter;
 
 	public void validate() {
@@ -50,27 +42,25 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 		appUserScreen = new AppUser();
 		HashMap errors = this.loadDetailObject(request, appUserScreen);
 		this.addInvalidFields(errors);
-		if (appUserScreen.getIdAppUser() == null || appUserScreen.getIdAppUser().intValue() == 0) {
+		if (appUserScreen.getIdAppUser() == null || appUserScreen.getIdAppUser() == 0) {
 			this.addInvalidField("idAppUser", "idAppUser is null or zero");
 		}
 
-		StringReader reader = null;
-		if (request.getParameter("userNotificationLabsXMLString") != null && !request.getParameter("userNotificationLabsXMLString").equals("")) {
-			String userNotificationLabsXMLString = request.getParameter("userNotificationLabsXMLString");
-			reader = new StringReader(userNotificationLabsXMLString);
+		String userNotificationLabsJSONString = request.getParameter("userNotificationLabsJSONString");
+		if (Util.isParameterNonEmpty(userNotificationLabsJSONString)) {
 			try {
-				SAXBuilder sax = new SAXBuilder();
-				userNotificationLabsDoc = sax.build(reader);
-
-			} catch (JDOMException je) {
-				this.addInvalidField("userNotificationLabsXMLString", "Invalid userNotificationLabsXMLString");
-				this.errorDetails = Util.GNLOG(LOG,"Cannot parse userNotificationLabsXMLString", je);
+				JsonReader jsonReader = Json.createReader(new StringReader(userNotificationLabsJSONString));
+				this.userNotificationLabs = jsonReader.readArray();
+				jsonReader.close();
+			} catch (Exception e) {
+				this.addInvalidField("userNotificationLabsJSONString", "Invalid userNotificationLabsJSONString");
+				this.errorDetails = Util.GNLOG(LOG,"Cannot parse userNotificationLabsJSONString", e);
 			}
 		}
 	}
 
 	public Command execute() throws RollBackCommandException {
-		Session sess = null;
+		Session sess;
 		try {
 			sess = HibernateSession.currentSession(this.getUsername());
 			passwordEncrypter = new EncryptionUtility();
@@ -90,12 +80,15 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 			if (this.isValid()) {
 				sess.flush();
 
-				Element root = userNotificationLabsDoc.getRootElement();
-
-				MyWork mw = new MyWork(root, appUserScreen.getIdAppUser());
-				sess.doWork(mw);
-
-				this.xmlResult = "<SUCCESS idAppUser=\"" + appUser.getIdAppUser() + "\"/>";
+				if (this.userNotificationLabs != null) {
+					MyWork mw = new MyWork(this.userNotificationLabs, appUserScreen.getIdAppUser());
+					sess.doWork(mw);
+				}
+				JsonObject value = Json.createObjectBuilder()
+						.add("result", "SUCCESS")
+						.add("idAppUser", appUser.getIdAppUser())
+						.build();
+				this.jsonResult = value.toString();
 				setResponsePage(this.SUCCESS_JSP);
 			} else {
 				setResponsePage(this.ERROR_JSP);
@@ -112,7 +105,7 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 	private boolean isDuplicateUserName(Session sess){
 
 		int idAppUser = appUserScreen.getIdAppUser();
-		List<Integer> l = new ArrayList<Integer>();
+		List<Integer> l = new ArrayList<>();
 		if(appUserScreen.getuNID() != null && !appUserScreen.getuNID().trim().equals("")){
 			Query q = sess.createQuery("SELECT idAppUser from AppUser where uNID = :uNID");
 			q.setString("uNID", appUserScreen.getuNID());
@@ -133,11 +126,7 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 			int x = l.get(0);
 			//if they match then it is the owners and it is not duplicate
 			//it it is not the owners then the name can't be used.
-			if(x == idAppUser){
-				return false;
-			} else{
-				return true;
-			}
+			return !(x == idAppUser);
 		} else {
 			return true;
 		}
@@ -190,33 +179,77 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 
 
 	class MyWork implements Work {
-		private Element root;
+		private JsonArray labs;
 		private Integer idAppUser;
 
-		public MyWork(Element e, Integer idAppUser) {
-			this.root = e;
+		private MyWork(JsonArray labs, Integer idAppUser) {
+			this.labs = labs;
 			this.idAppUser = idAppUser;
 		}
 
 		@Override
 		public void execute(Connection conn) throws SQLException {
-			Statement stmt = null;
-			for (Iterator i = root.getChildren("Lab").iterator(); i.hasNext();) {
-				Element node = (Element) i.next();
-				stmt = conn.createStatement();
-				String idLab = node.getAttributeValue("idLab");
-				String role = node.getAttributeValue("role");
-				String doUploadAlert = node.getAttributeValue("doUploadAlert");
+			PreparedStatement stmt = null;
+			PreparedStatement stmtManager = null;
+			PreparedStatement stmtCollaborator = null;
+			PreparedStatement stmtUser = null;
+			String updateStringManager = "UPDATE LabManager SET sendUploadAlert = ? WHERE idLab = ? AND idAppUser = ?";
+			String updateStringCollaborator = "UPDATE LabCollaborator SET sendUploadAlert = ? WHERE idLab = ? AND idAppUser = ?";
+			String updateStringUser = "UPDATE LabUser SET sendUploadAlert = ? WHERE idLab = ? AND idAppUser = ?";
+			try {
+				conn.setAutoCommit(false);
+				stmtManager = conn.prepareStatement(updateStringManager);
+				stmtCollaborator = conn.prepareStatement(updateStringCollaborator);
+				stmtUser = conn.prepareStatement(updateStringUser);
+				for (int i = 0; i < this.labs.size(); i++) {
+					JsonObject lab = this.labs.getJsonObject(i);
+					String idLab = lab.getString("idLab");
+					String role = lab.getString("role");
+					String doUploadAlert = lab.getString("doUploadAlert");
 
-				String tableName = "Lab" + role;
+					switch (role) {
+						case "Manager":
+							stmt = stmtManager;
+							break;
+						case "Collaborator":
+							stmt = stmtCollaborator;
+							break;
+						case "User":
+							stmt = stmtUser;
+							break;
+						default:
+							stmt = null;
+							break;
+					}
+					if (stmt == null) {
+						continue;
+					}
 
-				StringBuffer buf = new StringBuffer("update " + tableName + "\n");
-				buf.append(" set sendUploadAlert = '" + doUploadAlert + "'\n");
-				buf.append(" where idLab = " + idLab + "\n");
-				buf.append("       and idAppUser = " + idAppUser.intValue() + "\n");
-				stmt.executeUpdate(buf.toString());
+					stmt.setString(1, doUploadAlert);
+					stmt.setString(2, idLab);
+					stmt.setInt(3, this.idAppUser);
+					stmt.executeUpdate();
+					conn.commit();
+
+					stmt = null;
+				}
+			} catch (SQLException e) {
+				try {
+					conn.rollback();
+				} catch (SQLException e2) {
+				}
+				throw e;
+			} finally {
+				if (stmtManager != null) {
+					stmtManager.close();
+				}
+				if (stmtCollaborator != null) {
+					stmtCollaborator.close();
+				}
+				if (stmtUser != null) {
+					stmtUser.close();
+				}
 			}
-
 		}
 	}
 }

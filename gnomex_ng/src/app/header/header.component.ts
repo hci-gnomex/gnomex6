@@ -205,7 +205,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'My Account',
                         context: 'browseExperiments',
                         iconName: '../../assets/white_information.png',
-                        route: ''
+                        route: './MyAccount'
                     },
                     {
                         displayName: 'Sign out',

@@ -150,7 +150,8 @@ export class DictionaryService {
             emitter.emit(response);
             emitter.complete();
         });
-        return emitter.asObservable().timeout(this.RELOAD_EXPIRATION_MILLIS);
+        //return emitter.asObservable().timeout(this.RELOAD_EXPIRATION_MILLIS);
+        return emitter.asObservable();
     }
 
     /**

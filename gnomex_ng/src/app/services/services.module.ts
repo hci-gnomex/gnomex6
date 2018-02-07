@@ -26,6 +26,8 @@ import {TopicService} from "./topic.service";
 import {CookieUtilService} from "./cookie-util.service";
 import {BroadcastEmailService} from "./broadcast-email.service";
 import {GenomeBuildValidateService} from "./genome-build-validate.service"
+import {PasswordUtilService} from "./password-util.service";
+import {AppUserPublicService} from "./app-user-public.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -59,7 +61,9 @@ import {GenomeBuildValidateService} from "./genome-build-validate.service"
         BroadcastEmailService,
         CookieUtilService,
         GenomeBuildResolverService,
-        GenomeBuildValidateService
+        GenomeBuildValidateService,
+        PasswordUtilService,
+        AppUserPublicService,
     ]})
 export class ServicesModule {
 }
