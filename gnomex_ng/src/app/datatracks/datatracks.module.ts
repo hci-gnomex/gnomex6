@@ -29,6 +29,7 @@ import {DATATRACKS_ROUTING} from "./datatracks.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {UtilModule} from "../util/util.module";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
+import {DatatracksOverviewModule} from "./datatracks-overview/datatracks-overview.module"
 
 /**
  * @author jdewell
@@ -61,7 +62,8 @@ import {MoveDataTrackComponent} from "./move-datatrack.component";
         UtilModule,
         WindowModule,
         ReactiveFormsModule,
-        AngularSplitModule
+        AngularSplitModule,
+        DatatracksOverviewModule
     ],
     declarations: [
         BrowseDatatracksComponent, MoveDataTrackComponent

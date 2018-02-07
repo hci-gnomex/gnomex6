@@ -25,6 +25,7 @@ import {
 } from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
+import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
 import {LogoutComponent} from "./logout.component";
 import {CreateReportProblemLauncherComponent} from "./reportProblem/report-problem-launcher.component";
 import {ReportProblemComponent} from "./reportProblem/report-problem.component";
@@ -34,7 +35,9 @@ import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-render
 import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
 
 @NgModule({
-  imports: [HEADER_ROUTING, CommonModule,
+  imports: [
+      HEADER_ROUTING,
+      CommonModule,
       BrowserModule,
       NgbModule.forRoot(),
       FormsModule,
@@ -44,8 +47,8 @@ import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.
       UserModule,
       AngularMaterialModule,
       BrowserAnimationsModule,
-      MatDialogModule,
-      AgGridModule.withComponents([IconTextRendererComponent])
+      NewBillingAccountModule,
+      MatDialogModule
   ],
    providers: [
        ExternalLinkResolver

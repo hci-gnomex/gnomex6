@@ -16,6 +16,7 @@ import {ConfigurationModule} from "./configuration/configuration.module";
 import {NewBillingAccountModule} from "./billing/new_billing_account/new-billing-account.module";
 import {ProgressService} from "./home/progress.service";
 import {RouterModule} from "@angular/router";
+import {TestPageModule} from "./testing/test-page.module";
 import {FormsModule} from "@angular/forms";
 import {
     AUTHENTICATED_USER_ENDPOINT, UserModule, UserService
@@ -39,6 +40,7 @@ import {MatIconModule} from "@angular/material";
 import {ReportsModule} from "./reports/reports.module";
 import {CookieService} from "angular2-cookie/core";
 import {TopicsModule} from "./topics/topics.module";
+import {AccountModule} from "./account/account.module";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -73,7 +75,9 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         DatatracksModule,
         TopicsModule,
         MatIconModule,
-        ReportsModule
+        ReportsModule,
+        TestPageModule,
+        AccountModule,
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],

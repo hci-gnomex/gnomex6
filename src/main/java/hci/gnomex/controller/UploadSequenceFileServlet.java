@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -163,19 +166,18 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 			}
 		}
 
-		Document doc = DocumentHelper.createDocument();
-		Element root = doc.addElement("SUCCESS");
-		root.addAttribute("idGenomeBuild", idGenomeBuild.toString());
 
-//		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
-//		writer.write(doc);
-		// return json
-		PrintWriter responseOut = res.getWriter();
+
+		JsonObject value = Json.createObjectBuilder()
+				.add("RESULT", "SUCCESS")
+				.add("idGenomeBuild", idGenomeBuild.toString())
+				.build();
+		JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
+
 		res.setContentType("application/json");
-		XMLOutputter xmlOut = new XMLOutputter();
-		String xmlResult = xmlOut.outputString(doc.toString());
-		String jsonResult = Util.xmlToJson(xmlResult);
-		responseOut.println(jsonResult);
+		jsonWriter.writeObject(value);
+		jsonWriter.close();
+
 
 	} catch (Exception e) {
 		LOG.error("An error occurred in UploadSequenceFileServlet", e);
@@ -183,19 +185,15 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 
 		sess.flush();
 		res.addHeader("message", e.getMessage());
-		Document doc = DocumentHelper.createDocument();
-		Element root = doc.addElement("ERROR");
-		root.addAttribute("message", e.getMessage());
 
-		PrintWriter responseOut = res.getWriter();
+		JsonObject value = Json.createObjectBuilder()
+				.add("ERROR", e.getMessage())
+				.build();
+		JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
+
 		res.setContentType("application/json");
-		XMLOutputter xmlOut = new XMLOutputter();
-		String xmlResult = xmlOut.outputString(doc.toString());
-		String jsonResult = Util.xmlToJson(xmlResult);
-		responseOut.println(jsonResult);
-
-//		XMLWriter writer = new XMLWriter(res.getOutputStream(), OutputFormat.createCompactFormat());
-//		writer.write(doc);
+		jsonWriter.writeObject(value);
+		jsonWriter.close();
 
 	} finally {
 		if (tempBulkUploadFile != null && tempBulkUploadFile.exists())

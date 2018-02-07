@@ -9,7 +9,7 @@ import {DataTrackService} from "./data-track.service";
 import {DictionaryService} from "./dictionary.service";
 import {ExperimentViewService} from "./experiment-view.service";
 import {ExperimentResolverService,ProjectResolverService,AnalysisGroupResolverService,
-        AnalysisResolverService} from "./resolvers/index";
+        AnalysisResolverService,GenomeBuildResolverService} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
 import {ProjectService} from "./project.service";
@@ -26,6 +26,9 @@ import {TopicService} from "./topic.service";
 import {CookieUtilService} from "./cookie-util.service";
 import {BroadcastEmailService} from "./broadcast-email.service";
 import {ReportIssueService} from "./report-issue.service";
+import {GenomeBuildValidateService} from "./genome-build-validate.service"
+import {PasswordUtilService} from "./password-util.service";
+import {AppUserPublicService} from "./app-user-public.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -58,7 +61,11 @@ import {ReportIssueService} from "./report-issue.service";
         TopicService,
         BroadcastEmailService,
         CookieUtilService,
-        ReportIssueService
+        ReportIssueService,
+        GenomeBuildResolverService,
+        GenomeBuildValidateService,
+        PasswordUtilService,
+        AppUserPublicService,
     ]})
 export class ServicesModule {
 }

@@ -1,66 +1,64 @@
 <mat-toolbar class="header-one" *ngIf="isLoggedIn | async">
   <span class="top-menu-item">
-        <a [routerLink]="['/home']">
-            <img src="../../assets/gnomex_logo_hdr.png">
-        </a>
-    </span>
+    <a [routerLink]="['/home']">
+      <img src="../../assets/gnomex_logo_hdr.png">
+    </a>
+  </span>
   <span class="top-menu-item lookup">
-      <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
-                      [floatPlaceholder]="options.value.floatPlaceholder"
-              >
-        <input matInput type="text" [(ngModel)]="objNumber"  placeholder="Lookup by #">
-      </mat-form-field>
-      <button (click)="searchNumber()">
-        <img src="../../assets/arrow_right.png">
-      </button>
-      <mat-form-field floatPlaceholder='auto'>
-        <input matInput [(ngModel)]="searchText"  placeholder="Search">
-      </mat-form-field>
-      <button (click)="searchByText()">
-        <img src="../../assets/magnifier.png">
-      </button>
-    </span>
+    <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
+                    [floatPlaceholder]="options.value.floatPlaceholder">
+      <input matInput type="text" [(ngModel)]="objNumber"  placeholder="Lookup by #">
+    </mat-form-field>
+    <button (click)="searchNumber()">
+      <img src="../../assets/arrow_right.png">
+    </button>
+    <mat-form-field floatPlaceholder='auto'>
+      <input matInput [(ngModel)]="searchText"  placeholder="Search">
+    </mat-form-field>
+    <button (click)="searchByText()">
+      <img src="../../assets/magnifier.png">
+    </button>
+  </span>
   <span class="links-menu">
-      <span class="top-menu-item" *ngFor="let item of linkNavItems">
-        <!-- Handle branch node buttons here -->
-        <span *ngIf="item.children && item.children.length > 0">
-          <button [ngClass]="item.class" mat-button [matMenuTriggerFor]="menu.childMenu"
-                  [disabled]="item.disabled">
+    <span class="top-menu-item" *ngFor="let item of linkNavItems">
+      <!-- Handle branch node buttons here -->
+      <span *ngIf="item.children && item.children.length > 0">
+        <button [ngClass]="item.class" mat-button [matMenuTriggerFor]="menu.childMenu"
+                [disabled]="item.disabled">
           <img *ngIf="item.iconName" src="{{item.iconName}}">
           <span> {{item.displayName}} </span>
-          </button>
-          <app-menu-item #menu [items]="item.children"></app-menu-item>
-        </span>
-        <!-- Leaf node buttons here -->
-        <span *ngIf="!item.children || item.children.length === 0">
+        </button>
+        <app-menu-item #menu [items]="item.children"></app-menu-item>
+      </span>
+      <!-- Leaf node buttons here -->
+      <span *ngIf="!item.children || item.children.length === 0">
         <button [ngClass]="item.class" mat-button [routerLink]="item.route">
-        <img *ngIf="item.iconName" src="{{item.iconName}}">
-        <span>{{item.displayName}}</span>
+          <img *ngIf="item.iconName" src="{{item.iconName}}">
+          <span>{{item.displayName}}</span>
         </button>
-        </span>
       </span>
-
     </span>
+  </span>
   <mat-list></mat-list>
-    <mat-toolbar-row class="header-two">
-      <span [ngClass]="item.class" *ngFor="let item of navItems">
-        <!-- Handle branch node buttons here -->
-        <span *ngIf="item.children && item.children.length > 0">
-          <button mat-button class="top-menu-item" [hidden]="item.hidden" [matMenuTriggerFor]="menu.childMenu"
-          [disabled]="item.disabled">
+  <mat-toolbar-row class="header-two">
+    <span [ngClass]="item.class" *ngFor="let item of navItems">
+      <!-- Handle branch node buttons here -->
+      <span *ngIf="item.children && item.children.length > 0">
+        <button mat-button class="top-menu-item" [hidden]="item.hidden" [matMenuTriggerFor]="menu.childMenu"
+                [disabled]="item.disabled">
           <img *ngIf="item.iconName" src="{{item.iconName}}">
           <span> {{item.displayName}} </span>
-          </button>
-          <app-menu-item #menu [items]="item.children"></app-menu-item>
-        </span>
-        <!-- Leaf node buttons here -->
-        <span *ngIf="!item.children || item.children.length === 0">
-        <button mat-button class="top-menu-item" [hidden]="item.hidden" [routerLink]="item.route">
-        <img *ngIf="item.iconName" src="{{item.iconName}}">
-        <span>{{item.displayName}}</span>
         </button>
-        </span>
+        <app-menu-item #menu [items]="item.children"></app-menu-item>
       </span>
-    </mat-toolbar-row>
-  </mat-toolbar>
+      <!-- Leaf node buttons here -->
+      <span *ngIf="!item.children || item.children.length === 0">
+        <button mat-button class="top-menu-item" [hidden]="item.hidden" [routerLink]="item.route">
+          <img *ngIf="item.iconName" src="{{item.iconName}}">
+          <span>{{item.displayName}}</span>
+        </button>
+      </span>
+    </span>
+  </mat-toolbar-row>
+</mat-toolbar>
 

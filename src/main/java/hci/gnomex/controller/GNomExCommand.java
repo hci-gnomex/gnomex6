@@ -39,6 +39,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
 
   // put any instance variables here (usually the DetailObjects used by this command)
   protected String xmlResult = "<SUCCESS/>";
+  protected String jsonResult = null;
   protected String errorDetails = "";
 
   public String SUCCESS_JSP = "/getJSON.jsp";
@@ -77,6 +78,11 @@ public abstract class GNomExCommand extends Command implements Serializable {
 
       // Garbage collect
       this.errorDetails = null;
+    }
+
+    if (this.jsonResult != null) {
+      request.setAttribute("jsonResult", this.jsonResult);
+      this.jsonResult = null;
     }
 
     request.setAttribute("xmlResult",this.xmlResult);

@@ -26,6 +26,7 @@ import {DictionaryService} from "./services/dictionary.service";
 })
 
 export class GnomexAppComponent implements OnInit {
+
     public isCollapsed: boolean = true;
     public status: {isopen: boolean} = {isopen: false};
     objLoaderStatus: boolean;
@@ -56,5 +57,4 @@ export class GnomexAppComponent implements OnInit {
             window.location.href = "http://localhost/gnomex/experiments/"+keywords;
         };
     }
-
 }

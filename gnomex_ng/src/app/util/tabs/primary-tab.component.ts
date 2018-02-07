@@ -46,6 +46,9 @@ export class PrimaryTab implements OnDestroy{
         return this._theForm;
     }
 
+    public tabVisibleHook():void{
+    }
+
     public setState(value: string) {
         this._state = value;
         if(this._state === TabContainer.NEW || this._state === TabContainer.EDIT) {

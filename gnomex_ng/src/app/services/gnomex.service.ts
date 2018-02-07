@@ -339,7 +339,7 @@ export class GnomexService {
             for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
                 if (rc.isActive === 'Y') {
                     let rct = this.requestCategoryTypeMap[rc.type];
-                    if (rct.isIllumina == 'Y') {
+                    if (rct && rct.isIllumina == 'Y') {
                         found = true;
                         break;
                     }
@@ -352,7 +352,7 @@ export class GnomexService {
             for (let requestCategory of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
                 if (requestCategory.isActive === 'Y' && requestCategory.idCoreFacility === cf.idCoreFacility) {
                     let rct1 = this.requestCategoryTypeMap[requestCategory.type];
-                    if (rct1.isIllumina === 'Y') {
+                    if (rct1 && rct1.isIllumina === 'Y') {
                         return true;
                     }
                 }

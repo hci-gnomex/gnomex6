@@ -757,6 +757,8 @@ export class BrowseFilterComponent implements OnInit {
                 console.log("GetAnalysisGroupList called");
         } else if (this.mode === this.DATA_TRACK_BROWSE) {
             let params: URLSearchParams = this.getDataTrackBrowseParameters();
+            this.dataTrackService.previousURLParams = params;
+            this.dataTrackService.previousURLParams["refreshParams"] = true;
             this.dataTrackService.getDatatracksList_fromBackend(params);
         } else if (this.mode === this.BILLING_BROWSE) {
             let billingRequestListParams: URLSearchParams = this.getBillingRequestListParameters();

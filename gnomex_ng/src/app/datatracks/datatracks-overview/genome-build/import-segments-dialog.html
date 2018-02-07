@@ -1,0 +1,25 @@
+<form (ngSubmit)="save(importSegDialogForm.value)" [formGroup]="importSegDialogForm">
+    <h6 mat-dialog-title> Copy/paste segement information </h6>
+    <mat-dialog-content>
+        <div class="group-field">
+            <textarea class="simple-textarea" formControlName="segTextArea">
+            </textarea>
+        </div>
+        <p>
+            Example format:
+            <br>
+            chr1  123415
+            <br>chr2  214
+        </p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <div class="buttons-right">
+            <span></span>
+            <span>
+                <button mat-button  type="submit" [disabled]="!importSegDialogForm.valid" >Save</button>
+                <button mat-button  mat-dialog-close tabindex="-1">Cancel</button>
+                <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+            </span>
+        </div>
+    </mat-dialog-actions>
+</form>

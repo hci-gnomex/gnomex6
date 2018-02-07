@@ -1,0 +1,16 @@
+<h1 mat-dialog-title style="background-color: lightgreen;">Hello {{data.name}}</h1>
+<div mat-dialog-content>
+	<p style="background-color: yellow;">What's your favorite animal?</p>
+	<mat-form-field>
+		<input matInput tabindex="1" [(ngModel)]="data.animal">
+	</mat-form-field>
+	<mat-form-field>
+		<input matInput [matDatepicker]="myDatepicker" placeholder="Choose a date" disabled>
+		<mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
+		<mat-datepicker #myDatepicker disabled="false"></mat-datepicker>
+	</mat-form-field>
+</div>
+<div mat-dialog-actions>
+	<button mat-button [mat-dialog-close]="data.animal" tabindex="2">Ok</button>
+	<button mat-button (click)="onCloseClick()" tabindex="-1">Close</button>
+</div>
