@@ -1150,6 +1150,20 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
+		coreFacilityApplicable.sort((a, b) => {
+			let difference: number = 0;
+
+			if (a.sortOrder && b.sortOrder) {
+				difference = a.sortOrder - b.sortOrder;
+			}
+
+			if (difference == 0 && a.displayName && b.displayName) {
+				difference = a.displayName.localeCompare(b.displayName);
+			}
+
+			return difference;
+		});
+
 		this.coreFacilityReducedList = coreFacilityApplicable;
 
 		if (coreFacilityApplicable.length > 0) {
