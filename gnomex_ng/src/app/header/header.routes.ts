@@ -3,7 +3,8 @@
  */
 import {Routes, RouterModule} from "@angular/router";
 import {LogoutComponent} from "./logout.component";
-import {ExternalRoute} from "./external-routes.module";
+import {CreateReportProblemLauncherComponent} from "./reportProblem/report-problem-launcher.component";
+import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
 
 /**
  * A file defining and exporting the router configuration for the home module.
@@ -11,8 +12,12 @@ import {ExternalRoute} from "./external-routes.module";
  * @author brandony <brandon.youkstetter@hci.utah.edu>
  * @since 7/10/16
  */
+
 const ROUTES: Routes = [
-    {path: "logout", component: LogoutComponent}
+    {path: "logout", component: LogoutComponent},
+    { path: "manageLinks", component: ManageLinksLauncherComponent, outlet: 'modal' },
+    { path: "reportProblem", component: CreateReportProblemLauncherComponent, outlet: 'modal' }
+
 ];
 
 export const HEADER_ROUTING = RouterModule.forChild(ROUTES);

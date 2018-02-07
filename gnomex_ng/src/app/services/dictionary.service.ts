@@ -38,50 +38,8 @@ export class DictionaryService {
             delete dictionary.DictionaryEntry;
             this.cachedDictionaries.push(dictionary);
         }
-//        this.fixRequestCategories();
     }
-/*
-    private fixRequestCategories() {
-        let entries = this.cachedEntries[DictionaryService.REQUEST_CATEGORY];
-        for (let entry of entries) {
-            if (entry.codeRequestCategory == 'CAPSEQ') {entry.type = 'CAPSEQ';}
-            if (entry.codeRequestCategory == 'FOO') {entry.type = 'CAPSEQ';}
-            if (entry.codeRequestCategory == 'CLINSEQ') {entry.type = 'CLINSEQ';}
-            if (entry.codeRequestCategory == 'AATI') {entry.type = 'FRAGANAL';}
-            if (entry.codeRequestCategory == 'DDPCR') {entry.type = 'GENERIC';}
-            if (entry.codeRequestCategory == 'DNAGEN') {entry.type = 'GENERIC';}
-            if (entry.codeRequestCategory == 'EXP4') {entry.type = 'GENERIC';}
-            if (entry.codeRequestCategory == 'IONTOR') {entry.type = 'GENERIC';}
-            if (entry.codeRequestCategory == 'IONTORPR') {entry.type = 'GENERIC';}
-            if (entry.codeRequestCategory == '121') {entry.type = 'HISEQ';}
-            if (entry.codeRequestCategory == 'BCHEEZ') {entry.type = 'HISEQ';}
-            if (entry.codeRequestCategory == 'EXP5') {entry.type = 'HISEQ';}
-            if (entry.codeRequestCategory == 'HISEQ') {entry.type = 'HISEQ';}
-            if (entry.codeRequestCategory == 'SOLEXA') {entry.type = 'HISEQ';}
-            if (entry.codeRequestCategory == 'SSEQ') {entry.type = 'HISEQ';}
-            if (entry.codeRequestCategory == 'TP36') {entry.type = 'HISEQ';}
-            if (entry.codeRequestCategory == 'ISCAN') {entry.type = 'ISCAN';}
-            if (entry.codeRequestCategory == '45') {entry.type = 'ISOLATION';}
-            if (entry.codeRequestCategory == 'ISOL') {entry.type = 'ISOLATION';}
-            if (entry.codeRequestCategory == '539') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'AFFY') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'AGIL') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'AGIL1') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'CHEEZ') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'EXP3') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'INHOUSE') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'NIMBLE') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'OTHER') {entry.type = 'MICROARRAY';}
-            if (entry.codeRequestCategory == 'MDMISEQ') {entry.type = 'MISEQ';}
-            if (entry.codeRequestCategory == 'MISEQ') {entry.type = 'MISEQ';}
-            if (entry.codeRequestCategory == 'NANO') {entry.type = 'NANOSTRING';}
-            if (entry.codeRequestCategory == 'MDSQ') {entry.type = 'QC';}
-            if (entry.codeRequestCategory == 'QC') {entry.type = 'QC';}
-            if (entry.codeRequestCategory == 'SEQEPI') {entry.type = 'SEQUENOM';}
-            if (entry.codeRequestCategory == 'SEQUENOM') {entry.type = 'SEQUENOM';}
-        }
-    }
-*/
+
     /**
      * Forces a full reload of the dictionary, returns an observable of an empty object when it is done.
      * Provide a callback function to query the dictionary if you need it to run after the reload is complete

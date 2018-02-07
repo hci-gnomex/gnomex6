@@ -26,7 +26,9 @@ export class NewGenomeBuildComponent {
                 private organismService: OrganismService,
                 private dataTrackService: DataTrackService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
-        this.selectedItem = data.selectedItem;
+        if (this.data) {
+            this.selectedItem = data.selectedItem;
+        }
         this.organismService.getDas2OrganismList().subscribe((response: any[]) => {
             this.das2OrganismList = response;
         });
@@ -65,8 +67,10 @@ export class NewGenomeBuildComponent {
         params.set("idOrganism", this.idOrganism);
         params.set("isActive", this.activeFlag ? "Y" : "N");
         this.dataTrackService.saveGenomeBuild(params).subscribe((response: Response) => {
-            if (this.selectedItem) {
-                this.dataTrackService.refreshDatatracksList_fromBackend();
+            if (this.data) {
+                if (this.selectedItem) {
+                    this.dataTrackService.refreshDatatracksList_fromBackend();
+                }
             }
             this.showSpinner = false;
             this.dialogRef.close();

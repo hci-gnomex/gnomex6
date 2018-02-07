@@ -52,6 +52,11 @@ export class CreateSecurityAdvisorService {
         return this.userNameValue;
     }
 
+    private uIDValue: string;
+    public get uID(): string {
+        return this.uIDValue;
+    }
+
     private userEmailValue: string;
     public get userEmail(): string {
         return this.userEmailValue;
@@ -144,6 +149,7 @@ export class CreateSecurityAdvisorService {
 
                 this.idAppUserValue = Number(this.result.idAppUser);
                 this.isGuestValue = this.result.isGuest == "Y";
+                this.uIDValue = this.result.uID;
                 this.userNameValue = this.result.userFirstName + " " + this.result.userLastName;
                 this.userEmailValue = this.result.userEmail;
                 this.loginDateTimeValue = this.result.loginDateTime;

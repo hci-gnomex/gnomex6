@@ -24,6 +24,26 @@ export class LaunchPropertiesService {
         });
     }
 
+    saveFAQ(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/SaveFAQ.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response;
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
+    deleteFAQ(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/DeleteFAQ.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response;
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
     getFAQ(): Observable<any> {
         return this.http.get("/gnomex/GetFAQ.gx").map((response: Response) => {
             if (response.status === 200) {

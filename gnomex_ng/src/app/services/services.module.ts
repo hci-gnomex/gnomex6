@@ -25,6 +25,7 @@ import {GnomexService} from "./gnomex.service";
 import {TopicService} from "./topic.service";
 import {CookieUtilService} from "./cookie-util.service";
 import {BroadcastEmailService} from "./broadcast-email.service";
+import {ReportIssueService} from "./report-issue.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -57,6 +58,7 @@ import {BroadcastEmailService} from "./broadcast-email.service";
         TopicService,
         BroadcastEmailService,
         CookieUtilService,
+        ReportIssueService
     ]})
 export class ServicesModule {
 }

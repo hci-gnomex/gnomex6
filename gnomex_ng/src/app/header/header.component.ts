@@ -19,7 +19,6 @@ import {ExternalRoute} from "./external-routes.module";
 @Component({
     selector: "gnomex-header",
     templateUrl: "./header.component.html",
-    // template: require("./header.component.html"),
     styles: [`
         .lookup {
             font-size: small;
@@ -73,6 +72,7 @@ import {ExternalRoute} from "./external-routes.module";
 export class HeaderComponent implements OnInit{
     isLoggedIn: Observable<boolean>;
     options: FormGroup;
+
 
     constructor(private authenticationService: AuthenticationService,
                 private progressService: ProgressService,
@@ -152,11 +152,16 @@ export class HeaderComponent implements OnInit{
             }
         });
 
+        this.gnomexService.faqUpdateObservable.subscribe(response => {
+            this.rebuildFAQMenu();
+        });
+
         // Links, Help, Report Problem and Account
         this.linkNavItems = [
             {
                 displayName: 'Report Problem',
-                class: 'problem'
+                class: 'problem',
+                route: [{outlets: {modal: ['reportProblem']}}]
             },
             {
                 displayName: 'Links',
@@ -1779,6 +1784,24 @@ export class HeaderComponent implements OnInit{
         return obj;
     }
 
+    createModalMenuItem(displayName: string, context: string, icon: string, route: any, idCoreFacility: string, children: any[]): object {
+        let obj = {
+            displayName: displayName,
+            context: context,
+            iconName: icon,
+            route: route,
+            children: children
+        }
+        return obj;
+    }
+
+    rebuildFAQMenu() {
+        this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
+            this.faqList = response;
+            this.addQuickLinks();
+        });
+    }
+
     /**
      * Build the quick links menu items.
      */
@@ -1793,7 +1816,7 @@ export class HeaderComponent implements OnInit{
                     lniCtr++;
                 }
                 if (this.isAdminState) {
-                    let manageMenuItem = this.createMenuItem("Manage...", "", "", "", "", []);
+                    let manageMenuItem = this.createModalMenuItem("Manage...", "", "", [{outlets: {modal: ['manageLinks']}}], "", []);
                     lni.children[lniCtr] = manageMenuItem;
                     lniCtr++;
                 }
