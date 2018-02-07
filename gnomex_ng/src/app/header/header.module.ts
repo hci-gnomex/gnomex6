@@ -48,7 +48,8 @@ import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.
       AngularMaterialModule,
       BrowserAnimationsModule,
       NewBillingAccountModule,
-      MatDialogModule
+      MatDialogModule,
+      AgGridModule.withComponents([IconTextRendererComponent])
   ],
    providers: [
        ExternalLinkResolver
