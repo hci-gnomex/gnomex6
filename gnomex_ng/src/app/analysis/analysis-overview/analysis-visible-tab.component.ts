@@ -34,13 +34,12 @@ import {GnomexStringUtilService} from "../../services/gnomex-string-util.service
             <div class="flex-container">
                 <span></span>
                 <div>
-                <span *ngIf="dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
-                    Your changes have not been saved
-                </span>
-                    <span style="margin-left:1em; ">
-                    <button  mat-button  color="primary" (click)="save()"> <img src="../../../assets/action_save.gif">Save</button>
-                </span>
-
+                    <div *ngIf="dirty" style="display:inline; background:#feec89; padding: 1em 1em 1em 1em;">
+                        Your changes have not been saved
+                    </div>
+                    <div style="margin-left:1em;display:inline; ">
+                        <button  mat-button  color="primary" (click)="save()"> <img src="../../../assets/action_save.gif">Save</button>
+                    </div>
                 </div>
             </div>
             

@@ -255,6 +255,22 @@ export class DataTrackService {
 
     }
 
+    saveOrganism(params: URLSearchParams):  Observable<Response> {
+        this.cookieUtilService.formatXSRFCookie();
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/SaveOrganism.gx",params,{headers:headers})
+            .map((response: Response) => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            }).catch((err) =>{
+
+                console.log(err);
+                return Observable.throw(err);
+            });
+    }
+
 
 
 
