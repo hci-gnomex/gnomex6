@@ -158,6 +158,7 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit{
 
         this.dtService.saveOrganism(params).subscribe(resp =>{
                 this.showSpinner = false;
+                this.orgFormGroup.markAsPristine();
                 this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
             })
 
