@@ -15,7 +15,7 @@ import {
     TREE_ACTIONS
 } from "angular-tree-component";
 import {Subscription} from "rxjs/Subscription";
-import {Router} from "@angular/router";
+import {NavigationExtras, Router} from "@angular/router";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {LabListService} from "../services/lab-list.service";
 import {DataTrackService} from "../services/data-track.service";
@@ -222,15 +222,13 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
             this.buildTree(response);
-
+            let id = null;
 
             if(this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
                 this.router.navigate(['/datatracks', { outlets: { datatracksPanel: null }}]);
                 this.datatracksService.previousURLParams["refreshParams"] = false;
                 this.datatracksService.datatrackListTreeNode = response;
-            }
-            let id = null;
-            if(this.datatracksService.datatrackListTreeNode){
+            }else{
                 id = this.datatracksService.datatrackListTreeNode.id;
                 if(this.treeModel && id){
                     this.treeModel.getNodeById(id).setIsActive(true);
@@ -489,6 +487,11 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             datatrackListNode["treeNodeType"] = "GenomeBuild";
             this.disableDelete = false;
             let idGenomeBuild:string = datatrackListNode.idGenomeBuild;
+            /*let navExtras: NavigationExtras ={
+                queryParams: {idGenomeBuild: idGenomeBuild}
+            };*/
+
+            //this.router.navigate(['/datatracks', {outlets:'datatracksPanel'}
             this.router.navigate(['/datatracks', {outlets:{'datatracksPanel':['genomeBuild',{'idGenomeBuild':idGenomeBuild}]}}
             ]);
 
