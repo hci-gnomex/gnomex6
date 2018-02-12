@@ -40,4 +40,18 @@ export class LabListService {
         });
     }
 
+    public getAllLabsCall(): Observable<Response> {
+        return this.http.get("/gnomex/GetAllLabs.gx");
+    }
+
+    public getAllLabs(): Observable<any[]> {
+        return this.getAllLabsCall().map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                return [];
+            }
+        });
+    }
+
 }

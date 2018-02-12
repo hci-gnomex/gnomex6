@@ -6,6 +6,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {UtilModule} from "../util/util.module";
 import {AgGridModule} from "ag-grid-angular/main";
 import {MyAccountComponent} from "./my-account.component";
+import {LabMembershipRequestComponent} from "./lab-membership-request.component";
 
 @NgModule({
     imports: [
@@ -19,9 +20,14 @@ import {MyAccountComponent} from "./my-account.component";
     ],
     declarations: [
         MyAccountComponent,
+        LabMembershipRequestComponent,
     ],
     exports: [
         MyAccountComponent,
+        LabMembershipRequestComponent,
+    ],
+    entryComponents: [
+        LabMembershipRequestComponent,
     ],
 })
 
