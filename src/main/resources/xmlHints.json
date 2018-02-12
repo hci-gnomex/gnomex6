@@ -53,6 +53,30 @@
       ]
     },
     {
+      "command": "SaveAppUser",
+      "parameter": "coreFacilitiesUserCanSubmitTo",
+      "nodeheader": "coreFacilitiesICanSubmitTo",
+      "nodeprefix": "coreFacility",
+      "elementhints": [
+        {
+          "elementname": "itemsnotthere",
+          "elementheader": "itemnotthere1"
+        }
+      ]
+    },
+    {
+      "command": "SaveAppUser",
+      "parameter": "userManagingCoreFacilities",
+      "nodeheader": "managingCoreFacilities",
+      "nodeprefix": "coreFacility",
+      "elementhints": [
+        {
+          "elementname": "itemsnotthere",
+          "elementheader": "itemnotthere1"
+        }
+      ]
+    },
+    {
       "command": "SubmitWorkAuthForm",
       "parameter": "coreFacilitiesXMLString",
       "nodeheader": "coreFacilities",

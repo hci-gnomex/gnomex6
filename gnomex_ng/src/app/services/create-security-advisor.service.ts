@@ -37,6 +37,11 @@ export class CreateSecurityAdvisorService {
         return this.isAdminValue;
     }
 
+    private isLabManagerValue: boolean;
+    public get isLabManager(): boolean {
+        return this.isLabManagerValue;
+    }
+
     private isSuperAdminValue: boolean;
     public get isSuperAdmin(): boolean {
         return this.isSuperAdminValue;
@@ -158,10 +163,16 @@ export class CreateSecurityAdvisorService {
                 this.isExternalUserValue = this.result.isExternalUser == "Y";
                 this.versionValue = this.result.version;
                 this.isSuperAdminValue = this.hasPermission("canAdministerAllCoreFacilities");
-                if (!this.isArray(this.result.groupsToManage.Lab)) {
-                    this.groupsToManage = [this.result.groupsToManage.Lab];
+                if (this.result.groupsToManage.Lab) {
+                    this.isLabManagerValue = true;
+                    if (!this.isArray(this.result.groupsToManage.Lab)) {
+                        this.groupsToManage = [this.result.groupsToManage.Lab];
+                    } else {
+                        this.groupsToManage = this.result.groupsToManage.Lab;
+                    }
                 } else {
-                    this.groupsToManage = this.result.groupsToManage.Lab;
+                    this.groupsToManage = [];
+                    this.isLabManagerValue = false;
                 }
 
                 if (this.hasPermission("canAccessAnyObject")) {
