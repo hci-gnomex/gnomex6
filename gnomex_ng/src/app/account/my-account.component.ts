@@ -4,7 +4,8 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {PasswordUtilService} from "../services/password-util.service";
 import {AppUserPublicService} from "../services/app-user-public.service";
-import {MatSnackBar} from "@angular/material";
+import {MatDialog, MatSnackBar} from "@angular/material";
+import {LabMembershipRequestComponent} from "./lab-membership-request.component";
 
 @Component({
     selector: 'my-account',
@@ -43,7 +44,8 @@ export class MyAccountComponent {
     constructor(public createSecurityAdvisorService: CreateSecurityAdvisorService,
                 public passwordUtilService: PasswordUtilService,
                 private appUserPublicService: AppUserPublicService,
-                private snackBar: MatSnackBar) {
+                private snackBar: MatSnackBar,
+                private dialog: MatDialog,) {
         this.firstNameFC = new FormControl("", Validators.required);
         this.lastNameFC = new FormControl("", Validators.required);
         this.emailFC = new FormControl("", [Validators.required, Validators.email]);
@@ -231,7 +233,10 @@ export class MyAccountComponent {
 
     public showRequestLabMembershipDialog(): void {
         if (this.showRequestLabMembership) {
-            // TODO
+            this.dialog.open(LabMembershipRequestComponent, {
+                height: '560px',
+                width: '470px',
+            });
         }
     }
 

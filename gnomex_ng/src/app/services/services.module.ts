@@ -29,6 +29,7 @@ import {ReportIssueService} from "./report-issue.service";
 import {GenomeBuildValidateService} from "./genome-build-validate.service"
 import {PasswordUtilService} from "./password-util.service";
 import {AppUserPublicService} from "./app-user-public.service";
+import {LabMembershipRequestService} from "./lab-membership-request.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -66,6 +67,7 @@ import {AppUserPublicService} from "./app-user-public.service";
         GenomeBuildValidateService,
         PasswordUtilService,
         AppUserPublicService,
+        LabMembershipRequestService,
     ]})
 export class ServicesModule {
 }
