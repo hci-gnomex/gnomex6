@@ -2,6 +2,8 @@ import {EventEmitter, Injectable} from "@angular/core";
 import {Http, Response} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 
+import 'rxjs/add/operator/timeout';
+
 @Injectable()
 export class DictionaryService {
 
@@ -150,8 +152,7 @@ export class DictionaryService {
             emitter.emit(response);
             emitter.complete();
         });
-        //return emitter.asObservable().timeout(this.RELOAD_EXPIRATION_MILLIS);
-        return emitter.asObservable();
+        return emitter.asObservable().timeout(this.RELOAD_EXPIRATION_MILLIS);
     }
 
     /**
