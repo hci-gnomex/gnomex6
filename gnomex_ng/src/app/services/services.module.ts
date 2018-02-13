@@ -67,7 +67,7 @@ import {UserService} from "./user.service";
         GenomeBuildValidateService,
         PasswordUtilService,
         AppUserPublicService,
-	    UserService
+	    UserService,
         LabMembershipRequestService,
     ]})
 export class ServicesModule {

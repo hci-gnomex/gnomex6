@@ -501,7 +501,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
                 iconName: '../../assets/group.png',
-                route: ''
+                route: '/UsersGroups'
             },
             {
                 displayName: 'Configure',
@@ -606,7 +606,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
                 iconName: '../../assets/group.png',
-                route: ''
+                route: '/UsersGroups'
             },
             {
                 displayName: 'Configure',
@@ -929,7 +929,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
                 iconName: '../../assets/group.png',
-                route: ''
+                route: '/UsersGroups'
             },
             {
                 displayName: 'Configure',
@@ -1274,7 +1274,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Users & Groups',
                         iconName: '../../assets/group.png',
-                        route: ''
+                        route: '/UsersGroups'
                     },
                     {
                         displayName: 'Send email to all GNomEx users',
@@ -1382,7 +1382,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
                 iconName: '../../assets/group.png',
-                route: ''
+                route: '/UsersGroups'
             },
             {
                 displayName: 'New Billing Account',
@@ -1472,7 +1472,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
                 iconName: '../../assets/group.png',
-                route: ''
+                route: '/UsersGroups'
             },
             {
                 displayName: 'New Billing Account',
@@ -1565,7 +1565,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
                 iconName: '../../assets/group.png',
-                route: ''
+                route: '/UsersGroups'
             },
             {
                 displayName: 'Configure',

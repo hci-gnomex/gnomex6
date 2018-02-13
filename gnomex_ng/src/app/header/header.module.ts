@@ -50,6 +50,7 @@ import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.
       NewBillingAccountModule,
       MatDialogModule,
       AgGridModule.withComponents([IconTextRendererComponent])
+
   ],
    providers: [
        ExternalLinkResolver

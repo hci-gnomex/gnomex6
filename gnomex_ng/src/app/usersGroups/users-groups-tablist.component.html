@@ -1,0 +1,282 @@
+<div class="background">
+    <div class="flex-column-container">
+        <div style="flex:1;"class="flex-row-container">
+            <split (dragEnd)="onSplitDragEnd($event)">
+                <split-area size="30">
+
+                <mat-tab-group style="height: 100%" [selectedIndex]="selectedTab" (selectedTabChange)="onTabChange($event)">
+                <mat-tab *ngIf="rowData.length>0" #userTab label="Users"  style="height:100%;">
+                        <div class="users-groups-item" style="height:100%">
+                            <div class="flex-column-container" style="height:100%;">
+                                <div class="users-groups-item users-groups-one">
+                                    <mat-form-field>
+                                        <input matInput [(ngModel)]="searchText" placeholder="Enter search here...">
+                                    </mat-form-field>
+                                    <button mat-button (click)="search()"><img src="../../assets/magnifier.png"></button>
+
+                                </div>
+                                <div class="users-groups-item users-groups-three" style="width: 100%">
+                                        <ag-grid-angular id="userTable" style="width: 100%; height: 42em;" class="ag-fresh"
+                                                         [gridOptions]="gridOptions"
+                                                         [rowData]="rowData"
+                                                         [columnDefs]="columnDefs"
+                                                         (rowDataChanged)="this.onNotifyGridRowDataChanged()"
+                                                         [rowSelection]="rowSelection"
+                                                         (gridReady)="onGridReady($event)"
+                                                         (selectionChanged)="onSelectionChanged($event)"
+                                                         [enableSorting]="true"
+                                                         (onGridSizeChanged)="onGridSizeChanged($event)"
+                                                         [enableFilter]="true"
+                                                         [enableColResize]="true">
+                                        </ag-grid-angular>
+                                </div>
+                                <div class="users-groups-item users-groups-four">
+                                    <div class="flex-row-container">
+                                        <div class="users-groups-item-row-one" style="position: relative; top: 1em">
+                                            <button mat-button (click)="newUser()"><img src="../../assets/user.png">New User</button>
+                                        </div>
+                                        <div class="users-groups-item-row-two" style="position: relative; top: 1em">
+                                            <button mat-button (click)="deleteUser()"><img src="../../assets/delete.png">Delete User</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </mat-tab>
+                <mat-tab #groupTab label="Groups"  style="height:100%;">
+                    <div class="users-groups-item" style="height:100%">
+                        <div class="flex-column-container" style="height:100%;">
+                            <div class="users-groups-item users-groups-one">
+                                <mat-form-field>
+                                    <input matInput [(ngModel)]="searchText" placeholder="Enter search here...">
+                                </mat-form-field>
+                                <button mat-button (click)="search()"><img src="../../assets/magnifier.png"></button>
+
+                            </div>
+                            <div class="users-groups-item users-groups-three">
+                                <ag-grid-angular style="width: 100%; height: 30em;" class="ag-fresh"
+                                                 [gridOptions]="groupsGridOptions"
+                                                 [rowData]="groupsData"
+                                                 [columnDefs]="groupsColumnDefs"
+                                                 [rowSelection]="rowSelection"
+                                                 (gridReady)="onGroupsGridReady($event)"
+                                                 (selectionChanged)="onGroupsSelectionChanged($event)"
+                                                 [enableSorting]="true"
+                                                 [enableColResize]="true">
+                                </ag-grid-angular>
+                            </div>
+                            <div class="users-groups-item users-groups-four">
+                                <div class="flex-row-container">
+                                    <div class="users-groups-item-row-one" style="position: relative; top: 1em">
+                                        <button mat-button (click)="newUser()"><img src="../../assets/user.png">New User</button>
+                                    </div>
+                                    <div class="users-groups-item-row-two" style="position: relative; top: 1em">
+                                        <button mat-button (click)="deleteUser()"><img src="../../assets/delete.png">Delete User</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </mat-tab>
+            </mat-tab-group>
+                </split-area>
+            <split-area size="70">
+                <div *ngIf="isUserTab && selectedUser" #userDetail class="flex-column-container ug-background" style="width: 100%">
+                    <split direction="vertical">
+                    <split-area size="75" style="background: white">
+                    <!--user detail-->
+                        <div class="flex-column-container">
+                            <form style="width: 100%" [formGroup]="userForm">
+                                <div class="users-groups-row-one">
+                                    <div class="formRow">
+                                        <mat-form-field class="formField">
+                                            <input matInput formControlName="firstName" placeholder="First name">
+                                            <mat-error *ngIf="userForm.controls['firstName'].hasError('required')">
+                                                First name is <strong>required</strong>
+                                            </mat-error>
+                                        </mat-form-field>
+                                        <mat-form-field class="formField">
+                                            <input matInput formControlName="lastName" placeholder="Last Name">
+                                            <mat-error *ngIf="userForm.controls['lastName'].hasError('required')">
+                                                Last name is <strong>required</strong>
+                                            </mat-error>
+                                        </mat-form-field>
+                                        <mat-checkbox formControlName="isActive" (change)="onIsActiveChange($event)">User is Active</mat-checkbox>
+                                    </div>
+                                </div>
+                                <div class="users-groups-row-one">
+                                    <div class="formRow" cellspacing="0">
+                                        <mat-form-field class="formField">
+                                            <input matInput formControlName="phone" placeholder="Phone">
+                                        </mat-form-field>
+                                        <mat-form-field class="formField">
+                                            <input matInput formControlName="email" placeholder="Email">
+                                            <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
+                                            <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
+                                        </mat-form-field>
+                                        <mat-form-field class="formField">
+                                            <input matInput formControlName="ucscUrl" placeholder="UCSC Url">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="users-groups-row-one">
+                                    <div class="formRow" cellspacing="0">
+                                        <mat-form-field class="formField">
+                                            <input matInput formControlName="institute" placeholder="Institution (Optional)">
+                                        </mat-form-field>
+                                        <mat-form-field class="formField">
+                                            <input matInput formControlName="department" placeholder="Department (Optional)">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="users-groups-row-one">
+                                    <div class="flex-row-container" style="width: 100%">
+                                        <div class="users-groups-row-one ug-white-background">
+                                            <!--need flex row container-->
+                                            <div class="flex-row-container" style="width: 100%">
+                                                <div  class="users-groups-row-one" style="margin-right: 2em">
+                                                    <div class="flex-column-container">
+                                                        <div class="users-groups-type-row">
+                                                            <mat-radio-group formControlName="userType" (change)="onUserTypeChange($event)">
+                                                                <mat-radio-button [value]="USER_TYPE_UNIVERSITY">University User</mat-radio-button>
+                                                                <mat-radio-button [value]="USER_TYPE_EXTERNAL">External User</mat-radio-button>
+                                                            </mat-radio-group>
+                                                        </div>
+                                                        <div *ngIf="usertypeFC.value===USER_TYPE_UNIVERSITY" class="users-groups-unid-row">
+                                                            <mat-form-field>
+                                                                <input matInput formControlName="uNid" placeholder="uNID">
+                                                                <mat-error *ngIf="userForm.controls['uNid'].hasError('required') || userForm.controls['uNid'].hasError('pattern')">Invalid uNID</mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div *ngIf="usertypeFC.value===USER_TYPE_EXTERNAL" class="users-groups-unid-row">
+                                                            <div class="formRow" cellspacing="0">
+                                                                <mat-form-field class="formField">
+                                                                    <input matInput formControlName="userName" placeholder="User name">
+                                                                    <mat-error *ngIf="this.usernameFC.hasError('required')">Required</mat-error>
+                                                                </mat-form-field>
+                                                                    <mat-form-field class="formField">
+                                                                        <input matInput type="password" formControlName="password" placeholder="Password">
+                                                                        <mat-error *ngIf="this.passwordFC.hasError('validatePassword')">{{this.passwordUtilService.PASSWORD_COMPLEXITY_ERROR}}</mat-error>
+                                                                    </mat-form-field>
+                                                                <mat-form-field class="formField">
+                                                                    <input matInput type="password" formControlName="passwordConfirm" placeholder="Confirm Password">
+                                                                    <mat-error *ngIf="this.passwordConfirmFC.hasError('validatePasswordConfirm')">{{this.passwordUtilService.PASSWORD_MATCH_ERROR}}</mat-error>
+                                                                </mat-form-field>
+                                                            </div>
+                                                        </div>
+                                                        <div *ngIf="userType===USER_TYPE_EXTERNAL" class="users-groups-unid-row">
+                                                            <p>
+                                                            Passwords must be 8-25 characters long, contain no spaces
+                                                            <br>
+                                                            or slashes, and contain three or more of the following:
+                                                            <br>
+                                                            lowercase letter, uppercase letter, digit, or symbol.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="users-groups-row-one">
+                                                    <div class="flex-column-container">
+                                                        <div class="users-groups-unid-row" style="height: 2em">
+                                                            <label class="ug-label">Permission Level</label>
+                                                        </div>
+                                                        <div class="users-groups-unid-row">
+                                                            <mat-radio-group class="permission-radio-group" formControlName="permissionLevel" (change)="onPermissionLevelChange($event)">
+                                                                        <mat-radio-button value="LAB">Group</mat-radio-button>
+                                                                        <mat-radio-button value="ADMIN">Admin</mat-radio-button>
+                                                                        <mat-radio-button value="BILLING">Billing Admin</mat-radio-button>
+                                                                        <mat-radio-button value="SUPER">Super Admin</mat-radio-button>
+                                                            </mat-radio-group>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="codeUserPermissionKind==='BILLING'||codeUserPermissionKind==='ADMIN'" class="users-groups-row-one ug-white-background">
+                                            <section class="permission-radio-group">
+                                                <div style="text-align: right;height: 2em">
+                                                    <label class="ug-label" style="width: 100%">Core facilities this user manages</label>
+                                                </div>
+                                                <mat-checkbox *ngFor="let cfm of coreFacilitiesIManage" [checked]=cfm.isSelected [formControlName]=cfm.mDisplay>
+                                                    {{cfm.display}}
+                                                </mat-checkbox>
+                                            </section>
+                                        </div>
+                                        <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN'" class="users-groups-row-one ug-white-background">
+                                            <section class="permission-radio-group">
+                                                <div style="text-align: right;height: 2em">
+                                                    <label class="ug-label" style="width: 100%">Submit experiments in all labs in core</label>
+                                                </div>
+                                                <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>
+                                                    {{cf.display}}
+                                                </mat-checkbox>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </split-area>
+                    <split-area size="25" style="background: white">
+                    <div class="users-groups-row-one ug-background">
+                        <div class="flex-row-container" style="width: 100%">
+                            <div class="users-groups-row-one-shrink">
+                                <ag-grid-angular style="width: 30em; height: 10em;" class="ag-fresh"
+                                                 [gridOptions]="labGridOptions"
+                                                 [rowData]="labs"
+                                                 [columnDefs]="labColumnDefs"
+                                                 [rowSelection]="rowSelection"
+                                                 (gridReady)="onLabGridReady($event)"
+                                                 [enableSorting]="true">
+                                </ag-grid-angular>
+                            </div>
+                            <div class="users-groups-row-one-shrink">
+                                <ag-grid-angular style="width: 30em; height: 10em;" class="ag-fresh"
+                                                 [gridOptions]="collGridOptions"
+                                                 [rowData]="collaboratingLabs"
+                                                 [columnDefs]="collColumnDefs"
+                                                 [rowSelection]="rowSelection"
+                                                 (gridReady)="onCollGridReady($event)"
+                                                 [enableSorting]="true">
+                                </ag-grid-angular>
+                            </div>
+                            <div class="users-groups-row-one-shrink">
+                                <ag-grid-angular style="width: 30em; height: 10em;" class="ag-fresh"
+                                                 [gridOptions]="manGridOptions"
+                                                 [rowData]="managingLabs"
+                                                 [columnDefs]="manColumnDefs"
+                                                 [rowSelection]="rowSelection"
+                                                 (gridReady)="onManGridReady($event)"
+                                                 (onGridSizeChanged)="onManGridSizeChanged($event)"
+                                                 [enableSorting]="true">
+                                </ag-grid-angular>
+
+                            </div>
+                            </div>
+                        </div>
+                    </split-area>
+                    </split>
+                    <div class="flex-container users-groups-row-one" style="flex-grow:.1">
+                        <span *ngIf="userForm.dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
+                            Your changes have not been saved
+                        </span>
+
+                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveUser()"><img src="../../assets/save.png">Save</button>
+                        <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+                    </div>
+                </div>
+                <div *ngIf="isGroupsTab">
+                    <!--groups tab group-->
+                    <mat-tab-group style="height: 100%" (selectedTabChange)="onGroupsTabChange($event)">
+                        <mat-tab #userTab label="Users"  style="height:100%;">
+                        </mat-tab>
+                    </mat-tab-group>
+                </div>
+                </split-area>
+            </split>
+
+        </div>
+    </div>
+</div>
+

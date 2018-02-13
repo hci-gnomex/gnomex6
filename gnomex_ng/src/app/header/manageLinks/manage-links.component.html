@@ -19,6 +19,10 @@
 
 
         <mat-dialog-actions align="end">
+            <span *ngIf="dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
+                Your changes have not been saved
+            </span>
+
             <button mat-button (click)="save()"><img src="../../../assets/action_save.gif">Save</button>
             <button mat-button mat-dialog-close>Close</button>
         </mat-dialog-actions>
