@@ -77,7 +77,7 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
     String managingCoreFacilitiesString = request.getParameter("userManagingCoreFacilities");
     if (managingCoreFacilitiesString != null && managingCoreFacilitiesString.length() > 0) {
       managingCoreFacilitiesString = managingCoreFacilitiesString.replaceAll("&", "&amp;");
-      managingCoreFacilitiesString = "<managingCoreFacilities>" + managingCoreFacilitiesString + "</managingCoreFacilities>";
+//      managingCoreFacilitiesString = "<managingCoreFacilities>" + managingCoreFacilitiesString + "</managingCoreFacilities>";
       StringReader reader = new StringReader(managingCoreFacilitiesString);
       try {
         SAXBuilder sax = new SAXBuilder();
@@ -101,7 +101,7 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
     String coreFacilitiesICanSubmitToString = request.getParameter("coreFacilitiesUserCanSubmitTo");
     if (coreFacilitiesICanSubmitToString != null && coreFacilitiesICanSubmitToString.length() > 0) {
       coreFacilitiesICanSubmitToString = coreFacilitiesICanSubmitToString.replaceAll("&", "&amp;");
-      coreFacilitiesICanSubmitToString = "<coreFacilitiesICanSubmitTo>" + coreFacilitiesICanSubmitToString + "</coreFacilitiesICanSubmitTo>";
+//      coreFacilitiesICanSubmitToString = "<coreFacilitiesICanSubmitTo>" + coreFacilitiesICanSubmitToString + "</coreFacilitiesICanSubmitTo>";
       StringReader reader = new StringReader(coreFacilitiesICanSubmitToString);
       try {
         SAXBuilder sax = new SAXBuilder();
