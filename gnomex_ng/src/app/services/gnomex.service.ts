@@ -3,8 +3,10 @@ import {DictionaryService} from "./dictionary.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
 import {LabListService} from "./lab-list.service";
+import {Subject} from "rxjs/Subject";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
+const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
 const CORE_FACILITY_GENOMICS: string = "High Throughput Genomics";
 const CORE_FACILITY_DNA_SEQ: string = "DNA Sequencing";
 const CORE_FACILITY_MOLECULAR: string = "Molecular Diagnostics";
@@ -51,6 +53,9 @@ export class GnomexService {
     public manageLabList: any[] = [];
     public workAuthLabList: any[] = [];
     public promptedWorkAuthLabList: any[] = [];
+    public faqUpdateObservable: Subject<boolean> = new Subject();
+    public coreFacilitiesICanManage: any[] = [];
+    public coreFacilitiesICanSubmitTo: any[] = [];
 
     constructor(private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
@@ -87,6 +92,10 @@ export class GnomexService {
             return "";
         }
         return this.properties[name];
+    }
+
+    emitFaqUpdateObservable(): void {
+        this.faqUpdateObservable.next();
     }
 
     /**
@@ -206,7 +215,30 @@ export class GnomexService {
                 }
             }
         }
-        // Sort core facilities by sort order
+
+        this.coreFacilitiesICanManage = [];
+        for (let core of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility")) {
+            for (let mCore of this.createSecurityAdvisorService.coreFacilitiesICanManage) {
+                if (core.value == mCore.value) {
+                    this.coreFacilitiesICanManage.push(core);
+                    break;
+                }
+            }
+        }
+
+        this.coreFacilitiesICanSubmitTo = [];
+        for (var core of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility")) {
+            for (let sCore of this.createSecurityAdvisorService.coreFacilitiesICanSubmitTo) {
+                if (sCore.value === core.value) {
+                    this.coreFacilitiesICanSubmitTo.push(core);
+                    break;
+                }
+            }
+        }
+
+
+
+    // Sort core facilities by sort order
         if (this.myCoreFacilities)
             this.myCoreFacilities = this.myCoreFacilities.sort((n1, n2) => n1.sortOrder - n2.sortOrder);
 
@@ -333,7 +365,7 @@ export class GnomexService {
             for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
                 if (rc.isActive === 'Y') {
                     let rct = this.requestCategoryTypeMap[rc.type];
-                    if (rct.isIllumina == 'Y') {
+                    if (rct && rct.isIllumina == 'Y') {
                         found = true;
                         break;
                     }
@@ -346,7 +378,7 @@ export class GnomexService {
             for (let requestCategory of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
                 if (requestCategory.isActive === 'Y' && requestCategory.idCoreFacility === cf.idCoreFacility) {
                     let rct1 = this.requestCategoryTypeMap[requestCategory.type];
-                    if (rct1.isIllumina === 'Y') {
+                    if (rct1 && rct1.isIllumina === 'Y') {
                         return true;
                     }
                 }
@@ -436,12 +468,30 @@ export class GnomexService {
         }
     }
 
+    public isCoreFacilityIManage(idCoreFacility:String):Boolean {
+        if (this.createSecurityAdvisorService.isSuperAdmin) {
+            return true;
+        }
+        var isMyCoreFacility:Boolean = false;
+
+        for (let facility of this.createSecurityAdvisorService.coreFacilitiesICanManage) {
+            if (facility.idCoreFacility === idCoreFacility) {
+                isMyCoreFacility = true;
+                break;
+            }
+        }
+        return isMyCoreFacility;
+    }
+
+
+
     hasGroupsToManage(): boolean {
+        if (this.getGroupsToManage())
         return this.getGroupsToManage().length > 0;
     }
 
     getGroupsToManage(): any[] {
-        if (this.isGuestState) {
+        if (this.isGuestState || !this.createSecurityAdvisorService.groupsToManage) {
             return [];
         } else {
             return this.createSecurityAdvisorService.groupsToManage;

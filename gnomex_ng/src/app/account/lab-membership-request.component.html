@@ -1,0 +1,16 @@
+<h6 mat-dialog-title>Request Lab Membership</h6>
+<mat-dialog-content>
+    <ag-grid-angular style="width: 400px; height: 400px;"
+                     class="ag-fresh"
+                     [enableFilter]="true"
+                     (gridReady)="this.onLabGridReady($event)"
+                     [rowSelection]="'multiple'"
+                     [rowData]="this.labGridRowData"
+                     [columnDefs]="this.labGridColumnDefs">
+    </ag-grid-angular>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button *ngIf="!this.showSpinner" (click)="this.request()">Request</button>
+    <button mat-button *ngIf="!this.showSpinner" mat-dialog-close>Cancel</button>
+    <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>

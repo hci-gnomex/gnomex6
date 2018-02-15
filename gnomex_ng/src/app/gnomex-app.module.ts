@@ -40,6 +40,9 @@ import {MatIconModule} from "@angular/material";
 import {ReportsModule} from "./reports/reports.module";
 import {CookieService} from "angular2-cookie/core";
 import {TopicsModule} from "./topics/topics.module";
+import {AccountModule} from "./account/account.module";
+import {UsersGroupsTablistModule} from "./usersGroups/users-groups-tablist.module";
+
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -75,7 +78,9 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         TopicsModule,
         MatIconModule,
         ReportsModule,
-        TestPageModule
+        TestPageModule,
+        AccountModule,
+        UsersGroupsTablistModule
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],

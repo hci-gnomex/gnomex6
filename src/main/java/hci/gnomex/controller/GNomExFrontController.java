@@ -312,7 +312,14 @@ public static boolean areWeLite() {
 	// Convert it to JSON and give it back
 	System.out.println("[GNomExFrontController] requestName: " + requestName);
 	String thexml = (String) request.getAttribute("xmlResult");
-	if (thexml != null && !thexml.equals("")) {
+	String theJSON = (String) request.getAttribute("jsonResult");
+	if (theJSON != null) {
+		response.setContentType("application/json");
+		PrintWriter out = response.getWriter();
+		out.print(theJSON);
+		out.flush();
+		out.close();
+	} else if (thexml != null && !thexml.equals("")) {
 
 		if (thexml.length() < 80) {
 			System.out.println("WARNING short xml: -->" + thexml + "<--");
@@ -416,6 +423,11 @@ private void sendRedirect(HttpServletResponse response, String url) {
    *   Convert all the parameter values in the httpservletrequest from json to xml
    */
   public void convertJSONRequesttoXML(HttpServletWrappedRequest httpRequest, String requestName, boolean [] converted) {
+  	String noConversionNecessary = httpRequest.getParameter("noJSONToXMLConversionNeeded");
+  	if (Util.isParameterNonEmpty(noConversionNecessary) && Util.isParameterTrue(noConversionNecessary)) {
+  		return;
+	}
+
   	boolean debug = false;
     converted[0] = false;
 

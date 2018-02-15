@@ -1,13 +1,15 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.GNomExRollbackException;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.MailUtil;
 import hci.gnomex.utility.MailUtilHelper;
 import hci.gnomex.utility.PropertyDictionaryHelper;
@@ -17,14 +19,14 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
@@ -55,7 +57,7 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 	public Command execute() throws GNomExRollbackException {
 		try {
 			Session sess = HibernateSession.currentSession(this.getUsername());
-			AppUser currentUser = (AppUser) sess.load(AppUser.class, this.getSecAdvisor().getAppUser().getIdAppUser());
+			AppUser currentUser = sess.load(AppUser.class, this.getSecAdvisor().getAppUser().getIdAppUser());
 
 			// If we have a guid but it is expired then create a new guid with a new
 			// expiration date. Otherwise use what is currently in DB
@@ -68,13 +70,16 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 				sess.flush();
 			}
 
-			for (Iterator i = idLabs.iterator(); i.hasNext();) {
-				String id = (String) i.next();
-				Lab l = (Lab) sess.load(Lab.class, Integer.parseInt(id));
+			for (String id : idLabs) {
+				Lab l = sess.load(Lab.class, Integer.parseInt(id));
 
 				sendRequestEmail(l, currentUser, sess);
 			}
 
+			JsonObject value = Json.createObjectBuilder()
+					.add("result", "SUCCESS")
+					.build();
+			this.jsonResult = value.toString();
 			setResponsePage(this.SUCCESS_JSP);
 
 		} catch (Exception e) {
@@ -120,11 +125,11 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 
 		// Get approve and delete URLs
 		String uuidStr = appUser.getGuid();
-		String approveURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_LAB_MEMBERSHIP_SERVLET + "?idAppUser=" + appUser.getIdAppUser().intValue() + "&idLab="
+		String approveURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_LAB_MEMBERSHIP_SERVLET + "?idAppUser=" + appUser.getIdAppUser() + "&idLab="
 				+ requestedLab.getIdLab() + "&guid=" + uuidStr;
-		String deleteURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_LAB_MEMBERSHIP_SERVLET + "?idAppUser=" + appUser.getIdAppUser().intValue() + "&denyRequest=Y"
+		String deleteURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_LAB_MEMBERSHIP_SERVLET + "?idAppUser=" + appUser.getIdAppUser() + "&denyRequest=Y"
 				+ "&guid=" + uuidStr + "&idLab=" + requestedLab.getIdLab();
-		StringBuffer introForAdmin = new StringBuffer();
+		StringBuilder introForAdmin = new StringBuilder();
 
 		// Intro to Lab PI/Admin
 		String greeting = "Dear " + requestedLab.getName(false, false, false) + ",<br><br>";
@@ -132,14 +137,12 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 
 		introForAdmin.append(greeting);
 		introForAdmin.append(intro);
-		introForAdmin
-				.append("<a href='"
-						+ approveURL
-						+ "'>Click here</a> to approve their request.  GNomEx will automatically send an email to notify the user that they have been added to your lab.<br><br>");
-		introForAdmin
-				.append("<a href='"
-						+ deleteURL
-						+ "'>Click here</a> to deny their request.  GNomEx will automatically send an email to notify the user that their request has been denied.<br><br>");
+		introForAdmin.append("<a href='");
+		introForAdmin.append(approveURL);
+		introForAdmin.append("'>Click here</a> to approve their request.  GNomEx will automatically send an email to notify the user that they have been added to your lab.<br><br>");
+		introForAdmin.append("<a href='");
+		introForAdmin.append(deleteURL);
+		introForAdmin.append("'>Click here</a> to deny their request.  GNomEx will automatically send an email to notify the user that their request has been denied.<br><br>");
 
 		// Closing for Lab PI/Admin
 		if (requestedLab != null) {
@@ -150,25 +153,33 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 		}
 
 		MailUtilHelper helper = new MailUtilHelper(toAddress, ccAddress, null, fromAddress, subject, introForAdmin.toString()
-				+ getEmailBody(appUser, requestedLab, sess), null, true, dictionaryHelper, serverName);
+				+ getEmailBody(appUser, requestedLab), null, true, dictionaryHelper, serverName);
 		MailUtil.validateAndSendEmail(helper);
 
 	}
 
-	private String getEmailBody(AppUser appUser, Lab requestedLab, Session sess) {
-		StringBuffer body = new StringBuffer();
-		body.append("<table border='0'><tr><td>Last name:</td><td>" + this.getNonNullString(appUser.getLastName()));
-		body.append("</td></tr><tr><td>First name:</td><td>" + this.getNonNullString(appUser.getFirstName()));
-		body.append("</td></tr><tr><td>Lab:</td><td>" + this.getNonNullString(requestedLab.getName(false, false, false)));
+	private String getEmailBody(AppUser appUser, Lab requestedLab) {
+		StringBuilder body = new StringBuilder();
+		body.append("<table border='0'><tr><td>Last name:</td><td>");
+		body.append(this.getNonNullString(appUser.getLastName()));
+		body.append("</td></tr><tr><td>First name:</td><td>");
+		body.append(this.getNonNullString(appUser.getFirstName()));
+		body.append("</td></tr><tr><td>Lab:</td><td>");
+		body.append(this.getNonNullString(requestedLab.getName(false, false, false)));
 		if (!this.getNonNullString(appUser.getInstitute()).equals("")) {
-			body.append("</td></tr><tr><td>Institution:</td><td>" + this.getNonNullString(appUser.getInstitute()));
+			body.append("</td></tr><tr><td>Institution:</td><td>");
+			body.append(this.getNonNullString(appUser.getInstitute()));
 		}
-		body.append("</td></tr><tr><td>Email:</td><td>" + this.getNonNullString(appUser.getEmail()));
-		body.append("</td></tr><tr><td>Phone:</td><td>" + this.getNonNullString(appUser.getPhone()));
+		body.append("</td></tr><tr><td>Email:</td><td>");
+		body.append(this.getNonNullString(appUser.getEmail()));
+		body.append("</td></tr><tr><td>Phone:</td><td>");
+		body.append(this.getNonNullString(appUser.getPhone()));
 		if (appUser.getuNID() != null && appUser.getuNID().length() > 0) {
-			body.append("</td></tr><tr><td>University uNID:</td><td>" + this.getNonNullString(appUser.getuNID()));
+			body.append("</td></tr><tr><td>University uNID:</td><td>");
+			body.append(this.getNonNullString(appUser.getuNID()));
 		} else {
-			body.append("</td></tr><tr><td>Username:</td><td>" + this.getNonNullString(appUser.getUserNameExternal()));
+			body.append("</td></tr><tr><td>Username:</td><td>");
+			body.append(this.getNonNullString(appUser.getUserNameExternal()));
 		}
 		body.append("</td></tr></table>");
 
@@ -178,7 +189,6 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 	@Override
 	public void validate() {
 		// TODO Auto-generated method stub
-
 	}
 
 }

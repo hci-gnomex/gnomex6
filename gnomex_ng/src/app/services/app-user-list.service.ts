@@ -20,6 +20,36 @@ export class AppUserListService {
         });
     }
 
+    getAppUser(params: URLSearchParams): Observable<any[]> {
+        return this.http.get("/gnomex/GetAppUser.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
+    saveAppUser(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/SaveAppUser.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
+    getFullAppUserList(): Observable<any> {
+        return this.http.get("/gnomex/GetAppUserList.gx").map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
     getMembersOnly(): Observable<any[]> {
         let params: URLSearchParams = new URLSearchParams();
         params.set("membersOnly", "Y");

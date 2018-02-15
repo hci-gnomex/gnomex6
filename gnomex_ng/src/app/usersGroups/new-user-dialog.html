@@ -1,0 +1,17 @@
+<h6 mat-dialog-title><img src="../../assets/user.png">Add User</h6>
+<mat-dialog-content>
+    <div>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="firstName" placeholder="First name">
+        </mat-form-field>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="lastName" placeholder="Last name">
+        </mat-form-field>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button *ngIf="!showSpinner && !(firstName === '') && !(lastName === '')"
+            (click)="save()">Save</button>
+    <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
+    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>

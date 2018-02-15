@@ -1,0 +1,115 @@
+<div *ngIf="!this.createSecurityAdvisorService.isGuest" class="form">
+    <h3>My Account</h3>
+    <div class="formRow">
+        <mat-form-field class="formField">
+            <input matInput placeholder="First Name" [formControl]="this.firstNameFC">
+            <mat-error *ngIf="this.firstNameFC.hasError('required')">Required</mat-error>
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput placeholder="Last Name" [formControl]="this.lastNameFC">
+            <mat-error *ngIf="this.lastNameFC.hasError('required')">Required</mat-error>
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput placeholder="Email" [formControl]="this.emailFC">
+            <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
+            <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput placeholder="Phone" [formControl]="this.phoneFC">
+        </mat-form-field>
+    </div>
+    <div class="formRow">
+        <mat-form-field class="formField">
+            <input matInput placeholder="Institution (Optional)" [formControl]="this.institutionFC">
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput placeholder="Department (Optional)" [formControl]="this.departmentFC">
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput placeholder="UCSC URL" [formControl]="this.urlFC">
+        </mat-form-field>
+    </div>
+    <div class="formRow">
+        <mat-radio-group class="radioGroup" [(ngModel)]="this.userType" (change)="this.onUserTypeChange($event)">
+            <mat-radio-button class="radioOption" [value]="USER_TYPE_UNIVERSITY">University User</mat-radio-button>
+            <mat-radio-button class="radioOption" [value]="USER_TYPE_EXTERNAL">External User</mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <div class="formRow" *ngIf="this.userType === this.USER_TYPE_UNIVERSITY">
+        <mat-form-field class="formField">
+            <input matInput placeholder="uNID" [formControl]="this.unidFC">
+            <mat-error *ngIf="this.unidFC.hasError('required') || this.unidFC.hasError('pattern')">Invalid uNID</mat-error>
+        </mat-form-field>
+    </div>
+    <div class="formRow" *ngIf="this.userType === this.USER_TYPE_EXTERNAL">
+        <mat-form-field class="formField">
+            <input matInput placeholder="User Name" [formControl]="this.usernameFC">
+            <mat-error *ngIf="this.usernameFC.hasError('required')">Required</mat-error>
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput type="password" placeholder="Password" [formControl]="this.passwordFC">
+            <mat-error *ngIf="this.passwordFC.hasError('validatePassword')">{{this.passwordUtilService.PASSWORD_COMPLEXITY_ERROR}}</mat-error>
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput type="password" placeholder="Confirm Password" [formControl]="this.passwordConfirmFC">
+            <mat-error *ngIf="this.passwordConfirmFC.hasError('validatePasswordConfirm')">{{this.passwordUtilService.PASSWORD_MATCH_ERROR}}</mat-error>
+        </mat-form-field>
+    </div>
+    <div class="formRow" *ngIf="this.userType === this.USER_TYPE_EXTERNAL">
+        <label>{{this.passwordUtilService.PASSWORD_COMPLEXITY_REQUIREMENTS}}</label>
+    </div>
+    <div class="formRow">
+        <label>Select labs for which you would like to receive upload notifications</label>
+    </div>
+    <div class="formRow">
+        <ag-grid-angular style="width: 550px; height: 350px;"
+                         class="ag-fresh"
+                         (gridReady)="this.onNotifyGridReady($event)"
+                         (rowDataChanged)="this.onNotifyGridRowDataChanged()"
+                         [rowSelection]="'multiple'"
+                         (rowSelected)="this.onNotifyGridRowSelected($event)"
+                         (selectionChanged)="this.onNotifyGridSelectionChanged()"
+                         [rowData]="this.notifyGridRowData"
+                         [columnDefs]="this.notifyGridColumnDefs">
+        </ag-grid-angular>
+    </div>
+    <div class="formRow" *ngIf="this.showRequestLabMembership">
+        <button mat-button color="accent" (click)="this.showRequestLabMembershipDialog()">Request Membership to Additional Labs</button>
+    </div>
+    <div class="formRow">
+        <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.allFG.valid" (click)="this.save()"><img class="icon" src="../../assets/action_save.gif">Save</button>
+        <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+        <span *ngIf="this.allFG.dirty && !this.showSpinner" class="dirtyNote">Changes Have Not Been Saved</span>
+    </div>
+</div>
+<div *ngIf="this.createSecurityAdvisorService.isGuest">Account disabled for guest user</div>
+<style>
+    div.form {
+        display: flex;
+        flex-direction: column;
+        padding: 0 1%;
+    }
+    div.formRow {
+        display: flex;
+        flex-direction: row;
+        margin: 0.5% 0;
+    }
+    mat-form-field.formField {
+        width: 20%;
+        margin: 0 0.5%;
+    }
+    mat-radio-group.radioGroup {
+        width: 100%;
+    }
+    mat-radio-button.radioOption {
+        margin: 0 0.5%;
+    }
+    img.icon {
+        margin-right: 0.5rem;
+    }
+    span.dirtyNote {
+        background: yellow;
+        padding: 0.5rem;
+        margin-left: 1rem;
+    }
+</style>

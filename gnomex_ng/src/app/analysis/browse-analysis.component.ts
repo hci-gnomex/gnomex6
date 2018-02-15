@@ -215,6 +215,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     public createAnalysisGroupDialogRef: MatDialogRef<CreateAnalysisGroupComponent>;
     private parentProject: any;
     public showSpinner: boolean = false;
+    public newAnalysisName: any;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -230,6 +231,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 if (this.createAnalysisDialogRef.componentInstance.showSpinner) {
                     this.createAnalysisDialogRef.componentInstance.showSpinner = false;
                 }
+                this.newAnalysisName = this.createAnalysisDialogRef.componentInstance.newAnalysisName;
                 this.createAnalysisDialogRef.close();
             }
             if (this.deleteAnalysisDialogRef != undefined && this.deleteAnalysisDialogRef.componentInstance != undefined) {
@@ -257,13 +259,28 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             setTimeout(_ => {
                 this.treeModel.expandAll();
+                if (this.newAnalysisName) {
+                    this.selectNode(this.treeModel.getFirstRoot().children);
+                }
             })
-
         });
-
     }
 
     ngAfterViewInit() {
+    }
+
+    selectNode(nodes: any) {
+        for (let node of nodes) {
+            if (node.data.name === this.newAnalysisName && node.data.idAnalysis) {
+                node.setActiveAndVisible(false);
+                break;
+            } else if (node.hasChildren) {
+                this.selectNode(node.children)
+
+            }
+
+        }
+        this.newAnalysisName = "";
     }
 
     constructor(private analysisService: AnalysisService, private router: Router,
@@ -425,6 +442,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     deleteAnalysisClicked(event: any) {
         if (this.selectedItem && this.selectedItem.level != 1 && this.items.length > 0) {
             this.deleteAnalysisDialogRef = this.dialog.open(DeleteAnalysisComponent, {
+                height: '375px',
+                width: '300px',
                 data: {
                     idAnalysisGroup: this.selectedItem.data.idAnalysisGroup,
                     label: this.selectedItem.data.label,

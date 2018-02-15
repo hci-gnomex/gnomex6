@@ -37,6 +37,11 @@ export class CreateSecurityAdvisorService {
         return this.isAdminValue;
     }
 
+    private isLabManagerValue: boolean;
+    public get isLabManager(): boolean {
+        return this.isLabManagerValue;
+    }
+
     private isSuperAdminValue: boolean;
     public get isSuperAdmin(): boolean {
         return this.isSuperAdminValue;
@@ -50,6 +55,11 @@ export class CreateSecurityAdvisorService {
     private userNameValue: string;
     public get userName(): string {
         return this.userNameValue;
+    }
+
+    private uIDValue: string;
+    public get uID(): string {
+        return this.uIDValue;
     }
 
     private userEmailValue: string;
@@ -144,6 +154,7 @@ export class CreateSecurityAdvisorService {
 
                 this.idAppUserValue = Number(this.result.idAppUser);
                 this.isGuestValue = this.result.isGuest == "Y";
+                this.uIDValue = this.result.uID;
                 this.userNameValue = this.result.userFirstName + " " + this.result.userLastName;
                 this.userEmailValue = this.result.userEmail;
                 this.loginDateTimeValue = this.result.loginDateTime;
@@ -152,10 +163,16 @@ export class CreateSecurityAdvisorService {
                 this.isExternalUserValue = this.result.isExternalUser == "Y";
                 this.versionValue = this.result.version;
                 this.isSuperAdminValue = this.hasPermission("canAdministerAllCoreFacilities");
-                if (!this.isArray(this.result.groupsToManage.Lab)) {
-                    this.groupsToManage = [this.result.groupsToManage.Lab];
+                if (this.result.groupsToManage.Lab) {
+                    this.isLabManagerValue = true;
+                    if (!this.isArray(this.result.groupsToManage.Lab)) {
+                        this.groupsToManage = [this.result.groupsToManage.Lab];
+                    } else {
+                        this.groupsToManage = this.result.groupsToManage.Lab;
+                    }
                 } else {
-                    this.groupsToManage = this.result.groupsToManage.Lab;
+                    this.groupsToManage = [];
+                    this.isLabManagerValue = false;
                 }
 
                 if (this.hasPermission("canAccessAnyObject")) {

@@ -16,6 +16,7 @@ export class MenuHeaderTopicsComponent {
     private parentTopicLabel = "";
     public showDelete: boolean = false;
     public showRemoveLink: boolean = false;
+    public showNewTopic: boolean = false;
 
     constructor(private dialog: MatDialog) {
     }
@@ -36,6 +37,7 @@ export class MenuHeaderTopicsComponent {
 
     ngOnChanges(changes: SimpleChanges) {
         if (this.selectedNode) {
+            this.showNewTopic = true;
             this.removeLinkEnabled();
         }
     }

@@ -25,8 +25,12 @@ import {GnomexService} from "./gnomex.service";
 import {TopicService} from "./topic.service";
 import {CookieUtilService} from "./cookie-util.service";
 import {BroadcastEmailService} from "./broadcast-email.service";
+import {ReportIssueService} from "./report-issue.service";
 import {GenomeBuildValidateService} from "./genome-build-validate.service"
-
+import {PasswordUtilService} from "./password-util.service";
+import {AppUserPublicService} from "./app-user-public.service";
+import {LabMembershipRequestService} from "./lab-membership-request.service";
+import {UserService} from "./user.service";
 @NgModule({
     imports: [CommonModule],
     declarations: [],
@@ -58,8 +62,13 @@ import {GenomeBuildValidateService} from "./genome-build-validate.service"
         TopicService,
         BroadcastEmailService,
         CookieUtilService,
+        ReportIssueService,
         GenomeBuildResolverService,
-        GenomeBuildValidateService
+        GenomeBuildValidateService,
+        PasswordUtilService,
+        AppUserPublicService,
+	    UserService,
+        LabMembershipRequestService,
     ]})
 export class ServicesModule {
 }
