@@ -65,6 +65,7 @@ import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {AgGridRendererModule,IconTextRendererComponent} from "../util/grid-renderers/index";
 import {MatDialogModule} from "@angular/material";
 import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
+import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
 
 /**
  * @author mbyrne
@@ -116,8 +117,7 @@ export const componentFactories =
         TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
-        AgGridModule.withComponents([IconTextRendererComponent]),
-        MatDialogModule
+        AgGridModule.withComponents([IconTextRendererComponent,IconRendererComponent])
     ],
     declarations: [
                     BrowseExperimentsComponent,
