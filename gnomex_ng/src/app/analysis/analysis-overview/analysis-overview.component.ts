@@ -80,7 +80,7 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
             this.analysisGroup = data['analysisGroup']; // this data is carried on route look at browse-analysis.component.ts
             if(!this.tabView.isInitalize()){
                 if(this.analysisGroup){
-                    this.tabNames = [this.ANALYSIS,this.ANALYSIS,this.GROUP];
+                    this.tabNames = [this.ANALYSIS,this.VISIBILITY,this.GROUP];
                 }
                 else{
                     this.tabNames = [this.ANALYSIS,this.VISIBILITY];

@@ -147,6 +147,7 @@ const actionMapping:IActionMapping = {
             height:100%;
             width:100%;
             border: #C8C8C8 solid thin;
+            padding: 1em;
         }
     `]
 })
@@ -497,7 +498,9 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         }else if (datatrackListNode.isDataTrackFolder){
             datatrackListNode["treeNodeType"] = "Folder";
-            //idDataTrackFolder
+            let idDataTrackFolder:string = datatrackListNode.idDataTrackFolder;
+            this.router.navigate(['/datatracks', {outlets:{'datatracksPanel':['folder',{'idDataTrackFolder': idDataTrackFolder}]}}
+            ]);
             this.disableDelete = false;
         }else if (this.selectedItem.isRoot){
             datatrackListNode["treeNodeType"] = "Organism";

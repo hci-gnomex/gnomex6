@@ -13,8 +13,8 @@ import {specialChars} from "../../util/validators/special-characters.validator";
 @Component({
 
     template: `
-        <form (ngSubmit)="save()" [formGroup]="orgFormGroup" style="display:flex; height:100%; width:100%;">
-            <mat-dialog-content style="width:100%;">
+        <form class="body-footer-form" (ngSubmit)="save()" [formGroup]="orgFormGroup" >
+            <div style="width:100%;">
                 <p>
                     <mat-form-field >
                         <input  matInput
@@ -70,31 +70,24 @@ import {specialChars} from "../../util/validators/special-characters.validator";
                     <mat-checkbox matInput class="example-margin" formControlName="isActive">Active </mat-checkbox>
                 </p>
                 
-                
-
-            </mat-dialog-content>
-            <mat-dialog-actions style="align-self: flex-end;text-align: right;width:100%;">
-                <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-                <div style="align-self: flex-end;">
-                    <span *ngIf="orgFormGroup.dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
-                        Your changes have not been saved
-                    </span>
-                    <span style="margin-left: 1em;">
-                        <button [disabled]="showSpinner || orgFormGroup.invalid" type="submit" mat-button  color="primary" >
-                                <img src="../../../assets/action_save.gif">Save
-                        </button>
-                    </span>
-                </div>
-                
-                
-
-            </mat-dialog-actions>
+            </div>
+            <save-footer [disableSave]="orgFormGroup.invalid || secAdvisor.isGuest" 
+                         [showSpinner]="showSpinner" 
+                         [dirty]="orgFormGroup.dirty">
+            </save-footer>
             
         </form>
-
-
-
-    `
+        
+    `,
+    styles: [`
+        .body-footer-form{
+            display:flex;
+            flex-direction: column;
+            height:100%;
+            width:100%;
+            justify-content: space-between;
+        }
+    `]
 })
 export class DatatracksOrganismComponent extends PrimaryTab implements OnInit{
     //Override

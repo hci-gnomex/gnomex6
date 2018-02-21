@@ -759,6 +759,7 @@ export class BrowseFilterComponent implements OnInit {
             let params: URLSearchParams = this.getDataTrackBrowseParameters();
             this.dataTrackService.previousURLParams = params;
             this.dataTrackService.previousURLParams["refreshParams"] = true;
+            this.dataTrackService.labList = this.labList;
             this.dataTrackService.getDatatracksList_fromBackend(params);
         } else if (this.mode === this.BILLING_BROWSE) {
             let billingRequestListParams: URLSearchParams = this.getBillingRequestListParameters();
