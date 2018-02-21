@@ -10,16 +10,17 @@ import { DatatracksPanelComponent,
         GBSegmentsTabComponent,
         ImportSegmentsDialog,
         GBSequenceFilesTabComponent,
-        SequenceFilesDialog
+        SequenceFilesDialog,
+        DatatracksFolderComponent
         } from './index'
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {AgGridModule} from "ag-grid-angular";
 import {TabsModule} from "../../util/tabs/tabs.module";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {DATATRACKS_ROUTING} from "../datatracks.routes";
-
-
-
+import {RichEditorModule} from "../../../modules/rich-editor.module";
+import {ComboBoxModule} from "../../../modules/combobox.module";
+import {UtilModule} from "../../util/util.module";
 
 
 @NgModule({
@@ -31,7 +32,10 @@ import {DATATRACKS_ROUTING} from "../datatracks.routes";
         AngularMaterialModule,
         FormsModule,
         ReactiveFormsModule,
-        ProgressBarModule
+        ProgressBarModule,
+        RichEditorModule,
+        ComboBoxModule,
+        UtilModule
     ],
 
     declarations: [
@@ -42,7 +46,8 @@ import {DATATRACKS_ROUTING} from "../datatracks.routes";
         GBSegmentsTabComponent,
         GBSequenceFilesTabComponent,
         ImportSegmentsDialog,
-        SequenceFilesDialog
+        SequenceFilesDialog,
+        DatatracksFolderComponent
     ],
     providers: [],
     entryComponents: [

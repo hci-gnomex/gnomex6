@@ -20,6 +20,7 @@ import {NewTopicComponent} from "./new-topic.component";
 import {NewDataTrackFolderComponent} from "../datatracks/new-datatrackfolder.component";
 import {DeleteDataTrackComponent} from "../datatracks/delete-datatrack.component";
 import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
+import {SaveFooterComponent} from "./save-footer.component"
 
 @NgModule({
     imports: [
@@ -33,10 +34,12 @@ import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
 
     ],
     declarations: [DateRangePickerComponent, BrowseFilterComponent, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent,
-                    MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent, NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent],
+                    MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent, NewDataTrackFolderComponent,
+                    DeleteDataTrackComponent, NewDataTrackComponent,SaveFooterComponent],
     entryComponents: [BillingUsageReportComponent, NewGenomeBuildComponent, NewOrganismComponent, NewTopicComponent, NewDataTrackFolderComponent, NewDataTrackComponent, DeleteDataTrackComponent],
     exports: [DateRangePickerComponent, BrowseFilterComponent, TabsModule, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent,
-                    MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent, NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent]
+                MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent,
+                NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent,SaveFooterComponent]
 
 })
 export class UtilModule {
