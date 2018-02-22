@@ -31,6 +31,10 @@ import {UsersGroupsTablistComponent} from "./users-groups-tablist.component";
 import {AgGridModule} from 'ag-grid-angular/main';
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 import {NewUserDialogComponent} from "./new-user-dialog.component";
+import {DeleteUserDialogComponent} from "./delete-user-dialog.component";
+import {NewGroupDialogComponent} from "./new-group-dialog.component";
+import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
+import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
 
 /**
  * @author jdewell
@@ -66,9 +70,9 @@ import {NewUserDialogComponent} from "./new-user-dialog.component";
         AngularSplitModule,
         AgGridModule.withComponents([IconTextRendererComponent])
     ],
-    declarations: [UsersGroupsTablistComponent, NewUserDialogComponent],
-    entryComponents: [NewUserDialogComponent],
-    exports: [NewUserDialogComponent]
+    declarations: [UsersGroupsTablistComponent, NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
+    entryComponents: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
+    exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent]
 })
 export class UsersGroupsTablistModule {
 }

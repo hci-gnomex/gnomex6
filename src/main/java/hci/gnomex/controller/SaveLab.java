@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -80,6 +82,7 @@ public void validate() {
 }
 
 public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
+	StringReader reader = null;
 
 	labScreen = new Lab();
 	HashMap errors = this.loadDetailObject(request, labScreen);
@@ -98,76 +101,74 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 	if (request.getParameter("institutionsXMLString") != null
 			&& !request.getParameter("institutionsXMLString").equals("")) {
 		institutionsXMLString = request.getParameter("institutionsXMLString");
-	}
 
-	StringReader reader = new StringReader(institutionsXMLString);
-	try {
-		SAXBuilder sax = new SAXBuilder();
-		institutionsDoc = sax.build(reader);
-		labInstitutionParser = new LabInstitutionParser(institutionsDoc);
-	} catch (JDOMException je) {
-		this.addInvalidField("institutionsXMLString", "Invalid institutionsXMLString");
-		this.errorDetails = Util.GNLOG(LOG,"Cannot parse institutionsXMLString", je);
-	}
 
+		reader = new StringReader(institutionsXMLString);
+		try {
+			SAXBuilder sax = new SAXBuilder();
+			institutionsDoc = sax.build(reader);
+			labInstitutionParser = new LabInstitutionParser(institutionsDoc);
+		} catch (JDOMException je) {
+			this.addInvalidField("institutionsXMLString", "Invalid institutionsXMLString");
+			this.errorDetails = Util.GNLOG(LOG, "Cannot parse institutionsXMLString", je);
+		}
+	}
 	if (request.getParameter("membersXMLString") != null && !request.getParameter("membersXMLString").equals("")) {
 		membersXMLString = request.getParameter("membersXMLString");
-	}
 
-	reader = new StringReader(membersXMLString);
-	try {
-		SAXBuilder sax = new SAXBuilder();
-		membersDoc = sax.build(reader);
-		labMemberParser = new LabMemberParser(membersDoc);
-	} catch (JDOMException je) {
-		this.addInvalidField("membersXMLString", "Invalid membersXMLString");
-		this.errorDetails = Util.GNLOG(LOG,"Cannot parse membersXMLString", je);
-	}
 
+		reader = new StringReader(membersXMLString);
+		try {
+			SAXBuilder sax = new SAXBuilder();
+			membersDoc = sax.build(reader);
+			labMemberParser = new LabMemberParser(membersDoc);
+		} catch (JDOMException je) {
+			this.addInvalidField("membersXMLString", "Invalid membersXMLString");
+			this.errorDetails = Util.GNLOG(LOG, "Cannot parse membersXMLString", je);
+		}
+	}
 	if (request.getParameter("collaboratorsXMLString") != null
 			&& !request.getParameter("collaboratorsXMLString").equals("")) {
 		collaboratorsXMLString = request.getParameter("collaboratorsXMLString");
-	}
 
-	reader = new StringReader(collaboratorsXMLString);
-	try {
-		SAXBuilder sax = new SAXBuilder();
-		collaboratorsDoc = sax.build(reader);
-		collaboratorParser = new LabMemberParser(collaboratorsDoc);
-	} catch (JDOMException je) {
-		this.addInvalidField("collaboratorsXMLString", "Invalid collaboratorsXMLString");
-		this.errorDetails = Util.GNLOG(LOG,"Cannot parse collaboratorsXMLString", je);
+		reader = new StringReader(collaboratorsXMLString);
+		try {
+			SAXBuilder sax = new SAXBuilder();
+			collaboratorsDoc = sax.build(reader);
+			collaboratorParser = new LabMemberParser(collaboratorsDoc);
+		} catch (JDOMException je) {
+			this.addInvalidField("collaboratorsXMLString", "Invalid collaboratorsXMLString");
+			this.errorDetails = Util.GNLOG(LOG, "Cannot parse collaboratorsXMLString", je);
+		}
 	}
-
 	if (request.getParameter("managersXMLString") != null && !request.getParameter("managersXMLString").equals("")) {
 		managersXMLString = request.getParameter("managersXMLString");
-	}
 
-	reader = new StringReader(managersXMLString);
-	try {
-		SAXBuilder sax = new SAXBuilder();
-		managersDoc = sax.build(reader);
-		managerParser = new LabMemberParser(managersDoc);
-	} catch (JDOMException je) {
+		reader = new StringReader(managersXMLString);
+		try {
+			SAXBuilder sax = new SAXBuilder();
+			managersDoc = sax.build(reader);
+			managerParser = new LabMemberParser(managersDoc);
+		} catch (JDOMException je) {
 			this.addInvalidField("managersXMLString", "Invalid managersXMLString");
-		this.errorDetails = Util.GNLOG(LOG,"Cannot parse managersXMLString", je);
+			this.errorDetails = Util.GNLOG(LOG, "Cannot parse managersXMLString", je);
+		}
 	}
-
 	if (request.getParameter("accountsXMLString") != null && !request.getParameter("accountsXMLString").equals("")) {
 		accountsXMLString = request.getParameter("accountsXMLString");
+
+
+		reader = new StringReader(accountsXMLString);
+		try {
+			SAXBuilder sax = new SAXBuilder();
+			accountsDoc = sax.build(reader);
+			accountParser = new BillingAccountParser(accountsDoc);
+
+		} catch (JDOMException je) {
+			this.addInvalidField("accountsXMLString", "Invalid accountsXMLString");
+			this.errorDetails = Util.GNLOG(LOG, "Cannot parse accountsXMLString", je);
+		}
 	}
-
-	reader = new StringReader(accountsXMLString);
-	try {
-		SAXBuilder sax = new SAXBuilder();
-		accountsDoc = sax.build(reader);
-		accountParser = new BillingAccountParser(accountsDoc);
-
-	} catch (JDOMException je) {
-		this.addInvalidField("accountsXMLString", "Invalid accountsXMLString");
-		this.errorDetails = Util.GNLOG(LOG,"Cannot parse accountsXMLString", je);
-	}
-
 	String coreFacilitiesXMLString = "";
 	if (request.getParameter("coreFacilitiesXMLString") != null
 			&& !request.getParameter("coreFacilitiesXMLString").equals("")) {
@@ -238,15 +239,17 @@ public Command execute() throws RollBackCommandException {
 			setResponsePage(this.ERROR_JSP);
 		}
 
-		accountParser.parse(sess);
-
-		// For some reason, this code is necessary for the billing account saves. Without this here, the
-		// billing accounts are deleted, perhaps because the lab isn't iniatialized with all of the
-		// billing accounts?
-		for (Iterator i = accountParser.getBillingAccountMap().keySet().iterator(); i.hasNext();) {
-			String idBillingAccountString = (String) i.next();
-			BillingAccount ba = (BillingAccount) accountParser.getBillingAccountMap().get(idBillingAccountString);
+		if (accountParser != null) {
+			accountParser.parse(sess);
+			// For some reason, this code is necessary for the billing account saves. Without this here, the
+			// billing accounts are deleted, perhaps because the lab isn't iniatialized with all of the
+			// billing accounts?
+			for (Iterator i = accountParser.getBillingAccountMap().keySet().iterator(); i.hasNext();) {
+				String idBillingAccountString = (String) i.next();
+				BillingAccount ba = (BillingAccount) accountParser.getBillingAccountMap().get(idBillingAccountString);
+			}
 		}
+
 
 		if (isValid()) {
 			if (!this.getSecurityAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_USERS)) {
@@ -258,11 +261,21 @@ public Command execute() throws RollBackCommandException {
 		Lab lab = null;
 
 		if (isValid()) {
-			accountParser.parse(sess);
-			labInstitutionParser.parse(sess);
-			labMemberParser.parse(sess);
-			collaboratorParser.parse(sess);
-			managerParser.parse(sess);
+			if (accountParser != null) {
+				accountParser.parse(sess);
+			}
+			if (labInstitutionParser != null) {
+				labInstitutionParser.parse(sess);
+			}
+			if (labMemberParser != null) {
+				labMemberParser.parse(sess);
+			}
+			if (collaboratorParser != null) {
+				collaboratorParser.parse(sess);
+			}
+			if (managerParser != null) {
+				managerParser.parse(sess);
+			}
 			if (coreFacilityParser != null) {
 				coreFacilityParser.parse(sess);
 			}
@@ -294,67 +307,68 @@ public Command execute() throws RollBackCommandException {
 			// Save billing accounts
 			//
 			Set<BillingAccount> billingAccountsToSave = new TreeSet<BillingAccount>(new BillingAccountComparator());
-			for (Iterator i = accountParser.getBillingAccountMap().keySet().iterator(); i.hasNext();) {
-				String idBillingAccountString = (String) i.next();
-				BillingAccount ba = (BillingAccount) accountParser.getBillingAccountMap().get(idBillingAccountString);
-				ba.setIdLab(lab.getIdLab());
-				sess.save(ba);
-				billingAccountsToSave.add(ba);
+			if (accountParser != null) {
+				for (Iterator i = accountParser.getBillingAccountMap().keySet().iterator(); i.hasNext(); ) {
+					String idBillingAccountString = (String) i.next();
+					BillingAccount ba = (BillingAccount) accountParser.getBillingAccountMap().get(idBillingAccountString);
+					ba.setIdLab(lab.getIdLab());
+					sess.save(ba);
+					billingAccountsToSave.add(ba);
 
-				// If the billing account isPO then change billing status of all billingItems in the account
-				List billingItems = sess.createQuery(
-						"select bi from BillingItem bi where idBillingAccount = " + ba.getIdBillingAccount()).list();
-				if (ba.getIsPO().equals("Y")) {
-					for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext();) {
-						BillingItem bi = (BillingItem) bIterator.next();
-						if (bi.getCodeBillingStatus().equals(BillingStatus.APPROVED)) {
-							bi.setCodeBillingStatus(BillingStatus.APPROVED_PO);
-							sess.save(bi);
+					// If the billing account isPO then change billing status of all billingItems in the account
+					List billingItems = sess.createQuery(
+							"select bi from BillingItem bi where idBillingAccount = " + ba.getIdBillingAccount()).list();
+					if (ba.getIsPO().equals("Y")) {
+						for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext(); ) {
+							BillingItem bi = (BillingItem) bIterator.next();
+							if (bi.getCodeBillingStatus().equals(BillingStatus.APPROVED)) {
+								bi.setCodeBillingStatus(BillingStatus.APPROVED_PO);
+								sess.save(bi);
+							}
+						}
+					} else if (ba.getIsCreditCard().equals("Y")) {
+						for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext(); ) {
+							BillingItem bi = (BillingItem) bIterator.next();
+							if (bi.getCodeBillingStatus().equals(BillingStatus.APPROVED)) {
+								bi.setCodeBillingStatus(BillingStatus.APPROVED_CC);
+								sess.save(bi);
+							}
+						}
+					} else if (ba.getIsPO().equals("N")) {
+						for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext(); ) {
+							BillingItem bi = (BillingItem) bIterator.next();
+							if (bi.getCodeBillingStatus().equals(BillingStatus.APPROVED_PO)) {
+								bi.setCodeBillingStatus(BillingStatus.APPROVED);
+								sess.save(bi);
+							}
+						}
+					} else if (ba.getIsCreditCard().equals("N")) {
+						for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext(); ) {
+							BillingItem bi = (BillingItem) bIterator.next();
+							if (bi.getCodeBillingStatus().equals(BillingStatus.APPROVED_CC)) {
+								bi.setCodeBillingStatus(BillingStatus.APPROVED);
+								sess.save(bi);
+							}
 						}
 					}
-				} else if (ba.getIsCreditCard().equals("Y")) {
-					for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext();) {
-						BillingItem bi = (BillingItem) bIterator.next();
-						if (bi.getCodeBillingStatus().equals(BillingStatus.APPROVED)) {
-							bi.setCodeBillingStatus(BillingStatus.APPROVED_CC);
-							sess.save(bi);
-						}
-					}
-				} else if (ba.getIsPO().equals("N")) {
-					for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext();) {
-						BillingItem bi = (BillingItem) bIterator.next();
-						if (bi.getCodeBillingStatus().equals(BillingStatus.APPROVED_PO)) {
-							bi.setCodeBillingStatus(BillingStatus.APPROVED);
-							sess.save(bi);
-						}
-					}
-				} else if (ba.getIsCreditCard().equals("N")) {
-					for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext();) {
-						BillingItem bi = (BillingItem) bIterator.next();
-						if (bi.getCodeBillingStatus().equals(BillingStatus.APPROVED_CC)) {
-							bi.setCodeBillingStatus(BillingStatus.APPROVED);
-							sess.save(bi);
-						}
-					}
-				}
-				sess.flush();
+					sess.flush();
 
-				// If billing account has just been approved, send out a notification
-				// email to submitter of work auth form as well as lab managers
-				if (ba.isJustApproved()) {
-					ba.setIdApprover(this.getSecAdvisor().getIdAppUser());
-					AppUser au = (AppUser) sess.load(AppUser.class, this.getSecAdvisor().getIdAppUser());
-					BillingAccountUtil.sendApprovedBillingAccountEmail(sess, serverName, launchAppURL, ba, lab, au);
-				}
+					// If billing account has just been approved, send out a notification
+					// email to submitter of work auth form as well as lab managers
+					if (ba.isJustApproved()) {
+						ba.setIdApprover(this.getSecAdvisor().getIdAppUser());
+						AppUser au = (AppUser) sess.load(AppUser.class, this.getSecAdvisor().getIdAppUser());
+						BillingAccountUtil.sendApprovedBillingAccountEmail(sess, serverName, launchAppURL, ba, lab, au);
+					}
 
-				// If this is a new PO billing account notify the PI of the lab of its creation
-				// so that they can start billing against it
-				if (idBillingAccountString.startsWith("BillingAccount")
-						&& (lab.getContactEmail() != null && !lab.getContactEmail().equals(""))) {
-					this.sendNewPOAccountEmail(sess, ba, lab);
+					// If this is a new PO billing account notify the PI of the lab of its creation
+					// so that they can start billing against it
+					if (idBillingAccountString.startsWith("BillingAccount")
+							&& (lab.getContactEmail() != null && !lab.getContactEmail().equals(""))) {
+						this.sendNewPOAccountEmail(sess, ba, lab);
+					}
 				}
 			}
-
 			// Remove billing accounts no longer in the billing account list
 			List billingAccountsToRemove = new ArrayList();
 			if (lab.getBillingAccounts() != null) {
@@ -383,104 +397,115 @@ public Command execute() throws RollBackCommandException {
 			}
 
 			if (this.isValid()) {
-				//
-				// Save lab institutions
-				//
-				TreeSet institutions = new TreeSet(new InstitutionComparator());
-				for (Iterator i = labInstitutionParser.getInstititionMap().keySet().iterator(); i.hasNext();) {
-					Integer idInstitution = (Integer) i.next();
-					Institution institution = (Institution) labInstitutionParser.getInstititionMap().get(idInstitution);
-					institutions.add(institution);
-				}
-				lab.setInstitutions(institutions);
-
-				sess.flush();
-
-				//
-				// Save lab members
-				//
-				// Lab members to keep
-				TreeSet members = new TreeSet(new AppUserComparator());
-				for (Iterator i = labMemberParser.getAppUserMap().keySet().iterator(); i.hasNext();) {
-					Integer idAppUser = (Integer) i.next();
-					AppUser appUser = (AppUser) labMemberParser.getAppUserMap().get(idAppUser);
-					members.add(appUser);
-				}
-
-				// Lab members to remove
-				List membersToRemove = new ArrayList();
-				if (lab.getMembers() != null) {
-					for (Iterator i = lab.getMembers().iterator(); i.hasNext();) {
-						AppUser user = (AppUser) i.next();
-						if (!labMemberParser.getAppUserMap().containsKey(user.getIdAppUser())) {
-							membersToRemove.add(user);
-						}
+				if (labInstitutionParser != null) {
+					//
+					// Save lab institutions
+					//
+					TreeSet institutions = new TreeSet(new InstitutionComparator());
+					for (Iterator i = labInstitutionParser.getInstititionMap().keySet().iterator(); i.hasNext(); ) {
+						Integer idInstitution = (Integer) i.next();
+						Institution institution = (Institution) labInstitutionParser.getInstititionMap().get(idInstitution);
+						institutions.add(institution);
 					}
-					// Remove the lab member from any accounts they are users on
-					if (lab.getBillingAccounts() != null) {
-						for (Iterator i = lab.getBillingAccounts().iterator(); i.hasNext();) {
-							BillingAccount ba = (BillingAccount) i.next();
-							for (Iterator i2 = membersToRemove.iterator(); i2.hasNext();) {
-								AppUser user = (AppUser) i2.next();
-								ba.getUsers().remove(user);
+					lab.setInstitutions(institutions);
+
+					sess.flush();
+				}
+				if (labMemberParser != null) {
+					//
+					// Save lab members
+					//
+					// Lab members to keep
+					TreeSet members = new TreeSet(new AppUserComparator());
+					for (Iterator i = labMemberParser.getAppUserMap().keySet().iterator(); i.hasNext(); ) {
+						Integer idAppUser = (Integer) i.next();
+						AppUser appUser = (AppUser) labMemberParser.getAppUserMap().get(idAppUser);
+						members.add(appUser);
+					}
+
+					// Lab members to remove
+					List membersToRemove = new ArrayList();
+					if (lab.getMembers() != null) {
+						for (Iterator i = lab.getMembers().iterator(); i.hasNext(); ) {
+							AppUser user = (AppUser) i.next();
+							if (!labMemberParser.getAppUserMap().containsKey(user.getIdAppUser())) {
+								membersToRemove.add(user);
+							}
+						}
+						// Remove the lab member from any accounts they are users on
+						if (lab.getBillingAccounts() != null) {
+							for (Iterator i = lab.getBillingAccounts().iterator(); i.hasNext(); ) {
+								BillingAccount ba = (BillingAccount) i.next();
+								for (Iterator i2 = membersToRemove.iterator(); i2.hasNext(); ) {
+									AppUser user = (AppUser) i2.next();
+									ba.getUsers().remove(user);
+								}
 							}
 						}
 					}
+					// Save the members who are still part of the lab
+					lab.setMembers(members);
+
+					// Notify newly added members
+					Map<AppUser, String> newUsers = labMemberParser.getNewMemberEmailList();
+					for (Iterator<AppUser> iter = newUsers.keySet().iterator(); iter.hasNext(); ) {
+						AppUser newMember = iter.next();
+						String email = newUsers.get(newMember);
+						newMemberNotificationEmail(sess, email, lab.getName(false, true), newMember);
+					}
+
+					sess.flush();
+
 				}
-				// Save the members who are still part of the lab
-				lab.setMembers(members);
-
-				// Notify newly added members
-				Map<AppUser, String> newUsers = labMemberParser.getNewMemberEmailList();
-				for (Iterator<AppUser> iter = newUsers.keySet().iterator(); iter.hasNext();) {
-					AppUser newMember = iter.next();
-					String email = newUsers.get(newMember);
-					newMemberNotificationEmail(sess, email, lab.getName(false, true), newMember);
-				}
-
-				sess.flush();
-
 				//
 				// Save lab collaborators
 				//
-				TreeSet collaborators = new TreeSet(new AppUserComparator());
-				for (Iterator i = collaboratorParser.getAppUserMap().keySet().iterator(); i.hasNext();) {
-					Integer idAppUser = (Integer) i.next();
-					AppUser appUser = (AppUser) collaboratorParser.getAppUserMap().get(idAppUser);
-					collaborators.add(appUser);
+				if (collaboratorParser != null) {
+					TreeSet collaborators = new TreeSet(new AppUserComparator());
+					for (Iterator i = collaboratorParser.getAppUserMap().keySet().iterator(); i.hasNext(); ) {
+						Integer idAppUser = (Integer) i.next();
+						AppUser appUser = (AppUser) collaboratorParser.getAppUserMap().get(idAppUser);
+						collaborators.add(appUser);
+					}
+					lab.setCollaborators(collaborators);
+
+					sess.flush();
 				}
-				lab.setCollaborators(collaborators);
-
-				sess.flush();
-
 				//
 				// Save lab managers
 				//
-				TreeSet managers = new TreeSet(new AppUserComparator());
-				for (Iterator i = managerParser.getAppUserMap().keySet().iterator(); i.hasNext();) {
-					Integer idAppUser = (Integer) i.next();
-					AppUser appUser = (AppUser) managerParser.getAppUserMap().get(idAppUser);
-					managers.add(appUser);
+				if (managerParser != null) {
+					TreeSet managers = new TreeSet(new AppUserComparator());
+					for (Iterator i = managerParser.getAppUserMap().keySet().iterator(); i.hasNext(); ) {
+						Integer idAppUser = (Integer) i.next();
+						AppUser appUser = (AppUser) managerParser.getAppUserMap().get(idAppUser);
+						managers.add(appUser);
+					}
+					lab.setManagers(managers);
+
+					sess.flush();
 				}
-				lab.setManagers(managers);
-
-				sess.flush();
-
 				//
 				// delete any empty projects where user is no longer associated with this lab
 				//
 				ArrayList<Integer> labAssociatedIds = new ArrayList<Integer>();
-				for (Iterator i = lab.getManagers().iterator(); i.hasNext();) {
-					AppUser a = (AppUser) i.next();
-					labAssociatedIds.add(a.getIdAppUser());
+				if (lab.getManagers() != null) {
+					for (Iterator i = lab.getManagers().iterator(); i.hasNext(); ) {
+						AppUser a = (AppUser) i.next();
+						labAssociatedIds.add(a.getIdAppUser());
+					}
 				}
-				for (Iterator i = lab.getCollaborators().iterator(); i.hasNext();) {
-					AppUser a = (AppUser) i.next();
-					labAssociatedIds.add(a.getIdAppUser());
+				if (lab.getCollaborators() != null) {
+					for (Iterator i = lab.getCollaborators().iterator(); i.hasNext(); ) {
+						AppUser a = (AppUser) i.next();
+						labAssociatedIds.add(a.getIdAppUser());
+					}
 				}
-				for (Iterator i = lab.getMembers().iterator(); i.hasNext();) {
-					AppUser a = (AppUser) i.next();
-					labAssociatedIds.add(a.getIdAppUser());
+				if (lab.getMembers() != null) {
+					for (Iterator i = lab.getMembers().iterator(); i.hasNext(); ) {
+						AppUser a = (AppUser) i.next();
+						labAssociatedIds.add(a.getIdAppUser());
+					}
 				}
 				if (labAssociatedIds.size() == 0) {
 					labAssociatedIds.add(-1);
@@ -503,26 +528,27 @@ public Command execute() throws RollBackCommandException {
 				//
 				// Create default user projects
 				//
-				HashMap<Integer, List<Project>> userProjectMap = new HashMap<Integer, List<Project>>();
-				HashMap<Integer, AppUser> userMap = new HashMap<Integer, AppUser>();
-				initializeUserProjectMap(userProjectMap, userMap, (Set<AppUser>) lab.getMembers());
-				initializeUserProjectMap(userProjectMap, userMap, (Set<AppUser>) lab.getManagers());
-				hashProjects(userProjectMap, lab);
-				// Now iterate through the hash and create a default project for each user
-				// where one is not present
-				for (Integer idAppUser : userProjectMap.keySet()) {
-					List<Project> defaultProjects = userProjectMap.get(idAppUser);
-					if (defaultProjects == null || defaultProjects.isEmpty()) {
-						Project project = new Project();
-						project.setIdAppUser(idAppUser);
-						project.setIdLab(lab.getIdLab());
-						AppUser theUser = userMap.get(idAppUser);
-						project.setName("Experiments for " + theUser.getFirstLastDisplayName());
-						sess.save(project);
+				if (lab.getMembers() != null && lab.getManagers() != null) {
+					HashMap<Integer, List<Project>> userProjectMap = new HashMap<Integer, List<Project>>();
+					HashMap<Integer, AppUser> userMap = new HashMap<Integer, AppUser>();
+					initializeUserProjectMap(userProjectMap, userMap, (Set<AppUser>) lab.getMembers());
+					initializeUserProjectMap(userProjectMap, userMap, (Set<AppUser>) lab.getManagers());
+					hashProjects(userProjectMap, lab);
+					// Now iterate through the hash and create a default project for each user
+					// where one is not present
+					for (Integer idAppUser : userProjectMap.keySet()) {
+						List<Project> defaultProjects = userProjectMap.get(idAppUser);
+						if (defaultProjects == null || defaultProjects.isEmpty()) {
+							Project project = new Project();
+							project.setIdAppUser(idAppUser);
+							project.setIdLab(lab.getIdLab());
+							AppUser theUser = userMap.get(idAppUser);
+							project.setName("Experiments for " + theUser.getFirstLastDisplayName());
+							sess.save(project);
+						}
 					}
+					sess.flush();
 				}
-				sess.flush();
-
 				//
 				// Save core facilities
 				//
@@ -593,6 +619,11 @@ public Command execute() throws RollBackCommandException {
 				sess.flush();
 
 				this.xmlResult = "<SUCCESS idLab=\"" + lab.getIdLab() + "\"/>";
+				JsonObject value = Json.createObjectBuilder()
+						.add("result", "SUCCESS")
+						.add("idLab", lab.getIdLab())
+						.build();
+				this.jsonResult = value.toString();
 
 				setResponsePage(this.SUCCESS_JSP);
 

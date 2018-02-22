@@ -27,6 +27,41 @@ export class LabListService {
         });
     }
 
+    getLabListWithParams(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/GetLabList.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
+    saveLab(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/SaveLab.gx", {search: params});
+    }
+
+    generateUserAccountEmail(params: URLSearchParams): Observable<any> {
+        if (params.paramsMap.size === 0) {
+            return this.http.get("/gnomex/GenerateUserAccountEmail.gx").map((response: Response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error("Error");
+                }
+            });
+
+        } else {
+            return this.http.get("/gnomex/GenerateUserAccountEmail.gx", {search: params}).map((response: Response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error("Error");
+                }
+            });
+        }
+    }
+
     public getSubmitRequestLabList(): Observable<any[]> {
         return this.getLabListCall().map((response: Response) => {
             if (response.status === 200) {

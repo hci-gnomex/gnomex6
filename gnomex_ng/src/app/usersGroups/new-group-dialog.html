@@ -1,0 +1,31 @@
+<h6 mat-dialog-title><img src="../../assets/user.png"> Add Group</h6>
+<mat-dialog-content style="overflow: hidden">
+    <div>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="firstName" placeholder="Investigator First name">
+        </mat-form-field>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="lastName" placeholder="Investigator Last name">
+        </mat-form-field>
+        <mat-form-field class="dialogFormField">
+            <input matInput [(ngModel)]="phone" placeholder="Phone">
+        </mat-form-field>
+        <mat-form-field class="dialogFormField">
+            <input matInput [formControl]="this.emailFC" (change)="onEmailChange($event)" placeholder="PI email(s)">
+            <mat-hint align="end">Place , between emails</mat-hint>
+            <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
+            <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
+        </mat-form-field>
+        <mat-radio-group class="permission-radio-group" [formControl]="pricingFC">
+            <mat-radio-button value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
+            <mat-radio-button value="EXACADEMIC"><img src="../../assets/graduation_cap.png"> External Academic</mat-radio-button>
+            <mat-radio-button value="EXCOMM"><img src="../../assets/building.png"> External Commercial</mat-radio-button>
+        </mat-radio-group>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button *ngIf="!showSpinner && !(firstName === '' && lastName === '') && emailFC.valid"
+            (click)="save()">Save</button>
+    <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
+    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>

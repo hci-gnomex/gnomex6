@@ -24,6 +24,16 @@ export class GetLabService {
         });
     }
 
+    deleteLab(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/DeleteLab.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
     getLabById(idLab: string): Observable<any> {
         let params: URLSearchParams = new URLSearchParams();
         params.set("idLab", idLab);
