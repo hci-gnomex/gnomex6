@@ -318,7 +318,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     public buildUsers() {
-        if (!this.secAdvisor.isLabManager) {
+        if (this.secAdvisor.isAdmin || this.secAdvisor.isSuperAdmin) {
             this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any[]) => {
                 this.createUserForm();
                 this.userForm.markAsPristine();
@@ -326,7 +326,6 @@ export class UsersGroupsTablistComponent implements OnInit{
                 this.rowData = response;
             });
         }
-
     }
 
     public buildGroups(params: URLSearchParams) {
@@ -346,7 +345,13 @@ export class UsersGroupsTablistComponent implements OnInit{
 
         this.getGroupListSubscription = this.groupListService.getLabListWithParams(params).subscribe((response: any[]) => {
             this.buildManagedLabList(response);
-            this.groupsData = this.myManagingLabs;
+            if (this.secAdvisor.isSuperAdmin || this.secAdvisor.isAdmin) {
+                this.groupsData = this.myManagingLabs;
+            } else {
+                this.groupsData = this.secAdvisor.groupsToManage;
+                this.isGroupsTab = true;
+                this.isUserTab = false;
+            }
             this.createGroupForm();
             this.setPricing();
         });
@@ -355,21 +360,23 @@ export class UsersGroupsTablistComponent implements OnInit{
 
     buildManagedLabList(labs: any[]) {
         this.myCoreFacilitiesIManage = this.secAdvisor.coreFacilitiesICanManage;
-        this.idCoreFacility = this.myCoreFacilitiesIManage[0].value;
-        let allObj = {facilityName: "All cores"};
-        this.myCoreFacilitiesIManage.push(allObj);
-        if (this.labs) {
-            this.myManagingLabs = labs.filter((lab) => {
-                return lab.canManage === 'Y';
-            })
-        } else {
-            return [];
+        if (this.myCoreFacilitiesIManage.length > 0) {
+            this.idCoreFacility = this.myCoreFacilitiesIManage[0].value;
+            let allObj = {facilityName: "All cores"};
+            this.myCoreFacilitiesIManage.push(allObj);
+            if (this.labs) {
+                this.myManagingLabs = labs.filter((lab) => {
+                    return lab.canManage === 'Y';
+                })
+            }
         }
     }
 
     public onNotifyGridRowDataChanged(): void {
         setTimeout(() => {
-            this.userForm.markAsPristine();
+            if (this.userForm) {
+                this.userForm.markAsPristine();
+            }
         });
     }
 
