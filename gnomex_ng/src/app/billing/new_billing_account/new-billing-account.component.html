@@ -54,7 +54,7 @@
 						<mat-radio-group [(ngModel)]="showField">
 							<mat-radio-button class="radio-button" [value]="CHARTFIELD">Chartfield</mat-radio-button>
 							<mat-radio-button class="radio-button" [value]="PO">PO</mat-radio-button>
-							<mat-radio-button class="radio-button" [value]="CREDITCARD">Credit Card</mat-radio-button>
+							<mat-radio-button class="radio-button" [value]="CREDIT_CARD">Credit Card</mat-radio-button>
 						</mat-radio-group>
 					</div>
 				</div>
@@ -411,13 +411,13 @@
 						</div>
 					</div>
 				</div>
-				<div *ngIf="showFundingAgencies && usesCustomChartfields !== 'Y' || includeInCustomField_fundingAgency" class="tr full-width">
+				<div *ngIf="showFundingAgencies && (usesCustomChartfields !== 'Y' || includeInCustomField_fundingAgency)" class="tr full-width">
 					<div class="td cell-label">
 						Funding Agency
 					</div>
 					<div class="td">
 						<mat-form-field style="width: 100%; font-size: small;">
-							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency" required="{{ requireFundingAgency }}">
+							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_chartfield" required="{{ requireFundingAgency }}">
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
 									{{ fundingAgency.display }}
@@ -425,6 +425,8 @@
 							</mat-select>
 						</mat-form-field>
 					</div>
+				</div>
+				<div class="tr full-width row-spacer">
 				</div>
 				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_startDate" class="tr full-width">
 					<div class="td cell-label">
@@ -446,9 +448,29 @@
 						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>
-						<div class="inline-block cell-label" style="height: 100%;">
+						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" class="inline-block cell-label" style="height: 100%;">
 							Effective Until
 						</div>
+						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="effectiveUntilDate_chartfield"
+										[matDatepicker]="effectiveUntilDatePicker_chartfield"
+										placeholder="Choose a date"
+										required="{{ requireExpirationDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="effectiveUntilDatePicker_chartfield"></mat-datepicker-toggle>
+								<mat-datepicker #effectiveUntilDatePicker_chartfield disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="(usesCustomChartfields == 'Y' && (!includeInCustomField_startDate)) && includeInCustomField_expirationDate" class="tr full-width">
+					<div class="td cell-label">
+						Effective Until
+					</div>
+					<div class="td">
 						<div style="display:inline-block; overflow:visible; font-size:small;">
 							<mat-form-field>
 								<input
@@ -522,12 +544,6 @@
 						Account Name
 					</div>
 					<div class="td">
-						<!--<jqxInput-->
-								<!--#accountName_po-->
-								<!--[theme]="'gnomex5'"-->
-								<!--[width]="'calc(100% - 6px)'"-->
-								<!--[height]="'1.5rem'">-->
-						<!--</jqxInput>-->
 						<mat-form-field class="full-width">
 							<input
 									matInput
@@ -539,69 +555,80 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Short Account Name
+					</div>
+					<div class="td">
+						<mat-form-field class="full-width">
+							<input
+									matInput
+									placeholder="Short Account Name"
+									[(ngModel)]="shortAccountName_po"
+									[formControl]="shortNameFormControl_po"
+									[errorStateMatcher]="shortNameStateMatcher_po"
+									required="{{ requireShortAcct }}">
+						</mat-form-field>
+					</div>
+				</div>
+				<div *ngIf="showFundingAgencies" class="tr full-width">
+					<div class="td cell-label">
+						Funding Agency
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%; font-size: small;">
+							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_po" required="{{ requireFundingAgency }}">
+								<mat-option>--</mat-option>
+								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
+									{{ fundingAgency.display }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Start Date
 					</div>
 					<div class="td">
-						<span>
-							<!--<GnomexStyledDatePicker #startDatePicker_po [defaultToToday]="true"></GnomexStyledDatePicker>-->
-							<!--<GnomexStyledDatePicker #startDatePicker_po></GnomexStyledDatePicker>-->
-							<div style="display:inline-block; overflow:visible; font-size:small;">
-								<mat-form-field>
-									<input
-											matInput
-											[(ngModel)]="startDate_po"
-											[matDatepicker]="startDatePicker_po"
-											placeholder="Choose a date"
-											required="{{ requireStartDate }}"
-											disabled>
-									<mat-datepicker-toggle matSuffix [for]="startDatePicker_po"></mat-datepicker-toggle>
-									<mat-datepicker #startDatePicker_po disabled="false"></mat-datepicker>
-								</mat-form-field>
-							</div>
-						</span>
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="startDate_po"
+										[matDatepicker]="startDatePicker_po"
+										placeholder="Choose a date"
+										required="{{ requireStartDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="startDatePicker_po"></mat-datepicker-toggle>
+								<mat-datepicker #startDatePicker_po disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>
 						<div class="inline-block cell-label" style="height: 100%;">
 							Effective Until
 						</div>
-						<span>
-							<!--<GnomexStyledDatePicker #expirationDatePicker_po [defaultToToday]="false"></GnomexStyledDatePicker>-->
-							<!--<GnomexStyledDatePicker #expirationDatePicker_po></GnomexStyledDatePicker>-->
-							<div style="display:inline-block; overflow:visible; font-size:small;">
-								<mat-form-field>
-									<input
-											matInput
-											[(ngModel)]="expirationDate_po"
-											[matDatepicker]="expirationDatePicker_po"
-											placeholder="Choose a date"
-											required="{{ requireExpirationDate }}"
-											disabled>
-									<mat-datepicker-toggle matSuffix [for]="expirationDatePicker_po"></mat-datepicker-toggle>
-									<mat-datepicker #expirationDatePicker_po disabled="false"></mat-datepicker>
-								</mat-form-field>
-							</div>
-						</span>
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="expirationDate_po"
+										[matDatepicker]="expirationDatePicker_po"
+										placeholder="Choose a date"
+										required="{{ requireExpirationDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="expirationDatePicker_po"></mat-datepicker-toggle>
+								<mat-datepicker #expirationDatePicker_po disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Total Dollar Amount
 					</div>
 					<div class="td">
-						<!--<jqxInput-->
-								<!--#totalDollarAmountInput_po-->
-								<!--(focusin)="onPoTotalDollarAmountSelected()"-->
-								<!--(input)="onPoTotalDollarAmountChanged()"-->
-								<!--[theme]="'gnomex5'"-->
-								<!--[width]="'10em'"-->
-								<!--[height]="'1.5rem'">-->
-						<!--</jqxInput>-->
 						<mat-form-field style="width: 18em;">
 							<span matPrefix>$ &nbsp;</span>
 							<input
@@ -617,20 +644,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Your email address
 					</div>
 					<div class="td">
-						<!--<jqxInput-->
-								<!--#submitterEmailInput_po-->
-								<!--[value]="usersEmail"-->
-								<!--[theme]="'gnomex5'"-->
-								<!--[width]="'calc(100% - 6px)'"-->
-								<!--[height]="'1.5rem'">-->
-						<!--</jqxInput>-->
 						<mat-form-field style="width: 100%;">
 							<input
 									matInput
@@ -645,25 +663,12 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
-				<!--<div class="tr full-width">-->
-					<!--<div class="td cell-label">-->
-						<!--Approved Users-->
-					<!--</div>-->
-					<!--<div class="td">-->
-						<!--<multiple-selector [title]="'Options'"></multiple-selector>-->
-					<!--</div>-->
-				<!--</div>-->
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Active
 					</div>
 					<div class="td center-vertical-align">
 						<div class="checkbox-container">
-							<!--<jqxCheckBox #activeCheckBox_po></jqxCheckBox>-->
 							<mat-checkbox [(ngModel)]="activeCheckBox_po"></mat-checkbox>
 						</div>
 					</div>
@@ -671,18 +676,12 @@
 			</div>
 
 
-			<div *ngIf="showField === CREDITCARD" class="t full-width">
+			<div *ngIf="showField === CREDIT_CARD" class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Last four digits of <br/> Credit Card Number
 					</div>
 					<div class="td">
-						<!--<jqxInput-->
-								<!--#accountName_creditCard-->
-								<!--[theme]="'gnomex5'"-->
-								<!--[width]="'calc(100% - 6px)'"-->
-								<!--[height]="'1.5rem'">-->
-						<!--</jqxInput>-->
 						<mat-form-field class="full-width">
 							<input
 									matInput
@@ -694,69 +693,64 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
+				<div *ngIf="showFundingAgencies" class="tr full-width">
+					<div class="td cell-label">
+						Funding Agency
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%; font-size: small;">
+							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_creditCard" required="{{ requireFundingAgency }}">
+								<mat-option>--</mat-option>
+								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
+									{{ fundingAgency.display }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Start Date
 					</div>
 					<div class="td">
-						<span>
-							<!--<GnomexStyledDatePicker #startDatePicker_creditcard [defaultToToday]="true"></GnomexStyledDatePicker>-->
-							<!--<GnomexStyledDatePicker #startDatePicker_creditcard></GnomexStyledDatePicker>-->
-							<div style="display:inline-block; overflow:visible; font-size:small;">
-								<mat-form-field>
-									<input
-											matInput
-											[(ngModel)]="startDate_creditcard"
-											[matDatepicker]="startDatePicker_creditcard"
-											placeholder="Choose a date"
-											required="{{ requireStartDate }}"
-											disabled>
-									<mat-datepicker-toggle matSuffix [for]="startDatePicker_creditcard"></mat-datepicker-toggle>
-									<mat-datepicker #startDatePicker_creditcard disabled="false"></mat-datepicker>
-								</mat-form-field>
-							</div>
-						</span>
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="startDate_creditcard"
+										[matDatepicker]="startDatePicker_creditcard"
+										placeholder="Choose a date"
+										required="{{ requireStartDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="startDatePicker_creditcard"></mat-datepicker-toggle>
+								<mat-datepicker #startDatePicker_creditcard disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>
-						<span class="inline-block cell-label" style="height: 100%;">
+						<div class="inline-block cell-label" style="height: 100%;">
 							Expiration Date
-						</span>
-						<span>
-							<!--<GnomexStyledDatePicker #expirationDatePicker_creditcard [defaultToToday]="false"></GnomexStyledDatePicker>-->
-							<!--<GnomexStyledDatePicker #expirationDatePicker_creditcard></GnomexStyledDatePicker>-->
-							<div style="display:inline-block; overflow:visible; font-size:small;">
-								<mat-form-field>
-									<input
-											matInput
-											[(ngModel)]="expirationDate_creditcard"
-											[matDatepicker]="expirationDatePicker_creditcard"
-											placeholder="Choose a date"
-											required="{{ requireExpirationDate }}"
-											disabled>
-									<mat-datepicker-toggle matSuffix [for]="expirationDatePicker_creditcard"></mat-datepicker-toggle>
-									<mat-datepicker #expirationDatePicker_creditcard disabled="false"></mat-datepicker>
-								</mat-form-field>
-							</div>
-						</span>
+						</div>
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="expirationDate_creditcard"
+										[matDatepicker]="expirationDatePicker_creditcard"
+										placeholder="Choose a date"
+										required="{{ requireExpirationDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="expirationDatePicker_creditcard"></mat-datepicker-toggle>
+								<mat-datepicker #expirationDatePicker_creditcard disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Zip Code
 					</div>
 					<div class="td">
-						<!--<jqxInput-->
-								<!--#zipCodeInput_creditCard-->
-								<!--(focusin)="onCreditCardZipCodeSelected()"-->
-								<!--(input)="onCreditCardZipCodeChanged()"-->
-								<!--[theme]="'gnomex5'"-->
-								<!--[width]="'10em'"-->
-								<!--[height]="'1.5rem'">-->
-						<!--</jqxInput>-->
 						<mat-form-field style="width: 10em;">
 							<input
 									matInput
@@ -771,21 +765,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Credit Card Company
 					</div>
 					<div class="td">
-						<!--<jqxComboBox-->
-								<!--#creditCardCompanyComboBox_creditCard-->
-								<!--[source]="creditCardCompanies"-->
-								<!--[valueMember]="'value'"-->
-								<!--[displayMember]="'display'"-->
-								<!--[width]="'40%'"-->
-								<!--[theme]="'gnomex5'">-->
-						<!--</jqxComboBox>-->
 						<mat-form-field style="width: 40%;">
 							<mat-select placeholder="Credit Card Company" [(value)]="selectedCreditCardCompany" required>
 								<mat-option>--</mat-option>
@@ -796,21 +780,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Total Dollar Amount
 					</div>
 					<div class="td">
-						<!--<jqxInput-->
-								<!--#totalDollarAmountInput_creditCard-->
-								<!--(focusin)="onCreditCardTotalDollarAmountSelected()"-->
-								<!--(input)="onCreditCardTotalDollarAmountChanged()"-->
-								<!--[theme]="'gnomex5'"-->
-								<!--[width]="'10em'"-->
-								<!--[height]="'1.5rem'">-->
-						<!--</jqxInput>-->
 						<mat-form-field style="width: 18em;">
 							<span matPrefix>$ &nbsp;</span>
 							<input
@@ -831,13 +805,6 @@
 						Your email address
 					</div>
 					<div class="td">
-						<!--<jqxInput-->
-								<!--#submitterEmailInput_creditcard-->
-								<!--[value]="usersEmail"-->
-								<!--[theme]="'gnomex5'"-->
-								<!--[width]="'calc(100% - 6px)'"-->
-								<!--[height]="'1.5rem'">-->
-						<!--</jqxInput>-->
 						<mat-form-field style="width: 100%;">
 							<input
 									matInput
@@ -852,25 +819,12 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
-				<!--<div class="tr full-width">-->
-					<!--<div class="td cell-label">-->
-						<!--Approved Users-->
-					<!--</div>-->
-					<!--<div class="td">-->
-						<!--<multiple-selector [title]="'Options'"></multiple-selector>-->
-					<!--</div>-->
-				<!--</div>-->
-				<!--<div class="tr full-width row-spacer">-->
-				<!--</div>-->
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Active
 					</div>
 					<div class="td center-vertical-align">
 						<div class="checkbox-container">
-							<!--<jqxCheckBox #activeCheckBox_creditcard></jqxCheckBox>-->
 							<mat-checkbox [(ngModel)]="activeCheckBox_creditcard"></mat-checkbox>
 						</div>
 					</div>
@@ -889,24 +843,8 @@
 				I understand that this account will be billed automatically and that I will receive
 				a detailed statement of services for any month in which my account was charged.
 			</div>
-			<div style="text-align: center; margin: 1em;">
-				<div class="t full-width">
-					<!--<div class="tr row-spacer">-->
-					<!--</div>-->
-					<!--<div class="tr row-spacer">-->
-					<!--</div>-->
-					<div class="tr">
-						<div class="td">
-							<div class="checkbox-container">
-								<mat-checkbox [(ngModel)]="agreementCheckbox" required>I agree</mat-checkbox>
-								<!--<jqxCheckBox #agreementCheckbox></jqxCheckBox>-->
-							<!--</div>-->
-							<!--<div class="inline-block center-vertical-align agreement">-->
-								<!--I agree-->
-							</div>
-						</div>
-					</div>
-				</div>
+			<div style="text-align: center; margin: 0.5em;">
+				<mat-checkbox [(ngModel)]="agreementCheckbox" required>I agree</mat-checkbox>
 			</div>
 		</div>
 	</div>
@@ -923,64 +861,3 @@
 		</div>
 	</div>
 </div>
-
-<jqxWindow
-		#successWindow
-		[resizable]="false"
-		[autoOpen]="false"
-		[isModal]="true"
-		[width]="'40em'"
-		[height]="'18em'">
-	<div>Billing Account Added</div>
-	<div>
-		<div class="t full-width full-height">
-			<div class="tr full-width">
-				<div class="td full-width full-height">
-					<div style="padding: 0 15%;">
-						<p style="text-align: left;">{{successMessage}}</p>
-					</div>
-					<br>
-					<div style="padding: 0 15%;">
-						<p>
-							After the account information is reviewed and approved, you will be notified by email when
-							experiment requests may be submitted using this account.
-						</p>
-					</div>
-				</div>
-			</div>
-			<div class="tr full-width">
-				<div class="td full-width center">
-					<button style="text-align: center;" (click)="successOkButtonClicked()">OK</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</jqxWindow>
-
-<jqxWindow
-		#errorWindow
-		[resizable]="false"
-		[autoOpen]="false"
-		[isModal]="true"
-		[width]="'40em'"
-		[height]="'20em'">
-	<div>
-		<p class="error-header">Please fix the following errors with this form before proceeding:</p>
-	</div>
-	<div>
-		<div class="t full-width full-height">
-			<div class="tr full-width">
-				<div class="td full-width full-height">
-					<div style="padding: 0 15%;">
-						<pre style="text-align: left;">{{errorMessage}}</pre>
-					</div>
-				</div>
-			</div>
-			<div class="tr full-width">
-				<div class="td full-width center">
-					<button style="text-align: center;" (click)="errorOkButtonClicked()">OK</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</jqxWindow>

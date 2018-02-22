@@ -3,10 +3,10 @@ import {
 	ViewChild
 } from "@angular/core";
 
-import { jqxInputComponent } from "../../../../assets/jqwidgets-ts/angular_jqxinput"
-import { jqxWindowComponent } from "../../../../assets/jqwidgets-ts/angular_jqxwindow";
+import { jqxInputComponent } from "../../../../../assets/jqwidgets-ts/angular_jqxinput"
+import { jqxWindowComponent } from "../../../../../assets/jqwidgets-ts/angular_jqxwindow";
 
-import { GnomexStyledGridComponent } from "../../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component";
+import { GnomexStyledGridComponent } from "../../../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component";
 
 @Component({
 	selector: "user-multiple-selector",
