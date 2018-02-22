@@ -185,6 +185,9 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
 
     getExperiments(data:any):Array<any>{
         let flatRequestList:Array<any> = [];
+        if(!data){
+            return flatRequestList;
+        }
 
         if(Array.isArray(data) ){
             if(data.length > 0 && !data[0].Project){
