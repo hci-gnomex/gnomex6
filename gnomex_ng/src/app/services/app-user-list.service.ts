@@ -31,13 +31,7 @@ export class AppUserListService {
     }
 
     saveAppUser(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveAppUser.gx", {search: params}).map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        });
+        return this.http.get("/gnomex/SaveAppUser.gx", {search: params});
     }
 
     getFullAppUserList(): Observable<any> {

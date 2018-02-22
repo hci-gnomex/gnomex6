@@ -1,14 +1,11 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Response, URLSearchParams} from "@angular/http";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
-import {DataTrackService} from "../services/data-track.service";
-import {LabListService} from "../services/lab-list.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {DictionaryService} from "../services/dictionary.service";
+import {MatDialogRef} from "@angular/material";
 import {UserService} from "../services/user.service";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Component({
     selector: 'new-user-dialog',
@@ -18,10 +15,11 @@ import {UserService} from "../services/user.service";
 export class NewUserDialogComponent implements OnInit{
     private firstName: string = "";
     private lastName: string = "";
-
+    public rebuildUsers: boolean = false;
     public showSpinner: boolean = false;
 
     constructor(public dialogRef: MatDialogRef<NewUserDialogComponent>,
+                private dialogsService: DialogsService,
                 private userService: UserService,
                 ) {
 
@@ -43,6 +41,13 @@ export class NewUserDialogComponent implements OnInit{
 
 
         this.userService.saveAppUser(params).subscribe((response: Response) => {
+            if (response.status === 200) {
+                this.rebuildUsers = true;
+                this.dialogsService.confirm("The user has been saved but is inactive. You must fill in login information and activate the user before the user can login.", null)
+                    .subscribe(answer => {
+
+                    })
+            }
             this.showSpinner = false;
             this.dialogRef.close();
         });

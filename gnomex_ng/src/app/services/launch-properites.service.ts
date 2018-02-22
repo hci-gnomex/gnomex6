@@ -47,7 +47,7 @@ export class LaunchPropertiesService {
     getFAQ(): Observable<any> {
         return this.http.get("/gnomex/GetFAQ.gx").map((response: Response) => {
             if (response.status === 200) {
-                return response.json();
+                    return response.json();
             } else {
                 throw new Error("Error");
             }

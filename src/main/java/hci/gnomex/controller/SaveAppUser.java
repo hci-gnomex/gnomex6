@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.naming.NamingException;
@@ -318,7 +320,12 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
             updateUserOnInactivation(sess, appUser);
           }
           sess.flush();
-          this.xmlResult = "<SUCCESS idAppUser=\"" + appUser.getIdAppUser() + "\"/>";
+          JsonObject value = Json.createObjectBuilder()
+                  .add("result", "SUCCESS")
+                  .add("idAppUser", appUser.getIdAppUser())
+                  .build();
+          this.jsonResult = value.toString();
+
           setResponsePage(this.SUCCESS_JSP);
         } else {
           if (isUsedUsername || isUseduNID || isManageFacilityError || isNullEmail || isBadEmail || isNoLogon || isDupEmail) {

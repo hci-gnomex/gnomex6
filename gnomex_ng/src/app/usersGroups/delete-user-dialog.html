@@ -1,0 +1,11 @@
+<h6 mat-dialog-title><img src="../../assets/user.png">Delete User</h6>
+<mat-dialog-content>
+    <div>
+        Delete {{userName}}?
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button *ngIf="!showSpinner" mat-button (click)="delete()">Yes</button>
+    <button *ngIf="!showSpinner" mat-button mat-dialog-close>No</button>
+    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>

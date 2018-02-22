@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {AppUserListService} from "../services/app-user-list.service";
 import {Subscription} from "rxjs/Subscription";
@@ -12,6 +12,12 @@ import {MatDialog, MatDialogRef} from "@angular/material";
 import {PasswordUtilService} from "../services/password-util.service";
 import {MatSnackBar} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {DeleteUserDialogComponent} from "./delete-user-dialog.component";
+import {GetLabService} from "../services/get-lab.service";
+import {DictionaryService} from "../services/dictionary.service";
+import {NewGroupDialogComponent} from "./new-group-dialog.component";
+import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
+import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
 
 /**
  * @title Basic tabs
@@ -174,15 +180,24 @@ export class UsersGroupsTablistComponent implements OnInit{
     private groupsGridOptions:GridOptions = {};
     private rowSelection;
     private idAppUser;
+    private idLab;
     private appUser: any;
+    private idCoreFacility: string;
     private groupsData: any[] = [];
     private labs: any[] = [];
+    private institutions: any[] = [];
     public collaboratingLabs: any[] = [];
     public managingLabs: any[] = [];
+    public myManagingLabs: any[] = [];
+    public myCoreFacilitiesIManage: any[] = [];
+    public myCoreFacilities: any[] = [];
     public isUserTab: boolean = true;
     public isGroupsTab: boolean = false;
+    public isGroupSubTab: boolean = true;
     private userForm: FormGroup;
+    private groupForm: FormGroup;
     private selectedUser: any = "";
+    private selectedGroup: any = "";
     private isActive: boolean;
     public passwordFC: FormControl;
     public passwordConfirmFC: FormControl;
@@ -190,18 +205,27 @@ export class UsersGroupsTablistComponent implements OnInit{
     public usernameFC: FormControl;
     public usertypeFC: FormControl;
     public emailFC: FormControl;
+    public groupEmailFC: FormControl;
     public permissionLevelFC: FormControl;
+    public pricingFC: FormControl;
     public isActiveFC: FormControl;
     public codeUserPermissionKind: string;
     public coreFacilitiesICanSubmitTo: any[];
     public coreFacilitiesIManage: any[];
     public searchText: string;
     public selectedTab: number = 0;
+    public selectedGroupTab: number = 0;
     public showSpinner: boolean = false;
     private columnWidth: number;
     private isActiveChanged: boolean = false;
     private beingIsActive: boolean = false;
-
+    private createUserDialogRef: MatDialogRef<NewUserDialogComponent>;
+    private deleteUserDialogRef: MatDialogRef<DeleteUserDialogComponent>;
+    private createGroupDialogRef: MatDialogRef<NewGroupDialogComponent>;
+    private deleteGroupDialogRef: MatDialogRef<DeleteGroupDialogComponent>;
+    private verifyUsersDialogRef: MatDialogRef<VerifyUsersDialogComponent>;
+    panelOpenState: boolean = false;
+    public externalGroup: boolean = false;
     constructor(private secAdvisor: CreateSecurityAdvisorService,
                 public passwordUtilService: PasswordUtilService,
                 private appUserListService: AppUserListService,
@@ -210,6 +234,10 @@ export class UsersGroupsTablistComponent implements OnInit{
                 private gnomexService: GnomexService,
                 private snackBar: MatSnackBar,
                 private dialogsService: DialogsService,
+                private getLabService: GetLabService,
+                private labListService: LabListService,
+                private dictionaryService: DictionaryService,
+                private changeRef:ChangeDetectorRef,
                 private dialog: MatDialog
                 ) {
         this.columnDefs = [
@@ -227,8 +255,16 @@ export class UsersGroupsTablistComponent implements OnInit{
         ];
         this.groupsColumnDefs = [
             {
+                headerName: "",
                 editable: false,
                 field: "name",
+            },
+            {
+                headerName: "",
+                editable: false,
+                cellRenderer: this.pricingCellRenderer,
+                field: "pricing",
+                width: 20
             }
         ];
         this.labColumnDefs = [
@@ -255,7 +291,33 @@ export class UsersGroupsTablistComponent implements OnInit{
         this.rowSelection = "single";
     }
 
+    pricingCellRenderer(params) {
+        return "<img  src=" + params.data.icon + ">";
+    }
+
     ngOnInit() {
+        this.buildUsers();
+        this.buildLabList();
+        this.buildInstitutions();
+    }
+
+    setPricing() {
+        for (let lab of this.groupsData) {
+            if (lab.isExternalPricing === 'Y') {
+                lab.pricing = "ext";
+                lab.icon = "../../assets/graduation_cap.png";
+            } else if (lab.isExternalPricingCommercial === 'Y') {
+                lab.pricing = 'com';
+                lab.icon = "../../assets/building.png";
+            } else {
+                lab.pricing = "int;"
+                lab.icon = "../../assets/empty.png";
+            }
+
+        }
+    }
+
+    public buildUsers() {
         if (!this.secAdvisor.isLabManager) {
             this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any[]) => {
                 this.createUserForm();
@@ -264,9 +326,45 @@ export class UsersGroupsTablistComponent implements OnInit{
                 this.rowData = response;
             });
         }
-        this.getGroupListSubscription = this.groupListService.getLabList().subscribe((response: any[]) => {
+
+    }
+
+    public buildGroups(params: URLSearchParams) {
+        this.labListService.getLabListWithParams(params).subscribe((response: any[]) => {
             this.groupsData = response;
+            this.setPricing();
         });
+
+    }
+
+    public buildLabList() {
+        var params: URLSearchParams = new URLSearchParams();
+        params.set("idCoreFacility", this.idCoreFacility);
+        params.set("idInstitution", "");
+        params.set("isExternal", "");
+        params.set("listKind", "UnboundedLabList");
+
+        this.getGroupListSubscription = this.groupListService.getLabListWithParams(params).subscribe((response: any[]) => {
+            this.buildManagedLabList(response);
+            this.groupsData = this.myManagingLabs;
+            this.createGroupForm();
+            this.setPricing();
+        });
+
+    }
+
+    buildManagedLabList(labs: any[]) {
+        this.myCoreFacilitiesIManage = this.secAdvisor.coreFacilitiesICanManage;
+        this.idCoreFacility = this.myCoreFacilitiesIManage[0].value;
+        let allObj = {facilityName: "All cores"};
+        this.myCoreFacilitiesIManage.push(allObj);
+        if (this.labs) {
+            this.myManagingLabs = labs.filter((lab) => {
+                return lab.canManage === 'Y';
+            })
+        } else {
+            return [];
+        }
     }
 
     public onNotifyGridRowDataChanged(): void {
@@ -278,28 +376,20 @@ export class UsersGroupsTablistComponent implements OnInit{
     public onSplitDragEnd(event) {
         this.gridOptions.api.sizeColumnsToFit();
         this.groupsGridOptions.api.sizeColumnsToFit();
-        this.labGridOptions.api.sizeColumnsToFit();
-        this.manGridOptions.api.sizeColumnsToFit();
-        this.collGridOptions.api.sizeColumnsToFit();
 
     }
 
     public onGridSizeChanged(): void {
-        // this.columnWidth = document.getElementById('myTable').clientWidth;
-
         setTimeout(() => {
             this.gridOptions.api.sizeColumnsToFit();
         });
     }
 
     public onManGridSizeChanged(): void {
-        // this.columnWidth = document.getElementById('myTable').clientWidth;
-
         setTimeout(() => {
             this.manGridOptions.api.sizeColumnsToFit();
         });
     }
-
 
     private static validatePassword(c: FormControl): any {
         return PasswordUtilService.passwordMeetsRequirements(c.value) ? null : {'validatePassword': {value: c.value}};
@@ -342,6 +432,21 @@ export class UsersGroupsTablistComponent implements OnInit{
             });
     }
 
+    setGroupValues() {
+        for (let core of this.myCoreFacilities) {
+            this.groupForm.controls[core.display].patchValue(core.isSelected, {onlySelf: true, emitEvent: true});
+
+        }
+        this.groupForm
+            .patchValue({
+                firstName: this.selectedGroup.firstName,
+                lastName: this.selectedGroup.lastName,
+                pricing: this.selectedGroup.pricing,
+                phone: this.selectedGroup.contactPhone,
+                email: this.selectedGroup.contactEmail,
+            });
+    }
+
     createUserForm() {
         this.passwordFC = new FormControl("", UsersGroupsTablistComponent.validatePassword);
         this.passwordConfirmFC = new FormControl("", UsersGroupsTablistComponent.validatePasswordConfirm);
@@ -370,15 +475,37 @@ export class UsersGroupsTablistComponent implements OnInit{
             userName: this.usernameFC,
             password: this.passwordFC,
             passwordConfirm: this.passwordConfirmFC,
-        })
+        });
         this.passwordFC.setParent(this.userForm);
         this.passwordConfirmFC.setParent(this.userForm);
 
     }
 
+    createGroupForm() {
+        this.groupEmailFC = new FormControl("", [Validators.required, Validators.email]);
+        this.pricingFC = new FormControl("", Validators.required);
+
+        this.groupForm = this.formBuilder.group({
+            lastName: ['', [
+                Validators.required
+            ]],
+            firstName: ['', [
+                Validators.required
+            ]],
+            email: this.groupEmailFC,
+            phone: "",
+            pricing: this.pricingFC
+        })
+    }
+
     search() {
 
         this.gridOptions.api.setQuickFilter(this.searchText);
+    }
+
+    searchGroups(event) {
+
+        this.groupsGridOptions.api.setQuickFilter(this.searchText);
     }
 
     /**
@@ -429,14 +556,33 @@ export class UsersGroupsTablistComponent implements OnInit{
                 this.managingLabs = response.AppUser.managingLabs;
             }
             this.userForm.markAsPristine();
-            if (this.secAdvisor.isAdmin && !this.secAdvisor.isSuperAdmin && this.selectedUser.codeUserPermissionKind == 'SUPER') {
+            if (this.secAdvisor.isAdmin && !this.secAdvisor.isSuperAdmin && this.selectedUser.codeUserPermissionKind === 'SUPER') {
                 this.userForm.disable();
             }
         });
 
     }
 
-    /**
+    onGroupsSelectionChanged() {
+        var params: URLSearchParams = new URLSearchParams();
+        var selectedRows = this.groupsGridOptions.api.getSelectedRows();
+        this.idLab = selectedRows[0].idLab;
+        this.myCoreFacilities = [];
+        params.set("idLab", this.idLab);
+        this.getLabService.getLab(params).subscribe((response: any) => {
+            this.selectedGroup = response.Lab;
+            this.myCoreFacilities = this.buildGroupCoreControls();
+            this.setLabPricing(this.selectedGroup);
+            this.setGroupValues();
+            this.changeRef.detectChanges();
+
+
+        })
+        this.groupForm.markAsPristine();
+    }
+
+
+        /**
      *
      * @param permissionKind
      */
@@ -447,6 +593,19 @@ export class UsersGroupsTablistComponent implements OnInit{
         } else {
             this.isActive = false;
         }
+    }
+
+    private setLabPricing(lab) {
+        if (lab.isExternalPricing === 'Y') {
+            lab.pricing = "EXACADEMIC";
+        } else if (lab.isExternalPricingCommercial === 'Y') {
+            lab.pricing = 'EXCOMM';
+        } else {
+            lab.pricing = "INTERNAL"
+        }
+
+
+
     }
 
     private resetUserType(isExternal: boolean): void {
@@ -503,15 +662,28 @@ export class UsersGroupsTablistComponent implements OnInit{
         }
     }
 
+    onGroupsTabChange(event) {
+        switch(event.tab.textLabel) {
+            case "Group": {
+                this.isGroupSubTab = true;
+                break;
+            }
+        }
+    }
+
+
     selectSubmissionCheckbox(getAppUser: any) {
         // Have to build checkboxes on the fly
         this.coreFacilitiesICanSubmitTo = [];
         this.coreFacilitiesIManage = [];
-        if (this.codeUserPermissionKind === 'LAB' || this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind == 'ADMIN') {
-            this.coreFacilitiesICanSubmitTo = getAppUser.coreFacilitiesICanSubmitTo.filter((core) => {
-                return core.allowed === 'Y';
-            })
-        }
+            if (this.codeUserPermissionKind === 'LAB' || this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind == 'ADMIN') {
+                if (!this.secAdvisor.isArray(getAppUser.coreFacilitiesICanSubmitTo)) {
+                    getAppUser.coreFacilitiesICanSubmitTo = [getAppUser.coreFacilitiesICanSubmitTo];
+                }
+                this.coreFacilitiesICanSubmitTo = getAppUser.coreFacilitiesICanSubmitTo.filter((core) => {
+                    return core.allowed === 'Y';
+                })
+            }
         if (this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind==='ADMIN' ) {
             this.coreFacilitiesIManage = getAppUser.managingCoreFacilities;
             for (let core of this.coreFacilitiesIManage) {
@@ -530,35 +702,82 @@ export class UsersGroupsTablistComponent implements OnInit{
         }
 
         for (let core of this.coreFacilitiesICanSubmitTo) {
+            let control: FormControl = new FormControl(core.display);
+            this.userForm.addControl(core.display, control);
             if (core.selected ==='Y') {
                 core.isSelected = true;
             } else {
                 core.isSelected = false;
             }
         }
+    }
 
+    buildGroupCoreControls(): any[] {
+        let myCoreFacilities: any[] = [];
 
-        for (let core of this.coreFacilitiesICanSubmitTo) {
-            let control: FormControl = new FormControl(core.display);
-            this.userForm.addControl(core.display, control);
+        if (!this.secAdvisor.isArray(this.selectedGroup.coreFacilities)) {
+            this.selectedGroup.coreFacilities = [this.selectedGroup.coreFacilities.CoreFacility];
         }
-    }
 
-    onGroupsTabChange(event) {
+        let myCores = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility");
+        for (let myCore of myCores) {
+            let control: FormControl = new FormControl(myCore.display);
+            this.groupForm.addControl(myCore.display, control);
+            if (this.secAdvisor.isSuperAdmin) {
+                myCore.isDisabled = false;
+            } else {
+                if (myCore.idCoreFacility === this.idCoreFacility) {
+                    myCore.isDisabled = false;
+                } else {
+                    myCore.isDisabled = true;
+                }
+            }
+            myCore.isSelected = false;
+            myCoreFacilities.push(myCore);
+        }
 
-    }
-
-    dataChanged(): void {
+        for (let core of myCoreFacilities) {
+            for (let selectedCore of this.selectedGroup.coreFacilities) {
+                    selectedCore.isDisabled = false;
+                if (selectedCore.value === core.value) {
+                    core.isSelected = true;
+                    break;
+                }
+            }
+        }
+        return myCoreFacilities;
     }
 
     newUser() {
-        let dialogRef: MatDialogRef<NewUserDialogComponent> = this.dialog.open(NewUserDialogComponent, {
+        this.createUserDialogRef = this.dialog.open(NewUserDialogComponent, {
             height: '25em',
             width: '20em',
         });
+        this.createUserDialogRef.afterClosed()
+            .subscribe(result => {
+                if (this.createUserDialogRef.componentInstance.rebuildUsers) {
+                    this.buildUsers();
+                }
+            })
+
     }
 
     deleteUser() {
+        this.deleteUserDialogRef = this.dialog.open(DeleteUserDialogComponent, {
+            height: '15em',
+            width: '20em',
+            data: {
+                idAppUser: this.idAppUser,
+                userName: this.selectedUser.displayName
+            }
+
+        });
+        this.deleteUserDialogRef.afterClosed()
+            .subscribe(result => {
+                if (this.deleteUserDialogRef.componentInstance.rebuildUsers) {
+                    this.buildUsers();
+                }
+            })
 
     }
 
@@ -586,6 +805,7 @@ export class UsersGroupsTablistComponent implements OnInit{
         this.groupsGridOptions.api.sizeColumnsToFit();
 
     }
+
     setCoreFacilities(): number {
         let coresIManage: number = 0;
         for (let field in this.userForm.controls) { // 'field' is a string
@@ -632,7 +852,6 @@ export class UsersGroupsTablistComponent implements OnInit{
         return message;
     }
 
-
     save() {
         let stringifiedSF: string = "";
         let stringifiedMF: string = "";
@@ -658,7 +877,6 @@ export class UsersGroupsTablistComponent implements OnInit{
         } else {
             params.set("beingInactivated", 'Y');
         }
-        //params.set("isActive", this.userForm.controls['isActive'].value);
         if (this.usertypeFC.value === this.USER_TYPE_UNIVERSITY) {
             params.set("uNID", this.userForm.controls['uNid'].value);
         } else if (this.usertypeFC.value === this.USER_TYPE_EXTERNAL) {
@@ -681,8 +899,9 @@ export class UsersGroupsTablistComponent implements OnInit{
                 if (responseJSON.result && responseJSON.result === "SUCCESS") {
                     this.userForm.markAsPristine();
                     this.snackBar.open("Changes Saved", "My Account", {
-                        duration: 2000,
+                        duration: 2000
                     });
+                    this.buildUsers();
                 }
             }
             this.showSpinner = false;
@@ -698,17 +917,133 @@ export class UsersGroupsTablistComponent implements OnInit{
         } else {
             let answer: any;
             if (this.isActiveChanged && this.isActiveFC.value == false) {
-                let activeMessage = this.buildLabsMessage();
-                this.dialogsService.confirm("Inactivating this user will remove them from the following lab(s):", activeMessage).subscribe(answer => {
-                    if (answer) {
-                        this.beingIsActive = true;
-                        this.save();
-                    }
-                });
+                if ( this.isMemberOfLab()) {
+                    let activeMessage = this.buildLabsMessage();
+                    this.dialogsService.confirm("Inactivating this user will remove them from the following lab(s):", activeMessage).subscribe(answer => {
+                        if (answer) {
+                            this.beingIsActive = true;
+                            this.save();
+                        }
+                    });
+                } else {
+                    this.dialogsService.confirm("This will inactivate the user", " ").subscribe(answer => {
+                        if (answer) {
+                            this.beingIsActive = true;
+                            this.save();
+                        }
+                    });
+
+                }
 
             } else {
                 this.save();
             }
         }
+    }
+
+    isMemberOfLab(): boolean {
+       if (this.collaboratingLabs.length > 0 ||
+            this.managingLabs.length > 0 ||
+            this.labs.length > 0) {
+           return true;
+       } else {
+           return false;
+       }
+    }
+
+    saveGroup() {
+
+    }
+
+    searchCoreFacility(event) {
+        var params: URLSearchParams = new URLSearchParams();
+        params.set("idCoreFacility", event.value);
+        params.set("idInstitution", "");
+        params.set("isExternal", "");
+        params.set("listKind", "UnboundedLabList");
+
+
+        this.buildGroups(params);
+    }
+
+    onExternalGroupChange(event) {
+        var params: URLSearchParams = new URLSearchParams();
+        params.set("idCoreFacility", "");
+        params.set("idInstitution", "");
+        if (event.checked) {
+            params.set("isExternal", 'Y');
+        } else {
+            params.set("isExternal", 'N');
+        }
+        params.set("listKind", "UnboundedLabList");
+
+
+        this.buildGroups(params);
+
+    }
+
+    buildInstitutions() {
+        this.institutions = this.dictionaryService.getEntries(DictionaryService.INSTITUTION);
+
+    }
+
+    searchInstitution(event) {
+        var params: URLSearchParams = new URLSearchParams();
+        params.set("idCoreFacility", "");
+        params.set("idInstitution", event.value);
+        params.set("isExternal", "");
+        params.set("listKind", "UnboundedLabList");
+
+
+        this.buildGroups(params);
+    }
+
+    newGroup() {
+        this.createGroupDialogRef = this.dialog.open(NewGroupDialogComponent, {
+            height: '35em',
+            width: '20em',
+        });
+        this.createGroupDialogRef.afterClosed()
+            .subscribe(result => {
+                if (this.createGroupDialogRef.componentInstance.rebuildGroups) {
+                    this.buildLabList();
+                }
+            })
+
+    }
+
+    deleteGroup() {
+        this.deleteGroupDialogRef = this.dialog.open(DeleteGroupDialogComponent, {
+            height: '10em',
+            width: '20em',
+            data: {
+                idLab: this.idLab,
+                labName: this.selectedGroup.name
+            }
+
+        });
+        this.deleteGroupDialogRef.afterClosed()
+            .subscribe(result => {
+                if (this.deleteGroupDialogRef.componentInstance.rebuildGroups) {
+                    this.buildLabList();
+                }
+            })
+
+    }
+
+    verify(mode: string) {
+        this.verifyUsersDialogRef = this.dialog.open(VerifyUsersDialogComponent, {
+            height: '16em',
+            width: '20em',
+            data: {
+                idLab: this.idLab,
+                mode: mode
+            }
+
+        });
+        this.verifyUsersDialogRef.afterClosed()
+            .subscribe(result => {
+            })
+
     }
 }
