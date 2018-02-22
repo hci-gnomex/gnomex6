@@ -158,6 +158,9 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
 
     getAnalyses(data:any):Array<any>{
         let flatAnalysisList:Array<any> = [];
+        if(!data){
+            return flatAnalysisList;
+        }
 
         if(Array.isArray(data) ){
             if(data.length > 0 && !data[0].AnalysisGroup){

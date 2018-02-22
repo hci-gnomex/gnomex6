@@ -320,60 +320,67 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.analysisCount = 0;
         this.labs = [];
         this.items = [].concat(null);
-        if (!this.isArray(response)) {
-            this.items = [response];
-        } else {
-            this.items = response;
-        }
 
-        this.labs = this.labs.concat(this.items);
-        this.analysisService.emitCreateAnalysisDataSubject({labs:this.labs,items:this.items});
-        for (var l of this.items) {
-            l.id = "l"+l.idLab;
-            l.parentid = -1;
+        if(response){
+            if (!this.isArray(response)) {
+                this.items = [response];
+            } else {
+                this.items = response;
+            }
 
-            l.icon = "assets/group.png";
+            this.labs = this.labs.concat(this.items);
+            this.analysisService.emitCreateAnalysisDataSubject({labs:this.labs,items:this.items});
+            for (var l of this.items) {
+                l.id = "l"+l.idLab;
+                l.parentid = -1;
 
-            if (l.AnalysisGroup) {
-                if (!this.isArray(l.AnalysisGroup)) {
-                    l.items = [l.AnalysisGroup];
-                } else {
-                    l.items = l.AnalysisGroup;
-                }
-                for (var p of l.items) {
-                    p.icon = "assets/folder.png";
-                    p.idLab = l.idLab;
-                    p.id = "p"+p.idAnalysisGroup;
-                    if (p.Analysis) {
-                        if (!this.isArray(p.Analysis)) {
-                            p.items = [p.Analysis];
-                        } else {
-                            p.items = p.Analysis;
-                        }
-                        for (var a of p.items) {
-                            if (a) {
-                                if (a.label) {
-                                    this.analysisCount++;
-                                    var labelString: string = a.number;
-                                    labelString = labelString.concat(" (");
-                                    labelString = labelString.concat(a.label);
-                                    labelString = labelString.concat(")");
-                                    a.label = labelString;
-                                    a.id = "a"+a.idAnalysis;
-                                    a.icon = "assets/map.png";
-                                    a.parentid = p.idLab;
-                                } else {
-                                    console.log("label not defined");
-                                }
+                l.icon = "assets/group.png";
+
+                if (l.AnalysisGroup) {
+                    if (!this.isArray(l.AnalysisGroup)) {
+                        l.items = [l.AnalysisGroup];
+                    } else {
+                        l.items = l.AnalysisGroup;
+                    }
+                    for (var p of l.items) {
+                        p.icon = "assets/folder.png";
+                        p.idLab = l.idLab;
+                        p.id = "p"+p.idAnalysisGroup;
+                        if (p.Analysis) {
+                            if (!this.isArray(p.Analysis)) {
+                                p.items = [p.Analysis];
                             } else {
-                                console.log("a is undefined");
+                                p.items = p.Analysis;
                             }
-                        }
+                            for (var a of p.items) {
+                                if (a) {
+                                    if (a.label) {
+                                        this.analysisCount++;
+                                        var labelString: string = a.number;
+                                        labelString = labelString.concat(" (");
+                                        labelString = labelString.concat(a.label);
+                                        labelString = labelString.concat(")");
+                                        a.label = labelString;
+                                        a.id = "a"+a.idAnalysis;
+                                        a.icon = "assets/map.png";
+                                        a.parentid = p.idLab;
+                                    } else {
+                                        console.log("label not defined");
+                                    }
+                                } else {
+                                    console.log("a is undefined");
+                                }
+                            }
 
+                        }
                     }
                 }
             }
+
+        }else{
+            this.treeUpdateData({});
         }
+
     };
 
     treeUpdateData(event) {
