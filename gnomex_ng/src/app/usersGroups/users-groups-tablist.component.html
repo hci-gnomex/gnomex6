@@ -48,7 +48,7 @@
                             <mat-form-field>
                                 <input matInput [(ngModel)]="searchText" (input)="searchGroups($event)" placeholder="Enter search here...">
                             </mat-form-field>
-                            <mat-accordion>
+                            <mat-accordion *ngIf="secAdvisor.isSuperAdmin || secAdvisor.isAdmin">
                                 <mat-expansion-panel (opened)="panelOpenState = true"
                                                      (closed)="panelOpenState = false">
                                     <mat-expansion-panel-header>
@@ -311,10 +311,11 @@
                                                     </mat-error>
                                                 </mat-form-field>
                                                 <mat-form-field class="formField">
-                                                    <input matInput formControlName="lastName" placeholder="Last Name">
+                                                    <input matInput formControlName="lastName" placeholder="Last Name (or lab name)">
                                                     <mat-error *ngIf="groupForm.controls['lastName'].hasError('required')">
                                                         Last name is <strong>required</strong>
                                                     </mat-error>
+                                                    <mat-hint>PI get billing emails + notifications.</mat-hint>
                                                 </mat-form-field>
                                             </div>
                                         </div>
