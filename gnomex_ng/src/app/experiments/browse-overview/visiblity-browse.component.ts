@@ -195,6 +195,9 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
 
     onGridReady(params) {
     }
+    tabVisibleHook(){
+        this.gridOpt.api.sizeColumnsToFit();
+    }
 
 
 

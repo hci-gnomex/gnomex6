@@ -155,8 +155,13 @@ const actionMapping:IActionMapping = {
             height:98%;
             width:100%;
             border: #C8C8C8 solid thin;
-            overflow: auto;
+            padding: 2em;
         }
+        .br-anal-item{
+            width: 100%;
+            flex: 1 1 auto;
+        }
+        
     `]
 })
 

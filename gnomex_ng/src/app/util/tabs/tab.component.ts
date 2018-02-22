@@ -7,7 +7,7 @@ import {PrimaryTab} from './primary-tab.component'
         .pane {
             padding-left: 1em;
             height: calc(100% - 4em);
-            overflow:auto;
+            overflow-y: auto;
         }
         ::content >>> tab {background-color:grey}
   `],

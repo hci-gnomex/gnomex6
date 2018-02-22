@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { AngularMaterialModule } from '../../../modules/angular-material.module'
-import {IconTextRendererComponent} from "./index"
+import {IconTextRendererComponent,IconRendererComponent} from "./index"
 
 
 
@@ -17,10 +17,11 @@ import {IconTextRendererComponent} from "./index"
     ],
 
     declarations: [
-        IconTextRendererComponent
+        IconTextRendererComponent,
+        IconRendererComponent
     ],
     providers: [
     ],
-    exports: [IconTextRendererComponent]
+    exports: [IconTextRendererComponent,IconRendererComponent]
 })
 export class AgGridRendererModule { }

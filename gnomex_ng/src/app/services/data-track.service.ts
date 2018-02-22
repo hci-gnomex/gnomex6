@@ -15,11 +15,17 @@ export class DataTrackService {
     private _haveLoadedDatatracksList: boolean = false;
     private _previousURLParams: URLSearchParams = null;
     private _datatrackListTreeNode: any;
+    private _labList: any[] =[];
 
     constructor(private http: Http, private cookieUtilService: CookieUtilService ) {
     }
 
-
+    set labList(data:string[]){
+        this._labList = data;
+    }
+    get labList(){
+        return this._labList;
+    }
     set datatrackListTreeNode(data:any){
         this._datatrackListTreeNode = data;
     }
@@ -223,6 +229,24 @@ export class DataTrackService {
                 return Observable.throw(err);
             });
     }
+    saveFolder(params: URLSearchParams):  Observable<Response> {
+        this.cookieUtilService.formatXSRFCookie();
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/SaveDataTrackFolder.gx",params,{headers:headers})
+            .map((response: Response) => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            }).catch((err) =>{
+
+                console.log(err);
+                return Observable.throw(err);
+            });
+    }
+
+
+
     getImportSegments(params: URLSearchParams):Observable<any>{
         this.cookieUtilService.formatXSRFCookie();
         let headers: Headers = new Headers();

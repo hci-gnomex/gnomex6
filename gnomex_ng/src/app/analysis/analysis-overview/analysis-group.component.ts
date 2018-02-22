@@ -26,7 +26,6 @@ import {AnalysisService} from "../../services/analysis.service";
         
         .group-field{
             margin: 1em 1em 1em 1em;
-            font-size: 1.1rem;
             width:100%;
             resize:none;
         }

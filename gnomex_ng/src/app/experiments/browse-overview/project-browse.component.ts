@@ -25,7 +25,6 @@ import {URLSearchParams} from "@angular/http";
         }
         .project-field{
             margin: 1em 1em 1em 1em;
-            font-size: 1.1rem;
             width:100%;
             resize:none;
         }

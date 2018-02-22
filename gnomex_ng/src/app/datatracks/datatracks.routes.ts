@@ -7,6 +7,7 @@ import {BrowseDatatracksComponent} from "./browse-datatracks.component";
 import {DatatracksOrganismComponent} from "./datatracks-overview/datatracks-organism.component";
 import {DatatracksGenomeBuildComponent} from "./datatracks-overview/genome-build/datatracks-genome-build.component";
 import {GenomeBuildResolverService} from "../services/resolvers/genome-build-resolver.service";
+import {DatatracksFolderComponent} from "./datatracks-overview/datatracks-folder.component";
 
 
 /**
@@ -18,7 +19,8 @@ import {GenomeBuildResolverService} from "../services/resolvers/genome-build-res
 const ROUTES: Routes = [
     { path: "datatracks", component: BrowseDatatracksComponent, children:[
         {path:'organism',component: DatatracksOrganismComponent, outlet: 'datatracksPanel'},
-        {path:'genomeBuild',component:DatatracksGenomeBuildComponent, outlet:'datatracksPanel',resolve: {genomeBuild: GenomeBuildResolverService}}
+        {path:'genomeBuild',component:DatatracksGenomeBuildComponent, outlet:'datatracksPanel',resolve: {genomeBuild: GenomeBuildResolverService}},
+        {path:'folder',component: DatatracksFolderComponent , outlet: 'datatracksPanel'}
     ]
     }
 ];
