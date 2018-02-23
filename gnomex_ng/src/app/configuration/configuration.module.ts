@@ -8,6 +8,8 @@ import {ServicesModule} from "../services/services.module";
 import {TreeModule} from "angular-tree-component";
 
 import {BrowseDictionaryComponent} from "./browse-dictionary.component";
+import {ConfigureAnnotationsComponent} from "./configure-annotations.component";
+import {AgGridModule} from "ag-grid-angular";
 
 
 @NgModule({
@@ -18,9 +20,11 @@ import {BrowseDictionaryComponent} from "./browse-dictionary.component";
         FormsModule,
         ServicesModule,
         TreeModule,
+        AgGridModule.withComponents([]),
     ],
     declarations: [
         BrowseDictionaryComponent,
+        ConfigureAnnotationsComponent,
     ],
 })
 

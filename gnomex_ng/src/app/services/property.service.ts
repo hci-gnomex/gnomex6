@@ -1,12 +1,17 @@
 import {Injectable} from "@angular/core";
+import {Http, Response, URLSearchParams} from "@angular/http";
 import {DictionaryService} from "./dictionary.service";
+import {Observable} from "rxjs/Observable";
+
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class PropertyService {
 
     readonly SHOW_FUNDING_AGENCY: string = 'show_funding_agency';
 
-    constructor(private dictionaryService: DictionaryService) {}
+    constructor(private dictionaryService: DictionaryService,
+                private http: Http) {}
 
     /**
      * Returns the property entry that matches the provided search data as specifically as possible:
@@ -63,6 +68,26 @@ export class PropertyService {
 
     getPropertyForServer(): any {
 
+    }
+
+    public getPropertyListCall(propertyOnly: boolean): Observable<Response> {
+        if (propertyOnly) {
+            let params: URLSearchParams = new URLSearchParams();
+            params.set("propertyOnly", "Y");
+            return this.http.get("/gnomex/GetPropertyList.gx", {search: params});
+        } else {
+            return this.http.get("/gnomex/GetPropertyList.gx");
+        }
+    }
+
+    public getPropertyList(propertyOnly: boolean): Observable<any[]> {
+        return this.getPropertyListCall(propertyOnly).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                return [];
+            }
+        });
     }
 
 }
