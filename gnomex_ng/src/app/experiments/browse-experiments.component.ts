@@ -146,8 +146,13 @@ import {DictionaryService} from "../services/dictionary.service";
             height:98%;
             width:100%;
             border: #C8C8C8 solid thin;
-            overflow: auto;
+            padding: 1em;
+            
         }
+        .exp-overview-item {
+            flex: 1 1 auto;
+        }
+        
     `]
 })
 

@@ -31,6 +31,7 @@ import {PasswordUtilService} from "./password-util.service";
 import {AppUserPublicService} from "./app-user-public.service";
 import {LabMembershipRequestService} from "./lab-membership-request.service";
 import {UserService} from "./user.service";
+import {ConfigurationService} from "./configuration.service";
 @NgModule({
     imports: [CommonModule],
     declarations: [],
@@ -69,6 +70,7 @@ import {UserService} from "./user.service";
         AppUserPublicService,
 	    UserService,
         LabMembershipRequestService,
+        ConfigurationService
     ]})
 export class ServicesModule {
 }

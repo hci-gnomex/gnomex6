@@ -138,7 +138,7 @@ export class HeaderComponent implements OnInit{
                                 this.progressService.displayLoader(60);
                                 console.log("subscribe createSecurityAdvisor");
                                 if (response != null) {
-                                    this.faqList = response;
+                                this.faqList = response;
                                 }
                                 this.gnomexService.myCoreFacilities = this.dictionaryService.coreFacilities();
                                 this.progressService.displayLoader(75);
@@ -1078,7 +1078,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Core Facilities',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Annotations',
@@ -1430,7 +1430,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Core Facilities',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
@@ -1714,7 +1714,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Core Facilities',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Annotations',
@@ -1892,7 +1892,7 @@ export class HeaderComponent implements OnInit{
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
                 route: '/topics'
-            }
+    }
         ]
 
     }
