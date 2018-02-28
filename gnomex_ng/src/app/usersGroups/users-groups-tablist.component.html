@@ -108,8 +108,9 @@
                         </div>
                     </div>
                 </mat-tab>
+
             </mat-tab-group>
-                </split-area>
+            </split-area>
             <split-area size="70">
                 <div *ngIf="isUserTab && selectedUser" #userDetail class="flex-column-container ug-background" style="width: 100%">
                     <split direction="vertical">
@@ -294,10 +295,9 @@
                         <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveUser()"><img src="../../assets/save.png">Save</button>
                     </div>
                 </div>
-
                 <div *ngIf="isGroupsTab" style="height: 100%">
                     <!--groups tab group-->
-                    <mat-tab-group style="height: 100%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
+                    <mat-tab-group style="height: 90%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
                         <mat-tab #groupTab label="Group"  style="height:100%;">
                             <div *ngIf="isGroupSubTab && selectedGroup" #groupsDetail class="flex-column-container ug-background" style="width: 100%">
                                 <div class="flex-column-container">
@@ -306,16 +306,16 @@
                                             <div class="formRow">
                                                 <mat-form-field class="formField">
                                                     <input matInput formControlName="firstName" placeholder="First name">
-                                                    <mat-error *ngIf="groupForm.controls['firstName'].hasError('required')">
-                                                        First name is <strong>required</strong>
+                                                    <mat-error *ngIf="groupForm.controls['firstName'].hasError('incorrect')">
+                                                        First name or Last name <strong>required</strong>
                                                     </mat-error>
                                                 </mat-form-field>
                                                 <mat-form-field class="formField">
                                                     <input matInput formControlName="lastName" placeholder="Last Name (or lab name)">
-                                                    <mat-error *ngIf="groupForm.controls['lastName'].hasError('required')">
-                                                        Last name is <strong>required</strong>
+                                                    <mat-error *ngIf="groupForm.controls['lastName'].hasError('incorrect')">
+                                                        Last name or First name <strong>required</strong>
                                                     </mat-error>
-                                                    <mat-hint>PI get billing emails + notifications.</mat-hint>
+                                                    <mat-hint>PI gets billing emails + notifications.</mat-hint>
                                                 </mat-form-field>
                                             </div>
                                         </div>
@@ -366,28 +366,30 @@
                                         </div>
                                     </form>
                                 </div>
-                                <div class="flex-container users-groups-row-one" style="flex-grow:.1">
-                                    <button mat-button (click)="verify('lab')"><img src="../../assets/email_go.png">Send email to verify users</button>
-                                    <span *ngIf="groupForm.dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
-                                    Your changes have not been saved
-                                </span>
-                                    <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.groupForm.valid" (click)="saveGroup()"><img src="../../assets/save.png">Save</button>
-                                    <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-                                </div>
-
                             </div>
-
                         </mat-tab>
-                        <mat-tab #groupTab label="Billing Admin"  style="height:100%;">
+                        <mat-tab label="Billing Admin"  style="height:100%;">
+                            <div *ngIf="selectedGroup">
+                                <billing-admin-tab [group]="selectedGroup" #billingAdminTab ></billing-admin-tab>
+                            </div>
                         </mat-tab>
-                        <mat-tab #groupTab label="Membership"  style="height:100%;">
+                        <mat-tab #groupTab label="Membership"  style="height:90%;">
                         </mat-tab>
                         <mat-tab #groupTab label="Billing Accounts"  style="height:100%;">
                         </mat-tab>
                         <mat-tab #groupTab label="Invoices"  style="height:100%;">
                         </mat-tab>
                     </mat-tab-group>
+                    <div *ngIf="isGroupsTab" class="flex-container users-groups-row-one" style="flex-grow:.1">
+                        <button mat-button (click)="verify('lab')"><img src="../../assets/email_go.png">Send email to verify users</button>
+                        <span *ngIf="isGroupFormDirty()" style="background:#feec89; padding: 1em 1em 1em 1em;">
+                                    Your changes have not been saved
+                                </span>
+                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!isGroupFormValid()" (click)="saveGroup()"><img src="../../assets/save.png">Save</button>
+                        <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+                    </div>
                 </div>
+
                 </split-area>
             </split>
 

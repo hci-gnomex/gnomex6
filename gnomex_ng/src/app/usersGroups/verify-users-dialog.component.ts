@@ -12,25 +12,26 @@ import {LabListService} from "../services/lab-list.service";
 })
 
 export class VerifyUsersDialogComponent implements OnInit{
-    public rebuildUsers: boolean = false;
     public showSpinner: boolean = false;
     private idLab: string = "";
-    private mode: string = "";
+    private labName: string = "";
 
     constructor(public dialogRef: MatDialogRef<VerifyUsersDialogComponent>,
                 private labListService: LabListService,
                 @Inject(MAT_DIALOG_DATA) private data: any,
     ) {
         this.idLab = data.idLab;
+        this.labName = data.labName;
     }
 
     ngOnInit() {
+
     }
 
     public verify(): void {
         this.showSpinner = true;
         let params: URLSearchParams = new URLSearchParams();
-        if (this.mode) {
+        if (this.idLab) {
             params.set("idLab", this.idLab);
         }
 
@@ -38,6 +39,5 @@ export class VerifyUsersDialogComponent implements OnInit{
             this.dialogRef.close();
         });
     }
-
 
 }

@@ -35,6 +35,7 @@ import {DeleteUserDialogComponent} from "./delete-user-dialog.component";
 import {NewGroupDialogComponent} from "./new-group-dialog.component";
 import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
 import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
+import {BillingAdminTabComponent} from "./billing-admin-tab.component";
 
 /**
  * @author jdewell
@@ -70,9 +71,9 @@ import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
         AngularSplitModule,
         AgGridModule.withComponents([IconTextRendererComponent])
     ],
-    declarations: [UsersGroupsTablistComponent, NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
+    declarations: [UsersGroupsTablistComponent, NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent, BillingAdminTabComponent],
     entryComponents: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
-    exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent]
+    exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent, BillingAdminTabComponent]
 })
 export class UsersGroupsTablistModule {
 }

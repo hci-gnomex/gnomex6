@@ -2,7 +2,28 @@ import {Component, OnInit, ViewChild} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
 
 import {TreeComponent, ITreeOptions, TreeModel} from "angular-tree-component";
+import {Router} from "@angular/router";
+import {MatDialog} from "@angular/material";
 //
+@Component({
+    selector: "browse-dictionary-component-launcher",
+    template: `<div></div>`,
+    styles: [``]
+})
+
+export class BrowseDictionaryComponentLauncher {
+
+    constructor(private dialog: MatDialog, private router: Router) {
+        let dialogRef = this.dialog.open(BrowseDictionaryComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            // After closing the dialog, route away from this component so that the dialog could
+            // potentially be reopened.
+            this.router.navigate([{ outlets: {modal: null}}]);
+        });
+    }
+}
+
 
 @Component({
     selector: "browse-dictionary",

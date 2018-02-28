@@ -2,7 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {
+    FormBuilder, FormControl, FormGroup, Validators
+} from "@angular/forms";
 
 @Component({
     selector: 'new-group-dialog',
@@ -10,31 +12,46 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 })
 
 export class NewGroupDialogComponent implements OnInit{
-    private firstName: string = "";
-    private lastName: string = "";
-    private phone: string = "";
-    private email: string = "";
     public rebuildGroups: boolean = false;
     public showSpinner: boolean = false;
     public emailFC: FormControl;
     public pricingFC: FormControl;
-
+    public phoneFC: FormControl;
     public addGroupFG: FormGroup;
+
 
     constructor(public dialogRef: MatDialogRef<NewGroupDialogComponent>,
                 private labListService: LabListService,
+                private formBuilder: FormBuilder
     ) {
-        this.emailFC = new FormControl("", [Validators.required, Validators.email]);
+   }
+
+    ngOnInit() {
+        this.emailFC = new FormControl("", [Validators.required, Validators.pattern("^((\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*)\\s*[,]{0,1}\\s*)+$")]);
         this.pricingFC = new FormControl("", [Validators.required]);
-        this.addGroupFG = new FormGroup({
+        this.phoneFC = new FormControl("");
+        this.addGroupFG = this.formBuilder.group({
+            lastName: '',
+            firstName: '',
             email: this.emailFC,
+            phone: this.phoneFC,
             pricing: this.pricingFC
-            }
-        )
+        }, { validator: this.atLeastOneNameRequired}
+            );
         this.pricingFC.setValue("INTERNAL");
     }
 
-    ngOnInit() {
+    atLeastOneNameRequired(group: FormGroup) {
+        if (group) {
+            if (group.controls['lastName'].value || group.controls['firstName'].value) {
+
+                group.controls['lastName'].setErrors(null);
+                group.controls['firstName'].setErrors(null);
+            } else {
+                group.controls['lastName'].setErrors({'incorrect': true});
+                group.controls['firstName'].setErrors({'incorrect': true});
+            }
+        }
     }
 
     onEmailChange(event) {
@@ -46,9 +63,8 @@ export class NewGroupDialogComponent implements OnInit{
         let params: URLSearchParams = new URLSearchParams();
         params.set("accountsXMLString", "");
         params.set("collaboratorsXMLString", "");
-        params.set("contactPhone", this.phone);
+        params.set("contactPhone", this.addGroupFG.controls['phone'].value);
         params.set("contactEmail", this.emailFC.value);
-        params.set("firstName", this.firstName);
         params.set("idLab", '0');
         if (this.pricingFC.value === "INTERNAL") {
             params.set("isExternalPricing", "N");
@@ -63,7 +79,8 @@ export class NewGroupDialogComponent implements OnInit{
             params.set("isExternalPricingCommercial", "Y");
         }
         params.set("institutionsXMLString", "");
-        params.set("lastName", this.lastName);
+        params.set("firstName", this.addGroupFG.controls['firstName'].value);
+        params.set("lastName", this.addGroupFG.controls['lastName'].value);
         params.set("managersXMLString", "");
         params.set("membersXMLString", "");
 
