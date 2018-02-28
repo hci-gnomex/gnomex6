@@ -372,7 +372,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -520,7 +520,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -625,7 +625,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -1083,7 +1083,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
@@ -1719,7 +1719,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
@@ -1825,7 +1825,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
