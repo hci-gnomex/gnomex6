@@ -1,14 +1,20 @@
-<h6 mat-dialog-title><img src="../../assets/user.png">Delete User</h6>
+<h6 mat-dialog-title><img src="../../assets/email_go.png"> Send Email</h6>
 <mat-dialog-content>
-    <div>
+    <div *ngIf="!idLab;else lab">
         GNomEx will send an email to all groups to verify the active user accounts.
         <br>
         Do you wish to continue?
     </div>
+    <ng-template #lab>
+        <div>
+            GNomEx will send an email to {{labName}} to verify the active user accounts.
+            <br>
+            Do you wish to continue?
+        </div>
+    </ng-template>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <mat-dialog-actions>
         <button *ngIf="!showSpinner" mat-button (click)="verify()">Yes</button>
         <button *ngIf="!showSpinner" mat-button mat-dialog-close>No</button>
         <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-    </mat-dialog-actions></mat-dialog-actions>
+</mat-dialog-actions>

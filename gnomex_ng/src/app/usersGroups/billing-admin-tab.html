@@ -1,0 +1,57 @@
+<div class="formColumn">
+    <div>
+        <mat-form-field style="width: 100%">
+            <input matInput placeholder="Billing Contact Name" [formControl]="this.billingContactFC">
+            <mat-error *ngIf="this.billingContactFC.hasError('required')">Required</mat-error>
+        </mat-form-field>
+        <mat-form-field style="width: 100%">
+            <input matInput placeholder="Billing Contact Email(s)" [formControl]="this.billingContactEmailFC">
+            <mat-error *ngIf="this.billingContactEmailFC.hasError('required')">Required</mat-error>
+            <mat-hint>Place ',' between emails. Billing contact only gets billing emails.</mat-hint>
+        </mat-form-field>
+        <div>
+        <mat-form-field class="thirtyFormField">
+            <input matInput placeholder="Billing Contact Phone #" [formControl]="this.phoneFC">
+        </mat-form-field>
+        <mat-form-field class="thirtyFormField">
+            <input matInput placeholder="Department" [formControl]="this.departmentFC">
+        </mat-form-field>
+        </div>
+        <div>
+        <mat-form-field class="fortyFormField">
+            <input matInput placeholder="Address" [formControl]="this.addressFC">
+        </mat-form-field>;
+        <mat-form-field class="fortyFormField">
+            <input matInput placeholder="Address 2" [formControl]="this.address2FC">
+        </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class="formField">
+                <input matInput placeholder="City" [formControl]="this.cityFC">
+            </mat-form-field>
+            <mat-form-field class="formField">
+                <input matInput placeholder="Pick a state" aria-label="State" [matAutocomplete]="auto"
+                       [formControl]="stateFC" (keyup.enter)="chooseFirstOption()">
+                <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let state of filterStates(this.stateFC.value)" [value]="state.value">{{state.value}}</mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+            <!--<button mat-button class="edit-button" [routerLink]="[{outlets: {modal: ['reportProblem']}}]">-->
+            <button mat-button class="edit-button" (click)="editDictionary()">
+                Edit...
+            </button>
+            <!--<mat-form-field  class="formField">-->
+                <!--<mat-select [(ngModel)]="selectedState">-->
+                    <!--<mat-option *ngFor="let state of states" [value]="state.code">{{ state.code }}</mat-option>-->
+                <!--</mat-select>-->
+            <!--</mat-form-field>-->
+            <mat-form-field class="formField">
+                <input matInput placeholder="Postal Code" [formControl]="this.zipFC">
+            </mat-form-field>
+
+            <mat-form-field class="formField">
+                <input matInput placeholder="Country" [formControl]="this.countryFC">
+            </mat-form-field>
+        </div>
+    </div>
+</div>

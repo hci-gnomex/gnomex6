@@ -7,7 +7,7 @@ import {FormsModule} from '@angular/forms';
 import {ServicesModule} from "../services/services.module";
 import {TreeModule} from "angular-tree-component";
 
-import {BrowseDictionaryComponent} from "./browse-dictionary.component";
+import {BrowseDictionaryComponent, BrowseDictionaryComponentLauncher} from "./browse-dictionary.component";
 
 
 @NgModule({
@@ -21,7 +21,12 @@ import {BrowseDictionaryComponent} from "./browse-dictionary.component";
     ],
     declarations: [
         BrowseDictionaryComponent,
+        BrowseDictionaryComponentLauncher
     ],
+    exports: [
+        BrowseDictionaryComponentLauncher
+    ]
+
 })
 
 export class ConfigurationModule {

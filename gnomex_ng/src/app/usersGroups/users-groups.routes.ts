@@ -8,6 +8,7 @@ import {UsersGroupsTablistComponent} from "./users-groups-tablist.component";
 const ROUTES: Routes = [
     { path: "UsersGroups", component: UsersGroupsTablistComponent
     }
+
 ];
 
 export const USERS_GROUPS_ROUTING = RouterModule.forChild(ROUTES);

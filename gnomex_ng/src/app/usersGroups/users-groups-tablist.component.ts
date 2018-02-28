@@ -5,10 +5,10 @@ import {Subscription} from "rxjs/Subscription";
 import {GridOptions, RowDataChangedEvent} from "ag-grid/main";
 import { URLSearchParams } from "@angular/http";
 import {LabListService} from "../services/lab-list.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 import {GnomexService} from "../services/gnomex.service";
 import {NewUserDialogComponent} from "./new-user-dialog.component";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {ErrorStateMatcher, MatDialog, MatDialogRef} from "@angular/material";
 import {PasswordUtilService} from "../services/password-util.service";
 import {MatSnackBar} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
@@ -18,6 +18,7 @@ import {DictionaryService} from "../services/dictionary.service";
 import {NewGroupDialogComponent} from "./new-group-dialog.component";
 import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
 import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
+import {BillingAdminTabComponent} from "./billing-admin-tab.component";
 
 /**
  * @title Basic tabs
@@ -158,6 +159,7 @@ import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
 })
 
 export class UsersGroupsTablistComponent implements OnInit{
+    @ViewChild("billingAdminTab") billingAdminTab: BillingAdminTabComponent;
     public readonly USER_TYPE_UNIVERSITY: string = "uu";
     public readonly USER_TYPE_EXTERNAL: string = "ex";
     private readonly DUMMY_UNID: string = "u0000000";
@@ -194,6 +196,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     public isUserTab: boolean = true;
     public isGroupsTab: boolean = false;
     public isGroupSubTab: boolean = true;
+    public isBillingAdminSubTab: boolean = false;
     private userForm: FormGroup;
     private groupForm: FormGroup;
     private selectedUser: any = "";
@@ -208,6 +211,8 @@ export class UsersGroupsTablistComponent implements OnInit{
     public groupEmailFC: FormControl;
     public permissionLevelFC: FormControl;
     public pricingFC: FormControl;
+    public phoneFC: FormControl;
+    public groupPhoneFC: FormControl;
     public isActiveFC: FormControl;
     public codeUserPermissionKind: string;
     public coreFacilitiesICanSubmitTo: any[];
@@ -361,10 +366,12 @@ export class UsersGroupsTablistComponent implements OnInit{
     buildManagedLabList(labs: any[]) {
         this.myCoreFacilitiesIManage = this.secAdvisor.coreFacilitiesICanManage;
         if (this.myCoreFacilitiesIManage.length > 0) {
-            this.idCoreFacility = this.myCoreFacilitiesIManage[0].value;
+            if (!this.secAdvisor.isSuperAdmin) {
+                this.idCoreFacility = this.myCoreFacilitiesIManage[0].value;
+            }
             let allObj = {facilityName: "All cores"};
             this.myCoreFacilitiesIManage.push(allObj);
-            if (this.labs) {
+            if (labs) {
                 this.myManagingLabs = labs.filter((lab) => {
                     return lab.canManage === 'Y';
                 })
@@ -463,6 +470,8 @@ export class UsersGroupsTablistComponent implements OnInit{
         this.emailFC = new FormControl("", [Validators.required, Validators.email]);
         this.permissionLevelFC = new FormControl("", Validators.required);
         this.isActiveFC = new FormControl("");
+        this.phoneFC = new FormControl("");
+
         this.userForm = this.formBuilder.group({
             lastName: ['', [
                 Validators.required
@@ -471,7 +480,7 @@ export class UsersGroupsTablistComponent implements OnInit{
                 Validators.required
             ]],
             email: this.emailFC,
-            phone: "",
+            phone: this.phoneFC,
             isActive: this.isActiveFC,
             "ucscUrl": '',
             "institute": '',
@@ -485,24 +494,33 @@ export class UsersGroupsTablistComponent implements OnInit{
         });
         this.passwordFC.setParent(this.userForm);
         this.passwordConfirmFC.setParent(this.userForm);
-
     }
 
     createGroupForm() {
-        this.groupEmailFC = new FormControl("", [Validators.required, Validators.email]);
+        this.groupEmailFC = new FormControl("", [Validators.required, Validators.pattern("^((\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*)\\s*[,]{0,1}\\s*)+$")]);
         this.pricingFC = new FormControl("", Validators.required);
+        this.groupPhoneFC = new FormControl("");
 
         this.groupForm = this.formBuilder.group({
-            lastName: ['', [
-                Validators.required
-            ]],
-            firstName: ['', [
-                Validators.required
-            ]],
+            lastName: '',
+            firstName: '',
             email: this.groupEmailFC,
-            phone: "",
+            phone: this.groupPhoneFC,
             pricing: this.pricingFC
-        })
+        }, { validator: this.atLeastOneNameRequired});
+    }
+
+    atLeastOneNameRequired(group : FormGroup) {
+        if (group) {
+            if(group.controls['lastName'].value || group.controls['firstName'].value) {
+
+                group.controls['lastName'].setErrors(null);
+                group.controls['firstName'].setErrors(null);
+            } else {
+                group.controls['lastName'].setErrors({'incorrect': true});
+                group.controls['firstName'].setErrors({'incorrect': true});
+            }
+        }
     }
 
     search() {
@@ -673,6 +691,12 @@ export class UsersGroupsTablistComponent implements OnInit{
         switch(event.tab.textLabel) {
             case "Group": {
                 this.isGroupSubTab = true;
+                this.isBillingAdminSubTab = false;
+                break;
+            }
+            case "Billing Admin": {
+                this.isBillingAdminSubTab = true;
+                this.isGroupSubTab = false;
                 break;
             }
         }
@@ -757,8 +781,8 @@ export class UsersGroupsTablistComponent implements OnInit{
 
     newUser() {
         this.createUserDialogRef = this.dialog.open(NewUserDialogComponent, {
-            height: '25em',
-            width: '20em',
+            height: '20em',
+            width: '24em',
         });
         this.createUserDialogRef.afterClosed()
             .subscribe(result => {
@@ -771,8 +795,8 @@ export class UsersGroupsTablistComponent implements OnInit{
 
     deleteUser() {
         this.deleteUserDialogRef = this.dialog.open(DeleteUserDialogComponent, {
-            height: '15em',
-            width: '20em',
+            height: '11em',
+            width: '24em',
             data: {
                 idAppUser: this.idAppUser,
                 userName: this.selectedUser.displayName
@@ -888,7 +912,7 @@ export class UsersGroupsTablistComponent implements OnInit{
             params.set("uNID", this.userForm.controls['uNid'].value);
         } else if (this.usertypeFC.value === this.USER_TYPE_EXTERNAL) {
             params.set("userNameExternal", this.userForm.controls['userName'].value);
-            params.set("passwordExternal", this.userForm.controls['password'].value === this.DUMMY_PASSWORD ? this.PASSWORD_MASKED : this.userForm.controls['password'].value.value);
+            params.set("passwordExternal", this.userForm.controls['password'].value === this.DUMMY_PASSWORD ? this.PASSWORD_MASKED : this.userForm.controls['password'].value);
             params.set("uNID", "");
         }
         if (this.coreFacilitiesICanSubmitTo.length > 0) {
@@ -913,7 +937,6 @@ export class UsersGroupsTablistComponent implements OnInit{
             }
             this.showSpinner = false;
         });
-
     }
 
     saveUser() {
@@ -1039,12 +1062,13 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     verify(mode: string) {
+        let theLabId = (mode === 'lab' ? this.idLab : "");
         this.verifyUsersDialogRef = this.dialog.open(VerifyUsersDialogComponent, {
             height: '16em',
             width: '20em',
             data: {
-                idLab: this.idLab,
-                mode: mode
+                idLab: theLabId,
+                labName: this.selectedGroup.name
             }
 
         });
@@ -1052,5 +1076,26 @@ export class UsersGroupsTablistComponent implements OnInit{
             .subscribe(result => {
             })
 
+    }
+
+    isGroupFormDirty(): boolean {
+        if (this.billingAdminTab) {
+            if (this.billingAdminTab.billingForm.dirty) {
+                return true;
+            }
+        }
+        if (this.groupForm.dirty) {
+            return true;
+        }
+        return false;
+    }
+
+    isGroupFormValid() {
+        if ((this.billingAdminTab && this.billingAdminTab.billingForm.valid) &&
+            this.groupForm.valid) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
