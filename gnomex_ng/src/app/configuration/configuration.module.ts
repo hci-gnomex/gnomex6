@@ -24,7 +24,7 @@ import {AgGridModule} from "ag-grid-angular";
     ],
     declarations: [
         BrowseDictionaryComponent,
-        BrowseDictionaryComponentLauncher
+        BrowseDictionaryComponentLauncher,
         ConfigureAnnotationsComponent,
     ],
     exports: [
