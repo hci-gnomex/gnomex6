@@ -50,7 +50,6 @@ import {
 
 
 import {
-    DownloadsBrowseTab,
     ExperimentsBrowseTab,
     ProgressBrowseTab,
     ProjectBrowseTab,
@@ -78,7 +77,6 @@ export const componentFactories =
         TestComponent,
         DescriptionTab,
         PrepTab,
-        DownloadsBrowseTab,
         ExperimentsBrowseTab,
         ProgressBrowseTab,
         ProjectBrowseTab,
@@ -130,10 +128,8 @@ export const componentFactories =
                     ExperimentDetail,
                     PrepTab,
                     NewExperimentComponent,
-                    DownloadsBrowseTab,
                     BrowsePanelComponent,
                     BrowseOverviewComponent,
-                    DownloadsBrowseTab,
                     ExperimentsBrowseTab,
                     ProgressBrowseTab,
                     ProjectBrowseTab,

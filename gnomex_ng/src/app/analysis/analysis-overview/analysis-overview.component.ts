@@ -11,35 +11,56 @@ import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Subscription} from "rxjs/Subscription";
 import {AnalysisService} from "../../services/analysis.service";
+import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
+import {AnalysisGroupComponent} from "./analysis-group.component";
+import {AnalysisVisibleTabComponent} from "./analysis-visible-tab.component";
 
 
 @Component({
     template: `
+        <div class="flexbox-column">
             <div class="flex-container">
 
                 <div >
-                    {{ this.analysisService.analysisList.length + " Analysis"}}
+                    {{ this.analysisService.analysisList.length + " Analyses"}}
                 </div>
-                <div >
+                <div style="display:flex;" >
                     <label>Experiment #</label>
                     <jqxComboBox  class="inlineComboBox"
                                   [width]="170"
                                   [height]="20"
                                   [source]="orderedAnalysisIds"
-                            (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
+                                  (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
                     </jqxComboBox>
                 </div>
 
 
             </div>
 
-            <div style="height: 100%;width:100%">
-                <tab-container (tabChanging)="tabChanging($event)"
-                               [state]="state"
-                               [componentNames]="tabNames">
-
-                </tab-container>
-            </div> 
+            <div style="flex:10; width:100%">
+                <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
+                    <mat-tab style="height:100%" label="Analysis">
+                       <analysis-tab></analysis-tab> 
+                    </mat-tab>
+                    <mat-tab style="height:100%" label="Visibility">
+                        <analysis-visiblity-tab (saveSuccess)="saveVis()" ></analysis-visiblity-tab>
+                    </mat-tab>
+                    <mat-tab *ngIf="this.analysisGroup" style="height:100%;" label="Analysis Group">
+                        <analysis-group-tab (saveSuccess)="saveGroup()"></analysis-group-tab>
+                    </mat-tab>
+                </mat-tab-group>
+                
+            </div>
+            
+            <save-footer (saveClicked)="saveManager()"
+                         [dirty]="this.analysisService.dirty"
+                         [showSpinner]="this.showSpinner"
+                         [disableSave]="this.analysisService.invalid || this.noSave">
+                
+            </save-footer>
+            
+        </div>
+            
 `,
     styles: [`
        
@@ -48,24 +69,36 @@ import {AnalysisService} from "../../services/analysis.service";
         .flex-container{
             display: flex;
             justify-content: space-between;
-            margin-left: auto;
-            padding-left: 1em;
+            flex:1;
         }
+        .flexbox-column{
+            display:flex;
+            flex-direction:column;
+            height:100%;
+            width:100%;
+        }
+        /deep/ .mat-tab-body-wrapper {
+            flex-grow: 1 !important;
+        }
+        .mat-tab-group-border{
+            border: 1px solid #e8e8e8;
+        }
+        
+        
+        
     `]
 })
 export class AnalysisOverviewComponent implements OnInit,OnDestroy{
-    analysisGroup:any;
-    private readonly ANALYSIS:string = "AnalysisTab";
-    private readonly VISIBILITY:string = "AnalysisVisibleTabComponent";
-    private readonly GROUP:string = "AnalysisGroupComponent";
+    public analysisGroup:any;
+    public readonly message:string = "Your changes haven't been saved";
     private analysisIdSet: Set<string> = new Set();
     public orderedAnalysisIds: Array<string> = [];
     private overviewListSuscript: Subscription;
-    private initialed:boolean = false;
+    private initialized:boolean = false;
+    public showSpinner:boolean = false;
+    private noSave:boolean = true;
+    @ViewChild(MatTabGroup) tabs: MatTabGroup;
 
-
-
-    @ViewChild(TabContainer) tabView: TabContainer;
     state:string = TabContainer.VIEW;
     tabNames:Array<string>;
     constructor(private appConstants:ConstantsService,private route:ActivatedRoute,
@@ -78,38 +111,11 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
         // This 'data' observable fires when tree node changes because url will change.
         this.route.data.forEach((data) => {
             this.analysisGroup = data['analysisGroup']; // this data is carried on route look at browse-analysis.component.ts
-            if(!this.tabView.isInitalize()){
-                if(this.analysisGroup){
-                    this.tabNames = [this.ANALYSIS,this.VISIBILITY,this.GROUP];
-                }
-                else{
-                    this.tabNames = [this.ANALYSIS,this.VISIBILITY];
-                }
-            }
-            else{
-                if (this.analysisGroup) { // no projectTab, add it
-                    let index = this.tabView.containsTab(this.GROUP);
-                    if (index === -1) {
-                        this.tabView.addTab(this.GROUP);
-                        this.tabNames.push(this.GROUP);
-                    }
-                }
-                else {
-                    let index = this.tabView.containsTab(this.GROUP);
-                    if (index !== -1) {
-                        this.tabView.removeTab(index);
-                        this.tabNames.pop();//Project will always be the last tab
-                        if(index === this.tabView.activeId){
-                            this.tabView.select(0);
-                        }
-                    }
-                }
-            }
         });
 
 
         this.refreshOverviewData();
-        this.initialed = true;
+        this.initialized = true;
 
     }
 
@@ -120,6 +126,8 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
     refreshOverviewData():void{
         this.overviewListSuscript = this.analysisService.getAnalysisOverviewListSubject()
             .subscribe(data =>{
+                this.analysisService.invalid = false;
+                this.analysisService.dirty = false;
                 this.analysisIdSet.clear();
                 this.analysisService.analysisList = this.getAnalyses(data);
                 let sortIdFn = (obj1:string , obj2:string) => {
@@ -132,29 +140,9 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
                     return 0;
                 };
                 this.orderedAnalysisIds = Array.from(this.analysisIdSet).sort(sortIdFn);
-                if(this.tabView.isInitalize() ) { // incase new lab is being loaded from search
-                    this.refresh(data);
-                }
             });
     }
 
-
-    refreshAnalysis():void{
-        console.log("refreshing Analysis")
-    }
-
-    refresh(data?:any):void{
-        if(this.tabNames[this.tabView.activeId] === this.ANALYSIS ){
-            this.refreshAnalysis();
-        }
-        else if(this.tabNames[this.tabView.activeId] === this.VISIBILITY){
-            //this.refreshVisibility();
-        }
-        else{ // Project this  is optional
-
-            //this.refreshProject();
-        }
-    }
 
     getAnalyses(data:any):Array<any>{
         let flatAnalysisList:Array<any> = [];
@@ -196,6 +184,27 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
 
         return flatAnalysisList;
     }
+    tabChanged(event:MatTabChangeEvent){
+        if(event.index === 0){
+            this.noSave = true;
+        }else{
+            this.noSave = false;
+        }
+
+    }
+
+
+
+    saveVis():void{
+        this.showSpinner = false;
+        this.analysisService.dirty = false;
+
+
+    }
+    saveGroup():void{
+        this.showSpinner = false;
+        this.analysisService.dirty = false;
+    }
 
 
     initAllLabs(data:any ,flatAList:Array<any>):Array<any>{
@@ -225,21 +234,6 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
     }
 
 
-     tabChanging(event:TabChangeEvent){
-
-        if(this.tabNames[event.nextId] === this.ANALYSIS ){
-            this.refreshAnalysis();
-        }
-        else if(this.tabNames[event.nextId] === this.VISIBILITY){
-            //this.refreshVisibility();
-        }
-        else{ // Project this  is optional
-            //this.refreshProject();
-        }
-    }
-
-
-
     private onIDSelect($event:any): void{
         let filteredIdList:Array<any> = [];
         if($event.args && $event.args.item.value){
@@ -261,6 +255,18 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
         if(eList){
             this.analysisService.emitFilteredOverviewList(eList);
         }
+    }
+
+    saveManager(){
+        this.showSpinner = true;
+        if(this.tabs.selectedIndex === 1){
+            this.analysisService.emitSaveManger("visibility")
+        }else if (this.tabs.selectedIndex === 2){
+            this.analysisService.emitSaveManger("group")
+        }
+
+        console.log(this.tabs.selectedIndex)
+
     }
 
 

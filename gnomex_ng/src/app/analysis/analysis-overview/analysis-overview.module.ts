@@ -15,6 +15,7 @@ import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-ren
 import {AgGridModule} from "ag-grid-angular";
 import {TabsModule} from "../../util/tabs/tabs.module";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
+import {UtilModule} from "../../util/util.module";
 
 
 
@@ -27,7 +28,8 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
         TabsModule,
         AngularMaterialModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        UtilModule
     ],
 
     declarations: [

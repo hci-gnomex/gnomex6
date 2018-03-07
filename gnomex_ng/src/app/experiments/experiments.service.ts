@@ -31,10 +31,15 @@ export class ExperimentsService {
 
     private experimentOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
     private filteredExperimentOverviewListSubject:Subject<any> = new Subject();
+    private saveManagerSubject:Subject<any> = new Subject();
 
     // conditional params
     browsePanelParams:URLSearchParams;
     experimentList:Array<any> =[];
+
+    public invalid:boolean = false;
+    public dirty:boolean = false;
+
     constructor(private _http: Http, @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
     getExperiments() {
@@ -131,14 +136,6 @@ export class ExperimentsService {
         this.projectRequestListSubject.next(this.projectRequestList);
     }
 
-//    getProjectRequestList_fromBackend(params: URLSearchParams): void {
-    /*
-           if (this.haveLoadedExperimentOrders && this.previousURLParams === params) {
-               // do nothing
-               console.log("Experiment Orders already loaded");
-               // return Observable.of(this.experimentOrders);
-           } else {
-   */
     getProjectRequestList_fromBackend(params: URLSearchParams,allowRefresh?:boolean): void {
         this.startSearchSubject.next(true);
 
@@ -350,6 +347,13 @@ export class ExperimentsService {
     getFilteredOverviewListObservable():Observable<any>{
         return this.filteredExperimentOverviewListSubject.asObservable();
     }
+    emitSaveManger(type:string):void{
+        this.saveManagerSubject.next(type);
+    }
+    getSaveMangerObservable():Observable<any>{
+        return this.saveManagerSubject.asObservable();
+    }
+
 
 
 

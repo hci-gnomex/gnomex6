@@ -22,39 +22,43 @@ import {ConstantsService} from "../../services/constants.service";
 
 @Component({
 
+    selector: "analysis-tab",
     template: `
-        <div style="display:block; height:100%; width:100%;">
-            <span>
+        <div style="display:flex; flex-direction: column; height:100%; width:100%;">
+            <div style="flex:1;">
                 <button mat-button [disabled]="!enableCreateAnalysis"   (click)="create()"> <img [src]="this.newSegment" > New</button>
                 <button mat-button   [disabled]="!enableRemoveAnalysis" (click)="remove()"> <img [src]="this.removeSegment" > Remove</button>
-            </span>
-
-            <ag-grid-angular style="width: 100%; height: 90%;" class="ag-fresh"
-                             [gridOptions]="gridOpt"
-                             (cellDoubleClicked)="forwardToAnalysis($event)"
-                             (rowSelected)="selectedRow($event)"
-                             [rowDeselection]="true"
-                             [rowData]="rowData"
-                             [columnDefs]="columnDefs"
-                             [rowSelection]="rowSelection"
-                             (gridReady)="onGridReady($event)"
-                             (cellEditingStarted)="startEditingCell($event)"
-                             [enableSorting]="true"
-                             [enableColResize]="true">
-            </ag-grid-angular>
+            </div>
+            <div style="display:flex; flex:9; width:100%;">
+                <ag-grid-angular style="width: 100%;" class="ag-fresh"
+                                 [gridOptions]="gridOpt"
+                                 (cellDoubleClicked)="forwardToAnalysis($event)"
+                                 (rowSelected)="selectedRow($event)"
+                                 [rowDeselection]="true"
+                                 [rowData]="rowData"
+                                 [columnDefs]="columnDefs"
+                                 [rowSelection]="rowSelection"
+                                 (gridReady)="onGridReady($event)"
+                                 (gridSizeChanged)="adjustColumnSize($event)"
+                                 (cellEditingStarted)="startEditingCell($event)"
+                                 [enableSorting]="true"
+                                 [enableColResize]="true">
+                </ag-grid-angular>
+                
+            </div>
+            
         </div>
+        
     `,
     styles: [`
        
         
         
         .flex-container{
-           
             display: flex;
             justify-content: space-between;
             margin-left: auto;
             margin-top: 1em;
-            padding-left: 1em;
         }
     `]
 })
@@ -74,13 +78,6 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
     public  newSegment:string;
     public  removeSegment:string;
 
-
-
-
-    /*setState(){
-
-        this.gridOpt.api.sizeColumnsToFit();
-    }*/
 
 
     columnDefs = [
@@ -222,6 +219,14 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
         //console.log(event)
     }
 
+    adjustColumnSize(event:any){
+        if(this.gridOpt.api){
+            this.gridOpt.api.sizeColumnsToFit();
+        }
+    }
+
+
+
     forwardToAnalysis(event:any){
         console.log(event);
         let rowData = event.data;
@@ -239,8 +244,6 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
         return nameObj["display"];
     }
     remove():void{
-        console.log("Hello I am removed");
-        this.createAnalysisData
 
         let selectedAnalysisList:Array<any> = this.gridOpt.api.getSelectedRows();
         if (selectedAnalysisList && selectedAnalysisList.length > 0) {
@@ -256,33 +259,41 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
     }
     create():void{
 
-        let items = this.createAnalysisData.items;
-        let labs = this.createAnalysisData.labs ? this.createAnalysisData.labs : [];
-        let selectedIdLab = this.analysisService.analysisList[0].idLab;
-        let selectedLabLabel = this.analysisService.analysisList[0].labName;
+        let items = [];
+        let labs = [];
+        let selectedIdLab:string = "";
+        let selectedLabLabel:string= "";
+        if(this.createAnalysisData){
+            items = this.createAnalysisData.items;
+            labs = this.createAnalysisData.labs ? this.createAnalysisData.labs : [];
+            selectedIdLab = this.analysisService.analysisList[0].idLab;
+            selectedLabLabel = this.analysisService.analysisList[0].labName;
 
-
-        if (items.length > 0 ) {
-            let labListString = this.labList.map(function (item) {
-                return item['name'];
-            });
-            var useThisLabList: any[];
-            if (this.createSecurityAdvisorService.isSuperAdmin) {
-                useThisLabList = this.labList;
-            } else {
-                useThisLabList = labs;
-            }
-
-            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, {
-                data: {
-                    labList: useThisLabList,
-                    items: items,
-                    selectedLab: selectedIdLab,
-                    selectedLabLabel: selectedLabLabel
-                    //selectedItem: this.selectedItem
-                }
-            });
         }
+
+
+
+
+        let labListString = this.labList.map(function (item) {
+            return item['name'];
+        });
+        var useThisLabList: any[];
+        if (this.createSecurityAdvisorService.isSuperAdmin) {
+            useThisLabList = this.labList;
+        } else {
+            useThisLabList = labs;
+        }
+
+        this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, {
+            data: {
+                labList: useThisLabList,
+                items: items,
+                selectedLab: selectedIdLab,
+                selectedLabLabel: selectedLabLabel
+                //selectedItem: this.selectedItem
+            }
+        });
+
 
     }
     selectedRow(event:any){

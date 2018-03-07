@@ -9,7 +9,7 @@ import {AnalysisService} from "../../services/analysis.service"
 @Component({
     selector: 'analysis-panel',
     template: `        
-        <div style="height: calc(100% - 6em);">
+        <div style="height: 100%">
             <router-outlet name="analysisPanel"></router-outlet>
         </div>
 `

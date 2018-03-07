@@ -1,34 +1,23 @@
 
-import {Component,OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, OnDestroy, OnInit, Output} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {URLSearchParams} from "@angular/http";
 import {AnalysisService} from "../../services/analysis.service";
+import {Subscription} from "rxjs/Subscription";
 
 
 @Component({
-    templateUrl: './analysis-group.component.html',
-    styles:[`
-       
-        .dirtyWithSave{
 
-            display: flex;
-            justify-content: space-between;
-            margin-left: auto;
-            margin-top: 1em;
-            margin-bottom:1em;
-            padding-left: 1em;
-        }
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'analysis-group-tab',
+    templateUrl: './analysis-group.component.html',
+    styles:[`        
         .error-message{
             color: red;
         }
         
-        .group-field{
-            margin: 1em 1em 1em 1em;
-            width:100%;
-            resize:none;
-        }
         
         
         
@@ -36,14 +25,13 @@ import {AnalysisService} from "../../services/analysis.service";
 
     `]
 })
-export class AnalysisGroupComponent extends PrimaryTab implements OnInit{
-    name="Analysis Group";
-    description:string="";
-    projectName:string="";
-    dirty:boolean =false;
-    projectBrowseForm: FormGroup;
+export class AnalysisGroupComponent implements OnInit,OnDestroy{
+    public readonly name="group";
+    @Output() saveSuccess = new EventEmitter();
+    private projectBrowseForm: FormGroup;
     project:any;
     formInit:boolean = false;
+    private saveManagerSubscription: Subscription;
 
     //[(ngModel)]="description"
 
@@ -52,7 +40,6 @@ export class AnalysisGroupComponent extends PrimaryTab implements OnInit{
 
     constructor(protected fb: FormBuilder,private analysisService:AnalysisService,
                 private route:ActivatedRoute,private router:Router) {
-        super(fb);
     }
 
     ngOnInit(){
@@ -60,15 +47,14 @@ export class AnalysisGroupComponent extends PrimaryTab implements OnInit{
             name: ['', Validators.required],
             description: ['', Validators.maxLength(500)]
         });
-        this.projectBrowseForm.valueChanges.distinctUntilChanged()
-            .subscribe(value => {
-                if(this.formInit){
-                    this.dirty = true;
-                }
-            });
+
+        this.projectBrowseForm.valueChanges.subscribe(val =>{
+            if(this.formInit){
+                this.analysisService.dirty = true;
+            }
+        });
 
         this.route.data.forEach((data) => {  // need to update data when url changes
-            this.dirty = false;
             this.formInit = false;
             if(data.analysisGroup){ // save new project from tree will make data null since nothing is happening on the route but its refreshing
                 let ag = data['analysisGroup'];
@@ -78,6 +64,20 @@ export class AnalysisGroupComponent extends PrimaryTab implements OnInit{
                 this.formInit = true;
             }
         });
+        // when save is selected in parent
+        this.saveManagerSubscription = this.analysisService.getSaveMangerObservable()
+            .subscribe(saveType =>{
+                if(this.name === saveType){
+                    this.save();
+                }});
+        this.projectBrowseForm.statusChanges.distinctUntilChanged()
+            .subscribe(status =>{
+                if(status === "VALID"){
+                    this.analysisService.invalid = false;
+                }else{
+                    this.analysisService.invalid = true;
+                }
+            });
 
 
     }
@@ -105,13 +105,19 @@ export class AnalysisGroupComponent extends PrimaryTab implements OnInit{
 
         this.analysisService.saveAnalysisGroup(saveParams).first().subscribe(response =>{
             this.analysisService.refreshAnalysisGroupList_fromBackend();
+            this.saveSuccess.emit();
+            this.formInit = false;
+
             this.analysisService.getAnalysisGroup(getParams).first().subscribe(response =>{
                 this.projectBrowseForm.get("name").setValue( response["AnalysisGroup"].name);
                 this.projectBrowseForm.get("description").setValue( response["AnalysisGroup"].description);
-                this.dirty = false;
             });
         });
 
+    }
+
+    ngOnDestroy(){
+        this.saveManagerSubscription.unsubscribe();
     }
 
 }

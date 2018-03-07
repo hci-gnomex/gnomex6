@@ -1,5 +1,5 @@
 
-import {Component, OnInit, ViewChild,AfterViewInit} from "@angular/core";
+import {Component, OnInit, ViewChild, AfterViewInit, Output, EventEmitter} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {Subscription} from "rxjs/Subscription";
@@ -16,34 +16,28 @@ import {GnomexStringUtilService} from "../../services/gnomex-string-util.service
 
 
 @Component({
-
+    selector:"analysis-visiblity-tab",
     template: `
-        <div style="display:block; height:100%; width:100%;">
-
-            <ag-grid-angular style="width: 100%; height: 90%;" class="ag-fresh"
-                             [gridOptions]="gridOpt"
-                             [rowData]="rowData"
-                             [columnDefs]="columnDefs"
-                             [rowSelection]="rowSelection"
-                             (gridReady)="onGridReady($event)"
-                             (cellEditingStarted)="startEditingCell($event)"
-                             [enableSorting]="true"
-                             [enableColResize]="true">
-            </ag-grid-angular>
-
-            <div class="flex-container">
-                <span></span>
-                <div>
-                    <div *ngIf="dirty" style="display:inline; background:#feec89; padding: 1em 1em 1em 1em;">
-                        Your changes have not been saved
-                    </div>
-                    <div style="margin-left:1em;display:inline; ">
-                        <button  mat-button  color="primary" (click)="save()"> <img src="../../../assets/action_save.gif">Save</button>
-                    </div>
-                </div>
+        
+        <div class="flexbox-column">
+            <div style="flex:1; display:flex; width:100%;">
+                <ag-grid-angular style="width: 100%;" class="ag-fresh"
+                                 [gridOptions]="gridOpt"
+                                 [rowData]="rowData"
+                                 [columnDefs]="columnDefs"
+                                 [rowSelection]="rowSelection"
+                                 (gridReady)="onGridReady($event)"
+                                 (gridSizeChanged)="adjustColumnSize($event)"
+                                 (cellEditingStarted)="startEditingCell($event)"
+                                 [enableSorting]="true"
+                                 [enableColResize]="true">
+                </ag-grid-angular>
             </div>
-            
         </div>
+        
+       
+        
+        
         <!--<div> {{experimentService.experimentList[0] | json}} </div> -->
 
         
@@ -54,39 +48,30 @@ import {GnomexStringUtilService} from "../../services/gnomex-string-util.service
        
         
         
-        .flex-container{
-           
-            display: flex;
-            justify-content: space-between;
-            margin-left: auto;
-            margin-top: 1em;
-            padding-left: 1em;
+        .flexbox-column{
+
+            display:flex;
+            flex-direction:column;
+            height:100%;
+            width:100%;
+            
         }
     `]
 })
-export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
+export class AnalysisVisibleTabComponent implements OnInit{
 
-    name = "Visibility";
+    public readonly name = "visibility";
     //@ViewChild(GnomexStyledGridComponent) myGrid: GnomexStyledGridComponent;
     private filteredExperimentOverviewListSubscript: Subscription;
     private selectedTreeNodeSubscript: Subscription;
     private visList:Array<any>;
     private instList:Array<any>;
-    private dirty: boolean = false;
     private gridOpt:GridOptions = {};
     public rowSelection:string = "single";
+    @Output() saveSuccess = new EventEmitter();
 
-
-
-    /*setState(){
-        setTimeout(()=>{
-            this.gridOpt.api.sizeColumnsToFit();
-        });
-    }*/
 
     private  displayModelFormatter = (params)=>  {
-        //console.log(params.column);
-
         if(params.value){
             let display =  (<string>params.value).split(',');
             return display[0];
@@ -105,8 +90,8 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
             if(rowData.canUpdateVisibility === 'Y'
                 || this.secAdvisor.hasPermission(CreateSecurityAdvisorService.CAN_ACCESS_ANY_OBJECT)){
                 rowData.isDirty='Y';
-                this.dirty = true;
                 rowData[field] = params.newValue;
+                this.analysisService.dirty = true;
                 return true;
             }else{
                 this.dialogService.confirm("Visibility can only be changed by owner, lab manager, or GNomEx admins.",null)
@@ -140,7 +125,7 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
             field: "createDateDisplay",
             //cellEditorFramework: NumericEditorComponent,
             editable: false,
-            width: 200
+            width: 150
         },
         {
 
@@ -160,7 +145,7 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
             headerName:  "Description",
             field: "description",
             editable: false,
-            width: 400
+            width: 350
         },
         {
             headerName:  "Visibility",
@@ -178,7 +163,7 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
             headerName:  "Insitution",
             field: "instStr",
             editable: true,
-            width: 315,
+            width: 200,
             cellEditor: 'select',
             cellEditorParams: {
                 values: this.prepInstitutionList()
@@ -193,6 +178,10 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
     ];
 
     rowData:Array<any> =[];
+    constructor(protected fb: FormBuilder, private analysisService:AnalysisService,
+                private dictionaryService:DictionaryService,private secAdvisor: CreateSecurityAdvisorService,
+                private dialogService: DialogsService, private route:ActivatedRoute,) {
+    }
 
 
 
@@ -200,19 +189,17 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
 
     onGridReady(params) {
     }
-
-
-
-    constructor(protected fb: FormBuilder, private analysisService:AnalysisService,
-                private dictionaryService:DictionaryService,private secAdvisor: CreateSecurityAdvisorService,
-                private dialogService: DialogsService, private route:ActivatedRoute,) {
-        super(fb);
+    adjustColumnSize(event:any){
+        if(this.gridOpt.api){
+            this.gridOpt.api.sizeColumnsToFit();
+        }
     }
+
+
+
 
     ngOnInit(){
 
-        //this.myGrid.setColumns(this.columns);
-        //this.myGrid.setDataAdapterSource(this.source);
 
         this.visList = this.dictionaryService.getEntries(DictionaryService.VISIBILTY);
         this.instList = this.dictionaryService.getEntries(DictionaryService.INSTITUTION);
@@ -235,6 +222,12 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
 
                 });
                 this.rowData = this.analysisService.analysisList;
+            });
+        this.analysisService.getSaveMangerObservable()
+            .subscribe(saveType =>{
+                if(this.name === saveType){
+                    this.save();
+                }
             });
 
     }
@@ -262,12 +255,12 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
 
 
     save():void{
-        this.dirty = false;
         let aList:Array<any> = this.analysisService.analysisList;
 
         let dirtyRequests =aList.filter(reqObj => reqObj.isDirty === 'Y');
 
         if(!dirtyRequests || dirtyRequests.length  === 0){
+            this.saveSuccess.emit();
             return;
         }
 
@@ -279,6 +272,7 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
 
         for(let i = 0; i < aList.length; i++){
             if(aList[i].codeVisibility === "INST" && aList[i].idInstitution === ''){
+                this.saveSuccess.emit();
                 this.dialogService.confirm("Please specify an Institution for requests whose visibility is set to 'Institution'.", null);
                 return;
             }
@@ -293,6 +287,7 @@ export class AnalysisVisibleTabComponent extends PrimaryTab implements OnInit{
 
         this.analysisService.saveVisibility(params)
             .subscribe(resp =>{
+                this.saveSuccess.emit();
                 this.analysisService.getAnalysisGroupList_fromBackend(this.analysisService.analysisPanelParams,true);
             });
     }

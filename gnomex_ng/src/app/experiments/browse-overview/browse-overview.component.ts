@@ -11,34 +11,52 @@ import {TabChangeEvent} from "../../util/tabs/tab-change-event"
 import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Subscription} from "rxjs/Subscription";
+import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
 
 
 @Component({
     template: `
-            <div class="flex-container">
-
-                <div >
-                    {{ this.experimentsService.experimentList.length + " Experiments"}}
+            <div class="flexbox-column">
+                <div class="flex-container">
+                    <div >
+                        {{ this.experimentsService.experimentList.length + " Experiments"}}
+                    </div>
+                    <div >
+                        <label>Experiment #</label>
+                        <jqxComboBox  class="inlineComboBox"
+                                      [width]="170"
+                                      [height]="20"
+                                      [source]="orderedExperimentIds"
+                                      (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
+                        </jqxComboBox>
+                    </div>
                 </div>
-                <div >
-                    <label>Experiment #</label>
-                    <jqxComboBox  class="inlineComboBox"
-                                  [width]="170"
-                                  [height]="20"
-                                  [source]="orderedExperimentIds"
-                            (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
-                    </jqxComboBox>
+                <div style="flex:10; width:100%">
+                    <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
+                        <mat-tab style="height:100%" label="Experiment">
+                            <experiment-browse-tab> </experiment-browse-tab>
+                        </mat-tab>
+                        <mat-tab style="height:100%" label="Progress">
+                            <progress-tab> </progress-tab>
+                        </mat-tab>
+                        <mat-tab style="height:100%" label="Visibility">
+                            <visibility-tab (saveSuccess)="saveVis()"> </visibility-tab>
+                        </mat-tab>
+                        <mat-tab *ngIf="this.project" style="height:100%;" label="Project">
+                            <project-tab (saveSuccess)="saveProject()"> </project-tab>
+                        </mat-tab>
+                    </mat-tab-group>
+                    
                 </div>
+                <save-footer (saveClicked)="saveManager()"
+                             [dirty]="this.experimentsService.dirty"
+                             [showSpinner]="this.showSpinner"
+                             [disableSave]="this.experimentsService.invalid || this.noSave">
+                </save-footer>
 
+               
 
-            </div>
-
-            <div style="height: 100%;width:100%">
-                <tab-container (tabChanging)="tabChanging($event)"
-                               [state]="state"
-                               [componentNames]="tabNames">
-
-                </tab-container>
+                
             </div>
 `,
     styles: [`
@@ -48,21 +66,34 @@ import {Subscription} from "rxjs/Subscription";
         .flex-container{
             display: flex;
             justify-content: space-between;
-            margin-left: auto;
-            padding-left: 1em;
+            flex:1;
         }
+        .flexbox-column{
+            display:flex;
+            flex-direction:column;
+            height:100%;
+            width:100%;
+        }
+        /deep/ .mat-tab-body-wrapper {
+            flex-grow: 1 !important;
+        }
+        .mat-tab-group-border{
+            border: 1px solid #e8e8e8;
+        }
+        
     `]
 })
 export class BrowseOverviewComponent implements OnInit,OnDestroy{
     project:any;
-    private readonly EXPERIMENT:string = "ExperimentsBrowseTab";
-    private readonly PROGRESS:string = "ProgressBrowseTab";
-    private readonly VISIBILITY:string = "VisiblityBrowseTab";
-    private readonly PROJECT:string = "ProjectBrowseTab";
     private experimentIdSet: Set<string> = new Set();
     public orderedExperimentIds: Array<string> = [];
     private overviewListSuscript: Subscription;
-    private initialed:boolean = false;
+    private intialized:boolean = false;
+    private readonly PROJECT_INDEX:number = 1;
+    public showSpinner:boolean = false;
+    public noSave:boolean = true;
+
+    @ViewChild(MatTabGroup) tabs: MatTabGroup;
 
 
 
@@ -79,44 +110,11 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
         // This 'data' observable fires when tree node changes because url will change.
         this.route.data.forEach((data) => {
             this.project = data['project']; // this data is carried on route look at browse-experiments.component.ts
-            if(!this.tabView.isInitalize()){
-                if(this.project){
-                    this.tabNames = [this.EXPERIMENT,this.PROGRESS,this.VISIBILITY,this.PROJECT];
-                }
-                else{
-                    this.tabNames = [this.EXPERIMENT,this.PROGRESS,this.VISIBILITY];
-                }
-            }
-            else{
-                if (this.project) { // no projectTab, add it
-                    let index = this.tabView.containsTab(this.PROJECT);
-                    if (index === -1) {
-                        this.tabView.addTab(this.PROJECT);
-                        this.tabNames.push(this.PROJECT);
-                    }
-                }
-                else {
-                    let index = this.tabView.containsTab(this.PROJECT);
-                    if (index !== -1) {
-                        this.tabView.removeTab(index);
-                        this.tabNames.pop();//Project will always be the last tab
-                        if(index === this.tabView.activeId){
-                            this.tabView.select(0);
-                        }
-                    }
-                }
-            }
         });
 
 
         this.refreshOverviewData();
-        this.initialed = true;
 
-        /*this.router.events.subscribe(event => {
-            if (event instanceof NavigationEnd) {
-                let something = this.route.snapshot;
-            }
-        });*/
     }
 
     /* The subscribe is fire in the event a tree node of lab or project is select or search button in browse filter is
@@ -126,6 +124,9 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
     refreshOverviewData():void{
         this.overviewListSuscript = this.experimentsService.getExperimentOverviewListSubject()
             .subscribe(data =>{
+                this.intialized =false;
+                this.experimentsService.invalid = false;
+                this.experimentsService.dirty = false;
                 this.experimentIdSet.clear();
                 this.experimentsService.experimentList = this.getExperiments(data);
                 let sortIdFn = (obj1:string , obj2:string) => {
@@ -138,16 +139,19 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
                     return 0;
                 };
                 this.orderedExperimentIds = Array.from(this.experimentIdSet).sort(sortIdFn);
-                if(this.tabView.isInitalize() ) { // incase new lab is being loaded from search
-                   this.refresh(data);
-                }
+                this.refreshOnSearch(data)
             });
     }
 
 
-    refreshExperiment():void{
-        console.log("refreshing Experiment")
+
+    refreshOnSearch(data?:any):void{
+        if( this.tabs.selectedIndex === this.PROJECT_INDEX){
+            this.refreshProgress(data);
+        }
+
     }
+
     refreshProgress(data?:any):void{
         let params:URLSearchParams = this.experimentsService.browsePanelParams;
         if(params){
@@ -159,28 +163,18 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
                 let idProject = this.route.snapshot.paramMap.get('idProject');
                 params.set('idProject',idProject);
             }
-            this.experimentsService.getRequestProgressList_FromBackend(params);
-            this.experimentsService.getRequestProgressDNASeqList_FromBackend(params);
-            this.experimentsService.getRequestProgressSolexaList_FromBackend(params);
+
+            if(!this.intialized){
+                this.experimentsService.getRequestProgressList_FromBackend(params);
+                this.experimentsService.getRequestProgressDNASeqList_FromBackend(params);
+                this.experimentsService.getRequestProgressSolexaList_FromBackend(params);
+                this.intialized = true;
+            }
+
         }
         else{
             console.log("check browseFilter.search() to make sure browsePanelParams were set");
         }
-    }
-    refresh(data?:any):void{
-            if(this.tabNames[this.tabView.activeId] === this.EXPERIMENT ){
-                this.refreshExperiment();
-            }
-            else if(this.tabNames[this.tabView.activeId] === this.PROGRESS){
-                this.refreshProgress(data);
-            }
-            else if(this.tabNames[this.tabView.activeId] === this.VISIBILITY){
-                //this.refreshVisibility();
-            }
-            else{ // Project this  is optional
-
-                //this.refreshProject();
-            }
     }
 
     getExperiments(data:any):Array<any>{
@@ -255,23 +249,19 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
         return flatRList;
 
     }
-
-
-    tabChanging(event:TabChangeEvent){
-
-        if(this.tabNames[event.nextId] === this.EXPERIMENT ){
-            this.refreshExperiment();
-        }
-        else if(this.tabNames[event.nextId] === this.PROGRESS){
+    tabChanged(event:MatTabChangeEvent){
+        if(event.index  <= this.PROJECT_INDEX){
             this.refreshProgress();
+            this.noSave = true;
+        }else{
+            this.noSave = false;
         }
-        else if(this.tabNames[event.nextId] === this.VISIBILITY){
-            //this.refreshVisibility();
-        }
-        else{ // Project this  is optional
-            //this.refreshProject();
-        }
+
     }
+
+
+
+
 
     getRequestKind(item:any):string {
         var de:any = this.dictionary.getEntry(DictionaryService.REQUEST_CATEGORY, item.codeRequestCategory);
@@ -321,6 +311,29 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
         if(eList){
             this.experimentsService.emitFilteredOverviewList(eList);
         }
+    }
+
+
+    saveVis():void{
+        this.showSpinner = false;
+        this.experimentsService.dirty = false;
+
+
+    }
+    saveProject():void{
+        this.showSpinner = false;
+        this.experimentsService.dirty = false;
+    }
+
+
+    saveManager(){
+        this.showSpinner = true;
+        if(this.tabs.selectedIndex === 2){
+            this.experimentsService.emitSaveManger("visibility")
+        }else if (this.tabs.selectedIndex === 3){
+            this.experimentsService.emitSaveManger("project")
+        }
+
     }
 
 

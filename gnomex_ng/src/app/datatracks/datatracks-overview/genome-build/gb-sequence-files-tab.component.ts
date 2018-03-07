@@ -16,30 +16,39 @@ import {DataTrackService} from "../../../services/data-track.service";
 
 
 @Component({
-
+    selector: 'gb-sequence-files-tab',
     template: `
-        <span>
-            <span> Sequence Files: {{this.rowData.length }} </span>
-            <button mat-button [disabled]="!enableUpload" type="button" (click)="openSeqFilesDialog()">
-                <img [src]="this.newPage"> Upload .bnib or fasta file(s)
-            </button>
-            <button mat-button [disabled]="!enableRemove"  type="button" (click)="removeSeqFiles()">
-                <img [src]="this.removePage"> Remove file(s)
-            </button>
-        </span>
-        <div style="display:block; height:100%; width:100%; padding-top: 1em;">
-            <ag-grid-angular style="width: 100%; height: 90%;" class="ag-fresh"
-                             [rowData]="rowData"
-                             [columnDefs]="columnDefs"
-                             [rowSelection]="'multiple'"
-                             [rowDeselection]="true"
-                             [enableSorting]="true"
-                             [enableColResize]="true"
-                             (rowSelected)="selectedRow($event)"
-                             [gridOptions]="gridOpt">
-            </ag-grid-angular>
+
+        <div style="display:flex; flex-direction:column; height:100%; width:100%;">
+            <div style="width:100%;">
+                <div class="inline-block"> Sequence Files: {{this.rowData.length }} </div>
+                <button mat-button [disabled]="!enableUpload" type="button" (click)="openSeqFilesDialog()">
+                    <img [src]="this.newPage"> Upload .bnib or fasta file(s)
+                </button>
+                <button mat-button [disabled]="!enableRemove"  type="button" (click)="removeSeqFiles()">
+                    <img [src]="this.removePage"> Remove file(s)
+                </button>
+            </div>
+            <div style="flex:1; display:flex; width:100%; padding-top: 1em;">
+                <ag-grid-angular style="width: 100%;" class="ag-fresh"
+                                 [rowData]="rowData"
+                                 [columnDefs]="columnDefs"
+                                 [rowSelection]="'multiple'"
+                                 [rowDeselection]="true"
+                                 [enableSorting]="true"
+                                 [enableColResize]="true"
+                                 (rowSelected)="selectedRow($event)"
+                                 (gridSizeChanged)="adjustColumnSize($event)"
+                                 [gridOptions]="gridOpt">
+                </ag-grid-angular>
+
+            </div>
+            
+            
             
         </div>
+        
+        
         
     `,
     styles: [`
@@ -49,6 +58,9 @@ import {DataTrackService} from "../../../services/data-track.service";
             font-size: 1.1rem;
             width:30%;
             resize:none;
+        }
+        .inline-block{
+            display: inline-block;
         }
     `]
 
@@ -138,9 +150,10 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
         });
 
     }
-    //@Override
-    tabVisibleHook(){
-        this.gridOpt.api.sizeColumnsToFit();
+    adjustColumnSize(event:any){
+        if(this.gridOpt.api){
+            this.gridOpt.api.sizeColumnsToFit();
+        }
     }
 
     selectedRow(event:any){
@@ -158,29 +171,19 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
     }
 
     removeSeqFiles(){
-        let selectedRows:Array<any> = this.gridOpt.api.getSelectedRows();
-        let tmpRowData:Array<any> = this.rowData.slice();
+        let tmpRowData: Array<any> = [];
+        this.gridOpt.api.forEachNode(node=> {
+            if(!node.isSelected()){
+                tmpRowData.push(node.data);
+            }else{
+                this.gbValidateService.sequenceFilesList.push(node.data);
+            }
+        });
 
 
-
-        for(let i = 0; i < selectedRows.length; i++){
-            tmpRowData = tmpRowData.filter( rowObj =>{
-                let keepFile:boolean = rowObj.name !== selectedRows[i].name
-                    || rowObj.url !== selectedRows[i].url ||
-                    rowObj.lastModified !== selectedRows[i].lastModified ||
-                    rowObj.size !== selectedRows[i].size;
-
-                if(!keepFile){
-                    this.gbValidateService.sequenceFilesList.push(rowObj);
-                }
-                return keepFile;
-            });
-
-
-        }
         this.gbValidateService.dirtyNote = true;
-
         this.rowData = tmpRowData;
+
 
     }
 

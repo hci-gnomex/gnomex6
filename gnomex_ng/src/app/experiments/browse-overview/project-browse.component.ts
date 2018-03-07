@@ -1,13 +1,15 @@
 
-import {Component,OnInit} from "@angular/core";
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {ExperimentsService} from "../experiments.service";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {URLSearchParams} from "@angular/http";
+import {Subscription} from "rxjs/Subscription";
 
 
 @Component({
+    selector: "project-tab",
     templateUrl: './project-browse.component.html',
     styles:[`
       
@@ -35,16 +37,13 @@ import {URLSearchParams} from "@angular/http";
 
     `]
 })
-export class ProjectBrowseTab extends PrimaryTab implements OnInit{
-    name="Project";
-    description:string="";
-    projectName:string="";
-    dirty:boolean =false;
+export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
+    name="project";
+    @Output() saveSuccess = new EventEmitter();
     projectBrowseForm: FormGroup;
     project:any;
     formInit:boolean = false;
-
-    //[(ngModel)]="description"
+    private saveManagerSubscription: Subscription;
 
 
 
@@ -62,11 +61,12 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit{
         this.projectBrowseForm.valueChanges.distinctUntilChanged()
             .subscribe(value => {
                 if(this.formInit){
-                    this.dirty = true;
+                    this.experimentsService.dirty = true;
                 }
             });
 
         this.route.data.forEach((data) => {  // need to update data when url changes
+            this.formInit = false;
             if(data.project){ // save new project from tree will make data null since nothing is happening on the route but its refreshing
                 let p = data['project'];
                 this.project= p["Project"];
@@ -75,6 +75,20 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit{
                 this.formInit = true;
             }
         });
+        // when save is selected in parent
+        this.saveManagerSubscription = this.experimentsService.getSaveMangerObservable()
+            .subscribe(saveType =>{
+                if(this.name === saveType){
+                    this.save();
+                }});
+        this.projectBrowseForm.statusChanges.distinctUntilChanged()
+            .subscribe(status =>{
+                if(status === "VALID"){
+                    this.experimentsService.invalid = false;
+                }else{
+                    this.experimentsService.invalid = true;
+                }
+            });
 
 
     }
@@ -99,13 +113,19 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit{
 
         this.experimentsService.saveProject(saveParams).first().subscribe(response =>{
             this.experimentsService.refreshProjectRequestList_fromBackend();
+            this.saveSuccess.emit();
+            this.formInit = false;
+
             this.experimentsService.getProject(getParams).first().subscribe(response =>{
                 this.projectBrowseForm.get("projectName").setValue( response["Project"].name);
                 this.projectBrowseForm.get("description").setValue( response["Project"].description);
-                this.dirty = false;
             });
         });
 
+    }
+
+    ngOnDestroy(){
+        this.saveManagerSubscription.unsubscribe();
     }
 
 }

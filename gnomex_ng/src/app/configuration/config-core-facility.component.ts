@@ -69,6 +69,8 @@ export class ConfigCoreFacilityComponent implements OnInit{
     private rowData = [];
     private currentRow:number=0;
     private gridOpt:GridOptions = {};
+    private selectRowIndex:number;
+
     columnDefs = [
         {
             headerName: "Cores",
@@ -100,6 +102,13 @@ export class ConfigCoreFacilityComponent implements OnInit{
         let selectedRow:Array<any> = this.gridOpt.api.getSelectedRows();
         let coreFacility = selectedRow[0];
 
+        if(event.node.selected){
+            this.selectRowIndex = event.rowIndex;
+            console.log(this.selectRowIndex);
+        }
+
+
+
         if(coreFacility){
             this.configService.emitCoreList(coreFacility); // existing core
         }
@@ -129,7 +138,13 @@ export class ConfigCoreFacilityComponent implements OnInit{
 
     refresh(event:any){
         //this.rowData.find()
-        event.facilityName
+        let tempRowData:Array<any> = [];
+        let rowItem: any = this.rowData[this.selectRowIndex];
+        rowItem.idCoreFacility =event.idCoreFacility;
+        rowItem.facilityName = event.facilityName;
+
+        this.rowData = this.rowData.slice();
+
     }
 
 
