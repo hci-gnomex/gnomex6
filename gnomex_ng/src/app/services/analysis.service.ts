@@ -10,7 +10,6 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 export class AnalysisService {
     public analysisGroupList: any[];
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-
     private analysisGroupListSubject: Subject<any[]> = new Subject();
     private _haveLoadedAnalysisGroupList: boolean = false;
     private _previousURLParams: URLSearchParams = null;
@@ -19,7 +18,10 @@ export class AnalysisService {
     private analysisOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
     private filteredAnalysisListSubject:Subject<any> = new Subject();
     private createAnalysisDataSubject:Subject<any> = new Subject();
-
+    private saveManagerSubject:Subject<any> = new Subject();
+    // for the save button on right pane
+    public invalid:boolean = false;
+    public dirty:boolean = false;
 
 
     constructor(private http: Http) {
@@ -212,6 +214,13 @@ export class AnalysisService {
     getCreateAnaylsisDataSubject():Subject<any>{
         return this.createAnalysisDataSubject;
     }
+    emitSaveManger(type:string):void{
+        this.saveManagerSubject.next(type);
+    }
+    getSaveMangerObservable():Observable<any>{
+        return this.saveManagerSubject.asObservable();
+    }
+
     saveVisibility(params:URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/SaveVisibilityAnalysis.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {

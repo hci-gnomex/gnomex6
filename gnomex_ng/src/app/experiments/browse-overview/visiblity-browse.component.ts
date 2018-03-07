@@ -1,5 +1,5 @@
 
-import {Component, OnInit, ViewChild,AfterViewInit} from "@angular/core";
+import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {Subscription} from "rxjs/Subscription";
@@ -16,34 +16,28 @@ import {URLSearchParams} from "@angular/http"
 
 
 @Component({
-
+    selector: "visibility-tab",
     template: `
-        <div style="display:block; height:100%; width:100%;">
+        
+        <div style="width:100%; height:100%; display:flex; flex-direction: column ">
+            <div style="display:flex; flex-direction:column; flex:1; width:100%;">
 
-            <ag-grid-angular style="width: 100%; height: 90%;" class="ag-fresh"
-                             [gridOptions]="gridOpt"
-                             [rowData]="rowData"
-                             [columnDefs]="columnDefs"
-                             (gridReady)="onGridReady($event)"
-                             (cellEditingStarted)="startEditingCell($event)"
-                             [enableSorting]="true"
-                             [enableColResize]="true">
-            </ag-grid-angular>
+                <ag-grid-angular style="width: 100%; height: 100%;" class="ag-fresh"
+                                 [gridOptions]="gridOpt"
+                                 [rowData]="rowData"
+                                 [columnDefs]="columnDefs"
+                                 (gridReady)="onGridReady($event)"
+                                 (gridSizeChanged)="adjustColumnSize($event)" 
+                                 (cellEditingStarted)="startEditingCell($event)"
+                                 [enableSorting]="true"
+                                 [enableColResize]="true">
+                </ag-grid-angular>
 
-            <div class="flex-container">
-                <span></span>
-                <div>
-                <span *ngIf="dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
-                    Your changes have not been saved
-                </span>
-                    <span style="margin-left:1em; ">
-                    <button  mat-button  color="primary" (click)="save()"> <img src="../../../assets/action_save.gif">Save</button>
-                </span>
 
-                </div>
             </div>
             
         </div>
+        
         <!--<div> {{experimentService.experimentList[0] | json}} </div> -->
 
         
@@ -65,14 +59,14 @@ import {URLSearchParams} from "@angular/http"
     `]
 })
 export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
-    name = "Visibility";
+    name = "visibility";
     //@ViewChild(GnomexStyledGridComponent) myGrid: GnomexStyledGridComponent;
     private filteredExperimentOverviewListSubscript: Subscription;
     private selectedTreeNodeSubscript: Subscription;
     private visList:Array<any>;
     private instList:Array<any>;
-    private dirty: boolean = false;
     private gridOpt:GridOptions = {};
+    @Output() saveSuccess = new EventEmitter();
 
 
 
@@ -93,7 +87,6 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
 
 
     private valueChanging = (params):boolean => {
-        let eList = this.experimentService.experimentList;
         let rowData = params.data;
         let field = params.colDef.field;
 
@@ -102,8 +95,8 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
             if(rowData.canUpdateVisibility === 'Y'
                 || this.secAdvisor.hasPermission(CreateSecurityAdvisorService.CAN_ACCESS_ANY_OBJECT)){
                 rowData.isDirty='Y';
-                this.dirty = true;
                 rowData[field] = params.newValue;
+                this.experimentService.dirty = true;
                 return true;
             }else{
                 this.dialogService.confirm("Visibility can only be changed by owner, lab manager, or GNomEx admins.",null)
@@ -227,6 +220,12 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
                 });
                 this.rowData = this.experimentService.experimentList;
             });
+        this.experimentService.getSaveMangerObservable()
+            .subscribe(saveType =>{
+                if(this.name === saveType){
+                    this.save();
+                }
+            });
 
     }
 
@@ -253,12 +252,12 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
 
 
     save():void{
-        this.dirty = false;
         let eList:Array<any> = this.experimentService.experimentList;
 
         let dirtyRequests =eList.filter(reqObj => reqObj.isDirty === 'Y');
 
         if(!dirtyRequests || dirtyRequests.length  === 0){
+            this.saveSuccess.emit();
             return;
         }
 
@@ -270,17 +269,18 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
 
         for(let i = 0; i < eList.length; i++){
             if(eList[i].codeVisibility === "INST" && eList[i].idInstitution === ''){
+                this.saveSuccess.emit();
                 this.dialogService.confirm("Please specify an Institution for requests whose visibility is set to 'Institution'.", null);
                 return;
             }
         }
 
         let idProject =  this.route.snapshot.params["idProject"];
-        let strBody:string = JSON.stringify(dirtyRequests);
 
 
-        this.experimentService.saveVisibility(strBody,idProject)
+        this.experimentService.saveVisibility(dirtyRequests,idProject)
             .subscribe(resp =>{
+                this.saveSuccess.emit();
                 this.experimentService.getProjectRequestList_fromBackend(this.experimentService.browsePanelParams);
             });
     }
@@ -316,6 +316,13 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
         return instDisplays
 
     }
+
+    adjustColumnSize(event:any){
+        if(this.gridOpt.api){
+            this.gridOpt.api.sizeColumnsToFit();
+        }
+    }
+
 
 
     ngOnDestroy():void{

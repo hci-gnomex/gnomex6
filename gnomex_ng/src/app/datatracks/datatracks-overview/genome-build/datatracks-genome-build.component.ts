@@ -8,54 +8,62 @@ import {GenomeBuildValidateService} from "../../../services/genome-build-validat
 import {DataTrackService} from "../../../services/data-track.service";
 import {DialogsService} from "../../../util/popup/dialogs.service";
 import {GnomexStringUtilService} from "../../../services/gnomex-string-util.service";
+import {MatTabChangeEvent} from "@angular/material";
 
 
 
 @Component({
 
     template: `        
-        <div style="display:block;height:100%;">
+        <div style="display:flex; flex-direction:column; height:100%; width:100%;">
             
             <div style="padding-bottom: .5em;padding-left:1em;">
                 <img [src]="dtService.datatrackListTreeNode.icon">Genome Build: {{dtService.datatrackListTreeNode.genomeBuildName}}
             </div>
-            <div style="display:block;height:calc(100% - 4em);">
-                <tab-container [state]="state" [componentNames]="componentNames">
-                </tab-container>
+            <div style="display:flex; flex: 1;">
                 
+                <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
+                    <mat-tab style="height:100%" label="Details">
+                        <gb-detail></gb-detail>
+                    </mat-tab>
+                    <mat-tab style="height:100%" label="Segments">
+                        <gb-segment></gb-segment>
+                    </mat-tab>
+                    <mat-tab style="height:100%;" label="Sequences Files">
+                        <gb-sequence-files-tab></gb-sequence-files-tab>
+                    </mat-tab>
+                </mat-tab-group>
+                    
+               <!-- <tab-container [state]="state" [componentNames]="componentNames">
+                </tab-container> -->
             </div>
-               
-            <div style="display:block;height:4em;text-align: right">
-                    <div>
-                        <span *ngIf="gbValidateService.dirtyNote" style="background:#feec89; padding: 1em 1em 1em 1em;">
-                            Your changes have not been saved
-                        </span>
-                        <span style="margin-left:1em; ">
-                            <button [disabled]="!canWrite"  mat-button  color="primary" (click)="save()">
-                                <img src="../../../assets/action_save.gif">Save
-                            </button>
-                        </span>
-                    </div>
+            <div>
+                <save-footer (saveClicked)="save()" [disableSave]="!canWrite" [dirty]="gbValidateService.dirtyNote" ></save-footer>
             </div>
+            
+            
             
         </div>
         
         
     `,
     styles: [`
-        .flex-con{
-            display: flex;
-            justify-content: space-between;
-            margin-left: auto;
-            margin-top: 1em;
-            padding-left: 1em;
-        }
+        
         
         .flex-container{
             display: flex;
             flex-direction: column;
             height: 100%;
         }
+        /deep/ .mat-tab-body-wrapper {
+            flex-grow: 1 !important;
+        }
+        .mat-tab-group-border{
+            border: 1px solid #e8e8e8;
+        }
+
+
+
     `]
 })
 export class DatatracksGenomeBuildComponent implements OnInit{
@@ -73,6 +81,10 @@ export class DatatracksGenomeBuildComponent implements OnInit{
     ngOnInit():void{
         this.componentNames = ["GBDetailTabComponent","GBSegmentsTabComponent","GBSequenceFilesTabComponent"];
         this.canWrite = this.dtService.datatrackListTreeNode.canWrite === 'Y';
+
+    }
+
+    tabChanged(event:MatTabChangeEvent){
 
     }
 

@@ -77,7 +77,7 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
         });
 
         this.coreListSubscription = this.configService.getCoreListObservable().subscribe(core =>{
-            if(core.contactName != null && core.contactName != undefined ){ // existing
+            if(core.idCoreFacility ){ // existing
                 this.idCoreFacility = core.idCoreFacility;
                 this.coreFacilityForm.get("contactName").setValue(core.contactName);
                 this.coreFacilityForm.get("contactEmail").setValue(core.contactEmail);
@@ -138,7 +138,11 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
             this.showSpinner = false;
             this.coreFacilityForm.markAsPristine();
             this.dictionaryService.reload(() =>{
-               this.refreshedCore.emit({'facilityName':this.coreFacilityForm.get("facilityName").value});
+                this.idCoreFacility = resp.idCoreFacility;
+               this.refreshedCore.emit({
+                   'facilityName':this.coreFacilityForm.get("facilityName").value,
+                   'idCoreFacility':resp.idCoreFacility
+               });
             });
         })
     }
