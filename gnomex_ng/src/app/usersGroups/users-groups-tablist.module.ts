@@ -36,6 +36,7 @@ import {NewGroupDialogComponent} from "./new-group-dialog.component";
 import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
 import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
 import {BillingAccountTabComponent, ChartfieldLeftMiddleRenderer, ChartfieldRemoveRenderer, ChartfieldRightMiddleRenderer, CheckboxRenderer, SelectCellEditor, SelectCellRenderer} from "./billingAccountTab/billing-account-tab.component";
+import {BillingAdminTabComponent} from "./billing-admin-tab.component";
 
 /**
  * @author jdewell
@@ -81,21 +82,22 @@ import {BillingAccountTabComponent, ChartfieldLeftMiddleRenderer, ChartfieldRemo
     ],
     declarations: [
         BillingAccountTabComponent,
-			  ChartfieldLeftMiddleRenderer,
+			  BillingAdminTabComponent,
+        ChartfieldLeftMiddleRenderer,
         ChartfieldRemoveRenderer,
         ChartfieldRightMiddleRenderer,
         CheckboxRenderer,
-			  SelectCellEditor,
-			  SelectCellRenderer,
-        UsersGroupsTablistComponent,
-        NewUserDialogComponent,
+        DeleteGroupDialogComponent,
         DeleteUserDialogComponent,
         NewGroupDialogComponent,
-        DeleteGroupDialogComponent,
+        NewUserDialogComponent,
+        SelectCellEditor,
+        SelectCellRenderer,
+        UsersGroupsTablistComponent,
         VerifyUsersDialogComponent
     ],
     entryComponents: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
-    exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent]
+    exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent, BillingAdminTabComponent]
 })
 export class UsersGroupsTablistModule {
 }

@@ -11,17 +11,22 @@ import {Subscription} from "rxjs/Subscription";
 
 
 @Component({
+    selector: "progress-tab",
     template: `
-        <div style="display:block; height:100%; width:100%;">
-            <span class="radioLikeLink" *ngFor="let opt of progressOptions; let i=index">
-                <input id="{{opt.id}}" type="radio" name="progressRadio" [(ngModel)]="selectedOpt"  [id]="opt.id" [value]="opt.label" (change)="selectSubFilter()">
-                <label for="{{opt.id}}">{{opt.label}}</label>
-                <div *ngIf="!isEnd(i)" class="divider"></div>
+        <div style="display:flex; flex-direction: column; height:100%; width:100%;">
+            <div style="display:flex; width:100%;">
+                <div style="flex:1;" class="radioLikeLink" *ngFor="let opt of progressOptions; let i=index">
+                    <input id="{{opt.id}}" type="radio" name="progressRadio" [(ngModel)]="selectedOpt"  [id]="opt.id" [value]="opt.label" (change)="selectSubFilter()">
+                    <label for="{{opt.id}}">{{opt.label}}</label>
+                    <div *ngIf="!isEnd(i)" class="divider"></div>
+
+                </div>
                 
-            </span>
+            </div>
             
             
-            <div #treeGridContainer style="display:block; height:100%; width:100%;">
+            
+            <div #treeGridContainer style="display:flex; flex-direction:column; flex:10; width:100%;">
                 <jqxTreeGrid
                         
                         [width]="'calc(100% - 2px)'"

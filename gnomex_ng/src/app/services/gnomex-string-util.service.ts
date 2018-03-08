@@ -9,9 +9,9 @@ export class GnomexStringUtilService {
 
     constructor(private http: Http) {
     }
-    public static stripHTMLText(htmlText:String):String {
+    public static stripHTMLText(htmlText:string):string {
         var pattern:RegExp = /<P.*?>/g;
-        var str:String = htmlText.replace(pattern, "");
+        var str:string = htmlText.replace(pattern, "");
         pattern = /<\/P.*?>/g;
         str = str.replace(pattern, "");
         pattern = /<B.*?>/g;
@@ -38,9 +38,9 @@ export class GnomexStringUtilService {
         return GnomexStringUtilService.cleanRichTextHTML(str);
     }
 
-    public static cleanRichTextHTML(htmlText:String):String {
-        var pattern:RegExp = /<TEXTFORMAT.*?>/g;
-        var str:String = htmlText.replace(pattern, "");
+    public static cleanRichTextHTML(htmlText:string):string {
+        let pattern:RegExp = /<TEXTFORMAT.*?>/g;
+        let str:string = htmlText.replace(pattern, "");
         pattern = /<FONT.*?>/g;
         str = str.replace(pattern, "");
         pattern = /<\/FONT.*?>/g;
@@ -50,6 +50,7 @@ export class GnomexStringUtilService {
 
         return str;
     }
+
 
 
 

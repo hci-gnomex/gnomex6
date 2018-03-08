@@ -1,4 +1,3 @@
-export * from "./downloads-browse.component"
 export * from "./experiments-browse.component"
 export * from "./progress-browse.component"
 export * from "./project-browse.component"

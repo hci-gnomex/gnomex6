@@ -11,6 +11,7 @@ export class ConstantsService {
     public readonly SEGMENGT_REMOVE_DISABLE = "assets/segment_remove_disable.png";
     public readonly SEGMENGT_IMPORT ="assets/segment_import.png";
     public readonly SEGMENGT_IMPORT_DISABLE ="assets/segment_remove_disable.png";
+    public readonly PAGE_ADD = "assets/page_add.png";
     public readonly PAGE_REMOVE = "assets/page_remove.png";
     public readonly PAGE_REMOVE_DISABLE = "assets/page_remove_disable.png";
     public readonly PAGE_NEW = "assets/page_new.png"

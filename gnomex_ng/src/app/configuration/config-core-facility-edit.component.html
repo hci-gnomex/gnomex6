@@ -1,0 +1,106 @@
+
+<form (ngSubmit)="save()" [formGroup]="coreFacilityForm" style="display:flex;flex-direction: column;">
+    <div style="width:100%;">
+
+
+        <div style="display:flex;">
+            <mat-form-field style="margin-right: 2em; width:40%;">
+                <input matInput formControlName="contactName"  type="text" placeholder="Director Name"/>
+                <mat-error *ngIf="coreFacilityForm.get('contactName').hasError('required')">
+                    The folder name is required
+                </mat-error>
+                <mat-error *ngIf="coreFacilityForm.get('contactName').hasError('maxlength')">
+                    Your field exceeds 100 characters limit
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field style="margin-right: 2em; width:40%;">
+                <input matInput formControlName="contactEmail"  type="text" placeholder="Director Email"/>
+                <mat-error *ngIf="coreFacilityForm.get('contactEmail').hasError('email')">
+                    Invalid email format
+                </mat-error>
+                <mat-error *ngIf="coreFacilityForm.get('contactEmail').hasError('maxlength')">
+                    Your field exceeds 100 characters limit
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div style="display:flex;">
+            <mat-form-field style="margin-right: 2em; width:40%;">
+                <input matInput formControlName="contactPhone"  type="text" placeholder="Director Phone"/>
+                <mat-error *ngIf="coreFacilityForm.get('contactPhone').hasError('maxlength')">
+                    Your field exceeds 20 characters limit
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field style="margin-right: 2em; width:40%;">
+                <input matInput formControlName="contactRoom"  type="text" placeholder="Director Room"/>
+                <mat-error *ngIf="coreFacilityForm.get('contactRoom').hasError('maxlength')">
+                    Your field exceeds 200 characters limit
+                </mat-error>
+            </mat-form-field>
+
+        </div>
+        <div style="display:flex;">
+            <mat-form-field style="margin-right: 2em; width:40%;">
+                <input matInput formControlName="facilityName"  type="text" placeholder="Facility Name"/>
+                <mat-error *ngIf="coreFacilityForm.get('facilityName').hasError('maxlength')">
+                    Your field exceeds 100 characters limit
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field style="margin-right: 2em; width:40%;">
+                <input matInput formControlName="labRoom"  type="text" placeholder="Lab Room"/>
+                <mat-error *ngIf="coreFacilityForm.get('labRoom').hasError('maxlength')">
+                    Your field exceeds 200 characters limit
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div style="display:flex;">
+            <mat-form-field style="margin-right: 2em; width:40%;">
+                <input matInput formControlName="labPhone"  type="text" placeholder="Lab Phone"/>
+                <mat-error *ngIf="coreFacilityForm.get('labPhone').hasError('maxlength')">
+                    Your field exceeds 20 characters limit
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field style="margin-right: 2em; width:40%;">
+                <input matInput formControlName="contactImage"  type="text" placeholder="Contact Image File Name"/>
+            </mat-form-field>
+        </div>
+
+        <mat-form-field style="margin-right: 2em; width:80%;">
+            <input matInput formControlName="shortDescription"  type="text" placeholder="Short Description"/>
+            <mat-error *ngIf="coreFacilityForm.get('shortDescription').hasError('maxlength')">
+                Your field exceeds 1000 characters limit
+            </mat-error>
+        </mat-form-field>
+
+
+
+        <div style="width:80%;">
+
+            <label > Description </label>
+            <jqxEditor #editorReference
+                       [(ngModel)]="description"
+                       (onChange)="changed($event)"
+                       [ngModelOptions]="{standalone: true}"
+                       id="experimentDescriptionId"
+                       width="100%"
+                       [height]="250"
+                       [editable]="edit"
+                       [tools]="toolBarSettings"
+                       [toolbarPosition]="'bottom'">
+            </jqxEditor>
+        </div>
+        <div style="width:100%;display:flex;">
+
+        </div>
+        <div style="width:40%;display:flex; margin-top:1rem">
+            <mat-checkbox matInput class="example-margin" formControlName="isActive" style="margin-right: 1em;">Active </mat-checkbox>
+            <mat-checkbox matInput class="example-margin" formControlName="acceptOnlineWorkAuth" style="margin-right: 1em;">Accept Online Work Auth </mat-checkbox>
+            <mat-checkbox matInput class="example-margin" formControlName="showProjectAnnotations">Show Project Annotations  </mat-checkbox>
+        </div>
+
+
+
+    </div>
+    <save-footer [disableSave]="this.secAdvisor.isGuest" [dirty]="coreFacilityForm.dirty" [showSpinner]="this.showSpinner" ></save-footer>
+</form>

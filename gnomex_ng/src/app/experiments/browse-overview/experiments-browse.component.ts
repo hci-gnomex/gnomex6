@@ -12,22 +12,26 @@ import {IconRendererComponent} from "../../util/grid-renderers/icon-renderer.com
 import {GridOptions} from "ag-grid/main";
 
 @Component({
+    selector: "experiment-browse-tab",
     template: `
 
         <!--- <grid dataProvider={} > -->
-        <div style="display:block; height:100%; width:100%;">
-            <ag-grid-angular
-                    class="ag-fresh"
-                    style="width: 100%; height: 90%;"
-                    (cellDoubleClicked)="forwardToExperiment($event)"
-                    [gridOptions]="gridOpt"
-                    [rowData]="rowData"
-                    [columnDefs]="columnDefs"
-                    [rowSelection]="rowSelection"
-                    [rowDeselection]="true"
-                    [enableSorting]="true"
-                    [enableColResize]="true">
-            </ag-grid-angular>
+        <div style="height:100%; width:100%; display:flex; flex-direction: column;">
+            <div style="display:flex; flex-direction:column; flex:1; width:100%;">
+                
+                <ag-grid-angular class="ag-fresh" style="width: 100%;  height: 100%;" 
+                                 (cellDoubleClicked)="forwardToExperiment($event)"
+                                 (gridSizeChanged)="adjustColumnSize($event)"
+                                 [gridOptions]="gridOpt" 
+                                 [rowData]="rowData" 
+                                 [columnDefs]="columnDefs" 
+                                 [rowSelection]="rowSelection" 
+                                 [rowDeselection]="true" 
+                                 [enableSorting]="true"
+                                 [enableColResize]="true">
+                    
+                </ag-grid-angular>
+            </div>
         </div>
     `
 })
@@ -75,10 +79,12 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
 
     }
 
-    //Override
-    tabVisibleHook(){
-        this.gridOpt.api.sizeColumnsToFit();
+    adjustColumnSize(event:any){
+        if(this.gridOpt.api){
+            this.gridOpt.api.sizeColumnsToFit();
+        }
     }
+
 
 
 

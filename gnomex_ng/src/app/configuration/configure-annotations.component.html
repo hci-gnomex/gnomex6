@@ -1,0 +1,77 @@
+<div style="padding: 0.5%;">
+    <h5>Configure Annotations</h5>
+    <div class="fullRow">
+        <div class="embeddedRow">
+            <button mat-button (click)="this.add()"><img class="icon" src="../../assets/page_add.png">Add</button>
+            <button mat-button (click)="this.deleteAnnotation()"><img class="icon" src="../../assets/page_remove.png">Remove</button>
+        </div>
+        <button mat-button (click)="this.refresh()"><img class="icon" src="../../assets/refresh.png">Refresh</button>
+    </div>
+    <div class="fullRow">
+        <div class="embeddedRow">
+            <label class="leadingLabel">Show Annotations For</label>
+            <mat-radio-group [(ngModel)]="this.type" (change)="this.onCriteriaChange()">
+                <mat-radio-button [value]="TYPE_SAMPLES">Samples</mat-radio-button>
+                <mat-radio-button [value]="TYPE_ANALYSIS">Analysis</mat-radio-button>
+                <mat-radio-button [value]="TYPE_DATA_TRACKS">Data Tracks</mat-radio-button>
+                <mat-radio-button [value]="TYPE_EXPERIMENTS">Experiments</mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <div class="embeddedRow">
+            <label class="leadingLabel">Applies To Specific</label>
+            <mat-form-field class="embeddedField">
+                <mat-select placeholder="Organism" [(ngModel)]="idOrganism" (change)="this.onCriteriaChange()">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let organism of listOrganism" [value]="organism.display">{{organism.display}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="embeddedField">
+                <mat-select placeholder="Experiment Platform" [(ngModel)]="codeRequestCategory" (change)="this.onCriteriaChange()">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let plat of listExperimentPlatform" [value]="plat.display">{{plat.display}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="embeddedField">
+                <mat-select placeholder="Analysis Type" [(ngModel)]="idAnalysisType" (change)="this.onCriteriaChange()">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let analysisType of listAnalysisType" [value]="analysisType.display">{{analysisType.display}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="fullRow">
+        <ag-grid-angular style="width: 400px; height: 600px;"
+                         class="ag-fresh"
+                         (gridReady)="this.onAnnotGridReady($event)"
+                         (rowDataChanged)="this.onAnnotGridRowDataChanged()"
+                         [rowSelection]="'single'"
+                         (rowSelected)="this.onAnnotGridRowSelected($event)"
+                         [rowData]="this.annotGridRowData"
+                         [columnDefs]="this.annotGridColumnDefs">
+        </ag-grid-angular>
+    </div>
+</div>
+<style>
+    div.fullRow {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin: 0.1% 0;
+        align-items: center;
+    }
+    div.embeddedRow {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        align-items: center;
+    }
+    mat-form-field.embeddedField {
+        margin: 0 0.5%;
+    }
+    label.leadingLabel {
+        margin-right: 2%;
+    }
+    img.icon {
+        margin-right: 0.5rem;
+    }
+</style>

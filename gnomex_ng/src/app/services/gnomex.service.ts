@@ -60,7 +60,8 @@ export class GnomexService {
     constructor(private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
                 private labListService: LabListService,
-                private createSecurityAdvisorService: CreateSecurityAdvisorService) {}
+                private createSecurityAdvisorService: CreateSecurityAdvisorService) {
+    }
 
     /**
      * Set the internal properties array

@@ -14,6 +14,7 @@ import {LaunchPropertiesService} from "../services/launch-properites.service";
 import {Subscription} from "rxjs/Subscription";
 import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
+import * as _ from "lodash";
 
 @Component({
     selector: "gnomex-header",
@@ -109,6 +110,7 @@ export class HeaderComponent implements OnInit{
     private billingAdminESNavItems: any[];
     private managerNavItems: any[];
     private managerESNavItems: any[];
+    private userNonSubmitterNavItems: any[];
     private userESNavItems: any[];
     private guestNavItems: any[];
     private currentState: string;
@@ -135,11 +137,14 @@ export class HeaderComponent implements OnInit{
                             this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
                                 this.progressService.displayLoader(60);
                                 console.log("subscribe createSecurityAdvisor");
+                                if (response != null) {
                                 this.faqList = response;
+                                }
                                 this.gnomexService.myCoreFacilities = this.dictionaryService.coreFacilities();
                                 this.progressService.displayLoader(75);
                                 this.gnomexService.onDictionariesLoaded().then((response) => {
                                     this.progressService.displayLoader(90);
+                                    this.buildNavItems();
                                     this.checkSecurity();
                                     this.gnomexService.isGuestState = this.createSecurityAdvisorService.isGuest;
 
@@ -165,6 +170,10 @@ export class HeaderComponent implements OnInit{
         });
 
         // Links, Help, Report Problem and Account
+    }
+
+    public buildNavItems() {
+        this.resetNavItems();
         this.linkNavItems = [
             {
                 displayName: 'Report Problem',
@@ -363,7 +372,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -511,7 +520,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -616,7 +625,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -891,7 +900,132 @@ export class HeaderComponent implements OnInit{
                 ]
             },
             {
-                displayName: 'Products',
+                displayName: 'Workflow',
+                class: 'top-menu-item',
+                iconName: '../../assets/review.png',
+                children: [
+                    {
+                        displayName: 'QC',
+                        context: 'QC',
+                        iconName: '../../assets/data-accept.png',
+                        route: ''
+                    },
+                    {
+                        divider: true
+                    },
+                    {
+                        displayName: 'HiSeq - Lib Prep',
+                        context: 'HISEQ',
+                        iconName: '../../assets/flask.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'HiSeq - Lib Prep QC',
+                        context: 'HISEQ',
+                        iconName: '../../assets/flask.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'HiSeq - FlowCell Assembly',
+                        context: 'HISEQ',
+                        iconName: '../../assets/DNA_diag_lightening.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'HiSeq - Finalize Flow Cell',
+                        context: 'HISEQ',
+                        iconName: '../../assets/DNA_diag_lightening.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'HiSeq - Data Pipeline',
+                        context: 'HISEQ',
+                        iconName: '../../assets/page_go.png',
+                        route: ''
+                    },
+                    {
+                        displayName: 'HiSeq - Flow Cells',
+                        context: 'HISEQ',
+                        iconName: '../../assets/rectangle.png',
+                        route: ''
+                    },
+                    {
+                        divider: true
+                    },
+                    {
+                        displayName: 'Illumina MiSeq',
+                        context: 'MISEQ',
+                        iconName: '../../assets/DNA_diag_miseq.png',
+                        children: [
+                            {
+                                displayName: 'Lib Prep',
+                                context: 'MISEQ',
+                                iconName: '../../assets/flask.png',
+                                route: ''
+                            },
+                            {
+                                displayName: 'Lib Prep QC',
+                                context: 'MISEQ',
+                                iconName: '../../assets/flask.png',
+                                route: ''
+                            },
+                            {
+                                displayName: 'Flow Cell Assembly',
+                                iconName: '../../assets/DNA_diag_miseq.png',
+                                route: ''
+                            },
+                            {
+                                displayName: 'Finalize Flow Cell',
+                                iconName: '../../assets/DNA_diag_miseq.png',
+                                route: ''
+                            },
+                            {
+                                displayName: 'Pipeline',
+                                iconName: '../../assets/server_go.png',
+                                route: ''
+                            },
+                            {
+                                displayName: 'Flow Cells',
+                                iconName: '../../assets/rectangle.png',
+                                route: ''
+                            },
+
+                        ]
+                    },
+                    {
+                        displayName: 'Microarray',
+                        context: 'microarray',
+                        iconName: '../../assets/microarray_small.png',
+                        children: [
+                            {
+                                displayName: 'Labeling',
+                                iconName: '../../assets/asterisk_yellow.png',
+                                route: ''
+                            },
+                            {
+                                displayName: 'Hyb',
+                                iconName: '../../assets/basket_put.png',
+                                route: ''
+                            },
+                            {
+                                displayName: 'Extraction',
+                                iconName: '../../assets/microarray_small.png',
+                                route: ''
+                            },
+                        ]
+                    },
+                    {
+                        divider: true
+                    },
+                    {
+                        displayName: 'Workflow (all)',
+                        iconName: '../../assets/building_go.png',
+                        route: ''
+                    }
+                ]
+            },
+            {
+                displayName: 'Products...',
                 context: 'product',
                 class: 'top-menu-item',
                 iconName: '../../assets/basket.png',
@@ -939,17 +1073,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Add/Edit Dictionaries',
                         iconName: '../../assets/book.png',
-                        route: ''
+                        route: '/browse-dictionary'
                     },
                     {
                         displayName: 'Configure Core Facilities',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
@@ -1263,7 +1397,7 @@ export class HeaderComponent implements OnInit{
             },
             {
                 displayName: 'Admin',
-                iconName: '../../assets/basket.png',
+                iconName: '../../assets/group.png',
                 class: 'top-menu-item',
                 children: [
                     {
@@ -1291,12 +1425,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Add/Edit Dictionaries',
                         iconName: '../../assets/book.png',
-                        route: ''
+                        route: '/browse-dictionary'
                     },
                     {
                         displayName: 'Configure Core Facilities',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
@@ -1575,17 +1709,17 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Add/Edit Dictionaries',
                         iconName: '../../assets/book.png',
-                        route: ''
+                        route: '/browse-dictionary'
                     },
                     {
                         displayName: 'Configure Core Facilities',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
@@ -1652,7 +1786,7 @@ export class HeaderComponent implements OnInit{
                         route: '/experiments',
                     },
                     {
-                        displayName: 'Create New Experiments',
+                        displayName: 'Create New Experiment and Upload Files',
                         context: 'newExperimentOrder',
                         iconName: '../../assets/flask.png',
                         route: ''
@@ -1691,7 +1825,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Annotations',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -1734,8 +1868,34 @@ export class HeaderComponent implements OnInit{
             }
 
         ]
-    }
+        this.userNonSubmitterNavItems = [
+            {
+                displayName: 'Experiments',
+                iconName: '../../assets/flask.png',
+                class: 'top-menu-item',
+            },
+            {
+                displayName: 'Analysis',
+                class: 'top-menu-item',
+                iconName: '../../assets/map.png',
+                route: '/analysis'
+            },
 
+            {
+                displayName: 'Data Tracks',
+                class: 'top-menu-item',
+                iconName: '../../assets/datatrack.png',
+                route: '/datatracks'
+            },
+            {
+                displayName: 'Topics',
+                class: 'top-menu-item',
+                iconName: '../../assets/topic_tag.png',
+                route: '/topics'
+    }
+        ]
+
+    }
     /**
      * Search by number.
      */
@@ -1752,6 +1912,21 @@ export class HeaderComponent implements OnInit{
         console.log(this.searchText);
     }
 
+    public resetNavItems() {
+        this.managerESNavItems = _.cloneDeep([]);
+        this.userNonSubmitterNavItems = _.cloneDeep([]);
+        this.linkNavItems = _.cloneDeep([]);
+        this.managerNavItems = _.cloneDeep([]);
+        this.userESNavItems = _.cloneDeep([]);
+        this.adminPlateBasedNavItems = _.cloneDeep([]);
+        this.billingAdminSubmitterNavItems = _.cloneDeep([]);
+        this.billingAdminNavItems = _.cloneDeep([]);
+        this.userNavItems = _.cloneDeep([]);
+        this.adminNavItems = _.cloneDeep([]);
+        this.billingAdminESNavItems = _.cloneDeep([]);
+        this.guestNavItems = _.cloneDeep([]);
+        this.navItems = _.cloneDeep([]);
+    }
     /**
      * Create a new menu item.
      * @param {string} displayName
@@ -2074,6 +2249,7 @@ export class HeaderComponent implements OnInit{
      */
     public checkSecurity(): void {
         this.isAdminState = false;
+        this.navItems = [];
         this.customizeMenus(this.adminNavItems);
         this.customizeMenus(this.userNavItems);
         this.customizeMenus(this.billingAdminNavItems);
@@ -2121,6 +2297,10 @@ export class HeaderComponent implements OnInit{
             }
             case "UserState" : {
                 this.navItems = this.userNavItems;
+                break;
+            }
+            case "UserNonSubmitterState" : {
+                this.navItems = this.userNonSubmitterNavItems;
                 break;
             }
             case "BillingAdminState" : {
