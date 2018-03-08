@@ -295,11 +295,11 @@
                     </div>
                 </div>
 
-                <div *ngIf="isGroupsTab" style="height: 100%">
+                <div *ngIf="isGroupsTab && selectedGroup" style="height: 100%">
                     <!--groups tab group-->
                     <mat-tab-group style="height: 100%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
                         <mat-tab #groupTab label="Group"  style="height:100%;">
-                            <div *ngIf="isGroupSubTab && selectedGroup" #groupsDetail class="flex-column-container ug-background" style="width: 100%">
+                            <div #groupsDetail class="flex-column-container ug-background" style="width: 100%">
                                 <div class="flex-column-container">
                                     <form style="width: 100%" [formGroup]="groupForm">
                                         <div class="users-groups-row-one">
@@ -383,6 +383,7 @@
                         <mat-tab #groupTab label="Membership"  style="height:100%;">
                         </mat-tab>
                         <mat-tab #groupTab label="Billing Accounts"  style="height:100%;">
+                            <billing-account-tab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
                         </mat-tab>
                         <mat-tab #groupTab label="Invoices"  style="height:100%;">
                         </mat-tab>

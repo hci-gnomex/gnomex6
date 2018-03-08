@@ -35,6 +35,7 @@ import {DeleteUserDialogComponent} from "./delete-user-dialog.component";
 import {NewGroupDialogComponent} from "./new-group-dialog.component";
 import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
 import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
+import {BillingAccountTabComponent, ChartfieldLeftMiddleRenderer, ChartfieldRemoveRenderer, ChartfieldRightMiddleRenderer, CheckboxRenderer, SelectCellEditor, SelectCellRenderer} from "./billingAccountTab/billing-account-tab.component";
 
 /**
  * @author jdewell
@@ -68,9 +69,31 @@ import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
         WindowModule,
         ReactiveFormsModule,
         AngularSplitModule,
-        AgGridModule.withComponents([IconTextRendererComponent])
+        AgGridModule.withComponents([
+					  ChartfieldLeftMiddleRenderer,
+            ChartfieldRemoveRenderer,
+            ChartfieldRightMiddleRenderer,
+            CheckboxRenderer,
+            IconTextRendererComponent,
+					  SelectCellEditor,
+					  SelectCellRenderer
+        ])
     ],
-    declarations: [UsersGroupsTablistComponent, NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
+    declarations: [
+        BillingAccountTabComponent,
+			  ChartfieldLeftMiddleRenderer,
+        ChartfieldRemoveRenderer,
+        ChartfieldRightMiddleRenderer,
+        CheckboxRenderer,
+			  SelectCellEditor,
+			  SelectCellRenderer,
+        UsersGroupsTablistComponent,
+        NewUserDialogComponent,
+        DeleteUserDialogComponent,
+        NewGroupDialogComponent,
+        DeleteGroupDialogComponent,
+        VerifyUsersDialogComponent
+    ],
     entryComponents: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
     exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent]
 })
