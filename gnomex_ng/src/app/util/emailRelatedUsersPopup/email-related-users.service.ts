@@ -1,4 +1,4 @@
-import {Inject, Injectable, OpaqueToken} from "@angular/core";
+import {Inject, Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";

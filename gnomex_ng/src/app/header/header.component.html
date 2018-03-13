@@ -1,10 +1,11 @@
 <mat-toolbar class="header-one" *ngIf="isLoggedIn | async">
+  <mat-toolbar-row>
   <span class="top-menu-item">
     <a [routerLink]="['/home']">
       <img src="../../assets/gnomex_logo_hdr.png">
     </a>
   </span>
-  <span class="top-menu-item lookup">
+    <span class="top-menu-item lookup">
     <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
                     [floatPlaceholder]="options.value.floatPlaceholder">
       <input matInput type="text" [(ngModel)]="objNumber"  placeholder="Lookup by #">
@@ -19,7 +20,7 @@
       <img src="../../assets/magnifier.png">
     </button>
   </span>
-  <span class="links-menu">
+    <span class="links-menu">
     <span class="top-menu-item" *ngFor="let item of linkNavItems">
       <!-- Handle branch node buttons here -->
       <span *ngIf="item.children && item.children.length > 0">
@@ -39,7 +40,8 @@
       </span>
     </span>
   </span>
-  <mat-list></mat-list>
+    <mat-list></mat-list>
+  </mat-toolbar-row>
   <mat-toolbar-row class="header-two">
     <span [ngClass]="item.class" *ngFor="let item of navItems">
       <!-- Handle branch node buttons here -->
@@ -61,4 +63,3 @@
     </span>
   </mat-toolbar-row>
 </mat-toolbar>
-

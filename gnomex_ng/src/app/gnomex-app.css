@@ -5,6 +5,7 @@
 @footerBack: #f5f5f5;
 @footerBorder: #f5f5f5;
 @footerText: #333;*/
+@import '~angular-tree-component/dist/angular-tree-component.css';
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import '~ag-grid/dist/styles/ag-grid.css';
 @import '~ag-grid/dist/styles/theme-fresh.css';

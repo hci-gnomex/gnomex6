@@ -8,6 +8,7 @@ import {CommonModule} from "@angular/common";
 import {HeaderModule} from "./header/header.module";
 import {APP_ROUTING} from "./gnomex-app.routes";
 import {HttpModule} from "@angular/http";
+//import {HttpClientModule} from "@angular/common/http";
 import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
@@ -26,14 +27,14 @@ import {
     AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_ROUTE,
     AUTHENTICATION_TOKEN_KEY, AUTHENTICATION_TOKEN_ENDPOINT, AUTHENTICATION_DIRECT_ENDPOINT, AUTHENTICATION_MAX_INACTIVITY_MINUTES
 } from "@hci/authentication";
-import {NavigationModule} from "@hci/navigation";
+//import {NavigationModule} from "@hci/navigation";
 import {LocalStorageModule, LocalStorageService, ILocalStorageServiceConfig} from "angular-2-local-storage";
 
 import "./gnomex-app.css";
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { ServicesModule } from './services/services.module';
+import {ServicesModule } from './services/services.module';
 import {AnalysisModule} from "./analysis/analysis.module";
 import {DatatracksModule} from "./datatracks/datatracks.module";
 import {MatIconModule} from "@angular/material";
@@ -63,7 +64,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         HomeModule,
         UserModule,
         AuthenticationModule,
-        NavigationModule,
         ExperimentsModule,
         ConfigurationModule,
         NewBillingAccountModule,

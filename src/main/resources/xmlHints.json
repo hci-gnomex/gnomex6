@@ -101,6 +101,18 @@
       ]
     },
     {
+      "command": "SaveVisibilityAnalysis",
+      "parameter": "visibilityXMLString",
+      "nodeheader": "AnalysisVisibilityList",
+      "nodeprefix": "Analysis",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
       "command": "SaveGenomeBuild",
       "parameter": "segmentsXML",
       "nodeheader": "segments",

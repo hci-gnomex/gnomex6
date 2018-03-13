@@ -13,4 +13,4 @@ import "rxjs";
 // You can import js, ts, css, sass, ...
 import "font-awesome/css/font-awesome.min.css";
 
-import "@hci/style/core";
+//import "@hci/style/core";
