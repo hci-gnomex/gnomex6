@@ -10,10 +10,25 @@ import {ICellEditorAngularComp, ICellRendererAngularComp} from "ag-grid-angular"
 @Component({
 	template: `
 		<div class="full-width full-height">
-			{{display}}
+			<div class="t full-width full-height">
+				<div class="tr">
+					<div class="td cell-text-container">
+						{{display}}
+					</div>
+				</div>
+			</div>
 		</div>
 	`,
 	styles: [`
+			.t  { display: table;      }
+			.tr { display: table-row;  }
+			.td { display: table-cell; }
+			
+			.cell-text-container { 
+					vertical-align: middle;
+					padding-left: 0.3rem;
+			}
+			
       .full-width  { width:  100%; } 
 			.full-height { height: 100%; }
 	`]
@@ -152,11 +167,121 @@ import {ICellEditorAngularComp, ICellRendererAngularComp} from "ag-grid-angular"
 @Component({
 	template: `
 		<div class="full-width full-height">
-			<div *ngIf="showRemoveButton" class="t full-width full-height">
+			<div class="t full-width full-height cursor" (click)="invokeParentMethod()">
 				<div class="tr">
 					<div class="td vertical-center button-container">
-						<!--<button mat-button (click)="onChartfieldRemoveClick(rowIndex: number)"-->
-						<button class="link-button" (click)="invokeParentMethod()">Remove</button>
+						<button class="link-button {{classes}}"><img *ngIf="showIcon" src="{{icon}}" alt=""/><div class="name inline-block">{{value}}</div></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	`,
+	styles: [`
+			button.link-button {
+					background: none;
+					background-color: inherit;
+					border: none;
+					padding: 0;
+					text-decoration: underline;
+					cursor: pointer;
+			}
+      
+			button.link-button:focus {
+					outline: none;
+      }
+			
+      .button-container {
+					padding-left: 0.3rem;
+			}
+			
+			.cursor { cursor: pointer; }
+			
+			.full-width  { width:  100% }
+			.full-height { height: 100% }
+			
+			.t  { display: table; }
+			.tr { display: table-row; }
+			.td { display: table-cell; }
+			
+			.inline-block { display: inline-block; }
+			
+			.vertical-center { vertical-align: middle; }
+			
+			.name {
+					padding-left: 0.5rem;
+          text-decoration: underline;
+			}
+			.is-active {
+					color: #0000FF;
+					font-weight: bold;
+					font-style: normal;
+			}
+      .is-not-active {
+          color: #6a6b6e;
+          font-weight: normal;
+          font-style: italic;
+      }
+	`]
+})
+export class NameRenderer implements ICellRendererAngularComp {
+	public params: any;
+	public static readonly ACTIVE: string = "is-active";
+	public static readonly INACTIVE: string = "is-not-active";
+	public classes: string;
+	public icon: string;
+	public showIcon: boolean;
+	public value: string;
+	private onClick;
+
+	agInit(params: any): void {
+		this.params = params;
+		this.value = "";
+		this.icon = "";
+		this.showIcon = false;
+
+		this.classes = "";
+		this.checkIfActive();
+
+		if (this.params) {
+			this.value = "" + this.params.value;
+		}
+
+		if (this.params && this.params.colDef) {
+			this.onClick = this.params.colDef.onClick;
+			this.icon = this.params.colDef.icon;
+			if (this.icon) {
+				this.showIcon = true;
+			}
+		}
+	}
+
+	refresh(params: any): boolean {
+		return false;
+	}
+
+	checkIfActive(): void {
+		if (this.params && this.params.data && this.params.data.isActive && this.params.data.isActive.toLowerCase() == 'y') {
+			this.classes = this.classes + " " + NameRenderer.ACTIVE;
+		} else {
+			this.classes = this.classes + " " + NameRenderer.INACTIVE;
+		}
+	}
+
+	invokeParentMethod(): void {
+		if (this.onClick && this.params && this.params.context && this.params.context.componentParent) {
+			//this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
+			this.onClick(this.params.node.rowIndex);
+		}
+	}
+}
+
+@Component({
+	template: `
+		<div class="full-width full-height">
+			<div *ngIf="showRemoveButton" class="t full-width full-height cursor" (click)="invokeParentMethod()">
+				<div class="tr">
+					<div class="td vertical-center button-container">
+						<button class="link-button">Remove</button>
 					</div>
 				</div>
 			</div>
@@ -173,10 +298,16 @@ import {ICellEditorAngularComp, ICellRendererAngularComp} from "ag-grid-angular"
 					text-decoration: underline;
 					cursor: pointer;
 			}
+      
+			button.link-button:focus {
+					outline: none;
+      }
 			
       .button-container {
 					padding-left: 0.3rem;
 			}
+			
+			.cursor { cursor: pointer; }
 			
 			.full-width  { width:  100% }
 			.full-height { height: 100% }
@@ -342,6 +473,130 @@ export class ChartfieldLeftMiddleRenderer implements ICellRendererAngularComp {
 	}
 }
 
+
+@Component({
+	template: `
+		<div class="full-width full-height">
+			<div class="t full-width full-height cursor">
+				<div class="tr">
+					<div class="td vertical-center button-container">
+						<button class="link-button" (click)="invokeParentOnClickUpload()">
+							<img src="../../../assets/upload.png" alt=""/>
+							<div class="name inline-block">
+								Upload
+							</div>
+						</button>
+						<button class="link-button" (click)="invokeParentOnClickView()">
+							<img *ngIf="hasPoForm" src="../../../assets/page_find.gif" alt=""/>
+							<div class="name inline-block">
+								View
+							</div>
+						</button>
+						<button class="link-button" (click)="invokeParentOnClickRemove()>
+							<img *ngIf="showIcon" src="../../../assets/page_cross.gif" alt="""/>
+							<div class="name inline-block">
+								Remove
+							</div>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	`,
+	styles: [`
+			button.link-button {
+					background: none;
+					background-color: inherit;
+          color: #0000FF;
+					border: none;
+					padding: 0;
+					text-decoration: underline;
+					cursor: pointer;
+					margin-right: 0.6rem;
+			}
+      
+			button.link-button:focus {
+					outline: none;
+      }
+			
+      .button-container {
+					padding-left: 0.3rem;
+			}
+			
+			.cursor { cursor: pointer; }
+			
+			.full-width  { width:  100% }
+			.full-height { height: 100% }
+			
+			.t  { display: table; }
+			.tr { display: table-row; }
+			.td { display: table-cell; }
+			
+			.inline-block { display: inline-block; }
+			
+			.vertical-center { vertical-align: middle; }
+			
+			.name {
+					padding-left: 0.5rem;
+          text-decoration: underline;
+			}
+	`]
+})
+export class PurchaseOrderRenderer implements ICellRendererAngularComp {
+	public params: any;
+	public hasPoForm: boolean;
+	private onClickUpload;
+	private onClickView;
+	private onClickRemove;
+
+	agInit(params: any): void {
+		this.params = params;
+		this.hasPoForm = false;
+
+		this.checkIfHasPoForm();
+
+		if (this.params && this.params.colDef) {
+			this.onClickUpload = this.params.colDef.onClickUpload;
+			this.onClickView   = this.params.colDef.onClickView;
+			this.onClickRemove = this.params.colDef.onClickRemove;
+		}
+	}
+
+	refresh(params: any): boolean {
+		return false;
+	}
+
+	checkIfHasPoForm(): void {
+		if (this.params && this.params.data && this.params.data.isActive && this.params.data.isActive.toLowerCase() == 'y') {
+			this.hasPoForm = true;
+		} else {
+			this.hasPoForm = false;
+		}
+	}
+
+	invokeParentOnClickUpload(): void {
+		if (this.onClickUpload && this.params && this.params.context && this.params.context.componentParent) {
+			//this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
+			this.onClickUpload(this.params.node.rowIndex);
+		}
+	}
+
+	invokeParentOnClickView(): void {
+		if (this.onClickView && this.params && this.params.context && this.params.context.componentParent) {
+			//this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
+			this.onClickView(this.params.node.rowIndex);
+		}
+	}
+
+	invokeParentOnClickRemove(): void {
+		if (this.onClickRemove && this.params && this.params.context && this.params.context.componentParent) {
+			//this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
+			this.onClickRemove(this.params.node.rowIndex);
+		}
+	}
+}
+
+
 @Component ({
 	selector: "billing-account-tab",
 	templateUrl: "./billing-account-tab.component.html",
@@ -474,20 +729,101 @@ export class BillingAccountTabComponent implements OnInit{
 	private getChartfieldColumnDefs(shownGridData: any[]): any[] {
 		let columnDefinitions = [];
 
-		columnDefinitions.push({ headerName: "Account name",    editable: false, width: 300, field: "accountName" });
-		columnDefinitions.push({ headerName: "Starts",          editable:  true, width: 100, field: "startDate" });
-		columnDefinitions.push({ headerName: "Expires",         editable:  true, width: 100, field: "expirationDate" });
-		columnDefinitions.push({ headerName: "Bus",             editable:  true, width:  40, cellRendererFramework: ChartfieldLeftMiddleRenderer,  field: "accountNumberBus" });
-		columnDefinitions.push({ headerName: "Org",             editable:  true, width:  60, cellRendererFramework: ChartfieldLeftMiddleRenderer,  field: "accountNumberOrg" });
-		columnDefinitions.push({ headerName: "Fund",            editable:  true, width:  50, cellRendererFramework: ChartfieldLeftMiddleRenderer,  field: "accountNumberFund" });
-		columnDefinitions.push({ headerName: "Activity",        editable:  true, width:  70, cellRendererFramework: ChartfieldLeftMiddleRenderer,  field: "accountNumberActivity" });
-		columnDefinitions.push({ headerName: "Project",         editable:  true, width:  90, cellRendererFramework: ChartfieldLeftMiddleRenderer,  field: "accountNumberProject" });
-		columnDefinitions.push({ headerName: "Acct",            editable:  true, width:  50, cellRendererFramework: ChartfieldLeftMiddleRenderer,  field: "accountNumberAccount" });
-		columnDefinitions.push({ headerName: "AU",              editable:  true, width:  35, cellRendererFramework: ChartfieldLeftMiddleRenderer,  field: "accountNumberAu" });
-		columnDefinitions.push({ headerName: "Submitter email", editable:  true, width: 200, cellRendererFramework: ChartfieldLeftMiddleRenderer,  field: "submitterEmail" });
-		columnDefinitions.push({ headerName: "Users",           editable: false, width: 200, field: "acctUsers" });
-		columnDefinitions.push({ headerName: "Active",          editable: false, width:  50, cellRendererFramework: CheckboxRenderer,              field: "activeAccount" });
-		columnDefinitions.push({ headerName: "$ Billed",        editable: false, width: 100, cellRendererFramework: ChartfieldRightMiddleRenderer, field: "totalChargesToDateDisplay" });
+		columnDefinitions.push({
+			headerName: "Account name",
+			editable: false,
+			width: 300,
+			cellRendererFramework: NameRenderer,
+			icon: "../../../assets/pricesheet.png",
+			onClick: this.openChartfieldEditor,
+			field: "accountName"
+		});
+		columnDefinitions.push({
+			headerName: "Starts",
+			editable:  true,
+			width: 100,
+			field: "startDate"
+		});
+		columnDefinitions.push({
+			headerName: "Expires",
+			editable:  true,
+			width: 100,
+			field: "expirationDate"
+		});
+		columnDefinitions.push({
+			headerName: "Bus",
+			editable:  true,
+			width:  40,
+			cellRendererFramework: ChartfieldLeftMiddleRenderer,
+			field: "accountNumberBus"
+		});
+		columnDefinitions.push({
+			headerName: "Org",
+			editable:  true,
+			width:  60,
+			cellRendererFramework: ChartfieldLeftMiddleRenderer,
+			field: "accountNumberOrg"
+		});
+		columnDefinitions.push({ headerName: "Fund",
+			editable:  true,
+			width:  50,
+			cellRendererFramework: ChartfieldLeftMiddleRenderer,
+			field: "accountNumberFund"
+		});
+		columnDefinitions.push({
+			headerName: "Activity",
+			editable:  true,
+			width:  70,
+			cellRendererFramework: ChartfieldLeftMiddleRenderer,
+			field: "accountNumberActivity"
+		});
+		columnDefinitions.push({
+			headerName: "Project",
+			editable:  true,
+			width:  90,
+			cellRendererFramework: ChartfieldLeftMiddleRenderer,
+			field: "accountNumberProject"
+		});
+		columnDefinitions.push({ headerName: "Acct",
+			editable:  true,
+			width:  50,
+			cellRendererFramework: ChartfieldLeftMiddleRenderer,
+			field: "accountNumberAccount"
+		});
+		columnDefinitions.push({
+			headerName: "AU",
+			editable:  true,
+			width:  35,
+			cellRendererFramework: ChartfieldLeftMiddleRenderer,
+			field: "accountNumberAu"
+		});
+		columnDefinitions.push({
+			headerName: "Submitter email",
+			editable:  true,
+			width: 200,
+			cellRendererFramework: ChartfieldLeftMiddleRenderer,
+			field: "submitterEmail"
+		});
+		columnDefinitions.push({
+			headerName: "Users",
+			editable: false,
+			width: 200,
+			field: "acctUsers"
+		});
+		columnDefinitions.push({
+			headerName: "Active",
+			editable: false,
+			width:  50,
+			cellRendererFramework: CheckboxRenderer,
+			field: "activeAccount"
+		});
+		columnDefinitions.push({
+			headerName: "$ Billed",
+			editable: false,
+			width: 100,
+			cellRendererFramework: ChartfieldRightMiddleRenderer,
+			field: "totalChargesToDateDisplay"
+		});
 
 		let gridShowRemove:boolean = false;
 		for (let row in shownGridData) {
@@ -507,13 +843,57 @@ export class BillingAccountTabComponent implements OnInit{
 	private getPoColumnDefs(shownGridData: any[]): any[] {
 		let columnDefinitions = [];
 
-		columnDefinitions.push({ headerName: "PO",                  editable: false, width: 200, field: "accountName"                });
-		columnDefinitions.push({ headerName: "Starts",              editable:  true, width: 100, field: "startDate"                  });
-		columnDefinitions.push({ headerName: "Expires",             editable:  true, width: 100, field: "expirationDate"             });
-		columnDefinitions.push({ headerName: "Purchase Order Form", editable:  true, width: 200, field: "purchaseOrderForm"          });
-		columnDefinitions.push({ headerName: "Users",               editable: false, width: 100, field: "acctUsers"                  });
-		columnDefinitions.push({ headerName: "Active",              editable: false, width:  50, field: "activeAccount",             cellRendererFramework: CheckboxRenderer });
-		columnDefinitions.push({ headerName: "$ Billed",            editable: false, width: 100, field: "totalChargesToDateDisplay", cellRendererFramework: ChartfieldRightMiddleRenderer });
+		columnDefinitions.push({
+			headerName: "PO",
+			editable: false,
+			width: 200,
+			cellRendererFramework: NameRenderer,
+			icon: "../../../assets/email_open.png",
+			onClick: this.openPoEditor,
+			field: "accountName"
+		});
+		columnDefinitions.push({
+			headerName: "Starts",
+			editable:  true,
+			width: 100,
+			field: "startDate"
+		});
+		columnDefinitions.push({
+			headerName: "Expires",
+			editable:  true,
+			width: 100,
+			field: "expirationDate"
+		});
+		columnDefinitions.push({
+			headerName: "Purchase Order Form",
+			editable:  true,
+			cellRendererFramework: PurchaseOrderRenderer,
+			onClickUpload: this.onPoUploadClicked,
+			onClickView: this.onPoViewClicked,
+			onClickRemove: this.onPoRemoveClicked,
+			width: 200,
+			field: "purchaseOrderForm"
+		});
+		columnDefinitions.push({
+			headerName: "Users",
+			editable: false,
+			width: 100,
+			field: "acctUsers"
+		});
+		columnDefinitions.push({
+			headerName: "Active",
+			editable: false,
+			width:  50,
+			field: "activeAccount",
+			cellRendererFramework: CheckboxRenderer
+		});
+		columnDefinitions.push({
+			headerName: "$ Billed",
+			editable: false,
+			width: 100,
+			field: "totalChargesToDateDisplay",
+			cellRendererFramework: ChartfieldRightMiddleRenderer
+		});
 
 		let gridShowRemove:boolean = false;
 		for (let row of shownGridData) {
@@ -537,6 +917,9 @@ export class BillingAccountTabComponent implements OnInit{
 			headerName: "Credit Card Last 4 digits",
 			editable: false,
 			width: 200,
+			cellRendererFramework: NameRenderer,
+			icon: "../../../assets/creditcards.png",
+			onClick: this.openCreditCardEditor,
 			field: "accountName"
 		});
 		columnDefinitions.push({
@@ -649,6 +1032,8 @@ export class BillingAccountTabComponent implements OnInit{
 				shownGridData = shownGridData.filter((a, b) => {
 					return (selectedCore) ? a.idCoreFacility === idSelectedCore : false;
 				});
+			} else {
+				shownGridData = [];
 			}
 
 			this.chartfieldGridApi.setRowData(shownGridData);
@@ -678,6 +1063,8 @@ export class BillingAccountTabComponent implements OnInit{
 				shownGridData = shownGridData.filter((a, b) => {
 					return (selectedCore) ? a.idCoreFacility === idSelectedCore : false;
 				});
+			} else {
+				shownGridData = [];
 			}
 
 			this.poGridApi.setRowData(shownGridData);
@@ -707,6 +1094,8 @@ export class BillingAccountTabComponent implements OnInit{
 				shownGridData = shownGridData.filter((a, b) => {
 					return (selectedCore) ? a.idCoreFacility === idSelectedCore : false;
 				});
+			} else {
+				shownGridData = [];
 			}
 
 			this.creditCardGridApi.setColumnDefs(this.getCreditCardColumnDefs(shownGridData));
@@ -715,6 +1104,30 @@ export class BillingAccountTabComponent implements OnInit{
 		}
 	}
 
+
+	openChartfieldEditor(rowIndex: string) {
+		console.log("Should open editor for chartfield and index: " + rowIndex);
+	}
+
+	openPoEditor(rowIndex: string) {
+		console.log("Should open editor for po and index: " + rowIndex);
+	}
+
+	openCreditCardEditor(rowIndex: string) {
+		console.log("Should open editor for credit card and index: " + rowIndex);
+	}
+
+	onPoUploadClicked(rowIndex: string)	{
+		console.log("Should open uploader for po and index: " + rowIndex);
+	}
+
+	onPoViewClicked(rowIndex: string)	{
+		console.log("Should view po and index: " + rowIndex);
+	}
+
+	onPoRemoveClicked(rowIndex: string)	{
+		console.log("Should remove po and index: " + rowIndex);
+	}
 
 	removeChartfieldRow(rowIndex: string) {
 		console.log("Should remove index: " + rowIndex);

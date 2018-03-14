@@ -35,7 +35,7 @@ import {DeleteUserDialogComponent} from "./delete-user-dialog.component";
 import {NewGroupDialogComponent} from "./new-group-dialog.component";
 import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
 import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
-import {BillingAccountTabComponent, ChartfieldLeftMiddleRenderer, ChartfieldRemoveRenderer, ChartfieldRightMiddleRenderer, CheckboxRenderer, SelectCellEditor, SelectCellRenderer} from "./billingAccountTab/billing-account-tab.component";
+import {BillingAccountTabComponent, ChartfieldLeftMiddleRenderer, ChartfieldRemoveRenderer, ChartfieldRightMiddleRenderer, CheckboxRenderer, NameRenderer, PurchaseOrderRenderer, SelectCellEditor, SelectCellRenderer} from "./billingAccountTab/billing-account-tab.component";
 import {BillingAdminTabComponent} from "./billing-admin-tab.component";
 
 /**
@@ -76,6 +76,8 @@ import {BillingAdminTabComponent} from "./billing-admin-tab.component";
             ChartfieldRightMiddleRenderer,
             CheckboxRenderer,
             IconTextRendererComponent,
+					  NameRenderer,
+					  PurchaseOrderRenderer,
 					  SelectCellEditor,
 					  SelectCellRenderer
         ])
@@ -91,6 +93,8 @@ import {BillingAdminTabComponent} from "./billing-admin-tab.component";
         DeleteUserDialogComponent,
         NewGroupDialogComponent,
         NewUserDialogComponent,
+			  NameRenderer,
+			  PurchaseOrderRenderer,
         SelectCellEditor,
         SelectCellRenderer,
         UsersGroupsTablistComponent,
