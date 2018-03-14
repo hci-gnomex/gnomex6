@@ -31,6 +31,13 @@ import { RouterTestingModule } from '@angular/router/testing';
 import {ProgressService} from "../home/progress.service";
 import {BillingService} from "../services/billing.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
+import {AngularMaterialModule} from "../../modules/angular-material.module";
+import {AngularSplitModule} from "angular-split";
+import {BrowsePanelComponent} from "./browse-panel.component";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {CookieUtilService} from "../services/cookie-util.service";
+import {CookieService} from "angular2-cookie/services";
+import {ConstantsService} from "../services/constants.service";
 
 @Directive({
 
@@ -272,10 +279,14 @@ describe('Browse Experiment Component...', () => {
         TestBed.configureTestingModule({
             imports: [FormsModule, HttpModule, TreeModule, ButtonModule, ToggleButtonModule, ComboBoxModule,
                 WindowModule, InputModule, NotificationModule, TextAreaModule, CalendarModule, LoaderModule,
-                UtilModule, RouterTestingModule],
-            declarations: [BrowseExperimentsComponent],
+                UtilModule, RouterTestingModule, AngularMaterialModule, AngularSplitModule],
+            declarations: [BrowseExperimentsComponent, BrowsePanelComponent],
             providers: [{provide: ExperimentsService, useClass: MockExperimentService},
                 {provide: LabListService, useClass: LabListService},
+                {provide: DialogsService, useClass: DialogsService},
+                {provide: CookieUtilService, useClass: CookieUtilService},
+                {provide: CookieService, useClass: CookieService},
+                {provide: ConstantsService, useClass: ConstantsService},
                 {provide: ProgressService, useClass: ProgressService},
                 {provide: BillingService, useClass: BillingService},
                 {provide: LaunchPropertiesService, useClass: LaunchPropertiesService},
@@ -300,7 +311,7 @@ describe('Browse Experiment Component...', () => {
         TestBed.compileComponents().then(() => {
 
             var browseExperimentComponent = fixture.componentInstance;
-            browseExperimentComponent.experimentService.getProjectRequestList_fromBackend(new URLSearchParams());
+            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new URLSearchParams());
 
 
             fixture.whenStable().then(() => {
@@ -320,7 +331,7 @@ describe('Browse Experiment Component...', () => {
         TestBed.compileComponents().then(() => {
 
             var browseExperimentComponent = fixture.componentInstance;
-            browseExperimentComponent.experimentService.getProjectRequestList_fromBackend(new URLSearchParams());
+            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new URLSearchParams());
 
 
             fixture.whenStable().then(() => {
@@ -341,7 +352,7 @@ describe('Browse Experiment Component...', () => {
 
         TestBed.compileComponents().then ( () => {
             var browseExperimentComponent = fixture.componentInstance;
-            browseExperimentComponent.experimentService.getProjectRequestList_fromBackend(new URLSearchParams());
+            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new URLSearchParams());
 
             var tree: TreeComponent = browseExperimentComponent.treeComponent;
             fixture.whenStable().then(() => {
@@ -355,7 +366,7 @@ describe('Browse Experiment Component...', () => {
     it('Should have 2 root nodes ', () => {
         TestBed.compileComponents().then(() => {
             var browseExperimentComponent = fixture.componentInstance;
-            browseExperimentComponent.experimentService.getProjectRequestList_fromBackend(new URLSearchParams());
+            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new URLSearchParams());
 
             var tree: TreeComponent = browseExperimentComponent.treeComponent;
             fixture.whenStable().then(() => {

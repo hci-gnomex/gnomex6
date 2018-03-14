@@ -5,7 +5,10 @@ import {Subscription} from "rxjs/Subscription";
 import {GridOptions, RowDataChangedEvent} from "ag-grid/main";
 import { URLSearchParams } from "@angular/http";
 import {LabListService} from "../services/lab-list.service";
-import {FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
+import {
+    AbstractControl, FormBuilder, FormControl, FormGroup,
+    Validators
+} from "@angular/forms";
 import {GnomexService} from "../services/gnomex.service";
 import {NewUserDialogComponent} from "./new-user-dialog.component";
 import {ErrorStateMatcher, MatDialog, MatDialogRef} from "@angular/material";
@@ -18,7 +21,8 @@ import {DictionaryService} from "../services/dictionary.service";
 import {NewGroupDialogComponent} from "./new-group-dialog.component";
 import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
 import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
-import {BillingAdminTabComponent} from "./billing-admin-tab.component";
+import {BillingAdminTabComponent} from "./billingAdminTab/billing-admin-tab.component";
+import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
 
 /**
  * @title Basic tabs
@@ -160,13 +164,16 @@ import {BillingAdminTabComponent} from "./billing-admin-tab.component";
 
 export class UsersGroupsTablistComponent implements OnInit{
     @ViewChild("billingAdminTab") billingAdminTab: BillingAdminTabComponent;
+    @ViewChild("membershipTab") membershipTab: MembershipTabComponent;
     public readonly USER_TYPE_UNIVERSITY: string = "uu";
     public readonly USER_TYPE_EXTERNAL: string = "ex";
     private readonly DUMMY_UNID: string = "u0000000";
     private readonly DUMMY_USERNAME: string = "_";
     private readonly DUMMY_PASSWORD: string = "aaAA11$$";
     private readonly PASSWORD_MASKED: string = "XXXX";
-
+    public  readonly EXACADEMIC = "EXACADEMIC";
+    public  readonly EXCOMM = "EXCOMM";
+    public  readonly INTERNAL = "INTERNAL";
     private columnDefs;
     private labColumnDefs;
     private collColumnDefs;
@@ -221,7 +228,6 @@ export class UsersGroupsTablistComponent implements OnInit{
     public selectedTab: number = 0;
     public selectedGroupTab: number = 0;
     public showSpinner: boolean = false;
-    private columnWidth: number;
     private isActiveChanged: boolean = false;
     private beingIsActive: boolean = false;
     private createUserDialogRef: MatDialogRef<NewUserDialogComponent>;
@@ -231,12 +237,12 @@ export class UsersGroupsTablistComponent implements OnInit{
     private verifyUsersDialogRef: MatDialogRef<VerifyUsersDialogComponent>;
     panelOpenState: boolean = false;
     public externalGroup: boolean = false;
-    constructor(private secAdvisor: CreateSecurityAdvisorService,
+    public groupFormDirty: boolean = false;
+    public groupFormValid: boolean = false;
+    constructor(public secAdvisor: CreateSecurityAdvisorService,
                 public passwordUtilService: PasswordUtilService,
                 private appUserListService: AppUserListService,
-                private groupListService: LabListService,
                 private formBuilder: FormBuilder,
-                private gnomexService: GnomexService,
                 private snackBar: MatSnackBar,
                 private dialogsService: DialogsService,
                 private getLabService: GetLabService,
@@ -306,28 +312,48 @@ export class UsersGroupsTablistComponent implements OnInit{
         this.buildInstitutions();
     }
 
-    setPricing() {
-        for (let lab of this.groupsData) {
-            if (lab.isExternalPricing === 'Y') {
-                lab.pricing = "ext";
-                lab.icon = "../../assets/graduation_cap.png";
-            } else if (lab.isExternalPricingCommercial === 'Y') {
-                lab.pricing = 'com';
-                lab.icon = "../../assets/building.png";
-            } else {
-                lab.pricing = "int;"
-                lab.icon = "../../assets/empty.png";
-            }
+    ngAfterViewChecked() {
+        let dirty = this.isGroupFormDirty();
+        let valid = this.isGroupFormValid();
+        let detectChanges: boolean = false;
+        if (dirty != this.groupFormDirty) {
+            this.groupFormDirty = dirty;
+            detectChanges = true;
+        }
+        if (valid != this.groupFormValid) {
+            this.groupFormValid = valid;
+            detectChanges = true;
+        }
+        if (detectChanges) {
+            this.changeRef.detectChanges();
+        }
 
+    }
+
+    setPricing() {
+        if (this.groupsData) {
+            for (let lab of this.groupsData) {
+                if (lab.isExternalPricing === 'Y') {
+                    lab.pricing = "ext";
+                    lab.icon = "../../assets/graduation_cap.png";
+                } else if (lab.isExternalPricingCommercial === 'Y') {
+                    lab.pricing = 'com';
+                    lab.icon = "../../assets/building.png";
+                } else {
+                    lab.pricing = "int;"
+                    lab.icon = "../../assets/empty.png";
+                }
+            }
         }
     }
 
     public buildUsers() {
-        if (this.secAdvisor.isAdmin || this.secAdvisor.isSuperAdmin) {
+        this.rowData = [];
+        if (this.secAdvisor.isAdmin || this.secAdvisor.isSuperAdmin || this.secAdvisor.isBillingAdmin) {
             this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any[]) => {
                 this.createUserForm();
                 this.userForm.markAsPristine();
-
+                this.touchUserFields();
                 this.rowData = response;
             });
         }
@@ -341,6 +367,28 @@ export class UsersGroupsTablistComponent implements OnInit{
 
     }
 
+    touchGroupFields() {
+        for (let field in this.groupForm.controls) {
+            const control = this.groupForm.get(field);
+            if (control) {
+                if (control.valid === false) {
+                    control.markAsTouched();
+                }
+            }
+        }
+    }
+
+    touchUserFields() {
+        for (let field in this.userForm.controls) {
+            const control = this.userForm.get(field);
+            if (control) {
+                if (control.valid === false) {
+                    control.markAsTouched();
+                }
+            }
+        }
+    }
+
     public buildLabList() {
         var params: URLSearchParams = new URLSearchParams();
         params.set("idCoreFacility", this.idCoreFacility);
@@ -348,9 +396,9 @@ export class UsersGroupsTablistComponent implements OnInit{
         params.set("isExternal", "");
         params.set("listKind", "UnboundedLabList");
 
-        this.getGroupListSubscription = this.groupListService.getLabListWithParams(params).subscribe((response: any[]) => {
+        this.getGroupListSubscription = this.labListService.getLabListWithParams(params).subscribe((response: any[]) => {
             this.buildManagedLabList(response);
-            if (this.secAdvisor.isSuperAdmin || this.secAdvisor.isAdmin) {
+            if (this.secAdvisor.isSuperAdmin || this.secAdvisor.isAdmin || this.secAdvisor.isBillingAdmin) {
                 this.groupsData = this.myManagingLabs;
             } else {
                 this.groupsData = this.secAdvisor.groupsToManage;
@@ -383,6 +431,7 @@ export class UsersGroupsTablistComponent implements OnInit{
         setTimeout(() => {
             if (this.userForm) {
                 this.userForm.markAsPristine();
+                this.touchUserFields();
             }
         });
     }
@@ -456,8 +505,8 @@ export class UsersGroupsTablistComponent implements OnInit{
                 firstName: this.selectedGroup.firstName,
                 lastName: this.selectedGroup.lastName,
                 pricing: this.selectedGroup.pricing,
-                phone: this.selectedGroup.contactPhone,
-                email: this.selectedGroup.contactEmail,
+                contactPhone: this.selectedGroup.contactPhone,
+                contactEmail: this.selectedGroup.contactEmail,
             });
     }
 
@@ -504,8 +553,8 @@ export class UsersGroupsTablistComponent implements OnInit{
         this.groupForm = this.formBuilder.group({
             lastName: '',
             firstName: '',
-            email: this.groupEmailFC,
-            phone: this.groupPhoneFC,
+            contactEmail: this.groupEmailFC,
+            contactPhone: this.groupPhoneFC,
             pricing: this.pricingFC
         }, { validator: this.atLeastOneNameRequired});
     }
@@ -581,6 +630,7 @@ export class UsersGroupsTablistComponent implements OnInit{
                 this.managingLabs = response.AppUser.managingLabs;
             }
             this.userForm.markAsPristine();
+            this.touchUserFields();
             if (this.secAdvisor.isAdmin && !this.secAdvisor.isSuperAdmin && this.selectedUser.codeUserPermissionKind === 'SUPER') {
                 this.userForm.disable();
             }
@@ -604,6 +654,7 @@ export class UsersGroupsTablistComponent implements OnInit{
 
         })
         this.groupForm.markAsPristine();
+        this.touchGroupFields();
     }
 
 
@@ -622,15 +673,12 @@ export class UsersGroupsTablistComponent implements OnInit{
 
     private setLabPricing(lab) {
         if (lab.isExternalPricing === 'Y') {
-            lab.pricing = "EXACADEMIC";
+            lab.pricing = this.EXACADEMIC;
         } else if (lab.isExternalPricingCommercial === 'Y') {
-            lab.pricing = 'EXCOMM';
+            lab.pricing = this.EXCOMM;
         } else {
-            lab.pricing = "INTERNAL"
+            lab.pricing = this.INTERNAL;
         }
-
-
-
     }
 
     private resetUserType(isExternal: boolean): void {
@@ -702,20 +750,19 @@ export class UsersGroupsTablistComponent implements OnInit{
         }
     }
 
-
     selectSubmissionCheckbox(getAppUser: any) {
         // Have to build checkboxes on the fly
         this.coreFacilitiesICanSubmitTo = [];
         this.coreFacilitiesIManage = [];
-            if (this.codeUserPermissionKind === 'LAB' || this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind == 'ADMIN') {
-                if (!this.secAdvisor.isArray(getAppUser.coreFacilitiesICanSubmitTo)) {
-                    getAppUser.coreFacilitiesICanSubmitTo = [getAppUser.coreFacilitiesICanSubmitTo];
-                }
-                this.coreFacilitiesICanSubmitTo = getAppUser.coreFacilitiesICanSubmitTo.filter((core) => {
-                    return core.allowed === 'Y';
-                })
+        if (this.codeUserPermissionKind === 'LAB' || this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind == 'ADMIN') {
+            if (!this.secAdvisor.isArray(getAppUser.coreFacilitiesICanSubmitTo)) {
+                getAppUser.coreFacilitiesICanSubmitTo = [getAppUser.coreFacilitiesICanSubmitTo.coreFacility];
             }
-        if (this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind==='ADMIN' ) {
+            this.coreFacilitiesICanSubmitTo = getAppUser.coreFacilitiesICanSubmitTo.filter((core) => {
+                return core.allowed === 'Y';
+            })
+        }
+        if (this.secAdvisor.isSuperAdmin) {
             this.coreFacilitiesIManage = getAppUser.managingCoreFacilities;
             for (let core of this.coreFacilitiesIManage) {
                 if (core.selected ==='Y') {
@@ -723,11 +770,28 @@ export class UsersGroupsTablistComponent implements OnInit{
                 } else {
                     core.isSelected = false;
                 }
-                for (let core of this.coreFacilitiesIManage) {
-                    core.mDisplay = core.display + 'm';
-                    let control: FormControl = new FormControl(core.display + 'm');
-                    this.userForm.addControl(core.display + 'm', control);
+                let control: FormControl;
+                core.mDisplay = core.display + 'm';
+                control = new FormControl({value: core.display + 'm', disabled: false});
+                this.userForm.addControl(core.display + 'm', control);
+            }
+
+        } else if (this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind === 'ADMIN') {
+            this.coreFacilitiesIManage = getAppUser.managingCoreFacilities;
+            for (let core of this.coreFacilitiesIManage) {
+                if (core.selected ==='Y') {
+                    core.isSelected = true;
+                } else {
+                    core.isSelected = false;
                 }
+                let control: FormControl;
+                core.mDisplay = core.display + 'm';
+                if (core.value === this.secAdvisor.coreFacilitiesICanManage[0].value) {
+                    control = new FormControl({value: core.display + 'm', disabled: false});
+                } else {
+                    control = new FormControl({value: core.display + 'm', disabled: true});
+                }
+                this.userForm.addControl(core.display + 'm', control);
             }
 
         }
@@ -755,12 +819,12 @@ export class UsersGroupsTablistComponent implements OnInit{
             let control: FormControl = new FormControl(myCore.display);
             this.groupForm.addControl(myCore.display, control);
             if (this.secAdvisor.isSuperAdmin) {
-                myCore.isDisabled = false;
+                control.enable();
             } else {
                 if (myCore.idCoreFacility === this.idCoreFacility) {
-                    myCore.isDisabled = false;
+                    control.enable();
                 } else {
-                    myCore.isDisabled = true;
+                    control.disable();
                 }
             }
             myCore.isSelected = false;
@@ -769,7 +833,6 @@ export class UsersGroupsTablistComponent implements OnInit{
 
         for (let core of myCoreFacilities) {
             for (let selectedCore of this.selectedGroup.coreFacilities) {
-                    selectedCore.isDisabled = false;
                 if (selectedCore.value === core.value) {
                     core.isSelected = true;
                     break;
@@ -923,14 +986,14 @@ export class UsersGroupsTablistComponent implements OnInit{
         }
         params.set("coreFacilitiesUserCanSubmitTo", stringifiedSF);
         params.set("userManagingCoreFacilities", stringifiedMF);
-        this.userForm.markAsPristine();
         this.appUserListService.saveAppUser(params).subscribe((response: Response) => {
             if (response.status === 200) {
                 let responseJSON: any = response.json();
                 if (responseJSON.result && responseJSON.result === "SUCCESS") {
                     this.userForm.markAsPristine();
-                    this.snackBar.open("Changes Saved", "My Account", {
-                        duration: 2000
+                    this.touchUserFields();
+                    this.snackBar.open("Changes Saved", "User", {
+                        duration: 3000
                     });
                     this.buildUsers();
                 }
@@ -945,7 +1008,7 @@ export class UsersGroupsTablistComponent implements OnInit{
         if (this.codeUserPermissionKind === 'ADMIN' && coresIManage === 0) {
             this.dialogsService.confirm("The user is marked as an admin; Please specify the core facilities the user can manage.", null);
         } else {
-            let answer: any;
+            let answer: string;
             if (this.isActiveChanged && this.isActiveFC.value == false) {
                 if ( this.isMemberOfLab()) {
                     let activeMessage = this.buildLabsMessage();
@@ -982,7 +1045,89 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     saveGroup() {
+        let params: URLSearchParams = new URLSearchParams();
+        let cores: any[] = [];
+        // For now put the selectedGroup accounts in the savelab. Later get them off the billingAccountsForm
+        let accountsXMLString: string;
+        if (!this.secAdvisor.isArray(this.selectedGroup.billingAccounts)) {
+            this.selectedGroup.billingAccounts = [this.selectedGroup.billingAccounts.BillingAccount]
+        }
+        let stringifiedAccounts: string = JSON.stringify(this.selectedGroup.billingAccounts.slice(0,1));
+        params.set("accountsXMLString", stringifiedAccounts);
+        if (this.groupForm) {
+            for (let field in this.groupForm.controls) {
+                const control = this.groupForm.get(field);
+                if (control) {
+                    if (field === "pricing") {
+                        switch (control.value) {
+                            case this.EXACADEMIC: {
+                                params.set("isExternalPricing", 'Y');
+                                params.set("isExternalPricingCommercial", 'N');
+                                break;
+                            }
+                            case this.EXCOMM: {
+                                params.set("isExternalPricing", 'Y');
+                                params.set("isExternalPricingCommercial", 'Y');
+                                break;
+                            }
+                            case this.EXACADEMIC: {
+                                params.set("isExternalPricing", 'N');
+                                params.set("isExternalPricingCommercial", 'N');
+                                break;
+                            }
+                        }
+                    } else if (this.myCoreFacilities.filter((core => core.facilityName === field)).length > 0) {
+                        if (control.value === true) {
+                            let cf: any = this.myCoreFacilities.filter((core => core.facilityName === field));
+                            let coreObj = {
+                                "idCoreFacility": cf[0].idCoreFacility,
+                                "facilityName": cf[0].facilityName
+                            };
+                            cores.push(coreObj);
+                        }
 
+                    } else {
+                        params.set(field, control.value);
+                    }
+                }
+            }
+            let stringifiedSF = JSON.stringify(cores);
+            params.set("coreFacilitiesXMLString", stringifiedSF);
+            params.set("excludeUsage", this.selectedGroup.excludeUsage);
+            params.set("lab", this.selectedGroup.lab);
+            params.set("version", this.selectedGroup.version);
+        }
+        if (this.billingAdminTab) {
+            for (let field in this.billingAdminTab.billingForm.controls) {
+                const control = this.billingAdminTab.billingForm.get(field);
+                if (control) {
+                    params.set(field, control.value);
+                }
+            }
+        }
+        if (this.membershipTab) {
+            let stringifiedMembers = JSON.stringify(this.membershipTab.membersDataSource.data);
+            params.set("membersXMLString", stringifiedMembers);
+            let stringifiedColls = JSON.stringify(this.membershipTab.collaboratorsDataSource.data);
+            params.set("collaboratorsXMLString", stringifiedColls);
+            let stringifiedManagers = JSON.stringify(this.membershipTab.managersDataSource.data);
+            params.set("managersXMLString", stringifiedManagers);
+
+        }
+        this.labListService.saveLab(params).subscribe((response: Response) => {
+            if (response.status === 200) {
+                let responseJSON: any = response.json();
+                if (responseJSON.result && responseJSON.result === "SUCCESS") {
+                    this.groupForm.markAsPristine();
+                    this.touchGroupFields();
+                    this.snackBar.open("Changes Saved", "Lab", {
+                        duration: 2000
+                    });
+                    this.buildLabList();
+                }
+            }
+            this.showSpinner = false;
+        });
     }
 
     searchCoreFacility(event) {
@@ -1084,7 +1229,12 @@ export class UsersGroupsTablistComponent implements OnInit{
                 return true;
             }
         }
-        if (this.groupForm.dirty) {
+        if (this.membershipTab) {
+            if (this.membershipTab.membershipForm.dirty) {
+                return true;
+            }
+        }
+        if (this.groupForm && this.groupForm.dirty) {
             return true;
         }
         return false;
@@ -1092,6 +1242,7 @@ export class UsersGroupsTablistComponent implements OnInit{
 
     isGroupFormValid() {
         if ((this.billingAdminTab && this.billingAdminTab.billingForm.valid) &&
+            (this.membershipTab && this.membershipTab.membershipForm.valid) &&
             this.groupForm.valid) {
             return true;
         } else {
