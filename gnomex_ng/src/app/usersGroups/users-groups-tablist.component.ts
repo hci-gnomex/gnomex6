@@ -1224,15 +1224,11 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     isGroupFormDirty(): boolean {
-        if (this.billingAdminTab) {
-            if (this.billingAdminTab.billingForm.dirty) {
-                return true;
-            }
+        if (this.billingAdminTab && this.billingAdminTab.billingForm.dirty) {
+            return true;
         }
-        if (this.membershipTab) {
-            if (this.membershipTab.membershipForm.dirty) {
-                return true;
-            }
+        if (this.membershipTab && this.membershipTab.membershipForm.dirty) {
+            return true;
         }
         if (this.groupForm && this.groupForm.dirty) {
             return true;
