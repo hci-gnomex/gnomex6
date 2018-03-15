@@ -1,4 +1,4 @@
-import {Inject, Injectable, OpaqueToken} from "@angular/core";
+import {Inject, Injectable, InjectionToken, Injector} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
@@ -6,8 +6,8 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {HttpHeaders, HttpParams} from "@angular/common/http";
 
 
-export let BROWSE_EXPERIMENTS_ENDPOINT: OpaqueToken = new OpaqueToken("browse_experiments_url");
-export let VIEW_EXPERIMENT_ENDPOINT: OpaqueToken = new OpaqueToken("view_experiment_url");
+export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
+export let VIEW_EXPERIMENT_ENDPOINT = new InjectionToken("view_experiment_url");
 
 @Injectable()
 export class ExperimentsService {

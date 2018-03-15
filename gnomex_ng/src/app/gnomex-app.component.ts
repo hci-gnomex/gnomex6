@@ -6,7 +6,7 @@ import {Http, Response} from "@angular/http";
 import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {HeaderComponent} from "./header/header.component";
 
-import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigationItemGroup} from "@hci/navigation";
+//import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigationItemGroup} from "@hci/navigation";
 import {Observable} from "rxjs/Observable";
 import 'rxjs/operator/finally';
 import 'rxjs/add/operator/catch'
