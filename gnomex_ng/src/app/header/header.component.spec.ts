@@ -23,6 +23,13 @@ import {
     AUTHENTICATION_TOKEN_KEY, AUTHENTICATION_TOKEN_ENDPOINT, AUTHENTICATION_DIRECT_ENDPOINT, AUTHENTICATION_MAX_INACTIVITY_MINUTES
 } from "@hci/authentication";
 import {ProgressService} from "../home/progress.service";
+import {MenuItemComponent} from "./menu-item/menu-item.component";
+import {DictionaryService} from "../services/dictionary.service";
+import {LaunchPropertiesService} from "../services/launch-properites.service";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {LabListService} from "../services/lab-list.service";
+import {GnomexService} from "../services/gnomex.service";
+import {PropertyService} from "../services/property.service";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -33,7 +40,8 @@ describe('Header Component...', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [
-                HeaderComponent
+                HeaderComponent,
+                MenuItemComponent
             ],
             imports: [
                 RouterTestingModule,
@@ -50,7 +58,13 @@ describe('Header Component...', () => {
                 FormsModule
             ],
             providers: [{provide: AuthenticationService, useClass: AuthenticationService},
-                        {provide:LocalStorageService, useClass: LocalStorageService},
+                {provide:LocalStorageService, useClass: LocalStorageService},
+                {provide:DictionaryService, useClass: DictionaryService},
+                {provide:LaunchPropertiesService, useClass: LaunchPropertiesService},
+                {provide:CreateSecurityAdvisorService, useClass: CreateSecurityAdvisorService},
+                {provide:LabListService, useClass: LabListService},
+                {provide:GnomexService, useClass: GnomexService},
+                {provide:PropertyService, useClass: PropertyService},
                         {provide: AUTHENTICATION_LOGOUT_PATH, useValue: "https://localhost:8080/auth/logout"},
                         {provide: AUTHENTICATION_DIRECT_ENDPOINT, useValue: "https://localhost:8080/core/api/user/user-session/active"},
                         {provide: AUTHENTICATION_TOKEN_ENDPOINT, useValue: "https://localhost:8080/core/api/token"},

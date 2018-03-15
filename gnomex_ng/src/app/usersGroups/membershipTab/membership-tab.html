@@ -1,0 +1,114 @@
+<div style="margin-left: 33em;margin-top: 1em">
+    <mat-checkbox [(ngModel)]="showInactive" (change)="onShowInactiveChange($event)">Show inactive members</mat-checkbox>
+</div>
+<div class="flex-row-container" >
+    <div class="users-groups-row-one">
+        <div class="flex-column-container" style="width: 100%">
+            <div style="display: flex;">
+                <mat-form-field class="formField">
+                    <input matInput placeholder="Member to add" aria-label="Member" [matAutocomplete]="auto"
+                           [(ngModel)]="memberUser" (keyup.enter)="chooseFirstOption()">
+                    <mat-autocomplete #auto="matAutocomplete">
+                        <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let member of filterUsers(this.memberUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+                <button mat-button [disabled]="!memberUser" (click)="addUser('member')"><img *ngIf="memberUser;else addDisable" src="../../../assets/add.png"></button>
+                <button mat-button [disabled]="selectedMemberRowIndex<=0" (click)="deleteUser('member')"><img *ngIf="selectedMemberRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png"></button>
+                <ng-template #addDisable>
+                    <img src="../../../assets/add_disable.png">
+                </ng-template>
+
+                <ng-template #addDeleteDisable>
+                    <img src="../../../assets/delete_disable.png">
+                </ng-template>
+            </div>
+            <div class="users-groups-row-one">
+                <mat-table  style="width: 80%" #table [dataSource]="membersDataSource">
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef> Members </mat-header-cell>
+                        <mat-cell *matCellDef="let member"> {{member.displayName}} </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumns;"
+                             [ngClass]="{'highlight': selectedMemberRowIndex == row.idAppUser}"
+                             (click)="selectMemberRow(row)">
+                    </mat-row>
+                </mat-table>
+            </div>
+        </div>
+    </div>
+    <div class="users-groups-row-one">
+        <div class="flex-column-container" style="width: 100%">
+            <div class="users-groups-row-one">
+                <div class="flex-column-container" style="width: 100%">
+                    <div class="users-groups-row-one">
+                        <mat-form-field class="formField">
+                            <input matInput placeholder="Collaborator to add" aria-label="Collaborator" [matAutocomplete]="autoColl"
+                                   [(ngModel)]="collUser" (keyup.enter)="chooseFirstOption()">
+                            <mat-autocomplete #autoColl="matAutocomplete">
+                                <mat-option (onSelectionChange)="selectCollOption($event)" *ngFor="let member of filterUsers(this.collUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <button mat-button [disabled]="!collUser" (click)="addUser('collaborator')"><img *ngIf="collUser;else addDisable" src="../../../assets/add.png"></button>
+                        <button mat-button [disabled]="selectedCollRowIndex<=0" (click)="deleteUser('collaborator')"><img *ngIf="selectedCollRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png"></button>
+                        <ng-template #addDisable>
+                            <img src="../../../assets/add_disable.png">
+                        </ng-template>
+
+                        <ng-template #addDeleteDisable>
+                            <img src="../../../assets/delete_disable.png">
+                        </ng-template>
+                    </div>
+                    <div>
+                        <mat-table style="width: 80%" #table [dataSource]="collaboratorsDataSource">
+                            <ng-container matColumnDef="name">
+                                <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
+                                <mat-cell *matCellDef="let member"> {{member.displayName}} </mat-cell>
+                            </ng-container>
+                            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                            <mat-row *matRowDef="let row; columns: displayedColumns;"
+                                     [ngClass]="{'highlight': selectedCollRowIndex == row.idAppUser}"
+                                     (click)="selectCollRow(row)">
+                            </mat-row>
+                        </mat-table>
+                    </div>
+                </div>
+            </div>
+            <div class="users-groups-row-one">
+                <div class="flex-column-container" style="width: 100%">
+                    <div class="users-groups-row-one">
+                        <mat-form-field class="formField">
+                            <input matInput placeholder="Manager to add" aria-label="Manager" [matAutocomplete]="autoMan"
+                                   [(ngModel)]="manUser" (keyup.enter)="chooseFirstOption()">
+                            <mat-autocomplete #autoMan="matAutocomplete">
+                                <mat-option (onSelectionChange)="selectManOption($event)" *ngFor="let member of filterUsers(this.manUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <button mat-button [disabled]="!manUser" (click)="addUser('manager')"><img *ngIf="manUser;else addDisable" src="../../../assets/add.png"></button>
+                        <button mat-button [disabled]="selectedManRowIndex<=0" (click)="deleteUser('manager')"><img *ngIf="selectedManRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png"></button>
+                        <ng-template #addDisable>
+                            <img src="../../../assets/add_disable.png">
+                        </ng-template>
+
+                        <ng-template #addDeleteDisable>
+                            <img src="../../../assets/delete_disable.png">
+                        </ng-template>
+                    </div>
+                    <div>
+                        <mat-table style="width: 80%" #table [dataSource]="managersDataSource">
+                            <ng-container matColumnDef="name">
+                                <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
+                                <mat-cell *matCellDef="let member"> {{member.displayName}} </mat-cell>
+                            </ng-container>
+                            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                            <mat-row *matRowDef="let row; columns: displayedColumns;"
+                                     [ngClass]="{'highlight': selectedManRowIndex == row.idAppUser}"
+                                     (click)="selectManRow(row)">
+                            </mat-row>
+                        </mat-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
