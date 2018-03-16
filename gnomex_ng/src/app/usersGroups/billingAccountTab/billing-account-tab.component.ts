@@ -492,8 +492,8 @@ export class ChartfieldLeftMiddleRenderer implements ICellRendererAngularComp {
 								View
 							</div>
 						</button>
-						<button class="link-button" (click)="invokeParentOnClickRemove()>
-							<img *ngIf="showIcon" src="../../../assets/page_cross.gif" alt="""/>
+						<button class="link-button" (click)="invokeParentOnClickRemove()">
+							<img *ngIf="showIcon" src="../../../assets/page_cross.gif" alt=""/>
 							<div class="name inline-block">
 								Remove
 							</div>
