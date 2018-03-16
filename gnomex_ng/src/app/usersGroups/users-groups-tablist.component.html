@@ -10,7 +10,7 @@
                             <div class="flex-column-container" style="height:100%;">
                                 <div class="users-groups-item users-groups-one">
                                     <mat-form-field>
-                                        <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Enter search here...">
+                                        <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Search by name or email...">
                                     </mat-form-field>
 
                                 </div>
@@ -233,7 +233,7 @@
                                                 </mat-checkbox>
                                             </section>
                                         </div>
-                                        <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && this.secAdvisor.isSuperAdmin" class="users-groups-row-one ug-white-background">
+                                        <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && (this.secAdvisor.isSuperAdmin||this.secAdvisor.isBillingAdmin)" class="users-groups-row-one ug-white-background">
                                             <section class="permission-radio-group">
                                                 <div style="text-align: right;height: 2em">
                                                     <label class="ug-label" style="width: 100%">Submit experiments in all labs in core</label>
@@ -249,10 +249,10 @@
                         </div>
                     </split-area>
                     <split-area size="25" style="background: white">
-                    <div class="users-groups-row-one ug-background">
+                    <div class="users-groups-row-one ug-background" style="height:100%">
                         <div class="flex-row-container" style="width: 100%">
                             <div class="users-groups-row-one-shrink">
-                                <ag-grid-angular style="width: 30em; height: 10em;" class="ag-fresh"
+                                <ag-grid-angular style="width: 30em; height: 100%;" class="ag-fresh"
                                                  [gridOptions]="labGridOptions"
                                                  [rowData]="labs"
                                                  [columnDefs]="labColumnDefs"
@@ -262,7 +262,7 @@
                                 </ag-grid-angular>
                             </div>
                             <div class="users-groups-row-one-shrink">
-                                <ag-grid-angular style="width: 30em; height: 10em;" class="ag-fresh"
+                                <ag-grid-angular style="width: 30em; height: 100%;" class="ag-fresh"
                                                  [gridOptions]="collGridOptions"
                                                  [rowData]="collaboratingLabs"
                                                  [columnDefs]="collColumnDefs"
@@ -272,7 +272,7 @@
                                 </ag-grid-angular>
                             </div>
                             <div class="users-groups-row-one-shrink">
-                                <ag-grid-angular style="width: 30em; height: 10em;" class="ag-fresh"
+                                <ag-grid-angular style="width: 30em; height: 100%;" class="ag-fresh"
                                                  [gridOptions]="manGridOptions"
                                                  [rowData]="managingLabs"
                                                  [columnDefs]="manColumnDefs"
@@ -297,9 +297,9 @@
                 </div>
                 <div *ngIf="isGroupsTab && selectedGroup" style="height: 100%">
                     <!--groups tab group-->
-                    <mat-tab-group style="height: 90%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
-                        <mat-tab #groupTab label="Group"  style="height:100%;">
-                            <div #groupsDetail class="flex-column-container ug-background" style="width: 100%">
+                    <mat-tab-group id="groupTabGroup" style="height: 90%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
+                        <mat-tab groupTab label="Group"  style="height:100%;">
+                            <div *ngIf="isGroupSubTab && selectedGroup" #groupsDetail class="flex-column-container ug-background" style="width: 100%">
                                 <div class="flex-column-container">
                                     <form style="width: 100%" [formGroup]="groupForm">
                                         <div class="users-groups-row-one">
@@ -322,10 +322,10 @@
                                         <div class="users-groups-row-one">
                                             <div class="formRow" cellspacing="0">
                                                 <mat-form-field class="formField">
-                                                    <input matInput formControlName="phone" placeholder="Phone">
+                                                    <input matInput formControlName="contactPhone" placeholder="Phone">
                                                 </mat-form-field>
                                                 <mat-form-field class="formField">
-                                                    <input matInput formControlName="email" placeholder="Email">
+                                                    <input matInput formControlName="contactEmail" placeholder="Email">
                                                     <mat-error *ngIf="this.groupEmailFC.hasError('required')">Required</mat-error>
                                                     <mat-error *ngIf="this.groupEmailFC.hasError('email') && !this.groupEmailFC.hasError('required')">Valid Email Required</mat-error>
                                                 </mat-form-field>
@@ -357,7 +357,7 @@
                                                         <div style="text-align: right;height: 2em">
                                                             <label class="ug-label" style="width: 100%">Core facilities</label>
                                                         </div>
-                                                        <mat-checkbox *ngFor="let core of myCoreFacilities" [checked]="true" [disabled]=core.isDisabled [formControlName]="core.display">
+                                                        <mat-checkbox *ngFor="let core of myCoreFacilities" [formControlName]="core.display">
                                                             {{core.display}}
                                                         </mat-checkbox>
                                                     </section>
@@ -373,20 +373,23 @@
                                 <billing-admin-tab [group]="selectedGroup" #billingAdminTab ></billing-admin-tab>
                             </div>
                         </mat-tab>
-                        <mat-tab #groupTab label="Membership"  style="height:90%;">
+                        <mat-tab label="Membership"  style="height:90%;">
+                            <div *ngIf="selectedGroup">
+                                <membership-tab [memberGroup]="selectedGroup" [users]="rowData" #membershipTab ></membership-tab>
+                            </div>
                         </mat-tab>
                         <mat-tab #groupTab label="Billing Accounts"  style="height:100%;">
                             <billing-account-tab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
                         </mat-tab>
-                        <mat-tab #groupTab label="Invoices"  style="height:100%;">
+                        <mat-tab label="Invoices"  style="height:100%;">
                         </mat-tab>
                     </mat-tab-group>
                     <div *ngIf="isGroupsTab" class="flex-container users-groups-row-one" style="flex-grow:.1">
                         <button mat-button (click)="verify('lab')"><img src="../../assets/email_go.png">Send email to verify users</button>
-                        <span *ngIf="isGroupFormDirty()" style="background:#feec89; padding: 1em 1em 1em 1em;">
+                        <span *ngIf="groupFormDirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
                                     Your changes have not been saved
                                 </span>
-                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!isGroupFormValid()" (click)="saveGroup()"><img src="../../assets/save.png">Save</button>
+                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!groupFormValid" (click)="saveGroup()"><img src="../../assets/save.png">Save</button>
                         <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
                     </div>
                 </div>

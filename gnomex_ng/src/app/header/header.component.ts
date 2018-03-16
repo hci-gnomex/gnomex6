@@ -134,11 +134,13 @@ export class HeaderComponent implements OnInit{
                         this.labListService.getLabList().subscribe((response: any[]) => {
                             this.progressService.displayLoader(45);
                             this.labList = response;
-                            this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
+                            this.launchPropertiesService.getFAQ().subscribe((response: any) => {
                                 this.progressService.displayLoader(60);
                                 console.log("subscribe createSecurityAdvisor");
                                 if (response != null) {
-                                this.faqList = response;
+                                    if (!this.createSecurityAdvisorService.isArray(response)) {
+                                        this.faqList = [response.FAQ];
+                                    }
                                 }
                                 this.gnomexService.myCoreFacilities = this.dictionaryService.coreFacilities();
                                 this.progressService.displayLoader(75);
@@ -1892,7 +1894,7 @@ export class HeaderComponent implements OnInit{
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
                 route: '/topics'
-    }
+            }
         ]
 
     }

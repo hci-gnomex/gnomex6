@@ -20,7 +20,7 @@
         <div>
         <mat-form-field class="fortyFormField">
             <input matInput placeholder="Address" [formControl]="this.addressFC">
-        </mat-form-field>;
+        </mat-form-field>
         <mat-form-field class="fortyFormField">
             <input matInput placeholder="Address 2" [formControl]="this.address2FC">
         </mat-form-field>
@@ -36,15 +36,9 @@
                     <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let state of filterStates(this.stateFC.value)" [value]="state.value">{{state.value}}</mat-option>
                 </mat-autocomplete>
             </mat-form-field>
-            <!--<button mat-button class="edit-button" [routerLink]="[{outlets: {modal: ['reportProblem']}}]">-->
             <button mat-button class="edit-button" (click)="editDictionary()">
                 Edit...
             </button>
-            <!--<mat-form-field  class="formField">-->
-                <!--<mat-select [(ngModel)]="selectedState">-->
-                    <!--<mat-option *ngFor="let state of states" [value]="state.code">{{ state.code }}</mat-option>-->
-                <!--</mat-select>-->
-            <!--</mat-form-field>-->
             <mat-form-field class="formField">
                 <input matInput placeholder="Postal Code" [formControl]="this.zipFC">
             </mat-form-field>

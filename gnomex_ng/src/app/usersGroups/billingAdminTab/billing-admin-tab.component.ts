@@ -1,9 +1,9 @@
 
 import {Component, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material";
+import {MatAutocomplete} from "@angular/material";
 import {Observable} from "rxjs/Observable";
-import {DictionaryService} from "../services/dictionary.service";
+import {DictionaryService} from "../../services/dictionary.service";
 import {Router} from "@angular/router";
 
 @Component({
@@ -65,24 +65,21 @@ export class BillingAdminTabComponent implements OnInit {
     group: any;
 
     states: any[];
-    @ViewChild(MatAutocompleteTrigger) matAutocompleteTrigger: MatAutocompleteTrigger;
     @ViewChild(MatAutocomplete) matAutocomplete: MatAutocomplete;
 
     public billingForm: FormGroup;
-    public showSpinner: boolean = false;
 
-    public billingContactFC: FormControl;
-    public billingContactEmailFC: FormControl;
-    public phoneFC: FormControl;
-    public departmentFC: FormControl;
-    public addressFC: FormControl;
-    public address2FC: FormControl;
-    public cityFC: FormControl;
-    public stateFC: FormControl;
-    public zipFC: FormControl;
-    public countryFC: FormControl;
-    public selectedState: string;
-    filteredStates: Observable<any[]>;
+    private billingContactFC: FormControl;
+    private billingContactEmailFC: FormControl;
+    private phoneFC: FormControl;
+    private departmentFC: FormControl;
+    private addressFC: FormControl;
+    private address2FC: FormControl;
+    private cityFC: FormControl;
+    private stateFC: FormControl;
+    private zipFC: FormControl;
+    private countryFC: FormControl;
+    private selectedState: string;
 
     constructor(private dictionaryService: DictionaryService,
                 private router: Router) {
@@ -103,13 +100,6 @@ export class BillingAdminTabComponent implements OnInit {
     }
 
     ngAfterViewInit() {
-        this.matAutocompleteTrigger.panelClosingActions
-            .subscribe(e => {
-                if (!(e && e.source)) {
-                    this.stateFC.setValue(null);
-                    this.matAutocompleteTrigger.closePanel();
-                }
-            });
     }
 
     createBillingForm() {
@@ -125,16 +115,16 @@ export class BillingAdminTabComponent implements OnInit {
         this.countryFC = new FormControl("");
 
         this.billingForm = new FormGroup({
-            billingContact: this.billingContactFC,
-            email: this.billingContactEmailFC,
-            phone: this.phoneFC,
+            contactName: this.billingContactFC,
+            billingContactEmail: this.billingContactEmailFC,
+            billingContactPhone: this.phoneFC,
             department: this.departmentFC,
-            address: this.addressFC,
-            address2: this.address2FC,
-            city: this.cityFC,
-            state: this.stateFC,
-            zip: this.zipFC,
-            country: this.countryFC
+            contactAddress: this.addressFC,
+            contactAddress2: this.address2FC,
+            contactCity: this.cityFC,
+            contactCodeState: this.stateFC,
+            contactZip: this.zipFC,
+            contactCountry: this.countryFC
         });
 
     }
@@ -153,6 +143,18 @@ export class BillingAdminTabComponent implements OnInit {
             this.countryFC.setValue(this.group.contactCountry);
             this.selectedState = this.group.contactCodeState;
             this.billingForm.markAsPristine();
+            this.touchFields();
+        }
+    }
+
+    touchFields() {
+        for (let field in this.billingForm.controls) {
+            const control = this.billingForm.get(field);
+            if (control) {
+                if (control.valid === false) {
+                    control.markAsTouched();
+                }
+            }
         }
     }
 
@@ -170,7 +172,6 @@ export class BillingAdminTabComponent implements OnInit {
     }
     selectOption(event) {
         this.stateFC.setValue(event.source.value);
-        console.log("selectOption");
     }
 
     editDictionary() {

@@ -229,7 +229,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
 
-    constructor(private experimentsService: ExperimentsService,private router:Router,
+    constructor(public experimentsService: ExperimentsService,private router:Router,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,

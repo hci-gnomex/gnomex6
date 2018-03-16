@@ -56,8 +56,7 @@ module.exports = function(options) {
                                 /**
                                  * Use inline sourcemaps for "karma-remap-coverage" reporter
                                  */
-                                sourceMap: false,
-                                inlineSourceMap: true,
+                                sourceMap: true,
                                 compilerOptions: {
                                     removeComments: true
 
@@ -93,19 +92,21 @@ module.exports = function(options) {
                  * Instruments JS files with Istanbul for subsequent code coverage reporting.  Instrument only testing sources.
                  * See: https://github.com/deepsweet/istanbul-instrumenter-loader
                  */
-                {
-                    enforce: "post",
-                    test: /\.(js|ts)$/,
-                    loader: "istanbul-instrumenter-loader",
-                    query: {
-                        esModules: true
-                    },
-                    include: helpers.root("src"),
-                    exclude: [
-                        /\.(e2e|spec)\.ts$/,
-                        /node_modules/
-                    ]
-                }
+                // Commenting out for now. "istanbul-instrumenter-loader" makes it so that source is not loaded
+
+                // {
+                //     enforce: "post",
+                //     test: /\.(js|ts)$/,
+                //     loader: "istanbul-instrumenter-loader",
+                //     query: {
+                //         esModules: true
+                //     },
+                //     include: helpers.root("src"),
+                //     exclude: [
+                //         /\.(e2e|spec)\.ts$/,
+                //         /node_modules/
+                //     ]
+                // }
 
             ]
         },
@@ -136,7 +137,6 @@ module.exports = function(options) {
                 debug: false,
                 options: {}
             }),
-
         ],
 
         performance: {
