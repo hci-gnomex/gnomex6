@@ -48,6 +48,7 @@ export class GnomexAppComponent implements OnInit {
         let isDone: boolean = false;
         console.log("GnomexAppComponent ngOnInit");
         this.authenticationService.isAuthenticated().subscribe((authenticated: boolean) => {
+            console.log("GNOMEX App user is authed ")
         });
 
     }
