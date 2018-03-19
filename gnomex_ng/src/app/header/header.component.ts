@@ -124,52 +124,21 @@ export class HeaderComponent implements OnInit{
      * Initialize
      */
     ngOnInit() {
-        this.authSubscription = this.authenticationService.isAuthenticated().subscribe(authenticated => {
-            this.isLoggedIn = authenticated && this.progressService.hideLoader.asObservable();
-            if (authenticated) {
-                this.createSecurityAdvisorService.createSecurityAdvisor().subscribe(response => {
-                    this.progressService.displayLoader(15);
-                    this.dictionaryService.reload(() => {
-                        this.progressService.displayLoader(30);
-                        this.labListService.getLabList().subscribe((response: any[]) => {
-                            this.progressService.displayLoader(45);
-                            this.labList = response;
-                            this.launchPropertiesService.getFAQ().subscribe((response: any) => {
-                                this.progressService.displayLoader(60);
-                                console.log("subscribe createSecurityAdvisor");
-                                if (response != null) {
-                                    if (!this.createSecurityAdvisorService.isArray(response)) {
-                                        this.faqList = [response.FAQ];
-                                    }
-                                }
-                                this.gnomexService.myCoreFacilities = this.dictionaryService.coreFacilities();
-                                this.progressService.displayLoader(75);
-                                this.gnomexService.onDictionariesLoaded().then((response) => {
-                                    this.progressService.displayLoader(90);
-                                    this.buildNavItems();
-                                    this.checkSecurity();
-                                    this.gnomexService.isGuestState = this.createSecurityAdvisorService.isGuest;
+        console.log("Initializing app dependencies ");
 
-                                    this.addQuickLinks();
-                                    this.progressService.displayLoader(100);
-                                    // TODO will need this in future
-                                    // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
-                                    //      this.progressService.displayLoader(100);
-                                    //     this.gnomexService.uploadSampleSheetURL = response.url;
-                                    // });
-                                });
-                            });
-                        });
-                    });
-                });
-            } else {
-                this.navItems = [];
+        this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
+            if (response != null) {
+                this.faqList = response;
             }
         });
+        this.gnomexService.isAppInitCompleteObservable().subscribe(complete => {
+            this.buildNavItems();
+            this.checkSecurity();
+            this.gnomexService.isGuestState = this.createSecurityAdvisorService.isGuest;
+            this.addQuickLinks();
 
-        this.gnomexService.faqUpdateObservable.subscribe(response => {
-            this.rebuildFAQMenu();
         });
+
 
         // Links, Help, Report Problem and Account
     }
@@ -1894,7 +1863,7 @@ export class HeaderComponent implements OnInit{
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
                 route: '/topics'
-            }
+    }
         ]
 
     }

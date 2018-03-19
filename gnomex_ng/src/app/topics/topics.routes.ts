@@ -3,6 +3,7 @@
  */
 import { Routes, RouterModule } from "@angular/router";
 import {BrowseTopicsComponent} from "./browse-topics.component";
+import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
 
 
 /**
@@ -12,8 +13,7 @@ import {BrowseTopicsComponent} from "./browse-topics.component";
  * @since 12/19/16
  */
 const ROUTES: Routes = [
-    { path: "topics", component: BrowseTopicsComponent
-    }
+    { path: "topics", component: BrowseTopicsComponent, canActivate: [SubRouteGuardService]}
 ];
 
 export const TOPICS_ROUTING = RouterModule.forChild(ROUTES);
