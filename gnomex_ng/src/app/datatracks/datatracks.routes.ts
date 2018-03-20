@@ -8,6 +8,7 @@ import {DatatracksOrganismComponent} from "./datatracks-overview/datatracks-orga
 import {DatatracksGenomeBuildComponent} from "./datatracks-overview/genome-build/datatracks-genome-build.component";
 import {GenomeBuildResolverService} from "../services/resolvers/genome-build-resolver.service";
 import {DatatracksFolderComponent} from "./datatracks-overview/datatracks-folder.component";
+import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
 
 
 /**
@@ -21,7 +22,8 @@ const ROUTES: Routes = [
         {path:'organism',component: DatatracksOrganismComponent, outlet: 'datatracksPanel'},
         {path:'genomeBuild',component:DatatracksGenomeBuildComponent, outlet:'datatracksPanel',resolve: {genomeBuild: GenomeBuildResolverService}},
         {path:'folder',component: DatatracksFolderComponent , outlet: 'datatracksPanel'}
-    ]
+    ],
+        canActivate: [SubRouteGuardService]
     }
 ];
 

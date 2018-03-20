@@ -4,6 +4,10 @@ import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
 import {LabListService} from "./lab-list.service";
 import {Subject} from "rxjs/Subject";
+import {AuthenticationService} from "@hci/authentication";
+import {Subscription} from "rxjs/Subscription";
+import {ProgressService} from "../home/progress.service";
+import {Observable} from "rxjs/Observable";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -56,11 +60,30 @@ export class GnomexService {
     public faqUpdateObservable: Subject<boolean> = new Subject();
     public coreFacilitiesICanManage: any[] = [];
     public coreFacilitiesICanSubmitTo: any[] = [];
+    private authSubscription: Subscription;
+    private _isLoggedIn: boolean = false;
+    private appInitSubject:Subject<boolean> = new Subject();
+    public redirectURL:string;
+
 
     constructor(private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
+                private progressService: ProgressService,
                 private labListService: LabListService,
-                private createSecurityAdvisorService: CreateSecurityAdvisorService) {
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private authenticationService:AuthenticationService) {
+    }
+
+    /* The header only uses this for displaying itself.
+        use authenticateSerivce for security decisions.
+        Note this is set true when user is logged in and
+        app init is completed.
+    * */
+    get isLoggedIn(){
+        return this._isLoggedIn;
+    }
+    set isLoggedIn(loggedIn:boolean){
+        this._isLoggedIn = loggedIn;
     }
 
     /**
@@ -508,6 +531,49 @@ export class GnomexService {
             }
         }
         return hasLab;
+    }
+
+    emitIsAppInitCompelete(complete:boolean):void {
+        this.appInitSubject.next(complete);
+    }
+
+
+    isAppInitCompleteObservable():Observable<boolean>{
+        return this.appInitSubject.asObservable();
+    }
+
+
+    initApp(): void{
+        this.authSubscription = this.authenticationService.isAuthenticated().first().subscribe(authenticated => {
+            //this._isLoggedIn = authenticated && this.progressService.hideLoader.asObservable();
+            if (authenticated) {
+                this.createSecurityAdvisorService.createSecurityAdvisor().first().subscribe(response => {
+                    this.progressService.displayLoader(15);
+                    this.dictionaryService.reload(() => {
+                        this.progressService.displayLoader(30);
+                        this.labListService.getLabList().first().subscribe((response: any[]) => {
+                            this.progressService.displayLoader(45);
+                            this.labList = response;
+                            this.progressService.displayLoader(60);
+                            this.myCoreFacilities = this.dictionaryService.coreFacilities();
+                            this.progressService.displayLoader(75);
+                            this.onDictionariesLoaded().then((response) => {
+                                this.progressService.displayLoader(90);
+                                this.emitIsAppInitCompelete(true);
+                                this.progressService.displayLoader(100);
+                                this._isLoggedIn = true;
+                                // TODO will need this in future
+                                // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
+                                //      this.progressService.displayLoader(100);
+                                //     this.gnomexService.uploadSampleSheetURL = response.url;
+                                // });
+                            });
+                        });
+                    });
+                });
+            }
+        });
+
     }
 
 }

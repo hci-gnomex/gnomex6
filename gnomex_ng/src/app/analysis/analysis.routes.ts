@@ -7,6 +7,7 @@ import {BrowseAnalysisComponent} from "../analysis/browse-analysis.component";
 import {AnalysisOverviewComponent} from "./analysis-overview/analysis-overview.component";
 import {AnalysisGroupResolverService} from "../services/resolvers/analysis-group-resolver.service";
 import {AnalysisDetailComponent} from "./analysis-detail/analysis-detail.component";
+import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
 
 
 /**
@@ -19,8 +20,10 @@ const ROUTES: Routes = [
     { path: "analysis", component: BrowseAnalysisComponent , children:[
             {path:'overview',component: AnalysisOverviewComponent, outlet: 'analysisPanel', resolve:{analysisGroup:AnalysisGroupResolverService}},
             {path:':id', component: AnalysisDetailComponent, outlet: 'analysisPanel',resolve: {analysis: AnalysisGroupResolverService}}
-        ]
+        ],
+        canActivate: [SubRouteGuardService]
     }
+
 ];
 
 export const ANALYSIS_ROUTING = RouterModule.forChild(ROUTES);
