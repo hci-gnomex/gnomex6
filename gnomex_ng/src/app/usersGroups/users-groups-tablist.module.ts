@@ -15,6 +15,7 @@ import { TreeModule } from "angular-tree-component";
 import { AngularMaterialModule } from "../../modules/angular-material.module";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { DialogsModule } from "../util/popup/dialogs.module";
+import { EditBillingAccountModule } from "../billing/edit_billing_account/edit-billing-account.module";
 import { ServicesModule } from "../services/services.module";
 import { UtilModule } from "../util/util.module";
 
@@ -60,6 +61,7 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
 			  AngularSplitModule,
 			  BrowserAnimationsModule,
 			  DialogsModule,
+			  EditBillingAccountModule,
 			  FormsModule,
 			  ReactiveFormsModule,
 			  ServicesModule,

@@ -1,0 +1,863 @@
+<div mat-dialog-title style="background-color: #84b278; color: white; display: inline-block; width: 100%;">
+	<img src="../../../assets/work_auth_form.png" alt="Image not found" style="margin-right:0.2em;"/>
+	<h5 style="display: inline-block;">Submit Campus Billing Account</h5>
+</div>
+<div mat-dialog-content style="background-color: #eeeeeb; overflow: auto; font-size: small;">
+	<div class="full-width background-sideless">
+		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
+			<div class="t full-width">
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Lab
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%; font-size: small;">
+							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" (change)="onLabListSelection($event)" required>
+								<mat-option>--</mat-option>
+								<mat-option *ngFor="let lab of labList" [value]="lab">
+									{{ lab.name }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						<div>
+							Core Facility
+						</div>
+						<div>
+							Help me choose
+						</div>
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%; font-size: small;">
+							<mat-select
+									style="width: 100%;"
+									placeholder="Select Core Facilities"
+									[(ngModel)]="selectedCoreFacilities"
+									(change)="onCoreFacilitiesSelected($event)"
+									multiple
+									required>
+								<mat-option *ngFor="let coreFacility of coreFacilityReducedList" [value]="coreFacility">
+									{{ coreFacility.display }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Account Type
+					</div>
+					<div class="td center-vertical-align">
+						<mat-radio-group [(ngModel)]="showField">
+							<mat-radio-button class="radio-button" [value]="CHARTFIELD">Chartfield</mat-radio-button>
+							<mat-radio-button class="radio-button" [value]="PO">PO</mat-radio-button>
+							<mat-radio-button class="radio-button" [value]="CREDIT_CARD">Credit Card</mat-radio-button>
+						</mat-radio-group>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="full-width background" style="width: calc(100% - 8px); margin: 3px 4px;">
+		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
+
+
+			<div *ngIf="showField === CHARTFIELD" class="t full-width">
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Account Name
+					</div>
+					<div class="td">
+						<mat-form-field class="full-width">
+							<input
+									matInput
+									placeholder="Account Name"
+									[(ngModel)]="accountName_Chartfield"
+									[formControl]="accountNameFormControl_Chartfield"
+									[errorStateMatcher]="accountNameStateMatcher_Chartfield"
+									required>
+						</mat-form-field>
+					</div>
+				</div>
+				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_shortAccount" class="tr full-width">
+					<div class="td cell-label">
+						Short Account Name
+					</div>
+					<div class="td">
+						<mat-form-field class="full-width">
+							<input
+									matInput
+									placeholder="Short Account Name"
+									[(ngModel)]="shortAccountName_Chartfield"
+									[formControl]="shortNameFormControl_Chartfield"
+									[errorStateMatcher]="shortNameStateMatcher_Chartfield"
+									required="{{ requireShortAcct }}">
+						</mat-form-field>
+					</div>
+				</div>
+				<div *ngIf="usesCustomChartfields !== 'Y'" class="tr full-width">
+					<div class="td cell-label">
+						Chartfield to be charged
+					</div>
+					<div class="td" style="font-size: small;">
+						<div class="inline-block" style="vertical-align: top; font-size: small;">
+							<mat-form-field style="width: 3rem;">
+								<input
+										matInput
+										placeholder="Bus"
+										[(ngModel)]="accountNumberBus_Chartfield"
+										[formControl]="accountNumberBusFormControl_chartfield"
+										[errorStateMatcher]="accountNumberBusStateMatcher_chartfield"
+										required
+										maxlength="2"
+										minlength="2">
+								<mat-hint>2 digits</mat-hint>
+								<mat-error *ngIf="accountNumberBusFormControl_chartfield.hasError('pattern')">
+									2 <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="!accountNumberBusFormControl_chartfield.hasError('pattern') && (accountNumberBusFormControl_chartfield.hasError('minlength') || accountNumberBusFormControl_chartfield.hasError('maxlength'))">
+									<strong>2</strong> digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="horizontal-break"></div>
+						<div class="inline-block" style="vertical-align: top">
+							<mat-form-field style="width: 3rem;">
+								<input
+										matInput
+										placeholder="Org"
+										[(ngModel)]="accountNumberOrg_Chartfield"
+										[formControl]="accountNumberOrgFormControl_chartfield"
+										[errorStateMatcher]="accountNumberOrgStateMatcher_chartfield"
+										required
+										maxlength="5"
+										minlength="5">
+								<mat-hint>5 digits</mat-hint>
+								<mat-error *ngIf="accountNumberOrgFormControl_chartfield.hasError('pattern')">
+									5 <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="!accountNumberOrgFormControl_chartfield.hasError('pattern') && (accountNumberOrgFormControl_chartfield.hasError('minlength') || accountNumberOrgFormControl_chartfield.hasError('maxlength'))">
+									<strong>5</strong> digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="horizontal-break"></div>
+						<div class="inline-block" style="vertical-align: top">
+							<mat-form-field style="width: 3rem;">
+								<input
+										matInput
+										placeholder="Fund"
+										[(ngModel)]="accountNumberFund_Chartfield"
+										[formControl]="accountNumberFundFormControl_chartfield"
+										[errorStateMatcher]="accountNumberFundStateMatcher_chartfield"
+										required
+										maxlength="4"
+										minlength="4">
+								<mat-hint>4 digits</mat-hint>
+								<mat-error *ngIf="accountNumberFundFormControl_chartfield.hasError('pattern')">
+									4 <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="!accountNumberFundFormControl_chartfield.hasError('pattern') && (accountNumberFundFormControl_chartfield.hasError('minlength') || accountNumberFundFormControl_chartfield.hasError('maxlength'))">
+									<strong>4</strong> digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="horizontal-break"></div>
+						<div class="inline-block" style="vertical-align: top">
+							<mat-form-field style="width: 3rem;">
+								<input
+										matInput
+										placeholder="Activity"
+										(input)="clearAccountNumberProject()"
+										[(ngModel)]="accountNumberActivity_Chartfield"
+										[formControl]="accountNumberActivityFormControl_chartfield"
+										[errorStateMatcher]="accountNumberActivityStateMatcher_chartfield"
+										maxlength="5"
+										minlength="5">
+								<mat-hint>5 digits</mat-hint>
+								<mat-error *ngIf="accountNumberActivityFormControl_chartfield.hasError('pattern')">
+									5 <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="!accountNumberActivityFormControl_chartfield.hasError('pattern') && (accountNumberActivityFormControl_chartfield.hasError('minlength') || accountNumberActivityFormControl_chartfield.hasError('maxlength'))">
+									<strong>5</strong> digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="inline-block" style="vertical-align: top">
+							<p>OR</p>
+						</div>
+						<div class="inline-block" style="vertical-align: top">
+							<mat-form-field style="width: 4.5rem;">
+								<input
+										matInput
+										placeholder="Project"
+										(input)="clearAccountNumberActivity()"
+										[(ngModel)]="accountNumberProject_Chartfield"
+										[formControl]="accountNumberProjectFormControl_chartfield"
+										[errorStateMatcher]="accountNumberProjectStateMatcher_chartfield"
+										maxlength="8"
+										minlength="8">
+								<mat-hint>8 digits</mat-hint>
+								<mat-error *ngIf="accountNumberProjectFormControl_chartfield.hasError('pattern')">
+									8 <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="!accountNumberProjectFormControl_chartfield.hasError('pattern') && (accountNumberProjectFormControl_chartfield.hasError('minlength') || accountNumberProjectFormControl_chartfield.hasError('maxlength'))">
+									<strong>8</strong> digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="horizontal-break"></div>
+						<div class="inline-block" style="vertical-align: top">
+							<mat-form-field style="width: 3rem;">
+								<input
+										matInput
+										placeholder="Account"
+										[(ngModel)]="accountNumberAccount_Chartfield"
+										[formControl]="accountNumberAccountFormControl_chartfield"
+										[errorStateMatcher]="accountNumberAccountStateMatcher_chartfield"
+										required
+										maxlength="5"
+										minlength="5">
+								<mat-hint>5 digits</mat-hint>
+								<mat-error *ngIf="accountNumberAccountFormControl_chartfield.hasError('pattern')">
+									5 <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="!accountNumberAccountFormControl_chartfield.hasError('pattern') && (accountNumberAccountFormControl_chartfield.hasError('minlength') || accountNumberAccountFormControl_chartfield.hasError('maxlength'))">
+									<strong>5</strong> digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div *ngIf="isActivity" class="horizontal-break"></div>
+						<div *ngIf="isActivity" class="inline-block" style="vertical-align: top">
+							<mat-form-field style="width: 3rem;">
+								<input
+										matInput
+										placeholder="A/U"
+										[(ngModel)]="accountNumberAU_Chartfield"
+										disabled
+										maxlength="2"
+										minlength="2">
+								<mat-hint>1 digits</mat-hint>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="usesCustomChartfields === 'Y'"  class="tr full-width">
+					<div class="td cell-label">
+						Chartfield to be charged
+					</div>
+					<div class="td">
+						<div *ngIf="internalAccountFieldsConfiguration[0]" class="inline-block" style="vertical-align: top; width: 15%;">
+							<mat-form-field style="width: 100%;">
+								<input
+										matInput
+										placeholder="{{internalAccountFieldsConfiguration[0].displayName}}"
+										[(ngModel)]="internalAccountFieldsConfiguration[0].value"
+										[formControl]="InternalCustomFieldsFormControl[0]"
+										[errorStateMatcher]="InternalCustomFieldsStateMatcher[0]"
+										maxlength="{{internalAccountFieldsConfiguration[0].maxLength}}"
+										minlength="{{internalAccountFieldsConfiguration[0].minLength}}"
+										required="{{internalAccountFieldsConfiguration[0].isRequired === 'Y'}}">
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[0].minLength === internalAccountFieldsConfiguration[0].maxLength">
+									{{internalAccountFieldsConfiguration[0].maxLength}} digits
+								</mat-hint>
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[0].minLength !== internalAccountFieldsConfiguration[0].maxLength">
+									{{internalAccountFieldsConfiguration[0].minLength}} to {{internalAccountFieldsConfiguration[0].maxLength}} digits
+								</mat-hint>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[0].minLength === internalAccountFieldsConfiguration[0].maxLength) && (InternalCustomFieldsFormControl[0].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[0].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[0].minLength === internalAccountFieldsConfiguration[0].maxLength) && ((!InternalCustomFieldsFormControl[0].hasError('pattern')) && (InternalCustomFieldsFormControl[0].hasError('minlength') || InternalCustomFieldsFormControl[0].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[0].maxLength}}</strong> digits
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[0].minLength !== internalAccountFieldsConfiguration[0].maxLength) && (InternalCustomFieldsFormControl[0].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[0].minLength}} to {{internalAccountFieldsConfiguration[0].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[0].minLength !== internalAccountFieldsConfiguration[0].maxLength) && ((!InternalCustomFieldsFormControl[0].hasError('pattern')) && (InternalCustomFieldsFormControl[0].hasError('minlength') || InternalCustomFieldsFormControl[0].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[0].minLength}}</strong> to {{internalAccountFieldsConfiguration[0].maxLength}} digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div *ngIf="internalAccountFieldsConfiguration[1]" class="horizontal-break"></div>
+						<div *ngIf="internalAccountFieldsConfiguration[1]" class="inline-block" style="vertical-align: top; width: 15%;">
+							<mat-form-field style="width: 100%;">
+								<input
+										matInput
+										placeholder="{{internalAccountFieldsConfiguration[1].displayName}}"
+										[(ngModel)]="internalAccountFieldsConfiguration[1].value"
+										[formControl]="InternalCustomFieldsFormControl[1]"
+										[errorStateMatcher]="InternalCustomFieldsStateMatcher[1]"
+										maxlength="{{internalAccountFieldsConfiguration[1].maxLength}}"
+										minlength="{{internalAccountFieldsConfiguration[1].minLength}}"
+										required="{{internalAccountFieldsConfiguration[1].isRequired === 'Y'}}">
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[1].minLength === internalAccountFieldsConfiguration[1].maxLength">
+									{{internalAccountFieldsConfiguration[1].maxLength}} digits
+								</mat-hint>
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[1].minLength !== internalAccountFieldsConfiguration[1].maxLength">
+									{{internalAccountFieldsConfiguration[1].minLength}} to {{internalAccountFieldsConfiguration[1].maxLength}} digits
+								</mat-hint>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[1].minLength === internalAccountFieldsConfiguration[1].maxLength) && (InternalCustomFieldsFormControl[1].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[1].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[1].minLength === internalAccountFieldsConfiguration[1].maxLength) && ((!InternalCustomFieldsFormControl[1].hasError('pattern')) && (InternalCustomFieldsFormControl[1].hasError('minlength') || InternalCustomFieldsFormControl[1].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[1].maxLength}}</strong> digits
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[1].minLength !== internalAccountFieldsConfiguration[1].maxLength) && (InternalCustomFieldsFormControl[1].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[1].minLength}} to {{internalAccountFieldsConfiguration[1].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[1].minLength !== internalAccountFieldsConfiguration[1].maxLength) && ((!InternalCustomFieldsFormControl[1].hasError('pattern')) && (InternalCustomFieldsFormControl[1].hasError('minlength') || InternalCustomFieldsFormControl[1].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[1].minLength}}</strong> to {{internalAccountFieldsConfiguration[1].maxLength}} digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div *ngIf="internalAccountFieldsConfiguration[2]" class="horizontal-break"></div>
+						<div *ngIf="internalAccountFieldsConfiguration[2]" class="inline-block" style="vertical-align: top; width: 15%;">
+							<mat-form-field style="width: 100%;">
+								<input
+										matInput
+										placeholder="{{internalAccountFieldsConfiguration[2].displayName}}"
+										[(ngModel)]="internalAccountFieldsConfiguration[2].value"
+										[formControl]="InternalCustomFieldsFormControl[2]"
+										[errorStateMatcher]="InternalCustomFieldsStateMatcher[2]"
+										maxlength="{{internalAccountFieldsConfiguration[2].maxLength}}"
+										minlength="{{internalAccountFieldsConfiguration[2].minLength}}"
+										required="{{internalAccountFieldsConfiguration[2].isRequired === 'Y'}}">
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[2].minLength === internalAccountFieldsConfiguration[2].maxLength">
+									{{internalAccountFieldsConfiguration[2].maxLength}} digits
+								</mat-hint>
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[2].minLength !== internalAccountFieldsConfiguration[2].maxLength">
+									{{internalAccountFieldsConfiguration[2].minLength}} to {{internalAccountFieldsConfiguration[2].maxLength}} digits
+								</mat-hint>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[2].minLength === internalAccountFieldsConfiguration[2].maxLength) && (InternalCustomFieldsFormControl[2].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[2].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[2].minLength === internalAccountFieldsConfiguration[2].maxLength) && ((!InternalCustomFieldsFormControl[2].hasError('pattern')) && (InternalCustomFieldsFormControl[2].hasError('minlength') || InternalCustomFieldsFormControl[2].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[2].maxLength}}</strong> digits
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[2].minLength !== internalAccountFieldsConfiguration[2].maxLength) && (InternalCustomFieldsFormControl[2].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[2].minLength}} to {{internalAccountFieldsConfiguration[2].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[2].minLength !== internalAccountFieldsConfiguration[2].maxLength) && ((!InternalCustomFieldsFormControl[2].hasError('pattern')) && (InternalCustomFieldsFormControl[2].hasError('minlength') || InternalCustomFieldsFormControl[2].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[2].minLength}}</strong> to {{internalAccountFieldsConfiguration[2].maxLength}} digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div *ngIf="internalAccountFieldsConfiguration[3]" class="horizontal-break"></div>
+						<div *ngIf="internalAccountFieldsConfiguration[3]" class="inline-block" style="vertical-align: top; width: 15%;">
+							<mat-form-field style="width: 100%;">
+								<input
+										matInput
+										placeholder="{{internalAccountFieldsConfiguration[3].displayName}}"
+										[(ngModel)]="internalAccountFieldsConfiguration[3].value"
+										[formControl]="InternalCustomFieldsFormControl[3]"
+										[errorStateMatcher]="InternalCustomFieldsStateMatcher[3]"
+										maxlength="{{internalAccountFieldsConfiguration[3].maxLength}}"
+										minlength="{{internalAccountFieldsConfiguration[3].minLength}}"
+										required="{{internalAccountFieldsConfiguration[3].isRequired === 'Y'}}">
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[3].minLength === internalAccountFieldsConfiguration[3].maxLength">
+									{{internalAccountFieldsConfiguration[3].maxLength}} digits
+								</mat-hint>
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[3].minLength !== internalAccountFieldsConfiguration[3].maxLength">
+									{{internalAccountFieldsConfiguration[3].minLength}} to {{internalAccountFieldsConfiguration[3].maxLength}} digits
+								</mat-hint>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[3].minLength === internalAccountFieldsConfiguration[3].maxLength) && (InternalCustomFieldsFormControl[3].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[3].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[3].minLength === internalAccountFieldsConfiguration[3].maxLength) && ((!InternalCustomFieldsFormControl[3].hasError('pattern')) && (InternalCustomFieldsFormControl[3].hasError('minlength') || InternalCustomFieldsFormControl[3].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[3].maxLength}}</strong> digits
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[3].minLength !== internalAccountFieldsConfiguration[3].maxLength) && (InternalCustomFieldsFormControl[3].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[3].minLength}} to {{internalAccountFieldsConfiguration[3].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[3].minLength !== internalAccountFieldsConfiguration[3].maxLength) && ((!InternalCustomFieldsFormControl[3].hasError('pattern')) && (InternalCustomFieldsFormControl[3].hasError('minlength') || InternalCustomFieldsFormControl[3].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[3].minLength}}</strong> to {{internalAccountFieldsConfiguration[3].maxLength}} digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div *ngIf="internalAccountFieldsConfiguration[4]" class="horizontal-break"></div>
+						<div *ngIf="internalAccountFieldsConfiguration[4]" class="inline-block" style="vertical-align: top; width: 15%;">
+							<mat-form-field style="width: 100%;">
+								<input
+										matInput
+										placeholder="{{internalAccountFieldsConfiguration[4].displayName}}"
+										[(ngModel)]="internalAccountFieldsConfiguration[4].value"
+										[formControl]="InternalCustomFieldsFormControl[4]"
+										[errorStateMatcher]="InternalCustomFieldsStateMatcher[4]"
+										maxlength="{{internalAccountFieldsConfiguration[4].maxLength}}"
+										minlength="{{internalAccountFieldsConfiguration[4].minLength}}"
+										required="{{internalAccountFieldsConfiguration[4].isRequired === 'Y'}}">
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[4].minLength === internalAccountFieldsConfiguration[4].maxLength">
+									{{internalAccountFieldsConfiguration[4].maxLength}} digits
+								</mat-hint>
+								<mat-hint *ngIf="internalAccountFieldsConfiguration[4].minLength !== internalAccountFieldsConfiguration[4].maxLength">
+									{{internalAccountFieldsConfiguration[4].minLength}} to {{internalAccountFieldsConfiguration[4].maxLength}} digits
+								</mat-hint>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[4].minLength === internalAccountFieldsConfiguration[4].maxLength) && (InternalCustomFieldsFormControl[4].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[4].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[4].minLength === internalAccountFieldsConfiguration[4].maxLength) && ((!InternalCustomFieldsFormControl[4].hasError('pattern')) && (InternalCustomFieldsFormControl[4].hasError('minlength') || InternalCustomFieldsFormControl[4].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[4].maxLength}}</strong> digits
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[4].minLength !== internalAccountFieldsConfiguration[4].maxLength) && (InternalCustomFieldsFormControl[4].hasError('pattern'))">
+									{{internalAccountFieldsConfiguration[4].minLength}} to {{internalAccountFieldsConfiguration[4].maxLength}} <strong>digits</strong>
+								</mat-error>
+								<mat-error *ngIf="(internalAccountFieldsConfiguration[4].minLength !== internalAccountFieldsConfiguration[4].maxLength) && ((!InternalCustomFieldsFormControl[4].hasError('pattern')) && (InternalCustomFieldsFormControl[4].hasError('minlength') || InternalCustomFieldsFormControl[4].hasError('maxlength')))">
+									<strong>{{internalAccountFieldsConfiguration[4].minLength}}</strong> to {{internalAccountFieldsConfiguration[4].maxLength}} digits
+								</mat-error>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="showFundingAgencies && (usesCustomChartfields !== 'Y' || includeInCustomField_fundingAgency)" class="tr full-width">
+					<div class="td cell-label">
+						Funding Agency
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%; font-size: small;">
+							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_chartfield" required="{{ requireFundingAgency }}">
+								<mat-option>--</mat-option>
+								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
+									{{ fundingAgency.display }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width row-spacer">
+				</div>
+				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_startDate" class="tr full-width">
+					<div class="td cell-label">
+						Start Date
+					</div>
+					<div class="td">
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="startDate_chartfield"
+										[matDatepicker]="startDatePicker_chartfield"
+										placeholder="Choose a date"
+										required="{{ requireStartDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="startDatePicker_chartfield"></mat-datepicker-toggle>
+								<mat-datepicker #startDatePicker_chartfield disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
+						<div class="inline-block" style="width:7em;">
+						</div>
+						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" class="inline-block cell-label" style="height: 100%;">
+							Effective Until
+						</div>
+						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="effectiveUntilDate_chartfield"
+										[matDatepicker]="effectiveUntilDatePicker_chartfield"
+										placeholder="Choose a date"
+										required="{{ requireExpirationDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="effectiveUntilDatePicker_chartfield"></mat-datepicker-toggle>
+								<mat-datepicker #effectiveUntilDatePicker_chartfield disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="(usesCustomChartfields == 'Y' && (!includeInCustomField_startDate)) && includeInCustomField_expirationDate" class="tr full-width">
+					<div class="td cell-label">
+						Effective Until
+					</div>
+					<div class="td">
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="effectiveUntilDate_chartfield"
+										[matDatepicker]="effectiveUntilDatePicker_chartfield"
+										placeholder="Choose a date"
+										required="{{ requireExpirationDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="effectiveUntilDatePicker_chartfield"></mat-datepicker-toggle>
+								<mat-datepicker #effectiveUntilDatePicker_chartfield disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_totalDollarAmount" class="tr full-width">
+					<div class="td cell-label">
+						Total Dollar Amount
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 18em;">
+							<span matPrefix>$ &nbsp;</span>
+							<input
+									matInput
+									placeholder="Total Dollar Amount"
+									[(ngModel)]="totalDollarAmount_Chartfield"
+									[formControl]="totalDollarAmountFormControl_chartfield"
+									[errorStateMatcher]="totalDollarAmountStateMatcher_chartfield"
+									required="{{ requireDollarAmount }}">
+							<mat-error *ngIf="totalDollarAmountFormControl_chartfield.hasError('pattern')">
+								Invalid dollar amount
+							</mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Your email address
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%;">
+							<input
+									matInput
+									placeholder="Your Email Address"
+									[(ngModel)]="submitterEmail_chartfield"
+									[formControl]="submitterEmailFormControl_chartfield"
+									[errorStateMatcher]="submitterEmailStateMatcher_chartfield"
+									required>
+							<mat-error *ngIf="submitterEmailFormControl_chartfield.hasError('pattern')">
+								Invalid email
+							</mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Active
+					</div>
+					<div class="td center-vertical-align">
+						<div class="checkbox-container">
+							<mat-checkbox [(ngModel)]="activeCheckBox_chartfield"></mat-checkbox>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div *ngIf="showField === PO" class="t full-width">
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Account Name
+					</div>
+					<div class="td">
+						<mat-form-field class="full-width">
+							<input
+									matInput
+									placeholder="Account Name"
+									[(ngModel)]="accountName_po"
+									[formControl]="accountNameFormControl_po"
+									[errorStateMatcher]="accountNameStateMatcher_po"
+									required>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Short Account Name
+					</div>
+					<div class="td">
+						<mat-form-field class="full-width">
+							<input
+									matInput
+									placeholder="Short Account Name"
+									[(ngModel)]="shortAccountName_po"
+									[formControl]="shortNameFormControl_po"
+									[errorStateMatcher]="shortNameStateMatcher_po"
+									required="{{ requireShortAcct }}">
+						</mat-form-field>
+					</div>
+				</div>
+				<div *ngIf="showFundingAgencies" class="tr full-width">
+					<div class="td cell-label">
+						Funding Agency
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%; font-size: small;">
+							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_po" required="{{ requireFundingAgency }}">
+								<mat-option>--</mat-option>
+								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
+									{{ fundingAgency.display }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Start Date
+					</div>
+					<div class="td">
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="startDate_po"
+										[matDatepicker]="startDatePicker_po"
+										placeholder="Choose a date"
+										required="{{ requireStartDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="startDatePicker_po"></mat-datepicker-toggle>
+								<mat-datepicker #startDatePicker_po disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
+						<div class="inline-block" style="width:7em;">
+						</div>
+						<div class="inline-block cell-label" style="height: 100%;">
+							Effective Until
+						</div>
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="expirationDate_po"
+										[matDatepicker]="expirationDatePicker_po"
+										placeholder="Choose a date"
+										required="{{ requireExpirationDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="expirationDatePicker_po"></mat-datepicker-toggle>
+								<mat-datepicker #expirationDatePicker_po disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Total Dollar Amount
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 18em;">
+							<span matPrefix>$ &nbsp;</span>
+							<input
+									matInput
+									placeholder="Total Dollar Amount"
+									[(ngModel)]="totalDollarAmount_po"
+									[formControl]="totalDollarAmountFormControl_po"
+									[errorStateMatcher]="totalDollarAmountStateMatcher_po"
+									required="{{ requireDollarAmount }}">
+							<mat-error *ngIf="totalDollarAmountFormControl_po.hasError('pattern')">
+								Invalid dollar amount
+							</mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Your email address
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%;">
+							<input
+									matInput
+									placeholder="Your Email Address"
+									[(ngModel)]="submitterEmail_po"
+									[formControl]="submitterEmailFormControl_po"
+									[errorStateMatcher]="submitterEmailStateMatcher_po"
+									required>
+							<mat-error *ngIf="submitterEmailFormControl_po.hasError('pattern')">
+								Invalid email
+							</mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Active
+					</div>
+					<div class="td center-vertical-align">
+						<div class="checkbox-container">
+							<mat-checkbox [(ngModel)]="activeCheckBox_po"></mat-checkbox>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div *ngIf="showField === CREDIT_CARD" class="t full-width">
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Last four digits of <br/> Credit Card Number
+					</div>
+					<div class="td">
+						<mat-form-field class="full-width">
+							<input
+									matInput
+									placeholder="Last four digits of Credit Card Number"
+									[(ngModel)]="accountName_creditCard"
+									[formControl]="accountNameFormControl_creditCard"
+									[errorStateMatcher]="accountNameStateMatcher_creditCard"
+									required>
+						</mat-form-field>
+					</div>
+				</div>
+				<div *ngIf="showFundingAgencies" class="tr full-width">
+					<div class="td cell-label">
+						Funding Agency
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%; font-size: small;">
+							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_creditCard" required="{{ requireFundingAgency }}">
+								<mat-option>--</mat-option>
+								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
+									{{ fundingAgency.display }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Start Date
+					</div>
+					<div class="td">
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="startDate_creditcard"
+										[matDatepicker]="startDatePicker_creditcard"
+										placeholder="Choose a date"
+										required="{{ requireStartDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="startDatePicker_creditcard"></mat-datepicker-toggle>
+								<mat-datepicker #startDatePicker_creditcard disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
+						<div class="inline-block" style="width:7em;">
+						</div>
+						<div class="inline-block cell-label" style="height: 100%;">
+							Expiration Date
+						</div>
+						<div style="display:inline-block; overflow:visible; font-size:small;">
+							<mat-form-field>
+								<input
+										matInput
+										[(ngModel)]="expirationDate_creditcard"
+										[matDatepicker]="expirationDatePicker_creditcard"
+										placeholder="Choose a date"
+										required="{{ requireExpirationDate }}"
+										disabled>
+								<mat-datepicker-toggle matSuffix [for]="expirationDatePicker_creditcard"></mat-datepicker-toggle>
+								<mat-datepicker #expirationDatePicker_creditcard disabled="false"></mat-datepicker>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Zip Code
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 10em;">
+							<input
+									matInput
+									placeholder="Zip Code"
+									[(ngModel)]="zipCodeInput_creditCard"
+									[formControl]="zipCodeInputFormControl_creditCard"
+									[errorStateMatcher]="zipCodeInputStateMatcher_creditCard"
+									required>
+							<mat-error *ngIf="zipCodeInputFormControl_creditCard.hasError('pattern')">
+								Invalid Zip Code
+							</mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Credit Card Company
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 40%;">
+							<mat-select placeholder="Credit Card Company" [(value)]="selectedCreditCardCompany" required>
+								<mat-option>--</mat-option>
+								<mat-option *ngFor="let company of creditCardCompanies" [value]="company.value">
+									{{ company.display }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Total Dollar Amount
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 18em;">
+							<span matPrefix>$ &nbsp;</span>
+							<input
+									matInput
+									placeholder="Total Dollar Amount"
+									[(ngModel)]="totalDollarAmount_creditCard"
+									[formControl]="totalDollarAmountFormControl_creditCard"
+									[errorStateMatcher]="totalDollarAmountStateMatcher_creditCard"
+									required="{{ requireDollarAmount }}">
+							<mat-error *ngIf="totalDollarAmountFormControl_creditCard.hasError('pattern')">
+								Invalid dollar amount
+							</mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Your email address
+					</div>
+					<div class="td">
+						<mat-form-field style="width: 100%;">
+							<input
+									matInput
+									placeholder="Your Email Address"
+									[(ngModel)]="submitterEmail_creditcard"
+									[formControl]="submitterEmailFormControl_creditcard"
+									[errorStateMatcher]="submitterEmailStateMatcher_creditcard"
+									required>
+							<mat-error *ngIf="submitterEmailFormControl_creditcard.hasError('pattern')">
+								Invalid email
+							</mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Active
+					</div>
+					<div class="td center-vertical-align">
+						<div class="checkbox-container">
+							<mat-checkbox [(ngModel)]="activeCheckBox_creditcard"></mat-checkbox>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+	<div class="full-width background-sideless">
+		<div class="full-width" style="position: relative; padding: 0.4em 1.2em 0 1.2em;">
+			<div style="font-size: small;">
+				As the Principal Investigator (P.I.) or authorized personnel of the account listed
+				above I authorize the Core Facility to charge the account for work performed on my
+				laboratory’s behalf during the dates indicated, not to exceed the dollar amount.
+				I understand that this account will be billed automatically and that I will receive
+				a detailed statement of services for any month in which my account was charged.
+			</div>
+			<div style="text-align: center; margin: 0.5em;">
+				<mat-checkbox [(ngModel)]="agreementCheckbox" required>I agree</mat-checkbox>
+			</div>
+		</div>
+	</div>
+</div>
+<div mat-dialog-actions>
+	<div class="full-width" style="text-align:right; padding:0.4em;">
+		<div class="inline-block">
+			<button mat-raised-button (click)="onSaveButtonClicked()" autofocus>
+				<img src="../../../assets/save.png" alt=""/> Save
+			</button>
+		</div>
+		<div class="inline-block">
+			<button mat-raised-button (click)="onCancelButtonClicked()">Cancel</button>
+		</div>
+	</div>
+</div>

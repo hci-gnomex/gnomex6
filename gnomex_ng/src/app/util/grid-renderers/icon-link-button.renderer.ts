@@ -106,8 +106,8 @@ export class IconLinkButtonRenderer implements ICellRendererAngularComp {
 
 	invokeParentMethod(): void {
 		if (this.onClick && this.params && this.params.context && this.params.context.componentParent) {
-			//this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
-			this.onClick(this.params.node.rowIndex);
+			this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
+			// this.onClick(this.params.node.rowIndex);
 		}
 	}
 }

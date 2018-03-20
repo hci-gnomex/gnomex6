@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { URLSearchParams } from "@angular/http";
 import { Router } from "@angular/router";
+import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
-import { NewBillingAccountErrorDialogComponent } from "./dialogs/new-billing-account-error-dialog.component";
-import { NewBillingAccountSuccessDialogComponent } from "./dialogs/new-billing-account-success-dialog.component";
+import { EditBillingAccountErrorDialogComponent } from "./dialogs/edit-billing-account-error-dialog.component";
+import { EditBillingAccountSuccessDialogComponent } from "./dialogs/edit-billing-account-success-dialog.component";
 
 import { AccountFieldsConfigurationService } from "../../services/account-fields-configuration.service";
 import { CreateSecurityAdvisorService } from "../../services/create-security-advisor.service";
@@ -12,20 +13,19 @@ import { LabListService } from "../../services/lab-list.service";
 import { NewBillingAccountService } from "../../services/new-billing-account.service";
 import { PropertyService } from "../../services/property.service";
 
-import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
 import {MatDialogRef, MatDialog, ErrorStateMatcher} from "@angular/material";
 import {Subscription} from "rxjs/Subscription";
 
 @Component({
-	selector: "new-billing-account-launcher",
+	selector: "edit-billing-account-launcher",
 	template: `<div></div>`,
 	styles: [``]
 })
-export class NewBillingAccountLauncher {
+export class EditBillingAccountLauncher {
 
 	constructor(private dialog: MatDialog, private router: Router) {
-		let dialogRef = this.dialog.open(NewBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
 
 		dialogRef.afterClosed().subscribe((result) => {
 			// After closing the dialog, route away from this component so that the dialog could
@@ -35,15 +35,15 @@ export class NewBillingAccountLauncher {
 	}
 }
 
-export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
+export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 	isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
 		return !!(control && control.invalid && control.touched && (control.dirty || (form && form.submitted)));
 	}
 }
 
 @Component({
-	selector: "new-billing-account-window",
-	templateUrl: "./new-billing-account.component.html",
+	selector: "edit-billing-account-window",
+	templateUrl: "./edit-billing-account.component.html",
 	styles: [`
       .mat-dialog-title {
           margin: 0;
@@ -143,7 +143,7 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 			}
 	`]
 })
-export class NewBillingAccountComponent implements OnInit, OnDestroy {
+export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 	readonly CHARTFIELD:  string = 'chartfield';
 	readonly PO:          string = 'po';
@@ -155,48 +155,48 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 	accountName_Chartfield: string = '';
 	accountNameFormControl_Chartfield = new FormControl('', []);
-	accountNameStateMatcher_Chartfield = new NewBillingAccountStateMatcher();
+	accountNameStateMatcher_Chartfield = new EditBillingAccountStateMatcher();
 
 	accountName_po: string = '';
 	accountNameFormControl_po = new FormControl('', []);
-	accountNameStateMatcher_po = new NewBillingAccountStateMatcher();
+	accountNameStateMatcher_po = new EditBillingAccountStateMatcher();
 
 	accountName_creditCard: string = '';
 	accountNameFormControl_creditCard = new FormControl('', []);
-	accountNameStateMatcher_creditCard = new NewBillingAccountStateMatcher();
+	accountNameStateMatcher_creditCard = new EditBillingAccountStateMatcher();
 
 	shortAccountName_Chartfield: string = '';
 	shortNameFormControl_Chartfield = new FormControl('', []);
-	shortNameStateMatcher_Chartfield = new NewBillingAccountStateMatcher();
+	shortNameStateMatcher_Chartfield = new EditBillingAccountStateMatcher();
 	requireShortAcct: boolean = false;
 
 	shortAccountName_po: string = '';
 	shortNameFormControl_po = new FormControl('', []);
-	shortNameStateMatcher_po = new NewBillingAccountStateMatcher();
+	shortNameStateMatcher_po = new EditBillingAccountStateMatcher();
 
 	accountNumberBus_Chartfield: string = '';
 	accountNumberBusFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberBusStateMatcher_chartfield = new NewBillingAccountStateMatcher();
+	accountNumberBusStateMatcher_chartfield = new EditBillingAccountStateMatcher();
 
 	accountNumberOrg_Chartfield: string = '';
 	accountNumberOrgFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberOrgStateMatcher_chartfield = new NewBillingAccountStateMatcher();
+	accountNumberOrgStateMatcher_chartfield = new EditBillingAccountStateMatcher();
 
 	accountNumberFund_Chartfield: string = '';
 	accountNumberFundFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberFundStateMatcher_chartfield = new NewBillingAccountStateMatcher();
+	accountNumberFundStateMatcher_chartfield = new EditBillingAccountStateMatcher();
 
 	accountNumberActivity_Chartfield: string = '';
 	accountNumberActivityFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberActivityStateMatcher_chartfield = new NewBillingAccountStateMatcher();
+	accountNumberActivityStateMatcher_chartfield = new EditBillingAccountStateMatcher();
 
 	accountNumberProject_Chartfield: string = '';
 	accountNumberProjectFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberProjectStateMatcher_chartfield = new NewBillingAccountStateMatcher();
+	accountNumberProjectStateMatcher_chartfield = new EditBillingAccountStateMatcher();
 
 	accountNumberAccount_Chartfield: string = '64300';
 	accountNumberAccountFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberAccountStateMatcher_chartfield = new NewBillingAccountStateMatcher();
+	accountNumberAccountStateMatcher_chartfield = new EditBillingAccountStateMatcher();
 
 	accountNumberAU_Chartfield: string = '1';
 
@@ -214,15 +214,15 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 	totalDollarAmount_Chartfield: string = '';
 	totalDollarAmountFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_chartfield = new NewBillingAccountStateMatcher();
+	totalDollarAmountStateMatcher_chartfield = new EditBillingAccountStateMatcher();
 
 	totalDollarAmount_po: string = '';
 	totalDollarAmountFormControl_po  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_po = new NewBillingAccountStateMatcher();
+	totalDollarAmountStateMatcher_po = new EditBillingAccountStateMatcher();
 
 	totalDollarAmount_creditCard: string = '';
 	totalDollarAmountFormControl_creditCard  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_creditCard = new NewBillingAccountStateMatcher();
+	totalDollarAmountStateMatcher_creditCard = new EditBillingAccountStateMatcher();
 
 	// The definition of valid email addresses can be found at
 	//     https://en.wikipedia.org/wiki/Email_address#Domain
@@ -231,15 +231,15 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 	submitterEmail_chartfield: string = '';
 	submitterEmailFormControl_chartfield  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_chartfield = new NewBillingAccountStateMatcher();
+	submitterEmailStateMatcher_chartfield = new EditBillingAccountStateMatcher();
 
 	submitterEmail_po: string = '';
 	submitterEmailFormControl_po  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_po = new NewBillingAccountStateMatcher();
+	submitterEmailStateMatcher_po = new EditBillingAccountStateMatcher();
 
 	submitterEmail_creditcard: string = '';
 	submitterEmailFormControl_creditcard  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_creditcard = new NewBillingAccountStateMatcher();
+	submitterEmailStateMatcher_creditcard = new EditBillingAccountStateMatcher();
 
 	activeCheckBox_chartfield: boolean = false;
 	activeCheckBox_po: boolean = false;
@@ -269,7 +269,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 	zipCodeInput_creditCard: string = "";
 	zipCodeInputFormControl_creditCard  = new FormControl('', [ Validators.pattern(/^\d{5}((\s*|(\s*-\s*))(\d{4}))?$/) ]);
-	zipCodeInputStateMatcher_creditCard = new NewBillingAccountStateMatcher();
+	zipCodeInputStateMatcher_creditCard = new EditBillingAccountStateMatcher();
 
 	private selectedCoreFacilitiesString: string = "";
 
@@ -345,7 +345,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
 							private createSecurityAdvisorService: CreateSecurityAdvisorService,
 							private dialog: MatDialog,
-							private dialogRef: MatDialogRef<NewBillingAccountComponent>,
+							private dialogRef: MatDialogRef<EditBillingAccountComponent>,
 							private dictionaryService: DictionaryService,
 							private labListService: LabListService,
 							private newBillingAccountService: NewBillingAccountService,
@@ -395,7 +395,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		if (this.usesCustomChartfields === 'Y') {
 			for (let i = 0; i < 5; i++) {
 				this.InternalCustomFieldsFormControl[i] = new FormControl('', []);
-				this.InternalCustomFieldsStateMatcher[i] = new NewBillingAccountStateMatcher();
+				this.InternalCustomFieldsStateMatcher[i] = new EditBillingAccountStateMatcher();
 			}
 
 			this.internalAccountFieldsConfigurationSubscription =
@@ -1205,7 +1205,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 				successMessage: this.successMessage
 			}
 		};
-		let successDialogReference = this.dialog.open(NewBillingAccountSuccessDialogComponent, config);
+		let successDialogReference = this.dialog.open(EditBillingAccountSuccessDialogComponent, config);
 
 		successDialogReference.afterClosed().subscribe(() => {
 			this.dialogRef.close();
@@ -1218,7 +1218,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			panelClass: 'no-padding-dialog',
 			data: { errorMessage: this.errorMessage }
 		};
-		let errorDialogReference = this.dialog.open(NewBillingAccountErrorDialogComponent, config);
+		let errorDialogReference = this.dialog.open(EditBillingAccountErrorDialogComponent, config);
 	}
 
 	private clearAccountNumberActivity(): void {

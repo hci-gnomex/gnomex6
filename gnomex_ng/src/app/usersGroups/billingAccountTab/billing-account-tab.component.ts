@@ -1,6 +1,10 @@
 import {Component, Input, OnInit} from "@angular/core";
+import {MatDialog, MatDialogRef} from "@angular/material";
+
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
+
+import { EditBillingAccountComponent } from "../../billing/edit_billing_account/edit-billing-account.component";
 
 import { CheckboxRenderer } from "../../util/grid-renderers/checkbox.renderer";
 import { IconLinkButtonRenderer } from "../../util/grid-renderers/icon-link-button.renderer";
@@ -62,7 +66,6 @@ export class BillingAccountTabComponent implements OnInit{
 		this.onLabChanged();
 	}
 
-
 	coreFacilities: any[];
 	selectedCoreFacility: any;
 
@@ -82,7 +85,8 @@ export class BillingAccountTabComponent implements OnInit{
 	creditCardCompanies: any[];
 
 	constructor(private dictionaryService: DictionaryService,
-							private propertyService: PropertyService) {
+							private propertyService: PropertyService,
+							private dialog: MatDialog) {
 		this.context = { componentParent: this };
 	}
 
@@ -151,7 +155,7 @@ export class BillingAccountTabComponent implements OnInit{
 			width: 300,
 			cellRendererFramework: IconLinkButtonRenderer,
 			icon: "../../../assets/pricesheet.png",
-			onClick: this.openChartfieldEditor,
+			onClick: "openChartfieldEditor",
 			field: "accountName"
 		});
 		columnDefinitions.push({
@@ -523,6 +527,15 @@ export class BillingAccountTabComponent implements OnInit{
 
 	openChartfieldEditor(rowIndex: string) {
 		console.log("Should open editor for chartfield and index: " + rowIndex);
+
+
+		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+
+		dialogRef.afterClosed().subscribe((result) => {
+			// After closing the dialog, route away from this component so that the dialog could
+			// potentially be reopened.
+			console.log("Editor closed!");
+		});
 	}
 
 	openPoEditor(rowIndex: string) {

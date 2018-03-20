@@ -3,10 +3,11 @@ import {CommonModule} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
+import {ServicesModule} from "../../services/services.module";
 
-import {AccountFieldsConfigurationService} from "./account-fields-configuration.service";
+import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
 import {NewBillingAccountErrorDialogComponent} from "./dialogs/new-billing-account-error-dialog.component";
-import {NewBillingAccountService} from "./new-billing-account.service";
+import {NewBillingAccountService} from "../../services/new-billing-account.service";
 import {NewBillingAccountSuccessDialogComponent} from "./dialogs/new-billing-account-success-dialog.component";
 import {NewBillingAccountLauncher, NewBillingAccountComponent} from "./new-billing-account.component";
 
@@ -18,7 +19,8 @@ import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
 		AngularMaterialModule,
 		CommonModule,
 		FormsModule,
-		ReactiveFormsModule
+		ReactiveFormsModule,
+		ServicesModule
 	],
 	declarations: [
 		NewBillingAccountComponent,
