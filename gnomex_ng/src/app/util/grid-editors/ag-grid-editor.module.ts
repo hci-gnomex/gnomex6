@@ -1,26 +1,18 @@
-import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { RouterModule } from '@angular/router'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { AngularMaterialModule } from '../../../modules/angular-material.module'
-import {SelectEditorComponent} from './index'
-
-
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SelectEditor } from './select.editor';
 
 
 @NgModule({
     imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        AngularMaterialModule
+        CommonModule
     ],
 
     declarations: [
-        SelectEditorComponent
+        SelectEditor
     ],
-    providers: [
-    ],
-    exports: [SelectEditorComponent]
+    exports: [
+        SelectEditor
+    ]
 })
 export class AgGridEditorModule { }

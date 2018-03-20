@@ -1,0 +1,9 @@
+<div class="full-width full-height">
+    <select class="full-width full-height" [(value)]="value" (change)="onChange($event)">
+        <option
+            *ngFor="let option of options"
+            value="{{option.hasOwnProperty(optionsValueField) ? option[optionsValueField] : (option.value) ? option.value : option }}">
+            {{option.hasOwnProperty(optionsDisplayField) ? option[optionsDisplayField] : (option.display) ? option.display : option }}
+        </option>
+    </select>
+</div>

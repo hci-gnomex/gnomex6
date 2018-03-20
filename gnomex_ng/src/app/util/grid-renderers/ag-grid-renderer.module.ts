@@ -1,13 +1,15 @@
-import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { RouterModule } from '@angular/router'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { AngularMaterialModule } from '../../../modules/angular-material.module'
-import {IconTextRendererComponent,IconRendererComponent} from "./index"
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-
-
-
+import { CheckboxRenderer } from "./checkbox.renderer";
+import { IconTextRendererComponent, IconRendererComponent } from "./index";
+import { IconLinkButtonRenderer } from "./icon-link-button.renderer";
+import { RemoveLinkButtonRenderer } from "./remove-link-button.renderer";
+import { SelectRenderer } from "./select.renderer";
+import { TextAlignLeftMiddleRenderer } from "./text-align-left-middle.renderer";
+import { TextAlignRightMiddleRenderer } from "./text-align-right-middle.renderer";
+import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 
 @NgModule({
     imports: [
@@ -15,13 +17,27 @@ import {IconTextRendererComponent,IconRendererComponent} from "./index"
         FormsModule,
         ReactiveFormsModule,
     ],
-
     declarations: [
+			  CheckboxRenderer,
+			  IconLinkButtonRenderer,
         IconTextRendererComponent,
-        IconRendererComponent
+        IconRendererComponent,
+			  RemoveLinkButtonRenderer,
+			  SelectRenderer,
+			  TextAlignLeftMiddleRenderer,
+			  TextAlignRightMiddleRenderer,
+			  UploadViewRemoveRenderer
     ],
-    providers: [
-    ],
-    exports: [IconTextRendererComponent,IconRendererComponent]
+    exports: [
+			  CheckboxRenderer,
+			  IconLinkButtonRenderer,
+        IconTextRendererComponent,
+        IconRendererComponent,
+			  RemoveLinkButtonRenderer,
+			  SelectRenderer,
+			  TextAlignLeftMiddleRenderer,
+			  TextAlignRightMiddleRenderer,
+			  UploadViewRemoveRenderer
+    ]
 })
 export class AgGridRendererModule { }

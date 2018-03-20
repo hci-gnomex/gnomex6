@@ -9,7 +9,6 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ActivatedRoute} from "@angular/router";
-import {SelectEditorComponent} from "../../util/grid-editors/select-editor.component";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {GridOptions} from "ag-grid/main";
 import {URLSearchParams} from "@angular/http"
