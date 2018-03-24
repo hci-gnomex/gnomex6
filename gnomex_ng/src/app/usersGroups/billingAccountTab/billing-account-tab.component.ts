@@ -8,6 +8,7 @@ import { EditBillingAccountComponent } from "../../billing/edit_billing_account/
 
 import { CheckboxRenderer } from "../../util/grid-renderers/checkbox.renderer";
 import { IconLinkButtonRenderer } from "../../util/grid-renderers/icon-link-button.renderer";
+import { MultipleUsersRenderer } from "../../util/grid-renderers/multiple-users.renderer";
 import { RemoveLinkButtonRenderer } from "../../util/grid-renderers/remove-link-button.renderer";
 import { SelectEditor } from "../../util/grid-editors/select.editor";
 import { SelectRenderer } from "../../util/grid-renderers/select.renderer";
@@ -69,6 +70,8 @@ export class BillingAccountTabComponent implements OnInit{
 	coreFacilities: any[];
 	selectedCoreFacility: any;
 
+	labActiveSubmitters: any[];
+
 	showAddAccountBox: boolean = false;
 	accountType: string = this.CHARTFIELD;
 
@@ -103,6 +106,7 @@ export class BillingAccountTabComponent implements OnInit{
 	// when the input "labInfo" changes).
 	private onLabChanged() {
 		this.selectedCoreFacility = this.getDefaultCoreFacility();
+		this.labActiveSubmitters = this.getActiveSubmitters();
 
 		this.assignChartfieldGridContents(this.selectedCoreFacility);
 		this.assignPoGridContents(this.selectedCoreFacility);
@@ -110,6 +114,7 @@ export class BillingAccountTabComponent implements OnInit{
 
 		this.showAddAccountBox = false;
 		this.creditCardCompanies = this.dictionaryService.getEntries(DictionaryService.CREDIT_CARD_COMPANY);
+		//this.userList = this.dictionaryService.getEntries(DictionaryService.USE)
 	}
 
 
@@ -144,6 +149,86 @@ export class BillingAccountTabComponent implements OnInit{
 			return null;
 		}
 
+	}
+
+	getActiveSubmitters(): any[] {
+		let results: Set<any> = new Set();
+
+		// First, add this lab's users
+		if (this._labInfo && this._labInfo.activeSubmitters) {
+			if (Array.isArray(this._labInfo.activeSubmitters)) {
+				let tempArray = _.cloneDeep(this._labInfo.activeSubmitters);
+
+				for (let activeSubmitter of tempArray) {
+					results.add(activeSubmitter);
+				}
+			} else {
+				results.add(_.cloneDeep([this._labInfo.activeSubmitters.AppUser]));
+			}
+		}
+
+		// Then, add in any extra users who were added to various accounts
+		if (this._labInfo.billingAccounts) {
+			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.billingAccounts);
+
+			for (let user of tempArray) {
+				results.add(user);
+			}
+		}
+		if (this._labInfo.poBillingAccounts) {
+			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.poBillingAccounts);
+
+			for (let user of tempArray) {
+				results.add(user);
+			}
+		}
+		if (this._labInfo.creditCardBillingAccounts) {
+			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.creditCardBillingAccounts);
+
+			for (let user of tempArray) {
+				results.add(user);
+			}
+		}
+
+		let list: any[] = [];
+		for (let result of results) {
+			list.push(result);
+		}
+
+		return list;
+	}
+
+	/* getApprovedUsersFromBillingAccount - this function is necessary because billing accounts are allowed to have external users.
+	 * The purpose of this function is to look through lists(?) of billing accounts for additional users.
+	 * FAQ :
+	 *
+	 */
+	private getApprovedUsersFromBillingAccount(billingAccountList): Set<any> {
+		let temp: Set<any> = new Set();
+
+		if (Array.isArray(billingAccountList)) {
+			for (let billingAccount of billingAccountList) {
+				if (billingAccount.AppUser) {
+					if (Array.isArray(billingAccount.AppUser)) {
+						for (let user of billingAccount.AppUser) {
+							temp.add(_.cloneDeep(user));
+						}
+					} else {
+						temp.add(_.cloneDeep(billingAccount.AppUser));
+					}
+				}
+			}
+		} else if (billingAccountList.billingAccount && billingAccountList.billingAccount.AppUser) {
+			if (Array.isArray(billingAccountList.billingAccount.AppUser)) {
+				for (let user of billingAccountList.billingAccount.AppUser) {
+					temp.add(_.cloneDeep(user));
+				}
+			} else {
+				temp.add(_.cloneDeep(billingAccountList.billingAccount.AppUser));
+			}
+		}
+
+		return temp;
 	}
 
 	private getChartfieldColumnDefs(shownGridData: any[]): any[] {
@@ -228,7 +313,11 @@ export class BillingAccountTabComponent implements OnInit{
 			headerName: "Users",
 			editable: false,
 			width: 200,
-			field: "acctUsers"
+			field: "acctUsers",
+			rendererOptions: this.labActiveSubmitters,
+			rendererOptionDisplayField: "display",
+			rendererOptionValueField: "value",
+			cellRendererFramework: MultipleUsersRenderer
 		});
 		columnDefinitions.push({
 			headerName: "Active",
@@ -269,7 +358,7 @@ export class BillingAccountTabComponent implements OnInit{
 			width: 200,
 			cellRendererFramework: IconLinkButtonRenderer,
 			icon: "../../../assets/email_open.png",
-			onClick: this.openPoEditor,
+			onClick: "openPoEditor",
 			field: "accountName"
 		});
 		columnDefinitions.push({
@@ -298,7 +387,11 @@ export class BillingAccountTabComponent implements OnInit{
 			headerName: "Users",
 			editable: false,
 			width: 100,
-			field: "acctUsers"
+			field: "acctUsers",
+			rendererOptions: this.labActiveSubmitters,
+			rendererOptionDisplayField: "display",
+			rendererOptionValueField: "value",
+			cellRendererFramework: MultipleUsersRenderer
 		});
 		columnDefinitions.push({
 			headerName: "Active",
@@ -339,7 +432,7 @@ export class BillingAccountTabComponent implements OnInit{
 			width: 200,
 			cellRendererFramework: IconLinkButtonRenderer,
 			icon: "../../../assets/creditcards.png",
-			onClick: this.openCreditCardEditor,
+			onClick: "openCreditCardEditor",
 			field: "accountName"
 		});
 		columnDefinitions.push({
@@ -369,7 +462,11 @@ export class BillingAccountTabComponent implements OnInit{
 			headerName: "Users",
 			editable: false,
 			width: 100,
-			field: "acctUsers"
+			field: "acctUsers",
+			rendererOptions: this.labActiveSubmitters,
+			rendererOptionDisplayField: "display",
+			rendererOptionValueField: "value",
+			cellRendererFramework: MultipleUsersRenderer
 		});
 		columnDefinitions.push({
 			headerName: "Active",
@@ -540,10 +637,26 @@ export class BillingAccountTabComponent implements OnInit{
 
 	openPoEditor(rowIndex: string) {
 		console.log("Should open editor for po and index: " + rowIndex);
+
+		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+
+		dialogRef.afterClosed().subscribe((result) => {
+			// After closing the dialog, route away from this component so that the dialog could
+			// potentially be reopened.
+			console.log("Editor closed!");
+		});
 	}
 
 	openCreditCardEditor(rowIndex: string) {
 		console.log("Should open editor for credit card and index: " + rowIndex);
+
+		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+
+		dialogRef.afterClosed().subscribe((result) => {
+			// After closing the dialog, route away from this component so that the dialog could
+			// potentially be reopened.
+			console.log("Editor closed!");
+		});
 	}
 
 	onPoUploadClicked(rowIndex: string)	{

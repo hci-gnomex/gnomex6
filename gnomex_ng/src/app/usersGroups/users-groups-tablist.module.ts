@@ -21,6 +21,7 @@ import { UtilModule } from "../util/util.module";
 
 import { CheckboxRenderer } from "../util/grid-renderers/checkbox.renderer";
 import { IconLinkButtonRenderer } from "../util/grid-renderers/icon-link-button.renderer";
+import { MultipleUsersRenderer } from "../util/grid-renderers/multiple-users.renderer";
 import { RemoveLinkButtonRenderer } from "../util/grid-renderers/remove-link-button.renderer";
 import { SelectEditor } from "../util/grid-editors/select.editor";
 import { SelectRenderer } from "../util/grid-renderers/select.renderer";
@@ -28,6 +29,7 @@ import { TextAlignLeftMiddleRenderer } from "../util/grid-renderers/text-align-l
 import { TextAlignRightMiddleRenderer } from "../util/grid-renderers/text-align-right-middle.renderer";
 import { UploadViewRemoveRenderer } from "../util/grid-renderers/upload-view-remove.renderer";
 
+import { BillingUsersSelectorComponent } from "./billingAccountTab/billing-users-selector/billing-users-selector.component";
 import { BillingAccountTabComponent } from "./billingAccountTab/billing-account-tab.component";
 import { BillingAdminTabComponent } from "./billingAdminTab/billing-admin-tab.component";
 import { MembershipTabComponent } from "./membershipTab/membership-tab.component";
@@ -47,14 +49,15 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
     imports: [
 			  AgGridEditorModule,
 			  AgGridModule.withComponents([
-			  	  TextAlignLeftMiddleRenderer,
-			  	  RemoveLinkButtonRenderer,
-			  	  CheckboxRenderer,
-			  	  IconLinkButtonRenderer,
-			  	  UploadViewRemoveRenderer,
-			  	  SelectEditor,
-			  	  SelectRenderer,
-			  	  TextAlignRightMiddleRenderer
+					  CheckboxRenderer,
+					  IconLinkButtonRenderer,
+					  MultipleUsersRenderer,
+					  RemoveLinkButtonRenderer,
+					  SelectEditor,
+					  SelectRenderer,
+					  TextAlignLeftMiddleRenderer,
+					  TextAlignRightMiddleRenderer,
+					  UploadViewRemoveRenderer
 			  ]),
 			  AgGridRendererModule,
 			  AngularMaterialModule,
@@ -70,6 +73,7 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
 			  UtilModule
     ],
     declarations: [
+			  BillingUsersSelectorComponent,
         BillingAccountTabComponent,
 			  BillingAdminTabComponent,
         DeleteGroupDialogComponent,
@@ -81,6 +85,7 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
         VerifyUsersDialogComponent
     ],
     entryComponents: [
+			  BillingUsersSelectorComponent,
         DeleteGroupDialogComponent,
         DeleteUserDialogComponent,
 			  NewGroupDialogComponent,

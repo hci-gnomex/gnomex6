@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CheckboxRenderer } from "./checkbox.renderer";
 import { IconTextRendererComponent, IconRendererComponent } from "./index";
 import { IconLinkButtonRenderer } from "./icon-link-button.renderer";
+import { MultipleUsersRenderer } from "./multiple-users.renderer";
 import { RemoveLinkButtonRenderer } from "./remove-link-button.renderer";
 import { SelectRenderer } from "./select.renderer";
 import { TextAlignLeftMiddleRenderer } from "./text-align-left-middle.renderer";
@@ -22,6 +23,7 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 			  IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
+			  MultipleUsersRenderer,
 			  RemoveLinkButtonRenderer,
 			  SelectRenderer,
 			  TextAlignLeftMiddleRenderer,
@@ -33,6 +35,7 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 			  IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
+			  MultipleUsersRenderer,
 			  RemoveLinkButtonRenderer,
 			  SelectRenderer,
 			  TextAlignLeftMiddleRenderer,
