@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { CheckboxRenderer } from "./checkbox.renderer";
+import { DateRenderer } from "./date.renderer";
 import { IconTextRendererComponent, IconRendererComponent } from "./index";
 import { IconLinkButtonRenderer } from "./icon-link-button.renderer";
-import { MultipleUsersRenderer } from "./multiple-users.renderer";
+import { SplitStringToMultipleLinesRenderer } from "./split-string-to-multiple-lines.renderer";
 import { RemoveLinkButtonRenderer } from "./remove-link-button.renderer";
 import { SelectRenderer } from "./select.renderer";
 import { TextAlignLeftMiddleRenderer } from "./text-align-left-middle.renderer";
@@ -20,25 +21,27 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
     ],
     declarations: [
 			  CheckboxRenderer,
+			  DateRenderer,
 			  IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
-			  MultipleUsersRenderer,
 			  RemoveLinkButtonRenderer,
 			  SelectRenderer,
+			  SplitStringToMultipleLinesRenderer,
 			  TextAlignLeftMiddleRenderer,
 			  TextAlignRightMiddleRenderer,
 			  UploadViewRemoveRenderer
     ],
     exports: [
 			  CheckboxRenderer,
+			  DateRenderer,
 			  IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
-			  MultipleUsersRenderer,
 			  RemoveLinkButtonRenderer,
-			  SelectRenderer,
-			  TextAlignLeftMiddleRenderer,
+		    SelectRenderer,
+		    SplitStringToMultipleLinesRenderer,
+		    TextAlignLeftMiddleRenderer,
 			  TextAlignRightMiddleRenderer,
 			  UploadViewRemoveRenderer
     ]

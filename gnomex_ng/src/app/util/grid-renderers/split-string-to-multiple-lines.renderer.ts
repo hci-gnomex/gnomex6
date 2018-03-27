@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, ElementRef, ViewChild } from "@angular/core";
 import { ICellRendererAngularComp } from "ag-grid-angular";
 
 @Component({
@@ -6,8 +6,10 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 		<div class="full-width full-height">
 			<div class="t full-width full-height cursor" (click)="invokeParentMethod()">
 				<div class="tr">
-					<div class="td vertical-center string-container">
-						{{usersString}}
+					<div #totalHeightSource class="td vertical-center">
+						<div *ngFor="let displayString of displayStrings" class="full-width string-container {{displayString.classes}} ">
+							{{displayString.display}}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -30,12 +32,13 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 			.inline-block { display: inline-block; }
 			
 			.vertical-center { vertical-align: middle; }
+			
+			.error { color: red; }
 	`]
 })
-export class MultipleUsersRenderer implements ICellRendererAngularComp {
+export class SplitStringToMultipleLinesRenderer implements ICellRendererAngularComp {
 	public params: any;
-	public usersString: string;
-	public errorString: string;
+	public displayStrings: any[];
 	private onClick;
 	private rendererOptions: any[];
 
@@ -44,10 +47,7 @@ export class MultipleUsersRenderer implements ICellRendererAngularComp {
 
 	value: string;
 
-	// set value(value: string) {
-	// 	this._value = value;
-	// 	this.findDisplayValues();
-	// }
+	@ViewChild('totalHeightSource') totalHeightSource: ElementRef;
 
 	agInit(params: any): void {
 		this.params = params;
@@ -76,20 +76,19 @@ export class MultipleUsersRenderer implements ICellRendererAngularComp {
 		}
 
 		this.findDisplayValues();
-	}
-
-	refresh(params: any): boolean {
-		return false;
+		this.requestResizeRow()
 	}
 
 	findDisplayValues() {
-		this.usersString = "";
-		this.errorString = "";
+		this.displayStrings = [];
 
 		let tokens: string[] = this.value.split(',');
-		let foundOnePlus: boolean = false;
 
 		for (let token of tokens) {
+			if (!token || token === '') {
+				continue;
+			}
+
 			let found: boolean = false;
 			let userName: string = "";
 
@@ -104,15 +103,42 @@ export class MultipleUsersRenderer implements ICellRendererAngularComp {
 			}
 
 			if (found) {
-				if (foundOnePlus) {
-					this.usersString += ", "
-				}
-				this.usersString += userName;
-				foundOnePlus = true;
+				this.displayStrings.push({display: userName, classes: '' });
 			} else {
-				this.usersString += " " + token;
+				this.displayStrings.push({display: "FAILED LOOKUP " + token, classes: ' error ' });
 			}
 		}
+
+		this.displayStrings = this.displayStrings.sort((a, b) => {
+			if (a.display.toLowerCase() === b.display.toLowerCase()) {
+				return 0;
+			} else if (a.display.toLowerCase() > b.display.toLowerCase()) {
+				return 1;
+			} else {
+				return -1;
+			}
+		});
+	}
+
+	requestResizeRow(): void {
+		setTimeout(() => {
+			if (this.params
+					&& this.params.api
+					&& this.params.node
+					&& this.params.node.rowHeight
+					&& this.totalHeightSource.nativeElement
+					&& this.totalHeightSource.nativeElement.offsetHeight > this.params.node.rowHeight) {
+				// The + 4 comes from the AgGrid's default cell padding.
+				this.params.node.setRowHeight(this.totalHeightSource.nativeElement.offsetHeight + 4);
+				// Unfortunately, we have to call this for each of the n cells using this renderer, rather than once total...
+				this.params.api.onRowHeightChanged();
+				this.params.api.sizeColumnsToFit();
+			}
+		});
+	}
+
+	refresh(params: any): boolean {
+		return false;
 	}
 
 	invokeParentMethod(): void {

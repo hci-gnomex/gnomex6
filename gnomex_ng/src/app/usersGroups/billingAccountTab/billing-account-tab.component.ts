@@ -7,8 +7,10 @@ import {PropertyService} from "../../services/property.service";
 import { EditBillingAccountComponent } from "../../billing/edit_billing_account/edit-billing-account.component";
 
 import { CheckboxRenderer } from "../../util/grid-renderers/checkbox.renderer";
+import { DateEditor } from "../../util/grid-editors/date.editor";
+import { DateRenderer } from "../../util/grid-renderers/date.renderer";
 import { IconLinkButtonRenderer } from "../../util/grid-renderers/icon-link-button.renderer";
-import { MultipleUsersRenderer } from "../../util/grid-renderers/multiple-users.renderer";
+import { SplitStringToMultipleLinesRenderer } from "../../util/grid-renderers/split-string-to-multiple-lines.renderer";
 import { RemoveLinkButtonRenderer } from "../../util/grid-renderers/remove-link-button.renderer";
 import { SelectEditor } from "../../util/grid-editors/select.editor";
 import { SelectRenderer } from "../../util/grid-renderers/select.renderer";
@@ -17,6 +19,7 @@ import { TextAlignRightMiddleRenderer } from "../../util/grid-renderers/text-ali
 import { UploadViewRemoveRenderer } from "../../util/grid-renderers/upload-view-remove.renderer";
 
 import * as _ from "lodash";
+import {BillingUsersSelectorComponent} from "./billing-users-selector/billing-users-selector.component";
 
 @Component ({
 	selector: "billing-account-tab",
@@ -152,7 +155,7 @@ export class BillingAccountTabComponent implements OnInit{
 	}
 
 	getActiveSubmitters(): any[] {
-		let results: Set<any> = new Set();
+		let results = new Map();
 
 		// First, add this lab's users
 		if (this._labInfo && this._labInfo.activeSubmitters) {
@@ -160,10 +163,14 @@ export class BillingAccountTabComponent implements OnInit{
 				let tempArray = _.cloneDeep(this._labInfo.activeSubmitters);
 
 				for (let activeSubmitter of tempArray) {
-					results.add(activeSubmitter);
+					if (activeSubmitter.value && activeSubmitter.value !== '') {
+						results.set(activeSubmitter.value, activeSubmitter);
+					}
 				}
 			} else {
-				results.add(_.cloneDeep([this._labInfo.activeSubmitters.AppUser]));
+				if (this._labInfo.activeSubmitters.AppUser.value && this._labInfo.activeSubmitters.AppUser.value !== '') {
+					results.set(this._labInfo.activeSubmitters.AppUser.value, _.cloneDeep([this._labInfo.activeSubmitters.AppUser]));
+				}
 			}
 		}
 
@@ -172,26 +179,32 @@ export class BillingAccountTabComponent implements OnInit{
 			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.billingAccounts);
 
 			for (let user of tempArray) {
-				results.add(user);
+				if (user.value && user.value !== '') {
+					results.set(user.value, user);
+				}
 			}
 		}
 		if (this._labInfo.poBillingAccounts) {
 			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.poBillingAccounts);
 
 			for (let user of tempArray) {
-				results.add(user);
+				if (user.value && user.value !== '') {
+					results.set(user.value, user);
+				}
 			}
 		}
 		if (this._labInfo.creditCardBillingAccounts) {
 			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.creditCardBillingAccounts);
 
 			for (let user of tempArray) {
-				results.add(user);
+				if (user.value && user.value !== '') {
+					results.set(user.value, user);
+				}
 			}
 		}
 
 		let list: any[] = [];
-		for (let result of results) {
+		for (let result of results.values()) {
 			list.push(result);
 		}
 
@@ -247,12 +260,16 @@ export class BillingAccountTabComponent implements OnInit{
 			headerName: "Starts",
 			editable:  true,
 			width: 100,
+			cellRendererFramework: DateRenderer,
+			cellEditorFramework: DateEditor,
 			field: "startDate"
 		});
 		columnDefinitions.push({
 			headerName: "Expires",
 			editable:  true,
 			width: 100,
+			cellRendererFramework: DateRenderer,
+			cellEditorFramework: DateEditor,
 			field: "expirationDate"
 		});
 		columnDefinitions.push({
@@ -317,7 +334,8 @@ export class BillingAccountTabComponent implements OnInit{
 			rendererOptions: this.labActiveSubmitters,
 			rendererOptionDisplayField: "display",
 			rendererOptionValueField: "value",
-			cellRendererFramework: MultipleUsersRenderer
+			onClick: "onChartfieldUsersClicked",
+			cellRendererFramework: SplitStringToMultipleLinesRenderer
 		});
 		columnDefinitions.push({
 			headerName: "Active",
@@ -335,7 +353,7 @@ export class BillingAccountTabComponent implements OnInit{
 		});
 
 		let gridShowRemove:boolean = false;
-		for (let row in shownGridData) {
+		for (let row of shownGridData) {
 			if (RemoveLinkButtonRenderer.canRemoveRow(row)) {
 				gridShowRemove = true;
 				break;
@@ -365,12 +383,16 @@ export class BillingAccountTabComponent implements OnInit{
 			headerName: "Starts",
 			editable:  true,
 			width: 100,
+			cellRendererFramework: DateRenderer,
+			cellEditorFramework: DateEditor,
 			field: "startDate"
 		});
 		columnDefinitions.push({
 			headerName: "Expires",
 			editable:  true,
 			width: 100,
+			cellRendererFramework: DateRenderer,
+			cellEditorFramework: DateEditor,
 			field: "expirationDate"
 		});
 		columnDefinitions.push({
@@ -391,7 +413,8 @@ export class BillingAccountTabComponent implements OnInit{
 			rendererOptions: this.labActiveSubmitters,
 			rendererOptionDisplayField: "display",
 			rendererOptionValueField: "value",
-			cellRendererFramework: MultipleUsersRenderer
+			onClick: "onPoUsersClicked",
+			cellRendererFramework: SplitStringToMultipleLinesRenderer
 		});
 		columnDefinitions.push({
 			headerName: "Active",
@@ -439,6 +462,8 @@ export class BillingAccountTabComponent implements OnInit{
 			headerName: "Expires",
 			editable:  true,
 			width: 100,
+			cellRendererFramework: DateRenderer,
+			cellEditorFramework: DateEditor,
 			field: "expirationDate"
 		});
 		columnDefinitions.push({
@@ -466,7 +491,8 @@ export class BillingAccountTabComponent implements OnInit{
 			rendererOptions: this.labActiveSubmitters,
 			rendererOptionDisplayField: "display",
 			rendererOptionValueField: "value",
-			cellRendererFramework: MultipleUsersRenderer
+			onClick: "onCreditCardUsersClicked",
+			cellRendererFramework: SplitStringToMultipleLinesRenderer
 		});
 		columnDefinitions.push({
 			headerName: "Active",
@@ -511,6 +537,7 @@ export class BillingAccountTabComponent implements OnInit{
 		this.chartfieldGridColumnApi = event.columnApi;
 
 		this.assignChartfieldGridContents(this.selectedCoreFacility);
+		this.onChartfieldGridSizeChanged()
 	}
 	onPoGridReady(event: any): void {
 		this.poGridApi = event.api;
@@ -623,41 +650,54 @@ export class BillingAccountTabComponent implements OnInit{
 
 
 	openChartfieldEditor(rowIndex: string) {
-		console.log("Should open editor for chartfield and index: " + rowIndex);
-
-
 		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
 
 		dialogRef.afterClosed().subscribe((result) => {
-			// After closing the dialog, route away from this component so that the dialog could
-			// potentially be reopened.
 			console.log("Editor closed!");
 		});
 	}
 
 	openPoEditor(rowIndex: string) {
-		console.log("Should open editor for po and index: " + rowIndex);
-
 		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
 
 		dialogRef.afterClosed().subscribe((result) => {
-			// After closing the dialog, route away from this component so that the dialog could
-			// potentially be reopened.
 			console.log("Editor closed!");
 		});
 	}
 
 	openCreditCardEditor(rowIndex: string) {
-		console.log("Should open editor for credit card and index: " + rowIndex);
-
 		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
 
 		dialogRef.afterClosed().subscribe((result) => {
-			// After closing the dialog, route away from this component so that the dialog could
-			// potentially be reopened.
 			console.log("Editor closed!");
 		});
 	}
+
+
+	onChartfieldUsersClicked(rowIndex: string): void {
+		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+
+		dialogRef.afterClosed().subscribe((result) => {
+			console.log("Editor closed!");
+		});
+	}
+
+	onPoUsersClicked(rowIndex: string): void {
+		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+
+		dialogRef.afterClosed().subscribe((result) => {
+			console.log("Editor closed!");
+		});
+	}
+
+	onCreditCardUsersClicked(rowIndex: string): void {
+		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+
+		dialogRef.afterClosed().subscribe((result) => {
+			console.log("Editor closed!");
+		});
+	}
+
 
 	onPoUploadClicked(rowIndex: string)	{
 		console.log("Should open uploader for po and index: " + rowIndex);

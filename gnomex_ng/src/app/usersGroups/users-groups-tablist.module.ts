@@ -20,8 +20,10 @@ import { ServicesModule } from "../services/services.module";
 import { UtilModule } from "../util/util.module";
 
 import { CheckboxRenderer } from "../util/grid-renderers/checkbox.renderer";
+import { DateEditor } from "../util/grid-editors/date.editor";
+import { DateRenderer } from "../util/grid-renderers/date.renderer";
 import { IconLinkButtonRenderer } from "../util/grid-renderers/icon-link-button.renderer";
-import { MultipleUsersRenderer } from "../util/grid-renderers/multiple-users.renderer";
+import { SplitStringToMultipleLinesRenderer } from "../util/grid-renderers/split-string-to-multiple-lines.renderer";
 import { RemoveLinkButtonRenderer } from "../util/grid-renderers/remove-link-button.renderer";
 import { SelectEditor } from "../util/grid-editors/select.editor";
 import { SelectRenderer } from "../util/grid-renderers/select.renderer";
@@ -50,11 +52,13 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
 			  AgGridEditorModule,
 			  AgGridModule.withComponents([
 					  CheckboxRenderer,
+					  DateEditor,
+					  DateRenderer,
 					  IconLinkButtonRenderer,
-					  MultipleUsersRenderer,
 					  RemoveLinkButtonRenderer,
 					  SelectEditor,
 					  SelectRenderer,
+					  SplitStringToMultipleLinesRenderer,
 					  TextAlignLeftMiddleRenderer,
 					  TextAlignRightMiddleRenderer,
 					  UploadViewRemoveRenderer
