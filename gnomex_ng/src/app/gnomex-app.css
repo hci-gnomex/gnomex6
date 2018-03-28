@@ -108,6 +108,24 @@ div.mainnav {
   height: 100%;
 }
 
+.ag-fresh .annotationRequiredRow {
+  font-weight: bold !important;
+  font-style: italic !important;
+  color: black !important;
+}
+.ag-fresh .annotationActiveRow {
+  font-style: normal !important;
+  color: black !important;
+}
+.ag-fresh .annotationInactiveRow {
+  font-style: italic !important;
+  color: #647478 !important;
+}
+
+.mat-tab-body-wrapper {
+  height: 100%;
+}
+
 /******************************/
 /**** Primary Nav / Header ****/
 /******************************/

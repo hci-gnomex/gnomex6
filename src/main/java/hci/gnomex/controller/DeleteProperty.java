@@ -5,7 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
@@ -20,7 +21,7 @@ import hci.gnomex.model.PropertyOption;
 import hci.gnomex.model.PropertyPlatformApplication;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 
 import org.apache.log4j.Logger;
 
@@ -58,23 +59,24 @@ public class DeleteProperty extends GNomExCommand implements Serializable {
   }
 
   public Command execute() throws RollBackCommandException {
-    Session sess = null;
-    Property property = null;
+    Session sess;
+    Property property;
 
-    int nonBlankSampleCount = 0;
-    int nonBlankAnalysisCount = 0;
-    int nonBlankDataTrackCount = 0;
+    Integer nonBlankSampleCount = 0;
+    Integer nonBlankAnalysisCount = 0;
+    Integer nonBlankDataTrackCount = 0;
 
     try {
       sess = HibernateSession.currentSession(this.getUsername());
-      property = (Property)sess.load(Property.class, idProperty);
+      property = sess.load(Property.class, idProperty);
 
       // Check permissions
       if (this.getSecAdvisor().canDelete(property)) {
 
         StringBuffer propertyEntryQuery = new StringBuffer();
         propertyEntryQuery.append("SELECT pe from PropertyEntry as pe");
-        propertyEntryQuery.append(" where pe.idProperty = " + idProperty.intValue());
+        propertyEntryQuery.append(" where pe.idProperty = ");
+        propertyEntryQuery.append(idProperty.intValue());
         propertyEntryQuery.append(" and pe.idSample is not null");
         List samples = sess.createQuery(propertyEntryQuery.toString()).list();
         for(Iterator i1 = samples.iterator(); i1.hasNext();) {
@@ -86,7 +88,8 @@ public class DeleteProperty extends GNomExCommand implements Serializable {
 
         propertyEntryQuery = new StringBuffer();
         propertyEntryQuery.append("SELECT pe from PropertyEntry as pe");
-        propertyEntryQuery.append(" where pe.idProperty = " + idProperty.intValue());
+        propertyEntryQuery.append(" where pe.idProperty = ");
+        propertyEntryQuery.append(idProperty.intValue());
         propertyEntryQuery.append(" and pe.idAnalysis is not null");
         List analyses = sess.createQuery(propertyEntryQuery.toString()).list();
         for(Iterator i1 = analyses.iterator(); i1.hasNext();) {
@@ -98,7 +101,8 @@ public class DeleteProperty extends GNomExCommand implements Serializable {
 
         propertyEntryQuery = new StringBuffer();
         propertyEntryQuery.append("SELECT pe from PropertyEntry as pe");
-        propertyEntryQuery.append(" where pe.idProperty = " + idProperty.intValue());
+        propertyEntryQuery.append(" where pe.idProperty = ");
+        propertyEntryQuery.append(idProperty.intValue());
         propertyEntryQuery.append(" and pe.idDataTrack is not null");
         List dataTracks = sess.createQuery(propertyEntryQuery.toString()).list();
         for(Iterator i1 = dataTracks.iterator(); i1.hasNext();) {
@@ -112,14 +116,21 @@ public class DeleteProperty extends GNomExCommand implements Serializable {
             (nonBlankSampleCount > 0 || nonBlankAnalysisCount > 0 || nonBlankDataTrackCount > 0)) {
           try {
             sess.clear();
-            property = (Property)sess.load(Property.class, idProperty);
+            property = sess.load(Property.class, idProperty);
             property.setIsActive("N");
             sess.save(property);
             sess.flush();
 
             DictionaryHelper.reload(sess);
 
-            this.xmlResult = "<NONBLANKVALUES idProperty='" + property.getIdProperty().intValue() + "' sampleCount='"+ nonBlankSampleCount +"' analysisCount='"+ nonBlankAnalysisCount +"' dataTrackCount='"+ nonBlankDataTrackCount +"'/>";
+            JsonObject value = Json.createObjectBuilder()
+                    .add("result", "NONBLANKVALUES")
+                    .add("idProperty", property.getIdProperty().toString())
+                    .add("sampleCount", nonBlankSampleCount.toString())
+                    .add("analysisCount", nonBlankAnalysisCount.toString())
+                    .add("dataTrackCount", nonBlankDataTrackCount.toString())
+                    .build();
+            this.jsonResult = value.toString();
             setResponsePage(this.SUCCESS_JSP);
             return this;
 
@@ -135,9 +146,10 @@ public class DeleteProperty extends GNomExCommand implements Serializable {
             (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES))
             || (nonBlankSampleCount == 0 && nonBlankAnalysisCount == 0 && nonBlankDataTrackCount == 0)) {
 
-          StringBuffer allPropertyEntries = new StringBuffer();
+          StringBuilder allPropertyEntries = new StringBuilder();
           allPropertyEntries.append("SELECT pe from PropertyEntry as pe");
-          allPropertyEntries.append(" where pe.idProperty = " + idProperty.intValue());
+          allPropertyEntries.append(" where pe.idProperty = ");
+          allPropertyEntries.append(idProperty.intValue());
           List entriesToDelete = sess.createQuery(allPropertyEntries.toString()).list();
           for(Iterator i1 = entriesToDelete.iterator(); i1.hasNext();) {
             PropertyEntry entry = (PropertyEntry)i1.next();
@@ -218,7 +230,10 @@ public class DeleteProperty extends GNomExCommand implements Serializable {
 
         DictionaryHelper.reload(sess);
 
-        this.xmlResult = "<SUCCESS/>";
+        JsonObject value = Json.createObjectBuilder()
+                .add("result", "SUCCESS")
+                .build();
+        this.jsonResult = value.toString();
 
         setResponsePage(this.SUCCESS_JSP);
 
