@@ -12,16 +12,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.*;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Hibernate;
 import org.hibernate.query.Query;
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
@@ -42,29 +38,21 @@ import hci.gnomex.model.PropertyType;
 import hci.gnomex.model.RequestCategory;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PriceUtil;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import org.apache.log4j.Logger;
+
 public class SaveProperty extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger( SaveProperty.class );
 
-  private String                         optionsXMLString;
-  private Document                       optionsDoc;
-
-  private String                         organismsXMLString;
-  private Document                       organismsDoc;
-
-  private String                         appUsersXMLString;
-  private Document                       appUsersDoc;
-
-  private String                         platformsXMLString;
-  private Document                       platformsDoc;
-
-  private String                         analysisTypesXMLString;
-  private Document                       analysisTypesDoc;
+  private JsonArray                     optionsArray = null;
+  private JsonArray                     organismsArray = null;
+  private JsonArray                     appUsersArray = null;
+  private JsonArray                     platformsArray = null;
+  private JsonArray                     analysisTypesArray = null;
 
   private Property                       propertyScreen;
   private boolean                        isNewProperty                 = false;
@@ -90,7 +78,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
     HashMap errors = this.loadDetailObject( request, propertyScreen );
     this.addInvalidFields( errors );
     if( propertyScreen.getIdProperty() == null
-        || propertyScreen.getIdProperty().intValue() == 0 ) {
+        || propertyScreen.getIdProperty() == 0 ) {
       isNewProperty = true;
     }
 
@@ -107,73 +95,64 @@ public class SaveProperty extends GNomExCommand implements Serializable {
       includePricing = true;
     }
 
-    if( request.getParameter( "optionsXMLString" ) != null
-        && ! request.getParameter( "optionsXMLString" ).equals( "" ) ) {
-      optionsXMLString = request.getParameter( "optionsXMLString" );
-      StringReader reader = new StringReader( optionsXMLString );
+    String optionsJSONString = request.getParameter("optionsJSONString");
+    if (Util.isParameterNonEmpty(optionsJSONString)) {
       try {
-        SAXBuilder sax = new SAXBuilder();
-        optionsDoc = sax.build( reader );
+        JsonReader jsonReader = Json.createReader(new StringReader(optionsJSONString));
+        this.optionsArray = jsonReader.readArray();
+        jsonReader.close();
         checkOptions();
-      } catch( JDOMException je ) {
-        LOG.error( "Cannot parse optionsXMLString", je );
-        this.addInvalidField( "optionsXMLString", "Invalid optionsXMLString" );
+      } catch (Exception e) {
+        this.addInvalidField("optionsJSONString", "Invalid optionsJSONString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse optionsJSONString", e);
       }
     }
 
-    if( request.getParameter( "organismsXMLString" ) != null
-        && ! request.getParameter( "organismsXMLString" ).equals( "" ) ) {
-      organismsXMLString = request.getParameter( "organismsXMLString" );
-      StringReader reader = new StringReader( organismsXMLString );
+    String organismsJSONString = request.getParameter("organismsJSONString");
+    if (Util.isParameterNonEmpty(organismsJSONString)) {
       try {
-        SAXBuilder sax = new SAXBuilder();
-        organismsDoc = sax.build( reader );
-      } catch( JDOMException je ) {
-        LOG.error( "Cannot parse organismsXMLString", je );
-        this.addInvalidField( "organismsXMLString",
-            "Invalid organismsXMLString" );
+        JsonReader jsonReader = Json.createReader(new StringReader(organismsJSONString));
+        this.organismsArray = jsonReader.readArray();
+        jsonReader.close();
+      } catch (Exception e) {
+        this.addInvalidField("organismsJSONString", "Invalid organismsJSONString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse organismsJSONString", e);
       }
     }
 
-    if( request.getParameter( "appUsersXMLString" ) != null
-        && ! request.getParameter( "appUsersXMLString" ).equals( "" ) ) {
-      appUsersXMLString = request.getParameter( "appUsersXMLString" );
-      StringReader reader = new StringReader( appUsersXMLString );
+    String appUsersJSONString = request.getParameter("appUsersJSONString");
+    if (Util.isParameterNonEmpty(appUsersJSONString)) {
       try {
-        SAXBuilder sax = new SAXBuilder();
-        appUsersDoc = sax.build( reader );
-      } catch( JDOMException je ) {
-        LOG.error( "Cannot parse appUsersXMLString", je );
-        this.addInvalidField( "appUsersXMLString",
-            "Invalid appUsersXMLString" );
+        JsonReader jsonReader = Json.createReader(new StringReader(appUsersJSONString));
+        this.appUsersArray = jsonReader.readArray();
+        jsonReader.close();
+      } catch (Exception e) {
+        this.addInvalidField("appUsersJSONString", "Invalid appUsersJSONString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse appUsersJSONString", e);
       }
     }
 
-    if( request.getParameter( "platformsXMLString" ) != null
-        && ! request.getParameter( "platformsXMLString" ).equals( "" ) ) {
-      platformsXMLString = request.getParameter( "platformsXMLString" );
-      StringReader reader = new StringReader( platformsXMLString );
+    String platformsJSONString = request.getParameter("platformsJSONString");
+    if (Util.isParameterNonEmpty(platformsJSONString)) {
       try {
-        SAXBuilder sax = new SAXBuilder();
-        platformsDoc = sax.build( reader );
-      } catch( JDOMException je ) {
-        LOG.error( "Cannot parse platformsXMLString", je );
-        this.addInvalidField( "platformsXMLString",
-            "Invalid platformsXMLString" );
+        JsonReader jsonReader = Json.createReader(new StringReader(platformsJSONString));
+        this.platformsArray = jsonReader.readArray();
+        jsonReader.close();
+      } catch (Exception e) {
+        this.addInvalidField("platformsJSONString", "Invalid platformsJSONString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse platformsJSONString", e);
       }
     }
 
-    if( request.getParameter( "analysisTypesXMLString" ) != null
-        && ! request.getParameter( "analysisTypesXMLString" ).equals( "" ) ) {
-      analysisTypesXMLString = request.getParameter( "analysisTypesXMLString" );
-      StringReader reader = new StringReader( analysisTypesXMLString );
+    String analysisTypesJSONString = request.getParameter("analysisTypesJSONString");
+    if (Util.isParameterNonEmpty(analysisTypesJSONString)) {
       try {
-        SAXBuilder sax = new SAXBuilder();
-        analysisTypesDoc = sax.build( reader );
-      } catch( JDOMException je ) {
-        LOG.error( "Cannot parse analysisTypesXMLString", je );
-        this.addInvalidField( "analysisTypesXMLString",
-            "Invalid analysisTypesXMLString" );
+        JsonReader jsonReader = Json.createReader(new StringReader(analysisTypesJSONString));
+        this.analysisTypesArray = jsonReader.readArray();
+        jsonReader.close();
+      } catch (Exception e) {
+        this.addInvalidField("analysisTypesJSONString", "Invalid analysisTypesJSONString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse analysisTypesJSONString", e);
       }
     }
 
@@ -217,32 +196,32 @@ public class SaveProperty extends GNomExCommand implements Serializable {
     String annotationPropertyInvalid = pdh.getProperty(
         PropertyDictionary.ANNOTATION_OPTION_INVALID );
 
-    HashMap<String, String> invalidMap = new HashMap<String, String>();
+    HashMap<String, String> invalidMap = new HashMap<>();
     if( annotationPropertyInvalid != null ) {
       for( String i : annotationPropertyInvalid.split( "," ) ) {
         invalidMap.put( i.trim().toUpperCase(), i );
       }
     }
 
-    HashMap<String, String> nameMap = new HashMap<String, String>();
-    for( Iterator i = this.optionsDoc.getRootElement().getChildren().iterator(); i.hasNext(); ) {
-      Element node = ( Element ) i.next();
+    HashMap<String, String> nameMap = new HashMap<>();
+    for(int i = 0; i < this.optionsArray.size(); i++) {
+      JsonObject node = this.optionsArray.getJsonObject(i);
 
-      String name = node.getAttributeValue( "option" );
+      String name = node.getString( "option" );
       name = mapPropertyOptionEquivalents( name );
 
       if( invalidMap.containsKey( name.toUpperCase() ) ) {
         this.addInvalidField( "Invalid Option", "The option '"
-            + node.getAttributeValue( "option" ) + "' is not allowed." );
+            + node.getString( "option" ) + "' is not allowed." );
       }
 
       if( nameMap.containsKey( name.toUpperCase() ) ) {
         this.addInvalidField( "Duplicate Option",
-            "The options '" + node.getAttributeValue( "option" ) + "' and '"
+            "The options '" + node.getString( "option" ) + "' and '"
                 + nameMap.get( name.toUpperCase() )
                 + "' are duplicate.  Please correct and try again." );
       }
-      nameMap.put( name.toUpperCase(), node.getAttributeValue( "option" ) );
+      nameMap.put( name.toUpperCase(), node.getString( "option" ) );
     }
   }
 
@@ -281,9 +260,9 @@ public class SaveProperty extends GNomExCommand implements Serializable {
 
       if( this.getSecurityAdvisor().hasPermission( SecurityAdvisor.CAN_SUBMIT_REQUESTS ) ) {
 
-        if( validatePropertyScreen( sess ) && checkPermissionToEdit( sess ) ) {
+        if( validatePropertyScreen( sess ) && checkPermissionToEdit() ) {
 
-          Property sc = null;
+          Property sc;
 
           if( isNewProperty ) {
             sc = propertyScreen;
@@ -322,12 +301,12 @@ public class SaveProperty extends GNomExCommand implements Serializable {
           // Save options
           //
           HashMap optionMap = new HashMap();
-          if( optionsDoc != null && sc.hasOptions() ) {
-            for( Iterator i = this.optionsDoc.getRootElement().getChildren().iterator(); i.hasNext(); ) {
-              Element node = ( Element ) i.next();
-              PropertyOption option = null;
+          if( optionsArray != null && sc.hasOptions() ) {
+            for(int i = 0; i < this.optionsArray.size(); i++) {
+              JsonObject node = this.optionsArray.getJsonObject(i);
+              PropertyOption option;
 
-              String idPropertyOption = node.getAttributeValue( "idPropertyOption" );
+              String idPropertyOption = node.getString( "idPropertyOption" );
               if( idPropertyOption.startsWith( "PropertyOption" ) ) {
                 option = new PropertyOption();
               } else {
@@ -335,15 +314,15 @@ public class SaveProperty extends GNomExCommand implements Serializable {
                     Integer.valueOf( idPropertyOption ) );
               }
 
-              String name = node.getAttributeValue( "option" );
+              String name = node.getString( "option" );
               name = mapPropertyOptionEquivalents( name );
 
               option.setOption( name );
-              option.setSortOrder( node.getAttributeValue( "sortOrder" ) != null
-                  && ! node.getAttributeValue( "sortOrder" ).equals( "" )
-                  ? Integer.valueOf( node.getAttributeValue( "sortOrder" ) )
+              option.setSortOrder( node.getString( "sortOrder" ) != null
+                  && ! node.getString( "sortOrder" ).equals( "" )
+                  ? Integer.valueOf( node.getString( "sortOrder" ) )
                       : null );
-              option.setIsActive( node.getAttributeValue( "isActive" ) );
+              option.setIsActive( node.getString( "isActive" ) );
               option.setIdProperty( sc.getIdProperty() );
 
               sess.save( option );
@@ -375,7 +354,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
             for( Iterator i = optionsToRemove.iterator(); i.hasNext(); ) {
               PropertyOption op = ( PropertyOption ) i.next();
 
-              Integer entryCount = new Integer( 0 );
+              Integer entryCount = 0;
               String buf = "SELECT count(*) from PropertyEntry pe where pe.value like '%"
                   + op.getOption() + "%' and pe.idProperty = "
                   + op.getIdProperty().toString();
@@ -385,12 +364,12 @@ public class SaveProperty extends GNomExCommand implements Serializable {
               }
 
               // Delete or inactivate prices/price criteria for that option
-              removePriceForPropertyOption( sc, op, pc, sess );
+              removePriceForPropertyOption( op, pc, sess );
 
               // Inactive if there are existing property entries pointing to
               // this option.
               // If no existing entries, delete option.
-              if( entryCount.intValue() > 0 ) {
+              if( entryCount > 0 ) {
                 inactivate = true;
                 op.setIsActive( "N" );
               } else {
@@ -406,12 +385,12 @@ public class SaveProperty extends GNomExCommand implements Serializable {
           // Save property organisms
           //
           TreeSet organisms = new TreeSet( new OrganismComparator() );
-          if( organismsDoc != null ) {
-            for( Iterator i = this.organismsDoc.getRootElement().getChildren().iterator(); i.hasNext(); ) {
-              Element organismNode = ( Element ) i.next();
+          if( organismsArray != null ) {
+            for(int i = 0; i < this.organismsArray.size(); i++) {
+              JsonObject organismNode = this.organismsArray.getJsonObject(i);
               Organism organism = sess.load( Organism.class,
                   Integer.valueOf(
-                      organismNode.getAttributeValue( "idOrganism" ) ) );
+                      organismNode.getString( "idOrganism" ) ) );
               organisms.add( organism );
             }
           }
@@ -425,12 +404,12 @@ public class SaveProperty extends GNomExCommand implements Serializable {
           if( sc.getForSample() != null && sc.getForSample().equals( "Y" )
               && ( sc.getIsRequired() == null
               || ! sc.getIsRequired().equals( "Y" ) ) ) {
-            if( appUsersDoc != null ) {
-              for( Iterator i = this.appUsersDoc.getRootElement().getChildren().iterator(); i.hasNext(); ) {
-                Element appUserNode = ( Element ) i.next();
+            if( appUsersArray != null ) {
+              for(int i = 0; i < this.appUsersArray.size(); i++) {
+                JsonObject appUserNode = this.appUsersArray.getJsonObject(i);
                 AppUserLite appUser = sess.load(
                     AppUserLite.class, Integer.valueOf(
-                        appUserNode.getAttributeValue( "idAppUser" ) ) );
+                        appUserNode.getString( "idAppUser" ) ) );
                 appUsers.add( appUser );
               }
             }
@@ -443,21 +422,24 @@ public class SaveProperty extends GNomExCommand implements Serializable {
           TreeSet platformApplications = new TreeSet(
               new PlatformApplicationsComparator() );
           HashMap platformApplicationsMap = new HashMap();
-          if( platformsDoc != null ) {
-            for( Iterator i = this.platformsDoc.getRootElement().getChildren().iterator(); i.hasNext(); ) {
-              Element platformNode = ( Element ) i.next();
+          if( platformsArray != null ) {
+            for(int i = 0; i < this.platformsArray.size(); i++) {
+              JsonObject platformNode = this.platformsArray.getJsonObject(i);
 
               // See if this PropertyPlatformApplication object already exists
-              StringBuffer queryBuf = new StringBuffer( "select pa" );
+              StringBuilder queryBuf = new StringBuilder( "select pa" );
               queryBuf.append( " from PropertyPlatformApplication as pa" );
-              queryBuf.append( " where pa.idProperty = " + sc.getIdProperty().toString() + " and" );
-              queryBuf.append( " pa.codeRequestCategory = '"
-                  + platformNode.getAttributeValue( "codeRequestCategory" )
-                  + "' and" );
+              queryBuf.append( " where pa.idProperty = ");
+              queryBuf.append(sc.getIdProperty().toString());
+              queryBuf.append(" and");
+              queryBuf.append( " pa.codeRequestCategory = '");
+              queryBuf.append(platformNode.getString( "codeRequestCategory" ));
+              queryBuf.append("' and");
               queryBuf.append( " pa.codeApplication " );
-              if( platformNode.getAttributeValue( "codeApplication" ).length() > 0 ) {
-                queryBuf.append(
-                    "= '" + platformNode.getAttributeValue( "codeApplication" ) + "'" );
+              if( platformNode.getString( "codeApplication" ).length() > 0 ) {
+                queryBuf.append("= '");
+                queryBuf.append(platformNode.getString( "codeApplication" ));
+                queryBuf.append("'");
               } else {
                 queryBuf.append( "is null" );
               }
@@ -465,7 +447,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
               Query query = sess.createQuery( queryBuf.toString() );
               List paRows = query.list();
 
-              PropertyPlatformApplication pa = null;
+              PropertyPlatformApplication pa;
               if( paRows.size() > 0 ) {
                 pa = ( PropertyPlatformApplication ) paRows.get( 0 );
                 platformApplicationsMap.put( pa.getIdPlatformApplication(),
@@ -474,11 +456,11 @@ public class SaveProperty extends GNomExCommand implements Serializable {
                 pa = new PropertyPlatformApplication();
                 pa.setIdProperty( sc.getIdProperty() );
                 pa.setCodeRequestCategory(
-                    platformNode.getAttributeValue( "codeRequestCategory" ) );
-                if( platformNode.getAttributeValue(
+                    platformNode.getString( "codeRequestCategory" ) );
+                if( platformNode.getString(
                     "codeApplication" ).length() > 0 ) {
                   pa.setCodeApplication(
-                      platformNode.getAttributeValue( "codeApplication" ) );
+                      platformNode.getString( "codeApplication" ) );
                 } else {
                   pa.setCodeApplication( null );
                 }
@@ -537,11 +519,11 @@ public class SaveProperty extends GNomExCommand implements Serializable {
           // Save property analysisTypes
           //
           TreeSet analysisTypes = new TreeSet( new AnalysisTypeComparator() );
-          if( analysisTypesDoc != null ) {
-            for( Iterator i = this.analysisTypesDoc.getRootElement().getChildren().iterator(); i.hasNext(); ) {
-              Element analysisTypeNode = ( Element ) i.next();
+          if( analysisTypesArray != null ) {
+            for(int i = 0; i < this.analysisTypesArray.size(); i++) {
+              JsonObject analysisTypeNode = this.analysisTypesArray.getJsonObject(i);
               AnalysisType at = sess.load( AnalysisType.class,
-                  Integer.valueOf( analysisTypeNode.getAttributeValue(
+                  Integer.valueOf( analysisTypeNode.getString(
                       "idAnalysisType" ) ) );
               analysisTypes.add( at );
             }
@@ -551,15 +533,12 @@ public class SaveProperty extends GNomExCommand implements Serializable {
 
           DictionaryHelper.reload( sess );
 
-          if( inactivate ) {
-            this.xmlResult = "<SUCCESS idProperty=\"" + sc.getIdProperty()
-            + "\" inactivate=\"true\"/>";
-          } else {
-            this.xmlResult = "<SUCCESS idProperty=\"" + sc.getIdProperty()
-            + "\" inactivate=\"false\"/>";
-
-          }
-
+          JsonObject value = Json.createObjectBuilder()
+                  .add("result", "SUCCESS")
+                  .add("idProperty", sc.getIdProperty().toString())
+                  .add("inactivate", inactivate ? "true" : "false")
+                  .build();
+          this.jsonResult = value.toString();
           setResponsePage( this.SUCCESS_JSP );
         }
       } else {
@@ -611,16 +590,16 @@ public class SaveProperty extends GNomExCommand implements Serializable {
     return pc;
   }
 
-  private boolean removePriceForPropertyOption( Property property, PropertyOption po, PriceCategory pc, Session sess ) {
+  private boolean removePriceForPropertyOption(PropertyOption po, PriceCategory pc, Session sess ) {
 
     boolean deletedPrice = false;
 
-    Price price = null;
+    Price price;
 
     // Look up price/price criteria or create new
     price = PropertyOption.getPriceForPropertyOption ( po, pc );
     if( price == null ) {
-      return deletedPrice;
+      return false;
     }
     Hibernate.initialize( price.getPriceCriterias() );
 
@@ -658,7 +637,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
       PropertyPlatformApplication pa = ( PropertyPlatformApplication ) i2.next();
 
       // Find price sheet
-      PriceSheet priceSheet = null;
+      PriceSheet priceSheet;
       boolean foundPriceSheet = false;
       for(Iterator i = priceSheets.iterator(); i.hasNext();) {
         PriceSheet ps = (PriceSheet)i.next();
@@ -672,7 +651,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
 
             // Search for PriceSheetPriceCategory
             boolean foundPriceSheetPriceCategory = false;
-            Integer maxSortOrder = Integer.valueOf(0);
+            Integer maxSortOrder = 0;
             for(Iterator i3 = priceSheet.getPriceCategories().iterator(); i3.hasNext();) {
               PriceSheetPriceCategory x  = (PriceSheetPriceCategory)i3.next();
               PriceCategory cat = x.getPriceCategory();
@@ -688,7 +667,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
               x.setIdPriceCategory(priceCategory.getIdPriceCategory());
               x.setIdPriceSheet(priceSheet.getIdPriceSheet());
               x.setPriceCategory(priceCategory);
-              x.setSortOrder(Integer.valueOf(maxSortOrder.intValue() + 1));
+              x.setSortOrder(maxSortOrder + 1);
               sess.save(x);
               addedPriceCat.add(priceSheet.getIdPriceSheet());
             }
@@ -730,8 +709,8 @@ public class SaveProperty extends GNomExCommand implements Serializable {
 
   }
 
-  private void savePricesForPropertyOption( Element poNode, PropertyOption po, PriceCategory pc, Session sess ) {
-    Price price = null;
+  private void savePricesForPropertyOption( JsonObject poNode, PropertyOption po, PriceCategory pc, Session sess ) {
+    Price price;
     PriceCriteria priceCriteria = null;
 
     // Look up price/price criteria or create new
@@ -745,14 +724,14 @@ public class SaveProperty extends GNomExCommand implements Serializable {
       priceCriteria = new PriceCriteria();
     }
 
-    price.setName( poNode.getAttributeValue( "option" ) );
+    price.setName( poNode.getString( "option" ) );
     price.setIdPriceCategory( pc.getIdPriceCategory() );
     price.setIsActive( po.getIsActive() );
 
     // Update the prices
-    setPrice( poNode.getAttributeValue( "unitPriceInternal" ), price.getUnitPrice(), price, PriceUtil.PRICE_INTERNAL );
-    setPrice( poNode.getAttributeValue( "unitPriceExternalAcademic" ), price.getUnitPriceExternalAcademic(), price, PriceUtil.PRICE_EXTERNAL_ACADEMIC );
-    setPrice( poNode.getAttributeValue( "unitPriceExternalCommercial" ), price.getUnitPriceExternalCommercial(), price, PriceUtil.PRICE_EXTERNAL_COMMERCIAL );
+    setPrice( poNode.getString( "unitPriceInternal" ), price.getUnitPrice(), price, PriceUtil.PRICE_INTERNAL );
+    setPrice( poNode.getString( "unitPriceExternalAcademic" ), price.getUnitPriceExternalAcademic(), price, PriceUtil.PRICE_EXTERNAL_ACADEMIC );
+    setPrice( poNode.getString( "unitPriceExternalCommercial" ), price.getUnitPriceExternalCommercial(), price, PriceUtil.PRICE_EXTERNAL_COMMERCIAL );
 
     sess.save( price );
     sess.flush();
@@ -767,7 +746,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
   private PriceCriteria getPriceCriteriaForPropertyOption ( Price price, PropertyOption po ) {
     PriceCriteria priceCriteria = null;
     if ( po == null ) {
-      return priceCriteria;
+      return null;
     }
     for( Iterator i = price.getPriceCriterias().iterator(); i.hasNext(); ) {
       priceCriteria = ( PriceCriteria ) i.next();
@@ -779,7 +758,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
   }
 
   private void savePriceForCheckProperty(  Property property, PriceCategory pc, Session sess ) {
-    Price price = null;
+    Price price;
     PriceCriteria priceCriteria = new PriceCriteria();
 
     // Look up price/price criteria or create new
@@ -860,7 +839,7 @@ public class SaveProperty extends GNomExCommand implements Serializable {
   }
 
 
-  private Boolean checkPermissionToEdit( Session sess ) {
+  private Boolean checkPermissionToEdit() {
     if( propertyScreen.getForRequest() != null
         && propertyScreen.getForRequest().equals( "Y" ) ) {
       if( ! this.getSecurityAdvisor().hasPermission(

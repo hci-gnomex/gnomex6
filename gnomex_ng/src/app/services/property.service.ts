@@ -1,9 +1,10 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
+import {Http, Response, URLSearchParams, Headers} from "@angular/http";
 import {DictionaryService} from "./dictionary.service";
 import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class PropertyService {
@@ -11,7 +12,8 @@ export class PropertyService {
     readonly SHOW_FUNDING_AGENCY: string = 'show_funding_agency';
 
     constructor(private dictionaryService: DictionaryService,
-                private http: Http) {}
+                private http: Http,
+                private cookieUtilService: CookieUtilService) {}
 
     /**
      * Returns the property entry that matches the provided search data as specifically as possible:
@@ -88,6 +90,38 @@ export class PropertyService {
                 return [];
             }
         });
+    }
+
+    public getPropertyAnnotationCall(idProperty: string): Observable<Response> {
+        let params: URLSearchParams = new URLSearchParams();
+        params.set("idProperty", idProperty);
+        return this.http.get("/gnomex/GetProperty.gx", {search: params});
+    }
+
+    public getPropertyAnnotation(idProperty: string): Observable<any> {
+        return this.getPropertyAnnotationCall(idProperty).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                return null;
+            }
+        });
+    }
+
+    public savePropertyAnnotation(params: URLSearchParams):  Observable<Response> {
+        this.cookieUtilService.formatXSRFCookie();
+
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/SaveProperty.gx", params.toString(), {headers: headers});
+    }
+
+    public deletePropertyAnnotation(params: URLSearchParams):  Observable<Response> {
+        this.cookieUtilService.formatXSRFCookie();
+
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/DeleteProperty.gx", params.toString(), {headers: headers});
     }
 
 }
