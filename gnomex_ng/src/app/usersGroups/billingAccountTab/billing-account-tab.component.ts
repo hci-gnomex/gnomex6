@@ -20,6 +20,7 @@ import { UploadViewRemoveRenderer } from "../../util/grid-renderers/upload-view-
 
 import * as _ from "lodash";
 import {BillingUsersSelectorComponent} from "./billing-users-selector/billing-users-selector.component";
+import {DateParserComponent} from "../../util/parsers/date-parser.component";
 
 @Component ({
 	selector: "billing-account-tab",
@@ -262,6 +263,7 @@ export class BillingAccountTabComponent implements OnInit{
 			width: 100,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
+			dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
 			field: "startDate"
 		});
 		columnDefinitions.push({
@@ -270,6 +272,7 @@ export class BillingAccountTabComponent implements OnInit{
 			width: 100,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
+			dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
 			field: "expirationDate"
 		});
 		columnDefinitions.push({
@@ -385,6 +388,7 @@ export class BillingAccountTabComponent implements OnInit{
 			width: 100,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
+			dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
 			field: "startDate"
 		});
 		columnDefinitions.push({
@@ -393,6 +397,7 @@ export class BillingAccountTabComponent implements OnInit{
 			width: 100,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
+			dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
 			field: "expirationDate"
 		});
 		columnDefinitions.push({
@@ -464,6 +469,7 @@ export class BillingAccountTabComponent implements OnInit{
 			width: 100,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
+			dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
 			field: "expirationDate"
 		});
 		columnDefinitions.push({
