@@ -1,9 +1,11 @@
-<div style="padding: 0.5%;">
-    <h5>Configure Annotations</h5>
+<div class="wholeDocument">
+    <div class="fullRow">
+        <h5>Configure Annotations</h5>
+    </div>
     <div class="fullRow">
         <div class="embeddedRow">
             <button mat-button (click)="this.add()"><img class="icon" src="../../assets/page_add.png">Add</button>
-            <button mat-button (click)="this.deleteAnnotation()"><img class="icon" src="../../assets/page_remove.png">Remove</button>
+            <button mat-button (click)="this.deleteAnnotation()" [disabled]="this.selectedProperty == null || this.selectedProperty.canDelete != 'Y'"><img class="icon" src="../../assets/page_remove.png">Remove</button>
         </div>
         <button mat-button (click)="this.refresh()"><img class="icon" src="../../assets/refresh.png">Refresh</button>
     </div>
@@ -11,10 +13,10 @@
         <div class="embeddedRow">
             <label class="leadingLabel">Show Annotations For</label>
             <mat-radio-group [(ngModel)]="this.type" (change)="this.onCriteriaChange()">
-                <mat-radio-button [value]="TYPE_SAMPLES">Samples</mat-radio-button>
-                <mat-radio-button [value]="TYPE_ANALYSIS">Analysis</mat-radio-button>
-                <mat-radio-button [value]="TYPE_DATA_TRACKS">Data Tracks</mat-radio-button>
-                <mat-radio-button [value]="TYPE_EXPERIMENTS">Experiments</mat-radio-button>
+                <mat-radio-button [value]="SHOW_FOR_SAMPLES">Samples</mat-radio-button>
+                <mat-radio-button [value]="SHOW_FOR_ANALYSIS">Analysis</mat-radio-button>
+                <mat-radio-button [value]="SHOW_FOR_DATA_TRACKS">Data Tracks</mat-radio-button>
+                <mat-radio-button [value]="SHOW_FOR_EXPERIMENTS">Experiments</mat-radio-button>
             </mat-radio-group>
         </div>
         <div class="embeddedRow">
@@ -39,39 +41,284 @@
             </mat-form-field>
         </div>
     </div>
-    <div class="fullRow">
-        <ag-grid-angular style="width: 400px; height: 600px;"
+    <div class="gridAndDetailRow">
+        <ag-grid-angular style="width: 30%;"
                          class="ag-fresh"
                          (gridReady)="this.onAnnotGridReady($event)"
                          (rowDataChanged)="this.onAnnotGridRowDataChanged()"
                          [rowSelection]="'single'"
                          (rowSelected)="this.onAnnotGridRowSelected($event)"
                          [rowData]="this.annotGridRowData"
+                         [rowClassRules]="this.annotGridRowClassRules"
                          [columnDefs]="this.annotGridColumnDefs">
         </ag-grid-angular>
+        <mat-tab-group [(selectedIndex)]="this.selectedTabIndex" *ngIf="this.selectedProperty" style="width:65%;">
+            <mat-tab label="Annotation">
+                <div class="tabContent">
+                    <div class="tabRow" style="margin-bottom: 2%">
+                        <mat-form-field class="propFormField" style="margin-right: 2%;">
+                            <input matInput placeholder="Name" [formControl]="this.nameFC">
+                            <mat-error *ngIf="this.nameFC.hasError('required')">Required</mat-error>
+                        </mat-form-field>
+                        <mat-checkbox [formControl]="this.activeFC">Active</mat-checkbox>
+                    </div>
+                    <div class="tabRow">
+                        <mat-form-field class="propFormField">
+                            <mat-select placeholder="Core Facility" [formControl]="this.coreFacilityFC">
+                                <mat-option *ngFor="let core of myCoreFacilities" [value]="core.idCoreFacility">{{core.display}}</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="this.coreFacilityFC.hasError('required')">Required</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="tabRow">
+                        <label style="margin-right: 4%;">Annotates</label>
+                        <mat-checkbox style="margin-right: 2%;" [formControl]="this.forSampleFC">Sample</mat-checkbox>
+                        <mat-checkbox style="margin-right: 2%;" [formControl]="this.forDataTrackFC">Data Track</mat-checkbox>
+                        <mat-checkbox style="margin-right: 2%;" [formControl]="this.forAnalysisFC">Analysis</mat-checkbox>
+                        <mat-checkbox [formControl]="this.forRequestFC">Experiment</mat-checkbox>
+                    </div>
+                    <div class="tabRow">
+                        <mat-checkbox [formControl]="this.requiredFC">Required (Annotation must be filled in)</mat-checkbox>
+                    </div>
+                    <div class="tabRow">
+                        <mat-form-field class="propFormField" style="margin-bottom: 1%">
+                            <input matInput placeholder="Sort Order" [formControl]="this.sortOrderFC">
+                            <mat-error *ngIf="this.sortOrderFC.hasError('pattern')">Sort order must be a number less than or equal to 9999</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="tabRow" style="flex: 2; margin-bottom: 1%">
+                        <mat-form-field class="propFormField">
+                            <textarea matInput placeholder="Description" [formControl]="this.descriptionFC" matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+                            <mat-error *ngIf="this.descriptionFC.hasError('maxlength')">Description can be at most 2000 characters</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="tabRow">
+                        <mat-form-field class="propFormField">
+                            <mat-select placeholder="Owner" [formControl]="this.ownerFC">
+                                <mat-option>None</mat-option>
+                                <mat-option *ngFor="let user of appUserList" [value]="user.idAppUser">{{user.display}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="tabRow" style="align-items: flex-start; height: 30%; flex: 3;">
+                        <label style="margin-right: 4%;">Type</label>
+                        <mat-radio-group [formControl]="this.propertyTypeFC" style="display: flex; flex-direction: column;">
+                            <mat-radio-button [value]="TYPE_TEXT">Text</mat-radio-button>
+                            <mat-radio-button [value]="TYPE_URL">URL</mat-radio-button>
+                            <mat-radio-button [value]="TYPE_CHECKBOX">Checkbox</mat-radio-button>
+                            <mat-radio-button [value]="TYPE_OPTION">Dropdown (single selection)</mat-radio-button>
+                            <mat-radio-button [value]="TYPE_MULTI_OPTION">Dropdown (multiple selection)</mat-radio-button>
+                        </mat-radio-group>
+                        <div style="height: 100%; width: 100%; display: flex; flex-direction: column;  margin-left: 2%;" *ngIf="this.propertyTypeFC.value === this.TYPE_OPTION || this.propertyTypeFC.value === this.TYPE_MULTI_OPTION">
+                            <div style="display: flex; flex-direction: row;">
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty" (click)="this.addOption()"><img class="icon" src="../../assets/add.png">Add option</button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOptionIndex == null" (click)="this.deleteOption()"><img class="icon" src="../../assets/delete.png">Delete option</button>
+                            </div>
+                            <ag-grid-angular style="width: 30%; height: 100%;"
+                                             class="ag-fresh"
+                                             (gridReady)="this.onOptionGridReady($event)"
+                                             [rowSelection]="'single'"
+                                             (rowSelected)="this.onOptionGridRowSelected($event)"
+                                             (gridSizeChanged)="this.sizeColumnsToFit(this.optionGridApi)"
+                                             (cellEditingStarted)="this.cellEditingStarted()"
+                                             [rowData]="this.currentOptions"
+                                             [columnDefs]="this.optionGridColumnDefs"
+                                             [enableColResize]="true"
+                                             [singleClickEdit]="true">
+                            </ag-grid-angular>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab label="Applies To">
+                <div class="tabContent">
+                    <div class="appliesToGroup">
+                        <label>Only show for these platforms/experiment types</label>
+                        <div style="display: flex; flex-direction: row;">
+                            <mat-form-field class="appliesToField">
+                                <mat-select placeholder="Platform" [formControl]="this.appliesToPlatform">
+                                    <mat-option>None</mat-option>
+                                    <mat-option *ngFor="let plat of this.listFilteredExperimentPlatform" [value]="plat">{{plat.display}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field class="appliesToField">
+                                <mat-select placeholder="Experiment Type (optional)" [(ngModel)]="this.appliesToApp">
+                                    <mat-option>None</mat-option>
+                                    <mat-option *ngFor="let app of this.listFilteredApplication" [value]="app">{{app.application}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || !this.appliesToPlatform.value" (click)="this.addPlatform()"><img class="icon" src="../../assets/add.png"></button>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedPlatformIndex == null" (click)="this.deletePlatform()"><img class="icon" src="../../assets/delete.png"></button>
+                        </div>
+                        <ag-grid-angular style="width: 100%; height: 100%;"
+                                         class="ag-fresh"
+                                         (gridReady)="this.onPlatformGridReady($event)"
+                                         [rowSelection]="'single'"
+                                         (rowSelected)="this.onPlatformGridRowSelected($event)"
+                                         [rowData]="this.currentPlatforms"
+                                         [columnDefs]="this.platformGridColumnDefs"
+                                         (gridSizeChanged)="this.sizeColumnsToFit(this.platformGridApi)"
+                                         [enableColResize]="true">
+                        </ag-grid-angular>
+                    </div>
+                    <div class="appliesToGroup">
+                        <label>Only show for these organisms</label>
+                        <div style="display: flex; flex-direction: row;">
+                            <mat-form-field class="appliesToField">
+                                <mat-select placeholder="Organism" [(ngModel)]="this.appliesToOrganism">
+                                    <mat-option>None</mat-option>
+                                    <mat-option *ngFor="let org of this.listOrganism" [value]="org">{{org.display}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToOrganism == null" (click)="this.addOrganism()"><img class="icon" src="../../assets/add.png"></button>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOrganismIndex == null" (click)="this.deleteOrganism()"><img class="icon" src="../../assets/delete.png"></button>
+                        </div>
+                        <ag-grid-angular style="width: 100%; height: 100%;"
+                                         class="ag-fresh"
+                                         (gridReady)="this.onOrganismGridReady($event)"
+                                         [rowSelection]="'single'"
+                                         (rowSelected)="this.onOrganismGridRowSelected($event)"
+                                         [rowData]="this.currentOrganisms"
+                                         [columnDefs]="this.organismGridColumnDefs"
+                                         (gridSizeChanged)="this.sizeColumnsToFit(this.organismGridApi)"
+                                         [enableColResize]="true">
+                        </ag-grid-angular>
+                    </div>
+                    <div class="appliesToGroup">
+                        <label>Only show for these analysis types</label>
+                        <div style="display: flex; flex-direction: row;">
+                            <mat-form-field class="appliesToField">
+                                <mat-select placeholder="Analysis Type" [(ngModel)]="this.appliesToAnalysisType">
+                                    <mat-option>None</mat-option>
+                                    <mat-option *ngFor="let an of this.listAnalysisType" [value]="an">{{an.display}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToAnalysisType == null" (click)="this.addAnalysisType()"><img class="icon" src="../../assets/add.png"></button>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedAnalysisTypeIndex == null" (click)="this.deleteAnalysisType()"><img class="icon" src="../../assets/delete.png"></button>
+                        </div>
+                        <ag-grid-angular style="width: 100%; height: 100%;"
+                                         class="ag-fresh"
+                                         (gridReady)="this.onAnalysisTypeGridReady($event)"
+                                         [rowSelection]="'single'"
+                                         (rowSelected)="this.onAnalysisTypeGridRowSelected($event)"
+                                         [rowData]="this.currentAnalysisTypes"
+                                         [columnDefs]="this.analysisTypeGridColumnDefs"
+                                         (gridSizeChanged)="this.sizeColumnsToFit(this.analysisTypeGridApi)"
+                                         [enableColResize]="true">
+                        </ag-grid-angular>
+                    </div>
+                    <div class="appliesToGroup">
+                        <label>Only show for these users (only applies to non-required sample annotations)</label>
+                        <div style="display: flex; flex-direction: row;">
+                            <mat-form-field class="appliesToField">
+                                <mat-select placeholder="User" [(ngModel)]="this.appliesToUser">
+                                    <mat-option>None</mat-option>
+                                    <mat-option *ngFor="let u of this.appUserList" [value]="u">{{u.display}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToUser == null" (click)="this.addUser()"><img class="icon" src="../../assets/add.png"></button>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedUserIndex == null" (click)="this.deleteUser()"><img class="icon" src="../../assets/delete.png"></button>
+                        </div>
+                        <ag-grid-angular style="width: 100%; height: 100%;"
+                                         class="ag-fresh"
+                                         (gridReady)="this.onUserGridReady($event)"
+                                         [rowSelection]="'single'"
+                                         (rowSelected)="this.onUserGridRowSelected($event)"
+                                         [rowData]="this.currentUsers"
+                                         [columnDefs]="this.userGridColumnDefs"
+                                         (gridSizeChanged)="this.sizeColumnsToFit(this.userGridApi)"
+                                         [enableColResize]="true">
+                        </ag-grid-angular>
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab label="Mage Ontology">
+                <div class="tabContent">
+                    <mat-form-field class="propFormField">
+                        <input matInput placeholder="Mage Ontology Code" [formControl]="this.mageOntologyCodeFC">
+                    </mat-form-field>
+                    <mat-form-field class="propFormField">
+                        <input matInput placeholder="Mage Ontology Definition" [formControl]="this.mageOntologyDefFC">
+                    </mat-form-field>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+    <div class="fullRow">
+        <label>* Denotes annotations that apply to specific organisms, analysis types, experiment platforms, and/or users</label>
+        <div style="display: flex; flex-direction: row;" *ngIf="this.selectedProperty">
+            <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirtyNote">Changes Have Not Been Saved</span>
+            <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.formGroup.valid" (click)="this.save()"><img class="icon" src="../../assets/action_save.gif">Save</button>
+            <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+        </div>
     </div>
 </div>
 <style>
+    div.wholeDocument {
+        padding: 0.5%;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
     div.fullRow {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         margin: 0.1% 0;
         align-items: center;
+        flex: 1;
     }
     div.embeddedRow {
         display: flex;
         flex-direction: row;
-        flex-grow: 1;
+        flex: 1;
         align-items: center;
+    }
+    div.gridAndDetailRow {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin: 0.1% 0;
+        flex: 15;
     }
     mat-form-field.embeddedField {
         margin: 0 0.5%;
+    }
+    div.tabContent {
+        padding: 1%;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    div.tabRow {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex: 1;
+    }
+    div.appliesToGroup {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        flex: 1;
+    }
+    mat-form-field.propFormField {
+        width: 65%;
+    }
+    mat-form-field.appliesToField {
+        width: 30%;
+        margin-right: 2%;
     }
     label.leadingLabel {
         margin-right: 2%;
     }
     img.icon {
         margin-right: 0.5rem;
+    }
+    span.dirtyNote {
+        background: yellow;
+        padding: 0.5rem;
+        margin-left: 1rem;
     }
 </style>
