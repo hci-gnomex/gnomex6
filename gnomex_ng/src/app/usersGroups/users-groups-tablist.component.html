@@ -295,7 +295,7 @@
                         <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveUser()"><img src="../../assets/save.png">Save</button>
                     </div>
                 </div>
-                <div *ngIf="isGroupsTab" style="height: 100%">
+                <div *ngIf="isGroupsTab && selectedGroup" style="height: 100%">
                     <!--groups tab group-->
                     <mat-tab-group id="groupTabGroup" style="height: 90%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
                         <mat-tab groupTab label="Group"  style="height:100%;">
@@ -378,7 +378,8 @@
                                 <membership-tab [memberGroup]="selectedGroup" [users]="rowData" #membershipTab ></membership-tab>
                             </div>
                         </mat-tab>
-                        <mat-tab label="Billing Accounts"  style="height:100%;">
+                        <mat-tab #groupTab label="Billing Accounts"  style="height:100%;">
+                            <billing-account-tab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
                         </mat-tab>
                         <mat-tab label="Invoices"  style="height:100%;">
                         </mat-tab>

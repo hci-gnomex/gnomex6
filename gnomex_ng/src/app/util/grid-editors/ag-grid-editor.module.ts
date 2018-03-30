@@ -1,26 +1,26 @@
-import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { RouterModule } from '@angular/router'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { AngularMaterialModule } from '../../../modules/angular-material.module'
-import {SelectEditorComponent} from './index'
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule} from "@angular/forms";
 
-
+import { AngularMaterialModule } from "../../../modules/angular-material.module";
+import { DateEditor } from './date.editor'
+import { SelectEditor } from './select.editor';
 
 
 @NgModule({
     imports: [
+			  AngularMaterialModule,
         CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        AngularMaterialModule
+			  FormsModule
     ],
 
     declarations: [
-        SelectEditorComponent
+        DateEditor,
+        SelectEditor
     ],
-    providers: [
-    ],
-    exports: [SelectEditorComponent]
+    exports: [
+        DateEditor,
+        SelectEditor
+    ]
 })
 export class AgGridEditorModule { }

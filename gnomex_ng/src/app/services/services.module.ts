@@ -33,11 +33,15 @@ import {LabMembershipRequestService} from "./lab-membership-request.service";
 import {UserService} from "./user.service";
 import {ConfigurationService} from "./configuration.service";
 import {SubRouteGuardService} from "./route-guards/sub-route-guard.service";
+import {AccountFieldsConfigurationService} from "./account-fields-configuration.service";
+import {NewBillingAccountService} from "./new-billing-account.service";
+
 @NgModule({
     imports: [CommonModule],
     declarations: [],
     exports: [],
     providers: [
+			  AccountFieldsConfigurationService,
         AnalysisService,
         AppUserListService,
         BillingService,
@@ -72,7 +76,8 @@ import {SubRouteGuardService} from "./route-guards/sub-route-guard.service";
 	    UserService,
         LabMembershipRequestService,
         ConfigurationService,
-        SubRouteGuardService
+        SubRouteGuardService,
+			  NewBillingAccountService
     ]})
 export class ServicesModule {
 }
