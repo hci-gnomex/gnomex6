@@ -203,6 +203,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     public isUserTab: boolean = true;
     public isGroupsTab: boolean = false;
     public isGroupSubTab: boolean = true;
+    public groupSubTabName: string = "";
     public isBillingAdminSubTab: boolean = false;
     private userForm: FormGroup;
     private groupForm: FormGroup;
@@ -736,6 +737,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     onGroupsTabChange(event) {
+        this.groupSubTabName = event.tab.textLabel;
         switch(event.tab.textLabel) {
             case "Group": {
                 this.isGroupSubTab = true;

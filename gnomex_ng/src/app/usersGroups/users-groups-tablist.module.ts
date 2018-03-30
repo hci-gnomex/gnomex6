@@ -35,6 +35,7 @@ import {DeleteUserDialogComponent} from "./delete-user-dialog.component";
 import {NewGroupDialogComponent} from "./new-group-dialog.component";
 import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
 import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
+import {BillingAccountTabComponent, ChartfieldLeftMiddleRenderer, ChartfieldRemoveRenderer, ChartfieldRightMiddleRenderer, CheckboxRenderer, NameRenderer, PurchaseOrderRenderer, SelectCellEditor, SelectCellRenderer} from "./billingAccountTab/billing-account-tab.component";
 import {BillingAdminTabComponent} from "./billingAdminTab/billing-admin-tab.component";
 import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
 
@@ -70,10 +71,36 @@ import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
         WindowModule,
         ReactiveFormsModule,
         AngularSplitModule,
-        AgGridModule.withComponents([IconTextRendererComponent])
+        AgGridModule.withComponents([
+					  ChartfieldLeftMiddleRenderer,
+            ChartfieldRemoveRenderer,
+            ChartfieldRightMiddleRenderer,
+            CheckboxRenderer,
+            IconTextRendererComponent,
+					  NameRenderer,
+					  PurchaseOrderRenderer,
+					  SelectCellEditor,
+					  SelectCellRenderer
+        ])
     ],
-    declarations: [UsersGroupsTablistComponent, NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent, BillingAdminTabComponent,
-        MembershipTabComponent
+    declarations: [
+        BillingAccountTabComponent,
+			  BillingAdminTabComponent,
+        ChartfieldLeftMiddleRenderer,
+        ChartfieldRemoveRenderer,
+        ChartfieldRightMiddleRenderer,
+        CheckboxRenderer,
+        DeleteGroupDialogComponent,
+        DeleteUserDialogComponent,
+			  MembershipTabComponent,
+        NewGroupDialogComponent,
+        NewUserDialogComponent,
+			  NameRenderer,
+			  PurchaseOrderRenderer,
+        SelectCellEditor,
+        SelectCellRenderer,
+        UsersGroupsTablistComponent,
+        VerifyUsersDialogComponent
     ],
     entryComponents: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
     exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent, BillingAdminTabComponent, MembershipTabComponent]
