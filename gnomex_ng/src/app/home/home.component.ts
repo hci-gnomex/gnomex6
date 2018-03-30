@@ -13,6 +13,8 @@ import {jqxProgressBarComponent} from "jqwidgets-framework";
 import {Subscription} from "rxjs/Subscription";
 import {URLSearchParams} from "@angular/http";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {GnomexService} from "../services/gnomex.service";
+import {Router} from "@angular/router";
 
 @Component({
     selector: "gnomex-home",
@@ -59,7 +61,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private site_logo:string;
 
     constructor(private launchPropertiesService: LaunchPropertiesService,
-                private progressService: ProgressService
+                private progressService: ProgressService,
+                private gnomexService: GnomexService,
+                private router:Router
     ) {
         // Do instance configuration here
     }
@@ -74,8 +78,24 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         })
     }
     ngOnInit() {
-        this.hideLoader = this.progressService.hideLoader;
+
+        if(!this.progressService.hideLoader){
+            this.progressService.hideLoader = new BehaviorSubject<boolean>(false);
+            this.hideLoader = this.progressService.hideLoader;
+        }else{
+            this.hideLoader = this.progressService.hideLoader;
+        }
+
+
         let params: URLSearchParams = new URLSearchParams();
+        this.gnomexService.initApp();
+        this.gnomexService.isAppInitCompleteObservable().first().subscribe(complete =>{
+            if(this.gnomexService.redirectURL){
+                console.log(this.router.parseUrl(this.gnomexService.redirectURL));
+                this.router.navigateByUrl(this.gnomexService.redirectURL);
+            }
+        });
+
 
         this.launchPropertiesService.getLaunchProperties(params).subscribe((response: any[]) => {
             this.launchProperties = response;

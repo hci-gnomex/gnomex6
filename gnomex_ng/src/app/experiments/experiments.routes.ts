@@ -11,6 +11,7 @@ import { ExperimentDetail } from "./experiment-detail/experiment-detail.componen
 import { ExperimentResolverService, ProjectResolverService } from "../services/resolvers/index";
 import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
+import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
 
 
 /**
@@ -21,10 +22,17 @@ import {CreateProjectLauncherComponent} from "./create-project-launcher-componen
  */
 const ROUTES: Routes = [
 
-
-    { path: "experiments", component: BrowseExperimentsComponent , children:[
+    { path: "experiments/:id", component: BrowseExperimentsComponent , children:[ // for navigating via url
+        {path: '', pathMatch: 'full', redirectTo: '/experiments/:id/(browsePanel:overview)' },
         {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
-        {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}]
+        {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
+        canActivate: [SubRouteGuardService]
+    },
+    { path: "experiments", component: BrowseExperimentsComponent , children:[ // for stepping through app to this page
+        {path: '', pathMatch: 'full', redirectTo: '/experiments/(browsePanel:overview)' },
+        {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
+        {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
+        canActivate: [SubRouteGuardService]
     },
     { path: "experiments/new", component:NewExperimentComponent},
     { path: "experiments-orders", component:ExperimentOrdersComponent},

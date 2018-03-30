@@ -32,6 +32,7 @@ import {AppUserPublicService} from "./app-user-public.service";
 import {LabMembershipRequestService} from "./lab-membership-request.service";
 import {UserService} from "./user.service";
 import {ConfigurationService} from "./configuration.service";
+import {SubRouteGuardService} from "./route-guards/sub-route-guard.service";
 @NgModule({
     imports: [CommonModule],
     declarations: [],
@@ -70,7 +71,8 @@ import {ConfigurationService} from "./configuration.service";
         AppUserPublicService,
 	    UserService,
         LabMembershipRequestService,
-        ConfigurationService
+        ConfigurationService,
+        SubRouteGuardService
     ]})
 export class ServicesModule {
 }
