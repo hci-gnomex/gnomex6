@@ -1,4 +1,4 @@
-import {Component, Input, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 
 import {MatDialogRef, MatDialog} from '@angular/material';
 import {NewTopicComponent} from "../new-topic.component";
@@ -17,6 +17,9 @@ export class MenuHeaderTopicsComponent {
     public showDelete: boolean = false;
     public showRemoveLink: boolean = false;
     public showNewTopic: boolean = false;
+    public message: string = "startLinkToData";
+
+    @Output() messageEvent = new EventEmitter<string>();
 
     constructor(private dialog: MatDialog) {
     }
@@ -77,6 +80,7 @@ export class MenuHeaderTopicsComponent {
     }
 
     public doLinkToData(): void {
+        this.messageEvent.emit(this.message);
         // TODO
     }
 

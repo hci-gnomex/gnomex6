@@ -31,6 +31,9 @@ import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
 import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {DictionaryService} from "../services/dictionary.service";
+import {PropertyService} from "../services/property.service";
+
+const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
 @Component({
     selector: "experiments",
@@ -215,6 +218,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
     public deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
     public showSpinner: boolean = false;
+    private viewLimit: number = 999999;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -222,6 +226,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.labList = response;
         });
+        if (this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS) != null) {
+            this.viewLimit = this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS).propertyValue;
+        }
 
     }
 
@@ -235,7 +242,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private dialogsService: DialogsService,
                 private changeDetectorRef: ChangeDetectorRef,
                 private dictionaryService: DictionaryService,
-                private labListService: LabListService) {
+                private labListService: LabListService,
+                private propertyService: PropertyService) {
 
 
         this.items = [];
@@ -334,10 +342,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                             for (var request of project.items) {
                                 if (request) {
                                     if (request.label) {
-                                        var shortLabel = request.label.substring(0, (request.label.lastIndexOf("-")));
-                                        var shorterLabel = shortLabel.substring(0, shortLabel.lastIndexOf("-"));
-                                        request.label = shorterLabel;
+                                        request.label = request.requestNumber + '-' + request.name;
                                         this.experimentCount++;
+                                        if (this.experimentCount >= this.viewLimit) {
+                                            return;
+                                        }
                                         request.id = "r" + request.idRequest;
                                         request.parentid = project.id;
                                     } else {
@@ -414,7 +423,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         });
         this.reassignExperimentDialogRef.afterClosed()
             .subscribe(result => {
-                if (this.reassignExperimentDialogRef.componentInstance.noButton) {
+                if (this.reassignExperimentDialogRef && this.reassignExperimentDialogRef.componentInstance.noButton) {
                     this.resetTree();
                 }
             })
@@ -454,6 +463,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY, this.currentItem.codeRequestCategory).idCoreFacility;
 
         var i: number = 0;
+        if (!this.createSecurityAdvisorService.isArray(response.possibleCollaborators)) {
+            response.possibleCollaborators = [response.possibleCollaborators.AppUser];
+        }
         for (let user of response.possibleCollaborators) {
             if (user.isActive === "Y") {
                 this.labMembers[i] = user;
@@ -467,6 +479,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 billingAccount.label = billingAccount.accountName;
                 this.billingAccounts.push(billingAccount);
             }
+        }
+        if (!this.createSecurityAdvisorService.isArray(response.managers)) {
+            response.managers = [response.managers.AppUser];
         }
 
         for (let manager of response.managers) {

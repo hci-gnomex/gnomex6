@@ -1,6 +1,6 @@
 import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 import {DateRangePickerComponent} from "./date-range-picker.component";
 import {BrowseFilterComponent} from "./browse-filter.component";
@@ -21,6 +21,7 @@ import {NewDataTrackFolderComponent} from "../datatracks/new-datatrackfolder.com
 import {DeleteDataTrackComponent} from "../datatracks/delete-datatrack.component";
 import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
 import {SaveFooterComponent} from "./save-footer.component"
+import {MonthPickerComponent} from "./pickers/month-picker.component";
 
 @NgModule({
     imports: [
@@ -30,16 +31,17 @@ import {SaveFooterComponent} from "./save-footer.component"
         CalendarModule,
         ComboBoxModule,
         FormsModule,
+        ReactiveFormsModule,
         AngularMaterialModule
 
     ],
     declarations: [DateRangePickerComponent, BrowseFilterComponent, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent,
                     MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent, NewDataTrackFolderComponent,
-                    DeleteDataTrackComponent, NewDataTrackComponent,SaveFooterComponent],
+                    DeleteDataTrackComponent, NewDataTrackComponent,SaveFooterComponent, MonthPickerComponent],
     entryComponents: [BillingUsageReportComponent, NewGenomeBuildComponent, NewOrganismComponent, NewTopicComponent, NewDataTrackFolderComponent, NewDataTrackComponent, DeleteDataTrackComponent],
     exports: [DateRangePickerComponent, BrowseFilterComponent, TabsModule, BillingPeriodPickerComponent, MenuHeaderBillingComponent, BillingUsageReportComponent,
                 MenuHeaderDataTracksComponent, NewGenomeBuildComponent, NewOrganismComponent, MenuHeaderTopicsComponent, NewTopicComponent,
-                NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent,SaveFooterComponent]
+                NewDataTrackFolderComponent, DeleteDataTrackComponent, NewDataTrackComponent,SaveFooterComponent, MonthPickerComponent]
 
 })
 export class UtilModule {

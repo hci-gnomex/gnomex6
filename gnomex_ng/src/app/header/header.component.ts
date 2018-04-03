@@ -140,6 +140,8 @@ export class HeaderComponent implements OnInit{
                                 if (response != null) {
                                     if (!this.createSecurityAdvisorService.isArray(response)) {
                                         this.faqList = [response.FAQ];
+                                    } else {
+                                        this.faqList = response;
                                     }
                                 }
                                 this.gnomexService.myCoreFacilities = this.dictionaryService.coreFacilities();

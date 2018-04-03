@@ -37,6 +37,7 @@ import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
 import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
 import {BillingAdminTabComponent} from "./billingAdminTab/billing-admin-tab.component";
 import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
+import {InvoicesTabComponent} from "./invoicesTab/invoices-tab.component";
 
 /**
  * @author jdewell
@@ -73,10 +74,10 @@ import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
         AgGridModule.withComponents([IconTextRendererComponent])
     ],
     declarations: [UsersGroupsTablistComponent, NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent, BillingAdminTabComponent,
-        MembershipTabComponent
+        MembershipTabComponent, InvoicesTabComponent
     ],
     entryComponents: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent],
-    exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent, BillingAdminTabComponent, MembershipTabComponent]
+    exports: [NewUserDialogComponent, DeleteUserDialogComponent, NewGroupDialogComponent, DeleteGroupDialogComponent, VerifyUsersDialogComponent, BillingAdminTabComponent, MembershipTabComponent, InvoicesTabComponent]
 })
 export class UsersGroupsTablistModule {
 }

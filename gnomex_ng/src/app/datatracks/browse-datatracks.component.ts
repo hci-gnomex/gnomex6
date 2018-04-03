@@ -22,14 +22,13 @@ import {DataTrackService} from "../services/data-track.service";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import * as _ from "lodash";
-import {ReassignExperimentComponent} from "../experiments/reassign-experiment.component";
 
 const actionMapping:IActionMapping = {
     mouse: {
         click: (tree, node, $event) => {
             $event.ctrlKey
                 ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                : TREE_ACTIONS.TOGGLE_SELECTED(tree, node, $event)
+                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
         }
     }
 };
@@ -260,7 +259,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.items = this.dragEndItems;
     }
 
-
     onMoveNode($event) {
         console.log(
             "Moved",
@@ -318,8 +316,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     @param
      */
     buildTree(response: any[]) {
+        this.datatracksCount = 0;
         if (response) {
-            this.datatracksCount = 0;
             this.organisms = [];
             this.items = [].concat(null);
             if (!this.isArray(response)) {
@@ -373,6 +371,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 }
             }
         }
+        this.showSpinner = false;
         this.treeModel.clearFilter();
     };
 
