@@ -40,4 +40,14 @@ export class BillingService {
         });
     }
 
+    getBillingAccountListForPeriodAndCore(params: URLSearchParams): Observable<any> {
+        return this.http.get("/gnomex/GetBillingAccountListForPeriodAndCore.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
 }

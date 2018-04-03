@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {
-    AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,
+    AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild,
     ViewEncapsulation
 } from "@angular/core";
 
@@ -20,13 +20,19 @@ import {
 import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
 import {Router} from "@angular/router";
-import {MatDialogRef, MatDialog} from '@angular/material';
+import {MatDialogRef, MatDialog, MatAutocomplete} from '@angular/material';
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TopicService} from "../services/topic.service";
 import {GnomexService} from "../services/gnomex.service";
 import {MoveTopicComponent} from "./move-topic.component";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {LabListService} from "../services/lab-list.service";
+import {ExperimentsService} from "../experiments/experiments.service";
+import {AnalysisService} from "../services/analysis.service";
+import {DataTrackService} from "../services/data-track.service";
+import {DictionaryService} from "../services/dictionary.service";
+import { transaction } from 'mobx';
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -96,15 +102,6 @@ const actionMapping:IActionMapping = {
             flex-grow: .10;
         }
 
-        .jqx-tree {
-            height: 100%;
-        }
-
-        .jqx-notification {
-            margin-top: 30em;
-            margin-left: 20em;
-        }
-
         div.background {
             width: 100%;
             height: 100%;
@@ -115,15 +112,105 @@ const actionMapping:IActionMapping = {
             display: flex;
             flex-direction: column;
         }
+        div.labelAndIcon {
+            display: inline-block;
+            margin: 0.3rem 0rem 0.3rem 0.5rem;
+            width: 9.5rem;
+        }
+        mat-form-field.formField {
+            margin: 0 2.0%;
+            width: 20%
+        }
+        .radio-group-container {
+            display: inline-flex;
+            flex-direction: row;
+            vertical-align: middle;
+            width: fit-content;
+            margin-top: 1.1em;
+        }
+        .topics-radio-button {
+            margin: 0 0.5%;
+        }
+        .topics-radio-group {
+            display: inline-flex;
+            flex-direction: row;
+        }
+        .link-data-header {
+            margin-bottom: 1em;
+            display: flex;
+        }
+        .add-link-object-icon {
+            margin: .25rem 0rem 0rem 0.5rem;
+            height: 16px;
+        }
     `]
 })
 
 export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild("topicsTree") treeComponent: TreeComponent;
-
+    @ViewChild("experimentsTree") experimentTreeComponent: TreeComponent;
+    @ViewChild("analysisTree") analysisTreeComponent: TreeComponent;
+    @ViewChild("datatrackTree") datatrackTreeComponent: TreeComponent;
+    @ViewChild("autoLab") dtLabAutocomplete: MatAutocomplete;
+    @ViewChild("autoOrg") dtOrgAutocomplete: MatAutocomplete;
+    @ViewChild("autoAnalLab") analLabAutoComplete: MatAutocomplete;
+    @ViewChild("autoExpLab") expLabAutoComplete: MatAutocomplete;
+    @ViewChild("autoGen") dtGenAutocomplete: MatAutocomplete;
+    @Input() childMessage: string;
     public moveTopicDialogRef: MatDialogRef<MoveTopicComponent>;
 
     private treeModel: TreeModel;
+    private experimentTreeModel: TreeModel;
+    private analysisTreeModel: TreeModel;
+    private datatrackTreeModel: TreeModel;
+    private experimentLab: any;
+    private analysisLab: any;
+    private datatrackLab: any;
+    private organism: any;
+    private genomeBuild: any;
+    private labs: any[];
+    private analysisLabs: any[] = [];
+    private experimentLabs: any[] = [];
+    private datatrackLabs: any[] = [];
+    private pickerLabs: any[] = [];
+    private genomeBuildList: any[] = [];
+    private isExperimentsTab: boolean;
+    private isAnalysisTab: boolean;
+    private isDatatracksTab: boolean;
+    public selectedGroupTab: number = 0;
+    private linkDataView: boolean = false;
+    private experimentSearchText: string;
+    private analysisSearchText: string;
+    private datatrackSearchText: string;
+    private selectedExpTimeFrame: string = "3 months";
+    private previousExpTimeFrame: string = "";
+    private selectedAnalTimeFrame: string = "3 months";
+    private previousAnalTimeFrame: string = "";
+    private analysisCount: number = 0;
+    private selectedIdLab: any;
+    public organisms: any[] = [];
+    public oldOrganisms: any[] = [];
+    private showSpinner: boolean = false;
+    private idAnalysis: string = "";
+    private idExperiment: string = "";
+    private emptyLab = {idLab: "0",
+                    name: ""};
+    private previousURLParams: URLSearchParams;
+    private resetExperiment: boolean = false;
+    private resetAnalysis: boolean = false;
+    private resetDatatrack: boolean = false;
+    private experimentCount: number;
+    private datatracksCount: number;
+    private experimentLabel: string;
+    private analysisLabel: string;
+    private datatrackLabel: string;
+    timeFrames = [
+        'In last week',
+        'month',
+        '3 months',
+        'year',
+    ];
+
     /*
     angular2-tree options
      */
@@ -144,15 +231,83 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             }
         },
 
-        allowDrag: (node) => node.data.idDataTrack || node.data.idParentTopic,
+        allowDrag: (node) => node.data.idDataTrack || node.data.idRequest || node.data.idAnalysis || node.data.idParentTopic,
+        actionMapping
+    };
+
+    public experimentOptions: ITreeOptions = {
+        displayField: "label",
+        childrenField: "experimentItems",
+        useVirtualScroll: false,
+        nodeHeight: 22,
+        nodeClass: (node: TreeNode) => {
+            return "icon-" + node.data.icon;
+        },
+        allowDrop: (element, {parent, index}) => {
+            // this.dragEndExperimentItems = _.cloneDeep(this.experimentItems);
+            if (element.data.idTopic) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        allowDrag: (node) => node.isLeaf,
+        actionMapping
+    };
+
+    public analysisOptions: ITreeOptions = {
+        displayField: "label",
+        childrenField: "analysisItems",
+        useVirtualScroll: false,
+        nodeHeight: 22,
+        nodeClass: (node: TreeNode) => {
+            return "icon-" + node.data.icon;
+        },
+        allowDrop: (element, {parent, index}) => {
+            // this.dragEndAnalysisItems = _.cloneDeep(this.analysisItems);
+            if (element.data.idTopic) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        allowDrag: (node) => node.isLeaf,
+        actionMapping
+    };
+
+    public datatrackOptions: ITreeOptions = {
+        displayField: "label",
+        childrenField: "datatrackItems",
+        useVirtualScroll: false,
+        nodeClass: (node: TreeNode) => {
+            return "icon-" + node.data.icon;
+        },
+        allowDrop: (element, {parent, index}) => {
+            // this.dragEndDatatrackItems = _.cloneDeep(this.datatrackItems);
+            if (element.data.idTopic) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        allowDrag: (node) => node.data.isDataTrackFolder || node.data.idDataTrack,
         actionMapping
     };
 
     public items: any;
+    public experimentItems: any;
+    public analysisItems: any;
+    public datatrackItems: any;
     public currentItem: any;
     public targetItem: any;
 
     private dragEndItems: any;
+    private dragEndExperimentItems: any;
+    private dragEndAnalysisItems: any;
+    private dragEndDatatrackItems: any;
     private selectedItem: ITreeNode;
 
     private topicListSubscription: Subscription;
@@ -169,6 +324,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.items = [].concat([]);
                 setTimeout(() => {
                     this.buildTree(response);
+                    this.showSpinner = false;
                     this.treeModel.update();
                 });
                 setTimeout(_ => {
@@ -176,16 +332,40 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 });
             });
         });
+        this.pickerLabs.push(this.emptyLab);
+        this.pickerLabs = this.pickerLabs.concat(this.gnomexService.labList);
+        this.organisms = this.gnomexService.das2OrganismList;
+        this.isExperimentsTab = true;
+        this.isAnalysisTab = false;
+        this.isDatatracksTab = false;
+
     }
 
     ngAfterViewInit() {
+    }
+
+    ngAfterViewChecked() {
+        if (this.resetAnalysis) {
+            this.getAnalysis("", this.selectedAnalTimeFrame);
+            this.resetAnalysis = false;
+        } else if (this.resetExperiment) {
+            this.getExperiments("", this.selectedExpTimeFrame);
+            this.resetExperiment = false;
+        } else if (this.resetDatatrack) {
+            this.getDatatracks("", "", "");
+            this.resetDatatrack = false;
+        }
     }
 
     constructor(private topicService: TopicService, private router: Router,
                 private dialog: MatDialog,
                 private dialogService: DialogsService,
                 private gnomexService: GnomexService,
-                private createSecurityAdvisorService: CreateSecurityAdvisorService) {
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private datatrackService: DataTrackService,
+                public experimentsService: ExperimentsService,
+                public dictionaryService: DictionaryService,
+                private analysisService: AnalysisService) {
 
 
         this.items = [];
@@ -196,6 +376,18 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.items = this.dragEndItems;
     }
 
+    resetExperimentTree() {
+        this.experimentItems = this.dragEndExperimentItems;
+    }
+
+    resetAnalysisTree() {
+        this.analysisItems = this.dragEndAnalysisItems;
+    }
+
+    resetDatatrackTree() {
+        this.datatrackItems = this.dragEndDatatrackItems;
+    }
+
     onMoveNode($event) {
         console.log(
             "Moved",
@@ -204,6 +396,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             $event.to.parent.name,
             "at index",
             $event.to.index);
+        this.showSpinner = true;
         this.currentItem = $event.node;
         this.targetItem = $event.to.parent;
         this.doMove($event);
@@ -213,20 +406,43 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         if (this.currentItem.idTopic === this.targetItem.idTopic) {
             this.dialogService.confirm("Moving or Copying an item to the same topic is not allowed.'.", null);
         } else {
-            this.moveTopicDialogRef = this.dialog.open(MoveTopicComponent, {
-                height: '220px',
-                width: '400px',
-                data: {
-                    currentItem: this.currentItem,
-                    targetItem: this.targetItem
+            var params: URLSearchParams = new URLSearchParams();
+
+            if ((event.node.idRequest || event.node.idAnalysis || event.node.idDataTrack) && !this.currentItem.idTopic) {
+                params.set("idTopic", this.targetItem.idTopic);
+
+                if (this.currentItem.idAnalysis) {
+                    params.set("name", "Analysis");
+                    params.set("idAnalysis0", this.currentItem.idAnalysis);
+                    this.resetAnalysisTree();
+                } else if (this.currentItem.idRequest) {
+                    params.set("name", "Request");
+                    params.set("idRequest0", this.currentItem.idRequest);
+                    this.resetExperimentTree();
+                } else if (this.currentItem.idDataTrack) {
+                    params.set("name", "DataTrack");
+                    params.set("idDataTrack0", this.currentItem.idDataTrack);
+                    this.resetDatatrackTree();
                 }
-            });
-            this.moveTopicDialogRef.afterClosed()
-                .subscribe(result => {
-                    if (this.moveTopicDialogRef.componentInstance.noButton) {
-                        this.resetTree();
+                this.topicService.addItemToTopic(params).subscribe((response: Response) => {
+                    this.topicService.refreshTopicsList_fromBackend();
+                });
+            } else {
+                this.moveTopicDialogRef = this.dialog.open(MoveTopicComponent, {
+                    height: '220px',
+                    width: '400px',
+                    data: {
+                        currentItem: this.currentItem,
+                        targetItem: this.targetItem
                     }
+                });
+                this.moveTopicDialogRef.afterClosed()
+                    .subscribe(result => {
+                        if (this.moveTopicDialogRef.componentInstance.noButton) {
+                            this.resetTree();
+                        }
                 })
+            }
         }
     }
 
@@ -374,6 +590,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
     assignIconToDT(datatrack: any) {
+        let label = datatrack.name + " ("+datatrack.number + ")";
+        datatrack.label = label;
         switch (datatrack.codeVisibility) {
             case 'MEM': {
                 datatrack.icon = this.gnomexService.iconDataTrackMember;
@@ -388,6 +606,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 break;
             }
         }
+        this.datatracksCount++;
+        datatrack.id = "d"+datatrack.idDataTrack + datatrack.idDataTrackFolder;
     }
 
     /**
@@ -396,6 +616,18 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
      */
     treeOnSelect(event: any) {
         this.selectedItem = event.node;
+    }
+
+    expTreeOnSelect(event: any) {
+        this.dragEndExperimentItems = _.cloneDeep(this.experimentItems);
+    }
+
+    analTreeOnSelect(event: any) {
+        this.dragEndAnalysisItems = _.cloneDeep(this.analysisItems);
+    }
+
+    dTTreeOnSelect(event: any) {
+        this.dragEndDatatrackItems = _.cloneDeep(this.datatrackItems);
     }
 
     expandClicked() {
@@ -412,4 +644,742 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.topicListSubscription.unsubscribe();
     }
 
+    chooseFirstExpLabOption() {
+        this.expLabAutoComplete.options.first.select();
+    }
+
+    chooseFirstAnalLabOption() {
+        this.analLabAutoComplete.options.first.select();
+    }
+
+    chooseFirstLabOption(): void {
+        this.dtLabAutocomplete.options.first.select();
+    }
+
+    chooseFirstOrgOption(): void {
+        this.dtOrgAutocomplete.options.first.select();
+    }
+
+    chooseFirstGenomeOption(): void {
+        this.dtGenAutocomplete.options.first.select();
+    }
+
+    selectExperimentLabOption(event) {
+        if (event.source.value) {
+            this.experimentLab = event.source.value;
+            this.showSpinner = true;
+            this.getExperiments(this.experimentLab.idLab, this.selectedExpTimeFrame);
+        }
+    }
+
+    selectAnalysisLabOption(event) {
+        if (event.source.value && event.source.selected && event.source.value.idLab !== "0") {
+            this.analysisLab = event.source.value;
+            this.showSpinner = true;
+            this.getAnalysis(this.analysisLab.idLab, this.selectedAnalTimeFrame);
+        }
+    }
+
+    selectDatatrackLabOption(event) {
+        if (event.source.value && event.source.selected && event.source.value.idLab !== "0") {
+            this.oldOrganisms = [];
+            this.datatrackLab = event.source.value;
+            let orgs = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
+            this.showSpinner = true;
+            this.getDatatracks(this.datatrackLab.idLab, "", "");
+            console.log("datatrack lab");
+        }
+    }
+
+    selectDatatrackOrgOption(event) {
+        if (event != undefined && event.source.value && event.source.value.idLab !== "0") {
+            this.organism = event.source.value;
+            let genomeBuilds = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD);
+            this.genomeBuildList = genomeBuilds.filter(gen => {
+                if (gen.isActive === "Y" && !(gen.value === "")) {
+                    return gen.idOrganism === this.organism.idOrganism;
+                }
+                return false;
+            });
+            this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, "");
+        } else {
+            this.resetDatatrackOrganismSelection();
+        }
+
+    }
+
+    resetDatatrackOrganismSelection(): void {
+        this.organism = null;
+        this.genomeBuildList = [];
+        this.getDatatracks(this.datatrackLab.idLab, "", "");
+    }
+
+    selectDatatrackGenOption(event) {
+        this.genomeBuild = event.source.value;
+        this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, this.genomeBuild.idGenomeBuild);
+    }
+
+    filterAnalysisLabs(selectedLab: any): any[] {
+        let fLabs: any[];
+        if (selectedLab) {
+            if (selectedLab.idLab) {
+                if (selectedLab.idLab === "0") {
+                    this.showSpinner = true;
+                    this.resetAnalysis = true;
+                    this.analysisLab = null;
+                } else {
+                    fLabs = this.pickerLabs.filter(lab =>
+                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
+                    return fLabs;
+                }
+            } else {
+                fLabs = this.pickerLabs.filter(lab =>
+                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
+                return fLabs;
+            }
+        } else {
+            return this.pickerLabs;
+        }
+    }
+
+    filterDatatrackLabs(selectedLab: any): any[] {
+        let fLabs: any[];
+        if (selectedLab) {
+            if (selectedLab.idLab) {
+                if (selectedLab.idLab === "0") {
+                    this.showSpinner = true;
+                    this.resetDatatrack = true;
+                    this.datatrackLab = null;
+                } else {
+                    fLabs = this.pickerLabs.filter(lab =>
+                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
+                    return fLabs;
+                }
+            } else {
+                fLabs = this.pickerLabs.filter(lab =>
+                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
+                return fLabs;
+            }
+        } else {
+            return this.pickerLabs;
+        }
+
+    }
+
+    filterExperimentLabs(selectedLab: any): any[] {
+        let fLabs: any[];
+        if (selectedLab) {
+            if (selectedLab.idLab) {
+                if (selectedLab.idLab === "0") {
+                    this.showSpinner = true;
+                    this.resetExperiment = true;
+                    this.experimentLab = null;
+                } else {
+                    fLabs = this.pickerLabs.filter(lab =>
+                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
+                    return fLabs;
+                }
+            } else {
+                fLabs = this.pickerLabs.filter(lab =>
+                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
+                return fLabs;
+            }
+        } else {
+            return this.pickerLabs;
+        }
+
+    }
+
+    filterOrganism(selectedOrganism: any): any[] {
+        let fOrgs: any[] = [];
+        if (selectedOrganism) {
+            if (selectedOrganism.idOrganism) {
+                fOrgs = this.organisms.filter(org =>
+                    org.binomialName.toLowerCase().indexOf(selectedOrganism.binomialName.toLowerCase()) >= 0);
+                return fOrgs;
+            } else {
+                fOrgs = this.organisms.filter(org =>
+                    org.binomialName.toLowerCase().indexOf(selectedOrganism.toLowerCase()) >= 0);
+                return fOrgs;
+            }
+        } else {
+            return this.organisms;
+        }
+    }
+
+    highlightExpLabFirstOption(event): void {
+        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+            return;
+        }
+        if (this.expLabAutoComplete.options.first) {
+            this.expLabAutoComplete.options.first.setActiveStyles();
+        }
+    }
+
+    highlightAnalLabFirstOption(event): void {
+        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+            return;
+        }
+        if (this.analLabAutoComplete.options.first) {
+            this.analLabAutoComplete.options.first.setActiveStyles();
+        }
+    }
+
+    highlightDtLabFirstOption(event): void {
+        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+            return;
+        }
+        if (this.dtLabAutocomplete.options.first) {
+            this.dtLabAutocomplete.options.first.setActiveStyles();
+        }
+    }
+
+    highlightDtOrgFirstOption(event): void {
+        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+            return;
+        }
+        this.dtOrgAutocomplete.options.first.setActiveStyles();
+    }
+
+    searchExperiementsOnEnter(event): void {
+        if (event.key === "Enter") {
+            this.searchExperiment();
+        }
+    }
+
+    searchAnalysisOnEnter(event): void {
+        if (event.key === "Enter") {
+            this.searchAnalysis();
+        }
+    }
+
+    searchDatatrackOnEnter(event): void {
+        if (event.key === "Enter") {
+            this.searchDatatrack();
+        }
+    }
+
+
+    displayOrg(org: any) {
+        return org ? org.binomialName : org;
+    }
+
+    displayGen(gen: any) {
+        return gen ? gen.genomeBuildName : gen;
+    }
+
+    displayLab(lab: any) {
+        return lab ? lab.name : lab;
+    }
+
+    filterGenomeBuild(genomeBuild: any): any[] {
+        let gBuilds: any[];
+        if (genomeBuild) {
+            if (genomeBuild.idGenomeBuild) {
+                gBuilds = this.genomeBuildList.filter(gen =>
+                    gen.genomeBuildName.toLowerCase().indexOf(genomeBuild.genomeBuildName.toLowerCase()) >= 0);
+                return gBuilds;
+            } else {
+                gBuilds = this.genomeBuildList.filter(gen =>
+                    gen.genomeBuildName.toLowerCase().indexOf(genomeBuild.toLowerCase()) >= 0);
+                return gBuilds;
+            }
+        } else {
+            return this.genomeBuildList;
+        }
+    }
+
+
+    onTabChange(event) {
+        if (event.tab.textLabel === "Experiments") {
+            this.isAnalysisTab = false;
+            this.isDatatracksTab = false;
+            this.isExperimentsTab = true;
+            this.getExperiments("",'3 months');
+        } else if (event.tab.textLabel === "Analysis") {
+            this.showSpinner = true;
+            this.isAnalysisTab = true;
+            this.isDatatracksTab = false;
+            this.isExperimentsTab = false;
+            this.getAnalysis("",'3 months');
+        } else {
+            this.showSpinner = true;
+            this.isAnalysisTab = false;
+            this.isDatatracksTab = true;
+            this.isExperimentsTab = false;
+            this.getDatatracks("", "", "");
+        }
+    }
+
+    getExperiments(idLab: string, frame: any) {
+        var params: URLSearchParams = new URLSearchParams();
+
+        params.set("idLab", idLab);
+
+        params.set("allExperiments", 'Y');
+        params.set("excludeClinicResearch", 'Y');
+        params.set("isBioanalyzer", 'N');
+        params.set("isMicroarray", 'N');
+        params.set("isNextGenSeq", 'N');
+        switch(frame) {
+            case "In last week": {
+                params.set("lastWeek", 'Y');
+                break;
+            }
+            case "month": {
+                params.set("lastMonth", 'Y');
+                break;
+            }
+            case "3 months": {
+                params.set("lastThreeMonths", 'Y');
+                break;
+            }
+            case "year": {
+                params.set("lastYear", 'Y');
+                break;
+            }
+        }
+        params.set("publicExperimentsInOtherGroups", 'Y');
+        params.set("showCategory", 'N');
+        params.set("showMyLabsAlways", 'N');
+        params.set("showSamples", 'N');
+        this.experimentsService.getProjectRequestList(params).subscribe(response => {
+            console.log("requestlist");
+            this.buildExperimentsTree(response);
+            this.experimentTreeModel = this.experimentTreeComponent.treeModel;
+            this.showSpinner = false;
+            setTimeout(() => {
+                this.expandChildNodes(this.experimentTreeModel);
+            });
+            this.previousExpTimeFrame = frame;
+        });
+    }
+
+    getAnalysis(idLab: string, frame: any) {
+        var params: URLSearchParams = new URLSearchParams();
+
+        params.set("allAnalysis", 'Y');
+        params.set("labkeys", '');
+        params.set("isBioanalyzer", 'N');
+        params.set("isMicroarray", 'N');
+        params.set("isNextGenSeq", 'N');
+        switch(frame) {
+            case "In last week": {
+                params.set("lastWeek", 'Y');
+                params.set("lastMonth", 'N');
+                params.set("lastThreeMonths", 'N');
+                params.set("lastYear", 'N');
+                break;
+            }
+            case "month": {
+                params.set("lastWeek", 'N');
+                params.set("lastMonth", 'Y');
+                params.set("lastThreeMonths", 'N');
+                params.set("lastYear", 'N');
+                break;
+            }
+            case "3 months": {
+                params.set("lastWeek", 'N');
+                params.set("lastMonth", 'N');
+                params.set("lastThreeMonths", 'Y');
+                params.set("lastYear", 'N');
+                break;
+            }
+            case "year": {
+                params.set("lastWeek", 'N');
+                params.set("lastMonth", 'N');
+                params.set("lastThreeMonths", 'N');
+                params.set("lastYear", 'Y');
+                break;
+            }
+        }
+        params.set("showMyLabsAlways", 'N');
+        params.set("idLab", idLab);
+
+        this.analysisService.getAnalysisGroupList(params).subscribe(response => {
+            this.buildAnalysisTree(response);
+
+            this.analysisTreeModel = this.analysisTreeComponent.treeModel;
+            this.showSpinner = false;
+            setTimeout(() => {
+                this.expandChildNodes(this.analysisTreeModel);
+            });
+            this.previousAnalTimeFrame = frame;
+        });
+    }
+
+    getDatatracks(idLab: string, idOrganism: string, idGenomeBuild: string ) {
+        var params: URLSearchParams = new URLSearchParams();
+
+        params.set("isVisibilityInstitute", 'Y');
+        params.set("isVisibilityPublic", 'Y');
+        params.set("isVisibilityOwner", 'Y');
+        params.set("isVisibilityMembers", 'Y');
+        params.set("idOrganism", idOrganism);
+        params.set("idGenomeBuild", idGenomeBuild);
+        params.set("idLab", idLab);
+        if (!(params === this.previousURLParams)) {
+            this.datatrackService.getDataTrackList(params).subscribe(response => {
+                this.buildDatatracksTree(response);
+
+                this.datatrackTreeModel = this.datatrackTreeComponent.treeModel;
+                this.showSpinner = false;
+                this.previousURLParams = params;
+                setTimeout(() => {
+                    this.expandChildNodes(this.datatrackTreeModel);
+                });
+            });
+        }
+    }
+
+    doLinkData($event) {
+        this.linkDataView = true;
+        this.getExperiments("",'3 months');
+    }
+
+    onMoveExperimentNode($event) {
+    }
+
+    treeUpdateData($event) {
+
+    }
+
+    experimentTreeOnSelect($event) {
+
+    }
+
+    buildExperimentsTree(response: any[]) {
+        this.experimentLabs = [];
+        this.experimentCount = 0;
+
+        if (response) {
+            if (!this.createSecurityAdvisorService.isArray(response)) {
+                this.experimentItems = [response];
+            } else {
+                this.experimentItems = response;
+            }
+            this.experimentLabs = this.experimentLabs.concat(this.experimentItems);
+            for (var lab of this.experimentItems) {
+                lab.id = "l" + lab.idLab;
+                lab.parentid = -1;
+
+                lab.icon = "assets/group.png";
+                // If there is a lab with no Project skip
+                if (lab.Project) {
+                    if (!this.createSecurityAdvisorService.isArray(lab.Project)) {
+                        lab.experimentItems = [lab.Project];
+                    } else {
+                        lab.experimentItems = lab.Project;
+                    }
+                    for (var project of lab.experimentItems) {
+                        project.icon = "assets/folder.png";
+                        project.labId = lab.labId;
+                        project.id = "p" + project.idProject;
+                        project.parentid = lab.id;
+                        if (project.Request) {
+                            if (!this.createSecurityAdvisorService.isArray(project.Request)) {
+                                project.experimentItems = [project.Request];
+                            } else {
+                                project.experimentItems = project.Request;
+                            }
+                            for (var request of project.experimentItems) {
+                                if (request) {
+                                    if (request.label) {
+                                        request.label = request.requestNumber + '-' + request.name;
+                                        request.id = "r" + request.idRequest;
+                                        request.parentid = project.id;
+                                        this.experimentCount++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            this.experimentItems = [];
+        }
+        if (this.experimentTreeModel) {
+            this.experimentTreeModel.clearFilter();
+        }
+        this.experimentLabel = " (" + this.experimentCount.toString() + " experiments)";
+    };
+
+    buildAnalysisTree(response: any) {
+        this.analysisCount = 0;
+        this.analysisLabs = [];
+        this.analysisItems = [].concat(null);
+
+        if (response && response.Lab){
+            if (!this.createSecurityAdvisorService.isArray(response.Lab)) {
+                this.analysisItems = [response.Lab];
+            } else {
+                this.analysisItems = response.Lab;
+            }
+
+            this.analysisLabs = this.analysisLabs.concat(this.analysisItems);
+            this.analysisService.emitCreateAnalysisDataSubject({labs:this.analysisLabs,items:this.analysisItems});
+            for (var l of this.analysisItems) {
+                l.id = "l"+l.idLab;
+                l.parentid = -1;
+
+                l.icon = "assets/group.png";
+
+                if (l.AnalysisGroup) {
+                    if (!this.createSecurityAdvisorService.isArray(l.AnalysisGroup)) {
+                        l.analysisItems = [l.AnalysisGroup];
+                    } else {
+                        l.analysisItems = l.AnalysisGroup;
+                    }
+                    for (var p of l.analysisItems) {
+                        p.icon = "assets/folder.png";
+                        p.idLab = l.idLab;
+                        p.id = "p"+p.idAnalysisGroup;
+                        if (p.Analysis) {
+                            if (!this.createSecurityAdvisorService.isArray(p.Analysis)) {
+                                p.analysisItems = [p.Analysis];
+                            } else {
+                                p.analysisItems = p.Analysis;
+                            }
+                            for (var a of p.analysisItems) {
+                                if (a) {
+                                    if (a.label) {
+                                        this.analysisCount++;
+                                        var labelString: string = a.number;
+                                        labelString = labelString.concat(" (");
+                                        labelString = labelString.concat(a.label);
+                                        labelString = labelString.concat(")");
+                                        a.label = labelString;
+                                        a.id = "a"+a.idAnalysis;
+                                        a.icon = "assets/map.png";
+                                        a.parentid = p.idLab;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        } else {
+            this.analysisItems = [];
+        }
+        if (this.analysisTreeModel) {
+            this.analysisTreeModel.clearFilter();
+        }
+        this.analysisLabel = " (" + this.analysisCount.toString() + " analyses)";
+
+    };
+
+
+    /*
+Build the tree data
+@param
+ */
+    buildDatatracksTree(response: any) {
+        this.datatracksCount = 0;
+
+        if (response && response.Organism) {
+            this.datatrackItems = [].concat(null);
+            if (!this.createSecurityAdvisorService.isArray(response.Organism)) {
+                this.datatrackItems = [response.Organism];
+            } else {
+                this.datatrackItems = response.Organism;
+            }
+            for (var org of this.datatrackItems) {
+                org.id = "o" + org.idOrganism;
+                org.parentid = -1;
+
+                org.icon = "assets/organism.png";
+                if (org.GenomeBuild) {
+                    if (!this.createSecurityAdvisorService.isArray(org.GenomeBuild)) {
+                        org.datatrackItems = [org.GenomeBuild];
+                    } else {
+                        org.datatrackItems = org.GenomeBuild;
+                    }
+
+                    for (var gNomeBuild of org.datatrackItems) {
+                        if (gNomeBuild) {
+                            this.assignIconToGenomeBuild(gNomeBuild);
+                            gNomeBuild.labId = org.labId;
+                            gNomeBuild.id = "g" + gNomeBuild.idGenomeBuild;
+                            gNomeBuild.parentid = org.id;
+                            if (gNomeBuild.DataTrack) {
+                                if (!this.createSecurityAdvisorService.isArray(gNomeBuild.DataTrack)) {
+                                    gNomeBuild.datatrackItems = [gNomeBuild.DataTrack];
+                                } else {
+                                    gNomeBuild.datatrackItems = gNomeBuild.DataTrack;
+                                }
+                                for (var dataTrack of gNomeBuild.datatrackItems) {
+                                    if (dataTrack) {
+                                        if (dataTrack.label) {
+                                            this.assignIconToDT(dataTrack);
+                                            dataTrack.parentid = gNomeBuild.id;
+                                        }
+                                    }
+                                }
+                            }
+                            if (gNomeBuild.DataTrackFolder) {
+                                this.addDataTracksFromFolder(gNomeBuild, gNomeBuild.datatrackItems);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            this.datatrackItems = [];
+        }
+        if (this.datatrackTreeModel) {
+            this.datatrackTreeModel.clearFilter();
+        }
+        this.datatrackLabel = " (" + this.datatracksCount.toString() + " data tracks)";
+    };
+
+    addDataTracksFromFolder(root, datatrackItems: any[]): any[] {
+        var dtItems: any[] = [];
+        if (!this.createSecurityAdvisorService.isArray(root.DataTrackFolder)) {
+            root.DataTrackFolder = [root.DataTrackFolder];
+        }
+        if (!datatrackItems) {
+            datatrackItems = [];
+        }
+
+        if (!this.createSecurityAdvisorService.isArray(datatrackItems)) {
+            datatrackItems = [datatrackItems];
+        }
+        for (var dtf of root.DataTrackFolder) {
+            this.assignIconToDTFolder(dtf);
+        }
+        dtItems = dtItems.concat(root.DataTrackFolder);
+        dtItems = dtItems.concat(datatrackItems);
+        root.datatrackItems = dtItems;
+
+        for (var dtf of root.datatrackItems) {
+
+            if (dtf.DataTrackFolder) {
+                this.assignIconToDTFolder(dtf);
+                this.addDataTracksFromFolder(dtf, dtf.DataTracks);
+            }
+            if (dtf.DataTrack) {
+                if (!this.createSecurityAdvisorService.isArray(dtf.DataTrack)) {
+                    dtf.DataTrack = [dtf.DataTrack];
+                }
+                for (var dt of dtf.DataTrack) {
+                    this.assignIconToDT(dt);
+                }
+                if (dtf.datatrackItems) {
+                    dtf.datatrackItems = dtf.datatrackItems.concat(dtf.DataTrack);
+                } else {
+                    dtf.datatrackItems = dtf.DataTrack;
+                }
+            }
+
+        }
+
+        return root;
+    }
+
+    assignIconToGenomeBuild(genomeBuild: any): void {
+        if (genomeBuild.DataTrack || genomeBuild.DataTrackFolder) {
+            genomeBuild.icon = "assets/genome_build.png";
+        } else {
+            genomeBuild.icon = "assets/genome_build_faded.png"
+        }
+        genomeBuild.isGenomeBuild = true;
+    }
+
+    assignIconToDTFolder(dtf: any): void {
+        dtf.id = "df"+dtf.idDataTrackFolder;
+        if (dtf.idLab) {
+            dtf.icon = "assets/folder_group.png";
+        } else {
+            dtf.icon = "assets/folder.png";
+        }
+        dtf.isDataTrackFolder = true;
+    }
+
+    expandChildNodes(model: TreeModel) {
+        this.showSpinner = true;
+        if (model) {
+            if (this.createSecurityAdvisorService.isSuperAdmin) {
+                if (model.roots) {
+                    transaction(() => {
+                        // loop over the nodes recursively and call expand() on each one
+                        for (let node of model.roots) {
+                            node.expand();
+                            // let n = node;
+                            // while (n = n.getFirstChild()) {
+                            //     n.expand();
+                            // }
+                        }
+                    });
+                }
+            } else {
+                model.expandAll();
+            }
+        }
+        this.showSpinner = false;
+    }
+
+    searchExperiment() {
+        this.experimentTreeModel.filterNodes((node) => this.searchFn(node, this.experimentSearchText), true);
+    }
+
+    searchAnalysis() {
+        this.analysisTreeModel.filterNodes((node) => this.searchFn(node, this.analysisSearchText), true);
+    }
+
+    searchDatatrack() {
+        this.datatrackTreeModel.filterNodes((node) => this.searchFn(node, this.datatrackSearchText), true);
+        if (this.datatrackSearchText === "") {
+            this.datatrackTreeModel.collapseAll();
+        }
+    }
+
+    searchFn(node: any, searchText: string): boolean {
+        if (node) {
+            if (node.data.label.indexOf(searchText) >= 0 ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    selectFrame(frame: string, mode: string) {
+        switch (mode) {
+            case "experiment": {
+                if (frame === this.previousExpTimeFrame) {
+                    this.selectedExpTimeFrame = '';
+                } else {
+                    this.showSpinner = true;
+                    this.getExperiments(this.experimentLab ? this.experimentLab.idLab : "", frame);
+                }
+                break;
+            }
+            case "analysis": {
+                if (frame === this.previousAnalTimeFrame) {
+                    this.selectedAnalTimeFrame = '';
+                } else {
+                    this.showSpinner = true;
+                    this.getAnalysis(this.analysisLab ? this.analysisLab.idLab : "", frame);
+                }
+                break;
+            }
+        }
+    }
+
+    onExpRadioChange(event) {
+        if (event.value === this.previousExpTimeFrame) {
+            this.selectedExpTimeFrame = null;
+            this.getExperiments("", "");
+        }
+    }
+
+    onAnalRadioChange(event) {
+        if (event.value === this.previousAnalTimeFrame) {
+            this.selectedAnalTimeFrame = null;
+            this.getAnalysis("", "");
+        }
+    }
 }

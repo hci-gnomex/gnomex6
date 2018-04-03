@@ -240,6 +240,8 @@ export class UsersGroupsTablistComponent implements OnInit{
     public externalGroup: boolean = false;
     public groupFormDirty: boolean = false;
     public groupFormValid: boolean = false;
+    private userLabel: string;
+    private groupLabel: string;
     constructor(public secAdvisor: CreateSecurityAdvisorService,
                 public passwordUtilService: PasswordUtilService,
                 private appUserListService: AppUserListService,
@@ -352,6 +354,7 @@ export class UsersGroupsTablistComponent implements OnInit{
         this.rowData = [];
         if (this.secAdvisor.isAdmin || this.secAdvisor.isSuperAdmin || this.secAdvisor.isBillingAdmin) {
             this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any[]) => {
+                this.userLabel = response.length + " users"
                 this.createUserForm();
                 this.userForm.markAsPristine();
                 this.touchUserFields();
@@ -363,6 +366,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     public buildGroups(params: URLSearchParams) {
         this.labListService.getLabListWithParams(params).subscribe((response: any[]) => {
             this.groupsData = response;
+            this.groupLabel = response.length + " groups"
             this.setPricing();
         });
 
@@ -406,6 +410,7 @@ export class UsersGroupsTablistComponent implements OnInit{
                 this.isGroupsTab = true;
                 this.isUserTab = false;
             }
+            this.groupLabel = this.groupsData.length + " lab groups"
             this.createGroupForm();
             this.setPricing();
         });
@@ -1108,11 +1113,11 @@ export class UsersGroupsTablistComponent implements OnInit{
             }
         }
         if (this.membershipTab) {
-            let stringifiedMembers = JSON.stringify(this.membershipTab.membersDataSource.data);
+            let stringifiedMembers = JSON.stringify(this.addAppUser(this.membershipTab.membersDataSource.data));
             params.set("membersXMLString", stringifiedMembers);
-            let stringifiedColls = JSON.stringify(this.membershipTab.collaboratorsDataSource.data);
+            let stringifiedColls = JSON.stringify(this.addAppUser(this.membershipTab.collaboratorsDataSource.data));
             params.set("collaboratorsXMLString", stringifiedColls);
-            let stringifiedManagers = JSON.stringify(this.membershipTab.managersDataSource.data);
+            let stringifiedManagers = JSON.stringify(this.addAppUser(this.membershipTab.managersDataSource.data));
             params.set("managersXMLString", stringifiedManagers);
 
         }
@@ -1130,6 +1135,18 @@ export class UsersGroupsTablistComponent implements OnInit{
             }
             this.showSpinner = false;
         });
+    }
+
+    addAppUser(users: any[]): any[] {
+        let appUsers: any[] = [];
+
+        for (let user of users) {
+            let appUser: any;
+
+            appUser = {"AppUser": user};
+            appUsers.push(appUser);
+        }
+        return appUsers;
     }
 
     searchCoreFacility(event) {

@@ -42,6 +42,8 @@ import { DeleteUserDialogComponent } from "./delete-user-dialog.component";
 import { UsersGroupsTablistComponent } from "./users-groups-tablist.component";
 import { VerifyUsersDialogComponent } from "./verify-users-dialog.component";
 import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
+import {InvoicesTabComponent} from "./invoicesTab/invoices-tab.component";
+
 /**
  * @author jdewell
  * @since 12/19/16
@@ -86,7 +88,8 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
         NewGroupDialogComponent,
         NewUserDialogComponent,
         UsersGroupsTablistComponent,
-        VerifyUsersDialogComponent
+        VerifyUsersDialogComponent,
+        InvoicesTabComponent
     ],
     entryComponents: [
 			  BillingUsersSelectorComponent,
@@ -94,7 +97,8 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
         DeleteUserDialogComponent,
 			  NewGroupDialogComponent,
 			  NewUserDialogComponent,
-        VerifyUsersDialogComponent
+        VerifyUsersDialogComponent,
+        InvoicesTabComponent
     ],
     exports: [
 			  BillingAdminTabComponent,

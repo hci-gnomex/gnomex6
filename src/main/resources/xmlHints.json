@@ -149,6 +149,42 @@
       ]
     },
     {
+      "command": "SaveLab",
+      "parameter": "membersXMLString",
+      "nodeheader": "appUsers",
+      "nodeprefix": "AppUser",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
+      "parameter": "accountsXMLString",
+      "nodeheader": "billingAccounts",
+      "nodeprefix": "BillingAccount",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
+      "parameter": "coreFacilitiesXMLString",
+      "nodeheader": "coreFacilities",
+      "nodeprefix": "CoreFacility",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
       "command": "MoveAnalysis",
       "parameter": "analysisGroupsXMLString",
       "nodeheader": "analysisGroups",

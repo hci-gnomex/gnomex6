@@ -41,6 +41,16 @@ export class LabListService {
         return this.http.get("/gnomex/SaveLab.gx", {search: params});
     }
 
+    getOrganismList(): Observable<any> {
+        return this.http.get("/gnomex/GetOrganismList.gx").map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
     generateUserAccountEmail(params: URLSearchParams): Observable<any> {
         if (params.paramsMap.size === 0) {
             return this.http.get("/gnomex/GenerateUserAccountEmail.gx").map((response: Response) => {

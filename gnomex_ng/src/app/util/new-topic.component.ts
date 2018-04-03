@@ -37,7 +37,7 @@ export class NewTopicComponent {
         if (this.data != null) {
             this.selectedItem = data.selectedItem;
         }
-        if (!this.selectedItem.data.idTopic) {
+        if (!this.selectedItem || !this.selectedItem.data.idTopic) {
             this.title = " Add New Top Level Topic";
         } else {
             this.title = " Add Subtopic of " + this.selectedItem.parent.data.label;
