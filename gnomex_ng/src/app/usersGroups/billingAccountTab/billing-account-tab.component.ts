@@ -19,8 +19,8 @@ import { TextAlignRightMiddleRenderer } from "../../util/grid-renderers/text-ali
 import { UploadViewRemoveRenderer } from "../../util/grid-renderers/upload-view-remove.renderer";
 
 import * as _ from "lodash";
-import {BillingUsersSelectorComponent} from "./billing-users-selector/billing-users-selector.component";
 import {DateParserComponent} from "../../util/parsers/date-parser.component";
+import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-users-selector.component";
 
 @Component ({
 	selector: "billing-account-tab",
@@ -164,12 +164,13 @@ export class BillingAccountTabComponent implements OnInit{
 				let tempArray = _.cloneDeep(this._labInfo.activeSubmitters);
 
 				for (let activeSubmitter of tempArray) {
-					if (activeSubmitter.value && activeSubmitter.value !== '') {
+					if (activeSubmitter.value && activeSubmitter.value !== '' && activeSubmitter.display && activeSubmitter.display !== '') {
 						results.set(activeSubmitter.value, activeSubmitter);
 					}
 				}
 			} else {
-				if (this._labInfo.activeSubmitters.AppUser.value && this._labInfo.activeSubmitters.AppUser.value !== '') {
+				if (this._labInfo.activeSubmitters.AppUser.value && this._labInfo.activeSubmitters.AppUser.value !== ''
+						&& this._labInfo.activeSubmitters.AppUser.display && this._labInfo.activeSubmitters.AppUser.display !== '') {
 					results.set(this._labInfo.activeSubmitters.AppUser.value, _.cloneDeep([this._labInfo.activeSubmitters.AppUser]));
 				}
 			}
@@ -180,7 +181,7 @@ export class BillingAccountTabComponent implements OnInit{
 			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.billingAccounts);
 
 			for (let user of tempArray) {
-				if (user.value && user.value !== '') {
+				if (user.value && user.value !== '' && user.display && user.display !== '') {
 					results.set(user.value, user);
 				}
 			}
@@ -189,7 +190,7 @@ export class BillingAccountTabComponent implements OnInit{
 			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.poBillingAccounts);
 
 			for (let user of tempArray) {
-				if (user.value && user.value !== '') {
+				if (user.value && user.value !== '' && user.display && user.display !== '') {
 					results.set(user.value, user);
 				}
 			}
@@ -198,7 +199,7 @@ export class BillingAccountTabComponent implements OnInit{
 			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.creditCardBillingAccounts);
 
 			for (let user of tempArray) {
-				if (user.value && user.value !== '') {
+				if (user.value && user.value !== '' && user.display && user.display !== '') {
 					results.set(user.value, user);
 				}
 			}
@@ -681,15 +682,32 @@ export class BillingAccountTabComponent implements OnInit{
 
 
 	onChartfieldUsersClicked(rowIndex: string): void {
-		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+		if (this.chartfieldGridApi && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex) && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+			let data = {
+				options: this.labActiveSubmitters,
+				optionName: "Users",
+				value: this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers,
+				valueField: "value",
+				displayField: "display"
+			};
 
-		dialogRef.afterClosed().subscribe((result) => {
-			console.log("Editor closed!");
-		});
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+
+			dialogRef.afterClosed().subscribe((result) => {
+				if (dialogRef
+						&& dialogRef.componentInstance
+						&& this.chartfieldGridApi
+						&& this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
+						&& this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+					this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
+					this.chartfieldGridApi.refreshCells();
+				}
+			});
+		}
 	}
 
 	onPoUsersClicked(rowIndex: string): void {
-		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: { message: "hello world"}, width: '60em', panelClass: 'no-padding-dialog' });
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");
@@ -697,7 +715,7 @@ export class BillingAccountTabComponent implements OnInit{
 	}
 
 	onCreditCardUsersClicked(rowIndex: string): void {
-		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: { message: "hello world"}, width: '60em', panelClass: 'no-padding-dialog' });
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");

@@ -31,9 +31,9 @@ import { TextAlignLeftMiddleRenderer } from "../util/grid-renderers/text-align-l
 import { TextAlignRightMiddleRenderer } from "../util/grid-renderers/text-align-right-middle.renderer";
 import { UploadViewRemoveRenderer } from "../util/grid-renderers/upload-view-remove.renderer";
 
-import { BillingUsersSelectorComponent } from "./billingAccountTab/billing-users-selector/billing-users-selector.component";
 import { BillingAccountTabComponent } from "./billingAccountTab/billing-account-tab.component";
 import { BillingAdminTabComponent } from "./billingAdminTab/billing-admin-tab.component";
+import { BillingUsersSelectorComponent } from "./billingAccountTab/billingUsersSelector/billing-users-selector.component";
 import { MembershipTabComponent } from "./membershipTab/membership-tab.component";
 import { NewGroupDialogComponent } from "./new-group-dialog.component";
 import { NewUserDialogComponent } from "./new-user-dialog.component";
@@ -77,10 +77,10 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
 			  UtilModule
     ],
     declarations: [
-			  BillingUsersSelectorComponent,
         BillingAccountTabComponent,
 			  BillingAdminTabComponent,
-        DeleteGroupDialogComponent,
+			  BillingUsersSelectorComponent,
+			  DeleteGroupDialogComponent,
         DeleteUserDialogComponent,
 			  MembershipTabComponent,
         NewGroupDialogComponent,
@@ -98,6 +98,7 @@ import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
     ],
     exports: [
 			  BillingAdminTabComponent,
+			  BillingUsersSelectorComponent,
 			  DeleteGroupDialogComponent,
 			  DeleteUserDialogComponent,
 			  MembershipTabComponent ,
