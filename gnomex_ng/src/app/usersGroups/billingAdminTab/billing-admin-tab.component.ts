@@ -162,6 +162,15 @@ export class BillingAdminTabComponent implements OnInit {
         this.matAutocomplete.options.first.select();
     }
 
+    highlightStateFirstOption(event): void {
+        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+            return;
+        }
+        if (this.matAutocomplete.options.first) {
+            this.matAutocomplete.options.first.setActiveStyles();
+        }
+    }
+
     filterStates(name: any): any[] {
         if (name) {
             return this.states.filter(state =>
