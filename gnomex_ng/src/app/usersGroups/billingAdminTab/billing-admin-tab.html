@@ -31,7 +31,7 @@
             </mat-form-field>
             <mat-form-field class="formField">
                 <input matInput placeholder="Pick a state" aria-label="State" [matAutocomplete]="auto"
-                       [formControl]="stateFC" (keyup.enter)="chooseFirstOption()">
+                       [formControl]="stateFC" (keyup.enter)="chooseFirstOption()" (keyup)="highlightStateFirstOption($event)">
                 <mat-autocomplete #auto="matAutocomplete">
                     <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let state of filterStates(this.stateFC.value)" [value]="state.value">{{state.value}}</mat-option>
                 </mat-autocomplete>

@@ -1,6 +1,6 @@
 import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 import {DateRangePickerComponent} from "./date-range-picker.component";
 import {BrowseFilterComponent} from "./browse-filter.component";
@@ -22,6 +22,8 @@ import {DeleteDataTrackComponent} from "../datatracks/delete-datatrack.component
 import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
 import {SaveFooterComponent} from "./save-footer.component";
 import {DateParserComponent} from "./parsers/date-parser.component";
+import {MonthPickerComponent} from "./pickers/month-picker.component";
+
 
 @NgModule({
     imports: [
@@ -31,6 +33,7 @@ import {DateParserComponent} from "./parsers/date-parser.component";
         CalendarModule,
         ComboBoxModule,
         FormsModule,
+        ReactiveFormsModule,
         AngularMaterialModule
     ],
     declarations: [
@@ -48,7 +51,8 @@ import {DateParserComponent} from "./parsers/date-parser.component";
 			  NewGenomeBuildComponent,
 			  NewOrganismComponent,
 			  NewTopicComponent,
-			  SaveFooterComponent
+			  SaveFooterComponent,
+              MonthPickerComponent
 		],
     entryComponents: [
         BillingUsageReportComponent,
@@ -75,7 +79,8 @@ import {DateParserComponent} from "./parsers/date-parser.component";
 			  NewOrganismComponent,
 			  NewTopicComponent,
 			  SaveFooterComponent,
-			  TabsModule
+			  TabsModule,
+              MonthPickerComponent
     ]
 })
 export class UtilModule {

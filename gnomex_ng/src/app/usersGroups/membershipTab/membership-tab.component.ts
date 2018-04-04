@@ -93,7 +93,10 @@ export class MembershipTabComponent implements OnInit {
     @Input()
     users: any[];
 
-    @ViewChild(MatAutocomplete) matAutocomplete: MatAutocomplete;
+    // @ViewChild(MatAutocomplete) matAutocomplete: MatAutocomplete;
+    @ViewChild("autoMem") memAutoComplete: MatAutocomplete;
+    @ViewChild("autoColl") collAutoComplete: MatAutocomplete;
+    @ViewChild("autoMan") manAutoComplete: MatAutocomplete;
 
     public membershipForm: FormGroup;
     private showSpinner: boolean = false;
@@ -278,6 +281,34 @@ export class MembershipTabComponent implements OnInit {
         }
     }
 
+    highlightMemFirstOption(event): void {
+        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+            return;
+        }
+        if (this.memAutoComplete.options.first) {
+            this.memAutoComplete.options.first.setActiveStyles();
+        }
+    }
+
+    highlightCollFirstOption(event): void {
+        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+            return;
+        }
+        if (this.collAutoComplete.options.first) {
+            this.collAutoComplete.options.first.setActiveStyles();
+        }
+    }
+
+    highlightManFirstOption(event): void {
+        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+            return;
+        }
+        if (this.manAutoComplete.options.first) {
+            this.manAutoComplete.options.first.setActiveStyles();
+        }
+    }
+
+
     selectOption(event) {
         this.memberUser = event.value;
     }
@@ -290,8 +321,16 @@ export class MembershipTabComponent implements OnInit {
         this.collUser = event.value;
     }
 
-    chooseFirstOption(): void {
-        this.matAutocomplete.options.first.select();
+    chooseFirstMemOption(): void {
+        this.memAutoComplete.options.first.select();
+    }
+
+    chooseFirstCollOption(): void {
+        this.collAutoComplete.options.first.select();
+    }
+
+    chooseFirstManOption(): void {
+        this.manAutoComplete.options.first.select();
     }
 }
 

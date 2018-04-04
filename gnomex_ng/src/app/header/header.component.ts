@@ -126,9 +126,13 @@ export class HeaderComponent implements OnInit{
     ngOnInit() {
         console.log("Initializing app dependencies ");
 
-        this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
+        this.launchPropertiesService.getFAQ().subscribe((response: any) => {
             if (response != null) {
-                this.faqList = response;
+                if (!this.createSecurityAdvisorService.isArray(response)) {
+                    this.faqList = [response.FAQ];
+                } else {
+                    this.faqList = response;
+                }
             }
         });
         this.gnomexService.isAppInitCompleteObservable().subscribe(complete => {
@@ -1863,7 +1867,7 @@ export class HeaderComponent implements OnInit{
                 class: 'top-menu-item',
                 iconName: '../../assets/topic_tag.png',
                 route: '/topics'
-    }
+            }
         ]
 
     }

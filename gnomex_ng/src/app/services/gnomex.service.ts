@@ -66,6 +66,10 @@ export class GnomexService {
     public redirectURL:string;
 
 
+    public organismList: any[] = [];
+    public das2OrganismList: any[] = [];
+    public activeOrganismList: any[] = [];
+
     constructor(private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
                 private progressService: ProgressService,
@@ -160,6 +164,9 @@ export class GnomexService {
         this.setDefaultSubmissionState();
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.onGetLabList(response);
+        })
+        this.labListService.getOrganismList().subscribe((response: any[]) => {
+            this.onGetOrganismList(response);
         })
         return new Promise((resolve) => {
             resolve()
@@ -490,6 +497,22 @@ export class GnomexService {
             this.workAuthLabList = labs;
             this.promptedWorkAuthLabList = labs;
         }
+    }
+
+    public onGetOrganismList(orgs: any[]) {
+        for (let organism of orgs) {
+            if (organism.das2Name != '' && organism.bionomialName != '' && organism.isActive == 'Y') {
+                this.das2OrganismList.push(organism);
+            }
+            if (organism.isActive == 'Y') {
+                this.activeOrganismList.push(organism);
+            }
+        }
+        //TODO
+        // activeOrganismList.sort = new Sort();
+        // activeOrganismList.sort.compareFunction = sortActiveOrganismList;
+        // activeOrganismList.refresh();
+
     }
 
     public isCoreFacilityIManage(idCoreFacility:String):Boolean {

@@ -35,7 +35,7 @@ export class DeleteTopicComponent {
         this.topic = data.topic;
         if (this.selectedItem.data.idParentTopic) {
             this.deletePrompt = "Deleting topic '" + this.selectedItem.data.label + " will also remove all descendant topics " +
-                 "and links to experiments, analyses, and data tracks." + "Are you sure you want to delete the topic and all of its contents?";
+                 "and links to experiments, analyses, and data tracks." + " Are you sure you want to delete the topic and all of its contents?";
             this.unLink = false;
         } else if (this.selectedItem.isLeaf) {
             if (this.selectedItem.data.idDataTrack) {

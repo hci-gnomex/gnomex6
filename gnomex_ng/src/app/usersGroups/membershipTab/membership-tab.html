@@ -6,9 +6,9 @@
         <div class="flex-column-container" style="width: 100%">
             <div style="display: flex;">
                 <mat-form-field class="formField">
-                    <input matInput placeholder="Member to add" aria-label="Member" [matAutocomplete]="auto"
-                           [(ngModel)]="memberUser" (keyup.enter)="chooseFirstOption()">
-                    <mat-autocomplete #auto="matAutocomplete">
+                    <input matInput placeholder="Member to add" aria-label="Member" [matAutocomplete]="autoMem"
+                           [(ngModel)]="memberUser" (keyup.enter)="chooseFirstMemOption()" (keyup)="highlightMemFirstOption($event)">
+                    <mat-autocomplete #autoMem="matAutocomplete">
                         <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let member of filterUsers(this.memberUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
@@ -44,7 +44,7 @@
                     <div class="users-groups-row-one">
                         <mat-form-field class="formField">
                             <input matInput placeholder="Collaborator to add" aria-label="Collaborator" [matAutocomplete]="autoColl"
-                                   [(ngModel)]="collUser" (keyup.enter)="chooseFirstOption()">
+                                   [(ngModel)]="collUser" (keyup.enter)="chooseFirstCollOption()" (keyup)="highlightCollFirstOption($event)">
                             <mat-autocomplete #autoColl="matAutocomplete">
                                 <mat-option (onSelectionChange)="selectCollOption($event)" *ngFor="let member of filterUsers(this.collUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
                             </mat-autocomplete>
@@ -79,7 +79,7 @@
                     <div class="users-groups-row-one">
                         <mat-form-field class="formField">
                             <input matInput placeholder="Manager to add" aria-label="Manager" [matAutocomplete]="autoMan"
-                                   [(ngModel)]="manUser" (keyup.enter)="chooseFirstOption()">
+                                   [(ngModel)]="manUser" (keyup.enter)="chooseFirstManOption()" (keyup)="highlightManFirstOption($event)">
                             <mat-autocomplete #autoMan="matAutocomplete">
                                 <mat-option (onSelectionChange)="selectManOption($event)" *ngFor="let member of filterUsers(this.manUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
                             </mat-autocomplete>

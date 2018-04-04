@@ -4,10 +4,7 @@ package hci.gnomex.model;
 import hci.framework.model.DetailObject;
 import hci.gnomex.security.SecurityAdvisor;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class AnalysisGroupFilter extends DetailObject {
 
@@ -26,6 +23,11 @@ public class AnalysisGroupFilter extends DetailObject {
   
   private Date					createDateFrom;
   private Date					createDateTo;
+
+  private String                lastWeek  = "N";
+  private String                lastMonth = "N";
+  private String                lastThreeMonths = "N";
+  private String                lastYear  = "N";
 
   private String				idGenomeBuild;
   private String				idOrganism;
@@ -373,6 +375,70 @@ public class AnalysisGroupFilter extends DetailObject {
     	queryBuf.append("'");    	
     }
 
+    if (lastWeek.equals("Y")) {
+
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.DAY_OF_YEAR, -7);
+      java.sql.Date lastWeek = new java.sql.Date(cal.getTimeInMillis());
+
+      this.addWhereOrAnd();
+      if(secAdvisor.isGuest()) { // use when a request became public instead of create date
+        queryBuf.append(" CASE WHEN a.privacyExpirationDate IS NULL THEN a.createDate ELSE a.privacyExpirationDate END  >= '");
+      } else {
+        queryBuf.append(" a.createDate >= '");
+      }
+      queryBuf.append(this.formatDate(lastWeek, this.DATE_OUTPUT_SQL));
+      queryBuf.append("'");
+    }
+    // Search for requests submitted in last month
+    if (lastMonth.equals("Y")) {
+
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.MONTH, -1);
+      java.sql.Date lastMonth = new java.sql.Date(cal.getTimeInMillis());
+
+      this.addWhereOrAnd();
+      if(secAdvisor.isGuest()) { // use when a request became public instead of create date
+        queryBuf.append(" CASE WHEN a.privacyExpirationDate IS NULL THEN a.createDate ELSE a.privacyExpirationDate END  >= '");
+      } else {
+        queryBuf.append(" a.createDate >= '");
+      }
+      queryBuf.append(this.formatDate(lastMonth, this.DATE_OUTPUT_SQL));
+      queryBuf.append("'");
+    }
+    // Search for requests submitted in last 3 months
+    if (lastThreeMonths.equals("Y")) {
+
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.MONTH, -3);
+      java.sql.Date last3Month = new java.sql.Date(cal.getTimeInMillis());
+
+      this.addWhereOrAnd();
+      if(secAdvisor.isGuest()) { // use when a request became public instead of create date
+        queryBuf.append(" CASE WHEN a.privacyExpirationDate IS NULL THEN a.createDate ELSE a.privacyExpirationDate END  >= '");
+      } else {
+        queryBuf.append(" a.createDate >= '");
+      }
+      queryBuf.append(this.formatDate(last3Month, this.DATE_OUTPUT_SQL));
+      queryBuf.append("'");
+    }
+    // Search for requests submitted in last year
+    if (lastYear.equals("Y")) {
+
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.YEAR, -1);
+      java.sql.Date lastYear = new java.sql.Date(cal.getTimeInMillis());
+
+      this.addWhereOrAnd();
+      if(secAdvisor.isGuest()) { // use when a request became public instead of create date
+        queryBuf.append(" CASE WHEN a.privacyExpirationDate IS NULL THEN a.createDate ELSE a.privacyExpirationDate END  >= '");
+      } else {
+        queryBuf.append(" a.createDate >= '");
+      }
+      queryBuf.append(this.formatDate(lastYear, this.DATE_OUTPUT_SQL));
+      queryBuf.append("'");
+    }
+
     // Search for public projects
     if (publicProjects != null && publicProjects.equals("Y")) {
       this.addWhereOrAnd();
@@ -570,6 +636,42 @@ public class AnalysisGroupFilter extends DetailObject {
 
   public void setCreateDateTo(Date createDateTo) {
 	this.createDateTo = createDateTo;
-  }  
+  }
+
+  public String getLastWeek() {
+    return lastWeek;
+  }
+
+
+  public void setLastWeek(String lastWeek) {
+    this.lastWeek = lastWeek;
+  }
+
+
+  public String getLastMonth() {
+    return lastMonth;
+  }
+
+
+  public void setLastMonth(String lastMonth) {
+    this.lastMonth = lastMonth;
+  }
+
+  public String getLastThreeMonths() {
+    return lastThreeMonths;
+  }
+
+  public void setLastThreeMonths(String lastThreeMonths) {
+    this.lastThreeMonths = lastThreeMonths;
+  }
+
+  public String getLastYear() {
+    return lastYear;
+  }
+
+
+  public void setLastYear(String lastYear) {
+    this.lastYear = lastYear;
+  }
 
 }

@@ -1,0 +1,40 @@
+<div class="flex-row-container" >
+    <div class="users-groups-row-one">
+        <div class="flex-column-container" style="width: 100%">
+            <div style="display: flex;">
+                <mat-form-field class="formField">
+                    <input matInput placeholder="Core facility" aria-label="Core" [formControl]="this.coreFacilityFC" [matAutocomplete]="auto"
+                           [(ngModel)]="core" (keyup.enter)="chooseFirstOption()" (keyup)="highlightFirstOption($event)">
+                    <mat-autocomplete #auto="matAutocomplete">
+                        <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let cor of filterCores(this.core)" [value]="cor.display">{{cor.display}}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div>
+                <app-month-picker label="Billing period"
+                                  [formControl]="monthInputCtrl"
+                                  [max]="max"
+                                  [min]="min">
+                </app-month-picker>
+            </div>
+            <div style="width: 40%">
+                <div  *ngIf="billingAccounts.length>0">
+                    <mat-label>Billing Accounts</mat-label>
+                </div>
+                <mat-selection-list #billingAcc [(ngModel)]="selectedAccounts" (ngModelChange)="onNgModelChange($event)">
+                    <mat-list-option *ngFor="let account of billingAccounts" [value]="account.idBillingAccount">
+                        {{account.accountNameDisplay}}
+                    </mat-list-option>
+                </mat-selection-list>
+                <div *ngIf="billingAccounts.length<=0">
+                    <mat-label>No invoice available for this core and period</mat-label>
+                </div>
+            </div>
+            <div>
+                <button mat-button [disabled]="this.selectedAccounts.length<=0" (click)="run()">
+                    <mat-icon aria-label="New...">picture_as_pdf</mat-icon>
+                    Show Printable Invoice</button>
+            </div>
+        </div>
+    </div>
+</div>
