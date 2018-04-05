@@ -3,7 +3,7 @@
  */
 import {Routes, RouterModule} from "@angular/router";
 import {HomeComponent} from "./home.component";
-import {RouteGuardService} from "@hci/authentication";
+import {AuthRouteGuardService} from "../services/route-guards/auth-route-guard.service";
 
 /**
  * A file defining and exporting the router configuration for the home module.
@@ -12,7 +12,7 @@ import {RouteGuardService} from "@hci/authentication";
  * @since 7/10/16
  */
 const ROUTES: Routes = [
-    {path: "home", component: HomeComponent, canActivate: [RouteGuardService]}
+    {path: "home", component: HomeComponent, canActivate: [AuthRouteGuardService]}
 ];
 
 export const HOME_ROUTING = RouterModule.forChild(ROUTES);

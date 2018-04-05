@@ -88,22 +88,33 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
         let params: URLSearchParams = new URLSearchParams();
-        this.gnomexService.initApp();
-        this.gnomexService.isAppInitCompleteObservable().first().subscribe(complete =>{
-            if(this.gnomexService.redirectURL){
-                console.log(this.router.parseUrl(this.gnomexService.redirectURL));
-                this.router.navigateByUrl(this.gnomexService.redirectURL);
-            }
-        });
 
-
-        this.launchPropertiesService.getLaunchProperties(params).subscribe((response: any[]) => {
+        this.launchPropertiesService.getLaunchProperties(params).first().subscribe((response: any[]) => {
             this.launchProperties = response;
             this.getProps(response);
             console.log("launch properties");
             this.progressService.displayLoader(10);
+
+            if(this.gnomexService.orderInitObj){
+                if(this.gnomexService.orderInitObj.isGuest){
+                    this.gnomexService.initGuestApp();
+                }else{
+                    this.gnomexService.initApp();
+                }
+            }else{
+                this.gnomexService.initApp();
+            }
+
+
         });
 
+
+        this.gnomexService.isAppInitCompleteObservable().subscribe(complete =>{
+            if(this.gnomexService.redirectURL){
+                console.log(this.router.parseUrl(this.gnomexService.redirectURL));
+                this.router.navigateByUrl("/" + this.gnomexService.redirectURL);
+            }
+        });
     }
 
     getProps(response: any) {

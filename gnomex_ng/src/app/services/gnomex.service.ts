@@ -8,6 +8,8 @@ import {AuthenticationService} from "@hci/authentication";
 import {Subscription} from "rxjs/Subscription";
 import {ProgressService} from "../home/progress.service";
 import {Observable} from "rxjs/Observable";
+import {Http,Response} from "@angular/http";
+import {LaunchPropertiesService} from "./launch-properites.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -64,18 +66,21 @@ export class GnomexService {
     private _isLoggedIn: boolean = false;
     private appInitSubject:Subject<boolean> = new Subject();
     public redirectURL:string;
+    public orderInitObj:any;
 
 
     public organismList: any[] = [];
     public das2OrganismList: any[] = [];
     public activeOrganismList: any[] = [];
 
-    constructor(private dictionaryService: DictionaryService,
+    constructor(
+                private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
                 private progressService: ProgressService,
                 private labListService: LabListService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
-                private authenticationService:AuthenticationService) {
+                private authenticationService:AuthenticationService,
+                private http:Http) {
     }
 
     /* The header only uses this for displaying itself.
@@ -179,16 +184,17 @@ export class GnomexService {
      all we need is one rc that allows external so break as soon as we find it
      */
     setAllowExternal(): void {
-        for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-            for (let cf2 of this.myCoreFacilities)
-            {
-                if (rc.idCoreFacility === cf2.idCoreFacility && rc.isActive === 'Y' && rc.isExternal === 'Y') {
-                    this.allowExternal = true;
+        if(this.myCoreFacilities) {
+            for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
+                for (let cf2 of this.myCoreFacilities) {
+                    if (rc.idCoreFacility === cf2.idCoreFacility && rc.isActive === 'Y' && rc.isExternal === 'Y') {
+                        this.allowExternal = true;
+                        break;
+                    }
+                }
+                if (this.allowExternal) {
                     break;
                 }
-            }
-            if (this.allowExternal) {
-                break;
             }
         }
     }
@@ -279,12 +285,14 @@ export class GnomexService {
      * Update the coreFacility hasRequestCategories
      */
     updateCoreFacilityForRequestCategory(): void {
-        for (let coreCheckReqCat of this.myCoreFacilities) {
-            coreCheckReqCat.hasRequestCategories = 'N';
-            for (let reqCheckReqCat of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-                if (coreCheckReqCat.idCoreFacility === reqCheckReqCat.idCoreFacility) {
-                    coreCheckReqCat.hasRequestCategories = 'Y';
-                    break;
+        if(this.myCoreFacilities){
+            for (let coreCheckReqCat of this.myCoreFacilities) {
+                coreCheckReqCat.hasRequestCategories = 'N';
+                for (let reqCheckReqCat of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
+                    if (coreCheckReqCat.idCoreFacility === reqCheckReqCat.idCoreFacility) {
+                        coreCheckReqCat.hasRequestCategories = 'Y';
+                        break;
+                    }
                 }
             }
         }
@@ -459,11 +467,13 @@ export class GnomexService {
     getMyCoreThatUseProducts(): any[] {
         let myCoresThatUseProducts = [];
         let myCoresCtr: number = 0;
-        for (let core of this.myCoreFacilities) {
-            for (let pt of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.ProductType")) {
-                if (pt.idCoreFacility === core.idCoreFacility) {
-                    myCoresThatUseProducts[myCoresCtr] = core;
-                    break;
+        if(this.myCoreFacilities){
+            for (let core of this.myCoreFacilities) {
+                for (let pt of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.ProductType")) {
+                    if (pt.idCoreFacility === core.idCoreFacility) {
+                        myCoresThatUseProducts[myCoresCtr] = core;
+                        break;
+                    }
                 }
             }
         }
@@ -568,7 +578,7 @@ export class GnomexService {
 
     initApp(): void{
         this.authSubscription = this.authenticationService.isAuthenticated().first().subscribe(authenticated => {
-            //this._isLoggedIn = authenticated && this.progressService.hideLoader.asObservable();
+            //this._isLoggedIn = authenticated && this.progressService.hideLoader.asObservable()
             if (authenticated) {
                 this.createSecurityAdvisorService.createSecurityAdvisor().first().subscribe(response => {
                     this.progressService.displayLoader(15);
@@ -598,5 +608,49 @@ export class GnomexService {
         });
 
     }
+    initGuestApp() {
+
+        let params:URLSearchParams = new URLSearchParams();
+        params.set("idCoreFacility",null)
+        this.createSecurityAdvisorService.createGuestSecurityAdvisor(params).first().subscribe(response => {
+            this.progressService.displayLoader(15);
+            this.dictionaryService.reload(() => {
+                this.progressService.displayLoader(30);
+                this.labListService.getLabList().first().subscribe((response: any[]) => {
+                    this.progressService.displayLoader(45);
+                    this.labList = response;
+                    this.progressService.displayLoader(60);
+                    this.myCoreFacilities = this.dictionaryService.coreFacilities();
+                    this.progressService.displayLoader(75);
+                    this.onDictionariesLoaded().then((response) => {
+                        this.progressService.displayLoader(90);
+                        this.emitIsAppInitCompelete(true);
+                        this.progressService.displayLoader(100);
+                        this._isLoggedIn = true;
+
+                        // TODO will need this in future
+                        // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
+                        //      this.progressService.displayLoader(100);
+                        //     this.gnomexService.uploadSampleSheetURL = response.url;
+                        // });
+                    });
+                });
+            });
+        });
+
+    }
+
+
+    getOrderFromNumber(params:URLSearchParams) : Observable<any> {
+        return this.http.get("/gnomex/GetGNomExOrderFromNumberServlet.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
+
+
 
 }
