@@ -22,6 +22,8 @@ import {DataTrackService} from "../services/data-track.service";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import * as _ from "lodash";
+import {GnomexService} from "../services/gnomex.service";
+import {URLSearchParams} from "@angular/http";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -211,6 +213,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     constructor(private datatracksService: DataTrackService, private router: Router,
                 private labListService: LabListService,
                 private dialog: MatDialog,
+                private gnomexService:GnomexService,
                 private changeDetectorRef: ChangeDetectorRef) {
 
 
@@ -218,6 +221,17 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.labMembers = [];
         this.billingAccounts = [];
         this.organisms = [];
+
+
+        if(this.gnomexService.orderInitObj){ // for url navigating
+            let params:URLSearchParams =  new URLSearchParams();
+            params.set("idLab", this.gnomexService.orderInitObj.idLab );
+            params.set("number", this.gnomexService.orderInitObj.dataTrackNumber);
+            params.set("idOrganism", this.gnomexService.orderInitObj.idOrganism);
+            params.set("idGenomeBuild", this.gnomexService.orderInitObj.idGenomeBuild);
+            this.datatracksService.previousURLParams= params;
+            this.datatracksService.getDatatracksList_fromBackend(params)
+        }
 
 
         this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
@@ -229,14 +243,26 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 this.datatracksService.previousURLParams["refreshParams"] = false;
                 this.datatracksService.datatrackListTreeNode = response;
             }else{
-                id = this.datatracksService.datatrackListTreeNode.id;
-                if(this.treeModel && id){
-                    this.treeModel.getNodeById(id).setIsActive(true);
+                if(this.datatracksService.datatrackListTreeNode){
+                    id = this.datatracksService.datatrackListTreeNode.id;
+                    if(this.treeModel && id){
+                        this.treeModel.getNodeById(id).setIsActive(true);
+                        this.treeModel.getNodeById(id).scrollIntoView();
+                    }
                 }
+
             }
-
-
-
+            setTimeout(_ => {
+                this.treeModel.expandAll();
+                if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
+                    let id: string = "d" + this.gnomexService.orderInitObj.idDataTrack;
+                    if (this.treeModel && id) {
+                        this.treeModel.getNodeById(id).setIsActive(true);
+                        this.treeModel.getNodeById(id).scrollIntoView();
+                        this.gnomexService.orderInitObj = null;
+                    }
+                }
+            });
 
         });
         this.datatracksService.startSearchSubject.subscribe((value) =>{
