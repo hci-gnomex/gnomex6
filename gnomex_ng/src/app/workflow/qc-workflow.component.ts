@@ -163,7 +163,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     headerName: "QC Protocol",
                     editable:  true,
                     width: 400,
-                    field: "experimentType",
+                    field: "qualCodeBioanalyzerChipType",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.filteredQcProtocolList,
