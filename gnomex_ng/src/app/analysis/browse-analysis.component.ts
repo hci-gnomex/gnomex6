@@ -29,6 +29,7 @@ import {LabListService} from "../services/lab-list.service";
 import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {GnomexService} from "../services/gnomex.service";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -229,6 +230,16 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.labList = response;
         });
 
+        if(this.gnomexService.orderInitObj){
+            let params:URLSearchParams = new URLSearchParams();
+            params.set("idLab", this.gnomexService.orderInitObj.idLab );
+            params.set("searchPublicProjects", "Y");
+            params.set("showCategory", "N");
+            params.set("showSamples", "N");
+            this.analysisService.analysisPanelParams= params;
+            this.analysisService.getAnalysisGroupList_fromBackend(params)
+        }
+
         this.analysisGroupListSubscription = this.analysisService.getAnalysisGroupListObservable().subscribe(response => {
             this.items = [].concat([]);
             this.buildTree(response);
@@ -264,7 +275,16 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             setTimeout(_ => {
                 this.treeModel.expandAll();
-                if (this.newAnalysisName) {
+                if(this.gnomexService.orderInitObj){ // this is if component is being navigated to by url
+                    let id:string = "a" + this.gnomexService.orderInitObj.idAnalysis;
+                    if(this.treeModel && id) {
+                        this.treeModel.getNodeById(id).setIsActive(true);
+                        this.treeModel.getNodeById(id).scrollIntoView();
+                        this.gnomexService.orderInitObj = null;
+                    }
+
+                }
+                else if (this.newAnalysisName) {
                     this.selectNode(this.treeModel.getFirstRoot().children);
                 }
             })
@@ -290,6 +310,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     constructor(private analysisService: AnalysisService, private router: Router,
                 private dialog: MatDialog,
+                private gnomexService:GnomexService,
                 private labListService: LabListService,
                 private changeDetectorRef: ChangeDetectorRef,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService) {

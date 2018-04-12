@@ -59,16 +59,16 @@ module.exports = function (options) {
                 {
                     // Images and fonts are bundled as well.
                     test: /\.(png|jpe?g|gif|ico)$/,
-                    loader: "file-loader?name=assets/[name].[hash].[ext]"
+                    use: "file-loader?name=assets/[name].[hash].[ext]"
                 },
                 {
                     test: /\.css$/,
-                    loader: ExtractTextPlugin.extract({ fallbackLoader: "style-loader", loader: "css-loader?sourceMap" }),
+                    use: ExtractTextPlugin.extract({ fallback: "style-loader", use: "css-loader?sourceMap" }),
                     exclude: [helpers.root("src", "assets")]
                 },
                 {
                     test: /\.less$/,
-                    loader: ExtractTextPlugin.extract({loader:[ "css-loader", "less-loader" ], fallbackLoader: "style-loader"})
+                    use: ExtractTextPlugin.extract({use:[ "css-loader", "less-loader" ], fallback: "style-loader"})
                 },
                 {
                     test: /\.scss$/,
@@ -80,35 +80,32 @@ module.exports = function (options) {
                 },
                 {
                     test: /\.html$/,
-                    loader: "html-loader"
+                    use: "html-loader"
                 },
                 {
                     test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-                    loader: "url-loader?limit=10000&mimetype=application/font-woff"
+                    use: "url-loader?limit=10000&mimetype=application/font-woff"
                 },
                 {
                     test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-                    loader: "url-loader?limit=10000&mimetype=application/font-woff"
+                    use: "url-loader?limit=10000&mimetype=application/font-woff"
                 },
                 {
                     test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-                    loader: "url-loader?limit=10000&mimetype=application/octet-stream"
+                    use: "url-loader?limit=10000&mimetype=application/octet-stream"
                 },
                 {
                     test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-                    loader: "file-loader"
+                    use: "file-loader"
                 },
                 {
                     test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-                    loader: "url-loader?limit=10000&mimetype=image/svg+xml"
+                    use: "url-loader?limit=10000&mimetype=image/svg+xml"
                 }
             ]
         },
 
         plugins: [
-            new webpack.optimize.CommonsChunkPlugin({
-                name: ["app", "vendor", "twbs", "polyfills"]
-            }),
 
             new HtmlWebpackPlugin({
                 template: "src/index.html",

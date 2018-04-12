@@ -33,6 +33,7 @@ import {LabMembershipRequestService} from "./lab-membership-request.service";
 import {UserService} from "./user.service";
 import {ConfigurationService} from "./configuration.service";
 import {SubRouteGuardService} from "./route-guards/sub-route-guard.service";
+import {AuthRouteGuardService} from "./route-guards/auth-route-guard.service";
 import {AccountFieldsConfigurationService} from "./account-fields-configuration.service";
 import {NewBillingAccountService} from "./new-billing-account.service";
 import {WorkflowService} from "./workflow.service";
@@ -42,7 +43,7 @@ import {WorkflowService} from "./workflow.service";
     declarations: [],
     exports: [],
     providers: [
-			  AccountFieldsConfigurationService,
+        AccountFieldsConfigurationService,
         AnalysisService,
         AppUserListService,
         BillingService,
@@ -79,7 +80,8 @@ import {WorkflowService} from "./workflow.service";
         ConfigurationService,
         SubRouteGuardService,
 			  NewBillingAccountService,
-        WorkflowService
+        WorkflowService,
+        AuthRouteGuardService
     ]})
 export class ServicesModule {
 }

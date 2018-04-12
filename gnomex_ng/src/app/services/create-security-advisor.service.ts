@@ -199,6 +199,33 @@ export class CreateSecurityAdvisorService {
         });
     }
 
+    createGuestSecurityAdvisor(params:URLSearchParams):Observable<any> {
+        return this.http.get("/gnomex/CreateSecurityAdvisorForGuest.gx",{search:params}).map((response: Response) => {
+            if (response.status === 200) {
+                this.result = response.json();
+
+                this.isGuestValue = true;
+                this.idAppUserValue = Number(this.result.idAppUser);
+                this.userNameValue = "guest user";
+                this.loginDateTimeValue = this.result.loginDateTime;
+                this.versionValue = this.result.version;
+                this.isUniversityOnlyUserValue = this.result.isUniversityOnlyUser === 'Y';
+                this.isExternalUserValue = false;
+                this.isSuperAdminValue = false;
+                this.isAdminValue = false;
+                this.isBillingAdminValue = false;
+                this.isLabManagerValue = false;
+                this.groupsToManage = [];
+                this.determineUsersCoreFacilities();
+
+                this.result = response.json();
+            }
+            else {
+                throw new Error("Error");
+            }
+        })
+    }
+
     /*
     Determine if the object is an array
     @param what

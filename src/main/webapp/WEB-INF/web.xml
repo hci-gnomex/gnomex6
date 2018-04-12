@@ -217,6 +217,16 @@
 			hci.gnomex.controller.UploadSequenceFileServlet
 		</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>GetGNomExOrderFromNumberServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.GetGNomExOrderFromNumberServlet
+		</servlet-class>
+	</servlet>
+
+
+
+
 
 	<servlet>
 		<servlet-name>UploadSequenceURLServlet</servlet-name>
@@ -485,6 +495,11 @@
 	<servlet-mapping>
 		<servlet-name>UploadSequenceFileServlet</servlet-name>
 		<url-pattern>/UploadSequenceFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>GetGNomExOrderFromNumberServlet</servlet-name>
+		<url-pattern>/GetGNomExOrderFromNumberServlet.gx</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
