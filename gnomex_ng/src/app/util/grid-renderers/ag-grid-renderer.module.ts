@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { ApproveButtonRenderer } from "./approve-button.renderer";
 import { CheckboxRenderer } from "./checkbox.renderer";
 import { DateRenderer } from "./date.renderer";
 import { IconTextRendererComponent, IconRendererComponent } from "./index";
@@ -20,6 +21,7 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
         ReactiveFormsModule,
     ],
     declarations: [
+			  ApproveButtonRenderer,
 			  CheckboxRenderer,
 			  DateRenderer,
 			  IconLinkButtonRenderer,
@@ -33,6 +35,7 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 			  UploadViewRemoveRenderer
     ],
     exports: [
+			  ApproveButtonRenderer,
 			  CheckboxRenderer,
 			  DateRenderer,
 			  IconLinkButtonRenderer,

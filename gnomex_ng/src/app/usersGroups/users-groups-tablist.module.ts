@@ -19,6 +19,7 @@ import { EditBillingAccountModule } from "../billing/edit_billing_account/edit-b
 import { ServicesModule } from "../services/services.module";
 import { UtilModule } from "../util/util.module";
 
+import { ApproveButtonRenderer } from "../util/grid-renderers/approve-button.renderer";
 import { CheckboxRenderer } from "../util/grid-renderers/checkbox.renderer";
 import { DateEditor } from "../util/grid-editors/date.editor";
 import { DateRenderer } from "../util/grid-renderers/date.renderer";
@@ -53,6 +54,7 @@ import {InvoicesTabComponent} from "./invoicesTab/invoices-tab.component";
     imports: [
 			  AgGridEditorModule,
 			  AgGridModule.withComponents([
+					  ApproveButtonRenderer,
 					  CheckboxRenderer,
 					  DateEditor,
 					  DateRenderer,

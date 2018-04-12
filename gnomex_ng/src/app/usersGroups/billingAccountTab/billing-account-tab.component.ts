@@ -6,6 +6,7 @@ import {PropertyService} from "../../services/property.service";
 
 import { EditBillingAccountComponent } from "../../billing/edit_billing_account/edit-billing-account.component";
 
+import { ApproveButtonRenderer } from "../../util/grid-renderers/approve-button.renderer";
 import { CheckboxRenderer } from "../../util/grid-renderers/checkbox.renderer";
 import { DateEditor } from "../../util/grid-editors/date.editor";
 import { DateRenderer } from "../../util/grid-renderers/date.renderer";
@@ -249,6 +250,25 @@ export class BillingAccountTabComponent implements OnInit{
 	private getChartfieldColumnDefs(shownGridData: any[]): any[] {
 		let columnDefinitions = [];
 
+		let anyAccountsNeedApproval: boolean = false;
+		for (let row of shownGridData) {
+			if (row.isApproved && row.isApproved.toLowerCase() === 'n') {
+				anyAccountsNeedApproval = true;
+				break;
+			}
+		}
+
+		if (anyAccountsNeedApproval) {
+			columnDefinitions.push({
+				headerName: "",
+				editable: false,
+				width: 100,
+				cellRendererFramework: ApproveButtonRenderer,
+				onClick: "onApproveButtonClicked_chartfield",
+				field: "isApproved"
+			});
+		}
+
 		columnDefinitions.push({
 			headerName: "Account name",
 			editable: false,
@@ -374,6 +394,25 @@ export class BillingAccountTabComponent implements OnInit{
 	private getPoColumnDefs(shownGridData: any[]): any[] {
 		let columnDefinitions = [];
 
+		let anyAccountsNeedApproval: boolean = false;
+		for (let row of shownGridData) {
+			if (row.isApproved && row.isApproved.toLowerCase() === 'n') {
+				anyAccountsNeedApproval = true;
+				break;
+			}
+		}
+
+		if (anyAccountsNeedApproval) {
+			columnDefinitions.push({
+				headerName: "",
+				editable: false,
+				width: 100,
+				cellRendererFramework: ApproveButtonRenderer,
+				onClick: "onApproveButtonClicked_po",
+				field: "isApproved"
+			});
+		}
+
 		columnDefinitions.push({
 			headerName: "PO",
 			editable: false,
@@ -454,6 +493,25 @@ export class BillingAccountTabComponent implements OnInit{
 
 	private getCreditCardColumnDefs(shownGridData): any[] {
 		let columnDefinitions = [];
+
+		let anyAccountsNeedApproval: boolean = false;
+		for (let row of shownGridData) {
+			if (row.isApproved && row.isApproved.toLowerCase() === 'n') {
+				anyAccountsNeedApproval = true;
+				break;
+			}
+		}
+
+		if (anyAccountsNeedApproval) {
+			columnDefinitions.push({
+				headerName: "",
+				editable: false,
+				width: 100,
+				cellRendererFramework: ApproveButtonRenderer,
+				onClick: "onApproveButtonClicked_creditCard",
+				field: "isApproved"
+			});
+		}
 
 		columnDefinitions.push({
 			headerName: "Credit Card Last 4 digits",
@@ -656,6 +714,20 @@ export class BillingAccountTabComponent implements OnInit{
 	}
 
 
+	onApproveButtonClicked_chartfield(rowIndex: string) {
+		// this.chartfieldGridApi.getrowdatabyid(rowIndex).isApproved = 'Y';
+		console.log("Approved clicked!");
+	}
+
+	onApproveButtonClicked_po(rowIndex: string) {
+		console.log("Approved clicked!");
+	}
+
+	onApproveButtonClicked_creditCard(rowIndex: string) {
+		console.log("Approved clicked!");
+	}
+
+
 	openChartfieldEditor(rowIndex: string) {
 		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
 
@@ -707,19 +779,53 @@ export class BillingAccountTabComponent implements OnInit{
 	}
 
 	onPoUsersClicked(rowIndex: string): void {
-		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: { message: "hello world"}, width: '60em', panelClass: 'no-padding-dialog' });
+		if (this.poGridApi && this.poGridApi.getDisplayedRowAtIndex(rowIndex) && this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+			let data = {
+				options: this.labActiveSubmitters,
+				optionName: "Users",
+				value: this.poGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers,
+				valueField: "value",
+				displayField: "display"
+			};
 
-		dialogRef.afterClosed().subscribe((result) => {
-			console.log("Editor closed!");
-		});
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+
+			dialogRef.afterClosed().subscribe((result) => {
+				if (dialogRef
+						&& dialogRef.componentInstance
+						&& this.poGridApi
+						&& this.poGridApi.getDisplayedRowAtIndex(rowIndex)
+						&& this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+					this.poGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
+					this.poGridApi.refreshCells();
+				}
+			});
+		}
 	}
 
 	onCreditCardUsersClicked(rowIndex: string): void {
-		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: { message: "hello world"}, width: '60em', panelClass: 'no-padding-dialog' });
+		if (this.creditCardGridApi && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex) && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+			let data = {
+				options: this.labActiveSubmitters,
+				optionName: "Users",
+				value: this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers,
+				valueField: "value",
+				displayField: "display"
+			};
 
-		dialogRef.afterClosed().subscribe((result) => {
-			console.log("Editor closed!");
-		});
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+
+			dialogRef.afterClosed().subscribe((result) => {
+				if (dialogRef
+						&& dialogRef.componentInstance
+						&& this.creditCardGridApi
+						&& this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex)
+						&& this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+					this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
+					this.creditCardGridApi.refreshCells();
+				}
+			});
+		}
 	}
 
 
