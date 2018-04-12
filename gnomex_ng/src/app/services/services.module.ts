@@ -35,6 +35,7 @@ import {ConfigurationService} from "./configuration.service";
 import {SubRouteGuardService} from "./route-guards/sub-route-guard.service";
 import {AccountFieldsConfigurationService} from "./account-fields-configuration.service";
 import {NewBillingAccountService} from "./new-billing-account.service";
+import {WorkflowService} from "./workflow.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -77,7 +78,8 @@ import {NewBillingAccountService} from "./new-billing-account.service";
         LabMembershipRequestService,
         ConfigurationService,
         SubRouteGuardService,
-			  NewBillingAccountService
+			  NewBillingAccountService,
+        WorkflowService
     ]})
 export class ServicesModule {
 }

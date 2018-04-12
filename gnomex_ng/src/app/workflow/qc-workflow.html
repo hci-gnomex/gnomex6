@@ -1,0 +1,42 @@
+<div class="flex-column-container">
+    <div class="flex-row-container">
+        <mat-form-field class="formField">
+            <input matInput placeholder="Request #" aria-label="Request #" [matAutocomplete]="autoRequest"
+                   [formControl]="requestFC" (keyup.enter)="chooseFirstRequestOption()" (keyup)="highlightFirstRequestOption($event)">
+            <mat-autocomplete #autoRequest="matAutocomplete" [displayWith]="displayRequest">
+                <mat-option (onSelectionChange)="selectRequestOption($event)" *ngFor="let request of filterRequests(this.requestFC.value)" [value]="request">{{request.requestNumber}}</mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput placeholder="Core facility" aria-label="Core" [matAutocomplete]="autoCore"
+                   [formControl]="coreFacilityFC" (keyup.enter)="chooseFirstCoreOption()" (keyup)="highlightFirstCoreOption($event)">
+            <mat-autocomplete #autoCore="matAutocomplete" [displayWith]="displayCore">
+                <mat-option (onSelectionChange)="selectCoreOption($event)" *ngFor="let cor of filterCores(this.coreFacilityFC.value)" [value]="cor">{{cor.display}}</mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+    <div class="row-one" style="width: 100%;height: 90%">
+        <ag-grid-angular id="userTable" style="width: 100%;" class="ag-fresh"
+                         [gridOptions]="gridOptions"
+                         [rowData]="workingWorkItemList"
+                         [columnDefs]="columnDefs"
+                         (rowDataChanged)="this.onNotifyGridRowDataChanged()"
+                         [rowSelection]="rowSelection"
+                         (gridReady)="onGridReady($event)"
+                         (selectionChanged)="onSelectionChanged($event)"
+                         [enableSorting]="true"
+                         (onGridSizeChanged)="onGridSizeChanged($event)"
+                         [enableFilter]="true"
+                         [enableColResize]="true">
+        </ag-grid-angular>
+    </div>
+    <div class="row-one-right">
+        <span *ngIf="dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
+                                    Your changes have not been saved
+                                </span>
+        <button mat-button *ngIf="!this.showSpinner" (click)="save()"><img src="../../assets/save.png">Save</button>
+        <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+    </div>
+
+
+</div>

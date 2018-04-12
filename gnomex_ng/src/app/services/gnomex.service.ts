@@ -530,6 +530,32 @@ export class GnomexService {
         return isMyCoreFacility;
     }
 
+    public getCoreFacilityName(idCoreFacility: string):string {
+        let coreFacility = this.dictionaryService.getEntry('hci.gnomex.model.CoreFacility', idCoreFacility);
+        return coreFacility.facilityName;
+    }
+
+    public getQCAppCodesForCore(idCoreFacility: string): any[] {
+        let rc = this.getQCRequestCategoryForCore(idCoreFacility);
+        let appCodes: any[] = [];
+        for (var apprc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication")) {
+            if (apprc.codeRequestCategory === rc.codeRequestCategory) {
+                appCodes.push(apprc.codeApplication);
+            }
+        }
+        return appCodes;
+    }
+
+    public getQCRequestCategoryForCore(idCoreFacility: string): any {
+        let retObj = null;
+        for (var rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
+            if (rc.idCoreFacility === idCoreFacility && rc.type == 'QC') {
+                retObj = rc;
+                break;
+            }
+        }
+        return retObj;
+    }
 
 
     hasGroupsToManage(): boolean {
