@@ -352,7 +352,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Organisms and Genome Builds',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-organisms'
                     },
                     {
                         displayName: 'Protocols',
@@ -500,7 +500,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Organisms and Genome Builds',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-organisms'
                     },
                     {
                         displayName: 'Protocols',
@@ -605,7 +605,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Organisms and Genome Builds',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-organisms'
                     },
                     {
                         displayName: 'Manage Microarray Catalog',
@@ -1068,7 +1068,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Organisms and Genome Builds',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-organisms'
                     },
                     {
                         displayName: 'Manage Microarray Catalog',
@@ -1704,7 +1704,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Organisms and Genome Builds',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-organisms'
                     },
                     {
                         displayName: 'Manage Microarray Catalog',
@@ -1805,7 +1805,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Organisms and Genome Builds',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-organisms'
                     },
                     {
                         displayName: 'Protocols',

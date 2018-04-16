@@ -5,17 +5,15 @@ import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.Organism;
-import hci.gnomex.model.RequestCategory;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DataTrackFolderComparator;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 
 import java.io.Serializable;
 import java.io.StringReader;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,22 +22,17 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.*;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.apache.log4j.Logger;
 public class SaveOrganism extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger(SaveOrganism.class);
 
-  private String genomeBuildsXMLString;
-  private Document genomeBuildsDoc;
+  private JsonArray genomeBuildsArray = null;
 
   private Organism organismScreen;
   private boolean isNewOrganism = false;
@@ -52,13 +45,13 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
     organismScreen = new Organism();
     HashMap errors = this.loadDetailObject(request, organismScreen);
     this.addInvalidFields(errors);
-    if (organismScreen.getIdOrganism() == null || organismScreen.getIdOrganism().intValue() == 0) {
+    if (organismScreen.getIdOrganism() == null || organismScreen.getIdOrganism() == 0) {
       isNewOrganism = true;
     }
 
     // Make sure that the DAS2 name has no spaces or special characters
     if (isValid() && organismScreen.getDas2Name() != null && organismScreen.getDas2Name() != null) {
-      if (organismScreen.getDas2Name().indexOf(" ") >= 0) {
+      if (organismScreen.getDas2Name().contains(" ")) {
         addInvalidField("namespaces", "The DAS2 name cannot have spaces.");
       }
       Pattern pattern = Pattern.compile("\\W");
@@ -68,16 +61,15 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
       }
     }
 
-    if (request.getParameter("genomeBuildsXMLString") != null && !request.getParameter("genomeBuildsXMLString").equals("")) {
-      genomeBuildsXMLString = request.getParameter("genomeBuildsXMLString");
-      StringReader reader = new StringReader(genomeBuildsXMLString);
+    String genomeBuildsJSONString = request.getParameter("genomeBuildsJSONString");
+    if (Util.isParameterNonEmpty(genomeBuildsJSONString)) {
       try {
-        SAXBuilder sax = new SAXBuilder();
-        genomeBuildsDoc = sax.build(reader);
-      } catch (JDOMException je) {
-        LOG.error("Cannot parse genomeBuildsXMLString", je);
-        this.addInvalidField("genomeBuildsXMLString", "Invalid genomeBuildsXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse genomeBuildsXMLString", je);
+        JsonReader jsonReader = Json.createReader(new StringReader(genomeBuildsJSONString));
+        this.genomeBuildsArray = jsonReader.readArray();
+        jsonReader.close();
+      } catch (Exception e) {
+        this.addInvalidField("genomeBuildsJSONString", "Invalid genomeBuildsJSONString");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse genomeBuildsJSONString", e);
       }
     }
 
@@ -90,7 +82,7 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
 
       if (this.getSecurityAdvisor().hasPermission(SecurityAdvisor.CAN_SUBMIT_REQUESTS)) {
 
-        Organism o = null;
+        Organism o;
 
         if (isNewOrganism) {
           o = organismScreen;
@@ -110,10 +102,10 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
         }
 
         // Check to make sure genome builds have build dates. Otherwise throws error when saving
-        if (genomeBuildsDoc != null) {
-          for (Iterator i = this.genomeBuildsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-            Element node = (Element) i.next();
-            if (node.getAttributeValue("buildDate") == null || node.getAttributeValue("buildDate").equals("")) {
+        if (genomeBuildsArray != null) {
+          for(int i = 0; i < this.genomeBuildsArray.size(); i++) {
+            JsonObject node = this.genomeBuildsArray.getJsonObject(i);
+            if (node.get("buildDate") == null || node.getString("buildDate").equals("")) {
               this.addInvalidField("invalidBuildDate", "Please specify a build date for each genome build.");
             }
           }
@@ -124,28 +116,28 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
         //
         if (this.isValid()) {
           HashMap genomeBuildMap = new HashMap();
-          if (genomeBuildsDoc != null) {
+          if (genomeBuildsArray != null) {
 
-            for (Iterator i = this.genomeBuildsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-              Element node = (Element) i.next();
-              GenomeBuild genomeBuild = null;
+            for (int i = 0; i < this.genomeBuildsArray.size(); i++) {
+              JsonObject node = this.genomeBuildsArray.getJsonObject(i);
+              GenomeBuild genomeBuild;
 
-              String idGenomeBuild = node.getAttributeValue("idGenomeBuild");
+              String idGenomeBuild = node.getString("idGenomeBuild");
               if (idGenomeBuild.startsWith("GenomeBuild")) {
                 genomeBuild = new GenomeBuild();
               } else {
                 genomeBuild = sess.load(GenomeBuild.class, Integer.valueOf(idGenomeBuild));
               }
 
-              genomeBuild.setGenomeBuildName(node.getAttributeValue("genomeBuildName"));
-              genomeBuild.setIsLatestBuild(node.getAttributeValue("isLatestBuild"));
-              genomeBuild.setIsActive(node.getAttributeValue("isActive"));
-              genomeBuild.setDas2Name(node.getAttributeValue("das2Name"));
+              genomeBuild.setGenomeBuildName(node.getString("genomeBuildName"));
+              genomeBuild.setIsLatestBuild(node.getString("isLatestBuild"));
+              genomeBuild.setIsActive(node.getString("isActive"));
+              genomeBuild.setDas2Name(node.getString("das2Name"));
               // construct date to set the build date. since it takes a date object.
 
               SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-              Date date1 = new Date(df.parse(node.getAttributeValue("buildDate")).getTime());
+              Date date1 = new Date(df.parse(node.getString("buildDate")).getTime());
 
               genomeBuild.setBuildDate(date1);
               genomeBuild.setIdOrganism(o.getIdOrganism());
@@ -160,7 +152,7 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
                 folder.setIdParentDataTrackFolder(null);
                 sess.save(folder);
 
-                Set<DataTrackFolder> foldersToKeep = new TreeSet<DataTrackFolder>(new DataTrackFolderComparator());
+                Set<DataTrackFolder> foldersToKeep = new TreeSet<>(new DataTrackFolderComparator());
                 foldersToKeep.add(folder);
                 genomeBuild.setDataTrackFolders(foldersToKeep);
                 sess.flush();
@@ -179,13 +171,13 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
             }
 
             // Delete items no longer present
-            StringBuffer query = new StringBuffer("SELECT gb from GenomeBuild gb");
-            query.append(" where gb.idOrganism=" + o.getIdOrganism());
+            StringBuilder query = new StringBuilder("SELECT gb from GenomeBuild gb");
+            query.append(" where gb.idOrganism=");
+            query.append(o.getIdOrganism());
             query.append(" order by gb.genomeBuildName");
             List genomeBuilds = sess.createQuery(query.toString()).list();
 
             if (!genomeBuilds.isEmpty()) {
-              Element gbEle = new Element("genomeBuilds");
               for (Iterator j = genomeBuilds.iterator(); j.hasNext();) {
                 GenomeBuild gb = (GenomeBuild) j.next();
                 if (!genomeBuildMap.containsKey(gb.getIdGenomeBuild())) {
@@ -200,7 +192,10 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
 
           DictionaryHelper.reload(sess);
 
-          this.xmlResult = "<SUCCESS idOrganism=\"" + o.getIdOrganism() + "\"/>";
+          this.jsonResult = Json.createObjectBuilder()
+                  .add("result", "SUCCESS")
+                  .add("idOrganism", o.getIdOrganism().toString())
+                  .build().toString();
 
           setResponsePage(this.SUCCESS_JSP);
         } else {
@@ -235,23 +230,4 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
 
   }
 
-  private class OrganismComparator implements Comparator, Serializable {
-    public int compare(Object o1, Object o2) {
-      Organism org1 = (Organism) o1;
-      Organism org2 = (Organism) o2;
-
-      return org1.getIdOrganism().compareTo(org2.getIdOrganism());
-
-    }
-  }
-
-  private class RequestCategoryComparator implements Comparator, Serializable {
-    public int compare(Object o1, Object o2) {
-      RequestCategory rc1 = (RequestCategory) o1;
-      RequestCategory rc2 = (RequestCategory) o2;
-
-      return rc1.getCodeRequestCategory().compareTo(rc2.getCodeRequestCategory());
-
-    }
-  }
 }
