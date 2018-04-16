@@ -633,7 +633,7 @@ export class ConfigureAnnotationsComponent {
         newProp.organisms = [];
         newProp.analysisTypes = [];
         newProp.appUsers = [];
-        newProp.idAppUser = this.createSecurityAdvisorService.hasPermission("canWriteDictionaries") ? "" : this.createSecurityAdvisorService.idAppUser;
+        newProp.idAppUser = this.createSecurityAdvisorService.hasPermission("canWriteDictionaries") ? "" : "" + this.createSecurityAdvisorService.idAppUser;
         newProp.codePropertyType = this.TYPE_TEXT;
 
         this.selectedTabIndex = 0;
