@@ -9,6 +9,8 @@ import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {ValueParserParams} from "ag-grid/dist/lib/entities/colDef";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Component({
     selector: 'qc-workflow',
@@ -44,10 +46,14 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
             flex-grow: 1;
             margin-left: 85em;
         }
-        /deep/.mat-tab-label, /deep/.mat-tab-label-active{
-            min-width: 0!important;
-            padding: 3px!important;
-            margin: 3px!important;
+        .filler {
+            flex-grow:1; 
+            text-align:center
+        }
+        #groupTabGroup ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
+            min-width: 0;
+            padding: 3px;
+            margin: 3px;
         }
     `]
 })
@@ -80,16 +86,18 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     private workItem: any;
     private previousRequestMatOption: MatOption;
     private showNav: boolean = true;
+    private hide260230: boolean = true;
     status = [
         {display: ''},
         {display: 'In Progress'},
-        {display: 'Complete'},
+        {display: 'Completed'},
         {display: 'On Hold'},
         {display: 'Terminate'},
         {display: 'Bypass'}
     ];
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
+                private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService) {
         this.requestFC = new FormControl("");
         this.coreFacilityFC = new FormControl("");
@@ -129,7 +137,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                         appCodes = this.coreFacilityAppMap.get(this.coreFacilityFC.value.idCoreFacility);
                         if (appCodes && appCodes.length > 0) {
                             for (var code of appCodes) {
-                                console.log("codeApplic "+item.codeApplication+" code "+code);
                                 if (item.codeApplication.toString() === code) {
                                     retVal = true;
                                     break;
@@ -176,6 +183,15 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     width: 125,
                     field: "qualCalcConcentration",
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
+                    valueSetter: this.qualCalcValueSetter,
+                },
+                {
+                    headerName: "260/230",
+                    editable: true,
+                    width: 125,
+                    field: "260230Concentration",
+                    cellRendererFramework: TextAlignLeftMiddleRenderer,
+                    hide: this.hide260230  // TODO Hide for now until I can get the core facility property
 
                 },
                 {
@@ -200,6 +216,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             ];
             this.requestIds = Array.from(this.workingWorkItemList.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
             this.requestIds.unshift(this.emptyRequest);
+            // TODO Need to get hide260230 and hide that column appropriately
+            // var hide260230:String = parentApplication.getCoreFacilityProperty(selectedIdCoreFacility, parentApplication.PROPERTY_HIDE_260_230_QC_WORKFLOW);
 
         });
 
@@ -243,7 +261,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     chooseFirstRequestOption() {
-        console.log("request option ");
         if (this.autoRequestComplete.options.first) {
             console.log("request option first "+this.autoRequestComplete.options.first);
             this.autoRequestComplete.options.first.select();
@@ -254,7 +271,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.autoCoreComplete.options.first.select();
     }
 
-    filterRs(name: any): any[] {
+    filterRequests(name: any): any[] {
         let fUsers: any[];
         if (name) {
             fUsers = this.requestIds.filter(request =>
@@ -265,34 +282,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-
-    filterRequests(selectedRequest: any): any[] {
-        let fRequests: any[];
-        if (selectedRequest) {
-            if (typeof selectedRequest.requestNumber !== "undefined") {
-                if (selectedRequest.requestNumber === "") {
-                    this.dirty = false;
-                    this.workItem = null;
-                    this.initialize();
-                    this.requestInput.nativeElement.blur();
-                } else {
-                    fRequests = this.requestIds.filter(request =>
-                        request.requestNumber.indexOf(selectedRequest.requestNumber) >= 0);
-                    this.buildRequestIds(this.workingWorkItemList);
-                    return fRequests;
-                }
-            } else {
-                fRequests = this.requestIds.filter(request =>
-                    request.requestNumber.indexOf(selectedRequest) >= 0);
-                return fRequests;
-            }
-        } else {
-            this.filterWorkItems();
-            return this.requestIds;
-        }
-
-    }
-
     filterCores(name: any): any[] {
         return this.cores;
     }
@@ -301,9 +290,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         if (event.key == "ArrowDown" || event.key == "ArrowUp") {
             return;
         }
-        // if (event.key == "Backspace" && this.requestIds.length === 2) {
-        //     this.buildRequestIds(this.workItemList);
-        // }
         if (this.autoRequestComplete.options.first) {
             if (this.previousRequestMatOption) {
                 this.previousRequestMatOption.setInactiveStyles();
@@ -389,10 +375,20 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     save() {
-        console.log("save");
-        this.changedRowMap = new Map<string, any>();
-        this.dirty = false;
-        this.initialize();
+        var params: URLSearchParams = new URLSearchParams();
+        let workItems: any[] = [];
+        for(let value of Array.from( this.changedRowMap.values()) ) {
+            let obj: object = {"WorkItem": value};
+            workItems.push(obj);
+        }
+        params.set("workItemXMLString", JSON.stringify(workItems));
+        this.showSpinner = true;
+        this.workflowService.saveCombinedWorkItemQualityControl(params).subscribe((response: Response) => {
+            this.showSpinner = false;
+            this.changedRowMap = new Map<string, any>();
+            this.dirty = false;
+            this.initialize();
+        });
     }
 
     onGroupsTabChange(event) {
@@ -412,4 +408,27 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     close() {
     }
 
+    qualCalcValueSetter(params: ValueParserParams) {
+        console.log("qc");
+        let valid: boolean = false;
+        let message: string = "Invalid: ";
+        if (params.newValue === "") {
+            params.data[params.colDef.field] = "";
+        }
+        if (params.newValue > 0) {
+            if (params.newValue < 99999 ) {
+                params.data[params.colDef.field] = params.newValue;
+                valid = true;
+            } else {
+                message = "Exceeds max of 99999"
+            }
+        } else {
+            message = "Cannot be negative"
+        }
+        // if (!valid) {
+        //     this.dialogsService.confirm(message, null);
+        //
+        // }
+        // return valid;
+    }
 }

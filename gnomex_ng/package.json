@@ -123,7 +123,7 @@
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "minimist": "^1.2.0",
-    "node-sass": "4.5.1",
+    "node-sass": "^4.5.3",
     "null-loader": "^0.1.1",
     "optimize-js-plugin": "0.0.4",
     "phantomjs-prebuilt": "^2.1.7",
