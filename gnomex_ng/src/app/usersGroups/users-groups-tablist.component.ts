@@ -157,6 +157,11 @@ import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
             width: 30%;
             margin: 0 0.5%;
         }
+        ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
+            min-width: 10em;
+            padding: 3px;
+            margin: 3px;
+        }
 
     `]
 
