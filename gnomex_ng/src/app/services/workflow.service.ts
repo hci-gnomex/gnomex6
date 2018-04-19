@@ -20,4 +20,15 @@ export class WorkflowService {
 
     }
 
+    saveCombinedWorkItemQualityControl(params: URLSearchParams):  Observable<any> {
+        return this.http.get("/gnomex/SaveCombinedWorkItemQualityControl.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+
+    }
+
 }

@@ -1,8 +1,8 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {FormControl} from "@angular/forms";
-import {MatAutocomplete} from "@angular/material";
+import {MatAutocomplete, MatAutocompleteTrigger, MatInput, MatOption, MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
 import {GridOptions} from "ag-grid";
 import {DictionaryService} from "../services/dictionary.service";
@@ -32,18 +32,33 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
             display: flex;
             flex-grow: 1;
         }
+        .row-one {
+            display: flex;
+            flex-grow: 1;
+        }
+        .sidenav-container {
+            height: 100%;
+        }
         .row-one-right {
             display: flex;
             flex-grow: 1;
             margin-left: 85em;
         }
-
+        /deep/.mat-tab-label, /deep/.mat-tab-label-active{
+            min-width: 0!important;
+            padding: 3px!important;
+            margin: 3px!important;
+        }
     `]
 })
 
 export class QcWorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild("autoRequest") autoRequestComplete: MatAutocomplete;
+    @ViewChild("requestInput") requestInput: ElementRef;
+    @ViewChild("coreFacility") coreFacilityInput: ElementRef;
     @ViewChild("autoCore") autoCoreComplete: MatAutocomplete;
+    @ViewChild("autoRequest") trigger: MatAutocompleteTrigger;
+    @ViewChild('sidenav') sidenav: MatSidenav;
 
     private workItemList: any[] = [];
     private workingWorkItemList: any[] = [];
@@ -51,18 +66,20 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     private currentWorkItemList: any[] = [];
     private coreIds: any[] = [];
     private cores: any[] = [];
-    private selectedCore: any;
     private requestIds: any[] = [];
     private filteredQcProtocolList: any[] = [];
     private requestFC: FormControl;
     private coreFacilityFC: FormControl;
     private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
+    private changedRowMap: Map<string, any> = new Map<string, any>();
     private gridOptions:GridOptions = {};
     private columnDefs;
     private emptyRequest = {requestNumber: ""};
     private dirty: boolean = false;
-    private initial: boolean = true;
     private showSpinner: boolean = false;
+    private workItem: any;
+    private previousRequestMatOption: MatOption;
+    private showNav: boolean = true;
     status = [
         {display: ''},
         {display: 'In Progress'},
@@ -80,39 +97,28 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
+        this.initialize();
+        this.sidenav.open();
+    }
+
+    initialize() {
         var params: URLSearchParams = new URLSearchParams();
         params.set("codeStepNext", "QC");
-        let test: any[] = ["jdfk","303"];
-        console.log("test array "+test);
-        var testMap: Map<string, string> = new Map<string, string>();
-        testMap.set("3", "test" );
-        console.log("should work "+testMap.get("3"));
+        this.cores = [];
         this.workflowService.getWorkItemList(params).subscribe((response: any[]) => {
             this.workItemList = response;
-            // this.requestIds = [...new Set(this.workItemList.map(item => item.requestNumber))];
-            this.requestIds = Array.from(this.workItemList.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
-
-            this.requestIds.unshift(this.emptyRequest);
-            // for (let coreId of this.coreIds) {
-            //     let coreObj = {idCoreFacility: coreId,
-            //         display: this.gnomexService.getCoreFacilityName(coreId)}
-            //     this.cores.push(coreObj);
-            //     this.coreFacilityAppMap.set(coreId, this.gnomexService.getQCAppCodesForCore(coreId))
-            // }
             this.coreIds = [...new Set(this.workItemList.map(item => item.idCoreFacility))];
             for (let coreId of this.coreIds) {
                 let coreObj = {idCoreFacility: coreId,
-                                display: this.gnomexService.getCoreFacilityName(coreId)}
+                    display: this.gnomexService.getCoreFacilityName(coreId)};
                 this.cores.push(coreObj);
-                this.coreFacilityAppMap.set(coreId, this.gnomexService.getQCAppCodesForCore(coreId))
-                console.log("initial "+this.coreFacilityAppMap[coreId]);
-            }
-            if (this.cores.length > 0) {
-                this.selectedCore = this.coreIds[0];
+                this.coreFacilityAppMap.set(coreId, this.gnomexService.getQCAppCodesForCore(coreId));
             }
             this.workingWorkItemList = this.workItemList;
+            if (!this.coreFacilityFC.value) {
+                this.coreFacilityFC.setValue(this.cores[0]);
+            }
             this.workingWorkItemList = this.filterWorkItems();
-            this.coreFacilityFC.setValue(this.cores[0]);
             this.filteredQcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType").filter((item: any) => {
                 var retVal: boolean = false;
                 if (item.value == "") {
@@ -120,17 +126,11 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 } else {
                     if (item.isActive === 'Y' && this.coreFacilityFC.value) {
                         let appCodes: any[] = [];
-                        console.log("idCore "+this.coreFacilityFC.value.idCoreFacility);
-                        console.log("app "+this.coreFacilityAppMap.get(this.coreFacilityFC.value.idCoreFacility));
                         appCodes = this.coreFacilityAppMap.get(this.coreFacilityFC.value.idCoreFacility);
-                        Array.from(this.coreFacilityAppMap.keys()).forEach(key => console.log("key "+key));
-                        Array.from(this.coreFacilityAppMap.values()).forEach(value => console.log("value "+value));
-                        console.log("appcodes "+appCodes+" coreappmap "+this.coreFacilityAppMap);
                         if (appCodes && appCodes.length > 0) {
                             for (var code of appCodes) {
                                 console.log("codeApplic "+item.codeApplication+" code "+code);
                                 if (item.codeApplication.toString() === code) {
-                                    console.log("MATCHHHHHHHHHHHHHHHHHHHHHHH");
                                     retVal = true;
                                     break;
                                 }
@@ -146,7 +146,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     headerName: "Sample #",
                     editable: false,
                     field: "sampleNumber",
-                    width: 200
+                    width: 100
                 },
                 {
                     headerName: "Sample Type",
@@ -173,7 +173,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 {
                     headerName: "Conc. ng/uL",
                     editable: true,
-                    width: 200,
+                    width: 125,
                     field: "qualCalcConcentration",
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
 
@@ -181,7 +181,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 {
                     headerName: "RIN #",
                     editable: true,
-                    width: 200,
+                    width: 125,
                     field: "qualRINNumber",
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                 },
@@ -194,12 +194,15 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.status,
                     selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "qualStatus"
+                    selectOptionsValueField: "display"
                 }
 
             ];
+            this.requestIds = Array.from(this.workingWorkItemList.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
+            this.requestIds.unshift(this.emptyRequest);
 
         });
+
     }
 
     ngAfterViewInit() {
@@ -209,41 +212,73 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     filterWorkItems(): any[] {
         let items: any[] = [];
 
-        if (this.requestFC.value) {
-            items = this.workingWorkItemList.filter(request =>
-                request.requestNumber === this.requestFC.value.requestNumber
+        if (this.workItem) {
+            items = this.workItemList.filter(request =>
+                request.requestNumber === this.workItem
             )
         } else {
-            items = this.workingWorkItemList;
+            items = this.workItemList;
         }
-        if (this.selectedCore) {
+        if (this.coreFacilityFC.value) {
             items = items.filter(request =>
-                request.idCoreFacility === this.selectedCore
+                request.idCoreFacility === this.coreFacilityFC.value.idCoreFacility
             )
 
         }
+
         return items;
     }
 
+    buildRequestIds(items: any[]) {
+        let wItems: any[] = [];
+        if (this.coreFacilityFC.value) {
+            wItems = items.filter(request =>
+                request.idCoreFacility === this.coreFacilityFC.value.idCoreFacility
+            )
+
+        }
+
+        this.requestIds = Array.from(wItems.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
+        this.requestIds.unshift(this.emptyRequest);
+    }
+
     chooseFirstRequestOption() {
-        this.autoRequestComplete.options.first.select();
+        console.log("request option ");
+        if (this.autoRequestComplete.options.first) {
+            console.log("request option first "+this.autoRequestComplete.options.first);
+            this.autoRequestComplete.options.first.select();
+        }
     }
 
     chooseFirstCoreOption() {
         this.autoCoreComplete.options.first.select();
     }
 
+    filterRs(name: any): any[] {
+        let fUsers: any[];
+        if (name) {
+            fUsers = this.requestIds.filter(request =>
+                request.requestNumber.indexOf(name) >= 0);
+            return fUsers;
+        } else {
+            return this.requestIds;
+        }
+    }
+
+
     filterRequests(selectedRequest: any): any[] {
         let fRequests: any[];
         if (selectedRequest) {
-            if (selectedRequest.requestNumber) {
+            if (typeof selectedRequest.requestNumber !== "undefined") {
                 if (selectedRequest.requestNumber === "") {
-                    this.initial = true;
                     this.dirty = false;
-                    return this.requestIds;
+                    this.workItem = null;
+                    this.initialize();
+                    this.requestInput.nativeElement.blur();
                 } else {
                     fRequests = this.requestIds.filter(request =>
                         request.requestNumber.indexOf(selectedRequest.requestNumber) >= 0);
+                    this.buildRequestIds(this.workingWorkItemList);
                     return fRequests;
                 }
             } else {
@@ -252,6 +287,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 return fRequests;
             }
         } else {
+            this.filterWorkItems();
             return this.requestIds;
         }
 
@@ -265,8 +301,15 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         if (event.key == "ArrowDown" || event.key == "ArrowUp") {
             return;
         }
+        // if (event.key == "Backspace" && this.requestIds.length === 2) {
+        //     this.buildRequestIds(this.workItemList);
+        // }
         if (this.autoRequestComplete.options.first) {
+            if (this.previousRequestMatOption) {
+                this.previousRequestMatOption.setInactiveStyles();
+            }
             this.autoRequestComplete.options.first.setActiveStyles();
+            this.previousRequestMatOption = this.autoRequestComplete.options.first;
         }
     }
 
@@ -288,21 +331,29 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     selectRequestOption(event) {
-        this.requestFC.setValue(event.source.value);
-        this.workingWorkItemList = this.filterWorkItems();
+        if (event.source.selected) {
+            this.workItem = event.source.value;
+            this.workingWorkItemList = this.filterWorkItems();
+            this.filterWorkItems();
+        }
     }
 
     selectCoreOption(event) {
         this.coreFacilityFC.setValue(event.source.value);
-        this.filterWorkItems();
+        this.workingWorkItemList = this.filterWorkItems();
+        this.buildRequestIds(this.workItemList);
     }
 
-    onNotifyGridRowDataChanged() {
-        if (this.initial === true) {
-            this.initial = false;
-        } else {
-            this.dirty = true;
-        }
+    onNotifyGridRowDataChanged(event) {
+    }
+
+    onCellValueChanged(event) {
+        this.changedRowMap.set(event.data.key, event.data);
+        this.dirty = true;
+    }
+
+    onRowDataChanged(event) {
+        console.log("row changed");
     }
 
     onGridReady(event) {
@@ -335,6 +386,30 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             }
         }
         return retVal;
+    }
+
+    save() {
+        console.log("save");
+        this.changedRowMap = new Map<string, any>();
+        this.dirty = false;
+        this.initialize();
+    }
+
+    onGroupsTabChange(event) {
+
+    }
+
+    toggle(event) {
+        if (this.showNav) {
+            this.sidenav.close();
+            this.showNav = false;
+        } else {
+            this.sidenav.open();
+            this.showNav = true;
+        }
+    }
+
+    close() {
     }
 
 }
