@@ -175,7 +175,9 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.filteredQcProtocolList,
                     selectOptionsDisplayField: "bioanalyzerChipType",
-                    selectOptionsValueField: "datakey"
+                    selectOptionsValueField: "datakey",
+                    showFillButton: true,
+                    fillGroupAttribute: 'idRequest'
                 },
                 {
                     headerName: "Conc. ng/uL",
