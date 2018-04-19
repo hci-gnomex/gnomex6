@@ -15,7 +15,7 @@ module.exports = webpackMerge(devConfig, {
         preLoaders: [
             {
                 test: /\.ts$/,
-                loader: "tslint"
+                use: "tslint"
             }
         ]
     },

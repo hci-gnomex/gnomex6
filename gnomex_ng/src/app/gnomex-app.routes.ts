@@ -4,9 +4,10 @@
 import {Routes, RouterModule} from "@angular/router";
 
 
-import {DirectLoginComponent, RouteGuardService} from "@hci/authentication";
+import {DirectLoginComponent} from "@hci/authentication";
 
 import {HomeComponent} from "./home/home.component";
+import {AuthRouteGuardService} from "./services/route-guards/auth-route-guard.service";
 
 /**
  * A file defining and exporting the router configuration for the seed application.
@@ -17,7 +18,7 @@ import {HomeComponent} from "./home/home.component";
 export const ROUTES: Routes = [
     {path: "", redirectTo: "home", pathMatch: "full"},
     {path: "authenticate", component: DirectLoginComponent},
-    {path: "home", component: HomeComponent, canActivate: [RouteGuardService]}
+    {path: "home", component: HomeComponent, canActivate: [AuthRouteGuardService]}
 ];
 
 export const APP_ROUTING = RouterModule.forRoot(ROUTES);

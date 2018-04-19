@@ -31,7 +31,7 @@ module.exports = function(options) {
                 {
                     enforce: "pre",
                     test: /\.js$/,
-                    loader: "source-map-loader",
+                    use: "source-map-loader",
                     exclude: [
                         /**
                          * These packages have problems with their sourcemaps.  @hci doesn't include source.
@@ -51,7 +51,7 @@ module.exports = function(options) {
                     test: /\.ts$/,
                     use: [
                         {
-                            loader: "awesome-typescript-loader",
+                            use: "awesome-typescript-loader",
                             query: {
                                 /**
                                  * Use inline sourcemaps for "karma-remap-coverage" reporter
@@ -69,23 +69,23 @@ module.exports = function(options) {
                 },
                 {
                     test: /\.css$/,
-                    loader: ["to-string-loader", "css-loader"],
+                    use: ["to-string-loader", "css-loader"],
                     exclude: [helpers.root("src/index.html")]
                 },
                 {
                     test: /\.scss$/,
-                    loader: ["raw-loader", "sass-loader"]
+                    use: ["raw-loader", "sass-loader"]
                 },
                 {
                     test: /\.html$/,
-                    loader: "raw-loader"
+                    use: "raw-loader"
                 },
                 /**
                  * Loader support for *.less files.
                  */
                 {
                     test: /\.less$/,
-                    loader: "raw-loader"
+                    use: "raw-loader"
                 },
 
                 /**
@@ -97,7 +97,7 @@ module.exports = function(options) {
                 // {
                 //     enforce: "post",
                 //     test: /\.(js|ts)$/,
-                //     loader: "istanbul-instrumenter-loader",
+                //     use: "istanbul-instrumenter-loader",
                 //     query: {
                 //         esModules: true
                 //     },

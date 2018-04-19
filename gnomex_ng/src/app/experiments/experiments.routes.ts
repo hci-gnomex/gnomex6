@@ -22,13 +22,16 @@ import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.ser
  */
 const ROUTES: Routes = [
 
-    { path: "experiments/:id", component: BrowseExperimentsComponent , children:[ // for navigating via url
-        {path: '', pathMatch: 'full', redirectTo: '/experiments/:id/(browsePanel:overview)' },
+    /*
+    Please keep this code. It would make code a lot more clean if I could get the router to match experiments with a id
+    Would like to revisit this approach later
+    { path: "experiments/:idLab", component: BrowseExperimentsComponent , children:[ // for navigating via url
+        {path: '', pathMatch: 'full', redirectTo: '/experiments/:idLab/(browsePanel:overview)' },
         {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
         {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
         canActivate: [SubRouteGuardService]
-    },
-    { path: "experiments", component: BrowseExperimentsComponent , children:[ // for stepping through app to this page
+    },*/
+    { path: 'experiments', component: BrowseExperimentsComponent , children:[ // for stepping through app to this page
         {path: '', pathMatch: 'full', redirectTo: '/experiments/(browsePanel:overview)' },
         {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
         {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],

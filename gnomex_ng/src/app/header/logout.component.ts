@@ -21,6 +21,7 @@ export class LogoutComponent implements OnInit {
     ngOnInit() {
         this.authenticationService.logout();
         this.gnomexService.isLoggedIn = false;
+        this.gnomexService.orderInitObj = null;
         this.gnomexService.redirectURL = null;
         this.progressService.hideLoaderStatus(false);
         this.progressService.loaderStatus = new BehaviorSubject<number> (0);

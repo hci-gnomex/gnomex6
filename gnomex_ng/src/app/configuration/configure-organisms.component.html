@@ -1,0 +1,152 @@
+<div class="full-height full-width padding-sides flex-container-col">
+    <h5 class="flex-one">Configure Organisms</h5>
+    <div class="full-width flex-container-row flex-one">
+        <button mat-button (click)="this.addOrganism()"><img class="icon" src="../../assets/page_add.png">Add</button>
+        <button mat-button [disabled]="!this.selectedOrganism || !this.canDeleteSelectedOrganism" (click)="this.removeOrganism()"><img class="icon" src="../../assets/page_remove.png">Remove</button>
+    </div>
+    <div class="full-width flex-container-row flex-twenty">
+        <ag-grid-angular class="ag-fresh full-height quarter-width margin-right"
+                         (gridReady)="this.onOrganismGridReady($event)"
+                         [rowSelection]="'single'"
+                         (rowSelected)="this.onOrganismGridRowSelected($event)"
+                         (gridSizeChanged)="this.adjustColumns(this.organismGridApi)"
+                         [rowData]="this.organismList"
+                         [columnDefs]="this.organismGridColumnDefs">
+        </ag-grid-angular>
+        <div *ngIf="this.selectedOrganism" class="three-quarters-width flex-container-col">
+            <div class="full-width flex-container-row flex-one align-center">
+                <mat-form-field class="forty-percent-width margin-right">
+                    <input matInput placeholder="Name" [formControl]="this.nameFC">
+                    <mat-error *ngIf="this.nameFC.hasError('maxlength')">Exceeds max length</mat-error>
+                </mat-form-field>
+                <mat-checkbox [formControl]="this.activeFC">Active</mat-checkbox>
+            </div>
+            <div class="full-width flex-container-row flex-one align-center">
+                <mat-form-field class="forty-percent-width margin-right">
+                    <input matInput placeholder="das2Name" [formControl]="this.das2NameFC">
+                    <mat-error *ngIf="this.das2NameFC.hasError('maxlength')">Exceeds max length</mat-error>
+                </mat-form-field>
+                <mat-form-field class="forty-percent-width">
+                    <input matInput placeholder="Binomial Name" [formControl]="this.binomialNameFC">
+                    <mat-error *ngIf="this.binomialNameFC.hasError('maxlength')">Exceeds max length</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="full-width flex-container-row flex-one align-center">
+                <mat-form-field class="twenty-percent-width margin-right">
+                    <input matInput placeholder="Abbreviation" [formControl]="this.abbreviationFC">
+                    <mat-error *ngIf="this.abbreviationFC.hasError('maxlength')">Exceeds max length</mat-error>
+                </mat-form-field>
+                <mat-form-field class="twenty-percent-width margin-right">
+                    <input matInput placeholder="Mage Code" [formControl]="this.mageCodeFC">
+                    <mat-error *ngIf="this.mageCodeFC.hasError('maxlength')">Exceeds max length</mat-error>
+                </mat-form-field>
+                <mat-form-field class="twenty-percent-width margin-right">
+                    <input matInput placeholder="Taxonomy I.D." [formControl]="this.taxIdFC">
+                    <mat-error *ngIf="this.taxIdFC.hasError('maxlength')">Exceeds max length</mat-error>
+                </mat-form-field>
+                <mat-form-field class="twenty-percent-width">
+                    <input matInput placeholder="Sort Order" [formControl]="this.sortOrderFC">
+                    <mat-error *ngIf="this.sortOrderFC.hasError('pattern')">Must be a number less than or equal to 99999</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="full-width flex-container-row flex-one align-center">
+                <mat-form-field class="eighty-percent-width">
+                    <textarea matInput placeholder="Mage Definition" [formControl]="this.mageDefFC" matTextareaAutosize
+                              matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+                    <mat-error *ngIf="this.mageDefFC.hasError('maxlength')">Exceeds max length</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="full-width flex-container-col flex-three align-center">
+                <div class="full-width flex-container-row flex-one align-center">
+                    <label class="margin-right">Genome Builds</label>
+                    <button mat-button [disabled]="!this.canUpdateSelectedOrganism" (click)="this.addGenomeBuild()"><img class="icon" src="../../assets/add.png">Add</button>
+                    <button mat-button [disabled]="!this.canUpdateSelectedOrganism || this.genomeBuildSelectedIndex == null" (click)="this.removeGenomeBuild()"><img class="icon" src="../../assets/delete.png">Remove</button>
+                </div>
+                <ag-grid-angular class="ag-fresh flex-two full-width"
+                                 (gridReady)="this.onGenomeBuildGridReady($event)"
+                                 [rowSelection]="'single'"
+                                 (rowSelected)="this.onGenomeBuildGridRowSelected($event)"
+                                 (gridSizeChanged)="this.adjustColumns(this.genomeBuildGridApi)"
+                                 [rowData]="this.genomeBuildList"
+                                 [columnDefs]="this.genomeBuildGridColumnDefs">
+                </ag-grid-angular>
+            </div>
+            <div class="full-width flex-container-row flex-one align-center">
+                <mat-form-field class="forty-percent-width">
+                    <mat-select placeholder="Owner" [formControl]="this.ownerFC">
+                        <mat-option *ngFor="let user of appUserList" [value]="user.idAppUser">{{user.display}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="full-width flex-container-row flex-one align-center justify-end">
+                <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirty-note">Changes Have Not Been Saved</span>
+                <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.canUpdateSelectedOrganism || !this.formGroup.valid"
+                        (click)="this.prepareToSaveOrganism()"><img class="icon" src="../../assets/action_save.gif">Save</button>
+                <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .full-height {
+        height: 100%;
+    }
+    .full-width {
+        width: 100%;
+    }
+    .forty-percent-width {
+        width: 40%;
+    }
+    .twenty-percent-width {
+        width: 20%;
+    }
+    .eighty-percent-width {
+        width: 80%;
+    }
+    .quarter-width {
+        width: 25%;
+    }
+    .three-quarters-width {
+        width: 75%;
+    }
+    .flex-container-row {
+        display: flex;
+        flex-direction: row;
+    }
+    .flex-container-col {
+        display: flex;
+        flex-direction: column;
+    }
+    .align-center {
+        align-items: center;
+    }
+    .justify-end {
+        justify-content: flex-end;
+    }
+    img.icon {
+        margin-right: 0.5rem;
+    }
+    .padding-sides {
+        padding: 0 1rem;
+    }
+    .margin-right {
+        margin-right: 2rem;
+    }
+    .flex-one {
+        flex: 1;
+    }
+    .flex-two {
+        flex: 2;
+    }
+    .flex-three {
+        flex: 3;
+    }
+    .flex-twenty {
+        flex: 20;
+    }
+    span.dirty-note {
+        background: yellow;
+        padding: 0.5rem;
+        margin-left: 1rem;
+    }
+</style>
