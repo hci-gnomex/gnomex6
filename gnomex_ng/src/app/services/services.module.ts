@@ -9,7 +9,8 @@ import {DataTrackService} from "./data-track.service";
 import {DictionaryService} from "./dictionary.service";
 import {ExperimentViewService} from "./experiment-view.service";
 import {ExperimentResolverService,ProjectResolverService,AnalysisGroupResolverService,
-        AnalysisResolverService,GenomeBuildResolverService} from "./resolvers/index";
+        AnalysisResolverService,GenomeBuildResolverService,DatatrackResolverService,
+        LabResolverService} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
 import {ProjectService} from "./project.service";
@@ -79,7 +80,9 @@ import {NewBillingAccountService} from "./new-billing-account.service";
         ConfigurationService,
         SubRouteGuardService,
         NewBillingAccountService,
-        AuthRouteGuardService
+        AuthRouteGuardService,
+        DatatrackResolverService,
+        LabResolverService
     ]})
 export class ServicesModule {
 }
