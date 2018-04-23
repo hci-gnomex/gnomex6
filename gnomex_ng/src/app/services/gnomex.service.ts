@@ -72,6 +72,7 @@ export class GnomexService {
     public organismList: any[] = [];
     public das2OrganismList: any[] = [];
     public activeOrganismList: any[] = [];
+    public coreFacilityList: any[] = [];
 
     constructor(
                 private dictionaryService: DictionaryService,

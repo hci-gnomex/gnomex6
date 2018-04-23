@@ -5,14 +5,28 @@ import {NgModule} from "@angular/core";
 import {ABOUT_ROUTES} from "./about.routes";
 import {CommonModule} from "@angular/common";
 import {AboutComponent} from "./about.component";
+import {AboutWindowLauncher} from "./about-window-launcher";
+import {AngularMaterialModule} from "../../modules/angular-material.module";
+import {ContactUsWindowLauncher} from "./contact-us-window-launcher";
+import {ContactUsComponent} from "./contact-us.component";
 
-/**
- * @author brandony <brandon.youkstetter@hci.utah.edu>
- * @since 8/28/16
- */
 @NgModule({
-  imports: [ABOUT_ROUTES, CommonModule],
-  declarations: [AboutComponent]
+    imports: [
+        ABOUT_ROUTES,
+        CommonModule,
+        AngularMaterialModule,
+    ],
+    declarations: [
+        AboutComponent,
+        AboutWindowLauncher,
+        ContactUsWindowLauncher,
+        ContactUsComponent,
+    ],
+    entryComponents: [
+        AboutComponent,
+        ContactUsComponent,
+    ],
 })
+
 export class AboutModule {
 }

@@ -1,5 +1,50 @@
-<h3>About Component</h3>
-<p>This is the about component!</p>
-<div class="box">
-<img [src]="bacon" alt="It's really all about the bacon">
-</div>
+<h6 mat-dialog-title>About</h6>
+<mat-dialog-content>
+    <div class="flex-container-row justify-center">
+        <img src="../../assets/gnomex_logo_small.png">
+    </div>
+    <div class="flex-container-row justify-center">
+        Version 6.0
+    </div>
+    <label>Functionality</label>
+    <p>
+        <img src="../../assets/bullet_green.png">
+        A LIMS for making and tracking requests for genomic analysis (e.g. Next generation sequencing, Microarrays, Sanger
+        Sequencing, etc.)
+    </p>
+    <p>
+        <img src="../../assets/bullet_green.png">
+        Import of externally generated genomic datasets in their native formats
+    </p>
+    <p>
+        <img src="../../assets/bullet_green.png">
+        Entry and association of structured annotations for the samples and experimental parameters with the data
+    </p>
+    <p>
+        <img src="../../assets/bullet_green.png">
+        Web tools to browse, search, modify, and download data files associated with the aforementioned data
+    </p>
+    <label>Credits</label>
+    <p>
+        <img src="../../assets/bullet_green.png">
+        GNomEx was developed by Huntsman Cancer Institute Informatics and designed in conjuntion with the Microarray
+        and Genomics Analysis Core Facility and the University of Utah Bioinformatics Core
+    </p>
+    <p>
+        <img src="../../assets/bullet_green.png">
+        Experiment Type icons by <a href="http://www.famfamfam.com/lab/icons/silk/">FamFamFam Silk Icons</a> and
+        <a href="https://momentumdesignlab.com/">Momentum</a>
+    </p>
+    <p>
+        <img src="../../assets/bullet_green.png">
+        Finch TV is available through Geospiza and can be downloaded
+        <a href="http://jblseqdat.bioc.cam.ac.uk/gnmweb/download/soft/FinchTV_1.4/doc/">here</a>
+    </p>
+    <div class="flex-container-row justify-space-evenly">
+        <img src="../../assets/hciLogo.png">
+        <img src="../../assets/hcsLogoTransparent.gif">
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button [mat-dialog-close]>Close</button>
+</mat-dialog-actions>

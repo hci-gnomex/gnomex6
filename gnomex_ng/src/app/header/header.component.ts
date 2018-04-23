@@ -178,12 +178,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'About',
                         class: 'mat-menu-item',
-                        route: ''
+                        route: [{outlets: {'modal': 'about-window-modal'}}]
                     },
                     {
                         displayName: 'Contact Us',
                         class: 'mat-menu-item',
-                        route: ''
+                        route: [{outlets: {'modal': 'contact-us-window-modal'}}]
                     }
                 ]
             },
