@@ -616,6 +616,38 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
      */
     treeOnSelect(event: any) {
         this.selectedItem = event.node;
+        this.linkDataView = false;
+        let name = this.selectedItem.displayField;
+        //console.log(event);
+
+        //displayField "Data Tracks" "Experiments
+
+        if(this.selectedItem.isRoot){
+            this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
+        }else if(name === "Data Tracks" || name === "Experiments" || name === "Analysis" ){
+            this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
+        }else {
+            let pathPair:string = '';
+            if(this.selectedItem.data.idAnalysis){
+                pathPair = "analysis/" + this.selectedItem.data.idAnalysis;
+            }else if(this.selectedItem.data.idRequest){
+                pathPair = "experiment/" + this.selectedItem.data.idRequest;
+            }else if(this.selectedItem.data.idDataTrack){
+                pathPair = "datatrack/" + this.selectedItem.data.idDataTrack;
+            }else{
+                pathPair =  this.selectedItem.data.idLab;
+            }
+            if(pathPair){
+
+                this.router.navigate(['/topics',{outlets:{topicsPanel:pathPair}}])
+
+
+            }
+        }
+
+
+        //this.router.navigate(['/topics',  {outlets:{'topicsPanel':["experiment/43"]}}]);
+
     }
 
     expTreeOnSelect(event: any) {
