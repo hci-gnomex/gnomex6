@@ -43,6 +43,7 @@ import {CookieService} from "angular2-cookie/core";
 import {TopicsModule} from "./topics/topics.module";
 import {AccountModule} from "./account/account.module";
 import {UsersGroupsTablistModule} from "./usersGroups/users-groups-tablist.module";
+import {AboutModule} from "./about/about.module";
 
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
@@ -66,6 +67,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AuthenticationModule,
         ExperimentsModule,
         ConfigurationModule,
+        AboutModule,
         NewBillingAccountModule,
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig),

@@ -10,6 +10,8 @@ import {CookieUtilService} from "./cookie-util.service";
 export class PropertyService {
 
     readonly SHOW_FUNDING_AGENCY: string = 'show_funding_agency';
+    public static readonly PROPERTY_CONTACT_EMAIL_SOFTWARE_BUGS: string = 'contact_email_software_bugs';
+    public static readonly PROPERTY_CONTACT_EMAIL_BIOINFORMATICS: string = 'contact_email_bioinformatics';
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
