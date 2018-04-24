@@ -24,6 +24,7 @@ export class AnalysisPanelComponent implements OnInit, OnDestroy{
     }
     ngOnDestroy(){
         this.analysisService.analysisPanelParams = null;
+        this.analysisService.resetAnalysisOverviewListSubject();
     }
     save(){
 

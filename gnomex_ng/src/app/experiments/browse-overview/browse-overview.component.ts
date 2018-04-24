@@ -339,7 +339,6 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
 
 
     ngOnDestroy():void{
-        this.experimentsService.resetExperimentOverviewListSubject();
         this.overviewListSuscript.unsubscribe();
     }
 

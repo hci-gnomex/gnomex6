@@ -9,7 +9,8 @@ import {DataTrackService} from "./data-track.service";
 import {DictionaryService} from "./dictionary.service";
 import {ExperimentViewService} from "./experiment-view.service";
 import {ExperimentResolverService,ProjectResolverService,AnalysisGroupResolverService,
-        AnalysisResolverService,GenomeBuildResolverService,DatatrackResolverService,
+        AnalysisResolverService,GenomeBuildResolverService,AnalysisGroupListResolverService,
+        ProjectListResolverService,DatatrackListResolverService,DatatrackResolverService,
         LabResolverService} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
@@ -64,6 +65,7 @@ import {NewBillingAccountService} from "./new-billing-account.service";
         AnnotationService,
         UsageService,
         GnomexStringUtilService,
+        AnalysisGroupListResolverService,
         AnalysisGroupResolverService,
         AnalysisResolverService,
         GnomexService,
@@ -81,6 +83,8 @@ import {NewBillingAccountService} from "./new-billing-account.service";
         SubRouteGuardService,
         NewBillingAccountService,
         AuthRouteGuardService,
+        ProjectListResolverService,
+        DatatrackListResolverService,
         DatatrackResolverService,
         LabResolverService
     ]})

@@ -21,6 +21,7 @@ export const ROUTES: Routes = [
     {path: "home", component: HomeComponent, canActivate: [AuthRouteGuardService]}
 ];
 
-export const APP_ROUTING = RouterModule.forRoot(ROUTES);
+export const APP_ROUTING = RouterModule.forRoot(ROUTES,{onSameUrlNavigation:'reload'});
+// specifying 'reload' alone won't make all routes when routing to same URl,  you have specify for the specific routes.
 
 
