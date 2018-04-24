@@ -24,6 +24,7 @@ export class BrowsePanelComponent implements OnInit, OnDestroy{
     }
     ngOnDestroy(){
         this.experimentsService.browsePanelParams = null;
+        this.experimentsService.resetExperimentOverviewListSubject();
     }
     save(){
 

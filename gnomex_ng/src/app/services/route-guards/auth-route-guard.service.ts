@@ -5,6 +5,7 @@ import {ExperimentsService} from "../../experiments/experiments.service";
 import {Injectable} from "@angular/core";
 import {GnomexService} from "../gnomex.service";
 import {URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.
@@ -32,7 +33,7 @@ export class AuthRouteGuardService implements CanActivate {
      */
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean>{
         console.log(route.queryParams);
-        console.log("home guard is being hit")
+        console.log("home guard is being hit");
 
         let paramNumb:number = Object.keys(route.queryParams).length;
 
@@ -62,23 +63,23 @@ export class AuthRouteGuardService implements CanActivate {
         if (queryParam["requestNumber"]) {
             numberObj["type"] = "requestNumber";
             numberObj["value"] = queryParam["requestNumber"];
-            numberObj["urlSegList"] =  ["experiments","browsePanel"];
+            numberObj["urlSegList"] =  ["experiments","idProject","browsePanel","idRequest"];
 
         } else if (queryParam["analysisNumber"]) {
             numberObj["type"] = "analysisNumber";
             numberObj["value"] = queryParam["analysisNumber"];
-            numberObj["urlSegList"] =  ["analysis","analysisPanel"];
+            numberObj["urlSegList"] =  ["analysis","idLab","analysisPanel","idAnalysis"];
 
 
         } else if (queryParam["dataTrackNumber"]) {
             numberObj["type"] = "dataTrackNumber";
             numberObj["value"] = queryParam["dataTrackNumber"];
-            numberObj["urlSegList"] =  ["datatracks","datatracksPanel"];
+            numberObj["urlSegList"] =  ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
 
         } else if (queryParam["topicNumber"]) {
             numberObj["type"] = "topicNumber";
             numberObj["value"] = queryParam["topicNumber"];
-            numberObj["urlSegList"] =  ["topics","topicsPanel"];
+            numberObj["urlSegList"] =  ["topics","topicsPanel","idLab"]; // no getTopic
         } else {
             numberObj = null;
         }
@@ -87,8 +88,8 @@ export class AuthRouteGuardService implements CanActivate {
             return Observable.of(false);
         }
 
-        let params:URLSearchParams = new URLSearchParams();
-        params.set(numberObj.type, numberObj.value);
+        let params:HttpParams = new HttpParams()
+            .set(numberObj.type, numberObj.value);
 
 
         return this.gnomexService.getOrderFromNumber(params).map((res) =>{
@@ -120,15 +121,11 @@ export class AuthRouteGuardService implements CanActivate {
                 orderInfo[idKey] = resp[idKey];
             }
         }
+        
         if(orderInfo){
-            this.gnomexService.redirectURL = orderInfo.urlSegList[0];
+            this.gnomexService.redirectURL =this.gnomexService.makeURL(orderInfo);
         }
 
-    }
-
-    private makeURL(segmentList:Array<string>, orderId:string):string{
-        let url = "/"+segmentList[0]+"/("+segmentList[1] + ":" + orderId + ")";
-        return url;
     }
 
 }

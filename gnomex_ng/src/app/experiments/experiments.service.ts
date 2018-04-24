@@ -132,8 +132,13 @@ export class ExperimentsService {
     }
 
 
-    emitProjectRequestList(): void {
-        this.projectRequestListSubject.next(this.projectRequestList);
+    emitProjectRequestList(projectRequestList?:any): void {
+        if(projectRequestList){
+            this.projectRequestListSubject.next(projectRequestList);
+        }else{
+            this.projectRequestListSubject.next(this.projectRequestList);
+        }
+
     }
 
     getProjectRequestList_fromBackend(params: URLSearchParams,allowRefresh?:boolean): void {
@@ -159,7 +164,7 @@ export class ExperimentsService {
         //  }
     }
 
-        getExperiment(id: string): Observable<any> {
+    getExperiment(id: string): Observable<any> {
         return this._http.get("/gnomex/GetRequest.gx?idRequest=" + id, {withCredentials: true}).map((response: Response) => {
             if (response.status === 200) {
                 return response.json();

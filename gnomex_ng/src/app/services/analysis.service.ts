@@ -76,7 +76,7 @@ export class AnalysisService {
         return this.http.get("/gnomex/GetAnalysisGroupList.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
                 this.analysisGroupList = response.json().Lab;
-                return response.json();
+                return this.analysisGroupList;
             } else {
                 throw new Error("Error");
             }
@@ -93,8 +93,13 @@ export class AnalysisService {
         });
     }
 
-    emitAnalysisGroupList(): void {
-        this.analysisGroupListSubject.next(this.analysisGroupList);
+    emitAnalysisGroupList(agList?:any): void {
+        if(agList){
+            this.analysisGroupListSubject.next(agList);
+        }else{
+            this.analysisGroupListSubject.next(this.analysisGroupList);
+        }
+
     }
 
     getAnalysisGroupListObservable(): Observable<any> {

@@ -10,9 +10,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonWriter;
+import javax.json.*;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -73,6 +71,10 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                               .setParameter(1, requestNumberBase );
                 List reqRow = query.list();
 
+                if(reqRow.size() ==  0){
+                    throw new Exception("Request number " + requestNumber + " does not exists" );
+                }
+
                 Request r = (Request)reqRow.get(0);
                 value = Json.createObjectBuilder()
                         .add("result", "SUCCESS")
@@ -91,6 +93,9 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                 String queryStr ="SELECT a from Analysis as a where a.number = :analysisNumber" ;
                 Query query = sess.createQuery(queryStr).setParameter("analysisNumber", analysisNumber );
                 List analysisRow = query.list();
+                if(analysisRow.size() == 0){
+                    throw new Exception("Analysis number " + analysisNumber + " does not exists" );
+                }
 
                 Analysis a = (Analysis)analysisRow.get(0);
                 value = Json.createObjectBuilder()
@@ -113,28 +118,45 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                                    "WHERE dt.fileName = :dataTrackNumber";
                 Query query = sess.createQuery(queryStr).setParameter("dataTrackNumber" , dataTrackNumber );
                 List<Object[]> dtResults = query.list();
+                if(dtResults.size() ==  0){
+                    throw new Exception("Datatrack number " + requestNumber + " does not exists" );
+                }
 
 
 
                 Object[] dtRow = dtResults.get(0);
+
+                JsonObject idLabVal = null;
+                if(dtRow[3] != null){
+                    idLabVal = Json.createObjectBuilder().add("idLab", (Integer)dtRow[3]).build();
+                }else{
+                    idLabVal = Json.createObjectBuilder().add("idLab", JsonValue.NULL).build();
+                }
+
                 value = Json.createObjectBuilder()
                         .add("result", "SUCCESS")
                         .add("dataTrackNumber", (String)dtRow[0])
                         .add("codeVisibility", (String)dtRow[1])
                         .add("idDataTrack", (Integer)dtRow[2])
-                        .add("idLab",(Integer)dtRow[3])
+                        .add("idLab", idLabVal.get("idLab"))
                         .add("idGenomeBuild",(Integer)dtRow[4])
                         .add("idOrganism",(Integer)dtRow[5])
                         .build();
 
             }else if(topicNumber != null){
-                topicNumber = topicNumber.replaceAll("[A-Za-z#]*]", "");
-                System.out.println("topicNumber: " + topicNumber );
+                topicNumber = topicNumber.replaceAll("[A-Za-z#]*", "");
+                Integer idTopic = new Integer(topicNumber);
 
-                String  queryStr = "SELECT t from Topic as t where t.idTopic = :topicNumber";
+                System.out.println("topicNumber: " + topicNumber ); // not actually a topic number based off of idTopic
 
-                Query query = sess.createQuery(queryStr).setParameter("topicNumber" , topicNumber );
+                String  queryStr = "SELECT t from Topic as t where t.idTopic = :idTopic";
+
+                Query query = sess.createQuery(queryStr).setParameter("idTopic" ,idTopic);
                 List topicRow = query.list();
+
+                if(topicRow.size() ==  0){
+                    throw new Exception("Topic number " + topicNumber + " does not exists" );
+                }
 
                 Topic t = (Topic)topicRow.get(0);
                 value = Json.createObjectBuilder()

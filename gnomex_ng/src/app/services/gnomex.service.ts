@@ -8,7 +8,7 @@ import {AuthenticationService} from "@hci/authentication";
 import {Subscription} from "rxjs/Subscription";
 import {ProgressService} from "../home/progress.service";
 import {Observable} from "rxjs/Observable";
-import {Http,Response} from "@angular/http";
+import {HttpClient, HttpParams, HttpResponse} from "@angular/common/http";
 import {LaunchPropertiesService} from "./launch-properites.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
@@ -81,7 +81,8 @@ export class GnomexService {
                 private labListService: LabListService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private authenticationService:AuthenticationService,
-                private http:Http) {
+                //private http:Http
+                private http:HttpClient) {
     }
 
     /* The header only uses this for displaying itself.
@@ -642,14 +643,20 @@ export class GnomexService {
     }
 
 
-    getOrderFromNumber(params:URLSearchParams) : Observable<any> {
-        return this.http.get("/gnomex/GetGNomExOrderFromNumberServlet.gx", {search: params}).map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        });
+    getOrderFromNumber(p:HttpParams) : Observable<any> {
+        return this.http.get("/gnomex/GetGNomExOrderFromNumberServlet.gx",{params:p});
+    }
+
+    public makeURL(orderInfo:any ):string{
+        let segList:Array<string> = orderInfo.urlSegList;
+        let url:string = '';
+
+        if(segList.length === 4){
+            url ="/"+segList[0]+"/"+orderInfo[segList[1]]+"/("+segList[2] + ":" + orderInfo[segList[3]] + ")";
+        }else{ // topics
+            url = url ="/"+segList[0]+ "/("+segList[1] + ":" + orderInfo[segList[2]] + ")";
+        }
+        return url;
     }
 
 

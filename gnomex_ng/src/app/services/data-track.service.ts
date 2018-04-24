@@ -52,7 +52,7 @@ export class DataTrackService {
     getDataTrackList(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/GetDataTrackList.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
-                return response.json();
+                return response.json().Organism;
             } else {
                 throw new Error("Error");
             }
@@ -159,8 +159,12 @@ export class DataTrackService {
         });
     }
 
-    emitDatatracksList(): void {
-        this.datatracksListSubject.next(this.datatracksList);
+    emitDatatracksList(dtList?:any): void {
+        if(dtList){
+            this.datatracksListSubject.next(dtList);
+        }else{
+            this.datatracksListSubject.next(this.datatracksList);
+        }
     }
 
     getDatatracksListObservable(): Observable<any> {

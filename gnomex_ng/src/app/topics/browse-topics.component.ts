@@ -98,7 +98,7 @@ const actionMapping:IActionMapping = {
         }
 
         .br-topic-five {
-            width: 100%;            
+            width: 100%;
             flex-grow: .10;
         }
 
@@ -194,7 +194,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     private idAnalysis: string = "";
     private idExperiment: string = "";
     private emptyLab = {idLab: "0",
-                    name: ""};
+        name: ""};
     private previousURLParams: URLSearchParams;
     private resetExperiment: boolean = false;
     private resetAnalysis: boolean = false;
@@ -314,24 +314,37 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
-        this.topicService.getTopicList().subscribe(response => {
+        this.showSpinner = true;
+        this.topicService.refreshTopicsList_fromBackend();
+
+
+        this.topicListSubscription = this.topicService.getTopicsListObservable().subscribe(response => {
             this.items = [].concat([]);
             this.buildTree(response);
-            setTimeout(_ => {
+            setTimeout(() => {
+
+                this.showSpinner = false;
+                this.treeModel.update();
                 this.treeModel.expandAll();
+
+                if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
+                    let id: string = "t" + this.gnomexService.orderInitObj.idTopic;
+                    if (this.treeModel && id) {
+                        let tNode = this.treeModel.getNodeById(id);
+                        if(tNode){
+                            tNode.setIsActive(true);
+                            tNode.scrollIntoView();
+                        }
+                        this.gnomexService.orderInitObj = null;
+                    }
+                }
+
             });
-            this.topicListSubscription = this.topicService.getTopicsListObservable().subscribe(response => {
-                this.items = [].concat([]);
-                setTimeout(() => {
-                    this.buildTree(response);
-                    this.showSpinner = false;
-                    this.treeModel.update();
-                });
-                setTimeout(_ => {
-                    this.treeModel.expandAll();
-                });
-            });
+
         });
+
+
+
         this.pickerLabs.push(this.emptyLab);
         this.pickerLabs = this.pickerLabs.concat(this.gnomexService.labList);
         this.organisms = this.gnomexService.das2OrganismList;
@@ -441,7 +454,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                         if (this.moveTopicDialogRef.componentInstance.noButton) {
                             this.resetTree();
                         }
-                })
+                    })
             }
         }
     }
@@ -619,6 +632,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.linkDataView = false;
         let name = this.selectedItem.displayField;
         //console.log(event);
+        if(this.gnomexService.orderInitObj){
+            return;
+        }
 
         //displayField "Data Tracks" "Experiments
 
@@ -982,6 +998,12 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.showSpinner = false;
             setTimeout(() => {
                 this.expandChildNodes(this.experimentTreeModel);
+                if(this.gnomexService.orderInitObj){
+                    let id:string = "t" + this.gnomexService.orderInitObj.idTopic
+
+                }
+
+
             });
             this.previousExpTimeFrame = frame;
         });

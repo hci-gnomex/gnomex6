@@ -19,7 +19,7 @@ import {
 } from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {AnalysisService} from "../services/analysis.service";
 import {MatDialogRef, MatDialog} from '@angular/material';
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
@@ -222,6 +222,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private parentProject: any;
     public showSpinner: boolean = false;
     public newAnalysisName: any;
+    private navAnalysisGroupList:any;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -229,16 +230,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.labList = response;
         });
-
-        if(this.gnomexService.orderInitObj){
-            let params:URLSearchParams = new URLSearchParams();
-            params.set("idLab", this.gnomexService.orderInitObj.idLab );
-            params.set("searchPublicProjects", "Y");
-            params.set("showCategory", "N");
-            params.set("showSamples", "N");
-            this.analysisService.analysisPanelParams= params;
-            this.analysisService.getAnalysisGroupList_fromBackend(params)
-        }
 
         this.analysisGroupListSubscription = this.analysisService.getAnalysisGroupListObservable().subscribe(response => {
             this.items = [].concat([]);
@@ -267,28 +258,44 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             }
 
             this.analysisService.emitAnalysisOverviewList(response);
-            if(this.analysisService.analysisPanelParams["refreshParams"]){
-                this.router.navigate(['/analysis',{outlets:{'analysisPanel':'overview'}}]);
+            if( this.analysisService.analysisPanelParams && this.analysisService.analysisPanelParams["refreshParams"]){ // if user is searching
+
+                let navArray: any[] = ['/analysis',{outlets:{'analysisPanel':'overview'}}];
+                if(this.navAnalysisGroupList){
+                    navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idLab"));
+                }
+
+                this.router.navigate(navArray);
                 this.analysisService.analysisPanelParams["refreshParams"] = false;
             }
 
 
-            setTimeout(_ => {
+            setTimeout(() => {
                 this.treeModel.expandAll();
                 if(this.gnomexService.orderInitObj){ // this is if component is being navigated to by url
                     let id:string = "a" + this.gnomexService.orderInitObj.idAnalysis;
                     if(this.treeModel && id) {
-                        this.treeModel.getNodeById(id).setIsActive(true);
-                        this.treeModel.getNodeById(id).scrollIntoView();
-                        this.gnomexService.orderInitObj = null;
+                        let node = this.treeModel.getNodeById(id);
+                        if(node){
+                            node.setIsActive(true);
+                            node.scrollIntoView();
+                            this.gnomexService.orderInitObj = null;
+                        }
                     }
-
                 }
                 else if (this.newAnalysisName) {
                     this.selectNode(this.treeModel.getFirstRoot().children);
                 }
             })
         });
+
+        this.route.data.forEach(data => { // when navigating through url or lookup
+            this.navAnalysisGroupList = data.analysisGroupList;
+            if(this.navAnalysisGroupList){
+                this.analysisService.emitAnalysisGroupList(this.navAnalysisGroupList);
+            }
+        });
+
     }
 
     ngAfterViewInit() {
@@ -310,6 +317,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     constructor(private analysisService: AnalysisService, private router: Router,
                 private dialog: MatDialog,
+                private route: ActivatedRoute,
                 private gnomexService:GnomexService,
                 private labListService: LabListService,
                 private changeDetectorRef: ChangeDetectorRef,
@@ -560,7 +568,13 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         let idAnalysis = this.selectedItem.data.idAnalysis;
         let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
         let idLab = this.selectedItem.data.idLab;
+
+        if(this.gnomexService.orderInitObj){ // if navigating through url or lookup
+            return;
+        }
+
         let analysisGroupListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
+        let navArray: Array<any> = [];
 
 
         //Lab
@@ -568,7 +582,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysis = false;
             this.disableNewAnalysisGroup = false;
             this.disableDelete = true;
-            this.router.navigate(['/analysis',{outlets:{'analysisPanel':'overview'}}]);
+            navArray = ['/analysis',{outlets:{'analysisPanel':'overview'}}];
             this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
 
 
@@ -577,16 +591,14 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
-            this.router.navigate(['/analysis',
-                    {outlets:{'analysisPanel':['overview',{'idAnalysisGroup':idAnalysisGroup,'idLab':idLab}]}}
-                ]);
+            navArray = ['/analysis', {outlets:{'analysisPanel':['overview',{'idAnalysisGroup':idAnalysisGroup,'idLab':idLab}]}}];
             this.analysisService.emitAnalysisOverviewList(analysisGroupListNode)
 
 
 
             //Analysis
         } else if (this.selectedItem.level === 3) {
-            this.router.navigate(['/analysis',{outlets:{'analysisPanel':[idAnalysis]}}]);
+            navArray = ['/analysis',{outlets:{'analysisPanel':[idAnalysis]}}];
             this.parentProject = event.node.parent;
             this.disableNewAnalysis = false;
             this.disableDelete = false;
@@ -600,12 +612,17 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                     this.disableDelete = true;
                 }
             });
-        } else {
-
         }
+
+        if(this.navAnalysisGroupList){
+            navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idLab"));
+        }
+        this.router.navigate(navArray);
+
     }
 
     ngOnDestroy(): void {
         this.analysisGroupListSubscription.unsubscribe();
+        this.navAnalysisGroupList = null;
     }
 }

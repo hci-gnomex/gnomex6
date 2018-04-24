@@ -27,7 +27,7 @@ const ROUTES: Routes = [
             {path: 'datatrack/:id', component: NewExperimentComponent , outlet: 'topicsPanel', resolve:{datatrack:DatatrackResolverService}},
             {path: 'analysis/:id', component: AnalysisDetailComponent, outlet: 'topicsPanel', resolve: {analysis: AnalysisResolverService }},
         ],
-        canActivate: [SubRouteGuardService]
+        canActivate: [SubRouteGuardService], runGuardsAndResolvers: 'paramsChange'
     }
 
 

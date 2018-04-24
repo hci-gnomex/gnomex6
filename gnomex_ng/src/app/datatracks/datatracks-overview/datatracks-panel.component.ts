@@ -24,17 +24,6 @@ export class DatatracksPanelComponent implements OnInit, OnDestroy{
 
     ngOnInit(){
 
-        /*let routerConfig = this.router.config;
-        routerConfig.unshift({
-                path: 'genomeBuild',
-                runGuardsAndResolvers: 'always',
-                component: DatatracksOrganismComponent,
-                resolve: {genomeBuild: GenomeBuildResolverService}
-
-        });
-        routerConfig.unshift({path:'datatracks',component:DatatracksOrganismComponent, outlet:'datatracksPanel'});
-        console.log("here is the router config: " , routerConfig);
-        this.router.resetConfig(routerConfig);*/
 
     }
     ngOnDestroy(){
