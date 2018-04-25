@@ -403,8 +403,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         let workItems: any[] = [];
         for(let value of Array.from( this.changedRowMap.values()) ) {
             this.setQualCodeApplication(value);
-            let obj: object = {"WorkItem": value};
-            workItems.push(obj);
+            // let obj: object = {value};
+            workItems.push(value);
         }
         params.set("workItemXMLString", JSON.stringify(workItems));
         this.showSpinner = true;
@@ -412,6 +412,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             this.showSpinner = false;
             this.changedRowMap = new Map<string, any>();
             this.dirty = false;
+            this.workItem = "";
             this.initialize();
         });
     }
