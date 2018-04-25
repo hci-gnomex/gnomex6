@@ -638,6 +638,7 @@ export class TrackUsageComponent implements AfterViewInit {
             printWindow.print();
             printWindow.close();
         });
+        */
     }
 
 }
