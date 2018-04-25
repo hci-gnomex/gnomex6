@@ -627,6 +627,8 @@ export class TrackUsageComponent implements AfterViewInit {
         }
         doc += "</body></html>";
 
+        // TODO There is an error in Typescript 2.8.1 that flags this code, it will be fixed in 2.8.2
+        /*
         let printWindow = window.open();
         printWindow.document.open();
         printWindow.document.write(doc);
