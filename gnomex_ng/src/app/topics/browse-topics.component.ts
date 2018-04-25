@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {
-    AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild,
+    AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild,
     ViewEncapsulation
 } from "@angular/core";
 
@@ -20,7 +20,7 @@ import {
 import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
 import {Router} from "@angular/router";
-import {MatDialogRef, MatDialog, MatAutocomplete} from '@angular/material';
+import {MatDialogRef, MatDialog, MatAutocomplete, MatOption} from '@angular/material';
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TopicService} from "../services/topic.service";
@@ -152,9 +152,12 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild("analysisTree") analysisTreeComponent: TreeComponent;
     @ViewChild("datatrackTree") datatrackTreeComponent: TreeComponent;
     @ViewChild("autoLab") dtLabAutocomplete: MatAutocomplete;
+    @ViewChild("datatrackInput") datatrackInput: ElementRef;
     @ViewChild("autoOrg") dtOrgAutocomplete: MatAutocomplete;
     @ViewChild("autoAnalLab") analLabAutoComplete: MatAutocomplete;
+    @ViewChild("analysisInput") analysisInput: ElementRef;
     @ViewChild("autoExpLab") expLabAutoComplete: MatAutocomplete;
+    @ViewChild("experimentInput") experimentInput: ElementRef;
     @ViewChild("autoGen") dtGenAutocomplete: MatAutocomplete;
     @Input() childMessage: string;
     public moveTopicDialogRef: MatDialogRef<MoveTopicComponent>;
@@ -204,6 +207,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     private experimentLabel: string;
     private analysisLabel: string;
     private datatrackLabel: string;
+    private previousExperimentMatOption: MatOption;
+    private previousAnalysisMatOption: MatOption;
+    private previousDatatrackMatOption: MatOption;
+    private previousOrganismMatOption: MatOption;
+
     timeFrames = [
         'In last week',
         'month',
@@ -245,7 +253,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         allowDrop: (element, {parent, index}) => {
             // this.dragEndExperimentItems = _.cloneDeep(this.experimentItems);
-            if (element.data.idTopic) {
+            if (element.data.idTopic && element.data.linkData) {
                 return true;
             } else {
                 return false;
@@ -266,7 +274,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         allowDrop: (element, {parent, index}) => {
             // this.dragEndAnalysisItems = _.cloneDeep(this.analysisItems);
-            if (element.data.idTopic) {
+            if (element.data.idTopic && element.data.linkData) {
                 return true;
             } else {
                 return false;
@@ -286,7 +294,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         allowDrop: (element, {parent, index}) => {
             // this.dragEndDatatrackItems = _.cloneDeep(this.datatrackItems);
-            if (element.data.idTopic) {
+            if (element.data.idTopic && element.data.linkData) {
                 return true;
             } else {
                 return false;
@@ -542,7 +550,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                             }
                             for (var analysis of category.items) {
                                 analysis.icon = "assets/map.png";
-                                analysis.id = analysis.idAnalysis + category.id;;
+                                analysis.id = analysis.idAnalysis + category.id;
                                 this.setLabel(analysis);
                             }
 
@@ -556,7 +564,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                             }
                             for (var datatrack of category.items) {
                                 this.assignIconToDT(datatrack);
-                                datatrack.id = datatrack.idDataTrack + category.id;;
+                                datatrack.id = datatrack.idDataTrack + category.id;
                                 this.setLabel(datatrack);
                             }
 
@@ -749,7 +757,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 }
                 return false;
             });
-            this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, "");
+            if (this.datatrackLab) {
+                this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, "");
+            } else {
+                this.getDatatracks("", this.organism.idOrganism, "");
+            }
         } else {
             this.resetDatatrackOrganismSelection();
         }
@@ -775,6 +787,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.showSpinner = true;
                     this.resetAnalysis = true;
                     this.analysisLab = null;
+                    this.analysisInput.nativeElement.blur();
                 } else {
                     fLabs = this.pickerLabs.filter(lab =>
                         lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
@@ -798,6 +811,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.showSpinner = true;
                     this.resetDatatrack = true;
                     this.datatrackLab = null;
+                    this.datatrackInput.nativeElement.blur();
                 } else {
                     fLabs = this.pickerLabs.filter(lab =>
                         lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
@@ -822,6 +836,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.showSpinner = true;
                     this.resetExperiment = true;
                     this.experimentLab = null;
+                    this.experimentInput.nativeElement.blur();
                 } else {
                     fLabs = this.pickerLabs.filter(lab =>
                         lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
@@ -860,7 +875,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             return;
         }
         if (this.expLabAutoComplete.options.first) {
+            if (this.previousExperimentMatOption) {
+                this.previousExperimentMatOption.setInactiveStyles();
+            }
             this.expLabAutoComplete.options.first.setActiveStyles();
+            this.previousExperimentMatOption = this.expLabAutoComplete.options.first;
         }
     }
 
@@ -869,7 +888,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             return;
         }
         if (this.analLabAutoComplete.options.first) {
+            if (this.previousAnalysisMatOption) {
+                this.previousAnalysisMatOption.setInactiveStyles();
+            }
             this.analLabAutoComplete.options.first.setActiveStyles();
+            this.previousAnalysisMatOption = this.analLabAutoComplete.options.first;
         }
     }
 
@@ -878,7 +901,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             return;
         }
         if (this.dtLabAutocomplete.options.first) {
+            if (this.previousDatatrackMatOption) {
+                this.previousDatatrackMatOption.setInactiveStyles();
+            }
             this.dtLabAutocomplete.options.first.setActiveStyles();
+            this.previousDatatrackMatOption = this.dtLabAutocomplete.options.first;
         }
     }
 
@@ -886,7 +913,13 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         if (event.key == "ArrowDown" || event.key == "ArrowUp") {
             return;
         }
-        this.dtOrgAutocomplete.options.first.setActiveStyles();
+        if (this.dtOrgAutocomplete.options.first) {
+            if (this.previousOrganismMatOption) {
+                this.previousOrganismMatOption.setInactiveStyles();
+            }
+            this.dtOrgAutocomplete.options.first.setActiveStyles();
+            this.previousOrganismMatOption = this.dtOrgAutocomplete.options.first;
+        }
     }
 
     searchExperiementsOnEnter(event): void {
@@ -1115,6 +1148,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.experimentLabs = this.experimentLabs.concat(this.experimentItems);
             for (var lab of this.experimentItems) {
                 lab.id = "l" + lab.idLab;
+                lab.linkData = "link";
                 lab.parentid = -1;
 
                 lab.icon = "assets/group.png";
@@ -1128,6 +1162,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     for (var project of lab.experimentItems) {
                         project.icon = "assets/folder.png";
                         project.labId = lab.labId;
+                        project.linkData = "link";
                         project.id = "p" + project.idProject;
                         project.parentid = lab.id;
                         if (project.Request) {
@@ -1141,6 +1176,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                                     if (request.label) {
                                         request.label = request.requestNumber + '-' + request.name;
                                         request.id = "r" + request.idRequest;
+                                        request.linkData = "link";
                                         request.parentid = project.id;
                                         this.experimentCount++;
                                     }
@@ -1176,6 +1212,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             for (var l of this.analysisItems) {
                 l.id = "l"+l.idLab;
                 l.parentid = -1;
+                l.linkData = "link";
 
                 l.icon = "assets/group.png";
 
@@ -1188,6 +1225,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     for (var p of l.analysisItems) {
                         p.icon = "assets/folder.png";
                         p.idLab = l.idLab;
+                        p.linkData = "link";
                         p.id = "p"+p.idAnalysisGroup;
                         if (p.Analysis) {
                             if (!this.createSecurityAdvisorService.isArray(p.Analysis)) {
@@ -1205,6 +1243,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                                         labelString = labelString.concat(")");
                                         a.label = labelString;
                                         a.id = "a"+a.idAnalysis;
+                                        a.linkData = "link";
                                         a.icon = "assets/map.png";
                                         a.parentid = p.idLab;
                                     }
@@ -1243,6 +1282,7 @@ Build the tree data
             for (var org of this.datatrackItems) {
                 org.id = "o" + org.idOrganism;
                 org.parentid = -1;
+                org.linkData = "link";
 
                 org.icon = "assets/organism.png";
                 if (org.GenomeBuild) {
@@ -1257,6 +1297,7 @@ Build the tree data
                             this.assignIconToGenomeBuild(gNomeBuild);
                             gNomeBuild.labId = org.labId;
                             gNomeBuild.id = "g" + gNomeBuild.idGenomeBuild;
+                            gNomeBuild.linkData = "link";
                             gNomeBuild.parentid = org.id;
                             if (gNomeBuild.DataTrack) {
                                 if (!this.createSecurityAdvisorService.isArray(gNomeBuild.DataTrack)) {
@@ -1269,6 +1310,7 @@ Build the tree data
                                         if (dataTrack.label) {
                                             this.assignIconToDT(dataTrack);
                                             dataTrack.parentid = gNomeBuild.id;
+                                            dataTrack.linkData = "link";
                                         }
                                     }
                                 }

@@ -738,7 +738,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'QC',
                         context: 'QC',
                         iconName: '../../assets/data-accept.png',
-                        route: ''
+                        route: '/qcWorkFlow'
                     },
                     {
                         divider: true
@@ -886,7 +886,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'QC',
                         context: 'QC',
                         iconName: '../../assets/data-accept.png',
-                        route: ''
+                        route: '/qcWorkFlow'
                     },
                     {
                         divider: true
@@ -1205,7 +1205,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'QC',
                         context: 'QC',
                         iconName: '../../assets/data-accept.png',
-                        route: ''
+                        route: '/qcWorkFlow'
                     },
                     {
                         divider: true

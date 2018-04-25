@@ -1,9 +1,14 @@
-<div class="full-width full-height">
-    <select class="full-width full-height" [(value)]="value" (change)="onChange($event)">
-        <option
-            *ngFor="let option of options"
-            value="{{option.hasOwnProperty(optionsValueField) ? option[optionsValueField] : (option.value) ? option.value : option }}">
-            {{option.hasOwnProperty(optionsDisplayField) ? option[optionsDisplayField] : (option.display) ? option.display : option }}
-        </option>
-    </select>
+<div class="full-width full-height flex-column-container">
+    <div class="full-height flex-stretch flex-row">
+        <select class="full-width full-height" [(value)]="value" (change)="onChange($event)">
+            <option
+                *ngFor="let option of options"
+                value="{{option.hasOwnProperty(optionsValueField) ? option[optionsValueField] : (option.value) ? option.value : option }}">
+                {{option.hasOwnProperty(optionsDisplayField) ? option[optionsDisplayField] : (option.display) ? option.display : option }}
+            </option>
+        </select>
+    </div>
+    <div *ngIf="showFillButton" class="full-height flex-row button-container">
+        <button class="full-height" (click)="onFillButtonClicked()">Fill</button>
+    </div>
 </div>

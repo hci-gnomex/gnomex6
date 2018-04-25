@@ -47,7 +47,7 @@
                             </div>
                             <div style="display: flex">
                                 <mat-form-field class="formField">
-                                    <input matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoExpLab"
+                                    <input #experimentInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoExpLab"
                                            [(ngModel)]="experimentLab" (keyup.enter)="chooseFirstExpLabOption()" (keyup)="highlightExpLabFirstOption($event)">
                                     <mat-autocomplete #autoExpLab="matAutocomplete" [displayWith]="displayLab">
                                         <mat-option (onSelectionChange)="selectExperimentLabOption($event)" *ngFor="let lab of filterExperimentLabs(this.experimentLab)" [value]="lab">{{lab.name}}</mat-option>
@@ -75,7 +75,7 @@
                             </div>
                             <div style="display: flex">
                                 <mat-form-field class="formField">
-                                    <input matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoAnalLab"
+                                    <input #analysisInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoAnalLab"
                                            [(ngModel)]="analysisLab" (keyup.enter)="chooseFirstAnalLabOption()" (keyup)="highlightAnalLabFirstOption($event)">
                                     <mat-autocomplete #autoAnalLab="matAutocomplete" [displayWith]="displayLab">
                                         <mat-option (onSelectionChange)="selectAnalysisLabOption($event)" *ngFor="let lab of filterAnalysisLabs(this.analysisLab)" [value]="lab">{{lab.name}}</mat-option>
@@ -103,7 +103,7 @@
                             </div>
                             <div style="display: flex">
                                 <mat-form-field class="formField">
-                                    <input matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoLab"
+                                    <input #datatrackInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoLab"
                                            [(ngModel)]="datatrackLab" (keyup.enter)="chooseFirstLabOption()" (keyup)="highlightDtLabFirstOption($event)">
                                     <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
                                         <mat-option (onSelectionChange)="selectDatatrackLabOption($event)" *ngFor="let lab of filterDatatrackLabs(this.datatrackLab)" [value]="lab">{{lab.name}}</mat-option>
