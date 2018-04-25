@@ -9,7 +9,9 @@ import {DataTrackService} from "./data-track.service";
 import {DictionaryService} from "./dictionary.service";
 import {ExperimentViewService} from "./experiment-view.service";
 import {ExperimentResolverService,ProjectResolverService,AnalysisGroupResolverService,
-        AnalysisResolverService,GenomeBuildResolverService} from "./resolvers/index";
+        AnalysisResolverService,GenomeBuildResolverService,AnalysisGroupListResolverService,
+        ProjectListResolverService,DatatrackListResolverService,DatatrackResolverService,
+        LabResolverService} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
 import {ProjectService} from "./project.service";
@@ -65,6 +67,7 @@ import {GridColumnValidateService} from "./grid-column-validate.service";
         AnnotationService,
         UsageService,
         GnomexStringUtilService,
+        AnalysisGroupListResolverService,
         AnalysisGroupResolverService,
         AnalysisResolverService,
         GnomexService,
@@ -80,10 +83,15 @@ import {GridColumnValidateService} from "./grid-column-validate.service";
         LabMembershipRequestService,
         ConfigurationService,
         SubRouteGuardService,
-			  NewBillingAccountService,
         WorkflowService,
-        AuthRouteGuardService,
         GridColumnValidateService
+        NewBillingAccountService,
+        AuthRouteGuardService,
+        ProjectListResolverService,
+        DatatrackListResolverService,
+        DatatrackResolverService,
+        LabResolverService
+
     ]})
 export class ServicesModule {
 }

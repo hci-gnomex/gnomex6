@@ -7,7 +7,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 			<div class="t full-width full-height">
 				<div class="tr">
 					<div class="td vertical-center center-align">
-						<input type="checkbox" [checked]="checked">
+						<input type="checkbox" [checked]="checked" [disabled]="!editable" (change)="onChange($event)">
 					</div>
 				</div>
 			</div>
@@ -29,14 +29,25 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 export class CheckboxRenderer implements ICellRendererAngularComp {
 	params: any;
 	checked: boolean;
+	editable: boolean = false;
 
 	agInit(params: any): void {
 		this.params = params;
 
 		this.checked = (this.params && this.params.value && this.params.value === 'Y') ? true : false;
+
+		if (this.params && this.params.colDef && this.params.colDef.checkboxEditable) {
+			this.editable = this.params.colDef.checkboxEditable(this.params);
+		}
 	}
 
 	refresh(params: any): boolean {
 		return false;
+	}
+
+	onChange(event: any): void {
+		if (this.editable) {
+            this.params.data[this.params.colDef.field] = event.currentTarget.checked ? "Y" : "N";
+		}
 	}
 }

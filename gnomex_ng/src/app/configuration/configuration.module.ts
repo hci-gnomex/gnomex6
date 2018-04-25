@@ -15,6 +15,10 @@ import {AngularSplitModule} from "angular-split";
 import {ConfigCoreFacilityEditComponent} from "./config-core-facility-edit.component";
 import {UtilModule} from "../util/util.module";
 import {RichEditorModule} from "../../modules/rich-editor.module";
+import {ConfigureOrganismsComponent} from "./configure-organisms.component";
+import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
+import {DateEditor} from "../util/grid-editors/date.editor";
+import {DateRenderer} from "../util/grid-renderers/date.renderer";
 
 
 
@@ -26,7 +30,11 @@ import {RichEditorModule} from "../../modules/rich-editor.module";
         FormsModule,
         ServicesModule,
         TreeModule,
-        AgGridModule.withComponents([]),
+        AgGridModule.withComponents([
+            CheckboxRenderer,
+            DateEditor,
+            DateRenderer,
+        ]),
         UtilModule,
         RichEditorModule,
         ReactiveFormsModule,
@@ -38,7 +46,8 @@ import {RichEditorModule} from "../../modules/rich-editor.module";
         BrowseDictionaryComponentLauncher,
         ConfigureAnnotationsComponent,
         ConfigCoreFacilityComponent,
-        ConfigCoreFacilityEditComponent
+        ConfigCoreFacilityEditComponent,
+        ConfigureOrganismsComponent,
     ],
     exports: [
         BrowseDictionaryComponentLauncher

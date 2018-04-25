@@ -30,6 +30,8 @@ import {TOPICS_ROUTING} from "./topics.routes";
 import {BrowseTopicsComponent} from "./browse-topics.component";
 import {MoveTopicComponent} from "./move-topic.component";
 import {DeleteTopicComponent} from "./delete-topic.component";
+import {TopicDetailComponent} from "./topics-detail.component";
+import {TopicsPanelComponent} from "./topics-panel.component"
 
 /**
  * @author jdewell
@@ -64,7 +66,7 @@ import {DeleteTopicComponent} from "./delete-topic.component";
         ReactiveFormsModule,
         AngularSplitModule
     ],
-    declarations: [BrowseTopicsComponent, MoveTopicComponent, DeleteTopicComponent
+    declarations: [BrowseTopicsComponent, MoveTopicComponent, DeleteTopicComponent , TopicDetailComponent,TopicsPanelComponent
     ],
     entryComponents: [MoveTopicComponent, DeleteTopicComponent],
     exports: [MoveTopicComponent, DeleteTopicComponent]

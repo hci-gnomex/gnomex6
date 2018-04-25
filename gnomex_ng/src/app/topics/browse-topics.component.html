@@ -39,7 +39,7 @@
                 </split-area>
 
                 <split-area size="80">
-                    <div *ngIf="linkDataView" class="flex-column-container">
+                    <div [hidden]="!linkDataView" class="flex-column-container">
                         <div *ngIf="isExperimentsTab">
                             <div class="link-data-header">
                                 <img src="../../assets/flask.png" class="add-link-object-icon">
@@ -177,6 +177,10 @@
 
                         </div>
                     </div>
+                    <div  class="exp-overview-item topics-panel" [hidden]="linkDataView">
+                        <topics-panel></topics-panel>
+                    </div>
+
                 </split-area>
             </split>
         </div>

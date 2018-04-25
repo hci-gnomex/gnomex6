@@ -9,6 +9,9 @@ import {DatatracksGenomeBuildComponent} from "./datatracks-overview/genome-build
 import {GenomeBuildResolverService} from "../services/resolvers/genome-build-resolver.service";
 import {DatatracksFolderComponent} from "./datatracks-overview/datatracks-folder.component";
 import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
+import {DatatrackListResolverService} from "../services/resolvers/datatrack-list.resolver.service";
+import {NewExperimentComponent} from "../experiments/experiment-detail/new-experiment.component";
+import {DatatrackResolverService} from "../services/resolvers/datatrack-resolver.service";
 
 
 /**
@@ -21,10 +24,27 @@ const ROUTES: Routes = [
     { path: "datatracks", component: BrowseDatatracksComponent, children:[
         {path:'organism',component: DatatracksOrganismComponent, outlet: 'datatracksPanel'},
         {path:'genomeBuild',component:DatatracksGenomeBuildComponent, outlet:'datatracksPanel',resolve: {genomeBuild: GenomeBuildResolverService}},
-        {path:'folder',component: DatatracksFolderComponent , outlet: 'datatracksPanel'}
-    ],
-        canActivate: [SubRouteGuardService]
+        {path:'folder',component: DatatracksFolderComponent , outlet: 'datatracksPanel'},
+        {path:':id', component: NewExperimentComponent, outlet: 'datatracksPanel',resolve: {datatrack: DatatrackResolverService }}
+        ],
+        canActivate: [SubRouteGuardService], resolve:{datatrackList:DatatrackListResolverService}
+    },
+    { path: "datatracks/:idGenomeBuild", component: BrowseDatatracksComponent, children:[
+            {path:'organism',component: DatatracksOrganismComponent, outlet: 'datatracksPanel'},
+            {path:'genomeBuild',component:DatatracksGenomeBuildComponent, outlet:'datatracksPanel',resolve: {genomeBuild: GenomeBuildResolverService}},
+            {path:'folder',component: DatatracksFolderComponent , outlet: 'datatracksPanel'},
+            {path:':id', component: NewExperimentComponent, outlet: 'datatracksPanel',resolve: {datatrack: DatatrackResolverService }}
+        ],
+        canActivate: [SubRouteGuardService], resolve:{datatrackList:DatatrackListResolverService}, runGuardsAndResolvers: "paramsChange"
     }
+
+
+
+
+
+
+
+
 ];
 
 export const DATATRACKS_ROUTING = RouterModule.forChild(ROUTES);

@@ -5,13 +5,14 @@ import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.Organism;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.Json;
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
@@ -49,11 +50,11 @@ public class DeleteOrganism extends GNomExCommand implements Serializable {
 
   public Command execute() throws RollBackCommandException {
     Session sess = null;
-    Organism organism = null;
+    Organism organism;
 
     try {
       sess = HibernateSession.currentSession(this.getUsername());
-      organism = (Organism)sess.load(Organism.class, idOrganism);
+      organism = sess.load(Organism.class, idOrganism);
 
       // Check permissions
       if (this.getSecAdvisor().canDelete(organism)) {
@@ -63,13 +64,13 @@ public class DeleteOrganism extends GNomExCommand implements Serializable {
         //
         // First delete associated genome builds
         //
-        StringBuffer query = new StringBuffer("SELECT gb from GenomeBuild gb");
-        query.append(" where gb.idOrganism=" + organism.getIdOrganism());
+        StringBuilder query = new StringBuilder("SELECT gb from GenomeBuild gb");
+        query.append(" where gb.idOrganism=");
+        query.append(organism.getIdOrganism());
         query.append(" order by gb.genomeBuildName");
         List genomeBuilds = sess.createQuery(query.toString()).list();
 
         if (!genomeBuilds.isEmpty()) {
-          Element gbEle = new Element("genomeBuilds");
           for(Iterator j = genomeBuilds.iterator(); j.hasNext();) {
             GenomeBuild gb = (GenomeBuild)j.next();
             sess.delete(gb);
@@ -90,7 +91,7 @@ public class DeleteOrganism extends GNomExCommand implements Serializable {
 
         DictionaryHelper.reload(sess);
 
-        this.xmlResult = "<SUCCESS/>";
+        this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").build().toString();
 
         setResponsePage(this.SUCCESS_JSP);
 
@@ -98,12 +99,12 @@ public class DeleteOrganism extends GNomExCommand implements Serializable {
         this.addInvalidField("insufficient permission", "Insufficient permissions to delete organism.");
         setResponsePage(this.ERROR_JSP);
       }
-    } catch (ConstraintViolationException ce) {
-      this.addInvalidField("constraint", "Organism set to inactive.  Unable to delete because organism is referenced on existing db objects.");
+    } catch (PersistenceException ce) {
+      //this.addInvalidField("constraint", "Organism set to inactive.  Unable to delete because organism is referenced on existing db objects.");
 
       try {
         sess.clear();
-        organism = (Organism)sess.load(Organism.class, idOrganism);
+        organism = sess.load(Organism.class, idOrganism);
         organism.setIsActive("N");
         sess.flush();
       } catch(Exception e) {
@@ -112,6 +113,12 @@ public class DeleteOrganism extends GNomExCommand implements Serializable {
         throw new RollBackCommandException(e.getMessage());
 
       }
+
+      this.jsonResult = Json.createObjectBuilder()
+              .add("result", "FAILURE")
+              .add("message", "Organism is referenced on existing db objects so it was inactivated")
+              .build().toString();
+      setResponsePage(this.SUCCESS_JSP);
 
     } catch (Exception e){
       this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in DeleteOrganism ", e);

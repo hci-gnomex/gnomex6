@@ -8,6 +8,8 @@ import {AnalysisOverviewComponent} from "./analysis-overview/analysis-overview.c
 import {AnalysisGroupResolverService} from "../services/resolvers/analysis-group-resolver.service";
 import {AnalysisDetailComponent} from "./analysis-detail/analysis-detail.component";
 import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
+import {AnalysisResolverService} from "../services/resolvers/analysis-resolver.service";
+import {AnalysisGroupListResolverService} from "../services/resolvers/analysis-group-list-resolver.service";
 
 
 /**
@@ -17,12 +19,19 @@ import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.ser
  * @since 12/19/16
  */
 const ROUTES: Routes = [
-    { path: "analysis", component: BrowseAnalysisComponent , children:[
+    { path: 'analysis', component: BrowseAnalysisComponent , children:[
             {path:'overview',component: AnalysisOverviewComponent, outlet: 'analysisPanel', resolve:{analysisGroup:AnalysisGroupResolverService}},
-            {path:':id', component: AnalysisDetailComponent, outlet: 'analysisPanel',resolve: {analysis: AnalysisGroupResolverService}}
+            {path:':id', component: AnalysisDetailComponent, outlet: 'analysisPanel',resolve: {analysis: AnalysisResolverService }}
         ],
         canActivate: [SubRouteGuardService]
+    },
+    { path: "analysis/:idLab", component: BrowseAnalysisComponent , children:[
+        {path:'overview',component: AnalysisOverviewComponent, outlet: 'analysisPanel', resolve:{analysisGroup:AnalysisGroupResolverService}},
+        {path:':id', component: AnalysisDetailComponent, outlet: 'analysisPanel',resolve: {analysis: AnalysisResolverService }}],
+        canActivate: [SubRouteGuardService], resolve:{analysisGroupList:AnalysisGroupListResolverService}, runGuardsAndResolvers: 'paramsChange'
     }
+
+
 
 ];
 
