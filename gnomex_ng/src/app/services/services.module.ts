@@ -84,7 +84,7 @@ import {GridColumnValidateService} from "./grid-column-validate.service";
         ConfigurationService,
         SubRouteGuardService,
         WorkflowService,
-        GridColumnValidateService
+        GridColumnValidateService,
         NewBillingAccountService,
         AuthRouteGuardService,
         ProjectListResolverService,
