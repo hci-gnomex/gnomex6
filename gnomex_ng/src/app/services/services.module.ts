@@ -37,6 +37,7 @@ import {AuthRouteGuardService} from "./route-guards/auth-route-guard.service";
 import {AccountFieldsConfigurationService} from "./account-fields-configuration.service";
 import {NewBillingAccountService} from "./new-billing-account.service";
 import {WorkflowService} from "./workflow.service";
+import {GridColumnValidateService} from "./grid-column-validate.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -81,7 +82,8 @@ import {WorkflowService} from "./workflow.service";
         SubRouteGuardService,
 			  NewBillingAccountService,
         WorkflowService,
-        AuthRouteGuardService
+        AuthRouteGuardService,
+        GridColumnValidateService
     ]})
 export class ServicesModule {
 }

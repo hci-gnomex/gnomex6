@@ -601,6 +601,16 @@ export class GnomexService {
         return this.appInitSubject.asObservable();
     }
 
+    getCodeApplicationForBioanalyzerChipType(codeBioanalyzerChipType: string): string {
+        let code: string = "";
+        for (let ct of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType")) {
+            if (ct.codeBioanalyzerChipType === codeBioanalyzerChipType) {
+                code = ct.codeApplication;
+                break;
+            }
+        }
+        return code;
+    }
 
     initApp(): void{
         this.authSubscription = this.authenticationService.isAuthenticated().first().subscribe(authenticated => {

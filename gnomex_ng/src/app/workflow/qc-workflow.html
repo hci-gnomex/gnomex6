@@ -23,9 +23,9 @@
                 </mat-form-field>
                 <mat-form-field class="formField">
                     <input matInput #coreFacility placeholder="Core facility" aria-label="Core" [matAutocomplete]="autoCore"
-                           [formControl]="coreFacilityFC" (keyup.enter)="chooseFirstCoreOption()" (keyup)="highlightFirstCoreOption($event)">
+                           [(ngModel)]="core" (keyup.enter)="chooseFirstCoreOption()" (keyup)="highlightFirstCoreOption($event)">
                     <mat-autocomplete #autoCore="matAutocomplete" [displayWith]="displayCore">
-                        <mat-option (onSelectionChange)="selectCoreOption($event)" *ngFor="let cor of filterCores(this.coreFacilityFC.value)" [value]="cor">{{cor.display}}</mat-option>
+                        <mat-option (onSelectionChange)="selectCoreOption($event)" *ngFor="let cor of filterCores(this.core)" [value]="cor">{{cor.display}}</mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
             </div>
@@ -51,17 +51,53 @@
             </save-footer>
         </div>
     </mat-sidenav-content>
-    <mat-sidenav #sidenav mode="side" (keydown.escape)="close('escape')">
+    <mat-sidenav style="width:15%;" #sidenav mode="side" (keydown.escape)="close('escape')">
         <mat-tab-group id="groupTabGroup" style="height: 100%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
-            <mat-tab groupTab label="QC Worklist"  style="height:100%;">
+
+            <mat-tab groupTab  style="height:100%;width: 25%">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/data-accept.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>QC Worklist</mat-label>
+                    <button mat-button class="row-one" (click)="onClickAll($event)">All</button>
+                    <button mat-button class="row-one" (click)="onClickHiSeq($event)">Illumina NovaSeq</button>
+                    <button mat-button class="row-one" (click)="onClickHiSeq($event)">Illumina HiSeq</button>
+                    <button mat-button class="row-one" (click)="onClickMiSeq($event)">Illumina MiSeq</button>
+                    <button mat-button class="row-one" (click)="onClickSampleQuality($event)">Sample Quality</button>
+                </div>
             </mat-tab>
-            <mat-tab groupTab label="HiSeq"  style="height:100%;">
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag_lightening.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>NovaSeq</mat-label>
+                </div>
             </mat-tab>
-            <mat-tab groupTab label="MiSeq"  style="height:100%;">
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag_miseq.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>HiSeq</mat-label>
+                </div>
             </mat-tab>
-            <mat-tab groupTab label="Microarray"  style="height:100%;">
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>MiSeq</mat-label>
+                </div>
             </mat-tab>
-            <mat-tab groupTab label="GAIIx"  style="height:100%;">
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>MdMiSeq</mat-label>
+                </div>
             </mat-tab>
         </mat-tab-group>
     </mat-sidenav>

@@ -1,7 +1,6 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
-import {FormControl} from "@angular/forms";
 import {MatAutocomplete, MatAutocompleteTrigger, MatInput, MatOption, MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
 import {GridOptions} from "ag-grid";
@@ -11,6 +10,7 @@ import {SelectEditor} from "../util/grid-editors/select.editor";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {ValueParserParams} from "ag-grid/dist/lib/entities/colDef";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {GridColumnValidateService} from "../services/grid-column-validate.service";
 
 @Component({
     selector: 'qc-workflow',
@@ -34,10 +34,6 @@ import {DialogsService} from "../util/popup/dialogs.service";
             display: flex;
             flex-grow: 1;
         }
-        .row-one {
-            display: flex;
-            flex-grow: 1;
-        }
         .sidenav-container {
             height: 100%;
         }
@@ -51,6 +47,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
             text-align:center
         }
         #groupTabGroup ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
+            width: 25%;
             min-width: 0;
             padding: 3px;
             margin: 3px;
@@ -74,8 +71,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     private cores: any[] = [];
     private requestIds: any[] = [];
     private filteredQcProtocolList: any[] = [];
-    private requestFC: FormControl;
-    private coreFacilityFC: FormControl;
     private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
     private changedRowMap: Map<string, any> = new Map<string, any>();
     private gridOptions:GridOptions = {};
@@ -84,28 +79,38 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
+    private core: any;
     private previousRequestMatOption: MatOption;
     private showNav: boolean = true;
     private hide260230: boolean = true;
+    private gridApi;
+    private gridColumnApi;
+    private hiSeqCoreObject = {
+        idCoreFacility: "1",
+        display: "High Throughput Genomics"
+    };
+    private miSeqCoreObject = {
+        idCoreFacility: "3",
+        display: "Molecular Diagnostics"
+    };
     status = [
-        {display: ''},
-        {display: 'In Progress'},
-        {display: 'Completed'},
-        {display: 'On Hold'},
-        {display: 'Terminate'},
-        {display: 'Bypass'}
+        {display: '', value: ''},
+        {display: 'In Progress', value: 'In Progress'},
+        {display: 'Complete', value: 'Completed'},
+        {display: 'On Hold', value: 'On Hold'},
+        {display: 'Terminate', value: 'Terminated'},
+        {display: 'Bypass', value: 'Bypassed'}
     ];
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
+                private gridColumnValidatorService: GridColumnValidateService,
                 private dictionaryService: DictionaryService) {
-        this.requestFC = new FormControl("");
-        this.coreFacilityFC = new FormControl("");
 
     }
 
     ngOnInit() {
-        this.initialize();
+        // this.initialize();
         this.sidenav.open();
     }
 
@@ -123,8 +128,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 this.coreFacilityAppMap.set(coreId, this.gnomexService.getQCAppCodesForCore(coreId));
             }
             this.workingWorkItemList = this.workItemList;
-            if (!this.coreFacilityFC.value) {
-                this.coreFacilityFC.setValue(this.cores[0]);
+            if (!this.core) {
+                this.core = this.cores[0];
             }
             this.workingWorkItemList = this.filterWorkItems();
             this.filteredQcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType").filter((item: any) => {
@@ -132,9 +137,9 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 if (item.value == "") {
                     retVal = true;
                 } else {
-                    if (item.isActive === 'Y' && this.coreFacilityFC.value) {
+                    if (item.isActive === 'Y' && this.core) {
                         let appCodes: any[] = [];
-                        appCodes = this.coreFacilityAppMap.get(this.coreFacilityFC.value.idCoreFacility);
+                        appCodes = this.coreFacilityAppMap.get(this.core.idCoreFacility);
                         if (appCodes && appCodes.length > 0) {
                             for (var code of appCodes) {
                                 if (item.codeApplication.toString() === code) {
@@ -177,7 +182,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     selectOptionsDisplayField: "bioanalyzerChipType",
                     selectOptionsValueField: "datakey",
                     showFillButton: true,
-                    fillGroupAttribute: 'idRequest'
+                    fillGroupAttribute: 'idRequest',
                 },
                 {
                     headerName: "Conc. ng/uL",
@@ -186,14 +191,23 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     field: "qualCalcConcentration",
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     valueSetter: this.qualCalcValueSetter,
+                    validateService: this.gridColumnValidatorService,
+                    maxValue: 99999,
+                    minValue: 0,
+                    allowNegative: false
                 },
                 {
                     headerName: "260/230",
                     editable: true,
                     width: 125,
-                    field: "260230Concentration",
+                    field: "qual260nmTo230nmRatio",
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    hide: this.hide260230  // TODO Hide for now until I can get the core facility property
+                    hide: this.hide260230,  // TODO Hide for now until I can get the core facility property
+                    valueSetter: this.qualCalcValueSetter,
+                    validateService: this.gridColumnValidatorService,
+                    maxValue: 99999,
+                    minValue: 0,
+                    allowNegative: false
 
                 },
                 {
@@ -212,7 +226,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.status,
                     selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "display"
+                    selectOptionsValueField: "value"
                 }
 
             ];
@@ -220,7 +234,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             this.requestIds.unshift(this.emptyRequest);
             // TODO Need to get hide260230 and hide that column appropriately
             // var hide260230:String = parentApplication.getCoreFacilityProperty(selectedIdCoreFacility, parentApplication.PROPERTY_HIDE_260_230_QC_WORKFLOW);
-
         });
 
     }
@@ -231,7 +244,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
 
     filterWorkItems(): any[] {
         let items: any[] = [];
-
         if (this.workItem) {
             items = this.workItemList.filter(request =>
                 request.requestNumber === this.workItem
@@ -239,25 +251,27 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         } else {
             items = this.workItemList;
         }
-        if (this.coreFacilityFC.value) {
+        if (this.core) {
             items = items.filter(request =>
-                request.idCoreFacility === this.coreFacilityFC.value.idCoreFacility
+                request.idCoreFacility === this.core.idCoreFacility
             )
 
         }
-
         return items;
     }
 
-    buildRequestIds(items: any[]) {
+    buildRequestIds(items: any[], mode: string) {
         let wItems: any[] = [];
-        if (this.coreFacilityFC.value) {
-            wItems = items.filter(request =>
-                request.idCoreFacility === this.coreFacilityFC.value.idCoreFacility
-            )
+        if (mode === "main") {
+            if (this.core) {
+                wItems = items.filter(request =>
+                    request.idCoreFacility === this.core.idCoreFacility
+                )
 
+            }
+        } else {
+            wItems = items;
         }
-
         this.requestIds = Array.from(wItems.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
         this.requestIds.unshift(this.emptyRequest);
     }
@@ -274,17 +288,18 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     filterRequests(name: any): any[] {
-        let fUsers: any[];
+        let fRequests: any[];
         if (name) {
-            fUsers = this.requestIds.filter(request =>
+            fRequests = this.requestIds.filter(request =>
                 request.requestNumber.indexOf(name) >= 0);
-            return fUsers;
+            return fRequests;
         } else {
             return this.requestIds;
         }
     }
 
     filterCores(name: any): any[] {
+        this.coreFacilityInput.nativeElement.blur();
         return this.cores;
     }
 
@@ -322,17 +337,22 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         if (event.source.selected) {
             this.workItem = event.source.value;
             this.workingWorkItemList = this.filterWorkItems();
-            this.filterWorkItems();
+            // this.filterWorkItems("main");
         }
     }
 
     selectCoreOption(event) {
-        this.coreFacilityFC.setValue(event.source.value);
-        this.workingWorkItemList = this.filterWorkItems();
-        this.buildRequestIds(this.workItemList);
+        if (event.source.selected) {
+            this.core = event.source.value;
+            this.workingWorkItemList = this.filterWorkItems();
+            this.buildRequestIds(this.workItemList, "main");
+        }
     }
 
     onNotifyGridRowDataChanged(event) {
+        if (this.gridApi) {
+            this.gridApi.hideOverlay();
+        }
     }
 
     onCellValueChanged(event) {
@@ -341,11 +361,13 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     onRowDataChanged(event) {
-        console.log("row changed");
     }
 
-    onGridReady(event) {
-
+    onGridReady(params) {
+        this.gridApi = params.api;
+        this.gridColumnApi = params.columnApi;
+        params.api.sizeColumnsToFit();
+        this.initialize();
     }
 
     onSelectionChanged(event) {
@@ -361,8 +383,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         if (item.value == "") {
             retVal = true;
         } else {
-            if (item.isActive === 'Y' && this.coreFacilityFC.value) {
-                var appCodes: any[] = this.coreFacilityAppMap[this.coreFacilityFC.value];
+            if (item.isActive === 'Y' && this.core) {
+                var appCodes: any[] = this.coreFacilityAppMap[this.core];
                 if (appCodes.length > 0) {
                     for (var code of appCodes) {
                         if (item.codeApplication.toString() === code) {
@@ -380,6 +402,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         var params: URLSearchParams = new URLSearchParams();
         let workItems: any[] = [];
         for(let value of Array.from( this.changedRowMap.values()) ) {
+            this.setQualCodeApplication(value);
             let obj: object = {"WorkItem": value};
             workItems.push(obj);
         }
@@ -401,36 +424,55 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         if (this.showNav) {
             this.sidenav.close();
             this.showNav = false;
+
         } else {
             this.sidenav.open();
             this.showNav = true;
         }
+        this.gridApi.sizeColumnsToFit();
     }
 
     close() {
     }
 
-    qualCalcValueSetter(params: ValueParserParams) {
-        console.log("qc");
-        let valid: boolean = false;
-        let message: string = "Invalid: ";
-        if (params.newValue === "") {
-            params.data[params.colDef.field] = "";
-        }
-        if (params.newValue > 0) {
-            if (params.newValue < 99999 ) {
-                params.data[params.colDef.field] = params.newValue;
-                valid = true;
-            } else {
-                message = "Exceeds max of 99999"
+    qualCalcValueSetter(params: any) {
+        return params.colDef.validateService.validate(params);
+    }
+
+    setQualCodeApplication(item: any) {
+        let warningMessage: string = "";
+            if (item.qualCodeBioanalyzerChipType) {
+                let code:string = this.gnomexService.getCodeApplicationForBioanalyzerChipType(item.qualCodeBioanalyzerChipType);
+                item.qualCodeApplication = code;
+            } else if (item.qualStatus == 'Completed' || item.qualStatus == 'Terminated') {
+                warningMessage = item.sampleNumber + " is completed or terminated and does not have a QC Protocol specified.";
+                this.dialogsService.confirm(warningMessage, null);
             }
-        } else {
-            message = "Cannot be negative"
-        }
-        // if (!valid) {
-        //     this.dialogsService.confirm(message, null);
-        //
-        // }
-        // return valid;
+
+    }
+
+    onClickAll(event) {
+        this.workingWorkItemList = this.workItemList;
+        this.buildRequestIds(this.workingWorkItemList, "all");
+    }
+
+    onClickHiSeq(event) {
+        this.core = this.hiSeqCoreObject;
+        this.workingWorkItemList = this.filterWorkItems();
+        this.buildRequestIds(this.workingWorkItemList, "all");
+    }
+
+    onClickMiSeq(event) {
+        this.core = this.miSeqCoreObject;
+        this.workingWorkItemList = this.filterWorkItems();
+        this.buildRequestIds(this.workingWorkItemList, "all");
+    }
+
+    onClickMicroarray(event) {
+
+    }
+
+    onClickSampleQuality(event) {
+
     }
 }

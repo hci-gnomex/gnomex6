@@ -253,7 +253,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         allowDrop: (element, {parent, index}) => {
             // this.dragEndExperimentItems = _.cloneDeep(this.experimentItems);
-            if (element.data.idTopic) {
+            if (element.data.idTopic && element.data.linkData) {
                 return true;
             } else {
                 return false;
@@ -274,7 +274,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         allowDrop: (element, {parent, index}) => {
             // this.dragEndAnalysisItems = _.cloneDeep(this.analysisItems);
-            if (element.data.idTopic) {
+            if (element.data.idTopic && element.data.linkData) {
                 return true;
             } else {
                 return false;
@@ -294,7 +294,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         allowDrop: (element, {parent, index}) => {
             // this.dragEndDatatrackItems = _.cloneDeep(this.datatrackItems);
-            if (element.data.idTopic) {
+            if (element.data.idTopic && element.data.linkData) {
                 return true;
             } else {
                 return false;
@@ -1094,6 +1094,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.experimentLabs = this.experimentLabs.concat(this.experimentItems);
             for (var lab of this.experimentItems) {
                 lab.id = "l" + lab.idLab;
+                lab.linkData = "link";
                 lab.parentid = -1;
 
                 lab.icon = "assets/group.png";
@@ -1107,6 +1108,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     for (var project of lab.experimentItems) {
                         project.icon = "assets/folder.png";
                         project.labId = lab.labId;
+                        project.linkData = "link";
                         project.id = "p" + project.idProject;
                         project.parentid = lab.id;
                         if (project.Request) {
@@ -1120,6 +1122,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                                     if (request.label) {
                                         request.label = request.requestNumber + '-' + request.name;
                                         request.id = "r" + request.idRequest;
+                                        request.linkData = "link";
                                         request.parentid = project.id;
                                         this.experimentCount++;
                                     }
@@ -1155,6 +1158,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             for (var l of this.analysisItems) {
                 l.id = "l"+l.idLab;
                 l.parentid = -1;
+                l.linkData = "link";
 
                 l.icon = "assets/group.png";
 
@@ -1167,6 +1171,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     for (var p of l.analysisItems) {
                         p.icon = "assets/folder.png";
                         p.idLab = l.idLab;
+                        p.linkData = "link";
                         p.id = "p"+p.idAnalysisGroup;
                         if (p.Analysis) {
                             if (!this.createSecurityAdvisorService.isArray(p.Analysis)) {
@@ -1184,6 +1189,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                                         labelString = labelString.concat(")");
                                         a.label = labelString;
                                         a.id = "a"+a.idAnalysis;
+                                        a.linkData = "link";
                                         a.icon = "assets/map.png";
                                         a.parentid = p.idLab;
                                     }
@@ -1222,6 +1228,7 @@ Build the tree data
             for (var org of this.datatrackItems) {
                 org.id = "o" + org.idOrganism;
                 org.parentid = -1;
+                org.linkData = "link";
 
                 org.icon = "assets/organism.png";
                 if (org.GenomeBuild) {
@@ -1236,6 +1243,7 @@ Build the tree data
                             this.assignIconToGenomeBuild(gNomeBuild);
                             gNomeBuild.labId = org.labId;
                             gNomeBuild.id = "g" + gNomeBuild.idGenomeBuild;
+                            gNomeBuild.linkData = "link";
                             gNomeBuild.parentid = org.id;
                             if (gNomeBuild.DataTrack) {
                                 if (!this.createSecurityAdvisorService.isArray(gNomeBuild.DataTrack)) {
@@ -1248,6 +1256,7 @@ Build the tree data
                                         if (dataTrack.label) {
                                             this.assignIconToDT(dataTrack);
                                             dataTrack.parentid = gNomeBuild.id;
+                                            dataTrack.linkData = "link";
                                         }
                                     }
                                 }
