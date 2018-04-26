@@ -224,6 +224,8 @@ export class ConfigureOrganismsComponent implements OnInit {
                 this.snackBar.open("Organism Saved", "Configure Organisms", {
                     duration: 2000,
                 });
+            } else if (result && result.message) {
+                this.dialogsService.confirm(result.message, null);
             } else {
                 this.dialogsService.confirm("An error occurred while saving the organism", null);
             }
