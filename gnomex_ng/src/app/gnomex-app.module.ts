@@ -44,6 +44,11 @@ import {TopicsModule} from "./topics/topics.module";
 import {AccountModule} from "./account/account.module";
 import {UsersGroupsTablistModule} from "./usersGroups/users-groups-tablist.module";
 
+import {WorkflowModule} from "./workflow/workflow.module";
+
+import {AboutModule} from "./about/about.module";
+
+
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",
@@ -66,6 +71,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         AuthenticationModule,
         ExperimentsModule,
         ConfigurationModule,
+        AboutModule,
         NewBillingAccountModule,
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig),
@@ -80,7 +86,8 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         ReportsModule,
         TestPageModule,
         AccountModule,
-        UsersGroupsTablistModule
+        UsersGroupsTablistModule,
+        WorkflowModule
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],

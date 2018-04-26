@@ -1,0 +1,104 @@
+<mat-sidenav-container class="sidenav-container" (backdropClick)="close('backdrop')">
+    <mat-sidenav-content>
+        <div class="flex-column-container">
+
+
+            <div class="flex-row-container">
+                <button mat-button (click)="toggle($event)"><img *ngIf="showNav;else closedNav" src="../../assets/arrow_left.png"></button>
+                <ng-template #closedNav>
+                    <img src="../../assets/arrow_right.png">
+                </ng-template>
+                <img src="../../assets/data-accept.png" height="16" width="16" style="margin-top: .5em">
+                <mat-label style="margin-left: .4em;margin-top: .4em;">Combined Sample Quality</mat-label>
+                <mat-label style="justify-content: flex-end;margin-left: 40em;margin-top: .4em;">{{requestIds.length-1}} requests in worklist</mat-label>
+
+            </div>
+            <div class="flex-row-container">
+                <mat-form-field class="formField">
+                    <input #requestInput matInput placeholder="Request #" aria-label="Request #" [matAutocomplete]="autoRequest"
+                           [(ngModel)]="workItem" (keyup.enter)="chooseFirstRequestOption()" (keyup)="highlightFirstRequestOption($event)">
+                    <mat-autocomplete #autoRequest="matAutocomplete">
+                        <mat-option (onSelectionChange)="selectRequestOption($event)" *ngFor="let request of filterRequests(this.workItem)" [value]="request.requestNumber">{{request.requestNumber}}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+                <mat-form-field class="formField">
+                    <input matInput #coreFacility placeholder="Core facility" aria-label="Core" [matAutocomplete]="autoCore"
+                           [(ngModel)]="core" (keyup.enter)="chooseFirstCoreOption()" (keyup)="highlightFirstCoreOption($event)">
+                    <mat-autocomplete #autoCore="matAutocomplete" [displayWith]="displayCore">
+                        <mat-option (onSelectionChange)="selectCoreOption($event)" *ngFor="let cor of filterCores(this.core)" [value]="cor">{{cor.display}}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div class="row-one" style="width: 100%;height: 90%">
+                <ag-grid-angular id="userTable" style="width: 100%;" class="ag-fresh"
+                                 [gridOptions]="gridOptions"
+                                 [rowData]="workingWorkItemList"
+                                 [columnDefs]="columnDefs"
+                                 (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                                 [rowSelection]="rowSelection"
+                                 (gridReady)="onGridReady($event)"
+                                 (selectionChanged)="onSelectionChanged($event)"
+                                 [enableSorting]="true"
+                                 (onGridSizeChanged)="onGridSizeChanged($event)"
+                                 (cellValueChanged) = "onCellValueChanged($event)"
+                                 [enableFilter]="true"
+                                 [enableColResize]="true">
+                </ag-grid-angular>
+            </div>
+            <save-footer (saveClicked)="save()"
+                         [dirty]="this.dirty"
+                         [showSpinner]="this.showSpinner">
+            </save-footer>
+        </div>
+    </mat-sidenav-content>
+    <mat-sidenav style="width:15%;" #sidenav mode="side" (keydown.escape)="close('escape')">
+        <mat-tab-group id="groupTabGroup" style="height: 100%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
+
+            <mat-tab groupTab  style="height:100%;width: 25%">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/data-accept.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>QC Worklist</mat-label>
+                    <button mat-button class="row-one" (click)="onClickAll($event)">All</button>
+                    <button mat-button class="row-one" (click)="onClickHiSeq($event)">Illumina NovaSeq</button>
+                    <button mat-button class="row-one" (click)="onClickHiSeq($event)">Illumina HiSeq</button>
+                    <button mat-button class="row-one" (click)="onClickMiSeq($event)">Illumina MiSeq</button>
+                    <button mat-button class="row-one" (click)="onClickSampleQuality($event)">Sample Quality</button>
+                </div>
+            </mat-tab>
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag_lightening.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>NovaSeq</mat-label>
+                </div>
+            </mat-tab>
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag_miseq.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>HiSeq</mat-label>
+                </div>
+            </mat-tab>
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>MiSeq</mat-label>
+                </div>
+            </mat-tab>
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>MdMiSeq</mat-label>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-sidenav>
+</mat-sidenav-container>

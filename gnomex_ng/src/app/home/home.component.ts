@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private showProgressSubscription:Subscription;
     private hideLoader: BehaviorSubject<boolean>;
     private colorRanges = [{ stop: 100, color: '#3fca15' }];
-    private launchProperties: any[] = [];
+    private launchProperties: any;
     private site_splash: string;
 
     private site_logo:string;
@@ -89,11 +89,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         let params: URLSearchParams = new URLSearchParams();
 
-        this.launchPropertiesService.getLaunchProperties(params).first().subscribe((response: any[]) => {
+        this.launchPropertiesService.getLaunchProperties(params).first().subscribe((response: any) => {
             this.launchProperties = response;
             this.getProps(response);
+            this.gnomexService.coreFacilityList = response.CoreFacilities;
             console.log("launch properties");
             this.progressService.displayLoader(10);
+
+        });
+
+
+        if(!this.gnomexService.isLoggedIn){
 
             if(this.gnomexService.orderInitObj){
                 if(this.gnomexService.orderInitObj.isGuest){
@@ -105,11 +111,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.gnomexService.initApp();
             }
 
+        }
 
-        });
 
-
-        this.gnomexService.isAppInitCompleteObservable().subscribe(complete =>{
+        this.gnomexService.isAppInitCompleteObservable().first().subscribe(complete =>{
             if(this.gnomexService.redirectURL){
                 console.log(this.router.parseUrl(this.gnomexService.redirectURL));
                 this.router.navigateByUrl("/" + this.gnomexService.redirectURL);

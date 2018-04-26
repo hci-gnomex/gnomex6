@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {MatAutocomplete} from "@angular/material";
+import {MatAutocomplete, MatOption} from "@angular/material";
 import {Observable} from "rxjs/Observable";
 import {DataSource} from '@angular/cdk/collections';
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -114,6 +114,9 @@ export class MembershipTabComponent implements OnInit {
     private collaboratorsFC: FormControl;
     private managersFC: FormControl;
     private showInactive: boolean = false;
+    private previousMemMatOption: MatOption;
+    private previousColMatOption: MatOption;
+    private previousManMatOption: MatOption;
     constructor(private securityAdvisor: CreateSecurityAdvisorService) {
 
     }
@@ -286,7 +289,11 @@ export class MembershipTabComponent implements OnInit {
             return;
         }
         if (this.memAutoComplete.options.first) {
+            if (this.previousMemMatOption) {
+                this.previousMemMatOption.setInactiveStyles();
+            }
             this.memAutoComplete.options.first.setActiveStyles();
+            this.previousMemMatOption = this.memAutoComplete.options.first;
         }
     }
 
@@ -295,7 +302,11 @@ export class MembershipTabComponent implements OnInit {
             return;
         }
         if (this.collAutoComplete.options.first) {
+            if (this.previousColMatOption) {
+                this.previousColMatOption.setInactiveStyles();
+            }
             this.collAutoComplete.options.first.setActiveStyles();
+            this.previousColMatOption = this.collAutoComplete.options.first;
         }
     }
 
@@ -304,21 +315,24 @@ export class MembershipTabComponent implements OnInit {
             return;
         }
         if (this.manAutoComplete.options.first) {
+            if (this.previousManMatOption) {
+                this.previousManMatOption.setInactiveStyles();
+            }
             this.manAutoComplete.options.first.setActiveStyles();
+            this.previousManMatOption = this.manAutoComplete.options.first;
         }
     }
 
-
     selectOption(event) {
-        this.memberUser = event.value;
+        this.memberUser = event.source.value;
     }
 
     selectCollOption(event) {
-        this.collUser = event.value;
+        this.collUser = event.source.value;
     }
 
     selectManOption(event) {
-        this.collUser = event.value;
+        this.collUser = event.source.value;
     }
 
     chooseFirstMemOption(): void {

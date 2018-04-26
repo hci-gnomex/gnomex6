@@ -15,6 +15,8 @@ import {Subscription} from "rxjs/Subscription";
 import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
 import * as _ from "lodash";
+import {HttpParams} from "@angular/common/http";
+import {TopicService} from "../services/topic.service";
 
 @Component({
     selector: "gnomex-header",
@@ -87,6 +89,7 @@ export class HeaderComponent implements OnInit{
                 private dictionaryService: DictionaryService,
                 private launchPropertiesService: LaunchPropertiesService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private topicsService: TopicService,
                 private router:Router,
                 private labListService: LabListService,
                 private gnomexService: GnomexService,
@@ -178,12 +181,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'About',
                         class: 'mat-menu-item',
-                        route: ''
+                        route: [{outlets: {'modal': 'about-window-modal'}}]
                     },
                     {
                         displayName: 'Contact Us',
                         class: 'mat-menu-item',
-                        route: ''
+                        route: [{outlets: {'modal': 'contact-us-window-modal'}}]
                     }
                 ]
             },
@@ -735,7 +738,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'QC',
                         context: 'QC',
                         iconName: '../../assets/data-accept.png',
-                        route: ''
+                        route: '/qcWorkFlow'
                     },
                     {
                         divider: true
@@ -883,7 +886,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'QC',
                         context: 'QC',
                         iconName: '../../assets/data-accept.png',
-                        route: ''
+                        route: '/qcWorkFlow'
                     },
                     {
                         divider: true
@@ -1202,7 +1205,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'QC',
                         context: 'QC',
                         iconName: '../../assets/data-accept.png',
-                        route: ''
+                        route: '/qcWorkFlow'
                     },
                     {
                         divider: true
@@ -1875,7 +1878,47 @@ export class HeaderComponent implements OnInit{
      * Search by number.
      */
     public searchNumber() {
-        //  TODO Implement search by number
+        let params: HttpParams = new HttpParams();
+
+        if(this.objNumber){
+            let match = this.objNumber.match(/([A-Za-z]*)([0-9]+)([A-Za-z]?)/);
+            let path :Array<string> = [];
+
+            if( match[3].toUpperCase() === 'R'){
+                params = params.set("requestNumber", this.objNumber);
+                path = ["experiments","idProject","browsePanel","idRequest"];
+
+            }else if(match[1].toUpperCase() === 'A'){
+                params = params.set("analysisNumber", this.objNumber);
+                path =  ["analysis","idLab","analysisPanel","idAnalysis"];
+
+            }else if(match[1].toUpperCase()=== 'DT' ){
+                params = params.set("dataTrackNumber", this.objNumber);
+                path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
+            }else if(match[1].toUpperCase() === 'T'){
+                if(match[2]){
+                    params = params.set("topicNumber", match[2]);
+                }
+                path = [ "topics","topicsPanel", "idLab" ] ;
+                this.topicsService.refreshTopicsList_fromBackend();
+            }
+
+            this.gnomexService.getOrderFromNumber(params).first().subscribe(data =>{
+               if(data.result === 'SUCCESS'){
+                   this.gnomexService.orderInitObj = data;
+                   this.gnomexService.orderInitObj.urlSegList = path;
+                   let url = this.gnomexService.makeURL(this.gnomexService.orderInitObj);
+
+                   this.router.navigateByUrl(url);
+
+
+               }else{
+                   console.log(data.ERROR);
+               }
+            });
+
+
+        }
         console.log(this.objNumber);
     }
 
@@ -1938,7 +1981,7 @@ export class HeaderComponent implements OnInit{
             route: '/' + startRoute,
             children: children
         }
-        this.router.config.push(new ExternalRoute(startRoute, route))
+        this.router.config.push(new ExternalRoute(startRoute, route));
         return obj;
     }
 

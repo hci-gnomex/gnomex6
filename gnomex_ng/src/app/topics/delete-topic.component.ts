@@ -33,11 +33,11 @@ export class DeleteTopicComponent {
 
         this.selectedItem = data.selectedItem;
         this.topic = data.topic;
-        if (this.selectedItem.data.idParentTopic) {
+        if (!this.selectedItem.data.idDataTrack && !this.selectedItem.data.idAnalysis && !this.selectedItem.data.idRequest) {
             this.deletePrompt = "Deleting topic '" + this.selectedItem.data.label + " will also remove all descendant topics " +
                  "and links to experiments, analyses, and data tracks." + " Are you sure you want to delete the topic and all of its contents?";
             this.unLink = false;
-        } else if (this.selectedItem.isLeaf) {
+        } else {
             if (this.selectedItem.data.idDataTrack) {
                 this.deletePrompt = "Remove link to data track  " + this.selectedItem.data.label + " under topic " + this.topic.label + "?";
                 this.type = "idDataTrack";

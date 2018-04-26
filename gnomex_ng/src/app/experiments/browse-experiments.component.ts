@@ -20,7 +20,7 @@ import { BrowseFilterComponent } from "../util/browse-filter.component";
 import { transaction } from 'mobx';
 import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
 import {MatDialog, MatDialogRef} from "@angular/material";
@@ -220,6 +220,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
     public showSpinner: boolean = false;
     private viewLimit: number = 999999;
+    private navProjectReqList:any;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -244,7 +245,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private dictionaryService: DictionaryService,
                 private labListService: LabListService,
                 private propertyService: PropertyService,
-                private gnomexService: GnomexService) {
+                private gnomexService: GnomexService,
+                private route:ActivatedRoute) {
 
 
         this.items = [];
@@ -252,15 +254,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labMembers = [];
         this.billingAccounts = [];
         this.labs = [];
-        if(this.gnomexService.orderInitObj){
-            let params:URLSearchParams = new URLSearchParams();
-            params.set("idProject", this.gnomexService.orderInitObj.idProject );
-            params.set("showEmptyProjectFolders", "N" );
-            params.set("showCategory", "N");
-            params.set("showSamples", "N");
-            this.experimentsService.browsePanelParams= params;
-            this.experimentsService.getProjectRequestList_fromBackend(params)
-        }
+
+
+
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
             if (this.createProjectDialogRef) {
@@ -287,8 +283,14 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
 
             this.experimentsService.emitExperimentOverviewList(response);
-            if(this.experimentsService.browsePanelParams["refreshParams"]){
-                this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+            if(this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]){
+
+                let navArray :any[] = ['/experiments',{outlets:{'browsePanel':'overview'}}];
+                if(this.navProjectReqList){
+                   navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idProject"));
+                }
+
+                this.router.navigate(navArray);
                 this.experimentsService.browsePanelParams["refreshParams"] = false;
             }
 
@@ -306,6 +308,16 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     }
                 }
             });
+        });
+
+
+        this.route.data.forEach( data => {
+            console.log("This is the project request data: " , data.projectList);
+            this.navProjectReqList = data.projectList;
+            if(this.navProjectReqList){
+                this.experimentsService.emitProjectRequestList(this.navProjectReqList);
+            }
+
         });
 
         this.experimentsService.startSearchSubject.subscribe((value) =>{
@@ -598,8 +610,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         let idLab = this.selectedItem.data.idLab;
         let idProject = this.selectedItem.data.idProject;
         let idRequest = this.selectedItem.data.idRequest;
+        if(this.gnomexService.orderInitObj){
+            return;
+        }
 
         let projectRequestListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
+        let navArray:Array<any> = [];
 
         //Lab
         if (this.selectedItem.level === 1) {
@@ -608,7 +624,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableDeleteProject = true;
             this.disableDeleteExperiment = true;
 
-            this.router.navigate(['/experiments',{outlets:{'browsePanel':'overview'}}]);
+            navArray = ['/experiments',{outlets:{'browsePanel':'overview'}}];
             this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
 
 
@@ -618,13 +634,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableDeleteProject = false;
             this.disableDeleteExperiment = true;
 
-            this.router.navigate(['/experiments',
-                {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}]);
+            navArray = ['/experiments' , {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}];
             this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
 
             //Experiment
         } else {
-            this.router.navigate(['/experiments',  {outlets:{'browsePanel':[idRequest]}}]);
+            navArray = ['/experiments',  {outlets:{'browsePanel':[idRequest]}}];
             this.disableNewProject = true;
             this.disableDeleteProject = true;
             this.experimentsService.getExperiment(this.selectedItem.data.idRequest).subscribe((response: any) => {
@@ -637,6 +652,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             });
 
         }
+
+        if(this.navProjectReqList){
+            navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idProject"));
+        }
+        this.router.navigate(navArray);
+
     }
 
     /**
@@ -673,5 +694,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     ngOnDestroy(): void {
         this.projectRequestListSubscription.unsubscribe();
+        this.navProjectReqList = null;
     }
 }

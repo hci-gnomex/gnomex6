@@ -9,7 +9,9 @@ import {DataTrackService} from "./data-track.service";
 import {DictionaryService} from "./dictionary.service";
 import {ExperimentViewService} from "./experiment-view.service";
 import {ExperimentResolverService,ProjectResolverService,AnalysisGroupResolverService,
-        AnalysisResolverService,GenomeBuildResolverService} from "./resolvers/index";
+        AnalysisResolverService,GenomeBuildResolverService,AnalysisGroupListResolverService,
+        ProjectListResolverService,DatatrackListResolverService,DatatrackResolverService,
+        LabResolverService} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
 import {ProjectService} from "./project.service";
@@ -36,6 +38,8 @@ import {SubRouteGuardService} from "./route-guards/sub-route-guard.service";
 import {AuthRouteGuardService} from "./route-guards/auth-route-guard.service";
 import {AccountFieldsConfigurationService} from "./account-fields-configuration.service";
 import {NewBillingAccountService} from "./new-billing-account.service";
+import {WorkflowService} from "./workflow.service";
+import {GridColumnValidateService} from "./grid-column-validate.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -63,6 +67,7 @@ import {NewBillingAccountService} from "./new-billing-account.service";
         AnnotationService,
         UsageService,
         GnomexStringUtilService,
+        AnalysisGroupListResolverService,
         AnalysisGroupResolverService,
         AnalysisResolverService,
         GnomexService,
@@ -78,8 +83,15 @@ import {NewBillingAccountService} from "./new-billing-account.service";
         LabMembershipRequestService,
         ConfigurationService,
         SubRouteGuardService,
+        WorkflowService,
+        GridColumnValidateService,
         NewBillingAccountService,
-        AuthRouteGuardService
+        AuthRouteGuardService,
+        ProjectListResolverService,
+        DatatrackListResolverService,
+        DatatrackResolverService,
+        LabResolverService
+
     ]})
 export class ServicesModule {
 }
