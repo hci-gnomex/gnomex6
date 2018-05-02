@@ -226,7 +226,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
-        this.router.navigate(['/analysis', {outlets: {'analysisPanel': 'overview'}}]);
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.labList = response;
         });
@@ -569,9 +568,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
         let idLab = this.selectedItem.data.idLab;
 
-        if(this.gnomexService.orderInitObj){ // if navigating through url or lookup
-            return;
-        }
 
         let analysisGroupListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
         let navArray: Array<any> = [];

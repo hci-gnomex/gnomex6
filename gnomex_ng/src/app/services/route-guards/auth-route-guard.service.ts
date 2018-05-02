@@ -6,6 +6,7 @@ import {Injectable} from "@angular/core";
 import {GnomexService} from "../gnomex.service";
 import {URLSearchParams} from "@angular/http";
 import {HttpParams} from "@angular/common/http";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.
@@ -58,43 +59,11 @@ export class AuthRouteGuardService implements CanActivate {
     }
 
 
-    private determineIfPublic(queryParam:any,isAuthed:boolean, url: string):Observable<boolean> {
-        let numberObj: any = {};
-        if (queryParam["requestNumber"]) {
-            numberObj["type"] = "requestNumber";
-            numberObj["value"] = queryParam["requestNumber"];
-            numberObj["urlSegList"] =  ["experiments","idProject","browsePanel","idRequest"];
-
-        } else if (queryParam["analysisNumber"]) {
-            numberObj["type"] = "analysisNumber";
-            numberObj["value"] = queryParam["analysisNumber"];
-            numberObj["urlSegList"] =  ["analysis","idLab","analysisPanel","idAnalysis"];
-
-
-        } else if (queryParam["dataTrackNumber"]) {
-            numberObj["type"] = "dataTrackNumber";
-            numberObj["value"] = queryParam["dataTrackNumber"];
-            numberObj["urlSegList"] =  ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
-
-        } else if (queryParam["topicNumber"]) {
-            numberObj["type"] = "topicNumber";
-            numberObj["value"] = queryParam["topicNumber"];
-            numberObj["urlSegList"] =  ["topics","topicsPanel","idLab"]; // no getTopic
-        } else {
-            numberObj = null;
-        }
-
-        if(!numberObj){
-            return Observable.of(false);
-        }
-
-        let params:HttpParams = new HttpParams()
-            .set(numberObj.type, numberObj.value);
-
-
+    private redirectByURL(params:HttpParams,initOrderSubject:BehaviorSubject<any>,isAuthed:boolean,numberObj:any):Observable<boolean>{
         return this.gnomexService.getOrderFromNumber(params).map((res) =>{
-            this.setIDsFromResponse(res,numberObj);
+            this.setIDsFromResponse(res,numberObj); // no navigation
             this.gnomexService.orderInitObj = numberObj;
+            initOrderSubject.next(this.gnomexService.orderInitObj);
 
             if(res.codeVisbility === "PUBLIC" && !isAuthed ){ // has guest access
                 numberObj["isGuest"] = true;
@@ -109,6 +78,52 @@ export class AuthRouteGuardService implements CanActivate {
                 return false;
             }
         });
+
+    }
+
+    private determineIfPublic(queryParam:any,isAuthed:boolean, url: string):Observable<boolean> {
+        let numberObj: any = {};
+        if (queryParam["requestNumber"]) {
+            numberObj["type"] = "requestNumber";
+            numberObj["value"] = queryParam["requestNumber"];
+            //numberObj["urlSegList"] =  ["experiments","idProject","browsePanel","idRequest"];
+            numberObj["urlSegList"] =  ["experiments"];
+            let params:HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+            let sub = this.gnomexService.navInitBrowseExperimentSubject;
+            return this.redirectByURL(params,sub,isAuthed,numberObj);
+
+
+        } else if (queryParam["analysisNumber"]) {
+            numberObj["type"] = "analysisNumber";
+            numberObj["value"] = queryParam["analysisNumber"];
+            //numberObj["urlSegList"] =  ["analysis","idLab","analysisPanel","idAnalysis"];
+            numberObj["urlSegList"] =  ["analysis"];
+            let params:HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+            let sub = this.gnomexService.navInitBrowseAnalysisSubject;
+            return this.redirectByURL(params,sub,isAuthed,numberObj);
+
+        } else if (queryParam["dataTrackNumber"]) {
+            numberObj["type"] = "dataTrackNumber";
+            numberObj["value"] = queryParam["dataTrackNumber"];
+            //numberObj["urlSegList"] =  ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
+            numberObj["urlSegList"]=["datatracks"];
+            let params:HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+            let sub = this.gnomexService.navInitBrowseDatatrackSubject;
+            return this.redirectByURL(params,sub,isAuthed,numberObj);
+
+        } else if (queryParam["topicNumber"]) {
+            numberObj["type"] = "topicNumber";
+            numberObj["value"] = queryParam["topicNumber"];
+            numberObj["urlSegList"] =  ["topics"];
+            let params:HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+            let sub = this.gnomexService.navInitBrowseTopicSubject;
+            return this.redirectByURL(params,sub,isAuthed,numberObj);
+
+
+        } else {
+            return Observable.of(false);
+        }
+
 
     }
 

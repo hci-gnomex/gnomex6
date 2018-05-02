@@ -17,6 +17,7 @@ import {ExternalRoute} from "./external-routes.module";
 import * as _ from "lodash";
 import {HttpParams} from "@angular/common/http";
 import {TopicService} from "../services/topic.service";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Component({
     selector: "gnomex-header",
@@ -119,7 +120,6 @@ export class HeaderComponent implements OnInit{
     private currentState: string;
     private isAdminState: boolean = false;
     private labList: any[] = [];
-    private faqList: any[] = [];
     public linkNavItems: any[] = [];
     private authSubscription: Subscription;
 
@@ -129,15 +129,7 @@ export class HeaderComponent implements OnInit{
     ngOnInit() {
         console.log("Initializing app dependencies ");
 
-        this.launchPropertiesService.getFAQ().subscribe((response: any) => {
-            if (response != null) {
-                if (!this.createSecurityAdvisorService.isArray(response)) {
-                    this.faqList = [response.FAQ];
-                } else {
-                    this.faqList = response;
-                }
-            }
-        });
+
         this.gnomexService.isAppInitCompleteObservable().subscribe(complete => {
             this.buildNavItems();
             this.checkSecurity();
@@ -1877,49 +1869,62 @@ export class HeaderComponent implements OnInit{
     /**
      * Search by number.
      */
+
+
+    private navByNumber(params:HttpParams,path:string[],initOrderSubject:BehaviorSubject<any> ){
+        this.gnomexService.getOrderFromNumber(params).first().subscribe(data =>{
+            if(data.result === 'SUCCESS'){
+                this.gnomexService.orderInitObj = data;
+                this.gnomexService.orderInitObj.urlSegList = path;
+                let url = this.gnomexService.makeURL(this.gnomexService.orderInitObj);
+
+                this.router.navigateByUrl(url);
+                initOrderSubject.next(this.gnomexService.orderInitObj);
+
+            }else{
+                console.log(data.ERROR);
+            }
+        });
+    }
+
     public searchNumber() {
         let params: HttpParams = new HttpParams();
 
         if(this.objNumber){
             let match = this.objNumber.match(/([A-Za-z]*)([0-9]+)([A-Za-z]?)/);
-            let path :Array<string> = [];
+            let path:Array<string> = [];
 
             if( match[3].toUpperCase() === 'R'){
                 params = params.set("requestNumber", this.objNumber);
-                path = ["experiments","idProject","browsePanel","idRequest"];
+                //path = ["experiments","idProject","browsePanel","idRequest"];
+                path = ["experiments"];
+                let sub = this.gnomexService.navInitBrowseExperimentSubject;
+                this.navByNumber(params,path,sub);
 
             }else if(match[1].toUpperCase() === 'A'){
                 params = params.set("analysisNumber", this.objNumber);
-                path =  ["analysis","idLab","analysisPanel","idAnalysis"];
+                //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
+                path = ["analysis"];
+                let sub = this.gnomexService.navInitBrowseAnalysisSubject;
+                this.navByNumber(params,path,sub);
 
             }else if(match[1].toUpperCase()=== 'DT' ){
                 params = params.set("dataTrackNumber", this.objNumber);
-                path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
+                //path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
+                path = ["datatracks"];
+                let sub = this.gnomexService.navInitBrowseDatatrackSubject;
+                this.navByNumber(params,path,sub);
             }else if(match[1].toUpperCase() === 'T'){
                 if(match[2]){
                     params = params.set("topicNumber", match[2]);
                 }
-                path = [ "topics","topicsPanel", "idLab" ] ;
-                this.topicsService.refreshTopicsList_fromBackend();
+                //path = [ "topics","topicsPanel", "idLab" ] ;
+                path = [ "topics"] ;
+                let sub = this.gnomexService.navInitBrowseTopicSubject;
+                this.navByNumber(params,path,sub);
             }
 
-            this.gnomexService.getOrderFromNumber(params).first().subscribe(data =>{
-               if(data.result === 'SUCCESS'){
-                   this.gnomexService.orderInitObj = data;
-                   this.gnomexService.orderInitObj.urlSegList = path;
-                   let url = this.gnomexService.makeURL(this.gnomexService.orderInitObj);
-
-                   this.router.navigateByUrl(url);
-
-
-               }else{
-                   console.log(data.ERROR);
-               }
-            });
-
-
         }
-        console.log(this.objNumber);
     }
 
     /**
@@ -1998,7 +2003,7 @@ export class HeaderComponent implements OnInit{
 
     rebuildFAQMenu() {
         this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
-            this.faqList = response;
+            this.gnomexService.faqList = response;
             this.addQuickLinks();
         });
     }
@@ -2011,7 +2016,7 @@ export class HeaderComponent implements OnInit{
             if (lni.displayName === "Links") {
                 lni.children = [];
                 let lniCtr = 0;
-                for (let item of this.faqList) {
+                for (let item of this.gnomexService.faqList) {
                     let menuItem = this.createLinkMenuItem(item.title, "", "", item.url, "", []);
                     lni.children[lniCtr] = menuItem;
                     lniCtr++;

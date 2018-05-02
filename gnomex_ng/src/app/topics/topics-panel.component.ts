@@ -3,6 +3,7 @@
  */
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {Router} from "@angular/router";
+import {TopicService} from "../services/topic.service";
 
 
 
@@ -18,14 +19,14 @@ import {Router} from "@angular/router";
 })
 export class TopicsPanelComponent implements OnInit, OnDestroy{
 
-    constructor(private router:Router){
+    constructor(private router:Router,
+                private topicService:TopicService){
     }
 
     ngOnInit(){
 
     }
     ngOnDestroy(){
-
     }
     save(){
 
