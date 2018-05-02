@@ -38,7 +38,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
 
 
   // put any instance variables here (usually the DetailObjects used by this command)
-  protected String xmlResult = "<SUCCESS/>";
+  protected String xmlResult = "";
   protected String jsonResult = null;
   protected String errorDetails = "";
 

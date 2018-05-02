@@ -53,4 +53,10 @@ export class ConstantsService {
         "Seq Lib Conc. ng/uL",
         "Seq Lib Prep Status",
     ];
+
+    public readonly DEFAULT_TOOLBAR_SETTINGS:string = "bold italic underline | left center right |  format font size |" +
+        " color | ul ol | outdent indent";
+    public readonly ICON_TOPIC_OWNER:string = "assets/topic_tag_owner.png";
+    public readonly ICON_TOPIC_MEMBER:string = "assets/topic_tag_members.png";
+    public readonly ICON_TOPIC_PUBLIC:string = "assets/topic_tag_public.png";
 }

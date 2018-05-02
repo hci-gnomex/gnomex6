@@ -3,6 +3,7 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Injectable()
 export class GetLabService {
@@ -10,10 +11,55 @@ export class GetLabService {
     constructor(private http: Http) {
     }
 
+    public labMembersSubject: BehaviorSubject<any[]> = new BehaviorSubject([]);
+
     public getLabCall(params: URLSearchParams): Observable<Response> {
         return this.http.get("/gnomex/GetLab.gx", {search: params});
     }
 
+
+    public  sortLabMembersFn = (obj1, obj2) =>{
+        if (!obj1 && !obj2) {
+            return 0;
+        } else if (!obj1) {
+            return 1;
+        } else if (!obj2) {
+            return -1;
+        } else {
+            var display1:String = obj1.displayName;
+            var display2:String = obj2.displayName;
+
+            if (display1.toLowerCase() < display2.toLowerCase()) {
+                return -1;
+            } else if (display1.toLowerCase() > display2.toLowerCase()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    };
+
+
+    getLabMembers_fromBackend(params: URLSearchParams): void {
+
+        this.http.get("/gnomex/GetLab.gx", { search: params}).subscribe((response: Response) => {
+            // console.log("GetRequestList called");
+
+            if (response.status === 200) {
+                let lab: any = response.json().Lab;
+                if(lab){
+                    let members:Array<any> = Array.isArray(lab.members) ? lab.members : [lab.members];
+                    let activeMembers:Array<any> = members.filter(appUser => appUser.isActive === 'Y');
+                    let sortedActiveMembers = activeMembers.sort(this.sortLabMembersFn);
+                    this.labMembersSubject.next(sortedActiveMembers);
+                }
+
+                //return response.json().Request;
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
     getLab(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/GetLab.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {

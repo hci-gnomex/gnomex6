@@ -9,14 +9,21 @@ export class TopicService {
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private _previousURLParams: URLSearchParams = null;
     private topicsListSubject: Subject<any[]> = new Subject();
+    private topicTreeNodeSubject:BehaviorSubject<any>= new BehaviorSubject({});
 
     public topicsList: any[];
 
     constructor(private http: Http) {
     }
 
-    public saveTopic(params: URLSearchParams):  Observable<Response> {
-        return this.http.get("/gnomex/SaveTopic.gx", {search: params});
+    public saveTopic(params: URLSearchParams):  Observable<any> {
+        return this.http.get("/gnomex/SaveTopic.gx", {search: params}).map((response:Response) =>{
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
     }
 
     getTopicList(): Observable<any> {
@@ -92,6 +99,17 @@ export class TopicService {
             }
         });
     }
+
+    emitSelectedTreeNode(data:any):void{
+        this.topicTreeNodeSubject.next(data);
+    }
+    getSelectedTreeNodeObservable(): Observable<any>{
+        return this.topicTreeNodeSubject.asObservable();
+    }
+    resetTopicTreeNodeSubject():void{
+        this.topicTreeNodeSubject =  new BehaviorSubject({});
+    }
+
 
 
 }

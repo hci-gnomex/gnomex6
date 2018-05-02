@@ -12,6 +12,7 @@ export class PropertyService {
     readonly SHOW_FUNDING_AGENCY: string = 'show_funding_agency';
     public static readonly PROPERTY_CONTACT_EMAIL_SOFTWARE_BUGS: string = 'contact_email_software_bugs';
     public static readonly PROPERTY_CONTACT_EMAIL_BIOINFORMATICS: string = 'contact_email_bioinformatics';
+    public static readonly PROPERTY_NO_PUBLIC_VISIBILITY:string = "no_public_visibility";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
@@ -124,6 +125,15 @@ export class PropertyService {
         let headers: Headers = new Headers();
         headers.set("Content-Type", "application/x-www-form-urlencoded");
         return this.http.post("/gnomex/DeleteProperty.gx", params.toString(), {headers: headers});
+    }
+
+    public isPublicVisbility():boolean{
+        let visProp = this.getProperty(PropertyService.PROPERTY_NO_PUBLIC_VISIBILITY);
+         if(visProp){
+            return !(visProp.propertyValue === 'Y');
+         }else{
+             return true;
+         }
     }
 
 }

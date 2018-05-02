@@ -321,6 +321,12 @@ public static boolean areWeLite() {
 		out.close();
 	} else if (thexml != null && !thexml.equals("")) {
 
+		if (thexml.equals("<SUCCESS/>")) {
+			request.setAttribute("statusCode", "SUCCESS");
+			forwardPage(request, response, "/message.jsp");
+			return;
+		}
+
 		if (thexml.length() < 80) {
 			System.out.println("WARNING short xml: -->" + thexml + "<--");
 		}
@@ -369,6 +375,8 @@ public static boolean areWeLite() {
 		if (!commandInstance.isValid()) {
 			String tmpMessage = commandInstance.getInvalidFieldsMessage();
 			request.setAttribute("message", tmpMessage);
+			request.setAttribute("statusCode", "INVALID");
+			forwardJSP = "/message.jsp";
 		}
 
 		if (commandInstance.isRedirect()) {
@@ -391,6 +399,7 @@ private void forwardWithError(HttpServletRequest request, HttpServletResponse re
 	String errMsg = message;
 
 	request.setAttribute("message", errMsg);
+	request.setAttribute("statusCode", "ERROR");
 	this.forwardPage(request, response, "/message.jsp");
 }
 

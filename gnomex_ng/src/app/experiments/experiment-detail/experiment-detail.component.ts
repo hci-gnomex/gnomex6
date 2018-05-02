@@ -81,7 +81,11 @@ export class ExperimentDetail implements OnInit {
         // this data is carried on route look at browse-experiments.component.ts & experiment-resolver.service.ts
         this.route.data.subscribe((data) => {
             this.experiment = data.experiment.Request;
-            this.experimentViewService.setExperiment(this.experiment);
+            if(this.experiment){
+                this.experimentsService.emitExperiment(this.experiment);
+                this.experimentViewService.setExperiment(this.experiment);
+            }
+
         });
     }
 

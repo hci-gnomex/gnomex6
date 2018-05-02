@@ -22,12 +22,12 @@ import {LabResolverService} from "../services/resolvers/lab-resolver.service";
  */
 const ROUTES: Routes = [
     { path: "topics", component: BrowseTopicsComponent, children:[
-            {path:':idLab', component: TopicDetailComponent, outlet: 'topicsPanel', resolve: {topicLab: LabResolverService}},
+            {path:':idLab', component: TopicDetailComponent, outlet: 'topicsPanel', resolve: {topicLab: LabResolverService}, runGuardsAndResolvers: 'always'},
             {path: 'experiment/:id', component: ExperimentDetail, outlet: 'topicsPanel',resolve: {experiment: ExperimentResolverService}},
             {path: 'datatrack/:id', component: NewExperimentComponent , outlet: 'topicsPanel', resolve:{datatrack:DatatrackResolverService}},
-            {path: 'analysis/:id', component: AnalysisDetailComponent, outlet: 'topicsPanel', resolve: {analysis: AnalysisResolverService }},
+            {path: 'analysis/:idAnalysis', component: AnalysisDetailComponent, outlet: 'topicsPanel', resolve: {analysis: AnalysisResolverService }},
         ],
-        canActivate: [SubRouteGuardService], runGuardsAndResolvers: 'paramsChange'
+        canActivate: [SubRouteGuardService]
     }
 
 

@@ -19,6 +19,7 @@ export class ExperimentsService {
 
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
+    private experimentSubject: Subject<any> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
     private projectSubject:Subject<any> = new Subject();
 
@@ -32,6 +33,7 @@ export class ExperimentsService {
     private experimentOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
     private filteredExperimentOverviewListSubject:Subject<any> = new Subject();
     private saveManagerSubject:Subject<any> = new Subject();
+    private navInitBrowsExperimentSubject:BehaviorSubject<boolean>= new BehaviorSubject(false);
 
     // conditional params
     browsePanelParams:URLSearchParams;
@@ -39,6 +41,7 @@ export class ExperimentsService {
 
     public invalid:boolean = false;
     public dirty:boolean = false;
+
 
     constructor(private _http: Http, @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
@@ -78,27 +81,27 @@ export class ExperimentsService {
 	}
 
 
-	getExperiments_fromBackend(parameters: URLSearchParams): void {
-			this.haveLoadedExperimentOrders = true;
-			this.previousURLParams = parameters;
+    getExperiments_fromBackend(parameters: URLSearchParams): void {
+        this.haveLoadedExperimentOrders = true;
+        this.previousURLParams = parameters;
 
-			this._http.get("/gnomex/GetRequestList.gx", {withCredentials: true, search: parameters}).subscribe((response: Response) => {
-				// console.log("GetRequestList called");
+        this._http.get("/gnomex/GetRequestList.gx", {withCredentials: true, search: parameters}).subscribe((response: Response) => {
+            // console.log("GetRequestList called");
 
-				if (response.status === 200) {
-					this.experimentOrders = response.json().Request;
-					this.emitExperimentOrders();
-					//return response.json().Request;
-				} else {
-					throw new Error("Error");
-				}
-			});
-	}
+            if (response.status === 200) {
+                this.experimentOrders = response.json().Request;
+                this.emitExperimentOrders();
+                //return response.json().Request;
+            } else {
+                throw new Error("Error");
+            }
+        });
+    }
 
-	repeatGetExperiments_fromBackend(): void {
-    this.haveLoadedExperimentOrders = false;
-    this.getExperiments_fromBackend(this.previousURLParams);
-  }
+    repeatGetExperiments_fromBackend(): void {
+        this.haveLoadedExperimentOrders = false;
+        this.getExperiments_fromBackend(this.previousURLParams);
+    }
 
 	getChangeExperimentStatusObservable(): Observable<any> {
 		return this.changeStatusSubject.asObservable();
@@ -162,6 +165,13 @@ export class ExperimentsService {
             }
         });
         //  }
+    }
+
+    emitExperiment(exp:any):void{
+        this.experimentSubject.next(exp);
+    }
+    getExperimentObservable():Observable<any>{
+        return this.experimentSubject.asObservable();
     }
 
     getExperiment(id: string): Observable<any> {
@@ -358,6 +368,8 @@ export class ExperimentsService {
     getSaveMangerObservable():Observable<any>{
         return this.saveManagerSubject.asObservable();
     }
+
+
 
 
 
