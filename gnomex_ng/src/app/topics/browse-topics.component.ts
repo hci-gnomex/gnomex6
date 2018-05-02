@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {
-    AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild,
+    AfterViewInit, ChangeDetectorRef, Component,ElementRef, Input, OnDestroy, OnInit, ViewChild,
     ViewEncapsulation
 } from "@angular/core";
 
@@ -19,8 +19,8 @@ import {
 } from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
-import {Router} from "@angular/router";
-import {MatDialogRef, MatDialog, MatAutocomplete, MatOption} from '@angular/material';
+import {NavigationEnd, Router} from "@angular/router";
+import {MatDialogRef, MatDialog, MatAutocomplete,MatOption} from '@angular/material';
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TopicService} from "../services/topic.service";
@@ -211,6 +211,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     private previousAnalysisMatOption: MatOption;
     private previousDatatrackMatOption: MatOption;
     private previousOrganismMatOption: MatOption;
+    private navInitSubsciption:Subscription;
+
 
     timeFrames = [
         'In last week',
@@ -323,7 +325,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
         this.showSpinner = true;
-        this.topicService.refreshTopicsList_fromBackend();
+
 
 
         this.topicListSubscription = this.topicService.getTopicsListObservable().subscribe(response => {
@@ -349,6 +351,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
             });
 
+        });
+
+        this.navInitSubsciption = this.gnomexService.navInitBrowseTopicSubject
+            .subscribe(orderInitObj =>{
+            this.topicService.refreshTopicsList_fromBackend();
         });
 
 
@@ -639,12 +646,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.selectedItem = event.node;
         this.linkDataView = false;
         let name = this.selectedItem.displayField;
-        //console.log(event);
-        if(this.gnomexService.orderInitObj){
-            return;
-        }
+        let topicListNode = _.cloneDeep(this.selectedItem.data);
 
-        //displayField "Data Tracks" "Experiments
+        this.topicService.emitSelectedTreeNode(topicListNode);
 
         if(this.selectedItem.isRoot){
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
@@ -658,8 +662,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 pathPair = "experiment/" + this.selectedItem.data.idRequest;
             }else if(this.selectedItem.data.idDataTrack){
                 pathPair = "datatrack/" + this.selectedItem.data.idDataTrack;
-            }else{
+            }else if(this.selectedItem.data.idTopic){
                 pathPair =  this.selectedItem.data.idLab;
+
             }
             if(pathPair){
 
@@ -668,7 +673,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
             }
         }
-
 
         //this.router.navigate(['/topics',  {outlets:{'topicsPanel':["experiment/43"]}}]);
 
@@ -698,6 +702,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnDestroy(): void {
         this.topicListSubscription.unsubscribe();
+        this.navInitSubsciption.unsubscribe();
     }
 
     chooseFirstExpLabOption() {
@@ -758,7 +763,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 return false;
             });
             if (this.datatrackLab) {
-                this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, "");
+            this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, "");
             } else {
                 this.getDatatracks("", this.organism.idOrganism, "");
             }
@@ -917,7 +922,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             if (this.previousOrganismMatOption) {
                 this.previousOrganismMatOption.setInactiveStyles();
             }
-            this.dtOrgAutocomplete.options.first.setActiveStyles();
+        this.dtOrgAutocomplete.options.first.setActiveStyles();
             this.previousOrganismMatOption = this.dtOrgAutocomplete.options.first;
         }
     }

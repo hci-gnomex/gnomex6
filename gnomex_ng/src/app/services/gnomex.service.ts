@@ -10,6 +10,7 @@ import {ProgressService} from "../home/progress.service";
 import {Observable} from "rxjs/Observable";
 import {HttpClient, HttpParams, HttpResponse} from "@angular/common/http";
 import {LaunchPropertiesService} from "./launch-properites.service";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -65,14 +66,22 @@ export class GnomexService {
     private authSubscription: Subscription;
     private _isLoggedIn: boolean = false;
     private appInitSubject:Subject<boolean> = new Subject();
+    public faqList:any[] = []; // header uses this list is initalized when app is first loaded
     public redirectURL:string;
+    /*used  app navigating to specific order item  */
     public orderInitObj:any;
-
+    public navInitBrowseExperimentSubject:BehaviorSubject<any>= new BehaviorSubject(null);
+    public navInitBrowseAnalysisSubject:BehaviorSubject<any>= new BehaviorSubject(null);
+    public navInitBrowseDatatrackSubject:BehaviorSubject<any>= new BehaviorSubject(null);
+    public navInitBrowseTopicSubject:BehaviorSubject<any>= new BehaviorSubject(null);
 
     public organismList: any[] = [];
     public das2OrganismList: any[] = [];
     public activeOrganismList: any[] = [];
     public coreFacilityList: any[] = [];
+
+
+
 
     constructor(
                 private dictionaryService: DictionaryService,
@@ -81,6 +90,7 @@ export class GnomexService {
                 private labListService: LabListService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private authenticationService:AuthenticationService,
+                private launchPropertiesService: LaunchPropertiesService,
                 //private http:Http
                 private http:HttpClient) {
     }
@@ -630,9 +640,22 @@ export class GnomexService {
                             this.progressService.displayLoader(75);
                             this.onDictionariesLoaded().then((response) => {
                                 this.progressService.displayLoader(90);
-                                this.emitIsAppInitCompelete(true);
-                                this.progressService.displayLoader(100);
-                                this._isLoggedIn = true;
+                                this.launchPropertiesService.getFAQ().first().subscribe((response: any) => {
+                                    if (response != null) {
+                                        if (!this.createSecurityAdvisorService.isArray(response)) {
+                                            this.faqList = [response.FAQ];
+                                        } else {
+                                            this.faqList = response;
+                                        }
+                                    }
+                                    this.emitIsAppInitCompelete(true);
+                                    this.progressService.displayLoader(100);
+                                    this._isLoggedIn = true;
+                                });
+
+
+
+
                                 // TODO will need this in future
                                 // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
                                 //      this.progressService.displayLoader(100);
@@ -687,11 +710,13 @@ export class GnomexService {
         let segList:Array<string> = orderInfo.urlSegList;
         let url:string = '';
 
-        if(segList.length === 4){
-            url ="/"+segList[0]+"/"+orderInfo[segList[1]]+"/("+segList[2] + ":" + orderInfo[segList[3]] + ")";
-        }else{ // topics
-            url = url ="/"+segList[0]+ "/("+segList[1] + ":" + orderInfo[segList[2]] + ")";
+        if(segList.length === 2){
+            url ="/"+segList[0]+ "/"+segList[1];
+        }else{
+            url ="/"+segList[0];
         }
+
+
         return url;
     }
 

@@ -32,6 +32,7 @@ import {MoveTopicComponent} from "./move-topic.component";
 import {DeleteTopicComponent} from "./delete-topic.component";
 import {TopicDetailComponent} from "./topics-detail.component";
 import {TopicsPanelComponent} from "./topics-panel.component"
+import {RichEditorModule} from "../../modules/rich-editor.module";
 
 /**
  * @author jdewell
@@ -64,7 +65,8 @@ import {TopicsPanelComponent} from "./topics-panel.component"
         UtilModule,
         WindowModule,
         ReactiveFormsModule,
-        AngularSplitModule
+        AngularSplitModule,
+        RichEditorModule
     ],
     declarations: [BrowseTopicsComponent, MoveTopicComponent, DeleteTopicComponent , TopicDetailComponent,TopicsPanelComponent
     ],

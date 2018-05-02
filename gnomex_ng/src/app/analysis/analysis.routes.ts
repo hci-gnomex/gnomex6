@@ -27,8 +27,8 @@ const ROUTES: Routes = [
     },
     { path: "analysis/:idLab", component: BrowseAnalysisComponent , children:[
         {path:'overview',component: AnalysisOverviewComponent, outlet: 'analysisPanel', resolve:{analysisGroup:AnalysisGroupResolverService}},
-        {path:':id', component: AnalysisDetailComponent, outlet: 'analysisPanel',resolve: {analysis: AnalysisResolverService }}],
-        canActivate: [SubRouteGuardService], resolve:{analysisGroupList:AnalysisGroupListResolverService}, runGuardsAndResolvers: 'paramsChange'
+        {path:':id', component: AnalysisDetailComponent, outlet: 'analysisPanel',resolve: {analysis: AnalysisResolverService }, runGuardsAndResolvers: 'always'}],
+        canActivate: [SubRouteGuardService], resolve:{analysisGroupList:AnalysisGroupListResolverService},runGuardsAndResolvers: 'always'
     }
 
 
