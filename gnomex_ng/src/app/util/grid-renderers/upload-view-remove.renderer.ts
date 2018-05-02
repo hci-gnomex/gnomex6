@@ -1,6 +1,7 @@
-import {Component} from "@angular/core";
+import {Component, ElementRef, ViewChild} from "@angular/core";
 import {ICellRendererAngularComp} from "ag-grid-angular";
 import {BillingPOFormService} from "../../services/billingPOForm.service";
+import {DialogsService} from "../popup/dialogs.service";
 
 @Component({
     template: `
@@ -9,21 +10,21 @@ import {BillingPOFormService} from "../../services/billingPOForm.service";
                 <div class="tr">
                     <div class="td vertical-center button-container">
                         <input type="file" class="hidden" (change)="selectFile($event)" #fileInput>
-                        <button class="link-button" (click)="fileInput.click()">
+                        <button class="link-button" (click)="onClickUpload()">
                             <img src="../../../assets/upload.png" alt=""/>
                             <div class="name inline-block">
                                 Upload
                             </div>
                         </button>
                         <button *ngIf="hasPoForm" class="link-button"
-                                (click)="invokeParentOnClickView()">
+                                (click)="onClickView()">
                             <img src="../../../assets/page_find.gif" alt=""/>
                             <div class="name inline-block">
                                 View
                             </div>
                         </button>
                         <button *ngIf="hasPoForm" class="link-button"
-                                (click)="invokeParentOnClickRemove()">
+                                (click)="onClickRemove()">
                             <img src="../../../assets/page_cross.gif" alt=""/>
                             <div class="name inline-block">
                                 Remove
@@ -76,24 +77,18 @@ import {BillingPOFormService} from "../../services/billingPOForm.service";
 export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
     public params: any;
     public hasPoForm: boolean;
-    private onClickUpload;
-    private onClickView;
-    private onClickRemove;
     public file: any;
 
-    constructor(private poFormService :BillingPOFormService) {}
+    @ViewChild('fileInput') fileInput: ElementRef;
+
+    constructor(private poFormService: BillingPOFormService,
+                private dialogService: DialogsService) {}
 
     agInit(params: any): void {
         this.params = params;
         this.hasPoForm = false;
 
         this.checkIfHasPoForm();
-
-        if (this.params && this.params.colDef) {
-            this.onClickUpload = this.params.colDef.onClickUpload;
-            this.onClickView = this.params.colDef.onClickView;
-            this.onClickRemove = this.params.colDef.onClickRemove;
-        }
     }
 
     refresh(params: any): boolean {
@@ -101,11 +96,29 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
     }
 
     checkIfHasPoForm(): void {
-        if (this.params && this.params.data && this.params.data.isActive && this.params.data.isActive.toLowerCase() == 'y') {
+        if (this.params && this.params.data
+            && this.params.data.purchaseOrderForm && this.params.data.purchaseOrderForm !== ''
+            && this.params.data.orderFormFileType && this.params.data.orderFormFileType !== ''
+            && this.params.data.orderFormFileSize && this.params.data.orderFormFileSize !== '') {
             this.hasPoForm = true;
         } else {
             this.hasPoForm = false;
         }
+    }
+
+    public onClickUpload(): void {
+        if (this.hasPoForm) {
+            let message: string = "By uploading a new purchase form you will overwrite the existing purchase form.\n\n" +
+                "Continue anyway?";
+            this.dialogService.yesNoDialog(message, this, 'triggerFileSelector');
+        } else {
+            this.triggerFileSelector();
+        }
+    }
+
+    private triggerFileSelector() {
+        this.fileInput.nativeElement.value = null;
+        this.fileInput.nativeElement.click();
     }
 
     selectFile(event: any) {
@@ -113,38 +126,43 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
             this.file = event.target.files[0];
             console.log("Selected a file! " + this.file.name);
 
-            // currently VERY bad - appears to break an account forever, actually.
             let formData: FormData = new FormData();
             formData.append("Filename", this.file.name);
             formData.append("format", this.file.type == "text/html" ? "html" : "text");
-            // formData.append("subject", this.file.value);
-            // formData.append("coreFacilityIds", this.file.value);
+            formData.append("idBillingAccount", this.params.data.idBillingAccount);
             formData.append("Filedata", this.file, this.file.name);
-            // formData.append("Upload", "Submit Query");
-            // formData.append("fromAddress", this.file.value);
 
-            this.poFormService.uploadNewForm(formData);
+            this.poFormService.uploadNewForm(formData).subscribe((uploadWasSuccessful) => {
+                if (uploadWasSuccessful) {
+                    this.dialogService.alert("File uploaded successfully");
+                } else {
+                    this.dialogService.alert("File failed to upload.");
+                }
+
+                this.hasPoForm = this.hasPoForm || uploadWasSuccessful;
+            });
         }
     }
 
-    invokeParentOnClickUpload(): void {
-        if (this.onClickUpload && this.params && this.params.context && this.params.context.componentParent) {
-            //this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
-            this.onClickUpload(this.params.node.rowIndex);
-        }
+    public onClickView():void {
+        let billingAccount:number = this.params.data.idBillingAccount;
+        let url:string = 'GetPurchaseOrderForm.gx?idBillingAccount=' + billingAccount;
+        window.open(url, '_blank');
     }
 
-    invokeParentOnClickView(): void {
-        if (this.onClickView && this.params && this.params.context && this.params.context.componentParent) {
-            //this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
-            this.onClickView(this.params.node.rowIndex);
-        }
-    }
+    public onClickRemove():void {
+        // if (dirty.isDirty()) {
+        //     Alert.show("Please save existing changes before attempting to upload/remove a purchase order form.");
+        //     return;
+        // }
+        if (this.poFormService && this.params && this.params.data) {
+            this.poFormService.deletePoFormFromBillingAccount(this.params.data.idBillingAccount).subscribe((deleteWasSuccessful) => {
+                this.hasPoForm = !deleteWasSuccessful;
 
-    invokeParentOnClickRemove(): void {
-        if (this.onClickRemove && this.params && this.params.context && this.params.context.componentParent) {
-            //this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
-            this.onClickRemove(this.params.node.rowIndex);
+                if (deleteWasSuccessful) {
+                    this.dialogService.alert("File successfully removed");
+                }
+            });
         }
     }
 }

@@ -2,33 +2,71 @@ import {Injectable} from "@angular/core";
 import {Http, Headers, Response, URLSearchParams} from "@angular/http";
 
 import { Observable } from "rxjs/observable";
+import { Subject } from "rxjs/Subject";
+
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class BillingPOFormService {
 
     private static readonly getPOUploadURL_URL: string = "/gnomex/UploadPurchaseOrderURL.gx";
+    private static readonly deletePoForm_URL: string = "DeletePurchaseForm.gx";
 
     private poUpload_URL: string = null;
+    private uploadSucceededSubject: Subject<boolean>;
+    private deleteSucceededSubject: Subject<boolean>;
 
-    constructor(private http: Http) { }
+    constructor(private http: Http, private cookieUtilService: CookieUtilService) { }
 
-    public getPOUploadURL(): string {
+    public uploadNewForm(params: any): Observable<boolean> {
+
+        this.cookieUtilService.formatXSRFCookie();
+
         if (this.poUpload_URL != null) {
-            return this.poUpload_URL;
+            console.log("Uploaded a file using " + this.poUpload_URL+ "!");
+            this.http.post(this.poUpload_URL, params).subscribe((response) => {
+                if (response.status === 200) {
+                    this.uploadSucceededSubject.next(true);
+                    console.log("Form Added!");
+                } else {
+                    this.uploadSucceededSubject.next(false);
+                    console.log("Form not Added!");
+                }
+            });
+        } else {
+            this.http.get(BillingPOFormService.getPOUploadURL_URL, {}).subscribe((response) => {
+                if (response && response.status === 200) {
+                    this.poUpload_URL = response.json().url;
+                    console.log("Uploaded a file using " + this.poUpload_URL+ "!");
+                    this.http.post(this.poUpload_URL, params).subscribe((response) => {
+                        if (response.status === 200) {
+                            this.uploadSucceededSubject.next(true);
+                            console.log("Form Added!");
+                        } else {
+                            this.uploadSucceededSubject.next(false);
+                            console.log("Form not Added!");
+                        }
+                    });
+                }
+            });
         }
 
-        this.http.post(BillingPOFormService.getPOUploadURL_URL, {}).subscribe((response) => {
-            if (response && response.status === 200
-                // && response.name === "UploadPurchaseOrderURL"
-            ) {
-                this.poUpload_URL = response.url;
-            }
-        });
+        this.uploadSucceededSubject = new Subject();
+        return this.uploadSucceededSubject.asObservable();
     }
 
-    public uploadNewForm(params: any): Observable<Response> {
-        console.log("Uploaded a file using " + this.poUpload_URL+ "!");
+    public deletePoFormFromBillingAccount(idBillingAccount: string): Observable<boolean> {
+        let params: URLSearchParams = new URLSearchParams();
+        params.set("idBillingAccount", '' + idBillingAccount);
+        this.http.get(BillingPOFormService.deletePoForm_URL, {search: params}).subscribe((response) => {
+            if (response.status === 200) {
+                this.deleteSucceededSubject.next(true);
+            } else {
+                this.deleteSucceededSubject.next(false);
+            }
+        });
 
-        return this.http.post(this.getPOUploadURL(), params);
+        this.deleteSucceededSubject = new Subject();
+        return this.deleteSucceededSubject.asObservable();
     }
 }

@@ -444,9 +444,6 @@ export class BillingAccountTabComponent implements OnInit{
 			headerName: "Purchase Order Form",
 			editable:  false,
 			cellRendererFramework: UploadViewRemoveRenderer,
-			onClickUpload: this.onPoUploadClicked,
-			onClickView: this.onPoViewClicked,
-			onClickRemove: this.onPoRemoveClicked,
 			width: 200,
 			field: "purchaseOrderForm"
 		});
@@ -826,19 +823,6 @@ export class BillingAccountTabComponent implements OnInit{
 				}
 			});
 		}
-	}
-
-
-	onPoUploadClicked(rowIndex: string)	{
-		console.log("Should open uploader for po and index: " + rowIndex);
-	}
-
-	onPoViewClicked(rowIndex: string)	{
-		console.log("Should view po and index: " + rowIndex);
-	}
-
-	onPoRemoveClicked(rowIndex: string)	{
-		console.log("Should remove po and index: " + rowIndex);
 	}
 
 	removeChartfieldRow(rowIndex: string) {
