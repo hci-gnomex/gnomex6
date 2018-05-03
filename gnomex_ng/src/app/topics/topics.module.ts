@@ -34,6 +34,7 @@ import {TopicDetailComponent} from "./topics-detail.component";
 import {TopicsPanelComponent} from "./topics-panel.component"
 import {RichEditorModule} from "../../modules/rich-editor.module";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
+import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 
 /**
  * @author jdewell
@@ -75,10 +76,11 @@ import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
                     DeleteTopicComponent ,
                     TopicDetailComponent,
                     TopicsPanelComponent,
-                    BasicEmailDialogComponent
+                    BasicEmailDialogComponent,
+                    ShareLinkDialogComponent
 
     ],
-    entryComponents: [MoveTopicComponent, DeleteTopicComponent,BasicEmailDialogComponent],
+    entryComponents: [MoveTopicComponent, DeleteTopicComponent,BasicEmailDialogComponent,ShareLinkDialogComponent],
     exports: [MoveTopicComponent, DeleteTopicComponent]
 })
 export class TopicsModule {

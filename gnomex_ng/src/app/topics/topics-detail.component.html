@@ -3,6 +3,9 @@
         <div style="margin:1em" >
             <img [src]="this.topicNode?.icon">Topic {{"T"+this.topicNode?.idTopic+" - "}} {{this.topicNode?.name}}
         </div>
+        <button mat-button color="primary" (click)="onShareLinkClick()" style="margin:1em" >
+            <img [src]="this.constService.GLOBE_LINK"> Share web link
+        </button>
         <button mat-button color="primary" (click)="onEmailClick()" style="margin:1em" >
             <img [src]="this.constService.EMAIL_GO_LINK"> Email topic owner
         </button>
