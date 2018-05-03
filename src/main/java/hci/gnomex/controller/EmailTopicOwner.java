@@ -72,7 +72,7 @@ public class EmailTopicOwner extends GNomExCommand implements Serializable {
       		    serverName 	);
         helper.setRecipientAppUser(recipient);
         MailUtil.validateAndSendEmail(helper);
-
+        this.xmlResult = "<SUCCESS/>";
         this.setResponsePage(SUCCESS_JSP);
       }
       else{
