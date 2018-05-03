@@ -16,6 +16,7 @@ import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {jqxEditorComponent} from "../../assets/jqwidgets-ts/angular_jqxeditor";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
+import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 
 @Component({
     templateUrl: './topics-detail.component.html',
@@ -54,6 +55,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
     private description:string = '';
     private visOpt:string;
     public showSpinner:boolean = false;
+    private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
     private emailImportDialogRef: MatDialogRef<BasicEmailDialogComponent>;
 
 
@@ -242,6 +244,18 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
         })
     }
 
+
+    onShareLinkClick():void{
+        this.shareWebLinkDialogRef = this.dialog.open(ShareLinkDialogComponent, {
+            width: '35em',
+            data: {
+                name: this.topicNode.name,
+                number: this.topicNode.idTopic,
+                type: "topicNumber"
+
+            }
+        });
+    }
     onEmailClick():void{
 
         let idAppUser = this.topicForm.get("selectOwner").value;
