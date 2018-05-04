@@ -4,6 +4,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {ServicesModule} from "../../services/services.module";
+import {UtilModule} from "../../util/util.module";
 
 import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
 import {EditBillingAccountErrorDialogComponent} from "./dialogs/edit-billing-account-error-dialog.component";
@@ -16,7 +17,8 @@ import {EditBillingAccountLauncher, EditBillingAccountComponent} from "./edit-bi
 		CommonModule,
 		FormsModule,
 		ReactiveFormsModule,
-		ServicesModule
+		ServicesModule,
+        UtilModule
 	],
 	declarations: [
 		EditBillingAccountComponent,

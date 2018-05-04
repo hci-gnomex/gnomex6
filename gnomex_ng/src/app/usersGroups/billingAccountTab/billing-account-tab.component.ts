@@ -655,24 +655,27 @@ export class BillingAccountTabComponent implements OnInit{
 	}
 
 
-	openChartfieldEditor(rowIndex: string) {
+	openChartfieldEditor(rowData: any) {
 		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+        dialogRef.componentInstance.rowData = rowData;
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");
 		});
 	}
 
-	openPoEditor(rowIndex: string) {
+	openPoEditor(rowData: any) {
 		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+		dialogRef.componentInstance.rowData = rowData;
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");
 		});
 	}
 
-	openCreditCardEditor(rowIndex: string) {
+	openCreditCardEditor(rowData: any) {
 		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+        dialogRef.componentInstance.rowData = rowData;
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");

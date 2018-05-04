@@ -1,6 +1,6 @@
 <div mat-dialog-title style="background-color: #84b278; color: white; display: inline-block; width: 100%;">
 	<img src="../../../assets/work_auth_form.png" alt="Image not found" style="margin-right:0.2em;"/>
-	<h5 style="display: inline-block;">Submit Campus Billing Account</h5>
+	<h5 style="display: inline-block;">Edit Billing Account</h5>
 </div>
 <div mat-dialog-content style="background-color: #eeeeeb; overflow: auto; font-size: small;">
 	<div class="full-width background-sideless">
@@ -12,7 +12,7 @@
 					</div>
 					<div class="td">
 						<mat-form-field style="width: 100%; font-size: small;">
-							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" (change)="onLabListSelection($event)" required>
+							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" disabled>
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let lab of labList" [value]="lab">
 									{{ lab.name }}
@@ -40,7 +40,9 @@
 									multiple
 									required>
 								<mat-option *ngFor="let coreFacility of coreFacilityReducedList" [value]="coreFacility">
-									{{ coreFacility.display }}
+									{{ coreFacility.display
+									+ (!!coreFacility.contactName      ? ' (' + coreFacility.contactName + ')' : '')
+									+ (!!coreFacility.shortDescription ? ' - ' + coreFacility.shortDescription : '') }}
 								</mat-option>
 							</mat-select>
 						</mat-form-field>
@@ -434,17 +436,24 @@
 					</div>
 					<div class="td">
 						<div style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="startDate_chartfield"
-										[matDatepicker]="startDatePicker_chartfield"
-										placeholder="Choose a date"
-										required="{{ requireStartDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="startDatePicker_chartfield"></mat-datepicker-toggle>
-								<mat-datepicker #startDatePicker_chartfield disabled="false"></mat-datepicker>
-							</mat-form-field>
+							<date-picker
+									[value]="startDate_chartfield"
+									[defaultToToday]="true"
+									[textInputDisabled]="false"
+									[placeholder]="'Choose a date'"
+									[required]="requireStartDate">
+							</date-picker>
+							<!--<mat-form-field>-->
+								<!--<input-->
+										<!--matInput-->
+										<!--[(ngModel)]="startDate_chartfield"-->
+										<!--[matDatepicker]="startDatePicker_chartfield"-->
+										<!--placeholder="Choose a date"-->
+										<!--required="{{ requireStartDate }}"-->
+										<!--disabled>-->
+								<!--<mat-datepicker-toggle matSuffix [for]="startDatePicker_chartfield"></mat-datepicker-toggle>-->
+								<!--<mat-datepicker #startDatePicker_chartfield disabled="false"></mat-datepicker>-->
+							<!--</mat-form-field>-->
 						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>

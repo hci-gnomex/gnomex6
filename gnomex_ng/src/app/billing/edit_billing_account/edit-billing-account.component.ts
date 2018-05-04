@@ -200,7 +200,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 	accountNumberAU_Chartfield: string = '1';
 
-	startDate_chartfield = new Date();
+    startDate_chartfield: string = '';
+	// startDate_chartfield = new Date();
 	startDate_po = new Date();
 	startDate_creditcard = new Date();
 
@@ -284,6 +285,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 	isActivity: boolean = false;
 	disableCoreFacilitiesSelector = true;
 
+	private _rowData: any;
+
 	internalAccountFieldsConfiguration: any = [
 		{
 			displayName : 'customField1 default name',
@@ -355,28 +358,28 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		this.selectedLab = null;
 		this.selectedCoreFacilities = [];
 
-		this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
-			this.labList = response;
-		});
+		// this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
+		// 	this.labList = response;
+		// });
 
-		this.submitterEmail_chartfield = this.createSecurityAdvisorService.userEmail;
-		this.submitterEmail_po         = this.createSecurityAdvisorService.userEmail;
-		this.submitterEmail_creditcard = this.createSecurityAdvisorService.userEmail;
+		// this.submitterEmail_chartfield = this.createSecurityAdvisorService.userEmail;
+		// this.submitterEmail_po         = this.createSecurityAdvisorService.userEmail;
+		// this.submitterEmail_creditcard = this.createSecurityAdvisorService.userEmail;
 
 		this.submitterEmailFormControl_chartfield.reset();
 		this.submitterEmailFormControl_po.reset();
 		this.submitterEmailFormControl_creditcard.reset();
 
-		let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
-		this.fundingAgencies = [];
-
-		if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
-			for (let i = 0; i < originalFundingAgencies.length; i++) {
-				if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
-					this.fundingAgencies.push(originalFundingAgencies[i]);
-				}
-			}
-		}
+		// let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
+		// this.fundingAgencies = [];
+        //
+		// if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
+		// 	for (let i = 0; i < originalFundingAgencies.length; i++) {
+		// 		if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
+		// 			this.fundingAgencies.push(originalFundingAgencies[i]);
+		// 		}
+		// 	}
+		// }
 
 		let originalCreditCardCompanies = this.dictionaryService.getEntries('hci.gnomex.model.CreditCardCompany');
 		originalCreditCardCompanies.sort((a, b) => { return a.sortOrder - b.sortOrder; });
@@ -635,7 +638,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			parameters.set('custom2', custom2);
 			parameters.set('custom3', custom3);
 			parameters.set('submitterEmail', this.submitterEmail_chartfield);
-			parameters.set('startDate', this.startDate_chartfield.toLocaleDateString());
+			// parameters.set('startDate', this.startDate_chartfield.toLocaleDateString());
 			parameters.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''));
 			parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield);
 			parameters.set('activeAccount', activeAccount);
@@ -773,7 +776,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		if ((!(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''))
+        if ((!(this.startDate_chartfield && this.startDate_chartfield != ''))
+		// if ((!(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''))
 						&& (this.usesCustomChartfields !== 'Y' || this.includeInCustomField_startDate)) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
@@ -1123,11 +1127,11 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		return !errorFound;
 	}
 
-	private onLabListSelection(event: any): void {
+	private onLabLoad(lab: any): void {
 		let coreFacilityApplicable: any[] = [];
 
-		if (event && event.value && event.value.coreFacilities) {
-			let coreFacilities = event.value.coreFacilities;
+		if (lab && lab.coreFacilities) {
+			let coreFacilities = lab.coreFacilities;
 
 			if (coreFacilities != undefined && coreFacilities != null) {
 				if (coreFacilities[0] != undefined && coreFacilities[0] != null) {
@@ -1146,6 +1150,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 							coreFacilityApplicable.push(coreFacilities.CoreFacility);
 						}
 					}
+
 				}
 			}
 		}
@@ -1235,4 +1240,127 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	set rowData(rowData: any) {
+		this._rowData = rowData;
+		this.applyRowData();
+	}
+
+	get rowData(): any {
+		return this._rowData;
+	}
+
+	private applyRowData(): void {
+        if (this._rowData) {
+            if (this._rowData && this._rowData.isPO === 'Y') {
+                this.loadPOAccount();
+            } else if (this._rowData && this._rowData.isCreditCard === 'Y') {
+                this.loadCreditCardAccount();
+            } else {
+                this.loadChartfieldAccount();
+            }
+        }
+	}
+
+    private loadChartfieldAccount(): void {
+        this.showField = this.CHARTFIELD;
+
+        if (!this._rowData) {
+        	return;
+		}
+
+
+        // parameters.set('idLab', idLab);
+        // parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
+        // parameters.set('accountName', this.accountName_Chartfield);
+        // parameters.set('shortAcct', this.shortAccountName_Chartfield);
+        // parameters.set('accountNumberBus', this.accountNumberBus_Chartfield);
+        // parameters.set('accountNumberOrg', this.accountNumberOrg_Chartfield);
+        // parameters.set('accountNumberFund', this.accountNumberFund_Chartfield);
+        // parameters.set('accountNumberActivity', this.accountNumberActivity_Chartfield);
+        // parameters.set('accountNumberProject', accountNumberProject);
+        // parameters.set('accountNumberAccount', accountNumberAccount);
+        // parameters.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''));
+        // parameters.set('idFundingAgency', idFundingAgency);
+        // parameters.set('custom1', custom1);
+        // parameters.set('custom2', custom2);
+        // parameters.set('custom3', custom3);
+        // parameters.set('submitterEmail', this.submitterEmail_chartfield);
+        // parameters.set('startDate', this.startDate_chartfield.toLocaleDateString());
+        // parameters.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''));
+        // parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield);
+        // parameters.set('activeAccount', activeAccount);
+        // parameters.set('isPO', isPO);
+
+        // Set the selected lab!
+        this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
+            this.labList = response;
+
+            this.selectedLab = null;
+
+            for (let lab of this.labList) {
+                if (lab.idLab === this._rowData.idLab) {
+                    this.selectedLab = lab;
+                    this.onLabLoad(lab);
+                    break;
+                }
+            }
+
+            // This timeout is important to the sorting of the Core Facility list, for some reason.
+            setTimeout(() => {
+                if (!!this.selectedLab) {
+                    for (let coreFacility of this.coreFacilityReducedList) {
+                        if (coreFacility.idCoreFacility === this._rowData.idCoreFacility) {
+                            this.selectedCoreFacilities = [coreFacility];
+                            break;
+                        }
+                    }
+                }
+			});
+        });
+
+        let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
+        this.fundingAgencies = [];
+
+        if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
+            for (let i = 0; i < originalFundingAgencies.length; i++) {
+                if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
+                    this.fundingAgencies.push(originalFundingAgencies[i]);
+                }
+            }
+        }
+
+        this.accountName_Chartfield           = this._rowData.accountName;
+        this.shortAccountName_Chartfield      = this._rowData.shortAcct;
+
+        this.accountNumberBus_Chartfield      = this._rowData.accountNumberBus;
+        this.accountNumberOrg_Chartfield      = this._rowData.accountNumberOrg;
+        this.accountNumberFund_Chartfield     = this._rowData.accountNumberFund;
+        this.accountNumberActivity_Chartfield = this._rowData.accountNumberActivity;
+        this.accountNumberProject_Chartfield  = this._rowData.accountNumberProject;
+        this.accountNumberAccount_Chartfield  = this._rowData.accountNumberAccount;
+        this.accountNumberAU_Chartfield       = this._rowData.accountNumberAu;
+
+        this.selectedFundingAgency_chartfield = this._rowData.idFundingAgency;
+
+
+        // this.custom
+
+
+		this.submitterEmail_chartfield = this._rowData.submitterEmail;
+        this.submitterEmailFormControl_chartfield.reset();
+
+        this.startDate_chartfield = this._rowData.startDate;
+        this.effectiveUntilDate_chartfield = this._rowData.expirationDate;
+
+        this.totalDollarAmount_Chartfield = this._rowData.totalDollarAmount;
+        this.activeCheckBox_chartfield = this._rowData.activeAccount === 'Y';
+    }
+
+    private loadPOAccount(): void {
+        this.showField = this.PO;
+    }
+
+    private loadCreditCardAccount(): void {
+        this.showField = this.CREDIT_CARD;
+    }
 }

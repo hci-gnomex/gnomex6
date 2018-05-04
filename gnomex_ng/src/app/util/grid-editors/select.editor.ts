@@ -80,10 +80,12 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 			// The problem was that this.value isn't updated with the new value before this event fires,
 			// so we need to update it manually here.
 			this.value = event.currentTarget.value;
+            this.params.node.setDataValue(this.gridValueField, this.value);
 		}
 		if (this.params) {
 
-			//  If the fill button, which is part of the editor, is activated, don't stop editing immediately after making a selection.
+			//  If the fill button, which is part of the editor, is activated, don't stop editing
+			// immediately after making a selection.
 			if (!this.showFillButton) {
 				this.params.stopEditing();
 			}
@@ -106,17 +108,13 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 		}
 
 		if (this.params && this.params.column && this.params.column.gridApi && this.params.node && this.fillGroupAttribute && this.fillGroupAttribute !== '') {
-            // if (this.params.column.gridApi.getRenderedNodes() && Array.isArray(this.params.column.gridApi.getRenderedNodes())) {
-            // 	console.log("  Number of nodes : " + this.params.column.gridApi.getRenderedNodes().length);
-            // }
-
 			let temp = this.params.column.gridApi.getRenderedNodes();
 			let thisRowNode = this.params.node;
 
 			for (let node of temp) {
 				if (node && node.data && thisRowNode && thisRowNode.data
 					&& node.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
-					node.data[this.gridValueField] = this.value;
+					node.setDataValue(this.gridValueField, this.value);
 				}
 			}
 
