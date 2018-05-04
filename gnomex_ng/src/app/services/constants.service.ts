@@ -59,4 +59,9 @@ export class ConstantsService {
     public readonly ICON_TOPIC_OWNER:string = "assets/topic_tag_owner.png";
     public readonly ICON_TOPIC_MEMBER:string = "assets/topic_tag_members.png";
     public readonly ICON_TOPIC_PUBLIC:string = "assets/topic_tag_public.png";
+    public readonly GLOBE_LINK:string ="assets/globe_link.png";
+    public readonly EMAIL_GO_LINK:string="assets/email_go.png";
+
+
+
 }

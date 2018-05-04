@@ -33,6 +33,8 @@ import {DeleteTopicComponent} from "./delete-topic.component";
 import {TopicDetailComponent} from "./topics-detail.component";
 import {TopicsPanelComponent} from "./topics-panel.component"
 import {RichEditorModule} from "../../modules/rich-editor.module";
+import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
+import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 
 /**
  * @author jdewell
@@ -68,9 +70,17 @@ import {RichEditorModule} from "../../modules/rich-editor.module";
         AngularSplitModule,
         RichEditorModule
     ],
-    declarations: [BrowseTopicsComponent, MoveTopicComponent, DeleteTopicComponent , TopicDetailComponent,TopicsPanelComponent
+    declarations: [
+                    BrowseTopicsComponent,
+                    MoveTopicComponent,
+                    DeleteTopicComponent ,
+                    TopicDetailComponent,
+                    TopicsPanelComponent,
+                    BasicEmailDialogComponent,
+                    ShareLinkDialogComponent
+
     ],
-    entryComponents: [MoveTopicComponent, DeleteTopicComponent],
+    entryComponents: [MoveTopicComponent, DeleteTopicComponent,BasicEmailDialogComponent,ShareLinkDialogComponent],
     exports: [MoveTopicComponent, DeleteTopicComponent]
 })
 export class TopicsModule {

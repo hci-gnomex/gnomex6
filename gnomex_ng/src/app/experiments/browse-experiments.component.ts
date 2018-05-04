@@ -286,12 +286,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.experimentsService.emitExperimentOverviewList(response);
             if(this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]){
 
-                /*let navArray :any[] = ['/experiments',{outlets:{'browsePanel':'overview'}}];
-                if(this.navProjectReqList){
-                   navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idProject"));
-                }
-
-                this.router.navigate(navArray);*/
                 let navArray :any[] = ['/experiments'];
                 this.experimentsService.browsePanelParams["refreshParams"] = false;
                 this.router.navigate(navArray);
@@ -619,9 +613,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         let idLab = this.selectedItem.data.idLab;
         let idProject = this.selectedItem.data.idProject;
         let idRequest = this.selectedItem.data.idRequest;
-        /*if(this.gnomexService.orderInitObj){
-            return;
-        }*/
 
         let projectRequestListNode:Array<any> = _.cloneDeep(this.selectedItem.data);
         this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
@@ -636,8 +627,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableDeleteExperiment = true;
 
              navArray = ['/experiments',{outlets:{'browsePanel':'overview'}}];
-            //this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
-
 
             //Project
         } else if (this.selectedItem.level === 2) {
@@ -646,7 +635,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableDeleteExperiment = true;
 
             navArray = ['/experiments' , {outlets:{'browsePanel':['overview',{'idLab':idLab,'idProject':idProject}]}}];
-            //this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
 
             //Experiment
         } else {
@@ -664,9 +652,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         }
 
-        /*if(this.navProjectReqList){
-            navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idProject"));
-        }*/
         this.router.navigate(navArray);
 
     }

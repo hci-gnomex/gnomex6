@@ -8,13 +8,15 @@ import {Subscription} from "rxjs/Subscription";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {MatAutocomplete} from "@angular/material";
+import {MatAutocomplete, MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
 import {URLSearchParams} from "@angular/http";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {jqxEditorComponent} from "../../assets/jqwidgets-ts/angular_jqxeditor";
+import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
+import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 
 @Component({
     templateUrl: './topics-detail.component.html',
@@ -47,12 +49,15 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
     private topicNode:any;
     private topicForm: FormGroup;
     private currentIdLab:string;
-    private currentIdAppUser:string;
+    public currentIdAppUser:string;
     private toolBarSettings:string = "bold italic underline | left center right |  format font size | color | ul ol | outdent indent";
     private edit:boolean = false;
     private description:string = '';
     private visOpt:string;
     public showSpinner:boolean = false;
+    private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
+    private emailImportDialogRef: MatDialogRef<BasicEmailDialogComponent>;
+
 
     @ViewChild("autoLab") matAutoLab: MatAutocomplete;
     @ViewChild('editorReference') myEditor: jqxEditorComponent;
@@ -64,10 +69,13 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
                 public topicService:TopicService,
                 private fb: FormBuilder,
                 private gnomexService:GnomexService,
-                private constService:ConstantsService,
+                public constService:ConstantsService,
                 public getLabService:GetLabService,
                 private propertyService:PropertyService,
-                private dialogService: DialogsService) {
+                private dialogService: DialogsService,
+                private dialog: MatDialog,
+                private snackBar: MatSnackBar
+            ) {
     }
 
     ngOnInit(){
@@ -102,10 +110,9 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
         this.route.data.forEach(data =>{
             this.topicLab = data.topicLab.Lab;
             this.currentIdLab = this.topicLab.idLab ? this.topicLab.idLab : "";
-            console.log("The topic lab: ", this.topicLab);
+
             if(this.topicNode.name){
                 this.visOpt = this.topicNode.codeVisibility;
-                console.log("the select topic node ", this.topicNode);
                 this.currentIdAppUser = this.topicNode.idAppUser ? this.topicNode.idAppUser : '';
 
                 let memList: Array<any> = Array.isArray(this.topicLab.members) ? this.topicLab.members : [this.topicLab.members.AppUser];
@@ -235,6 +242,63 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
 
 
         })
+    }
+
+
+    onShareLinkClick():void{
+        this.shareWebLinkDialogRef = this.dialog.open(ShareLinkDialogComponent, {
+            width: '35em',
+            data: {
+                name: this.topicNode.name,
+                number: this.topicNode.idTopic,
+                type: "topicNumber"
+
+            }
+        });
+    }
+    onEmailClick():void{
+
+        let idAppUser = this.topicForm.get("selectOwner").value;
+        if(!idAppUser){
+            this.dialogService.confirm("There is no owner selected for this topic. " +
+                " Please select an owner in the dropdown and save before" +
+                " trying to communicate through email.", null);
+            return
+        }
+
+        let saveFn = (data:any) =>{
+
+            data.format =  "text";
+            data.idAppUser = idAppUser;
+
+
+            let params:HttpParams = new HttpParams()
+                .set("body",data.body)
+                .set("format",data.format)
+                .set("fromAddress", data.fromAddress)
+                .set("idAppUser", data.idAppUser)
+                .set("subject", data.subject);
+
+
+
+            this.topicService.emailTopicOwner(params).first().subscribe(resp =>{
+                let email =<BasicEmailDialogComponent>this.emailImportDialogRef.componentInstance;
+                email.showSpinner =false;
+
+                let snackBarRef = this.snackBar.open("Email was sent", "Email Topic", {
+                    duration: 2000
+                });
+
+            });
+        };
+
+
+        this.emailImportDialogRef = this.dialog.open(BasicEmailDialogComponent, {
+            width: '40em',
+            data: {
+                saveFn: saveFn
+            }
+        });
     }
 
 
