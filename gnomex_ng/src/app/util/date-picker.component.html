@@ -4,7 +4,8 @@
            [matDatepicker]="datePicker"
            placeholder="{{ placeholder }}"
            required="{{ required }}"
+           (change)="onChange()"
            [disabled]="textInputDisabled">
     <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
-    <mat-datepicker #datePicker [disabled]="datePickerDisabled"></mat-datepicker>
+    <mat-datepicker #datePicker (selectedChanged)="onChange()" [disabled]="datePickerDisabled"></mat-datepicker>
 </mat-form-field>

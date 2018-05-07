@@ -246,8 +246,6 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 	activeCheckBox_po: boolean = false;
 	activeCheckBox_creditcard: boolean = false;
 
-	agreementCheckbox: boolean = false;
-
 	labList: any[] = [];
 	coreFacilityReducedList: any[] = [];
 
@@ -713,8 +711,6 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		// console.log("submitterEmailFormControl_chartfield          invalid : " + this.submitterEmailFormControl_chartfield.invalid);
 		//
 		// console.log("activeCheckBox_chartfield                     invalid : " + (false && this.activeCheckBox_chartfield));
-		//
-		// console.log("agreementCheckbox                             invalid : " + !this.agreementCheckbox.valueOf());
 
 		if (!(this.selectedLab != undefined && this.selectedLab != null && this.selectedLab !== '')) {
 			errorFound = errorFound || true;
@@ -797,11 +793,6 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		if (this.submitterEmailFormControl_chartfield.invalid) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please enter an email address you can be reached at\n';
-		}
-
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
 		}
 
 		return !errorFound;
@@ -949,11 +940,6 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		if (this.submitterEmailFormControl_po.invalid) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please enter an email address you can be reached at\n';
-		}
-
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
 		}
 
 		return !errorFound;
@@ -1119,11 +1105,6 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			this.errorMessage += '- Please enter an email address you can be reached at\n';
 		}
 
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
-		}
-
 		return !errorFound;
 	}
 
@@ -1268,29 +1249,6 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
         	return;
 		}
 
-
-        // parameters.set('idLab', idLab);
-        // parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-        // parameters.set('accountName', this.accountName_Chartfield);
-        // parameters.set('shortAcct', this.shortAccountName_Chartfield);
-        // parameters.set('accountNumberBus', this.accountNumberBus_Chartfield);
-        // parameters.set('accountNumberOrg', this.accountNumberOrg_Chartfield);
-        // parameters.set('accountNumberFund', this.accountNumberFund_Chartfield);
-        // parameters.set('accountNumberActivity', this.accountNumberActivity_Chartfield);
-        // parameters.set('accountNumberProject', accountNumberProject);
-        // parameters.set('accountNumberAccount', accountNumberAccount);
-        // parameters.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''));
-        // parameters.set('idFundingAgency', idFundingAgency);
-        // parameters.set('custom1', custom1);
-        // parameters.set('custom2', custom2);
-        // parameters.set('custom3', custom3);
-        // parameters.set('submitterEmail', this.submitterEmail_chartfield);
-        // parameters.set('startDate', this.startDate_chartfield.toLocaleDateString());
-        // parameters.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''));
-        // parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield);
-        // parameters.set('activeAccount', activeAccount);
-        // parameters.set('isPO', isPO);
-
         // Set the selected lab!
         this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
             this.labList = response;
@@ -1336,14 +1294,27 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
         this.accountNumberOrg_Chartfield      = this._rowData.accountNumberOrg;
         this.accountNumberFund_Chartfield     = this._rowData.accountNumberFund;
         this.accountNumberActivity_Chartfield = this._rowData.accountNumberActivity;
-        this.accountNumberProject_Chartfield  = this._rowData.accountNumberProject;
-        this.accountNumberAccount_Chartfield  = this._rowData.accountNumberAccount;
         this.accountNumberAU_Chartfield       = this._rowData.accountNumberAu;
 
         this.selectedFundingAgency_chartfield = this._rowData.idFundingAgency;
 
-
-        // this.custom
+        if (this.usesCustomChartfields === 'Y') {
+            if (this.internalAccountFieldsConfiguration) {
+                for (let i: number = 0; i < this.internalAccountFieldsConfiguration.length; i++) {
+                    switch(this.internalAccountFieldsConfiguration[i].fieldName) {
+                        case 'project' : this.internalAccountFieldsConfiguration[i].value = this._rowData.accountNumberProject; break;
+                        case 'account' : this.internalAccountFieldsConfiguration[i].value = this._rowData.accountNumberAccount; break;
+                        case 'custom1' : this.internalAccountFieldsConfiguration[i].value = this._rowData.custom1; break;
+                        case 'custom2' : this.internalAccountFieldsConfiguration[i].value = this._rowData.custom2; break;
+                        case 'custom3' : this.internalAccountFieldsConfiguration[i].value = this._rowData.custom3; break;
+                        default : break;
+                    }
+                }
+            }
+        } else {
+            this.accountNumberProject_Chartfield = this._rowData.accountNumberProject;
+            this.accountNumberAccount_Chartfield = this._rowData.accountNumberAccount;
+        }
 
 
 		this.submitterEmail_chartfield = this._rowData.submitterEmail;

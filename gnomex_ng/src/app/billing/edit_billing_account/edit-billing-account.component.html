@@ -437,23 +437,10 @@
 					<div class="td">
 						<div style="display:inline-block; overflow:visible; font-size:small;">
 							<date-picker
-									[value]="startDate_chartfield"
-									[defaultToToday]="true"
-									[textInputDisabled]="false"
+									[(ngModel)]="startDate_chartfield"
 									[placeholder]="'Choose a date'"
 									[required]="requireStartDate">
 							</date-picker>
-							<!--<mat-form-field>-->
-								<!--<input-->
-										<!--matInput-->
-										<!--[(ngModel)]="startDate_chartfield"-->
-										<!--[matDatepicker]="startDatePicker_chartfield"-->
-										<!--placeholder="Choose a date"-->
-										<!--required="{{ requireStartDate }}"-->
-										<!--disabled>-->
-								<!--<mat-datepicker-toggle matSuffix [for]="startDatePicker_chartfield"></mat-datepicker-toggle>-->
-								<!--<mat-datepicker #startDatePicker_chartfield disabled="false"></mat-datepicker>-->
-							<!--</mat-form-field>-->
 						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>
@@ -461,17 +448,11 @@
 							Effective Until
 						</div>
 						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="effectiveUntilDate_chartfield"
-										[matDatepicker]="effectiveUntilDatePicker_chartfield"
-										placeholder="Choose a date"
-										required="{{ requireExpirationDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="effectiveUntilDatePicker_chartfield"></mat-datepicker-toggle>
-								<mat-datepicker #effectiveUntilDatePicker_chartfield disabled="false"></mat-datepicker>
-							</mat-form-field>
+							<date-picker
+									[(ngModel)]="effectiveUntilDate_chartfield"
+									[placeholder]="'Choose a date'"
+									[required]="requireExpirationDate">
+							</date-picker>
 						</div>
 					</div>
 				</div>
@@ -841,20 +822,6 @@
 			</div>
 
 
-		</div>
-	</div>
-	<div class="full-width background-sideless">
-		<div class="full-width" style="position: relative; padding: 0.4em 1.2em 0 1.2em;">
-			<div style="font-size: small;">
-				As the Principal Investigator (P.I.) or authorized personnel of the account listed
-				above I authorize the Core Facility to charge the account for work performed on my
-				laboratory’s behalf during the dates indicated, not to exceed the dollar amount.
-				I understand that this account will be billed automatically and that I will receive
-				a detailed statement of services for any month in which my account was charged.
-			</div>
-			<div style="text-align: center; margin: 0.5em;">
-				<mat-checkbox [(ngModel)]="agreementCheckbox" required>I agree</mat-checkbox>
-			</div>
 		</div>
 	</div>
 </div>
