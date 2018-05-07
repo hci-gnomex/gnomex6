@@ -1,0 +1,80 @@
+<div class="full-width full-height flex-vertical-container">
+	<div mat-dialog-title style="margin: 0; padding: 0.5em;">
+		<h3 class="no-margin">
+			{{optionName}}
+		</h3>
+	</div>
+	<div mat-dialog-content class="full-width full-height stretch" style="margin: 0; padding: 0;">
+		<div class="full-width full-height">
+			<div *ngIf="!addingUser" class="full-height full-width" style="padding: .5em 2em;">
+
+				<ag-grid-angular
+						style="width:100%; height:100%;"
+						class="ag-fresh"
+						[singleClickEdit]="true"
+						[rowSelection]="'multiple'"
+						[suppressRowClickSelection]="true"
+						[columnDefs]="columnDefinitions"
+						[enableSorting]="true"
+						[enableColResize]="true"
+						(gridSizeChanged)="onGridSizeChanged()"
+						(gridReady)="onGridReady($event)">
+				</ag-grid-angular>
+
+			</div>
+			<div *ngIf="addingUser" class="full-height full-width" style="padding: .5em 2em;">
+				<div class="t full-width full-height">
+					<div class="tr">
+						<div class="td vertical-center center">
+
+							<mat-form-field style="width: 80%;">
+								<mat-select placeholder="Select a Lab..." [(value)]="selectedLab" (change)="onLabListSelection($event)">
+									<mat-option *ngFor="let lab of labList" [value]="lab">
+										{{ lab.name }}
+									</mat-option>
+								</mat-select>
+							</mat-form-field>
+
+							<mat-form-field style="width: 80%;">
+								<mat-select placeholder="Select a User..." [(value)]="selectedUser">
+									<mat-option *ngFor="let user of userList" [value]="user">
+										{{ user.display }}
+									</mat-option>
+								</mat-select>
+							</mat-form-field>
+
+							<p *ngIf="!!selectedLab && !userListLoading && (!userList || userList.length < 1)" class="error-message">No users found</p>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div mat-dialog-actions style="margin: 0; display: block;">
+
+		<div *ngIf="!addingUser" class="t full-width">
+			<div class="tr">
+				<div class="td left-align horizontal-padding">
+					<button mat-button (click)="addUserFromOtherLabButtonClicked()">Add User from Another Lab</button>
+				</div>
+				<div class="td right-align horizontal-padding">
+					<button mat-button cdkFocusInitial (click)="updateButtonClicked()">Update</button>
+					<button mat-button (click)="cancelButtonClicked()">Cancel</button>
+				</div>
+			</div>
+		</div>
+
+		<div *ngIf="addingUser" class="t full-width">
+			<div class="tr">
+				<div class="td left-align horizontal-padding">
+					<button mat-button (click)="backButtonClicked()">Back</button>
+				</div>
+				<div class="td right-align horizontal-padding">
+					<button mat-button (click)="addUserButtonClicked()">Add User</button>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>

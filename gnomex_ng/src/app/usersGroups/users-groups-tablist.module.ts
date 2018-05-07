@@ -19,6 +19,7 @@ import { EditBillingAccountModule } from "../billing/edit_billing_account/edit-b
 import { ServicesModule } from "../services/services.module";
 import { UtilModule } from "../util/util.module";
 
+import { ApproveButtonRenderer } from "../util/grid-renderers/approve-button.renderer";
 import { CheckboxRenderer } from "../util/grid-renderers/checkbox.renderer";
 import { DateEditor } from "../util/grid-editors/date.editor";
 import { DateRenderer } from "../util/grid-renderers/date.renderer";
@@ -31,9 +32,9 @@ import { TextAlignLeftMiddleRenderer } from "../util/grid-renderers/text-align-l
 import { TextAlignRightMiddleRenderer } from "../util/grid-renderers/text-align-right-middle.renderer";
 import { UploadViewRemoveRenderer } from "../util/grid-renderers/upload-view-remove.renderer";
 
-import { BillingUsersSelectorComponent } from "./billingAccountTab/billing-users-selector/billing-users-selector.component";
 import { BillingAccountTabComponent } from "./billingAccountTab/billing-account-tab.component";
 import { BillingAdminTabComponent } from "./billingAdminTab/billing-admin-tab.component";
+import { BillingUsersSelectorComponent } from "./billingAccountTab/billingUsersSelector/billing-users-selector.component";
 import { MembershipTabComponent } from "./membershipTab/membership-tab.component";
 import { NewGroupDialogComponent } from "./new-group-dialog.component";
 import { NewUserDialogComponent } from "./new-user-dialog.component";
@@ -53,6 +54,7 @@ import {InvoicesTabComponent} from "./invoicesTab/invoices-tab.component";
     imports: [
 			  AgGridEditorModule,
 			  AgGridModule.withComponents([
+					  ApproveButtonRenderer,
 					  CheckboxRenderer,
 					  DateEditor,
 					  DateRenderer,
@@ -79,10 +81,10 @@ import {InvoicesTabComponent} from "./invoicesTab/invoices-tab.component";
 			  UtilModule
     ],
     declarations: [
-			  BillingUsersSelectorComponent,
         BillingAccountTabComponent,
 			  BillingAdminTabComponent,
-        DeleteGroupDialogComponent,
+			  BillingUsersSelectorComponent,
+			  DeleteGroupDialogComponent,
         DeleteUserDialogComponent,
 			  MembershipTabComponent,
         NewGroupDialogComponent,
@@ -102,6 +104,7 @@ import {InvoicesTabComponent} from "./invoicesTab/invoices-tab.component";
     ],
     exports: [
 			  BillingAdminTabComponent,
+			  BillingUsersSelectorComponent,
 			  DeleteGroupDialogComponent,
 			  DeleteUserDialogComponent,
 			  MembershipTabComponent ,
