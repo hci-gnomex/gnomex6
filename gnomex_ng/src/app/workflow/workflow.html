@@ -1,0 +1,49 @@
+<mat-sidenav-container class="sidenav-container" (backdropClick)="close('backdrop')">
+    <mat-sidenav-content style="background-color: white">
+        <button mat-button class="sidebutton" (click)="toggle($event)"><img *ngIf="showNav;else closedNav" src="../../assets/arrow_left.png"></button>
+        <ng-template #closedNav>
+            <img src="../../assets/arrow_right.png">
+        </ng-template>
+
+        <qc-workflow [hidden]="codeStepNext!='QC'" #qcWorkflow class="workflow"></qc-workflow>
+        <libprep-workflow [hidden]="codeStepNext!='LIBPREP'" #libPrepWorkflow class="workflow"></libprep-workflow>
+    </mat-sidenav-content>
+    <mat-sidenav style="width:15%;" #sidenav mode="side" (keydown.escape)="close('escape')">
+        <mat-tab-group id="groupTabGroup" style="height: 100%" [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)">
+            <mat-tab groupTab  style="height:100%;width: 25%">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/data-accept.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>QC Worklist</mat-label>
+                    <button mat-button *ngFor="let option of combinedQCTabItems" class="row-one" (click)="onClickQC($event)" [value]="option.label">{{option.label}}</button>
+                    <!--<button mat-button class="row-one" (click)="onClickAll($event)">All</button>-->
+                    <!--<button mat-button class="row-one" (click)="onClickIlluminaQC($event)">Illumina</button>-->
+                    <!--<button mat-button class="row-one" (click)="onClickMicroarray($event)">Microarray</button>-->
+                    <!--<button mat-button class="row-one" (click)="onClickSampleQuality($event)">Sample Quality</button>-->
+                </div>
+            </mat-tab>
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/DNA_diag_lightening.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>Illumina</mat-label>
+                    <button mat-button (click)="onClickLibPrep($event)"><img src="../../assets/flask.png">Lib Prep</button>
+                    <button mat-button (click)="onClickLibPrepQC($event)"><img src="../../assets/flask.png">Lib Prep QC</button>
+                    <button mat-button (click)="onClickFlowCellAssem($event)"><img src="../../assets/DNA_diag.png">Flow Cell Assem</button>
+                    <button mat-button (click)="onClickFinalizedFlowCell($event)"><img src="../../assets/DNA_diag.png">Finalize Flow Cell</button>
+                    <button mat-button (click)="onClickDataPipeline($event)"><img src="../../assets/server_go.png">Data Pipeline</button>
+                </div>
+            </mat-tab>
+            <mat-tab groupTab  style="height:100%;">
+                <ng-template mat-tab-label>
+                    <img src="../../assets/microarray_small.png">
+                </ng-template>
+                <div class="flex-column-container">
+                    <mat-label>Microarray</mat-label>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-sidenav>
+</mat-sidenav-container>

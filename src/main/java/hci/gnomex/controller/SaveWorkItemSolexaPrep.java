@@ -71,8 +71,7 @@ public class SaveWorkItemSolexaPrep extends GNomExCommand implements Serializabl
     
     
     if (request.getParameter("workItemXMLString") != null && !request.getParameter("workItemXMLString").equals("")) {
-      workItemXMLString = "<WorkItemList>" + request.getParameter("workItemXMLString") + "</WorkItemList>";
-      
+      workItemXMLString = request.getParameter("workItemXMLString");
       StringReader reader = new StringReader(workItemXMLString);
       try {
         SAXBuilder sax = new SAXBuilder();
@@ -147,12 +146,11 @@ public class SaveWorkItemSolexaPrep extends GNomExCommand implements Serializabl
                       wi.setIdCoreFacility(sample.getRequest().getIdCoreFacility());
                       
                       String codeStepNext = "";
+                      // ILLSEQQC
                       if(workItem.getCodeStepNext().equals(Step.SEQ_PREP)) {
                         codeStepNext = Step.SEQ_PREP_QC;
-                      } else if (workItem.getCodeStepNext().equals(Step.HISEQ_PREP)) {
-                        codeStepNext = Step.HISEQ_PREP_QC;
-                      } else if (workItem.getCodeStepNext().equals(Step.MISEQ_PREP)) {
-                        codeStepNext = Step.MISEQ_PREP_QC;
+                      } else {
+                        codeStepNext = Step.ILLSEQ_PREP_QC;
                       }
                       wi.setSample(sample);
                       wi.setCodeStepNext(codeStepNext);

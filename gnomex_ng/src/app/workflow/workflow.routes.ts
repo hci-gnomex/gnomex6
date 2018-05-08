@@ -4,6 +4,7 @@
 import { Routes, RouterModule } from "@angular/router";
 import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
 import {QcWorkflowComponent} from "./qc-workflow.component";
+import {WorkflowComponent} from "./workflow.component";
 
 
 /**
@@ -13,7 +14,9 @@ import {QcWorkflowComponent} from "./qc-workflow.component";
  * @since 12/19/16
  */
 const ROUTES: Routes = [
-    { path: "qcWorkFlow", component: QcWorkflowComponent, canActivate: [SubRouteGuardService]}
+    { path: "qcWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'QC'}, canActivate: [SubRouteGuardService]},
+    { path: "libprepWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'LIBPREP'}, canActivate: [SubRouteGuardService]}
+
 ];
 
 export const WORKFLOW_ROUTING = RouterModule.forChild(ROUTES);

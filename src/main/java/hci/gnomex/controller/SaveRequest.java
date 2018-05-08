@@ -491,9 +491,9 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						workItem.setSequenceLane(lane);
 						String codeStepNext = "";
 						if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
-							codeStepNext = Step.HISEQ_CLUSTER_GEN;
+							codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
 						} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
-							codeStepNext = Step.MISEQ_CLUSTER_GEN;
+							codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
 						}
 						workItem.setCodeStepNext(codeStepNext);
 						workItem.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
@@ -2039,9 +2039,9 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						if (requestParser.isQCAmendRequest() && !isNewSample) {
 							String codeStepNext = "";
 							if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
-								codeStepNext = Step.HISEQ_PREP;
+								codeStepNext = Step.ILLSEQ_PREP;
 							} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
-								codeStepNext = Step.MISEQ_PREP;
+								codeStepNext = Step.ILLSEQ_PREP;
 							}
 							// QC->Solexa request....
 							// Place samples on Seq Prep worklist.
@@ -2056,20 +2056,21 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 							// For samples NOT prepped by core, place on Solexa Seq Prep worklist (where the post Lib prep QC fields
 							// will be recorded.
 							if (sample.getSeqPrepByCore() != null && sample.getSeqPrepByCore().equalsIgnoreCase("Y")) {
+								// ILLSEQQC
 								String codeStepNext = "";
 								if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
-									codeStepNext = Step.HISEQ_QC;
+									codeStepNext = Step.ILLSEQ_QC;
 								}
 								if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
-									codeStepNext = Step.MISEQ_QC;
+									codeStepNext = Step.ILLSEQ_QC;
 								}
 								workItem.setCodeStepNext(codeStepNext);
 							} else {
 								String codeStepNext = "";
 								if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
-									codeStepNext = Step.HISEQ_PREP_QC;
+									codeStepNext = Step.ILLSEQ_PREP_QC;
 								} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
-									codeStepNext = Step.MISEQ_PREP_QC;
+									codeStepNext = Step.ILLSEQ_PREP_QC;
 								}
 								workItem.setCodeStepNext(codeStepNext);
 								sample.setQualBypassed("Y");
