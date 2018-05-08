@@ -17,10 +17,6 @@
                 <div class="flex-column-container">
                     <mat-label>QC Worklist</mat-label>
                     <button mat-button *ngFor="let option of combinedQCTabItems" class="row-one" (click)="onClickQC($event)" [value]="option.label">{{option.label}}</button>
-                    <!--<button mat-button class="row-one" (click)="onClickAll($event)">All</button>-->
-                    <!--<button mat-button class="row-one" (click)="onClickIlluminaQC($event)">Illumina</button>-->
-                    <!--<button mat-button class="row-one" (click)="onClickMicroarray($event)">Microarray</button>-->
-                    <!--<button mat-button class="row-one" (click)="onClickSampleQuality($event)">Sample Quality</button>-->
                 </div>
             </mat-tab>
             <mat-tab groupTab  style="height:100%;">
