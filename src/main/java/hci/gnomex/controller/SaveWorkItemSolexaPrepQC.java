@@ -108,13 +108,13 @@ public class SaveWorkItemSolexaPrepQC extends GNomExCommand implements Serializa
                       wi.setIdCoreFacility(sample.getRequest().getIdCoreFacility());
 
                       String codeStepNext = "";
+                      // ILLSEQQC
                       if(workItem.getCodeStepNext().equals(Step.SEQ_PREP_QC)) {
                         codeStepNext = Step.SEQ_CLUSTER_GEN;
-                      } else if (workItem.getCodeStepNext().equals(Step.HISEQ_PREP_QC)) {
-                        codeStepNext = Step.HISEQ_CLUSTER_GEN;
-                      } else if (workItem.getCodeStepNext().equals(Step.MISEQ_PREP_QC)) {
-                        codeStepNext = Step.MISEQ_CLUSTER_GEN;
+                      } else {
+                        codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
                       }
+
                       wi.setCodeStepNext(codeStepNext);
                       wi.setSequenceLane(lane);
                       wi.setCreateDate(new java.sql.Date(System.currentTimeMillis()));

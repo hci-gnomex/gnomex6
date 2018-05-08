@@ -196,7 +196,18 @@
         }
       ]
     },
-
+    {
+      "command": "SaveWorkItemSolexaPrep",
+      "parameter": "workItemXMLString",
+      "nodeheader": "WorkItemList",
+      "nodeprefix": "WorkItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
     {
       "command": "MoveAnalysis",
       "parameter": "analysisGroupsXMLString",

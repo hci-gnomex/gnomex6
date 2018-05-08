@@ -336,6 +336,38 @@ export class DictionaryService {
         });
     }
 
+    /**
+     * Get the dictionary entry for the application that matches the specified idSeqLibProtocol. Returns undefined if no match is found.
+     * There should never be multiple matches for a single protocol - this method will either return a single match or undefined.
+     * @param {string} idSeqLibProtocol
+     * @returns {any}
+     */
+    public getApplicationForProtocol(idSeqLibProtocol: string): any {
+        let application;
+        let seqLibProtocolApplication = this.findEntryByField(DictionaryService.SEQ_LIB_PROTOCOL_APPLICATION, "idSeqLibProtocol", idSeqLibProtocol);
+        if (seqLibProtocolApplication) {
+            application = this.findEntryByField(DictionaryService.APPLICATION, "codeApplication", seqLibProtocolApplication.codeApplication);
+        }
+        return application;
+    }
+
+    // public getOligoBarcodes(): any[] {
+    //     for (var barcodeScheme of this.findEntryByField(()))
+    // }
+
+    /**
+     * Get the dictionary entry for a specific className and field value. Returns undefined if no match is found.
+     * This method will return the first match it finds and should not be used if multiple matches are expected.
+     * @param {string} className
+     * @param {string} fieldName
+     * @param {string} fieldValue
+     * @returns {any}
+     */
+    public findEntryByField(className: string, fieldName: string, fieldValue: string): any {
+        let entry = this.getCachedEntries(className).find((entry) => entry[fieldName] == fieldValue);
+        return this.cloneObject(entry);
+    }
+
     private cloneObject(object: any): any {
         if (!object) {
             // leave null and undefined unchanged

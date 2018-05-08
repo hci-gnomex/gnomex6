@@ -79,6 +79,7 @@ export class GnomexService {
     public das2OrganismList: any[] = [];
     public activeOrganismList: any[] = [];
     public coreFacilityList: any[] = [];
+    public seqLibProtocolsWithAppFilters: any[] = [];
 
 
 
@@ -179,6 +180,7 @@ export class GnomexService {
         this.managesPlateBasedWorkflow = this.doesManagePlateBasedWorkflow();
         this.setShowUsage();
         this.setDefaultSubmissionState();
+        this.buildSeqLibProtocolListWithAppFilters();
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.onGetLabList(response);
         })
@@ -720,6 +722,22 @@ export class GnomexService {
         return url;
     }
 
-
+    private buildSeqLibProtocolListWithAppFilters():void {
+        for (let seq of this.dictionaryService.getEntries('hci.gnomex.model.SeqLibProtocol')) {
+            if (seq != null) {
+                if (seq.isActive === "N") {
+                    continue;
+                }
+            }
+            let app = this.dictionaryService.getApplicationForProtocol(seq.idSeqLibProtocol);
+            if (app) {
+                if (app.isActive === "N" || app.onlyForLabPrepped === "Y")
+                    continue;
+                seq.idCoreFacility = app.idCoreFacility;
+                seq.codeApplicationType = app.codeApplicationType;
+            }
+            this.seqLibProtocolsWithAppFilters.push(seq);
+        }
+    }
 
 }
