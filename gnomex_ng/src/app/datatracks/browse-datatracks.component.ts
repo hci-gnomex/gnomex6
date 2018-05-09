@@ -160,6 +160,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     @Output() selItem: EventEmitter<ITreeNode> = new EventEmitter();
     private treeModel: TreeModel;
     public moveDatatrackDialogRef: MatDialogRef<MoveDataTrackComponent>;
+    private navInitSubscription: Subscription;
 
     /*
     angular2-tree options
@@ -231,13 +232,10 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
             if(this.datatracksService.previousURLParams && this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
                 let navArray:any[] = ['/datatracks', { outlets: { datatracksPanel: null }}];
-                if(this.navDatatrackList){
-                    navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idGenomeBuild"));
-                }
 
-                this.router.navigate(navArray);
                 this.datatracksService.previousURLParams["refreshParams"] = false;
                 this.datatracksService.datatrackListTreeNode = response;
+                this.router.navigate(navArray);
             }
 
 
@@ -259,12 +257,21 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         });
 
-        this.route.data.forEach(data => {
-           this.navDatatrackList = data.datatrackList;
-           if(this.navDatatrackList){
-               this.datatracksService.emitDatatracksList(this.navDatatrackList);
-           }
+
+        this.navInitSubscription = this.gnomexService.navInitBrowseDatatrackSubject.subscribe( orderInitObj => {
+            if(orderInitObj){
+                let ids: URLSearchParams = new URLSearchParams;
+                ids.set("number", this.gnomexService.orderInitObj.dataTrackNumber);
+                ids.set("idOrganism", this.gnomexService.orderInitObj.idOrganism);
+                ids.set("idLab", this.gnomexService.orderInitObj.idLab);
+                ids.set("idGenomeBuild",this.gnomexService.orderInitObj.idGenomeBuild);
+                this.datatracksService.previousURLParams = ids;
+                this.datatracksService.getDatatracksList_fromBackend(ids);
+            }
         });
+
+
+
 
         this.datatracksService.startSearchSubject.subscribe((value) =>{
             if (value) {
@@ -511,13 +518,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         let datatrackListNode =  _.cloneDeep(this.selectedItem.data);
         this.datatracksService.datatrackListTreeNode = datatrackListNode;
 
-        if(this.gnomexService.orderInitObj){
-            return;
-        }
-
 
         let navArray:Array<any> = [];
-
 
 
         if(datatrackListNode.isGenomeBuild){
@@ -546,9 +548,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             navArray = ['/datatracks',  {outlets:{'datatracksPanel':[idDataTrack]}}];
         }
 
-        if(this.navDatatrackList){
-            navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idGenomeBuild"));
-        }
         this.router.navigate(navArray);
 
 
@@ -564,6 +563,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     ngOnDestroy(): void {
         this.dataTracksListSubscription.unsubscribe();
+        this.navInitSubscription.unsubscribe();
+        //this.gnomexService.navInitBrowseDatatrackSubject.next(null);
         this.navDatatrackList = null;
     }
 }

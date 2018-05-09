@@ -317,7 +317,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 ids.set("showEmptyProjectFolders", "N");
                 ids.set("showCategory", "N");
                 ids.set("showSamples", "N");
-
+                this.experimentsService.browsePanelParams = ids;
                 this.experimentsService.getProjectRequestList_fromBackend(ids);
             }
         });

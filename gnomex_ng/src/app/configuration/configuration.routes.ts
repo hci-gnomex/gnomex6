@@ -1,7 +1,7 @@
 import { Routes, RouterModule } from "@angular/router";
 import { BrowseDictionaryComponent } from "./browse-dictionary.component";
 import {ConfigCoreFacilityComponent} from "./config-core-facility.component";
-import {ConfigureAnnotationsComponent} from "./configure-annotations.component";
+import {ConfigureAnnotationsComponent} from "../util/configure-annotations.component";
 import {ConfigureOrganismsComponent} from "./configure-organisms.component";
 
 const ROUTES: Routes = [
