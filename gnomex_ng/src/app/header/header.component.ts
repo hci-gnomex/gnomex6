@@ -736,83 +736,43 @@ export class HeaderComponent implements OnInit{
                         divider: true
                     },
                     {
-                        displayName: 'HiSeq - Lib Prep',
+                        displayName: 'Illumina - Lib Prep',
+                        context: 'HISEQ',
+                        iconName: '../../assets/flask.png',
+                        route: '/libprepWorkFlow'
+                    },
+                    {
+                        displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
                         iconName: '../../assets/flask.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Lib Prep QC',
-                        context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
-                        route: ''
-                    },
-                    {
-                        displayName: 'HiSeq - FlowCell Assembly',
+                        displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Finalize Flow Cell',
+                        displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Data Pipeline',
+                        displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
                         iconName: '../../assets/page_go.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Flow Cells',
+                        displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
                         iconName: '../../assets/rectangle.png',
                         route: ''
                     },
                     {
                         divider: true
-                    },
-                    {
-                        displayName: 'Illumina MiSeq',
-                        context: 'MISEQ',
-                        iconName: '../../assets/DNA_diag_miseq.png',
-                        children: [
-                            {
-                                displayName: 'Lib Prep',
-                                context: 'MISEQ',
-                                iconName: '../../assets/flask.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Lib Prep QC',
-                                context: 'MISEQ',
-                                iconName: '../../assets/flask.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Flow Cell Assembly',
-                                iconName: '../../assets/DNA_diag_miseq.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Finalize Flow Cell',
-                                iconName: '../../assets/DNA_diag_miseq.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Pipeline',
-                                iconName: '../../assets/server_go.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Flow Cells',
-                                iconName: '../../assets/rectangle.png',
-                                route: ''
-                            },
-
-                        ]
                     },
                     {
                         displayName: 'Microarray',
@@ -884,83 +844,43 @@ export class HeaderComponent implements OnInit{
                         divider: true
                     },
                     {
-                        displayName: 'HiSeq - Lib Prep',
+                        displayName: 'Illumina - Lib Prep',
+                        context: 'HISEQ',
+                        iconName: '../../assets/flask.png',
+                        route: '/libprepWorkFlow'
+                    },
+                    {
+                        displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
                         iconName: '../../assets/flask.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Lib Prep QC',
-                        context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
-                        route: ''
-                    },
-                    {
-                        displayName: 'HiSeq - FlowCell Assembly',
+                        displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Finalize Flow Cell',
+                        displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Data Pipeline',
+                        displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
                         iconName: '../../assets/page_go.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Flow Cells',
+                        displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
                         iconName: '../../assets/rectangle.png',
                         route: ''
                     },
                     {
                         divider: true
-                    },
-                    {
-                        displayName: 'Illumina MiSeq',
-                        context: 'MISEQ',
-                        iconName: '../../assets/DNA_diag_miseq.png',
-                        children: [
-                            {
-                                displayName: 'Lib Prep',
-                                context: 'MISEQ',
-                                iconName: '../../assets/flask.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Lib Prep QC',
-                                context: 'MISEQ',
-                                iconName: '../../assets/flask.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Flow Cell Assembly',
-                                iconName: '../../assets/DNA_diag_miseq.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Finalize Flow Cell',
-                                iconName: '../../assets/DNA_diag_miseq.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Pipeline',
-                                iconName: '../../assets/server_go.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Flow Cells',
-                                iconName: '../../assets/rectangle.png',
-                                route: ''
-                            },
-
-                        ]
                     },
                     {
                         displayName: 'Microarray',
@@ -1203,83 +1123,43 @@ export class HeaderComponent implements OnInit{
                         divider: true
                     },
                     {
-                        displayName: 'HiSeq - Lib Prep',
+                        displayName: 'Illumina - Lib Prep',
+                        context: 'HISEQ',
+                        iconName: '../../assets/flask.png',
+                        route: '/libprepWorkFlow'
+                    },
+                    {
+                        displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
                         iconName: '../../assets/flask.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Lib Prep QC',
-                        context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
-                        route: ''
-                    },
-                    {
-                        displayName: 'HiSeq - FlowCell Assembly',
+                        displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Finalize Flow Cell',
+                        displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Data Pipeline',
+                        displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
                         iconName: '../../assets/page_go.png',
                         route: ''
                     },
                     {
-                        displayName: 'HiSeq - Flow Cells',
+                        displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
                         iconName: '../../assets/rectangle.png',
                         route: ''
                     },
                     {
                         divider: true
-                    },
-                    {
-                        displayName: 'Illumina MiSeq',
-                        context: 'MISEQ',
-                        iconName: '../../assets/DNA_diag_miseq.png',
-                        children: [
-                            {
-                                displayName: 'Lib Prep',
-                                context: 'MISEQPREP',
-                                iconName: '../../assets/flask.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Lib Prep QC',
-                                context: 'MISEQ',
-                                iconName: '../../assets/flask.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Flow Cell Assembly',
-                                iconName: '../../assets/DNA_diag_miseq.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Finalize Flow Cell',
-                                iconName: '../../assets/DNA_diag_miseq.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Pipeline',
-                                iconName: '../../assets/server_go.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Flow Cells',
-                                iconName: '../../assets/rectangle.png',
-                                route: ''
-                            },
-
-                        ]
                     },
                     {
                         displayName: 'Microarray',

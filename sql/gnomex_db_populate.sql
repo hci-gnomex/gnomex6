@@ -1007,6 +1007,7 @@ insert into RequestCategoryType values('CHERRYPICK','Cherry Picking','assets/che
 insert into RequestCategoryType values('CLINSEQ','Clinical Sequenom','assets/cherrypick.png','N','N');
 insert into RequestCategoryType values('FRAGANAL','Fragment Analysis Panels','assets/fraganal.png','N','N');
 insert into RequestCategoryType values('HISEQ','Illumina Sequencing','assets/DNA_diag.png','Y','Y');
+insert into RequestCategoryType values('ILLSEQ','Illumina Sequencing','assets/DNA_diag.png','Y','Y');
 insert into RequestCategoryType values('MISEQ','Illumina Sequencing','assets/DNA_diag.png','Y','Y');
 insert into RequestCategoryType values('ISCAN','iScan','assets/iscan.png','N','N');
 insert into RequestCategoryType values('MICROARRAY','Microarray','assets/microarray_small.png','N','Y');
@@ -1506,6 +1507,12 @@ VALUES ('COMPLETE', 'Complete', 'Y', null),
   ('MISEQPIPE', 'Illumina MiSeq Data Pipeline', 'Y', 4),
   ('MISEQPREP', 'Illumina MiSeq Library Prep', 'Y', 2),
   ('MISEQQC', 'Illumina MiSeq Quality Control', 'Y', 1),
+  ('ILLSEQASSEM', 'Illumina Seq Prep', 'Y', 3),
+  ('ILLSEQPIPE', 'Illumina Data Pipeline', 'Y', 4),
+  ('ILLSEQPREP', 'Illumina Library Prep', 'Y', 2),
+  ('ILLSEQPREPQC', 'Illumina Prep QC','Y',null),
+  ('ILLSEQQC', 'Illumina Quality Control', 'Y', 1),
+  ('ILLSEQRUN', 'Illumina Sequencing Run', 'Y', null),
   ('STOP', 'Stop/Failed', 'Y', null);
 
 
@@ -1603,6 +1610,7 @@ VALUES ('SampleDetailsOrganism', '4', '', '<TEXTFORMAT LEADING="2"><P ALIGN="LEF
 -- Insert new workflow steps for finalize flow cell
 INSERT INTO Step (codeStep, step, isActive, sortOrder) VALUES ('HSEQFINFC', 'Illumina HiSeq Finalize Flow Cell', 'Y', NULL); 
 INSERT INTO Step (codeStep, step, isActive, sortOrder) VALUES ('MISEQFINFC', 'Illumina MiSeq Finalize Flow Cell', 'Y', NULL); 
+INSERT INTO Step (codeStep, step, isActive, sortOrder) VALUES ('ILLSEQFINFC', 'Illumina Flow Cell', 'Y', NULL);
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

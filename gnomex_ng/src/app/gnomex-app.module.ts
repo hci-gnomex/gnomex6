@@ -100,6 +100,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: AUTHENTICATION_ROUTE, useValue: "/authenticate"},
         {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
         {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 240},
+        {provide: Window, useValue: window},
         UserService,
         AuthenticationService,
         ExperimentsService,

@@ -3,6 +3,8 @@ import {Http, Response} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Subject} from "rxjs/Subject";
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class TopicService {
@@ -13,7 +15,8 @@ export class TopicService {
 
     public topicsList: any[];
 
-    constructor(private http: Http) {
+    constructor(private http: Http,private httpClient:HttpClient,
+                private cookieUtilService:CookieUtilService) {
     }
 
     public saveTopic(params: URLSearchParams):  Observable<any> {
@@ -108,6 +111,10 @@ export class TopicService {
     }
     resetTopicTreeNodeSubject():void{
         this.topicTreeNodeSubject =  new BehaviorSubject({});
+    }
+    emailTopicOwner(params:HttpParams):Observable<any>{
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/EmailTopicOwner.gx",null,{params:params});
     }
 
 

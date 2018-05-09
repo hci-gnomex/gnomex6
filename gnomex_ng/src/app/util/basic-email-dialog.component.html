@@ -1,0 +1,23 @@
+<form (ngSubmit)="send(emailGroup.value)" [formGroup]="emailGroup">
+    <h6 mat-dialog-title><img class="icon" src="../../assets/email_go.png">Email Topic Owner</h6>
+    <mat-dialog-content style="display: flex; flex-direction: column; height: 85%; position: relative">
+        <mat-form-field class="formField">
+            <input matInput placeholder="Subject" formControlName="subject">
+            <mat-error *ngIf="emailGroup.get('subject').hasError('required')">Subject is required</mat-error>
+        </mat-form-field>
+        <mat-form-field class="formField">
+            <input matInput placeholder="From" formControlName="fromAddress">
+            <mat-error *ngIf="emailGroup.get('fromAddress').hasError('required')">From is required</mat-error>
+            <mat-error *ngIf="emailGroup.get('fromAddress').hasError('email') && !emailGroup.hasError('required')">Please enter a valid email address</mat-error>
+        </mat-form-field>
+        <mat-form-field  class="formField">
+            <textarea style="resize: none; height: 14rem;" matInput placeholder="Body" formControlName="body"></textarea>
+            <mat-error *ngIf="emailGroup.get('body').hasError('required')">Body is required</mat-error>
+        </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button type="submit" *ngIf="!showSpinner" [disabled]="!emailGroup.valid" ><img class="icon" src="../../assets/email_go.png">Send Email</button>
+        <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
+        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+    </mat-dialog-actions>
+</form>

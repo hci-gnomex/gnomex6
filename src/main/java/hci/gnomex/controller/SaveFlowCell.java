@@ -144,16 +144,15 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
                 existingChannel.getIdFlowCellChannel()).list();
             for (Iterator i1 = workItems.iterator(); i1.hasNext();) {
               WorkItem x = (WorkItem)i1.next();
-              if(x.getCodeStepNext().equals("HSEQFINFC") || x.getCodeStepNext().equals("HSEQPIPE") || x.getCodeStepNext().equals("MISEQFINFC") || x.getCodeStepNext().equals("MISEQPIPE")) {
+              // ILLSEQQC
+              if(x.getCodeStepNext().equals("ILLSEQFINFC") || x.getCodeStepNext().equals("ILLSEQPIPE")) {
                 for(Iterator ii = existingChannel.getSequenceLanes().iterator(); ii.hasNext();) {
                   SequenceLane sl = (SequenceLane)ii.next();
                   WorkItem wi = new WorkItem();
                   wi.setIdRequest(sl.getIdRequest());
                   wi.setSequenceLane(sl);
-                  if(x.getCodeStepNext().equals("HSEQFINFC") || x.getCodeStepNext().equals("HSEQPIPE")) {
-                    wi.setCodeStepNext("HSEQASSEM");  
-                  } else if (x.getCodeStepNext().equals("MISEQFINFC") || x.getCodeStepNext().equals("MISEQPIPE")) {
-                    wi.setCodeStepNext("MISEQASSEM");            		  
+                  if(x.getCodeStepNext().equals("ILLSEQFINFC") || x.getCodeStepNext().equals("ILLSEQPIPE")) {
+                    wi.setCodeStepNext("ILLSEQASSEM");
                   }
                   sess.save(wi);
                 }
@@ -310,11 +309,9 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
           List workItems = sess.createQuery(sb.toString()).list();
           for(Iterator i = workItems.iterator(); i.hasNext();) {
             WorkItem wi = (WorkItem)i.next();
-            if(wi.getCodeStepNext().equals("HSEQFINFC")) {
-              wi.setCodeStepNext("HSEQPIPE");
-              sess.save(wi);
-            } else if (wi.getCodeStepNext().equals("MISEQFINFC")) {
-              wi.setCodeStepNext("MISEQPIPE");
+            // ILLSEQQC
+            if(wi.getCodeStepNext().equals("ILLSEQFINFC")) {
+              wi.setCodeStepNext("ILLSEQPIPE");
               sess.save(wi);
             }
           }

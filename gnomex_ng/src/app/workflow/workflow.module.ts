@@ -27,6 +27,9 @@ import { SelectRenderer } from "../util/grid-renderers/select.renderer";
 import { TextAlignLeftMiddleRenderer } from "../util/grid-renderers/text-align-left-middle.renderer";
 import { TextAlignRightMiddleRenderer } from "../util/grid-renderers/text-align-right-middle.renderer";
 import { UploadViewRemoveRenderer } from "../util/grid-renderers/upload-view-remove.renderer";
+import {WorkflowComponent} from "./workflow.component";
+import {LibprepWorkflowComponent} from "./libprep-workflow.component";
+import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
 
 /**
  * @author jdewell
@@ -44,6 +47,7 @@ import { UploadViewRemoveRenderer } from "../util/grid-renderers/upload-view-rem
             IconLinkButtonRenderer,
             RemoveLinkButtonRenderer,
             SelectEditor,
+            BarcodeSelectEditor,
             SelectRenderer,
             SplitStringToMultipleLinesRenderer,
             TextAlignLeftMiddleRenderer,
@@ -63,9 +67,9 @@ import { UploadViewRemoveRenderer } from "../util/grid-renderers/upload-view-rem
         UtilModule,
         ReactiveFormsModule,
     ],
-    declarations: [QcWorkflowComponent],
-    entryComponents: [QcWorkflowComponent],
-    exports: [QcWorkflowComponent]
+    declarations: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent],
+    entryComponents: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent],
+    exports: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent]
 })
 export class WorkflowModule {
 }

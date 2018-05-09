@@ -844,9 +844,8 @@ public class Sample extends HibernateDetailObject {
       for (WorkItem workItem : (Set<WorkItem>) lane.getWorkItems()) {
 
         // Check that the sample is ready to be added to a flow cell
-        if (workItem.getCodeStepNext().equals(Step.HISEQ_CLUSTER_GEN)) {
-          stepMap.put(new Integer(lastStep - 2).toString(), null);
-        } else if (workItem.getCodeStepNext().equals(Step.MISEQ_CLUSTER_GEN)) {
+        // Illseq
+        if (workItem.getCodeStepNext().equals(Step.ILLSEQ_CLUSTER_GEN)) {
           stepMap.put(new Integer(lastStep - 2).toString(), null);
         }
       }

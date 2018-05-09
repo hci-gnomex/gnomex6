@@ -113,12 +113,11 @@ public class SaveWorkItemSolexaRun extends GNomExCommand implements Serializable
               if (channel.getLastCycleDate() != null) {
                 WorkItem wi = new WorkItem();
                 String codeStepNext;
+                // ILLSEQ
                 if(workItem.getCodeStepNext().equals(Step.SEQ_RUN)) {
                   codeStepNext = Step.SEQ_DATA_PIPELINE;
-                } else if (workItem.getCodeStepNext().equals(Step.HISEQ_RUN)) {
-                  codeStepNext = Step.HISEQ_DATA_PIPELINE;
                 } else {
-                  codeStepNext = Step.MISEQ_DATA_PIPELINE;
+                  codeStepNext = Step.ILLSEQ_DATA_PIPELINE;
                 }
                 wi.setIdCoreFacility(workItem.getIdCoreFacility());
                 wi.setCodeStepNext(codeStepNext);                 
