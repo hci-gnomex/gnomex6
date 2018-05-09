@@ -461,19 +461,24 @@
 						Effective Until
 					</div>
 					<div class="td">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="effectiveUntilDate_chartfield"
-										[matDatepicker]="effectiveUntilDatePicker_chartfield"
-										placeholder="Choose a date"
-										required="{{ requireExpirationDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="effectiveUntilDatePicker_chartfield"></mat-datepicker-toggle>
-								<mat-datepicker #effectiveUntilDatePicker_chartfield disabled="false"></mat-datepicker>
-							</mat-form-field>
-						</div>
+						<date-picker
+								[(ngModel)]="effectiveUntilDate_chartfield"
+								[placeholder]="'Choose a date'"
+								[required]="requireExpirationDate">
+						</date-picker>
+						<!--<div style="display:inline-block; overflow:visible; font-size:small;">-->
+							<!--<mat-form-field>-->
+								<!--<input-->
+										<!--matInput-->
+										<!--[(ngModel)]="effectiveUntilDate_chartfield"-->
+										<!--[matDatepicker]="effectiveUntilDatePicker_chartfield"-->
+										<!--placeholder="Choose a date"-->
+										<!--required="{{ requireExpirationDate }}"-->
+										<!--disabled>-->
+								<!--<mat-datepicker-toggle matSuffix [for]="effectiveUntilDatePicker_chartfield"></mat-datepicker-toggle>-->
+								<!--<mat-datepicker #effectiveUntilDatePicker_chartfield disabled="false"></mat-datepicker>-->
+							<!--</mat-form-field>-->
+						<!--</div>-->
 					</div>
 				</div>
 				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_totalDollarAmount" class="tr full-width">
@@ -828,8 +833,8 @@
 <div mat-dialog-actions>
 	<div class="full-width" style="text-align:right; padding:0.4em;">
 		<div class="inline-block">
-			<button mat-raised-button (click)="onSaveButtonClicked()" autofocus>
-				<img src="../../../assets/save.png" alt=""/> Save
+			<button mat-raised-button (click)="onUpdateButtonClicked()" autofocus>
+				<img src="../../../assets/save.png" alt=""/> Update
 			</button>
 		</div>
 		<div class="inline-block">

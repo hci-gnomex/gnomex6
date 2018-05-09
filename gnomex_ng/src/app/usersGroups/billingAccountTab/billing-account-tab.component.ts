@@ -157,6 +157,11 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     private otherAccountFieldsConfiguration: any[];
     private otherAccountsFieldsConfigurationSubscription: Subscription;
 
+    private chartfieldRowNode_LastSelected;
+
+    private hasReceivedInternalAccountFieldsConfiguration: boolean = false;
+    private hasReceivedOtherAccountFieldsConfiguration: boolean = false;
+
     constructor(private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
                 private accountFieldsConfigurationService: AccountFieldsConfigurationService,
@@ -165,31 +170,53 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.initializeCustomizedFields();
+        this.onLabChanged();
+    }
 
+    private initializeCustomizedFields() {
         this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
 
         if (this.usesCustomChartfields === 'Y') {
             for (let i = 0; i < 5; i++) {
-                this.internalCustomFieldsFormControl[i] = new FormControl('', []);
-                this.internalCustomFieldsStateMatcher[i] = new EditBillingAccountStateMatcher();
+                if (!this.internalCustomFieldsFormControl[i]) {
+                    this.internalCustomFieldsFormControl[i] = new FormControl('', []);
+                }
+                if (!this.internalCustomFieldsStateMatcher[i]) {
+                    this.internalCustomFieldsStateMatcher[i] = new EditBillingAccountStateMatcher();
+                }
             }
 
-            this.internalAccountsFieldsConfigurationSubscription =
-                this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
-                    this.processInternalAccountFieldsConfigurations(response);
-                    this.assignChartfieldGridContents(this.selectedCoreFacility);
-                });
+            if (!this.internalAccountsFieldsConfigurationSubscription) {
+                this.internalAccountsFieldsConfigurationSubscription =
+                    this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
+                        if (!this.hasReceivedInternalAccountFieldsConfiguration) {
+                            this.hasReceivedInternalAccountFieldsConfiguration = true;
+                            this.processInternalAccountFieldsConfigurations(response);
 
-            this.otherAccountsFieldsConfigurationSubscription =
-                this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
-                    this.processOtherAccountFieldsConfigurations(response);
-                    this.assignChartfieldGridContents(this.selectedCoreFacility);
-                });
+                            if (this.hasReceivedOtherAccountFieldsConfiguration) {
+                                this.assignChartfieldGridContents(this.selectedCoreFacility);
+                            }
+                        }
+                    });
+            }
+
+            if (!this.otherAccountsFieldsConfigurationSubscription) {
+                this.otherAccountsFieldsConfigurationSubscription =
+                    this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
+                        if (!this.hasReceivedOtherAccountFieldsConfiguration) {
+                            this.hasReceivedOtherAccountFieldsConfiguration = true;
+                            this.processOtherAccountFieldsConfigurations(response);
+
+                            if (this.hasReceivedInternalAccountFieldsConfiguration) {
+                                this.assignChartfieldGridContents(this.selectedCoreFacility);
+                            }
+                        }
+                    });
+            }
 
             this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
         }
-
-        this.onLabChanged();
     }
 
     ngOnDestroy(): void {
@@ -418,8 +445,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     private getChartfieldColumnDefs(shownGridData: any[]): any[] {
         let columnDefinitions = [];
 
-
-        this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
+        // this.initializeCustomizedFields();
+        // this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
 
         columnDefinitions.push({
             headerName: "Account name",
@@ -455,26 +482,28 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 });
             }
 
-            for (let item of this.internalAccountFieldsConfiguration) {
-                if(item.include && item.include.toLowerCase() !== 'n') {
-                    let fieldName: string = "";
+            if (Array.isArray(this.internalAccountFieldsConfiguration)) {
+                for (let item of this.internalAccountFieldsConfiguration) {
+                    if(item.include && item.include.toLowerCase() !== 'n') {
+                        let fieldName: string = "";
 
-                    switch(item.fieldName) {
-                        case 'project' : fieldName = 'accountNumberProject'; break;
-                        case 'account' : fieldName = 'accountNumberAccount'; break;
-                        case 'custom1' : fieldName = 'custom1'; break;
-                        case 'custom2' : fieldName = 'custom2'; break;
-                        case 'custom3' : fieldName = 'custom3'; break;
-                        default : // do nothing.
+                        switch(item.fieldName) {
+                            case 'project' : fieldName = 'accountNumberProject'; break;
+                            case 'account' : fieldName = 'accountNumberAccount'; break;
+                            case 'custom1' : fieldName = 'custom1'; break;
+                            case 'custom2' : fieldName = 'custom2'; break;
+                            case 'custom3' : fieldName = 'custom3'; break;
+                            default : // do nothing.
+                        }
+
+                        columnDefinitions.push({
+                            headerName: item.displayName,
+                            editable: true,
+                            width: 100,
+                            cellRendererFramework: TextAlignLeftMiddleRenderer,
+                            field: fieldName
+                        });
                     }
-
-                    columnDefinitions.push({
-                        headerName: item.displayName,
-                        editable: true,
-                        width: 100,
-                        cellRendererFramework: TextAlignLeftMiddleRenderer,
-                        field: fieldName
-                    });
                 }
             }
 
@@ -933,36 +962,42 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     }
 
 
-    openChartfieldEditor(rowData: any) {
+    openChartfieldEditor(rowNode: any) {
+        this.chartfieldRowNode_LastSelected = rowNode.id;
+
         let dialogRef = this.dialog.open(EditBillingAccountComponent, {
             width: '60em',
             panelClass: 'no-padding-dialog'
         });
-        dialogRef.componentInstance.rowData = rowData;
+        dialogRef.componentInstance.rowData = rowNode.data;
+
+        dialogRef.afterClosed().subscribe((result) => {
+            // We only expect a result back if the popup's "OK" button was clicked.
+            if (!result) {
+                return;
+            }
+            this.chartfieldGridApi.getRowNode(this.chartfieldRowNode_LastSelected).setData(result);
+        });
+    }
+
+    openPoEditor(rowNode: any) {
+        let dialogRef = this.dialog.open(EditBillingAccountComponent, {
+            width: '60em',
+            panelClass: 'no-padding-dialog'
+        });
+        dialogRef.componentInstance.rowData = rowNode.data;
 
         dialogRef.afterClosed().subscribe((result) => {
             console.log("Editor closed!");
         });
     }
 
-    openPoEditor(rowData: any) {
+    openCreditCardEditor(rowNode: any) {
         let dialogRef = this.dialog.open(EditBillingAccountComponent, {
             width: '60em',
             panelClass: 'no-padding-dialog'
         });
-        dialogRef.componentInstance.rowData = rowData;
-
-        dialogRef.afterClosed().subscribe((result) => {
-            console.log("Editor closed!");
-        });
-    }
-
-    openCreditCardEditor(rowData: any) {
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, {
-            width: '60em',
-            panelClass: 'no-padding-dialog'
-        });
-        dialogRef.componentInstance.rowData = rowData;
+        dialogRef.componentInstance.rowData = rowNode.data;
 
         dialogRef.afterClosed().subscribe((result) => {
             console.log("Editor closed!");

@@ -39,8 +39,8 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
                 this._date = new Date();
                 this._date.setFullYear(+tokens[2], +tokens[0] - 1, +tokens[1]);
             } else {
-                this._date = new Date();
                 if (this._defaultToToday) {
+                    this._date = new Date();
                     this._dateString = this.value;
                 }
             }

@@ -7,7 +7,6 @@ import { EditBillingAccountErrorDialogComponent } from "./dialogs/edit-billing-a
 import { EditBillingAccountSuccessDialogComponent } from "./dialogs/edit-billing-account-success-dialog.component";
 
 import { AccountFieldsConfigurationService } from "../../services/account-fields-configuration.service";
-import { CreateSecurityAdvisorService } from "../../services/create-security-advisor.service";
 import { DictionaryService } from "../../services/dictionary.service";
 import { LabListService } from "../../services/lab-list.service";
 import { NewBillingAccountService } from "../../services/new-billing-account.service";
@@ -207,7 +206,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 	requireStartDate: boolean = true;
 
-	effectiveUntilDate_chartfield: Date;
+    effectiveUntilDate_chartfield: string;
+
 	expirationDate_po: Date;
 	expirationDate_creditcard: Date;
 
@@ -344,13 +344,12 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 
 	constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
-							private createSecurityAdvisorService: CreateSecurityAdvisorService,
-							private dialog: MatDialog,
-							private dialogRef: MatDialogRef<EditBillingAccountComponent>,
-							private dictionaryService: DictionaryService,
-							private labListService: LabListService,
-							private newBillingAccountService: NewBillingAccountService,
-							private propertyService: PropertyService) { }
+				private dialog: MatDialog,
+				private dialogRef: MatDialogRef<EditBillingAccountComponent>,
+				private dictionaryService: DictionaryService,
+				private labListService: LabListService,
+				private newBillingAccountService: NewBillingAccountService,
+				private propertyService: PropertyService) { }
 
 	ngOnInit(): void {
 		this.selectedLab = null;
@@ -391,26 +390,39 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
+		this.initializeCustomElements();
+	}
 
-		if (this.usesCustomChartfields === 'Y') {
-			for (let i = 0; i < 5; i++) {
-				this.InternalCustomFieldsFormControl[i] = new FormControl('', []);
-				this.InternalCustomFieldsStateMatcher[i] = new EditBillingAccountStateMatcher();
+	private initializeCustomElements(): void {
+		if (!this.usesCustomChartfields || this.usesCustomChartfields === '') {
+            this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
+		}
+
+        if (this.usesCustomChartfields === 'Y') {
+            for (let i = 0; i < 5; i++) {
+            	if (!this.InternalCustomFieldsFormControl[i]) {
+                    this.InternalCustomFieldsFormControl[i] = new FormControl('', []);
+				}
+                if (!this.InternalCustomFieldsStateMatcher[i]) {
+                    this.InternalCustomFieldsStateMatcher[i] = new EditBillingAccountStateMatcher();
+				}
+            }
+
+            if (!this.internalAccountFieldsConfigurationSubscription) {
+                this.internalAccountFieldsConfigurationSubscription =
+                    this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
+                        this.processInternalAccountFieldsConfigurations(response);
+                    });
+			}
+			if (!this.otherAccountFieldsConfigurationSubscription) {
+                this.otherAccountFieldsConfigurationSubscription =
+                    this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
+                        this.processOtherAccountFieldsConfigurations(response);
+                    });
 			}
 
-			this.internalAccountFieldsConfigurationSubscription =
-					this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
-						this.processInternalAccountFieldsConfigurations(response);
-					});
-
-			this.otherAccountFieldsConfigurationSubscription =
-					this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
-						this.processOtherAccountFieldsConfigurations(response);
-					});
-
-			this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
-		}
+            this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
+        }
 	}
 
 	ngOnDestroy(): void {
@@ -508,7 +520,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private onSaveButtonClicked(): void {
+	private onUpdateButtonClicked(): void {
 		this.errorMessage = '';
 
 		if (this.showField == this.CHARTFIELD) {
@@ -617,63 +629,32 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		// 		"    isPO                     : " + isPO + "\n"
 		// );
 
-		if (this.areChartfieldValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
+		if (this.areChartfieldValuesValid() && this._rowData) {
 
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_Chartfield);
-			parameters.set('shortAcct', this.shortAccountName_Chartfield);
-			parameters.set('accountNumberBus', this.accountNumberBus_Chartfield);
-			parameters.set('accountNumberOrg', this.accountNumberOrg_Chartfield);
-			parameters.set('accountNumberFund', this.accountNumberFund_Chartfield);
-			parameters.set('accountNumberActivity', this.accountNumberActivity_Chartfield);
-			parameters.set('accountNumberProject', accountNumberProject);
-			parameters.set('accountNumberAccount', accountNumberAccount);
-			parameters.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''));
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', this.submitterEmail_chartfield);
-			// parameters.set('startDate', this.startDate_chartfield.toLocaleDateString());
-			parameters.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''));
-			parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
+			this._rowData.idLab                    = idLab;
+            this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+            this._rowData.accountName              = this.accountName_Chartfield;
+            this._rowData.shortAcct                = this.shortAccountName_Chartfield;
+            this._rowData.accountNumberBus         = this.accountNumberBus_Chartfield;
+            this._rowData.accountNumberOrg         = this.accountNumberOrg_Chartfield;
+            this._rowData.accountNumberFund        = this.accountNumberFund_Chartfield;
+            this._rowData.accountNumberActivity    = this.accountNumberActivity_Chartfield;
+            this._rowData.accountNumberProject     = accountNumberProject;
+            this._rowData.accountNumberAccount     = accountNumberAccount;
+            this._rowData.accountNumberAu          = (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : '');
+            this._rowData.idFundingAgency          = idFundingAgency;
+            this._rowData.custom1                  = custom1;
+            this._rowData.custom2                  = custom2;
+            this._rowData.custom3                  = custom3;
+            this._rowData.submitterEmail           = this.submitterEmail_chartfield;
+            this._rowData.startDate                = this.startDate_chartfield;
+            this._rowData.expirationDate           = this.effectiveUntilDate_chartfield;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount_Chartfield;
+            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount_Chartfield;
+            this._rowData.activeAccount            = activeAccount;
+            this._rowData.isPO                     = isPO;
 
-
-			// in original, called SubmitWorkAuthForm.gx with params :
-			//    idLab: "1507"
-			//    coreFacilitiesXMLString: "<coreFacilities> <CoreFacility ... /> </coreFacilities>"
-			//    accountName: "tempAccount"
-			//    shortAcct: ""
-			//    accountNumberBus: "01"
-			//    accountNumberOrg: "12345"
-			//    accountNumberFund: "1234"
-			//    accountNumberActivity: "12345"
-			//    accountNumberProject: ""
-			//    accountNumberAccount: "64300"
-			//    accountNumberAu: "1"
-			//    idFundingAgency: ""
-			//    custom1: ""
-			//    custom2: ""
-			//    custom3: ""
-			//    submitterEmail: "John.Hofer@hci.utah.edu"
-			//    startDate: "11/01/2017"
-			//    expirationDate: "03/01/2018"
-			//    totalDollarAmountDisplay: ""
-			//    activeAccount: "Y"
-			//    isPO: "N"
-
-			//  On the groups screen, the saving is done by SaveLab.gx
-
-			this.successMessage = 'Billing Account \"' + this.accountName_Chartfield + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
-
-			//this.window.close();
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
-				this.openSuccessDialog();
-			});
+            this.dialogRef.close(this._rowData);
 		} else {
 			// validation has caught problems - report them.
 			this.openErrorDialog();
@@ -773,12 +754,11 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		}
 
         if ((!(this.startDate_chartfield && this.startDate_chartfield != ''))
-		// if ((!(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''))
-						&& (this.usesCustomChartfields !== 'Y' || this.includeInCustomField_startDate)) {
+			&& (this.usesCustomChartfields !== 'Y' || this.includeInCustomField_startDate)) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if ((!(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() != ''))
+		if ((!(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield != ''))
 				&& ((this.usesCustomChartfields !== 'Y' ||   this.includeInCustomField_startDate)  && this.includeInCustomField_expirationDate)
 				&& ((this.usesCustomChartfields  == 'Y' && (!this.includeInCustomField_startDate)) && this.includeInCustomField_expirationDate)) {
 			errorFound = errorFound || true;
@@ -1118,16 +1098,16 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 				if (coreFacilities[0] != undefined && coreFacilities[0] != null) {
 					for (let i: number = 0; i < coreFacilities.length; i++) {
 						if (coreFacilities[i].acceptOnlineWorkAuth != null
-								&& coreFacilities[i].acceptOnlineWorkAuth != undefined
-								&& coreFacilities[i].acceptOnlineWorkAuth === 'Y') {
+							&& coreFacilities[i].acceptOnlineWorkAuth != undefined
+							&& coreFacilities[i].acceptOnlineWorkAuth === 'Y') {
 							coreFacilityApplicable.push(coreFacilities[i]);
 						}
 					}
 				} else {
 					if (coreFacilities.CoreFacility != undefined && coreFacilities.CoreFacility != null) {
 						if (coreFacilities.CoreFacility.acceptOnlineWorkAuth != null
-								&& coreFacilities.CoreFacility.acceptOnlineWorkAuth != undefined
-								&& coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
+							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth != undefined
+							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
 							coreFacilityApplicable.push(coreFacilities.CoreFacility);
 						}
 					}
@@ -1231,6 +1211,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 	}
 
 	private applyRowData(): void {
+        this.initializeCustomElements();
+
         if (this._rowData) {
             if (this._rowData && this._rowData.isPO === 'Y') {
                 this.loadPOAccount();
@@ -1242,12 +1224,10 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
         }
 	}
 
-    private loadChartfieldAccount(): void {
-        this.showField = this.CHARTFIELD;
-
+	private loadLabAndCoreFacilityFromRowData(): void {
         if (!this._rowData) {
-        	return;
-		}
+            return;
+        }
 
         // Set the selected lab!
         this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
@@ -1273,8 +1253,18 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
                         }
                     }
                 }
-			});
+            });
         });
+	}
+
+    private loadChartfieldAccount(): void {
+        this.showField = this.CHARTFIELD;
+
+        if (!this._rowData) {
+        	return;
+		}
+
+        this.loadLabAndCoreFacilityFromRowData();
 
         let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
         this.fundingAgencies = [];
