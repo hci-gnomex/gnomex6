@@ -30,6 +30,7 @@ import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {UtilModule} from "../util/util.module";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
 import {DatatracksOverviewModule} from "./datatracks-overview/datatracks-overview.module"
+import {DatatracksDetailModule} from "./datatracks-detail/datatracks-detail.module";
 
 /**
  * @author jdewell
@@ -63,7 +64,8 @@ import {DatatracksOverviewModule} from "./datatracks-overview/datatracks-overvie
         WindowModule,
         ReactiveFormsModule,
         AngularSplitModule,
-        DatatracksOverviewModule
+        DatatracksOverviewModule,
+        DatatracksDetailModule
     ],
     declarations: [
         BrowseDatatracksComponent, MoveDataTrackComponent

@@ -12,6 +12,7 @@ import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.ser
 import {DatatrackListResolverService} from "../services/resolvers/datatrack-list.resolver.service";
 import {NewExperimentComponent} from "../experiments/experiment-detail/new-experiment.component";
 import {DatatrackResolverService} from "../services/resolvers/datatrack-resolver.service";
+import {DatatracksDetailOverviewComponent} from "./datatracks-detail/datatrack-detail-overview.component";
 
 
 /**
@@ -25,23 +26,10 @@ const ROUTES: Routes = [
         {path:'organism',component: DatatracksOrganismComponent, outlet: 'datatracksPanel'},
         {path:'genomeBuild',component:DatatracksGenomeBuildComponent, outlet:'datatracksPanel',resolve: {genomeBuild: GenomeBuildResolverService}},
         {path:'folder',component: DatatracksFolderComponent , outlet: 'datatracksPanel'},
-        {path:':id', component: NewExperimentComponent, outlet: 'datatracksPanel',resolve: {datatrack: DatatrackResolverService }}
+        {path:':id', component: DatatracksDetailOverviewComponent, outlet: 'datatracksPanel',resolve: {datatrack: DatatrackResolverService }, runGuardsAndResolvers: "always"}
         ],
-        canActivate: [SubRouteGuardService], resolve:{datatrackList:DatatrackListResolverService}
-    },
-    { path: "datatracks/:idGenomeBuild", component: BrowseDatatracksComponent, children:[
-            {path:'organism',component: DatatracksOrganismComponent, outlet: 'datatracksPanel'},
-            {path:'genomeBuild',component:DatatracksGenomeBuildComponent, outlet:'datatracksPanel',resolve: {genomeBuild: GenomeBuildResolverService}},
-            {path:'folder',component: DatatracksFolderComponent , outlet: 'datatracksPanel'},
-            {path:':id', component: NewExperimentComponent, outlet: 'datatracksPanel',resolve: {datatrack: DatatrackResolverService }}
-        ],
-        canActivate: [SubRouteGuardService], resolve:{datatrackList:DatatrackListResolverService}, runGuardsAndResolvers: "paramsChange"
+        canActivate: [SubRouteGuardService]
     }
-
-
-
-
-
 
 
 
