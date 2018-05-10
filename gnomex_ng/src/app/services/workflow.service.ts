@@ -7,6 +7,7 @@ import {HttpParams} from "@angular/common/http";
 @Injectable()
 export class WorkflowService {
     public readonly ILLUMINA_SEQQC = "ILLSEQQC";
+    public readonly ILLSEQ_PREP = "ILLSEQPREP";
     public readonly ILLSEQ_PREP_QC = "ILLSEQPREPQC";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";

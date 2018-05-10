@@ -93,7 +93,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
 
     initialize() {
         let params: URLSearchParams = new URLSearchParams();
-        params.set("codeStepNext", "ILLSEQPREP");
+        params.set("codeStepNext", this.workflowService.ILLSEQ_PREP);
         this.cores = [];
         let params3: URLSearchParams = new URLSearchParams();
         params3.set("idCoreFacility", this.gnomexService.idCoreFacilityHTG);
