@@ -6,6 +6,7 @@ import {ActivatedRoute} from "@angular/router";
 import {QcWorkflowComponent} from "./qc-workflow.component";
 import {LibprepWorkflowComponent} from "./libprep-workflow.component";
 import {GnomexService} from "../services/gnomex.service";
+import {LibprepQcWorkflowComponent} from "./libprepqc-workflow.component";
 
 @Component({
     selector: 'workflow',
@@ -42,6 +43,7 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild('sidenav') sidenav: MatSidenav;
     @ViewChild('qcWorkflow') qcWorkflow: QcWorkflowComponent;
     @ViewChild('libPrepWorkflow') libPrepWorkflow: LibprepWorkflowComponent;
+    @ViewChild('libPrepQcWorkflow') libPrepQcWorkflow: LibprepQcWorkflowComponent;
 
     private showNav: boolean = true;
     private codeStepNext: any = 'QC';
@@ -96,6 +98,9 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
                 this.resetTab = 0;
                 break;
             case 'LIBPREP' :
+                this.resetTab = 1;
+                break;
+            case 'LIBPREPQC' :
                 this.resetTab = 1;
                 break;
 
@@ -154,17 +159,22 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
                 this.codeStepNext = 'QC';
                 break;
             case 1 :
-                this.codeStepNext = 'LIBPREP';
+                if (this.codeStepNext === 'QC') {
+                    this.libPrepWorkflow.initialize();
+                    this.codeStepNext = 'LIBPREP';
+                }
                 break;
-
         }
     }
 
     onClickLibPrep(event) {
+        this.codeStepNext = 'LIBPREP';
         this.libPrepWorkflow.onClickLibPrep(event);
     }
 
     onClickLibPrepQC(event) {
+        this.codeStepNext = 'LIBPREPQC';
+        this.libPrepQcWorkflow.onClickLibPrepQc(event);
     }
 
     onClickFlowCellAssem(event) {

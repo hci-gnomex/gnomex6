@@ -45,7 +45,7 @@ public class SaveWorkItemSolexaPrepQC extends GNomExCommand implements Serializa
 
 
     if (request.getParameter("workItemXMLString") != null && !request.getParameter("workItemXMLString").equals("")) {
-      workItemXMLString = "<WorkItemList>" + request.getParameter("workItemXMLString") + "</WorkItemList>";
+      workItemXMLString = request.getParameter("workItemXMLString");
 
       StringReader reader = new StringReader(workItemXMLString);
       try {

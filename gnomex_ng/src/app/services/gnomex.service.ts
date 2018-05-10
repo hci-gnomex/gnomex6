@@ -539,11 +539,11 @@ export class GnomexService {
 
     }
 
-    public isCoreFacilityIManage(idCoreFacility:String):Boolean {
+    public isCoreFacilityIManage(idCoreFacility:String): boolean {
         if (this.createSecurityAdvisorService.isSuperAdmin) {
             return true;
         }
-        var isMyCoreFacility:Boolean = false;
+        var isMyCoreFacility: boolean = false;
 
         for (let facility of this.createSecurityAdvisorService.coreFacilitiesICanManage) {
             if (facility.idCoreFacility === idCoreFacility) {
