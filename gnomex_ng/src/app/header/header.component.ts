@@ -745,7 +745,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/libprepQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - FlowCell Assembly',
@@ -853,7 +853,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/libprepQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - FlowCell Assembly',
@@ -1132,7 +1132,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
                         iconName: '../../assets/flask.png',
-                        route: ''
+                        route: '/libprepQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - FlowCell Assembly',
