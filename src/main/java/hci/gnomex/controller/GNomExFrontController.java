@@ -306,7 +306,7 @@ public static boolean areWeLite() {
 
 	// if command didn't provide one, default to getJSON.jsp (for error)
 	if (forwardJSP == null || forwardJSP.equals("")) {
-		forwardJSP = "/getJSON.jsp";
+		forwardJSP = "/message.jsp";
 	}
 
 	// Convert it to JSON and give it back

@@ -1,0 +1,47 @@
+<h6 mat-dialog-title>Configure Product Types</h6>
+<mat-dialog-content>
+    <div class="flex-container-row margin-bottom">
+        <button mat-button (click)="this.addProductType()"><img class="icon" src="../../assets/page_add.png">Add Product Type</button>
+        <button mat-button [disabled]="this.selectedProductType == null || this.selectedProductType.canDelete != 'Y'" (click)="this.removeProductType()"><img class="icon" src="../../assets/page_remove.png">Remove Product Type</button>
+    </div>
+    <div class="flex-container-row">
+        <tree-root #tree class="flex-one margin-right border-right" [nodes]="this.nodes" [options]="this.options" (activate)="this.onActivate($event)"></tree-root>
+        <div [hidden]="this.selectedProductType" class="flex-three">{{''}}</div>
+        <form [formGroup]="this.form" class="flex-three flex-container-col" [hidden]="!this.selectedProductType">
+            <mat-form-field class="full-width">
+                <mat-select placeholder="General - Core Facility" [formControlName]="'coreFacility'">
+                    <mat-option *ngFor="let cf of this.coreFacilities" [value]="cf.idCoreFacility">{{cf.display}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="full-width">
+                <mat-select placeholder="General - Vendor" [formControlName]="'vendor'">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let v of this.vendors" [value]="v.idVendor">{{v.display}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="flex-container-row full-width">
+                <mat-form-field class="flex-one margin-right">
+                    <mat-select placeholder="Price Category" [formControlName]="'priceCategory'">
+                        <mat-option *ngFor="let pc of this.priceCategories" [value]="pc.idPriceCategory">{{pc.display}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button class="flex-one margin-right" mat-button color="accent" (click)="this.toggleNewPriceCategory()">{{this.showNewPriceCategoryInput ? 'Close' : 'New'}}</button>
+                <mat-form-field [hidden]="!this.showNewPriceCategoryInput" class="flex-one margin-right">
+                    <input matInput placeholder="Name" [formControlName]="'newPriceCategoryName'">
+                </mat-form-field>
+                <button class="flex-one" [hidden]="!this.showNewPriceCategoryInput" [disabled]="this.form.controls['newPriceCategoryName'].invalid"
+                        mat-button color="primary" (click)="this.savePriceCategory()">Save</button>
+            </div>
+            <mat-form-field class="full-width">
+            <textarea matInput placeholder="Description" [formControlName]="'description'"
+                      matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+            </mat-form-field>
+        </form>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button [hidden]="!this.selectedProductType || this.showSpinner" [disabled]="this.form.invalid" color="primary" (click)="this.save()">Save</button>
+    <button mat-button [hidden]="this.showSpinner" [mat-dialog-close]>Close</button>
+    <span [hidden]="!this.form.dirty || this.showSpinner" class="dirty-note margin-right">Changes Have Not Been Saved</span>
+    <mat-spinner [hidden]="!this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>

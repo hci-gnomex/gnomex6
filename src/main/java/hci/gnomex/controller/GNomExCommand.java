@@ -42,8 +42,8 @@ public abstract class GNomExCommand extends Command implements Serializable {
   protected String jsonResult = null;
   protected String errorDetails = "";
 
-  public String SUCCESS_JSP = "/getJSON.jsp";
-  public String ERROR_JSP = "/getJSON.jsp";
+  public String SUCCESS_JSP = "/message.jsp";
+  public String ERROR_JSP = "/message.jsp";
   protected String rowSaveCMD;
   protected String rowDeleteCMD;
 

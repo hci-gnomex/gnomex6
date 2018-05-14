@@ -47,6 +47,7 @@ import {UsersGroupsTablistModule} from "./usersGroups/users-groups-tablist.modul
 import {WorkflowModule} from "./workflow/workflow.module";
 
 import {AboutModule} from "./about/about.module";
+import {ProductsModule} from "./products/products.module";
 
 
 
@@ -87,7 +88,8 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         TestPageModule,
         AccountModule,
         UsersGroupsTablistModule,
-        WorkflowModule
+        WorkflowModule,
+        ProductsModule,
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],
