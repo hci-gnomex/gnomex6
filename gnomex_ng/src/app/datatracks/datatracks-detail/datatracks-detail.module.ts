@@ -9,9 +9,11 @@ import {DATATRACKS_ROUTING} from "../datatracks.routes";
 import {ServicesModule} from "../../services/services.module";
 import {UtilModule} from "../../util/util.module";
 
-import {DatatracksDetailOverviewComponent,DatatracksAnnotationTabComponent} from "./index"
+import {DatatracksDetailOverviewComponent,DatatracksAnnotationTabComponent,
+        DatatracksSummaryTabComponent,DatatrackDetailOverviewService} from "./index"
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
+import {RichEditorModule} from "../../../modules/rich-editor.module";
 
 
 
@@ -28,6 +30,7 @@ import {ConfigureAnnotationsModule} from "../../util/configure-annotations.modul
         CommonModule,
         FormsModule,
         ServicesModule,
+        RichEditorModule,
         UtilModule,
         ReactiveFormsModule,
         ConfigureAnnotationsModule
@@ -35,10 +38,12 @@ import {ConfigureAnnotationsModule} from "../../util/configure-annotations.modul
     ],
     declarations: [
         DatatracksDetailOverviewComponent,
-        DatatracksAnnotationTabComponent
+        DatatracksAnnotationTabComponent,
+        DatatracksSummaryTabComponent
 
     ],
     entryComponents: [ConfigAnnotationDialogComponent],
+    providers: [DatatrackDetailOverviewService]
 })
 export class DatatracksDetailModule {
 }

@@ -1,13 +1,14 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, Input, OnChanges, OnDestroy, OnInit,SimpleChanges} from "@angular/core";
+import { Component, Input,OnDestroy, OnInit} from "@angular/core";
 import {DataTrackService} from "../../services/data-track.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {selectRequired} from "../../util/validators/select-required.validator";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
+import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
 
 
 
@@ -31,7 +32,7 @@ import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dial
 
 `]
 })
-export class DatatracksAnnotationTabComponent implements OnInit, OnDestroy,OnChanges{
+export class DatatracksAnnotationTabComponent implements OnInit, OnDestroy{
     public annotationForm: FormGroup;
     private _annotations: IAnnotation[];
     private urlAnnotations: any[] = [];
@@ -40,6 +41,8 @@ export class DatatracksAnnotationTabComponent implements OnInit, OnDestroy,OnCha
         this._annotations = a;
         if(!this.annotationForm){
             this.annotationForm =  new FormGroup({});
+            this.dtOverviewService.addFormToParent("annotationForm", this.annotationForm);
+
         }
 
         this._annotations.forEach(annot => {
@@ -78,16 +81,13 @@ export class DatatracksAnnotationTabComponent implements OnInit, OnDestroy,OnCha
 
 
     constructor(private dataTrackService:DataTrackService,private fb:FormBuilder,
-                private dialog: MatDialog){
+                private dialog: MatDialog,private dtOverviewService: DatatrackDetailOverviewService){
     }
 
     ngOnInit(){
 
     }
 
-    ngOnChanges(change:SimpleChanges){
-        console.log("A change occured ", change)
-    }
 
     loadConfigAnnotations(){
         let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.dialog.open(ConfigAnnotationDialogComponent, {

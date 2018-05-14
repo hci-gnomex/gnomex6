@@ -6,40 +6,42 @@ import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
+import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
+
 
 
 
 
 @Component({
-    template: `        
-            <div style="display:flex; flex-direction:column; height:100%; width:100%;">
-                <!--  <img [src]="dtService.datatrackListTreeNode.icon">Genome Build: -->
-                <div style="padding-bottom: .5em;padding-left:1em;">
-                   
-                    {{"test"}}
-                </div>
-                <div style="display:flex; flex: 1;">
+    template: `
+        <div style="display:flex; flex-direction:column; height:100%; width:100%;">
+            <!--  <img [src]="dtService.datatrackListTreeNode.icon">Genome Build: -->
+            <div style="padding-bottom: .5em;padding-left:1em;">
 
-                    <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border"
-                                   (selectedTabChange)="tabChanged($event)">
-                        <mat-tab style="height:100%" label="Summary">
-                            Hello again again
-                        </mat-tab>
-                        <mat-tab style="height:100%" label="Annotations">
-                            <dt-annotation-tab [annotations]="annotations"></dt-annotation-tab>
-                        </mat-tab>
-                        <mat-tab style="height:100%;" label="Sequences Files">
-                            Hello
-                        </mat-tab>
-                    </mat-tab-group>
-                </div>
-                <div>
-                    <save-footer (saveClicked)="save()" [disableSave]="!canWrite"
-                                 [dirty]="false"></save-footer>
-                </div>
-
-
+                {{"test"}}
             </div>
+            <div style="display:flex; flex: 1;">
+
+                <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border"
+                               (selectedTabChange)="tabChanged($event)">
+                    <mat-tab style="height:100%" label="Summary">
+                        <dt-summary-tab></dt-summary-tab>
+                    </mat-tab>
+                    <mat-tab style="height:100%" label="Annotations">
+                        <dt-annotation-tab [annotations]="annotations"></dt-annotation-tab>
+                    </mat-tab>
+                    <mat-tab style="height:100%;" label="Sequences Files">
+                        Hello
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+            <div>
+                <save-footer (saveClicked)="save()"
+                             [disableSave]="this.dtOverviewService.dtOverviewForm.invalid"
+                             [dirty]="this.dtOverviewService.dtOverviewForm.dirty"></save-footer>
+            </div>
+            
+        </div>
 `,
 
     styles: [`
@@ -61,7 +63,8 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
     private datatrack: any;
     private annotations: IAnnotation[];
 
-    constructor(private dataTrackService:DataTrackService,private route:ActivatedRoute){
+    constructor(private dataTrackService:DataTrackService,private route:ActivatedRoute,
+                public dtOverviewService: DatatrackDetailOverviewService){
     }
 
     ngOnInit(){
@@ -93,10 +96,9 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
 
     }
     ngOnDestroy(){
-
     }
     save(){
-
+        console.log(this.dtOverviewService.dtOverviewForm);
     }
 
     tabChanged(event:any){
