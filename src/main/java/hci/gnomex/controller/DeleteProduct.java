@@ -3,7 +3,7 @@ package hci.gnomex.controller;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.Json;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Hibernate;
@@ -16,7 +16,7 @@ import hci.gnomex.model.Product;
 import hci.gnomex.model.ProductType;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import org.apache.log4j.Logger;
 
 
@@ -78,8 +78,7 @@ public class DeleteProduct extends GNomExCommand implements Serializable {
 
         sess.flush();
 
-        this.xmlResult = "<SUCCESS message=\"" + resultMessage + "\"/>";
-
+        this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").add("message", resultMessage).build().toString();
         setResponsePage(this.SUCCESS_JSP);
 
       } else {
@@ -108,8 +107,7 @@ public class DeleteProduct extends GNomExCommand implements Serializable {
       return null;
     }
     String billingItemQuery = "SELECT bi from BillingItem as bi where bi.idPrice=" + price.getIdPrice();
-    List bi = sess.createQuery( billingItemQuery ).list();
-    return bi;
+    return sess.createQuery( billingItemQuery ).list();
   }
 
   private void inactivatePrice(Price price, Session sess) {
@@ -123,8 +121,7 @@ public class DeleteProduct extends GNomExCommand implements Serializable {
       return null;
     }
     String ledgerEntryQuery = "SELECT le from ProductLedger as le where le.idProduct=" + product.getIdProduct();
-    List le = sess.createQuery( ledgerEntryQuery ).list();
-    return le;
+    return sess.createQuery( ledgerEntryQuery ).list();
   }
 
   private void inactivateProduct(Product product, Session sess) {

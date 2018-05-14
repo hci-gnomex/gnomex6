@@ -939,7 +939,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Products',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-products'
                     },
                 ]
             },
@@ -1241,7 +1241,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Products',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/configure-products'
                     },
                 ]
             },

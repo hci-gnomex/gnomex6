@@ -3,7 +3,6 @@ package hci.gnomex.controller;
 import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
-import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Price;
 import hci.gnomex.model.Product;
@@ -12,13 +11,10 @@ import hci.gnomex.model.UserPermissionKind;
 import hci.gnomex.utility.DictionaryHelper;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.query.Query;
@@ -80,7 +76,7 @@ public class GetProductList extends GNomExCommand implements Serializable {
 			// and config windows.
 			// if they are normal users then bring back all products b/c they may be able to submit to all cores. This list that this servlet returns is used in
 			// both locations.
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			if (isAdmin) {
 				buf.append(" SELECT p from Product p ");
 				buf.append(" JOIN p.productType as pt ");
@@ -117,19 +113,6 @@ public class GetProductList extends GNomExCommand implements Serializable {
 			this.xmlResult = out.outputString(doc);
 
 			setResponsePage(this.SUCCESS_JSP);
-		} catch (NamingException e) {
-			this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in GetProductList ", e);
-
-			throw new RollBackCommandException(e.getMessage());
-
-		} catch (SQLException e) {
-			this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in GetProductList ", e);
-
-			throw new RollBackCommandException(e.getMessage());
-		} catch (XMLReflectException e) {
-			this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in GetProductList ", e);
-
-			throw new RollBackCommandException(e.getMessage());
 		} catch (Exception e) {
 			this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in GetProductList ", e);
 
@@ -155,12 +138,11 @@ public class GetProductList extends GNomExCommand implements Serializable {
 
 		if (product.getIdPrice() != null) {
 			priceQuery = "SELECT p from Price as p where p.idPrice=" + product.getIdPrice();
+			return (Price) sess.createQuery(priceQuery).uniqueResult();
 		} else {
-			priceQuery = "SELECT p from Price as p where p.idPriceCategory=" + pt.getIdPriceCategory() + "       AND p.name='" + product.getName() + "'";
+			priceQuery = "SELECT p from Price as p where p.idPriceCategory=" + pt.getIdPriceCategory() + "       AND p.name= :name ";
+			return (Price) sess.createQuery(priceQuery).setParameter("name", product.getName()).uniqueResult();
 		}
-		Price price = (Price) sess.createQuery(priceQuery).uniqueResult();
-
-		return price;
 	}
 
 }

@@ -3,10 +3,9 @@ package hci.gnomex.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.HashMap;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.Json;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
@@ -19,7 +18,7 @@ import hci.gnomex.model.Product;
 import hci.gnomex.model.ProductType;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PriceUtil;
 import org.apache.log4j.Logger;
 public class SaveProduct extends GNomExCommand implements Serializable {
@@ -47,7 +46,7 @@ public class SaveProduct extends GNomExCommand implements Serializable {
     this.addInvalidFields( errors );
 
     if( productScreen.getIdProduct() == null
-        || productScreen.getIdProduct().intValue() == 0 ) {
+        || productScreen.getIdProduct() == 0 ) {
       isNewProduct = true;
     }
 
@@ -102,7 +101,7 @@ public class SaveProduct extends GNomExCommand implements Serializable {
       DictionaryHelper dictionaryHelper = DictionaryHelper.getInstance( sess );
 
       ProductType pt = dictionaryHelper.getProductTypeObject(
-          productScreen.getIdProductType().intValue() );
+          productScreen.getIdProductType() );
 
       if( pt == null || pt.getIdCoreFacility() == null
           || this.getSecAdvisor().isCoreFacilityIManage(
@@ -110,7 +109,7 @@ public class SaveProduct extends GNomExCommand implements Serializable {
           || this.getSecAdvisor().hasPermission(
               SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES ) ) {
 
-        Product product = null;
+        Product product;
 
         if( isNewProduct ) {
           product = productScreen;
@@ -133,9 +132,7 @@ public class SaveProduct extends GNomExCommand implements Serializable {
 
         DictionaryHelper.reload( sess );
 
-        this.xmlResult = "<SUCCESS idProduct=\"" + product.getIdProduct()
-        + "\"/>";
-
+        this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").add("idProduct", product.getIdProduct()).build().toString();
         setResponsePage( this.SUCCESS_JSP );
       } else {
         this.addInvalidField( "Insufficient permissions",
@@ -261,7 +258,7 @@ public class SaveProduct extends GNomExCommand implements Serializable {
     }
 
     // Make sure product has correct idprice
-    if( product.getIdPrice() != price.getIdPrice() ) {
+    if( !price.getIdPrice().equals(product.getIdPrice()) ) {
       product.setIdPrice( price.getIdPrice() );
       modified = true;
     }
@@ -278,14 +275,4 @@ public class SaveProduct extends GNomExCommand implements Serializable {
     return false;
   }
 
-  private class ProductComparator implements Comparator, Serializable {
-
-    public int compare( Object o1, Object o2 ) {
-      Product org1 = ( Product ) o1;
-      Product org2 = ( Product ) o2;
-
-      return org1.getIdProduct().compareTo( org2.getIdProduct() );
-
-    }
-  }
 }
