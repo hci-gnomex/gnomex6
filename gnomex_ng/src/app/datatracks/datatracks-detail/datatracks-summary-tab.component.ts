@@ -1,15 +1,13 @@
 
-import {AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit,Component, OnInit, ViewChild} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
-import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {URLSearchParams} from "@angular/http";
 import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
-import jqxComboBox = jqwidgets.jqxComboBox;
-import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
-import {DatatrackDetailOverviewService} from "../../services/datatrack-detail-overview.service";
+import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
+
 
 
 
@@ -33,7 +31,7 @@ export class DatatracksSummaryTabComponent implements OnInit, AfterViewInit{
 
     constructor(protected fb: FormBuilder,private dtService: DataTrackService,
                 private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService,
-                private dtOverviewService: DatatrackDetailOverviewService){
+                private dtOverviewService : DatatrackDetailOverviewService){
     }
 
 

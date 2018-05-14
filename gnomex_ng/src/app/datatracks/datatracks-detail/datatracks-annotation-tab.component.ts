@@ -1,14 +1,14 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
+import { Component, Input,OnDestroy, OnInit} from "@angular/core";
 import {DataTrackService} from "../../services/data-track.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {selectRequired} from "../../util/validators/select-required.validator";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
-import {DatatrackDetailOverviewService} from "../../services/datatrack-detail-overview.service";
+import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
 
 
 

@@ -42,7 +42,7 @@ import {WorkflowService} from "./workflow.service";
 import {GridColumnValidateService} from "./grid-column-validate.service";
 import {BillingPOFormService} from "./billingPOForm.service";
 import {ProductsService} from "./products.service";
-import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
+
 
 @NgModule({
     imports: [CommonModule],
@@ -95,8 +95,7 @@ import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.servic
         DatatrackResolverService,
         LabResolverService,
         BillingPOFormService,
-        ProductsService,
-        DatatrackDetailOverviewService
+        ProductsService
     ]})
 export class ServicesModule {
 }

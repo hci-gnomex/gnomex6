@@ -6,7 +6,8 @@ import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
-import {DatatrackDetailOverviewService} from "../../services/datatrack-detail-overview.service";
+import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
+
 
 
 
