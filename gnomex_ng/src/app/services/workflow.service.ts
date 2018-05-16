@@ -7,7 +7,9 @@ import {HttpParams} from "@angular/common/http";
 @Injectable()
 export class WorkflowService {
     public readonly ILLUMINA_SEQQC = "ILLSEQQC";
+    public readonly ILLSEQ_PREP = "ILLSEQPREP";
     public readonly ILLSEQ_PREP_QC = "ILLSEQPREPQC";
+    public readonly ILLSEQ_CLUSTER_GEN = "ILLSEQASSEM";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";
     public readonly NANOSTRING = "NANO";
@@ -121,6 +123,17 @@ export class WorkflowService {
 
     saveWorkItemSolexaPrep(params: URLSearchParams):  Observable<any> {
         return this.http.get("/gnomex/SaveWorkItemSolexaPrep.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+
+    }
+
+    deleteWorkItem(params: URLSearchParams):  Observable<any> {
+        return this.http.get("/gnomex/DeleteWorkItem.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {

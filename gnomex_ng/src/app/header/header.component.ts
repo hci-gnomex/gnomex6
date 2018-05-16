@@ -751,7 +751,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/flowcellassmQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
@@ -859,7 +859,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/flowcellassmQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
@@ -1138,7 +1138,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/flowcellassmQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
@@ -1926,6 +1926,8 @@ export class HeaderComponent implements OnInit{
             if (menuItem.context === context) {
                 navMenu[menuItemCtr].hidden = true;
                 navMenu[menuItemCtr].class = 'header-flex0';
+                menuItemCtr++;
+            } else {
                 menuItemCtr++;
             }
             if (menuItem.children) {
