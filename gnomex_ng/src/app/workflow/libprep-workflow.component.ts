@@ -317,7 +317,6 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         if (event.source.selected) {
             this.workItem = event.source.value;
             this.workingWorkItemList = this.filterWorkItems();
-            this.buildRequestIds(this.workingWorkItemList, "");
         }
     }
 

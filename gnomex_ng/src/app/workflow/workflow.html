@@ -5,8 +5,9 @@
             <img src="../../assets/arrow_right.png">
         </ng-template>
         <qc-workflow [hidden]="codeStepNext!='QC'" #qcWorkflow class="workflow"></qc-workflow>
-        <libprep-workflow [hidden]="codeStepNext!='LIBPREP'" #libPrepWorkflow class="workflow"></libprep-workflow>
-        <libprepqc-workflow [hidden]="codeStepNext!='LIBPREPQC'" #libPrepQcWorkflow class="workflow"></libprepqc-workflow>
+        <libprep-workflow [hidden]="codeStepNext!='ILLSEQPREP'" #libPrepWorkflow class="workflow"></libprep-workflow>
+        <libprepqc-workflow [hidden]="codeStepNext!='ILLSEQPREPQC'" #libPrepQcWorkflow class="workflow"></libprepqc-workflow>
+        <flowcellassm-workflow [hidden]="codeStepNext!='ILLSEQASSEM'" #flowCellAssmWorkflow class="workflow"></flowcellassm-workflow>
     </mat-sidenav-content>
     <mat-sidenav style="width:15%;" #sidenav mode="side" (keydown.escape)="close('escape')">
         <mat-tab-group id="groupTabGroup" style="height: 100%" [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)">
@@ -27,12 +28,12 @@
                     <mat-label>Illumina</mat-label>
                     <button mat-button (click)="onClickLibPrep($event)"><img src="../../assets/flask.png">Lib Prep</button>
                     <button mat-button (click)="onClickLibPrepQC($event)"><img src="../../assets/flask.png">Lib Prep QC</button>
-                    <button mat-button (click)="onClickFlowCellAssem($event)"><img src="../../assets/DNA_diag.png">Flow Cell Assem</button>
+                    <button mat-button (click)="onClickFlowCellAssm($event)"><img src="../../assets/DNA_diag.png">Flow Cell Assem</button>
                     <button mat-button (click)="onClickFinalizedFlowCell($event)"><img src="../../assets/DNA_diag.png">Finalize Flow Cell</button>
                     <button mat-button (click)="onClickDataPipeline($event)"><img src="../../assets/server_go.png">Data Pipeline</button>
                 </div>
             </mat-tab>
-            <mat-tab style="height:100%;">
+            <mat-tab id="workflowTabGroup" [hidden]="microarrayDisabled" *ngIf="!microarrayDisabled" style="height:100%;">
                 <ng-template mat-tab-label>
                     <img matTooltip="Microarray workflow" src="../../assets/microarray_small.png">
                 </ng-template>

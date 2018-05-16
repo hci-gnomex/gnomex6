@@ -7,6 +7,8 @@ import {QcWorkflowComponent} from "./qc-workflow.component";
 import {LibprepWorkflowComponent} from "./libprep-workflow.component";
 import {GnomexService} from "../services/gnomex.service";
 import {LibprepQcWorkflowComponent} from "./libprepqc-workflow.component";
+import {FlowcellassmWorkflowComponent} from "./flowcellassm-workflow.component";
+import {WorkflowService} from "../services/workflow.service";
 
 @Component({
     selector: 'workflow',
@@ -24,7 +26,7 @@ import {LibprepQcWorkflowComponent} from "./libprepqc-workflow.component";
         }
         .workflow {
             display: flex;
-            height: 95%;
+            height: 94%;
         }
         .sidebutton {
             height: 5%;
@@ -44,13 +46,16 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild('qcWorkflow') qcWorkflow: QcWorkflowComponent;
     @ViewChild('libPrepWorkflow') libPrepWorkflow: LibprepWorkflowComponent;
     @ViewChild('libPrepQcWorkflow') libPrepQcWorkflow: LibprepQcWorkflowComponent;
+    @ViewChild('flowCellAssmWorkflow') flowCellAssmWorkflow: FlowcellassmWorkflowComponent;
 
     private showNav: boolean = true;
     private codeStepNext: any = 'QC';
     private selectedTab = 0;
     private resetTab = 0;
+    private microarrayDisabled: boolean = true;
     private combinedQCTabItems: any[] = [];
     constructor(private route: ActivatedRoute,
+                private workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private changeRef:ChangeDetectorRef) {
 
@@ -61,7 +66,6 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
         this.route
             .data
             .subscribe(v => {
-                console.log(v);
                 this.codeStepNext = v.codeStepNext;
             });
         this.buildCombinedQCTabItems();
@@ -70,7 +74,10 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     buildCombinedQCTabItems() {
         let allObj = {label: 'All', code: 'all'};
         this.combinedQCTabItems.push(allObj);
-        if (this.gnomexService.usesExperimentType('HISEQ')) {
+        if (this.gnomexService.usesExperimentType('HISEQ') ||
+            this.gnomexService.usesExperimentType('MISEQ') ||
+            this.gnomexService.usesExperimentType('NOSEQ')
+        ) {
             allObj = {label: 'Illumina', code: 'illseq'};
             this.combinedQCTabItems.push(allObj);
         }
@@ -81,6 +88,7 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
         if (this.gnomexService.usesExperimentType('MICROARRAY')) {
             allObj = {label: 'Microarray', code: 'microarray'};
             this.combinedQCTabItems.push(allObj);
+            this.microarrayDisabled = false;
         }
         if (this.gnomexService.usesExperimentType('QC')) {
             allObj = {label: 'Sample Quality', code: 'qc'};
@@ -97,10 +105,13 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
             case 'QC' :
                 this.resetTab = 0;
                 break;
-            case 'LIBPREP' :
+            case this.workflowService.ILLSEQ_PREP :
                 this.resetTab = 1;
                 break;
-            case 'LIBPREPQC' :
+            case this.workflowService.ILLSEQ_PREP_QC :
+                this.resetTab = 1;
+                break;
+            case this.workflowService.ILLSEQ_CLUSTER_GEN :
                 this.resetTab = 1;
                 break;
 
@@ -126,7 +137,6 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
                 break;
 
         }
-        console.log("qc");
     }
 
     ngAfterViewChecked() {
@@ -153,31 +163,32 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     }
 
     onGroupsTabChange(event) {
-        console.log("tabh");
         switch (event.index) {
             case 0 :
-                this.codeStepNext = 'QC';
+                this.codeStepNext = this.workflowService.QC;
                 break;
             case 1 :
-                if (this.codeStepNext === 'QC') {
+                if (this.codeStepNext === this.workflowService.QC) {
                     this.libPrepWorkflow.initialize();
-                    this.codeStepNext = 'LIBPREP';
+                    this.codeStepNext = this.workflowService.ILLSEQ_PREP;
                 }
                 break;
         }
     }
 
     onClickLibPrep(event) {
-        this.codeStepNext = 'LIBPREP';
+        this.codeStepNext = this.workflowService.ILLSEQ_PREP;
         this.libPrepWorkflow.onClickLibPrep(event);
     }
 
     onClickLibPrepQC(event) {
-        this.codeStepNext = 'LIBPREPQC';
+        this.codeStepNext = this.workflowService.ILLSEQ_PREP_QC;
         this.libPrepQcWorkflow.onClickLibPrepQc(event);
     }
 
-    onClickFlowCellAssem(event) {
+    onClickFlowCellAssm(event) {
+        this.codeStepNext = this.workflowService.ILLSEQ_CLUSTER_GEN;
+        this.flowCellAssmWorkflow.onClickFlowCellAssm(event);
     }
 
     onClickFinalizedFlowCell(event) {
