@@ -8,7 +8,6 @@ import {ServicesModule} from "../services/services.module";
 import {TreeModule} from "angular-tree-component";
 
 import {BrowseDictionaryComponent, BrowseDictionaryComponentLauncher} from "./browse-dictionary.component";
-import {ConfigureAnnotationsComponent} from "./configure-annotations.component";
 import {AgGridModule} from "ag-grid-angular";
 import {ConfigCoreFacilityComponent} from "./config-core-facility.component"
 import {AngularSplitModule} from "angular-split";
@@ -19,12 +18,14 @@ import {ConfigureOrganismsComponent} from "./configure-organisms.component";
 import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
 import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
+import {ConfigureAnnotationsModule} from "../util/configure-annotations.module";
 
 
 
 @NgModule({
     imports: [
         CONFIGURATION_ROUTING,
+        ConfigureAnnotationsModule,
         AngularMaterialModule,
         CommonModule,
         FormsModule,
@@ -44,7 +45,6 @@ import {DateRenderer} from "../util/grid-renderers/date.renderer";
     declarations: [
         BrowseDictionaryComponent,
         BrowseDictionaryComponentLauncher,
-        ConfigureAnnotationsComponent,
         ConfigCoreFacilityComponent,
         ConfigCoreFacilityEditComponent,
         ConfigureOrganismsComponent,

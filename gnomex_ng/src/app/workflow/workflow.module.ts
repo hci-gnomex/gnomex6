@@ -30,6 +30,7 @@ import { UploadViewRemoveRenderer } from "../util/grid-renderers/upload-view-rem
 import {WorkflowComponent} from "./workflow.component";
 import {LibprepWorkflowComponent} from "./libprep-workflow.component";
 import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
+import {LibprepQcWorkflowComponent} from "./libprepqc-workflow.component";
 
 /**
  * @author jdewell
@@ -67,9 +68,9 @@ import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
         UtilModule,
         ReactiveFormsModule,
     ],
-    declarations: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent],
-    entryComponents: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent],
-    exports: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent]
+    declarations: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent],
+    entryComponents: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent],
+    exports: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent]
 })
 export class WorkflowModule {
 }

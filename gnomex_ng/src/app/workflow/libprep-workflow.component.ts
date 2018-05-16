@@ -9,16 +9,17 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 
 @Component({
     selector: 'libprep-workflow',
     templateUrl: 'libprep-workflow.html',
     styles: [`
-        .flex-column-container {
+        .flex-column-container-workflow {
             display: flex;
             flex-direction: column;
             background-color: white;
-            height: 100%;
+            height: 99%;
             width: 100%;
         }
         .flex-row-container {
@@ -66,6 +67,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     private coreIds: any[] = [];
     private cores: any[] = [];
     private requestIds: any[] = [];
+    private seqLibProtocols: any[] = [];
     private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
     private changedRowMap: Map<string, any> = new Map<string, any>();
     private columnDefs;
@@ -84,21 +86,27 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
+                private securityAdvisor: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService) {
 
     }
 
     initialize() {
         let params: URLSearchParams = new URLSearchParams();
-        params.set("codeStepNext", "ILLSEQPREP");
+        params.set("codeStepNext", this.workflowService.ILLSEQ_PREP);
         this.cores = [];
         let params3: URLSearchParams = new URLSearchParams();
         params3.set("idCoreFacility", this.gnomexService.idCoreFacilityHTG);
         this.workflowService.getCoreAdmins(params3).subscribe((response: any[]) => {
             this.coreAdmins = response;
 
-            this.workflowService.getWorkItemList(params).subscribe((response: any[]) => {
+            this.workflowService.getWorkItemList(params).subscribe((response: any) => {
                 this.workItemList = response;
+                if (!this.securityAdvisor.isArray(response)) {
+                    this.workItemList = [response.WorkItem];
+                } else {
+                    this.workItemList = response;
+                }
                 this.coreIds = [...new Set(this.workItemList.map(item => item.idCoreFacility))];
                 for (let coreId of this.coreIds) {
                     let coreObj = {
@@ -113,7 +121,11 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                     this.core = this.cores[0];
                 }
                 this.workingWorkItemList = this.filterWorkItems();
+                this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
 
+                this.seqLibProtocols = this.gnomexService.seqLibProtocolsWithAppFilters.filter(item =>
+                    item.value === "" || (item.codeApplicationType === "Illumina" && this.gnomexService.isCoreFacilityIManage(item.idCoreFacility))
+                );
                 this.columnDefs = [
                     {
                         headerName: "Sample #",
@@ -136,11 +148,11 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                     {
                         headerName: "Library Protocol",
                         editable: true,
-                        width: 450,
+                        width: 500,
                         field: "idSeqLibProtocol",
                         cellRendererFramework: SelectRenderer,
                         cellEditorFramework: SelectEditor,
-                        selectOptions: this.gnomexService.seqLibProtocolsWithAppFilters,
+                        selectOptions: this.seqLibProtocols,
                         selectOptionsDisplayField: "display",
                         selectOptionsValueField: "idSeqLibProtocol",
                         showFillButton: true,
@@ -184,7 +196,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                     {
                         headerName: "Status",
                         editable: true,
-                        width: 150,
+                        width: 100,
                         field: "seqPrepStatus",
                         cellRendererFramework: SelectRenderer,
                         cellEditorFramework: SelectEditor,
@@ -305,6 +317,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         if (event.source.selected) {
             this.workItem = event.source.value;
             this.workingWorkItemList = this.filterWorkItems();
+            this.buildRequestIds(this.workingWorkItemList, "");
         }
     }
 
@@ -519,8 +532,11 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     onClickLibPrep(event) {
-        this.workingWorkItemList = this.workItemList;
-        this.buildRequestIds(this.workingWorkItemList, "all");
+        this.initialize();
+    }
+
+    refreshWorklist(event) {
+        this.initialize();
     }
 
 }

@@ -637,6 +637,11 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
     n.setAttribute("qcLibConcentration", row[WorkItemFilter.QC_LIB_CONCENTRATION] == null ? "" :  ((BigDecimal)row[WorkItemFilter.QC_LIB_CONCENTRATION]).toString());
     //n.setAttribute("libPrepQCProtocol", libPrepQCProtocol == null ? "" : libPrepQCProtocol);
     n.setAttribute("idLibPrepQCProtocol", row[WorkItemFilter.ID_LIB_PREP_QC_PROTOCOL] == null ? "" : ((Integer)row[WorkItemFilter.ID_LIB_PREP_QC_PROTOCOL]).toString());
+
+    String seqPrepQCStatus = "";
+    seqPrepQCStatus = row[WorkItemFilter.WI_STATUS] == null ? "" :  (String)row[WorkItemFilter.WI_STATUS];
+    n.setAttribute("seqPrepQCStatus", seqPrepQCStatus);
+
   }
 
   private void fillSeqPrep(Element n, Object[] row, String codeRequestCategory, HashMap<String, Integer> seqLibProtocolMap) {

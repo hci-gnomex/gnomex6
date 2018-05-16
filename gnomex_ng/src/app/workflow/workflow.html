@@ -1,27 +1,27 @@
 <mat-sidenav-container class="sidenav-container" (backdropClick)="close('backdrop')">
     <mat-sidenav-content style="background-color: white">
-        <button mat-button class="sidebutton" (click)="toggle($event)"><img *ngIf="showNav;else closedNav" src="../../assets/arrow_left.png"></button>
+        <button mat-button matTooltip="Minimize navigation panel" class="sidebutton" (click)="toggle($event)"><img *ngIf="showNav;else closedNav" src="../../assets/arrow_left.png"></button>
         <ng-template #closedNav>
             <img src="../../assets/arrow_right.png">
         </ng-template>
-
         <qc-workflow [hidden]="codeStepNext!='QC'" #qcWorkflow class="workflow"></qc-workflow>
         <libprep-workflow [hidden]="codeStepNext!='LIBPREP'" #libPrepWorkflow class="workflow"></libprep-workflow>
+        <libprepqc-workflow [hidden]="codeStepNext!='LIBPREPQC'" #libPrepQcWorkflow class="workflow"></libprepqc-workflow>
     </mat-sidenav-content>
     <mat-sidenav style="width:15%;" #sidenav mode="side" (keydown.escape)="close('escape')">
         <mat-tab-group id="groupTabGroup" style="height: 100%" [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)">
-            <mat-tab groupTab  style="height:100%;width: 25%">
+            <mat-tab style="height:100%;width: 25%">
                 <ng-template mat-tab-label>
-                    <img src="../../assets/data-accept.png">
+                    <img matTooltip="QC Worklist" src="../../assets/data-accept.png">
                 </ng-template>
                 <div class="flex-column-container">
                     <mat-label>QC Worklist</mat-label>
                     <button mat-button *ngFor="let option of combinedQCTabItems" class="row-one" (click)="onClickQC($event)" [value]="option.label">{{option.label}}</button>
                 </div>
             </mat-tab>
-            <mat-tab groupTab  style="height:100%;">
+            <mat-tab style="height:100%;">
                 <ng-template mat-tab-label>
-                    <img src="../../assets/DNA_diag_lightening.png">
+                    <img matTooltip="Illumina workflow" src="../../assets/DNA_diag_lightening.png">
                 </ng-template>
                 <div class="flex-column-container">
                     <mat-label>Illumina</mat-label>
@@ -32,9 +32,9 @@
                     <button mat-button (click)="onClickDataPipeline($event)"><img src="../../assets/server_go.png">Data Pipeline</button>
                 </div>
             </mat-tab>
-            <mat-tab groupTab  style="height:100%;">
+            <mat-tab style="height:100%;">
                 <ng-template mat-tab-label>
-                    <img src="../../assets/microarray_small.png">
+                    <img matTooltip="Microarray workflow" src="../../assets/microarray_small.png">
                 </ng-template>
                 <div class="flex-column-container">
                     <mat-label>Microarray</mat-label>

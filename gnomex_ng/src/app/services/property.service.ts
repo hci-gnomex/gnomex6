@@ -13,6 +13,7 @@ export class PropertyService {
     public static readonly PROPERTY_CONTACT_EMAIL_SOFTWARE_BUGS: string = 'contact_email_software_bugs';
     public static readonly PROPERTY_CONTACT_EMAIL_BIOINFORMATICS: string = 'contact_email_bioinformatics';
     public static readonly PROPERTY_NO_PUBLIC_VISIBILITY:string = "no_public_visibility";
+    public static readonly PROPERTY_PRODUCT_SHEET_NAME: string = 'product_sheet_name';
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,

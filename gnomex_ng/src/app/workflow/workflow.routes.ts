@@ -15,7 +15,8 @@ import {WorkflowComponent} from "./workflow.component";
  */
 const ROUTES: Routes = [
     { path: "qcWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'QC'}, canActivate: [SubRouteGuardService]},
-    { path: "libprepWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'LIBPREP'}, canActivate: [SubRouteGuardService]}
+    { path: "libprepWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'LIBPREP'}, canActivate: [SubRouteGuardService]},
+    { path: "libprepQcWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'LIBPREPQC'}, canActivate: [SubRouteGuardService]}
 
 ];
 

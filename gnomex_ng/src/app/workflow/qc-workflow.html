@@ -1,4 +1,4 @@
-<div class="flex-column-container">
+<div class="flex-column-container-workflow">
     <div class="flex-row-container">
         <img src="../../assets/data-accept.png" height="16" width="16" style="margin-top: .5em">
         <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
@@ -36,8 +36,11 @@
                          [enableColResize]="true">
         </ag-grid-angular>
     </div>
-    <save-footer (saveClicked)="save()"
+    <div class="flex-row-container">
+        <button mat-button style="margin-top: 1.2em" matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img src="../../assets/action_refresh.gif">Refresh</button>
+        <save-footer style="width: 100%" (saveClicked)="save()"
                  [dirty]="this.dirty"
                  [showSpinner]="this.showSpinner">
-    </save-footer>
+        </save-footer>
+    </div>
 </div>
