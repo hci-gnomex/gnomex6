@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy, OnInit} from "@angular/core";
-import {ErrorStateMatcher, MatDialog, MatDialogRef} from "@angular/material";
+import {ErrorStateMatcher, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
@@ -27,6 +27,7 @@ import {Subscription} from "rxjs/Subscription";
 import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
 import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-users-selector.component";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -136,12 +137,15 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     private otherAccountsFieldsConfigurationSubscription: Subscription;
 
     private chartfieldRowNode_LastSelected;
+    private poRowNode_LastSelected;
+    private creditCardRowNode_LastSelected;
 
     private hasReceivedInternalAccountFieldsConfiguration: boolean = false;
     private hasReceivedOtherAccountFieldsConfiguration: boolean = false;
 
 
     constructor(private dictionaryService: DictionaryService,
+                private dialogsService: DialogsService,
                 private propertyService: PropertyService,
                 private accountFieldsConfigurationService: AccountFieldsConfigurationService,
                 private dialog: MatDialog) {
@@ -860,7 +864,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		this.chartfieldGridColumnApi = event.columnApi;
 
 		this.assignChartfieldGridContents(this.selectedCoreFacility);
-		this.onChartfieldGridSizeChanged()
+		this.onChartfieldGridSizeChanged();
+
+        this.chartfieldGridApi.hideOverlay();
 	}
 	onPoGridReady(event: any): void {
 		this.poGridApi = event.api;
@@ -868,6 +874,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 		// set the data
 		this.assignPoGridContents(this.selectedCoreFacility);
+		this.onPoGridSizeChanged();
+        this.poGridApi.hideOverlay();
 	}
 	onCreditCardGridReady(event: any): void {
 		this.creditCardGridApi = event.api;
@@ -875,6 +883,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 		// set the data
 		this.assignCreditCardGridContents(this.selectedCoreFacility);
+        this.onCreditCardGridSizeChanged();
+        this.creditCardGridApi.hideOverlay();
 	}
 
 
@@ -989,10 +999,14 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     openChartfieldEditor(rowNode: any) {
         this.chartfieldRowNode_LastSelected = rowNode.id;
 
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, {
-            width: '60em',
-            panelClass: 'no-padding-dialog'
-        });
+        let data = { labActiveSubmitters: this.labActiveSubmitters };
+
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+        configuration.data = data;
+
+        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
         dialogRef.componentInstance.rowData = rowNode.data;
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -1001,30 +1015,53 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 return;
             }
             this.chartfieldGridApi.getRowNode(this.chartfieldRowNode_LastSelected).setData(result);
+            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
         });
     }
 
     openPoEditor(rowNode: any) {
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, {
-            width: '60em',
-            panelClass: 'no-padding-dialog'
-        });
+        this.poRowNode_LastSelected = rowNode.id;
+
+        let data = { labActiveSubmitters: this.labActiveSubmitters };
+
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+        configuration.data = data;
+
+        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
         dialogRef.componentInstance.rowData = rowNode.data;
 
         dialogRef.afterClosed().subscribe((result) => {
-            console.log("Editor closed!");
+            // We only expect a result back if the popup's "OK" button was clicked.
+            if (!result) {
+                return;
+            }
+            this.poGridApi.getRowNode(this.poRowNode_LastSelected).setData(result);
+            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
         });
     }
 
     openCreditCardEditor(rowNode: any) {
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, {
-            width: '60em',
-            panelClass: 'no-padding-dialog'
-        });
+        this.creditCardRowNode_LastSelected = rowNode.id;
+
+        let data = { labActiveSubmitters: this.labActiveSubmitters };
+
+	    let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+        configuration.data = data;
+
+        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
         dialogRef.componentInstance.rowData = rowNode.data;
 
         dialogRef.afterClosed().subscribe((result) => {
-            console.log("Editor closed!");
+            // We only expect a result back if the popup's "OK" button was clicked.
+            if (!result) {
+                return;
+            }
+            this.creditCardGridApi.getRowNode(this.creditCardRowNode_LastSelected).setData(result);
+            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
         });
     }
 
@@ -1039,7 +1076,14 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				displayField: "display"
 			};
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.width = '60em';
+            configuration.height = '45em';
+            configuration.panelClass = 'no-padding-dialog';
+            configuration.data = data;
+
+
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef
@@ -1064,7 +1108,13 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				displayField: "display"
 			};
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.width = '60em';
+            configuration.height = '45em';
+            configuration.panelClass = 'no-padding-dialog';
+            configuration.data = data;
+
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef
@@ -1089,7 +1139,13 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				displayField: "display"
 			};
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.width = '60em';
+            configuration.height = '45em';
+            configuration.panelClass = 'no-padding-dialog';
+            configuration.data = data;
+
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef
