@@ -1,0 +1,72 @@
+<form [formGroup]="visibilityForm" style="display:flex;flex-direction: column;">
+    <div style="display: flex; flex-direction: column">
+        <label style="font-size: small; font-style: italic">
+            Select the level of visibility:
+        </label>
+        <mat-radio-group class="flexbox-column"  formControlName="codeVisibility" (change)="updateCollaborators()" >
+            <mat-radio-button style="margin: 0.5em"  *ngFor="let rad of visRadio" [value]="rad.value">
+                <img [src]="rad.icon">{{rad.display}}
+            </mat-radio-button>
+        </mat-radio-group>
+
+    </div>
+
+    <div style="margin-top: 1em; display: flex; flex-direction: column;">
+        <label style="font-size: small; font-style: italic"> Individual collaborators allowed access to this data track  </label>
+
+        <div>
+            <mat-form-field style="width:30%" >
+                <mat-select  [compareWith]="compareByID" placeholder="Collaborators" multiple formControlName="collaborators" >
+                    <mat-option *ngFor="let collab of this.possibleCollaborators; let i = index "
+                                #opt
+                                [value]="collab"
+                                (onSelectionChange)="collaborChange(opt.selected, i)">
+                        {{collab.displayName}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="this.visibilityForm?.get('collaborators')?.hasError('selectRequired')">
+                    This field is required
+                </mat-error>
+            </mat-form-field>
+
+            <button mat-button color="primary" [disabled]="!isSelectable" (click)="toggeSelect()"> {{ selectMode }} </button>
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <mat-form-field style="width:30%;">
+        <input matInput placeholder="Lab" aria-label="State" [matAutocomplete]="autoLab"
+               formControlName="lab" (keyup.enter)="firstLabOpt()"  >
+        <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
+            <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let lab of  filterLabList(visibilityForm?.get('lab').value)" [value]="lab">
+                {{lab.name }}
+            </mat-option>
+        </mat-autocomplete>
+        <mat-error *ngIf="visibilityForm?.get('lab')?.hasError('lab')">
+            Lab is required
+        </mat-error>
+    </mat-form-field>
+
+
+    <mat-form-field style="width:30%;">
+        <mat-select placeholder="Owner" formControlName="idAppUser">
+            <mat-option>-- None --</mat-option>
+            <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem.idAppUser">
+                {{ mem.displayName }}
+            </mat-option>
+        </mat-select>
+        <mat-error *ngIf="visibilityForm?.get('idAppUser')?.hasError('required')"> Owner is required </mat-error>
+    </mat-form-field>
+
+
+
+
+
+
+
+</form>

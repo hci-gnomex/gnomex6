@@ -2,8 +2,8 @@
     <form [formGroup]="annotationForm" style=" height:100%;width:100%; display:flex; flex-direction:column;">
         <ng-container  [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations">
             <div *ngSwitchCase="'CHECK'" class="annot-control">
-                <label style="margin-right: 1em;" for="annot_check" >{{annot.name}}  </label>
-                <mat-checkbox id="annot_check" [formControlName]="annot.name" >
+                <label style="margin-right: 1em;"  >{{annot.name}}  </label>
+                <mat-checkbox  [formControlName]="annot.name" >
                 </mat-checkbox>
                 <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('required')">
                     This field is required
