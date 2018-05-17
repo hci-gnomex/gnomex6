@@ -10,7 +10,8 @@ import {ServicesModule} from "../../services/services.module";
 import {UtilModule} from "../../util/util.module";
 
 import {DatatracksDetailOverviewComponent,DatatracksAnnotationTabComponent,
-        DatatracksSummaryTabComponent,DatatrackDetailOverviewService} from "./index"
+        DatatracksSummaryTabComponent,DatatrackDetailOverviewService,
+        DatatracksVisibilityTabComponent } from "./index"
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
 import {RichEditorModule} from "../../../modules/rich-editor.module";
@@ -39,7 +40,8 @@ import {RichEditorModule} from "../../../modules/rich-editor.module";
     declarations: [
         DatatracksDetailOverviewComponent,
         DatatracksAnnotationTabComponent,
-        DatatracksSummaryTabComponent
+        DatatracksSummaryTabComponent,
+        DatatracksVisibilityTabComponent
 
     ],
     entryComponents: [ConfigAnnotationDialogComponent],
