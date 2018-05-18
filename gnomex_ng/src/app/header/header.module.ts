@@ -34,6 +34,8 @@ import {AgGridModule} from 'ag-grid-angular/main';
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
 
+import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
+
 @NgModule({
   imports: [
       HEADER_ROUTING,
@@ -56,10 +58,30 @@ import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.
        ExternalLinkResolver
     ],
 
-    declarations: [HeaderComponent, MenuItemComponent, LogoutComponent, ExternalLinkComponent, CreateReportProblemLauncherComponent, ReportProblemComponent,
-        ManageLinksComponent, ManageLinksLauncherComponent],
-    entryComponents:[ExternalLinkComponent, ReportProblemComponent, ManageLinksComponent],
-    exports: [HeaderComponent, LogoutComponent, ReportProblemComponent, ManageLinksComponent]
+    declarations: [
+        AdvancedSearchComponent,
+        CreateReportProblemLauncherComponent,
+        ExternalLinkComponent,
+        HeaderComponent,
+        LogoutComponent,
+        ManageLinksComponent,
+        ManageLinksLauncherComponent,
+        MenuItemComponent,
+        ReportProblemComponent,
+    ],
+    entryComponents:[
+        AdvancedSearchComponent,
+        ExternalLinkComponent,
+        ManageLinksComponent,
+        ReportProblemComponent,
+    ],
+    exports: [
+        AdvancedSearchComponent,
+        HeaderComponent,
+        LogoutComponent,
+        ManageLinksComponent,
+        ReportProblemComponent,
+    ]
 })
 export class HeaderModule {
 }

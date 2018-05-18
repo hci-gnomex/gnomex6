@@ -726,7 +726,7 @@ export class BillingAccountTabComponent implements OnInit{
 
 
 	openChartfieldEditor(rowIndex: string) {
-		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+        let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");
