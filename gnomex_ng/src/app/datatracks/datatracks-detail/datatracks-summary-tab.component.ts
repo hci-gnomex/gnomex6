@@ -78,24 +78,6 @@ export class DatatracksSummaryTabComponent implements OnInit, AfterViewInit{
         });
     }
 
-    save():void{
-        this.showSpinner = true;
-        let params:URLSearchParams = new URLSearchParams();
-        let idDataTrackFolder = this.dtService.datatrackListTreeNode.idDataTrackFolder;
-        let name = this.summaryFormGroup.get('folderName').value;
-        let descript = this.myEditor.val;
-
-
-        params.set('idDataTrackFolder', idDataTrackFolder);
-        params.set('description', '');
-        params.set('name', name);
-        params.set('idLab',this.idLabString);
-        this.dtService.saveFolder(params).subscribe(resp =>{
-            this.summaryFormGroup.markAsPristine();
-            this.showSpinner = false;
-            this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
-        });
-    }
 
 
 }

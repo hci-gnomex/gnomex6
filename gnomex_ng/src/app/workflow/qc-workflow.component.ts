@@ -309,7 +309,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
 
     chooseFirstRequestOption() {
         if (this.autoRequestComplete.options.first) {
-            console.log("request option first "+this.autoRequestComplete.options.first);
             this.autoRequestComplete.options.first.select();
         }
     }
@@ -364,7 +363,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         if (event.source.selected) {
             this.workItem = event.source.value;
             this.workingWorkItemList = this.filterWorkItems();
-            this.buildRequestIds(this.workingWorkItemList, "");
         }
     }
 
