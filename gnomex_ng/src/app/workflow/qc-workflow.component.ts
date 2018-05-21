@@ -35,11 +35,6 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
             display: flex;
             flex-grow: 1;
         }
-        .row-one-right {
-            display: flex;
-            flex-grow: 1;
-            margin-left: 85em;
-        }
     `]
 })
 
@@ -75,6 +70,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         idCoreFacility: "1",
         display: "High Throughput Genomics"
     };
+
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
@@ -88,7 +84,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     initialize() {
-        var params: URLSearchParams = new URLSearchParams();
+        let params: URLSearchParams = new URLSearchParams();
         params.set("codeStepNext", this.workflowService.QC);
         this.cores = [];
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
@@ -114,7 +110,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
 
             this.filteredQcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType").filter((item: any) => {
-                var retVal: boolean = false;
+                let retVal: boolean = false;
                 if (item.value == "") {
                     retVal = true;
                 } else {
@@ -171,7 +167,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     width: 125,
                     field: "qualCalcConcentration",
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    valueSetter: this.qualCalcValueSetter,
+                    valueSetter: QcWorkflowComponent.qualCalcValueSetter,
                     validateService: this.gridColumnValidatorService,
                     maxValue: 99999,
                     minValue: 0,
@@ -184,7 +180,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     field: "qual260nmTo230nmRatio",
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     hide: this.hide260230,  // TODO Hide for now until I can get the core facility property
-                    valueSetter: this.qualCalcValueSetter,
+                    valueSetter: QcWorkflowComponent.qualCalcValueSetter,
                     validateService: this.gridColumnValidatorService,
                     maxValue: 99999,
                     minValue: 0,
@@ -228,6 +224,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
 
     filterWorkItems(): any[] {
         let items: any[] = [];
+
         if (this.workItem) {
             items = this.workItemList.filter(request =>
                 request.requestNumber === this.workItem
@@ -245,6 +242,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 request.requestCategoryType === this.codeStepNext
             );
         }
+        this.workflowService.assignBackgroundColor(items);
         return items;
     }
 
@@ -272,6 +270,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             }
             return false;
         });
+        this.workflowService.assignBackgroundColor(items);
         return items;
     }
 
@@ -286,9 +285,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         items = items.filter(workItem =>
             workItem.codeStepNext === code
         );
-
+        this.workflowService.assignBackgroundColor(items);
         return items;
-
     }
 
     buildRequestIds(items: any[], mode: string) {
@@ -366,6 +364,10 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
+    selectedRow(event) {
+        this.gridApi.redrawRows();
+    }
+
     selectCoreOption(event) {
         this.core = event.source.value;
         if (event.source.selected) {
@@ -398,21 +400,13 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.initialize();
     }
 
-    onSelectionChanged(event) {
-
-    }
-
-    onGridSizeChanged(event) {
-
-    }
-
     filterAppList(item: any): boolean {
-        var retVal: boolean = false;
+        let retVal: boolean = false;
         if (item.value == "") {
             retVal = true;
         } else {
             if (item.isActive === 'Y' && this.core) {
-                var appCodes: any[] = this.coreFacilityAppMap[this.core];
+                let appCodes: any[] = this.coreFacilityAppMap[this.core];
                 if (appCodes.length > 0) {
                     for (var code of appCodes) {
                         if (item.codeApplication.toString() === code) {
@@ -429,7 +423,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     save() {
         this.gridApi.stopEditing();
         setTimeout(() => {
-            var params: URLSearchParams = new URLSearchParams();
+            let params: URLSearchParams = new URLSearchParams();
             let workItems: any[] = [];
             for(let value of Array.from( this.changedRowMap.values()) ) {
                 this.setQualCodeApplication(value);
@@ -448,15 +442,14 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
 
     }
 
-    qualCalcValueSetter(params: any) {
+    static qualCalcValueSetter(params: any) {
         return params.colDef.validateService.validate(params);
     }
 
     setQualCodeApplication(item: any) {
         let warningMessage: string = "";
             if (item.qualCodeBioanalyzerChipType) {
-                let code:string = this.gnomexService.getCodeApplicationForBioanalyzerChipType(item.qualCodeBioanalyzerChipType);
-                item.qualCodeApplication = code;
+                item.qualCodeApplication = this.gnomexService.getCodeApplicationForBioanalyzerChipType(item.qualCodeBioanalyzerChipType);
             } else if (item.qualStatus == 'Completed' || item.qualStatus == 'Terminated') {
                 warningMessage = item.sampleNumber + " is completed or terminated and does not have a QC Protocol specified.";
                 this.dialogsService.confirm(warningMessage, null);

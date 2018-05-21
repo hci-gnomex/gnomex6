@@ -107,8 +107,8 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
     }
     
     if (request.getParameter("workItemXMLString") != null && !request.getParameter("workItemXMLString").equals("")) {
-      workItemXMLString = "<WorkItemList>" + request.getParameter("workItemXMLString") + "</WorkItemList>";
-      
+      workItemXMLString = request.getParameter("workItemXMLString");
+
       StringReader reader = new StringReader(workItemXMLString);
       try {
         SAXBuilder sax = new SAXBuilder();

@@ -229,6 +229,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
 
     filterWorkItems(): any[] {
         let items: any[] = [];
+
         if (this.workItem) {
             items = this.workItemList.filter(request =>
                 request.requestNumber === this.workItem
@@ -240,8 +241,8 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
             items = items.filter(request =>
                 request.idCoreFacility === this.core.idCoreFacility
             )
-
         }
+        this.workflowService.assignBackgroundColor(items);
         return items;
     }
 
@@ -475,11 +476,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
             }
         }
 
-        if (uniqueBaseCount >= 3) {
-            return true;
-        } else {
-            return false;
-        }
+        return (uniqueBaseCount >= 3);
     }
 
     private static stringCompare(s1: string, s2:string): number {
