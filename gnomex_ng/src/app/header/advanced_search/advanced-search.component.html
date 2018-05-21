@@ -9,65 +9,62 @@
 
             <mat-tab label="New Search" class="full-height" #newSearchTab >
                 <div class="full-width fixed-height padding">
-                    <div class="flex-container full-height full-width">
-                        <div class="flex-fill full-width padding">
-                            <div class="t full-width full-height">
-                                <div class="tr full-width">
-                                    <div class="td label">
-                                        Search Category
-                                    </div>
-                                    <div class="td">
-                                        <mat-radio-group [(ngModel)]="searchType">
-                                            <mat-radio-button class="radio-button" [value]="ALL_OBJECTS">All Objects</mat-radio-button>
-                                            <mat-radio-button class="radio-button" [value]="EXPERIMENTS">Experiments</mat-radio-button>
-                                            <mat-radio-button class="radio-button" [value]="ANALYSES"   >Analyses</mat-radio-button>
-                                            <mat-radio-button class="radio-button" [value]="PROTOCOLS"  >Protocols</mat-radio-button>
-                                            <mat-radio-button class="radio-button" [value]="DATA_TRACKS">Data Tracks</mat-radio-button>
-                                            <mat-radio-button class="radio-button" [value]="TOPICS"     >Topics</mat-radio-button>
-                                        </mat-radio-group>
-                                    </div>
-                                </div>
-                                <div class="tr full-width">
-                                    <div class="td mat-input-label">General Keywords</div>
-                                    <div class="td">
-                                        <mat-form-field class="medium-input">
-                                            <input  matInput
-                                                    placeholder="Search"
-                                                    [(ngModel)]="searchText">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="tr full-width full-height">
-                                    <div class="td label">Field Search</div>
-                                    <div class="td">
-                                        <div class="grid-container full-height">
-                                            <ag-grid-angular
-                                                    style="font-size:x-small; width:100%; height:100%;"
-                                                    class="ag-fresh"
-                                                    [context]="context"
-                                                    [singleClickEdit]="true"
-                                                    [enableSorting]="true"
-                                                    [enableColResize]="true"
-                                                    [suppressNoRowsOverlay]="true"
-                                                    (gridSizeChanged)="onNewSearchGridSizeChanged()"
-                                                    (gridReady)="onNewSearchGridReady($event)">
-                                            </ag-grid-angular>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tr full-width full-height">
-                                    <div class="td label"></div>
-                                    <div class="td">
-                                        <mat-radio-group [(ngModel)]="matchType">
-                                            <mat-radio-button class="radio-button" [value]="MATCH_ALL_TERMS">Match ALL terms</mat-radio-button>
-                                            <mat-radio-button class="radio-button" [value]="MATCH_ANY_TERM">Match ANY term</mat-radio-button>
-                                        </mat-radio-group>
-                                    </div>
+
+                    <div class="t full-width full-height">
+                        <div class="tr full-width">
+                            <div class="td label">
+                                Search Category
+                            </div>
+                            <div class="td">
+                                <mat-radio-group [(ngModel)]="searchType" (change)="onSearchTypeChanged($event)">
+                                    <mat-radio-button class="radio-button" [value]="ALL_OBJECTS">All Objects</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="EXPERIMENTS">Experiments</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="ANALYSES"   >Analyses</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="PROTOCOLS"  >Protocols</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="DATA_TRACKS">Data Tracks</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="TOPICS"     >Topics</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </div>
+                        <div class="tr full-width">
+                            <div class="td mat-input-label">General Keywords</div>
+                            <div class="td">
+                                <mat-form-field class="medium-input">
+                                    <input  matInput
+                                            placeholder="Search"
+                                            [(ngModel)]="searchText">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="tr full-width full-height">
+                            <div class="td label">Field Search</div>
+                            <div class="td">
+                                <div class="grid-container full-height">
+                                    <ag-grid-angular
+                                            style="font-size:x-small; width:100%; height:100%;"
+                                            class="ag-fresh"
+                                            [context]="context"
+                                            [singleClickEdit]="true"
+                                            [enableSorting]="true"
+                                            [enableColResize]="true"
+                                            [suppressNoRowsOverlay]="true"
+                                            (gridSizeChanged)="onNewSearchGridSizeChanged()"
+                                            (gridReady)="onNewSearchGridReady($event)">
+                                    </ag-grid-angular>
                                 </div>
                             </div>
                         </div>
-
+                        <div class="tr full-width full-height">
+                            <div class="td label"></div>
+                            <div class="td">
+                                <mat-radio-group [(ngModel)]="matchType">
+                                    <mat-radio-button class="radio-button" [value]="MATCH_ALL_TERMS">Match ALL terms</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="MATCH_ANY_TERM">Match ANY term</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </mat-tab>
 

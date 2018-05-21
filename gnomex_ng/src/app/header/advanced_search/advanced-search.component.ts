@@ -10,6 +10,8 @@ import {
 
 import {MatDialogRef, MatDialog, MAT_DIALOG_DATA, DialogPosition} from "@angular/material";
 import { TextAlignLeftMiddleRenderer } from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {AdvancedSearchService} from "./advanced-search.service";
+import {Subscription} from "rxjs/Subscription";
 
 @Component({
     selector: 'advanced-search-component',
@@ -21,7 +23,7 @@ import { TextAlignLeftMiddleRenderer } from "../../util/grid-renderers/text-alig
         .full-height { height: 100%; }
         .full-width  { width:  100%; }
         
-        .padding { padding: 0.4em; }
+        .padding { padding: 0.6em; }
         
         .no-margin  { margin:  0; }
         .no-padding { padding: 0; }
@@ -169,13 +171,54 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     protected positionX: number = 0;
     protected positionY: number = 0;
 
+    private allObjectSearchList: any[];
+    private experimentSearchList: any[];
+    private analysisSearchList: any[];
+    private protocolSearchList: any[];
+    private dataTrackSearchList: any[];
+    private topicSearchList: any[];
+
+    private dictionaryMap: any[];
+
+    private allObjectSearchListSubscription:  Subscription;
+    private experimentSearchListSubscription: Subscription;
+    private analysisSearchListSubscription:   Subscription;
+    private protocolSearchListSubscription:   Subscription;
+    private dataTrackSearchListSubscription:  Subscription;
+    private topicSearchListSubscription:      Subscription;
+
+    private dictionaryMapSubscription: Subscription;
 
     constructor(private dialog: MatDialog,
                 private dialogRef: MatDialogRef<AdvancedSearchComponent>,
+                private advancedSearchService: AdvancedSearchService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (data) {
             this.searchText = !!data.searchText ? data.searchText : '';
         }
+
+        this.allObjectSearchListSubscription = this.advancedSearchService.getAllObjectSearchListObservable().subscribe((list) => {
+            this.allObjectSearchList = list;
+        });
+        this.experimentSearchListSubscription = this.advancedSearchService.getExperimentSearchListObservable().subscribe((list) => {
+            this.experimentSearchList = list;
+        });
+        this.analysisSearchListSubscription = this.advancedSearchService.getAnalysisSearchListObservable().subscribe((list) => {
+            this.analysisSearchList = list;
+        });
+        this.protocolSearchListSubscription = this.advancedSearchService.getProtocolSearchListObservable().subscribe((list) => {
+            this.protocolSearchList = list;
+        });
+        this.dataTrackSearchListSubscription = this.advancedSearchService.getDataTrackSearchListObservable().subscribe((list) => {
+            this.dataTrackSearchList = list;
+        });
+        this.topicSearchListSubscription = this.advancedSearchService.getTopicSearchListObservable().subscribe((list) => {
+            this.topicSearchList = list;
+        });
+
+        this.dictionaryMapSubscription = this.advancedSearchService.getDictionaryMapObservable().subscribe((list) => {
+            this.dictionaryMap = list;
+        });
     }
 
     ngOnInit() { }
@@ -196,7 +239,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 editable: false,
                 width: 100,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
-                field: "display"
+                field: "displayName"
             },
             {
                 headerName: "Value (Partial or Whole) to Search for",
@@ -293,5 +336,26 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
     onClickCancelButton(): void {
         this.dialogRef.close();
+    }
+
+    onSearchTypeChanged(event: any) {
+        let rowData: any[] = [];
+
+        switch (this.searchType) {
+            case this.ALL_OBJECTS : rowData = this.allObjectSearchList;  break;
+            case this.EXPERIMENTS : rowData = this.experimentSearchList; break;
+            case this.ANALYSES    : rowData = this.analysisSearchList;   break;
+            case this.PROTOCOLS   : rowData = this.protocolSearchList;   break;
+            case this.DATA_TRACKS : rowData = this.dataTrackSearchList;  break;
+            case this.TOPICS      : rowData = this.topicSearchList;      break;
+            default : // Do nothing;
+        }
+
+        // Due to XML parsing of single elements.
+        if (Array.isArray(rowData) && rowData.length == 1) {
+            rowData[0] = rowData[0].Field;
+        }
+
+        this.newSearchGridApi.setRowData(rowData);
     }
 }

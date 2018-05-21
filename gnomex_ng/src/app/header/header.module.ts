@@ -36,6 +36,8 @@ import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.
 
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 
+import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
+
 @NgModule({
   imports: [
       HEADER_ROUTING,
@@ -55,6 +57,7 @@ import {AdvancedSearchComponent} from "./advanced_search/advanced-search.compone
 
   ],
    providers: [
+       AdvancedSearchService,
        ExternalLinkResolver
     ],
 
