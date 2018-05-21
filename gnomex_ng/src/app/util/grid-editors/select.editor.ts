@@ -113,6 +113,7 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
 					&& rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
                     rowNode.data[this.gridValueField] = this.value;
+                    rowNode.setDataValue(this.gridValueField, this.value);
                 }
 			});
 
