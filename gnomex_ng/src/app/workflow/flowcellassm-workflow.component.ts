@@ -449,7 +449,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 if (this.lanes.length === 0) {
                     this.buildLanes();
                 }
-                this.dirty = true;
+                this.allFG.markAsDirty();
             }
         }
     }
