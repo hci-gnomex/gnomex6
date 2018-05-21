@@ -23,7 +23,7 @@ import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
 import {SaveFooterComponent} from "./save-footer.component";
 import {DateParserComponent} from "./parsers/date-parser.component";
 import {MonthPickerComponent} from "./pickers/month-picker.component";
-
+import {DatePickerComponent} from "./date-picker.component";
 
 @NgModule({
     imports: [
@@ -41,6 +41,7 @@ import {MonthPickerComponent} from "./pickers/month-picker.component";
 			  BillingUsageReportComponent,
 			  BrowseFilterComponent,
 			  DateParserComponent,
+              DatePickerComponent,
 			  DateRangePickerComponent,
 			  DeleteDataTrackComponent,
 			  MenuHeaderBillingComponent,
@@ -68,6 +69,7 @@ import {MonthPickerComponent} from "./pickers/month-picker.component";
 			  BillingPeriodPickerComponent,
 			  BillingUsageReportComponent,
 			  DateParserComponent,
+              DatePickerComponent,
 			  DateRangePickerComponent,
 			  DeleteDataTrackComponent,
 			  MenuHeaderBillingComponent,

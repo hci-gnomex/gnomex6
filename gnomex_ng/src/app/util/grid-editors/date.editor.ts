@@ -26,22 +26,22 @@ import { DateParserComponent } from "../parsers/date-parser.component";
 			</div>
 	`,
 	styles: [`
-			.t  { display: table;      }
-      .tr { display: table-row;  }
-      .td { display: table-cell; }
+		.t  { display: table;      }  
+		.tr { display: table-row;  }  
+		.td { display: table-cell; }
 			
-			.full-width  { width:  100%; }
-      .full-height { height: 100%; }
+		.full-width  { width:  100%; }  
+		.full-height { height: 100%; }
 			
-			.vertical-center { vertical-align: middle; }
+		.vertical-center { vertical-align: middle; }
 			
-			.invisible { 
-					visibility: hidden;
-					width: 0;
-					height: 0;
-			}
+		.invisible { 
+			visibility: hidden;
+			width: 0;
+			height: 0;
+		}
 			
-			.right-align { text-align: right; }
+		.right-align { text-align: right; }
 	`]
 })
 export class DateEditor implements AfterViewInit, ICellEditorAngularComp {
