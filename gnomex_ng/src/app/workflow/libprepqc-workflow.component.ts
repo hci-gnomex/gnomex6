@@ -69,6 +69,7 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     private label: string = "Illumina Library Prep QC";
     private codeStepNext: string = "ALL";
     private libraryPrepQCProtocols: any[] =[];
+
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private securityAdvisor: CreateSecurityAdvisorService,
@@ -174,6 +175,7 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
 
     filterWorkItems(): any[] {
         let items: any[] = [];
+
         if (this.workItem) {
             items = this.workItemList.filter(request =>
                 request.requestNumber === this.workItem
@@ -187,6 +189,7 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
             )
 
         }
+        this.workflowService.assignBackgroundColor(items);
         return items;
     }
 
@@ -208,7 +211,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
 
     chooseFirstRequestOption() {
         if (this.autoRequestComplete.options.first) {
-            console.log("request option first "+this.autoRequestComplete.options.first);
             this.autoRequestComplete.options.first.select();
         }
     }
@@ -263,7 +265,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         if (event.source.selected) {
             this.workItem = event.source.value;
             this.workingWorkItemList = this.filterWorkItems();
-            this.buildRequestIds(this.workingWorkItemList, "");
         }
     }
 

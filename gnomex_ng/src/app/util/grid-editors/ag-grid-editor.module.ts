@@ -6,6 +6,7 @@ import { AngularMaterialModule } from "../../../modules/angular-material.module"
 import { DateEditor } from './date.editor'
 import { SelectEditor } from './select.editor';
 import {BarcodeSelectEditor} from "./barcode-select.editor";
+import {SeqlaneSelectEditor} from "./seqlane-select.editor";
 
 
 @NgModule({
@@ -18,12 +19,14 @@ import {BarcodeSelectEditor} from "./barcode-select.editor";
     declarations: [
         DateEditor,
         SelectEditor,
-        BarcodeSelectEditor
+        BarcodeSelectEditor,
+        SeqlaneSelectEditor
     ],
     exports: [
         DateEditor,
         SelectEditor,
-        BarcodeSelectEditor
+        BarcodeSelectEditor,
+        SeqlaneSelectEditor
     ]
 })
 export class AgGridEditorModule { }

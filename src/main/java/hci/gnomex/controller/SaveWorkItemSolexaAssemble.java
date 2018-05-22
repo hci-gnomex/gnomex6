@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -109,8 +111,8 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
     }
     
     if (request.getParameter("workItemXMLString") != null && !request.getParameter("workItemXMLString").equals("")) {
-      workItemXMLString = "<WorkItemList>" + request.getParameter("workItemXMLString") + "</WorkItemList>";
-      
+      workItemXMLString = request.getParameter("workItemXMLString");
+
       StringReader reader = new StringReader(workItemXMLString);
       try {
         SAXBuilder sax = new SAXBuilder();
@@ -381,14 +383,14 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
 
           parser.resetIsDirty();
 
-          XMLOutputter out = new org.jdom.output.XMLOutputter();
           if (flowCell != null) {
-            this.xmlResult = "<SUCCESS flowCellNumber='" + flowCell.getNumber() + "'/>";            
-          } else {
-            this.xmlResult = "<SUCCESS/>";            
+            JsonObject value = Json.createObjectBuilder()
+                    .add("result", "SUCCESS")
+                    .add("flowCellNumber", flowCell.getNumber())
+                    .build();
+            this.jsonResult = value.toString();
           }
-          
-          setResponsePage(this.SUCCESS_JSP);          
+          setResponsePage(this.SUCCESS_JSP);
         } else {
           this.addInvalidField("Insufficient permissions", "Insufficient permission to manage workflow");
           setResponsePage(this.ERROR_JSP);
