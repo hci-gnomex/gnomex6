@@ -1,8 +1,10 @@
 
 import {Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import {Http, Response, Headers} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 import {HttpParams} from "@angular/common/http";
+import {DictionaryService} from "./dictionary.service";
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class WorkflowService {
@@ -10,10 +12,14 @@ export class WorkflowService {
     public readonly ILLSEQ_PREP = "ILLSEQPREP";
     public readonly ILLSEQ_PREP_QC = "ILLSEQPREPQC";
     public readonly ILLSEQ_CLUSTER_GEN = "ILLSEQASSEM";
+    public readonly ILLSEQ_FINALIZE_FC = "ILLSEQFINFC";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";
     public readonly NANOSTRING = "NANO";
     public readonly ALL = "ALL";
+    public assmGridRowClassRules: any;
+    public static readonly COLOR = '#f1eed6';
+    public static readonly OFFCOLOR = 'white';
 
     public readonly workflowCompletionStatus = [
         {display: '', value: ''},
@@ -24,8 +30,44 @@ export class WorkflowService {
         {display: 'Bypass', value: 'Bypassed'}
     ];
 
-    constructor(private http: Http) {
 
+    constructor(private http: Http,
+                private cookieUtilService: CookieUtilService) {
+
+        this.assmGridRowClassRules = {
+            "workFlowOnColor": "data.backgroundColor === 'ON' && !data.selected",
+            "workFlowOffColor": "data.backgroundColor === 'OFF' && !data.selected",
+            "workFlowSelectedColor": "data.selected",
+        };
+    }
+
+    /**
+     *  Alternate background colors in the grid of items.
+     * @param {any[]} items
+     */
+    assignBackgroundColor (items: any[]) {
+        let first: boolean = true;
+        let previousId: string = "";
+        let previousColor: string = "";
+
+        for (let wi of items) {
+            if (first) {
+                wi.backgroundColor = 'ON';
+                first = false;
+            } else {
+                if (wi.idRequest === previousId) {
+                    wi.backgroundColor = previousColor;
+                } else {
+                    if (previousColor === 'ON') {
+                        wi.backgroundColor = 'OFF';
+                    } else {
+                        wi.backgroundColor = 'ON';
+                    }
+                }
+            }
+            previousId = wi.idRequest;
+            previousColor = wi.backgroundColor;
+        }
     }
 
     public sortSampleNumber = (item1, item2) => {
@@ -86,7 +128,6 @@ export class WorkflowService {
             return 0;
         }
     }
-
 
     getWorkItemList(params: URLSearchParams):  Observable<any> {
         return this.http.get("/gnomex/GetWorkItemList.gx", {search: params}).map((response: Response) => {
@@ -154,8 +195,13 @@ export class WorkflowService {
 
     }
 
-    // getCoreAdmins(p: HttpParams) : Observable<any> {
-    //     return this.http.get("/gnomex/GetCoreAdmins.gx",{params: p});
-    // }
+    saveWorkItemSolexaAssemble(params: URLSearchParams):  Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/SaveWorkItemSolexaAssemble.gx", params.toString(), {headers: headers});
+
+    }
 
 }

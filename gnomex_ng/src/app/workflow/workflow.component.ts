@@ -2,7 +2,7 @@ import {
     AfterViewInit, ChangeDetectorRef, Component, ComponentFactoryResolver, ElementRef, OnInit, ViewChild
 } from "@angular/core";
 import {MatSidenav} from "@angular/material";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {QcWorkflowComponent} from "./qc-workflow.component";
 import {LibprepWorkflowComponent} from "./libprep-workflow.component";
 import {GnomexService} from "../services/gnomex.service";
@@ -55,6 +55,7 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     private microarrayDisabled: boolean = true;
     private combinedQCTabItems: any[] = [];
     constructor(private route: ActivatedRoute,
+                private router: Router,
                 private workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private changeRef:ChangeDetectorRef) {
@@ -135,7 +136,6 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
             case 'Nano String' :
                 this.qcWorkflow.onClickNanostringQC(event);
                 break;
-
         }
     }
 
@@ -169,7 +169,8 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
                 break;
             case 1 :
                 if (this.codeStepNext === this.workflowService.QC) {
-                    this.libPrepWorkflow.initialize();
+                    this.router.navigate(['libprepWorkFlow']);
+                    // this.libPrepWorkflow.initialize();
                     this.codeStepNext = this.workflowService.ILLSEQ_PREP;
                 }
                 break;
@@ -178,17 +179,17 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
 
     onClickLibPrep(event) {
         this.codeStepNext = this.workflowService.ILLSEQ_PREP;
-        this.libPrepWorkflow.onClickLibPrep(event);
+        this.router.navigate(['libprepWorkFlow']);
     }
 
     onClickLibPrepQC(event) {
         this.codeStepNext = this.workflowService.ILLSEQ_PREP_QC;
-        this.libPrepQcWorkflow.onClickLibPrepQc(event);
+        this.router.navigate(['libprepQcWorkFlow']);
     }
 
     onClickFlowCellAssm(event) {
         this.codeStepNext = this.workflowService.ILLSEQ_CLUSTER_GEN;
-        this.flowCellAssmWorkflow.onClickFlowCellAssm(event);
+        this.router.navigate(['flowcellassmWorkFlow']);
     }
 
     onClickFinalizedFlowCell(event) {

@@ -110,12 +110,13 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 		if (this.params && this.params.column && this.params.column.gridApi && this.params.node && this.fillGroupAttribute && this.fillGroupAttribute !== '') {
 			let thisRowNode = this.params.node;
 
-            this.params.column.gridApi.forEachNode((rowNode, index) => {
-                if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
-                    && rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
+      this.params.column.gridApi.forEachNode((rowNode, index) => {
+          if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
+					&& rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
+                    rowNode.data[this.gridValueField] = this.value;
                     rowNode.setDataValue(this.gridValueField, this.value);
-                }
-            });
+          }
+			});
 
 			this.params.column.gridApi.refreshCells();
 		}

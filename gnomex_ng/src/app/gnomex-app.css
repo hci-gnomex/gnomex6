@@ -121,6 +121,15 @@ div.mainnav {
   font-style: italic !important;
   color: #647478 !important;
 }
+.ag-fresh .workFlowOnColor {
+  background-color: #f1eed6 !important;
+}
+.ag-fresh .workFlowOffColor {
+  background-color: white !important;
+}
+.ag-fresh .workFlowSelectedColor {
+  background-color: deepskyblue !important;
+}
 
 .mat-tab-body-wrapper {
   height: 100%;

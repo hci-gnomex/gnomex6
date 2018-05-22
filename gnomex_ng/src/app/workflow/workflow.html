@@ -1,6 +1,6 @@
 <mat-sidenav-container class="sidenav-container" (backdropClick)="close('backdrop')">
     <mat-sidenav-content style="background-color: white">
-        <button mat-button matTooltip="Minimize navigation panel" class="sidebutton" (click)="toggle($event)"><img *ngIf="showNav;else closedNav" src="../../assets/arrow_left.png"></button>
+        <button mat-button [matTooltip]="showNav ? 'Minimize navigation panel' : 'Expand navigation panel'" class="sidebutton" (click)="toggle($event)"><img *ngIf="showNav;else closedNav" src="../../assets/arrow_left.png"></button>
         <ng-template #closedNav>
             <img src="../../assets/arrow_right.png">
         </ng-template>

@@ -29,15 +29,16 @@
                          [columnDefs]="columnDefs"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
                          [rowSelection]="rowSelection"
+                         (rowSelected)="selectedRow($event)"
                          (gridReady)="onGridReady($event)"
                          [enableSorting]="true"
                          (cellValueChanged) = "onCellValueChanged($event)"
                          [enableFilter]="true"
+                         [rowClassRules]="this.workflowService.assmGridRowClassRules"
                          [enableColResize]="true">
         </ag-grid-angular>
     </div>
     <div class="flex-row-container">
-        <button mat-button style="margin-top: 1.2em" matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img src="../../assets/action_refresh.gif">Refresh</button>
         <save-footer style="width: 100%" (saveClicked)="save()"
                  [dirty]="this.dirty"
                  [showSpinner]="this.showSpinner">
