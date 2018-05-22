@@ -84,7 +84,8 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 		}
 		if (this.params) {
 
-			//  If the fill button, which is part of the editor, is activated, don't stop editing immediately after making a selection.
+			//  If the fill button, which is part of the editor, is activated, don't stop editing
+			// immediately after making a selection.
 			if (!this.showFillButton) {
 				this.params.stopEditing();
 			}
@@ -109,12 +110,12 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 		if (this.params && this.params.column && this.params.column.gridApi && this.params.node && this.fillGroupAttribute && this.fillGroupAttribute !== '') {
 			let thisRowNode = this.params.node;
 
-            this.params.column.gridApi.forEachNode((rowNode, index) => {
-                if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
+      this.params.column.gridApi.forEachNode((rowNode, index) => {
+          if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
 					&& rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
                     rowNode.data[this.gridValueField] = this.value;
                     rowNode.setDataValue(this.gridValueField, this.value);
-                }
+          }
 			});
 
 			this.params.column.gridApi.refreshCells();

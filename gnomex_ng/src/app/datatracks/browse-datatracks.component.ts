@@ -267,6 +267,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 ids.set("idGenomeBuild",this.gnomexService.orderInitObj.idGenomeBuild);
                 this.datatracksService.previousURLParams = ids;
                 this.datatracksService.getDatatracksList_fromBackend(ids);
+            }else{
+                this.datatracksService.getDatatracksList_fromBackend(new URLSearchParams());
             }
         });
 

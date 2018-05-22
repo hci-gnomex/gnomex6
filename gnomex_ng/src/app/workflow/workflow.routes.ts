@@ -18,7 +18,6 @@ const ROUTES: Routes = [
     { path: "libprepWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'ILLSEQPREP'}, canActivate: [SubRouteGuardService]},
     { path: "libprepQcWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'ILLSEQPREPQC'}, canActivate: [SubRouteGuardService]},
     { path: "flowcellassmWorkFlow", component: WorkflowComponent, data : {codeStepNext : 'ILLSEQASSEM'}, canActivate: [SubRouteGuardService]}
-
 ];
 
 export const WORKFLOW_ROUTING = RouterModule.forChild(ROUTES);

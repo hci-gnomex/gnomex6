@@ -30,8 +30,8 @@ import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.servic
                     <mat-tab style="height:100%" label="Annotations">
                         <dt-annotation-tab [annotations]="annotations"></dt-annotation-tab>
                     </mat-tab>
-                    <mat-tab style="height:100%;" label="Sequences Files">
-                        Hello
+                    <mat-tab style="height:100%;" label="Visibility">
+                        <dt-visibility-tab></dt-visibility-tab>
                     </mat-tab>
                 </mat-tab-group>
             </div>
