@@ -1,9 +1,10 @@
 
 import {Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import {Http, Response, Headers} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 import {HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class WorkflowService {
@@ -31,7 +32,7 @@ export class WorkflowService {
 
 
     constructor(private http: Http,
-                private dictionaryService: DictionaryService) {
+                private cookieUtilService: CookieUtilService) {
 
         this.assmGridRowClassRules = {
             "workFlowOnColor": "data.backgroundColor === 'ON' && !data.selected",
@@ -195,13 +196,11 @@ export class WorkflowService {
     }
 
     saveWorkItemSolexaAssemble(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveWorkItemSolexaAssemble.gx", {search: params}).map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        });
+        this.cookieUtilService.formatXSRFCookie();
+
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/SaveWorkItemSolexaAssemble.gx", params.toString(), {headers: headers});
 
     }
 

@@ -577,15 +577,28 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
 
         this.showSpinner = true;
         this.workflowService.saveWorkItemSolexaAssemble(params).subscribe((response: any) => {
-            if (response.flowCellNumber) {
-                this.showSpinner = false;
-                setTimeout(() => {
+            if (response.status === 200) {
+                let responseJSON: any = response.json();
+                if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
                     this.allFG.markAsPristine();
+                    if (!responseJSON.flowCellNumber) {
+                        responseJSON.flowCellNumber = "";
+                    }
+                    this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " created", null);
                     this.assmItemList = [];
                     this.initialize();
-                });
-                this.dialogsService.confirm("Flowcell " + response.flowCellNumber + " created", null);
+                } else {
+                    let message: string = "";
+                    if (responseJSON && responseJSON.message) {
+                        message = ": " + responseJSON.message;
+                    }
+                    this.dialogsService.confirm("An error occurred while saving" + message, null);
+                }
+            } else {
+                this.dialogsService.confirm("An error occurred while saving " + response.status, null);
+
             }
+            this.showSpinner = false;
         });
 
     }
