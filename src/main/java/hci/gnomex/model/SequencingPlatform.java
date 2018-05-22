@@ -15,6 +15,7 @@ public class SequencingPlatform extends DictionaryEntry implements Serializable 
   public static final String   ILLUMINA_HISEQ_2000_SEQUENCING_PLATFORM = "HISEQ";
   public static final String   ILLUMINA_MISEQ_SEQUENCING_PLATFORM = "MISEQ";
   public static final String   ILLUMINA_SEQUENCING_PLATFORM = "ILLSEQ";
+  public static final String   ILLUMINA_NOSEQ_SEQUENCING_PLATFORM = "NOSEQ";
 
   public String getDisplay() {
     String display = this.getNonNullString(getSequencingPlatform());

@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
@@ -275,6 +277,7 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
 
   private static void addTask(String taskFileDir, String sourceDir, String targetDir, SecurityAdvisor secAdvisor, String remoteIPAddress, String emailAddress, String theIdRequest, String theIdLab, String theIdAnalysis, String theFDTUploadTransferFile ) {
     String taskFileName = taskFileDir + "/" + "fdtUploadInfoFile";
+    String uploadtransferlog = taskFileDir + "/" + theFDTUploadTransferFile;
     File taskFile;
     int numTries = 10;
     while(true) {
@@ -314,7 +317,7 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
       pw.println("idRequest: " + theIdRequest);
       pw.println("idLab: " + theIdLab);
       pw.println("idAnalysis: " + theIdAnalysis);
-      pw.println("transferlog: " + theFDTUploadTransferFile);
+      pw.println("transferlog: " + uploadtransferlog);
 
       pw.flush();
       pw.close();
@@ -322,5 +325,19 @@ public class FastDataTransferUploadStart extends GNomExCommand implements Serial
       System.out.println("[FastDataTransferUploadStart] IOException: file " + taskFileName + " " + e.getMessage());
       return;
     }
+
+
+    try {
+      PrintWriter pw = new PrintWriter(new FileWriter(theFDTUploadTransferFile));
+      SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+
+      pw.flush();
+      pw.close();
+    } catch (IOException e) {
+      System.out.println("[FastDataTransferUploadStart] IOException: file " + theFDTUploadTransferFile + " " + e.getMessage());
+      return;
+    }
   }
 }
+

@@ -1,8 +1,10 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.utility.*;
+import hci.gnomex.utility.AnalysisFileDescriptorParser;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -36,7 +38,7 @@ public class CacheAnalysisFileDownloadList extends GNomExCommand implements Seri
   private AnalysisFileDescriptorParser parser = null;
 
   
-  protected static final String   SESSION_KEY_FILE_DESCRIPTOR_PARSER = "GNomExAnalysisFileDescriptorParser";
+  protected final static String   SESSION_KEY_FILE_DESCRIPTOR_PARSER = "GNomExAnalysisFileDescriptorParser";
   
 
   /**

@@ -113,6 +113,17 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 		} else {
 			toAddress += propertyHelper.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
 			noEmailOnFileNote = "<p style=\"color:red\">THERE WAS NO CONTACT EMAIL ON FILE FOR THIS LAB.  LAB P.I. WAS NOT NOTIFIED OF THIS REQUEST!</p><BR><BR>";
+
+
+			// notify anyone besides gnomex support
+			String notifyEmail = propertyHelper.getProperty(PropertyDictionary.NOTIFY_IF_NO_EMAIL);
+			if (notifyEmail != null && !notifyEmail.equals("")) {
+				if (ccAddress.length() > 0) {
+					ccAddress += ", ";
+				}
+				ccAddress += notifyEmail;
+			}
+
 		}
 
 		// Add GNomEx support email to cc list
@@ -125,9 +136,9 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 
 		// Get approve and delete URLs
 		String uuidStr = appUser.getGuid();
-		String approveURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_LAB_MEMBERSHIP_SERVLET + "?idAppUser=" + appUser.getIdAppUser() + "&idLab="
+		String approveURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_LAB_MEMBERSHIP_SERVLET + "?idAppUser=" + appUser.getIdAppUser().intValue() + "&idLab="
 				+ requestedLab.getIdLab() + "&guid=" + uuidStr;
-		String deleteURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_LAB_MEMBERSHIP_SERVLET + "?idAppUser=" + appUser.getIdAppUser() + "&denyRequest=Y"
+		String deleteURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_LAB_MEMBERSHIP_SERVLET + "?idAppUser=" + appUser.getIdAppUser().intValue() + "&denyRequest=Y"
 				+ "&guid=" + uuidStr + "&idLab=" + requestedLab.getIdLab();
 		StringBuilder introForAdmin = new StringBuilder();
 

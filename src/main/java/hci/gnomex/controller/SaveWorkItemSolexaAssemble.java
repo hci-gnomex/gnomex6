@@ -3,14 +3,16 @@ package hci.gnomex.controller;
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FlowCellChannelComparator;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.WorkItemSolexaAssembleParser;
 import hci.gnomex.utility.WorkItemSolexaAssembleParser.ChannelContent;
@@ -185,6 +187,12 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
             // ILLSEQQC
             if(codeStepNext.equals(Step.SEQ_DATA_PIPELINE)) {
               sequencingPlatform = SequencingPlatform.ILLUMINA_GAIIX_SEQUENCING_PLATFORM;
+            } else if (codeStepNext.equals(Step.HISEQ_FINALIZE_FC)) { // HSEQPIPE, needs to be changed to HSEQFINFC
+              sequencingPlatform = SequencingPlatform.ILLUMINA_HISEQ_2000_SEQUENCING_PLATFORM;
+            } else if (codeStepNext.equals(Step.MISEQ_FINALIZE_FC)) {
+              sequencingPlatform = SequencingPlatform.ILLUMINA_MISEQ_SEQUENCING_PLATFORM;
+            }  else if (codeStepNext.equals(Step.NOSEQ_FINALIZE_FC)) {
+              sequencingPlatform = SequencingPlatform.ILLUMINA_NOSEQ_SEQUENCING_PLATFORM;
             } else {
               sequencingPlatform = SequencingPlatform.ILLUMINA_SEQUENCING_PLATFORM;
             }

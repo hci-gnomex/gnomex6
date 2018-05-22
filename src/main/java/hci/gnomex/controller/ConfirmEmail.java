@@ -1,7 +1,8 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.model.AppUser;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.IOException;
 
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 

@@ -4,7 +4,7 @@
   "repository": "https://github.com/hci-gnomex/gnomex.git",
   "private": true,
   "scripts": {
-    "build:dev": "npm run clean:dist && webpack --mode development --config config/webpack.dev.js --progress --profile",
+    "build:dev": "npm run clean:dist && webpack --mode development --config config/webpack.dev.js --progress --profile  --json > stats.json",
     "build:prod": "npm run clean:dist && webpack --config config/webpack.prod.js  --progress --profile --bail",
     "build": "npm run build:dev",
     "clean:dist": "npm run rimraf -- dist",
@@ -136,6 +136,7 @@
     "resolve-url-loader": "2.0.2",
     "rimraf": "^2.6.2",
     "sass-loader": "6.0.3",
+    "source-map-explorer": "^1.5.0",
     "source-map-loader": "^0.1.5",
     "style-loader": "^0.16.1",
     "to-string-loader": "^1.1.4",

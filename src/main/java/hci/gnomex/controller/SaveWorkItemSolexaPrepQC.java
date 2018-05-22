@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
@@ -108,9 +110,14 @@ public class SaveWorkItemSolexaPrepQC extends GNomExCommand implements Serializa
                       wi.setIdCoreFacility(sample.getRequest().getIdCoreFacility());
 
                       String codeStepNext = "";
-                      // ILLSEQQC
                       if(workItem.getCodeStepNext().equals(Step.SEQ_PREP_QC)) {
                         codeStepNext = Step.SEQ_CLUSTER_GEN;
+                      } else if (workItem.getCodeStepNext().equals(Step.HISEQ_PREP_QC)) {
+                        codeStepNext = Step.HISEQ_CLUSTER_GEN;
+                      } else if (workItem.getCodeStepNext().equals(Step.MISEQ_PREP_QC)) {
+                        codeStepNext = Step.MISEQ_CLUSTER_GEN;
+                      } else if (workItem.getCodeStepNext().equals(Step.NOSEQ_PREP_QC)) {
+                        codeStepNext = Step.NOSEQ_CLUSTER_GEN;
                       } else {
                         codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
                       }
