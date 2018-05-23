@@ -60,4 +60,32 @@ export class ProductsService {
         return this.httpClient.post("/gnomex/SavePriceCategory.gx", null, {params: params});
     }
 
+    public getProductLedgerList(idLab?: string, idProduct?: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idLab", idLab ? idLab : "")
+            .set("idProduct", idProduct ? idProduct : "");
+        return this.httpClient.get("/gnomex/GetProductLedgerList.gx", {params: params});
+    }
+
+    public getProductLedgerEntries(idLab: string, idProduct: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idLab", idLab)
+            .set("idProduct", idProduct);
+        return this.httpClient.get("/gnomex/GetProductLedgerEntries.gx", {params: params});
+    }
+
+    public saveProductLedgerEntry(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/SaveProductLedgerEntry.gx", null, {params: params});
+    }
+
+    public saveProductLedgerEntryList(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/SaveProductLedgerEntryList.gx", null, {params: params});
+    }
+
+    public getCoreFacilityLabList(): Observable<any> {
+        return this.httpClient.get("/gnomex/GetCoreFacilityLabList.gx");
+    }
+
 }
