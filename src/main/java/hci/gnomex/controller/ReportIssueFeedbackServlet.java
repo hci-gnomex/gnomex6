@@ -39,7 +39,7 @@ private static String serverName;
 private static final int STATUS_ERROR = 999;
 private static final Logger LOG = Logger.getLogger(ReportIssueFeedbackServlet.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletdRequest req, HttpServletResponse res) throws ServletException, IOException {
 	doPost(req, res);
 }
 

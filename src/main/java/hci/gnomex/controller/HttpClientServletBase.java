@@ -33,7 +33,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	doGet(req, res);
 }
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	Session sess = null;
 	try {
 		sess = HibernateSession.currentSession(getNameOfServlet());

@@ -59,7 +59,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	LOG.error("Post not implemented");
 }
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	String serverName = req.getServerName();
 	Session sess = null;
