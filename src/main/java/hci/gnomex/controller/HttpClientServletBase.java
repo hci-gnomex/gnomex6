@@ -33,9 +33,10 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	doGet(req, res);
 }
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req1, HttpServletResponse res) throws ServletException, IOException {
 	Session sess = null;
 	try {
+		HttpServletWrappedRequest req = new HttpServletWrappedRequest(req1);
 		sess = HibernateSession.currentSession(getNameOfServlet());
 
 		String username = req.getParameter("userName");

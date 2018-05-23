@@ -1,0 +1,23 @@
+<h6 mat-dialog-title>Add Ledger Entry</h6>
+<mat-dialog-content>
+    <form [formGroup]="this.form" class="flex-container-col">
+        <label class="full-width">{{this.selectedProduct.display}}</label>
+        <mat-form-field class="full-width">
+            <input matInput placeholder="Quantity" [formControlName]="'quantity'">
+        </mat-form-field>
+        <mat-form-field class="full-width">
+            <textarea matInput placeholder="Comment" [formControlName]="'comment'"
+                      matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+            <textarea matInput placeholder="Notes" [formControlName]="'notes'"
+                      matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button [hidden]="this.showSpinner" [disabled]="this.form.invalid" color="primary" (click)="this.save()">Save</button>
+    <button mat-button [hidden]="this.showSpinner" [mat-dialog-close]>Close</button>
+    <span [hidden]="!this.form.dirty || this.showSpinner" class="dirty-note">Changes Have Not Been Saved</span>
+    <mat-spinner [hidden]="!this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+</mat-dialog-actions>

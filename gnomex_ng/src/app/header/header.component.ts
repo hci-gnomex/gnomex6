@@ -330,7 +330,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     }
                 ]
             },
@@ -472,7 +472,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     }
                 ]
             },
@@ -934,7 +934,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     },
                     {
                         displayName: 'Configure Products',
@@ -1236,7 +1236,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     },
                     {
                         displayName: 'Configure Products',
@@ -1352,7 +1352,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     },
                 ]
             },
@@ -1442,7 +1442,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     },
                 ]
             },
