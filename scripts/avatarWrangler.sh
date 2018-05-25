@@ -43,6 +43,7 @@ echo optional param  $optParam
 downloadCode=0
 fileList=""
 verifiedSlInfo=""
+tokenVal=`cat "$pDataPath"token.properties`
 
 
 
@@ -55,7 +56,7 @@ echo This is the path : $scriptsPath
 if [ "$flaggedIDParam" = "normal"  ]; then
 
         source "$dnaNexusPath"dx-toolkit/environment
-        dx login --token 0qFo3v0VLcWuqFzsuWXjkMKogFfVM89x
+        dx login --token $tokenVal
         dx cd /
 
         tree "$avatarLocalDataPath" --noreport > "$pDataPath"localTree.out
