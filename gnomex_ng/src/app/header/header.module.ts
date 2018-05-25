@@ -37,6 +37,7 @@ import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 
 import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
+import {TextSelectXorMultiselectEditor} from "../util/grid-editors/text-select-xor-multiselect.editor";
 
 @NgModule({
   imports: [
@@ -53,7 +54,10 @@ import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
       BrowserAnimationsModule,
       NewBillingAccountModule,
       MatDialogModule,
-      AgGridModule.withComponents([IconTextRendererComponent])
+      AgGridModule.withComponents([
+          IconTextRendererComponent,
+          TextSelectXorMultiselectEditor
+      ])
 
   ],
    providers: [

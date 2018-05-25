@@ -16,7 +16,7 @@
                                 Search Category
                             </div>
                             <div class="td">
-                                <mat-radio-group [(ngModel)]="searchType" (change)="onSearchTypeChanged($event)">
+                                <mat-radio-group [(ngModel)]="searchType" (change)="onSearchTypeChanged()">
                                     <mat-radio-button class="radio-button" [value]="ALL_OBJECTS">All Objects</mat-radio-button>
                                     <mat-radio-button class="radio-button" [value]="EXPERIMENTS">Experiments</mat-radio-button>
                                     <mat-radio-button class="radio-button" [value]="ANALYSES"   >Analyses</mat-radio-button>
@@ -48,6 +48,7 @@
                                             [enableSorting]="true"
                                             [enableColResize]="true"
                                             [suppressNoRowsOverlay]="true"
+                                            [stopEditingWhenGridLosesFocus]="true"
                                             (gridSizeChanged)="onNewSearchGridSizeChanged()"
                                             (gridReady)="onNewSearchGridReady($event)">
                                     </ag-grid-angular>

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
@@ -726,7 +726,11 @@ export class BillingAccountTabComponent implements OnInit{
 
 
 	openChartfieldEditor(rowIndex: string) {
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+
+        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");
@@ -734,7 +738,11 @@ export class BillingAccountTabComponent implements OnInit{
 	}
 
 	openPoEditor(rowIndex: string) {
-		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+
+		let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");
@@ -742,7 +750,11 @@ export class BillingAccountTabComponent implements OnInit{
 	}
 
 	openCreditCardEditor(rowIndex: string) {
-		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+
+		let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
 
 		dialogRef.afterClosed().subscribe((result) => {
 			console.log("Editor closed!");
@@ -760,7 +772,13 @@ export class BillingAccountTabComponent implements OnInit{
 				displayField: "display"
 			};
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.data = data;
+            configuration.width = '60em';
+            configuration.height = '45em';
+            configuration.panelClass = 'no-padding-dialog';
+
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef
@@ -785,7 +803,13 @@ export class BillingAccountTabComponent implements OnInit{
 				displayField: "display"
 			};
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+			let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.data = data;
+            configuration.width = '60em';
+            configuration.height = '45em';
+            configuration.panelClass = 'no-padding-dialog';
+
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef
@@ -810,7 +834,13 @@ export class BillingAccountTabComponent implements OnInit{
 				displayField: "display"
 			};
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, { data: data, width: '60em', height: '45em', panelClass: 'no-padding-dialog' });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.data = data;
+            configuration.width = '60em';
+            configuration.height = '45em';
+            configuration.panelClass = 'no-padding-dialog';
+
+			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef

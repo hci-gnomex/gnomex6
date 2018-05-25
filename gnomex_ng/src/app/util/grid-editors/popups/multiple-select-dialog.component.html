@@ -1,0 +1,36 @@
+<div class="full-width full-height flex-vertical-container">
+    <div mat-dialog-title style="margin: 0; padding: 0.5em;">
+        <h3 class="no-margin">
+            {{optionName}}
+        </h3>
+    </div>
+    <div mat-dialog-content class="full-width full-height stretch" style="margin: 0; padding: 0;">
+        <div class="full-width full-height">
+            <div class="full-height full-width" style="padding: .5em 2em;">
+                <ag-grid-angular
+                        style="width:100%; height:100%;"
+                        class="ag-fresh"
+                        [singleClickEdit]="true"
+                        [rowSelection]="gridRowSelection"
+                        [suppressRowClickSelection]="allowMultipleSelection"
+                        [columnDefs]="columnDefinitions"
+                        [enableSorting]="true"
+                        [enableColResize]="true"
+                        (gridSizeChanged)="onGridSizeChanged()"
+                        (gridReady)="onGridReady($event)">
+                </ag-grid-angular>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions style="margin: 0; display: block;">
+        <div class="t full-width">
+            <div class="tr">
+                <div class="td right-align horizontal-padding">
+                    <button mat-button cdkFocusInitial (click)="updateButtonClicked()">Update</button>
+                    <!--<button mat-button (click)="cancelButtonClicked()">Cancel</button>-->
+                    <button mat-button (click)="onGridSizeChanged()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

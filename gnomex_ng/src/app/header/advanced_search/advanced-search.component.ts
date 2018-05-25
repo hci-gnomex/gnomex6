@@ -12,6 +12,9 @@ import {MatDialogRef, MatDialog, MAT_DIALOG_DATA, DialogPosition} from "@angular
 import { TextAlignLeftMiddleRenderer } from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {AdvancedSearchService} from "./advanced-search.service";
 import {Subscription} from "rxjs/Subscription";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {SpinnerDialogComponent} from "../../util/popup/spinner-dialog.component";
+import {TextSelectXorMultiselectEditor} from "../../util/grid-editors/text-select-xor-multiselect.editor";
 
 @Component({
     selector: 'advanced-search-component',
@@ -189,35 +192,47 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
     private dictionaryMapSubscription: Subscription;
 
+    private spinnerRef: MatDialogRef<SpinnerDialogComponent>;
+
     constructor(private dialog: MatDialog,
                 private dialogRef: MatDialogRef<AdvancedSearchComponent>,
+                private dialogService: DialogsService,
                 private advancedSearchService: AdvancedSearchService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (data) {
             this.searchText = !!data.searchText ? data.searchText : '';
         }
 
+        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+
         this.allObjectSearchListSubscription = this.advancedSearchService.getAllObjectSearchListObservable().subscribe((list) => {
             this.allObjectSearchList = list;
+            this.onSearchTypeChanged();
         });
         this.experimentSearchListSubscription = this.advancedSearchService.getExperimentSearchListObservable().subscribe((list) => {
             this.experimentSearchList = list;
+            this.onSearchTypeChanged();
         });
         this.analysisSearchListSubscription = this.advancedSearchService.getAnalysisSearchListObservable().subscribe((list) => {
             this.analysisSearchList = list;
+            this.onSearchTypeChanged();
         });
         this.protocolSearchListSubscription = this.advancedSearchService.getProtocolSearchListObservable().subscribe((list) => {
             this.protocolSearchList = list;
+            this.onSearchTypeChanged();
         });
         this.dataTrackSearchListSubscription = this.advancedSearchService.getDataTrackSearchListObservable().subscribe((list) => {
             this.dataTrackSearchList = list;
+            this.onSearchTypeChanged();
         });
         this.topicSearchListSubscription = this.advancedSearchService.getTopicSearchListObservable().subscribe((list) => {
             this.topicSearchList = list;
+            this.onSearchTypeChanged();
         });
 
         this.dictionaryMapSubscription = this.advancedSearchService.getDictionaryMapObservable().subscribe((list) => {
             this.dictionaryMap = list;
+            this.onSearchTypeChanged();
         });
     }
 
@@ -243,9 +258,10 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             },
             {
                 headerName: "Value (Partial or Whole) to Search for",
-                editable: false,
+                editable: true,
                 width: 300,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextSelectXorMultiselectEditor,
                 field: "value"
             }
         ];
@@ -338,7 +354,11 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         this.dialogRef.close();
     }
 
-    onSearchTypeChanged(event: any) {
+    onSearchTypeChanged() {
+        if (!this.newSearchGridApi || !this.dictionaryMap) {
+            return;
+        }
+
         let rowData: any[] = [];
 
         switch (this.searchType) {
@@ -351,11 +371,36 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             default : // Do nothing;
         }
 
-        // Due to XML parsing of single elements.
-        if (Array.isArray(rowData) && rowData.length == 1) {
-            rowData[0] = rowData[0].Field;
+        if (!rowData) {
+            rowData = [];
+        } else {
+            // Due to XML parsing of single elements.
+            if (Array.isArray(rowData) && rowData.length == 1 && !!rowData[0].Field) {
+                rowData[0] = rowData[0].Field;
+            }
+
+            if (!Array.isArray(rowData)) {
+                rowData = [rowData];
+            }
+        }
+
+        if (rowData && Array.isArray(rowData) && this.dictionaryMap && Array.isArray(this.dictionaryMap)) {
+            for (let row of rowData) {
+
+                if (row.isOptionChoice && row.isOptionChoice.toLowerCase() === 'y') {
+                    for (let dictionary of this.dictionaryMap) {
+                        if (dictionary.fieldName === row.displayName) {
+                            row.dictionary = dictionary;
+                        }
+                    }
+                }
+            }
         }
 
         this.newSearchGridApi.setRowData(rowData);
+
+        if (!!this.spinnerRef) {
+            this.spinnerRef.close();
+        }
     }
 }
