@@ -1,0 +1,13 @@
+<button mat-button [matMenuTriggerFor]="topMenu">{{this.label}}</button>
+<mat-menu #topMenu="matMenu">
+    <button mat-menu-item (click)="this.setRangeWithinLast(7)">Last week</button>
+    <button mat-menu-item (click)="this.setRangeWithinLast(30)">Last 30 days</button>
+    <button mat-menu-item (click)="this.setRangeWithinLast(90)">Last 90 days</button>
+    <button mat-menu-item (click)="this.setRangeWithinLast(365)">Last year</button>
+    <button mat-menu-item [matMenuTriggerFor]="yearMenu">From year...</button>
+    <button mat-menu-item (click)="this.openPopup()">Custom dates</button>
+    <button mat-menu-item (click)="this.clear()">Clear filter</button>
+</mat-menu>
+<mat-menu #yearMenu="matMenu">
+    <button *ngFor="let item of this.yearMenuArray" mat-menu-item (click)="this.setRangeForYear(item.year)">{{item.label}}</button>
+</mat-menu>
