@@ -15,6 +15,8 @@ import {Subscription} from "rxjs/Subscription";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {SpinnerDialogComponent} from "../../util/popup/spinner-dialog.component";
 import {TextSelectXorMultiselectEditor} from "../../util/grid-editors/text-select-xor-multiselect.editor";
+import {SplitStringToMultipleLinesRenderer} from "../../util/grid-renderers/split-string-to-multiple-lines.renderer";
+import {TextSelectXorMultiselectRenderer} from "../../util/grid-renderers/text-select-xor-multiselect.renderer";
 
 @Component({
     selector: 'advanced-search-component',
@@ -260,7 +262,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 headerName: "Value (Partial or Whole) to Search for",
                 editable: true,
                 width: 300,
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellRendererFramework: TextSelectXorMultiselectRenderer,
                 cellEditorFramework: TextSelectXorMultiselectEditor,
                 field: "value"
             }

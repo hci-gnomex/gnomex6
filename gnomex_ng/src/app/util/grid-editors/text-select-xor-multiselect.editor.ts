@@ -19,7 +19,7 @@ export class TextSelectXorMultiselectEditor implements ICellEditorAngularComp {
 
     private _displayType: string = this.TEXT;
 
-    public value: string = 'testing';
+    public value: string;
     public options: any[] = [];
 
     public params: any;
@@ -28,6 +28,19 @@ export class TextSelectXorMultiselectEditor implements ICellEditorAngularComp {
 
     agInit(params: any): void {
         this.params = params;
+
+        if (this.params
+            && this.params.node
+            && this.params.node.data
+            && this.params.column.colDef
+            && this.params.column.colDef
+            && this.params.column.colDef.field
+            && this.params.column.colDef.field != ''
+            && this.params.node.data[this.params.column.colDef.field]) {
+            this.value = this.params.node.data[this.params.column.colDef.field];
+        } else {
+            this.value = '';
+        }
 
         if (this.params && this.params.node && this.params.node.data) {
             if (this.params.node.data.isOptionChoice && this.params.node.data.isOptionChoice.toLowerCase() === 'y') {

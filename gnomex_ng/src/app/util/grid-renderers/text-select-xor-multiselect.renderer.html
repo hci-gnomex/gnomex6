@@ -1,0 +1,20 @@
+<div class="full-width full-height">
+    <div *ngIf="isTextDisplay" class="full-width full-height">
+        <div class="t full-width full-height">
+            <div class="tr">
+                <div class="td vertical-center left-align padded">
+                    {{ value }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!isTextDisplay" class="t full-width full-height cursor" (click)="invokeParentMethod()">
+        <div class="tr">
+            <div #totalHeightSource class="td vertical-center">
+                <div *ngFor="let displayString of displayStrings" class="full-width string-container {{displayString.classes}} ">
+                    {{displayString.display}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

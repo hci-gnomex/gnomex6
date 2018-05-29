@@ -15,35 +15,35 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 			</div>
 		</div>
 	`,
-	styles: [`
-      .string-container {
-					padding-left: 0.3rem;
-			}
+	styles: [`		
+		.string-container {
+			padding-left: 0.3rem;
+		}
 			
-			.cursor { cursor: pointer; }
+		.cursor { cursor: pointer; }
 			
-			.full-width  { width:  100% }
-			.full-height { height: 100% }
+		.full-width  { width:  100% }
+		.full-height { height: 100% }
 			
-			.t  { display: table; }
-			.tr { display: table-row; }
-			.td { display: table-cell; }
+		.t  { display: table; }
+		.tr { display: table-row; }
+		.td { display: table-cell; }
 			
-			.inline-block { display: inline-block; }
+		.inline-block { display: inline-block; }
 			
-			.vertical-center { vertical-align: middle; }
+		.vertical-center { vertical-align: middle; }
 			
-			.error { color: red; }
+		.error { color: red; }
 	`]
 })
 export class SplitStringToMultipleLinesRenderer implements ICellRendererAngularComp {
 	public params: any;
 	public displayStrings: any[];
-	private onClick;
-	private rendererOptions: any[];
+	protected onClick;
+    protected rendererOptions: any[];
 
-	private rendererOptionDisplayField: string;
-	private rendererOptionValueField: string;
+    protected rendererOptionDisplayField: string;
+    protected rendererOptionValueField: string;
 
 	value: string;
 
@@ -76,7 +76,7 @@ export class SplitStringToMultipleLinesRenderer implements ICellRendererAngularC
 		}
 
 		this.findDisplayValues();
-		this.requestResizeRow()
+		this.requestResizeRow();
 	}
 
 	findDisplayValues() {

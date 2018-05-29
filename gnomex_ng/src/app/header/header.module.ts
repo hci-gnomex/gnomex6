@@ -38,29 +38,30 @@ import {AdvancedSearchComponent} from "./advanced_search/advanced-search.compone
 
 import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
 import {TextSelectXorMultiselectEditor} from "../util/grid-editors/text-select-xor-multiselect.editor";
+import {TextSelectXorMultiselectRenderer} from "../util/grid-renderers/text-select-xor-multiselect.renderer";
 
 @NgModule({
-  imports: [
-      HEADER_ROUTING,
-      CommonModule,
-      BrowserModule,
-      NgbModule.forRoot(),
-      FormsModule,
-      CommonModule,
-      FormsModule,
-      ReactiveFormsModule,
-      UserModule,
-      AngularMaterialModule,
-      BrowserAnimationsModule,
-      NewBillingAccountModule,
-      MatDialogModule,
-      AgGridModule.withComponents([
-          IconTextRendererComponent,
-          TextSelectXorMultiselectEditor
-      ])
-
-  ],
-   providers: [
+    imports: [
+        HEADER_ROUTING,
+        CommonModule,
+        BrowserModule,
+        NgbModule.forRoot(),
+        FormsModule,
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        UserModule,
+        AngularMaterialModule,
+        BrowserAnimationsModule,
+        NewBillingAccountModule,
+        MatDialogModule,
+        AgGridModule.withComponents([
+            IconTextRendererComponent,
+            TextSelectXorMultiselectEditor,
+            TextSelectXorMultiselectRenderer
+        ])
+    ],
+    providers: [
        AdvancedSearchService,
        ExternalLinkResolver
     ],
