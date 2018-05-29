@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -163,7 +166,7 @@ private String linkContents(String path, DataTrackFolder folder, int depth, Sess
 
 }
 
-public void execute(HttpServletResponse res, String serverName, SecurityAdvisor secAdvisor, Session sess, String username) throws RollBackCommandException {
+public void execute(HttpServletResponse res, String serverName, SecurityAdvisor secAdvisor, Session sess, String username) throws RollBackCommandException, IOException {
 	try {
 		String baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 				PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
@@ -316,18 +319,41 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 						"Launch IGV and replace the default Data Registry URL (View->Preferences->Advanced) with the following link: \n\n");
 
 				StringBuilder sbo = new StringBuilder(preamble + htmlPath + "igv_registry_$$.txt");
+				JsonObject value = Json.createObjectBuilder()
+						.add("result", "SUCCESS")
+						.add("igvURL", sbo.toString())
+						.build();
+				JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 
-				res.setContentType("application/xml");
-				res.getOutputStream().println("<SUCCESS igvURL=\"" + sbo.toString() + "\"/>");
+				res.setContentType("application/json");
+				jsonWriter.writeObject(value);
+				jsonWriter.close();
+
 			} else {
+
 				throw new Exception("Could not create IGV Links");
 			}
 		} else {
-			LOG.error("MakeDataTrackIGVLink -- No data tracks associated with this user!");
+			throw new Exception("No data tracks associated with this user!");
 		}
 
 	} catch (Exception e) {
 		LOG.error("An exception has occurred in MakeDataTrackIGVLinks ", e);
+
+		JsonObject value = Json.createObjectBuilder()
+				.add("result", "INVALID")
+				.add("message", e.getMessage())
+				.build();
+
+		JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
+
+		res.setContentType("application/json");
+		jsonWriter.writeObject(value);
+		jsonWriter.close();
+
+
+
+
 		throw new RollBackCommandException(e.getMessage());
 	}
 }

@@ -61,6 +61,13 @@ export class ConstantsService {
     public readonly ICON_TOPIC_PUBLIC:string = "assets/topic_tag_public.png";
     public readonly GLOBE_LINK:string ="assets/globe_link.png";
     public readonly EMAIL_GO_LINK:string="assets/email_go.png";
+    public readonly ICON_UCSC:string = "assets/ucscFavicon.png";
+    public readonly ICON_IGV:string = "assets/igv.png";
+    public readonly ICON_IOBIO:string = "assets/iobio.png";
+    public readonly ICON_LINK:string = "assets/icon_link.gif";
+    public readonly ICON_DELETE_LINK:string = "assets/link_delete.png";
+    public readonly ICON_DOWNLOAD:string = "assets/download.png";
+
 
 
 

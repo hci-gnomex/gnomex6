@@ -2,14 +2,13 @@ package hci.gnomex.controller;
 
 import java.net.URLEncoder;
 
-import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.model.*;
 import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.File;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.json.Json;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -181,7 +181,9 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
         }
 
         System.out.println ("\n[MakeDataTrackLinks] requestType: " + requestType + " urlsToLink: " + theURL + "\n");
-        this.xmlResult = "<SUCCESS urlsToLink=\"" +  theURL + "\"" + "/>";
+        this.jsonResult =  Json.createObjectBuilder()
+                .add("result", "SUCCESS")
+                .add("urlsToLink", theURL ).build().toString(); //"<SUCCESS urlsToLink=\"" +  theURL + "\"" + "/>";
         setResponsePage(this.SUCCESS_JSP);
 
       } else {

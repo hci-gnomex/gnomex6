@@ -12,6 +12,7 @@ import {AnalysisResolverService} from "../services/resolvers/analysis-resolver.s
 import {NewExperimentComponent} from "../experiments/experiment-detail/new-experiment.component";
 import {DatatrackResolverService} from "../services/resolvers/datatrack-resolver.service";
 import {LabResolverService} from "../services/resolvers/lab-resolver.service";
+import {DatatracksDetailOverviewComponent} from "../datatracks/datatracks-detail/datatrack-detail-overview.component";
 
 
 /**
@@ -24,7 +25,7 @@ const ROUTES: Routes = [
     { path: "topics", component: BrowseTopicsComponent, children:[
             {path:':idLab', component: TopicDetailComponent, outlet: 'topicsPanel', resolve: {topicLab: LabResolverService}, runGuardsAndResolvers: 'always'},
             {path: 'experiment/:id', component: ExperimentDetail, outlet: 'topicsPanel',resolve: {experiment: ExperimentResolverService}},
-            {path: 'datatrack/:id', component: NewExperimentComponent , outlet: 'topicsPanel', resolve:{datatrack:DatatrackResolverService}},
+            {path: 'datatrack/:id', component: DatatracksDetailOverviewComponent , data:{fromTopic:true}, outlet: 'topicsPanel', resolve:{datatrack:DatatrackResolverService}},
             {path: 'analysis/:idAnalysis', component: AnalysisDetailComponent, outlet: 'topicsPanel', resolve: {analysis: AnalysisResolverService }},
         ],
         canActivate: [SubRouteGuardService]
