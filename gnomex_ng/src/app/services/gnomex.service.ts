@@ -740,4 +740,33 @@ export class GnomexService {
         }
     }
 
+    private recurseGetFiles(fileStruct : any, flattenedFiles: any[] ):void{
+        Object.keys(fileStruct).forEach(objName =>{
+            if(objName === 'File'){
+                let files = Array.isArray(fileStruct.File) ? fileStruct.File : [fileStruct.File];
+                for(let f of files){
+                    flattenedFiles.push(f);
+                }
+
+            }else if(objName === 'Dir'){
+                this.recurseGetFiles(fileStruct[objName], flattenedFiles);
+            }
+        });
+
+
+    }
+
+    /**
+     * Will flatten File structure to get you all files in every folder
+     * @params: {any}fileStruct
+     * @returns {any[]}
+     */
+    public getFiles(fileStruct:any) :any[]{
+        let flatFiles : any[] = [];
+        this.recurseGetFiles(fileStruct, flatFiles);
+        return flatFiles;
+
+
+    }
+
 }

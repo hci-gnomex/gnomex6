@@ -9,7 +9,7 @@ import {DOCUMENT} from '@angular/platform-browser';
         
             <mat-dialog-content style="display: flex; flex-direction: column; height: 85%; position: relative">
 
-                <h6 mat-dialog-title>Web Link Topic {{this.name}}</h6>
+                <h6 mat-dialog-title>Web Link: {{this.name}}</h6>
                 <input style="margin: 1em;" disabled [(ngModel)]="link"/> 
                 <button mat-button color="primary" (click)="copyToClipboard(link)">
                     Copy To Clipboard

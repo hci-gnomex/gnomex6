@@ -6,6 +6,7 @@ import 'rxjs/add/operator/map';
 import {Subject} from "rxjs/Subject";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {CookieUtilService} from "./cookie-util.service";
+import {HttpClient, HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class DataTrackService {
@@ -17,7 +18,8 @@ export class DataTrackService {
     private _datatrackListTreeNode: any;
     private _labList: any[] =[];
 
-    constructor(private http: Http, private cookieUtilService: CookieUtilService ) {
+    constructor(private http: Http, private cookieUtilService: CookieUtilService,
+                private httpClient: HttpClient ) {
     }
 
     set labList(data:string[]){
@@ -297,6 +299,29 @@ export class DataTrackService {
                 console.log(err);
                 return Observable.throw(err);
             });
+    }
+
+    makeUCSCLinks(params:HttpParams): Observable<any>{
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/MakeDataTrackUCSCLinks.gx",null,{params:params});
+    }
+    makeIGVLink(): Observable<any>{
+        //this.cookieUtilService.formatXSRFCookie();
+        //return this.httpClient.post("/gnomex/MakeDataTrackIGVLink.gx",null);
+        return this.httpClient.get("/gnomex/MakeDataTrackIGVLink.gx");
+
+    }
+    makeIOBIOLink(params:HttpParams): Observable<any>{
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx",null,{params:params});
+    }
+    makeURLLink(params:HttpParams) : Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", null, {params:params});
+    }
+    destroyLinks(): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/DestroyExistingLinks.gx",null);
     }
 
 

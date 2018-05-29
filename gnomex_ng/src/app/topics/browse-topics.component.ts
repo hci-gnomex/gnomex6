@@ -660,8 +660,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 pathPair = "analysis/" + this.selectedItem.data.idAnalysis;
             }else if(this.selectedItem.data.idRequest){
                 pathPair = "experiment/" + this.selectedItem.data.idRequest;
+
             }else if(this.selectedItem.data.idDataTrack){
                 pathPair = "datatrack/" + this.selectedItem.data.idDataTrack;
+                this.datatrackService.datatrackListTreeNode = topicListNode;
+
             }else if(this.selectedItem.data.idTopic){
                 pathPair =  this.selectedItem.data.idLab;
 
