@@ -115,7 +115,6 @@
                     </div>
                 </div>
             </mat-tab>
-
         </mat-tab-group>
     </div>
 </div>
@@ -124,7 +123,7 @@
         <div class="t full-width">
             <div class="tr">
                 <div class="td">
-                    <button mat-button><img src="../../../assets/magnifier.png" alt="" /> Search</button>
+                    <button mat-button (click)="onClickSearchButton()"><img src="../../../assets/magnifier.png" alt="" /> Search</button>
                     <button mat-button (click)="onClickClearButton()">Clear</button>
                 </div>
                 <div class="td right-aligned">

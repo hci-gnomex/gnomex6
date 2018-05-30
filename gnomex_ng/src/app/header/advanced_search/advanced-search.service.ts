@@ -1,12 +1,25 @@
 import {Injectable, OnDestroy} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
 import {Subscription} from "rxjs/Subscription";
+import {AdvancedSearchComponent} from "./advanced-search.component";
+import {CookieUtilService} from "../../services/cookie-util.service";
 
 @Injectable()
 export class AdvancedSearchService implements OnDestroy {
+
+    private readonly ALL_OBJECTS : string = 'ALL_OBJECTS';
+    private readonly EXPERIMENTS : string = 'EXPERIMENTS';
+    private readonly ANALYSES    : string = 'ANALYSES';
+    private readonly PROTOCOLS   : string = 'PROTOCOLS';
+    private readonly DATA_TRACKS : string = 'DATA_TRACKS';
+    private readonly TOPICS      : string = 'TOPICS';
+
+    private readonly MATCH_ALL_TERMS : string = 'MATCH_ALL_TERMS';
+    private readonly MATCH_ANY_TERM  : string = 'MATCH_ANY_TERM';
 
     private readonly ALL_OBJECT_SEARCH_LIST_ATTRIBUTE: string = 'AllObjectsSearchList';
     private readonly EXPERIMENT_SEARCH_LIST_ATTRIBUTE: string = 'ExperimentSearchList';
@@ -45,9 +58,10 @@ export class AdvancedSearchService implements OnDestroy {
 
     private _dictionaryMapSubject: BehaviorSubject<any[]> = new BehaviorSubject([]);
 
+    private _searchResultSubject: Subject<any[]> = new Subject();
 
-
-    constructor(private httpClient: HttpClient) { }
+    constructor(private cookieUtilService: CookieUtilService,
+                private httpClient: HttpClient) { }
 
     ngOnDestroy(): void {
         this._allObjectSearchListSubscription.unsubscribe();
@@ -87,6 +101,10 @@ export class AdvancedSearchService implements OnDestroy {
     getDictionaryMapObservable(): Observable<any[]> {
         this.getDictionaryMap();
         return this._dictionaryMapSubject.asObservable();
+    }
+
+    getSearchResultObservable(): Observable<any[]> {
+        return this._searchResultSubject.asObservable();
     }
 
     private getAllObjectSearchList(): void {
@@ -213,6 +231,129 @@ export class AdvancedSearchService implements OnDestroy {
                 console.log("ERROR : " + error);
                 this.isAwaitingGetSearchMetaInformationResponse = false;
             });
+        }
+    }
+
+    // This search feature is specific to the advanced search, and works off of constants belonging
+    // to the AdvancedSearchComponent
+    public search(searchType: string, searchText: string, fields: any[], matchingType: string): void {
+
+        let anyFieldHasSearchableValue: boolean = false;
+        let isValidRequest: boolean = true;
+
+        let constructingParams: any = {
+            text1: '',
+            searchPublicProjects: 'Y',
+            listKind: "SearchList",
+
+            isAnalysisOnlySearch:   'N',
+            isDataTrackOnlySearch:  'N',
+            isExperimentOnlySearch: 'N',
+            isProtocolOnlySearch:   'N',
+            isTopicOnlySearch:      'N',
+
+            matchAllTerms: 'N',
+            matchAnyTerm:  'N',
+
+            searchList: ''
+        };
+
+        if (searchText && searchText != '') {
+            constructingParams.text1 = searchText;
+        }
+
+        if (searchType) {
+            switch(searchType) {
+                case this.ALL_OBJECTS : break;
+                case this.ANALYSES    : constructingParams.isAnalysisOnlySearch   = 'Y'; break;
+                case this.DATA_TRACKS : constructingParams.isDataTrackOnlySearch  = 'Y'; break;
+                case this.EXPERIMENTS : constructingParams.isExperimentOnlySearch = 'Y'; break;
+                case this.PROTOCOLS   : constructingParams.isProtocolOnlySearch   = 'Y'; break;
+                case this.TOPICS      : constructingParams.isTopicOnlySearch      = 'Y'; break;
+                default : isValidRequest = false;
+            }
+        } else {
+            isValidRequest = false;
+        }
+
+        if (matchingType) {
+            switch(matchingType) {
+                case this.MATCH_ALL_TERMS : constructingParams.matchAllTerms = 'Y'; break;
+                case this.MATCH_ANY_TERM  : constructingParams.matchAnyTerm  = 'Y'; break;
+                default : isValidRequest = false;
+            }
+        } else {
+            isValidRequest = false;
+        }
+
+        if (fields && Array.isArray(fields)) {
+
+            let searchStringXML: string = '';
+
+            for (let field of fields) {
+
+                if (field.displayName && field.displayName !== ''
+                    && field.searchName && field.searchName !== ''
+                    && field.isOptionChoice && field.isOptionChoice !== ''
+                    && field.allowMultipleChoice && field.allowMultipleChoice !== '') {
+
+                    searchStringXML += ('<Field displayName="' + field.displayName
+                        + '" searchName="' + field.searchName
+                        + '" isOptionChoice="' + field.isOptionChoice
+                        + '" allowMultipleChoice="' + field.allowMultipleChoice
+                        + '" value="' + field.value
+                        + '"/>');
+
+                    if (field.value && field.value !== '') {
+                        anyFieldHasSearchableValue = true;
+                    }
+                }
+            }
+
+            constructingParams.searchList = searchStringXML;
+        }
+
+        if (isValidRequest && (anyFieldHasSearchableValue || constructingParams.text1 !== '')) {
+            let finalParams: HttpParams = new HttpParams()
+                .set('text1',                  "" + constructingParams.text1)
+                .set('searchPublicProjects',   "" + constructingParams.searchPublicProjects)
+                .set('listKind',               "" + constructingParams.listKind)
+                .set('isAnalysisOnlySearch',   "" + constructingParams.isAnalysisOnlySearch)
+                .set('isDataTrackOnlySearch',  "" + constructingParams.isDataTrackOnlySearch)
+                .set('isExperimentOnlySearch', "" + constructingParams.isExperimentOnlySearch)
+                .set('isProtocolOnlySearch',   "" + constructingParams.isProtocolOnlySearch)
+                .set('isTopicOnlySearch',      "" + constructingParams.isTopicOnlySearch)
+                .set('matchAllTerms',          "" + constructingParams.matchAllTerms)
+                .set('matchAnyTerm',           "" + constructingParams.matchAnyTerm)
+                .set('searchList',             "" + constructingParams.searchList);
+
+            let headers: HttpHeaders = new HttpHeaders({
+               'Content-Type': 'application/json'
+            });
+
+            this.cookieUtilService.formatXSRFCookie();
+
+            this.httpClient.post('/gnomex/SearchIndex.gx', null, { params: finalParams }).subscribe((response: any|any[]) => {
+                if (response) {
+                    let data = response;
+
+                    if (!Array.isArray(response)) {
+                        data = [response];
+                    }
+                    this._searchResultSubject.next(data);
+                }
+            });
+
+            // this.httpClient.post('/gnomex/SearchIndex.gx', finalParams).subscribe((response: any|any[]) => {
+            //     if (response) {
+            //         let data = response;
+            //
+            //         if (!Array.isArray(response)) {
+            //             data = [response];
+            //         }
+            //         this._searchResultSubject.next(data);
+            //     }
+            // });
         }
     }
 }

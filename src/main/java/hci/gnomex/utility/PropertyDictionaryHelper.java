@@ -153,7 +153,7 @@ public class PropertyDictionaryHelper implements Serializable {
   public String getProperty(String name) {
     String propertyValue = "";
     if (name != null && !name.equals("")) {
-      return (String) propertyMap.get(name);
+      return (String) propertyMap.get(name.trim());
     } else {
       return "";
     }

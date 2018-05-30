@@ -194,7 +194,11 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
     private dictionaryMapSubscription: Subscription;
 
+    private searchResultsSubscription: Subscription;
+
     private spinnerRef: MatDialogRef<SpinnerDialogComponent>;
+
+    private currentlyDisplayedRowData: any|any[] = [];
 
     constructor(private dialog: MatDialog,
                 private dialogRef: MatDialogRef<AdvancedSearchComponent>,
@@ -235,6 +239,10 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         this.dictionaryMapSubscription = this.advancedSearchService.getDictionaryMapObservable().subscribe((list) => {
             this.dictionaryMap = list;
             this.onSearchTypeChanged();
+        });
+
+        this.searchResultsSubscription = this.advancedSearchService.getSearchResultObservable().subscribe((results) => {
+           this.processSearchResults(results);
         });
     }
 
@@ -348,6 +356,10 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         this.movingDialog = false;
     }
 
+    onClickSearchButton(): void {
+        this.advancedSearchService.search(this.searchType, this.searchText, this.currentlyDisplayedRowData, this.matchType);
+    }
+
     onClickClearButton(): void {
         console.log("This should clear the search terms from the window, shown and unshown.");
     }
@@ -400,9 +412,14 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         }
 
         this.newSearchGridApi.setRowData(rowData);
+        this.currentlyDisplayedRowData = rowData;
 
         if (!!this.spinnerRef) {
             this.spinnerRef.close();
         }
+    }
+
+    private processSearchResults(results: any): void {
+        console.log(results);
     }
 }
