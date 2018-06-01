@@ -13,159 +13,147 @@ import hci.gnomex.utility.ProductLineItemComparator;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.*;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.apache.log4j.Logger;
-
-
 
 public class DeleteProductLineItems extends GNomExCommand implements Serializable {
 
+    // the static field for logging in Log4J
+    private static Logger LOG = Logger.getLogger(DeleteProductLineItems.class);
 
+    private JsonArray productOrdersToDeleteArray;
+    private JsonArray productLineItemsToDeleteArray;
 
-  // the static field for logging in Log4J
-  private static Logger LOG = Logger.getLogger(DeleteProductLineItems.class);
+    private StringBuilder resultMessage = new StringBuilder("");
 
-  private String productOrdersToDeleteXMLString;
-  private Document productOrdersToDeleteDoc;
-  private String productLineItemsToDeleteXMLString;
-  private Document productLineItemsToDeleteDoc;
-  private String resultMessage = "";
-
-  public void validate() {
-  }
-
-  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
-
-    if (request.getParameter("productOrdersToDeleteXMLString") != null && !request.getParameter("productOrdersToDeleteXMLString").equals("")) {
-      productOrdersToDeleteXMLString = request.getParameter("productOrdersToDeleteXMLString");
-      StringReader reader = new StringReader(productOrdersToDeleteXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        productOrdersToDeleteDoc = sax.build(reader);
-      } catch (JDOMException je ) {
-        this.addInvalidField( "productOrdersToDeleteXMLString", "Invalid productOrdersToDeleteXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse productOrdersToDeleteXMLString", je);
-      }
-    } else if (request.getParameter("productLineItemsToDeleteXMLString") != null && !request.getParameter("productLineItemsToDeleteXMLString").equals("")) {
-      productLineItemsToDeleteXMLString = request.getParameter("productLineItemsToDeleteXMLString");
-      StringReader reader = new StringReader(productLineItemsToDeleteXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        productLineItemsToDeleteDoc = sax.build(reader);
-      } catch (JDOMException je ) {
-        this.addInvalidField( "productLineItemsToDeleteXMLString", "Invalid productLineItemsToDeleteXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse productLineItemsToDeleteXMLString", je);
-      }
-    } else {
-      this.addInvalidField("xmlString", "Missing line items to delete XML String");
+    public void validate() {
     }
 
-  }
+    public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
-  public Command execute() throws RollBackCommandException {
+        String productOrdersToDeleteJSONString = request.getParameter("productOrdersToDeleteJSONString");
+        String productLineItemsToDeleteJSONString = request.getParameter("productLineItemsToDeleteJSONString");
+        if (Util.isParameterNonEmpty(productOrdersToDeleteJSONString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(productOrdersToDeleteJSONString))) {
+                this.productOrdersToDeleteArray = jsonReader.readArray();
+            } catch (Exception e) {
+                this.addInvalidField("productOrdersToDeleteJSONString", "Invalid productOrdersToDeleteJSONString");
+                this.errorDetails = Util.GNLOG(LOG, "Cannot parse productOrdersToDeleteJSONString", e);
+            }
+        } else if (Util.isParameterNonEmpty(productLineItemsToDeleteJSONString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(productLineItemsToDeleteJSONString))) {
+                this.productLineItemsToDeleteArray = jsonReader.readArray();
+            } catch (Exception e) {
+                this.addInvalidField("productLineItemsToDeleteJSONString", "Invalid productLineItemsToDeleteJSONString");
+                this.errorDetails = Util.GNLOG(LOG, "Cannot parse productLineItemsToDeleteJSONString", e);
+            }
+        } else {
+            this.addInvalidField("jsonString", "Missing line items to delete JSON String");
+        }
 
-    try {
-      Session sess = HibernateSession.currentSession(this.getUsername());
+    }
 
-      if ( productOrdersToDeleteDoc != null ) {
-        for(Iterator i = this.productOrdersToDeleteDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-          Element node = (Element)i.next();
-          Integer idProductOrder = Integer.parseInt(node.getAttributeValue("idProductOrder") );
-          ProductOrder po = (ProductOrder) sess.load( ProductOrder.class, idProductOrder );
+    public Command execute() throws RollBackCommandException {
 
-          if (po != null && po.getIdCoreFacility() != null && (this.getSecAdvisor().isCoreFacilityIManage(po.getIdCoreFacility())
-              || this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES)) ){
+        try {
+            Session sess = HibernateSession.currentSession(this.getUsername());
 
-            if ( po.getProductLineItems() == null || po.getProductLineItems().size() == 0 ) {
-              resultMessage += po.getDisplay() + " deleted.\r\n";
-              sess.delete(po);
-            } else {
-              Set <ProductLineItem> plis = po.getProductLineItems();
-              // Remove all line items from product order
-              po.setProductLineItems( new TreeSet(new ProductLineItemComparator()) );
-              for (ProductLineItem li : plis) {
-                po.getProductLineItems().remove( li );
-                if ( !this.deleteProductLineItem( li, sess ) ) {
-                  // Add line item back to product order if it can't be deleted.
-                  po.getProductLineItems().add( li );
+            if (productOrdersToDeleteArray != null) {
+                for (int i = 0; i < productOrdersToDeleteArray.size(); i++) {
+                    JsonObject node = productOrdersToDeleteArray.getJsonObject(i);
+                    Integer idProductOrder = Integer.parseInt(node.getString("idProductOrder"));
+                    ProductOrder po = sess.load(ProductOrder.class, idProductOrder);
+
+                    if (po != null && po.getIdCoreFacility() != null && (this.getSecAdvisor().isCoreFacilityIManage(po.getIdCoreFacility())
+                            || this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES))) {
+
+                        if (po.getProductLineItems() == null || po.getProductLineItems().size() == 0) {
+                            resultMessage.append(po.getDisplay());
+                            resultMessage.append(" deleted.\r\n");
+                            sess.delete(po);
+                        } else {
+                            Set<ProductLineItem> plis = po.getProductLineItems();
+                            // Remove all line items from product order
+                            po.setProductLineItems(new TreeSet(new ProductLineItemComparator()));
+                            for (ProductLineItem li : plis) {
+                                po.getProductLineItems().remove(li);
+                                if (!this.deleteProductLineItem(li, sess)) {
+                                    // Add line item back to product order if it can't be deleted.
+                                    po.getProductLineItems().add(li);
+                                }
+                            }
+                            // Delete product order if all the line items have been deleted.
+                            if (po.getProductLineItems().size() == 0) {
+                                resultMessage.append(po.getDisplay());
+                                resultMessage.append(" deleted.\r\n");
+                                sess.delete(po);
+                            }
+                        }
+                    } else {
+                        this.addInvalidField("Insufficient permissions", "Insufficient permissions to delete product order id:" + idProductOrder + ".");
+                        setResponsePage(this.ERROR_JSP);
+                    }
                 }
-              }
-              // Delete product order if all the line items have been deleted.
-              if ( po != null && po.getProductLineItems().size()==0 ) {
-                resultMessage += po.getDisplay() + " deleted.\r\n";
-                sess.delete(po);
-              }
             }
-          } else {
-            this.addInvalidField("Insufficient permissions", "Insufficient permissions to delete product order id:" + po.getIdProductOrder() + ".");
-            setResponsePage(this.ERROR_JSP);
-          }
-        }
-      }
-      if ( productLineItemsToDeleteDoc != null ) {
-        for(Iterator i = this.productLineItemsToDeleteDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-          Element node = (Element)i.next();
-          Integer idProductLineItem = Integer.parseInt(node.getAttributeValue("idProductLineItem") );
-          ProductLineItem pli = (ProductLineItem)sess.load(ProductLineItem.class, idProductLineItem);
-          ProductOrder po = (ProductOrder)sess.load(ProductOrder.class, pli.getIdProductOrder());
-          if (po != null && po.getIdCoreFacility() != null && (this.getSecAdvisor().isCoreFacilityIManage(po.getIdCoreFacility())
-              || this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES)) ){
+            if (productLineItemsToDeleteArray != null) {
+                for (int i = 0; i < productLineItemsToDeleteArray.size(); i++) {
+                    JsonObject node = productLineItemsToDeleteArray.getJsonObject(i);
+                    Integer idProductLineItem = Integer.parseInt(node.getString("idProductLineItem"));
+                    ProductLineItem pli = sess.load(ProductLineItem.class, idProductLineItem);
+                    ProductOrder po = sess.load(ProductOrder.class, pli.getIdProductOrder());
+                    if (po != null && po.getIdCoreFacility() != null && (this.getSecAdvisor().isCoreFacilityIManage(po.getIdCoreFacility())
+                            || this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES))) {
 
-            this.deleteProductLineItem( pli, sess );
+                        this.deleteProductLineItem(pli, sess);
 
-            // Delete product order if all the line items have been deleted.
-            if ( po != null && po.getProductLineItems().size()==0 ) {
-              resultMessage += po.getDisplay() + " deleted.\r\n";
-              sess.delete(po);
+                        // Delete product order if all the line items have been deleted.
+                        if (po.getProductLineItems().size() == 0) {
+                            resultMessage.append(po.getDisplay());
+                            resultMessage.append(" deleted.\r\n");
+                            sess.delete(po);
+                        }
+                    } else {
+                        this.addInvalidField("Insufficient permissions", "Insufficient permissions to delete product line item id:" + idProductLineItem + ".");
+                        setResponsePage(this.ERROR_JSP);
+                    }
+                }
             }
-          } else {
-            this.addInvalidField("Insufficient permissions", "Insufficient permissions to delete product order id:" + po.getIdProductOrder() + ".");
-            setResponsePage(this.ERROR_JSP);
-          }
+
+            this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").add("message", resultMessage.toString()).build().toString();
+            sess.flush();
+            setResponsePage(this.SUCCESS_JSP);
+
+        } catch (Exception e) {
+            this.errorDetails = Util.GNLOG(LOG, "An exception has occurred in DeleteProductOrders ", e);
+            throw new RollBackCommandException(e.getMessage());
         }
-      }
 
-
-
-      this.xmlResult = "<SUCCESS message=\"" + resultMessage + "\"/>";
-      sess.flush();
-      setResponsePage(this.SUCCESS_JSP);
-
-
-    }catch (Exception e){
-      this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in DeleteProductOrders ", e);
-
-      throw new RollBackCommandException(e.getMessage());
-
+        return this;
     }
 
-    return this;
-  }
+    private boolean deleteProductLineItem(ProductLineItem pli, Session sess) {
 
-  private boolean deleteProductLineItem(ProductLineItem pli, Session sess) {
+        if (pli.getCodeProductOrderStatus() != null && pli.getCodeProductOrderStatus().equals(ProductOrderStatus.COMPLETED)) {
+            resultMessage.append("Cannot delete completed product line item: ");
+            resultMessage.append(pli.getDisplay());
+            resultMessage.append(".\r\n");
+            this.addInvalidField("Cannot delete line item", "Cannot delete completed product line item: " + pli.getDisplay() + ".");
+            return false;
+        }
 
-    if ( pli.getCodeProductOrderStatus() != null &&  pli.getCodeProductOrderStatus().equals( ProductOrderStatus.COMPLETED )) {
-      resultMessage += "Cannot delete completed product line item: " + pli.getDisplay() + ".\r\n";
-      this.addInvalidField("Cannot delete line item", "Cannot delete completed product line item: " + pli.getDisplay() + ".");
-      return false;
+        sess.delete(pli);
+        resultMessage.append("Product line item: ");
+        resultMessage.append(pli.getDisplay());
+        resultMessage.append(" deleted.\r\n");
+
+        sess.flush();
+        return true;
     }
-
-    sess.delete(pli);
-    resultMessage += "Product line item: " + pli.getDisplay() + " deleted.\r\n";
-
-    sess.flush();
-    return true;
-  }
 
 }

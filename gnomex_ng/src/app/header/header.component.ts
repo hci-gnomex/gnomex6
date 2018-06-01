@@ -325,7 +325,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
@@ -467,7 +467,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
@@ -929,7 +929,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
@@ -1231,7 +1231,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
@@ -1347,7 +1347,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
@@ -1437,7 +1437,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',

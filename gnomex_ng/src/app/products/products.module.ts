@@ -12,6 +12,7 @@ import {ProductLedgerComponent} from "./product-ledger.component";
 import {AgGridModule} from "ag-grid-angular";
 import {AddLedgerEntryComponent} from "./add-ledger-entry.component";
 import {AddProductWindowComponent} from "./add-product-window.component";
+import {ProductOrdersComponent} from "./product-orders.component";
 
 @NgModule({
     imports: [
@@ -29,6 +30,7 @@ import {AddProductWindowComponent} from "./add-product-window.component";
         ConfigureProductsComponent,
         ConfigureProductTypesComponent,
         ProductLedgerComponent,
+        ProductOrdersComponent,
         AddLedgerEntryComponent,
         AddProductWindowComponent,
     ],
