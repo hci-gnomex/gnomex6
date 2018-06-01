@@ -138,6 +138,11 @@ img.icon {
   margin-right: 0.5rem;
 }
 
+.gx-label{
+  font-size: small;
+  font-style: italic;
+}
+
 
 /******************************/
 /**** Primary Nav / Header ****/
