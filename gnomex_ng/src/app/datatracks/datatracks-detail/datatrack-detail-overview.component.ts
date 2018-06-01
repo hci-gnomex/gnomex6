@@ -96,6 +96,10 @@ import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
                     <mat-tab style="height:100%;" label="Visibility">
                         <dt-visibility-tab></dt-visibility-tab>
                     </mat-tab>
+                    <mat-tab *ngIf="showRelatedDataTab" style="height:100%;" label="Related Data">
+                        <dt-relate-data-tab [relatedTopics]="relatedTopics" [relatedObjects]="relatedObjects" >
+                        </dt-relate-data-tab>
+                    </mat-tab>
                 </mat-tab-group>
             </div>
             <div>
@@ -127,6 +131,9 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
     private datatrackFiles: Array<any> ;
     private datatrackDirectory:any;
     private annotations: IAnnotation[];
+    public relatedObjects: any;
+    public relatedTopics: any;
+    public showRelatedDataTab:boolean = false;
     public showDownloadLink:boolean = false;
     public showUCSC:boolean = false;
     public showIGV: boolean = true;
@@ -156,6 +163,8 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
            this.showDownloadLink = data.fromTopic ? data.fromTopic : false;
            if(this.datatrack){
                let annots = this.datatrack.DataTrackProperties;
+               this.showRelatedDataTab = this.initRelatedData(this.datatrack);
+
                if(annots){
                    this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
                    for(let i = 0; i < this.annotations.length; i++){
@@ -170,6 +179,8 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
 
            }else{
                 this.annotations = [];
+                this.relatedObjects = [];
+                this.relatedTopics = [];
            }
             this.dtOverviewService.dtOverviewForm.markAsPristine()
 
@@ -195,6 +206,31 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
         }
 
 
+
+    }
+
+    initRelatedData(datatrack:any):boolean {
+        this.relatedObjects = datatrack.relatedObjects;
+        this.relatedTopics = datatrack.relatedTopics;
+        if(this.relatedObjects){
+            let analysis:Array<any> = this.relatedObjects.Analysis;
+            if(analysis){
+                this.relatedObjects.Analysis = Array.isArray(analysis) ? analysis : [analysis];
+            }else{
+                this.relatedObjects.Analysis = [];
+            }
+
+        }
+        if(this.relatedTopics){
+            let topics:Array<any> = this.relatedTopics.Topic;
+            if(topics){
+                this.relatedTopics.Topic = Array.isArray(topics) ? topics : [topics];
+            }else{
+                this.relatedTopics.Topic = [];
+            }
+        }
+
+        return (this.relatedTopics.Topic.length > 0 || this.relatedObjects.Analysis.length > 0 );
 
     }
 
