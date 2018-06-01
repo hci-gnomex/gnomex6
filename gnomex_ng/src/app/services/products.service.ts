@@ -88,4 +88,22 @@ export class ProductsService {
         return this.httpClient.get("/gnomex/GetCoreFacilityLabList.gx");
     }
 
+    public getProductOrderList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetProductOrderList.gx", {params: params});
+    }
+
+    public getProductOrderLineItemList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetProductOrderLineItemList.gx", {params: params});
+    }
+
+    public deleteProductLineItems(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/DeleteProductLineItems.gx", null, {params: params});
+    }
+
+    public changeProductOrderStatus(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/ChangeProductOrderStatus.gx", null, {params: params});
+    }
+
 }
