@@ -10,7 +10,7 @@ import { DateParserComponent } from "../parsers/date-parser.component";
 			<div class="t full-width full-height">
 				<div class="tr">
 					<div class="td vertical-center right-align padded cursor">
-						{{ valueFormatted }}
+						{{ displayString }}
 					</div>
 					<!--<div class="td vertical-center">-->
 						<!--<button class="full-height"><img src="../../../assets/calendar_date.png" alt=""/></button>-->
@@ -42,7 +42,7 @@ export class DateRenderer implements ICellRendererAngularComp {
 
 	params: any;
 	value: any;
-	valueFormatted: string;
+    displayString: string;
 
 	// constructor(private propertyService: PropertyService) { }
 	// this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
@@ -50,21 +50,14 @@ export class DateRenderer implements ICellRendererAngularComp {
 	agInit(params: any): void {
 		this.params = params;
 		this.value = this.params.value;
-		this.valueFormatted = "";
+		this.displayString = "";
 
 		if (this.value && this.value !== '') {
 			if (this.params && this.params.colDef && this.params.colDef.dateParser) {
-				this.valueFormatted = this.params.colDef.dateParser.parseDateString(this.value);
+				this.displayString = this.params.colDef.dateParser.parseDateString(this.value);
 			} else {
-				this.valueFormatted = this.value;
+				this.displayString = this.value;
 			}
-			// this.valueFormatted = DateRenderer.parseDateString(this.value, DateRenderer.DEFAULT_RECEIVED_DATE_FORMAT, DateRenderer.DEFAULT_DISPLAY_DATE_FORMAT);
-
-			//new Date(Date.parse(this.value)).toDateString();
-			//
-			// if (this.valueFormatted === 'Invalid Date') {
-			// 	this.valueFormatted = this.value;
-			// }
 		}
 	}
 
