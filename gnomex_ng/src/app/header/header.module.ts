@@ -10,35 +10,42 @@ import {UserModule} from "@hci/user";
 
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {HeaderComponent} from "./header.component";
-import {MenuItemComponent} from './menu-item/menu-item.component';
-import {ExternalLinkResolver} from './external-routes.module';
-import {ExternalLinkComponent} from './external-routes.module';
 import {
-    MatGridListModule,
-    MatToolbarModule,
     MatButtonModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatGridListModule,
     MatInputModule,
     MatListModule,
-    MatFormFieldModule,
-    MatMenuModule, ShowOnDirtyErrorStateMatcher, MatDialogModule
+    MatMenuModule,
+    MatToolbarModule,
+    ShowOnDirtyErrorStateMatcher
 } from '@angular/material';
 import {HEADER_ROUTING} from "./header.routes";
+import {AgGridModule} from 'ag-grid-angular/main';
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
-import {LogoutComponent} from "./logout.component";
-import {CreateReportProblemLauncherComponent} from "./reportProblem/report-problem-launcher.component";
-import {ReportProblemComponent} from "./reportProblem/report-problem.component";
-import {ManageLinksComponent} from "./manageLinks/manage-links.component";
-import {AgGridModule} from 'ag-grid-angular/main';
-import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
-import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
 
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
+import {CreateReportProblemLauncherComponent} from "./reportProblem/report-problem-launcher.component";
+import {ExternalLinkComponent} from './external-routes.module';
+import {ExternalLinkResolver} from './external-routes.module';
+import {HeaderComponent} from "./header.component";
+import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
+import {LogoutComponent} from "./logout.component";
+import {ManageLinksComponent} from "./manageLinks/manage-links.component";
+import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
+import {MenuItemComponent} from './menu-item/menu-item.component';
+import {ReportProblemComponent} from "./reportProblem/report-problem.component";
 
-import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
+import {DateRenderer} from "../util/grid-renderers/date.renderer";
+import {SelectRenderer} from "../util/grid-renderers/select.renderer";
+import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
 import {TextSelectXorMultiselectEditor} from "../util/grid-editors/text-select-xor-multiselect.editor";
 import {TextSelectXorMultiselectRenderer} from "../util/grid-renderers/text-select-xor-multiselect.renderer";
+
+import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
 
 @NgModule({
     imports: [
@@ -56,7 +63,11 @@ import {TextSelectXorMultiselectRenderer} from "../util/grid-renderers/text-sele
         NewBillingAccountModule,
         MatDialogModule,
         AgGridModule.withComponents([
+            DateRenderer,
             IconTextRendererComponent,
+            SelectRenderer,
+            TextAlignLeftMiddleRenderer,
+            TextAlignRightMiddleRenderer,
             TextSelectXorMultiselectEditor,
             TextSelectXorMultiselectRenderer
         ])

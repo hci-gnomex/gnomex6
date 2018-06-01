@@ -14,9 +14,15 @@ import {AdvancedSearchService} from "./advanced-search.service";
 import {Subscription} from "rxjs/Subscription";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {SpinnerDialogComponent} from "../../util/popup/spinner-dialog.component";
+
 import {TextSelectXorMultiselectEditor} from "../../util/grid-editors/text-select-xor-multiselect.editor";
-import {SplitStringToMultipleLinesRenderer} from "../../util/grid-renderers/split-string-to-multiple-lines.renderer";
 import {TextSelectXorMultiselectRenderer} from "../../util/grid-renderers/text-select-xor-multiselect.renderer";
+import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
+import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
+import {DateRenderer} from "../../util/grid-renderers/date.renderer";
+import {DictionaryService} from "../../services/dictionary.service";
+import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
+import {DateParserComponent} from "../../util/parsers/date-parser.component";
 
 @Component({
     selector: 'advanced-search-component',
@@ -77,17 +83,32 @@ import {TextSelectXorMultiselectRenderer} from "../../util/grid-renderers/text-s
         .light-background { background-color: #ffffff; }
         
         .right-aligned { text-align: right; }
+
+        .horizontal-rule-container {
+            padding: 2px 2px 2px 0;
+        }
+        .horizontal-rule-label-container {
+            padding: 2px 0 2px 2px;
+        }
+        .horizontal-rule {
+            height: 1px;
+            background-color: #ebeae8;
+        }
+        .horizontal-rule-label {
+            height: 1px;
+            background-color: #ebeae8;
+        }
+        
+        .row-vertical-spacing-a {
+            height: 0.6em;
+        }
+        .row-vertical-spacing-b {
+            height: 0.2em;
+        }
         
         .button-container { 
             text-align:left; 
             padding:0.4em; 
-        }
-        
-        .horizontal-rule {
-            height: 2px;
-            width: calc(100% - 0.8em);
-            background-color: #ebeae8;
-            margin: 0.4em;
         }
 
         .button-bar {
@@ -110,7 +131,6 @@ import {TextSelectXorMultiselectRenderer} from "../../util/grid-renderers/text-s
         
         .grid-container {
             width:  100%; 
-            padding-bottom: 0.5em;
         }
         
         .medium-input {
@@ -160,6 +180,8 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     searchType: string = this.ALL_OBJECTS;
     matchType:  string = this.MATCH_ALL_TERMS;
 
+    private _resultType: string = this.ALL_OBJECTS;
+
     context: any = this;
 
     newSearchGridApi: any;
@@ -200,9 +222,13 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
     private currentlyDisplayedRowData: any|any[] = [];
 
+    private visibilityDictionary: any[];
+    private requestCategoryDictionary: any[];
+
     constructor(private dialog: MatDialog,
                 private dialogRef: MatDialogRef<AdvancedSearchComponent>,
                 private dialogService: DialogsService,
+                private dictionaryService: DictionaryService,
                 private advancedSearchService: AdvancedSearchService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (data) {
@@ -243,7 +269,11 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
         this.searchResultsSubscription = this.advancedSearchService.getSearchResultObservable().subscribe((results) => {
            this.processSearchResults(results);
+           this.selectedTabIndex = 1; // Change the tab to the Search Results
         });
+
+        this.visibilityDictionary = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.Visibility");
+        this.requestCategoryDictionary = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory");
     }
 
     ngOnInit() { }
@@ -302,6 +332,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
         this.assignSearchResultsGridContents();
         this.onSearchResultsGridSizeChanged();
+
     }
 
     onNewSearchGridSizeChanged(): void {
@@ -357,6 +388,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     }
 
     onClickSearchButton(): void {
+        this.resultType = this.searchType;
         this.advancedSearchService.search(this.searchType, this.searchText, this.currentlyDisplayedRowData, this.matchType);
     }
 
@@ -419,7 +451,608 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         }
     }
 
+    selectedTabIndex: number = 0;
+
+    private wholeLastSearchData: any[];
+
+    private lastSearchDataAllObjects:  any[];
+    private lastSearchDataExperiments: any[];
+    private lastSearchDataAnalyses:    any[];
+    private lastSearchDataProtocols:   any[];
+    private lastSearchDataDataTracks:  any[];
+    private lastSearchDataTopics:      any[];
+
+    private numberOfAllObjectResults:  number = 0;
+    private numberOfExperimentResults: number = 0;
+    private numberOfAnalysisResults:   number = 0;
+    private numberOfProtocolResults:   number = 0;
+    private numberOfDataTrackResults:  number = 0;
+    private numberOfTopicResults:      number = 0;
+
     private processSearchResults(results: any): void {
         console.log(results);
+
+        this.wholeLastSearchData = results;
+
+        if (results && Array.isArray(results) && results.length === 1) {
+            // Get "All Results" Results
+            if (results[0].GlobalList) {
+                if (Array.isArray(results[0].GlobalList)) {
+                    this.lastSearchDataAllObjects = results[0].GlobalList;
+                } else {
+                    this.lastSearchDataAllObjects = [results[0].GlobalList.Global];
+                }
+
+                if (this.resultType === this.ALL_OBJECTS && this.searchResultsGridApi) {
+                    this.searchResultsGridApi.setRowData(this.lastSearchDataAllObjects);
+                }
+
+                this.numberOfAllObjectResults = this.lastSearchDataAllObjects.length;
+            } else {
+                this.numberOfAllObjectResults = 0;
+            }
+
+            // Get "Experiments" Results
+            if (results[0].RequestList) {
+                if (Array.isArray(results[0].RequestList)) {
+                    this.lastSearchDataExperiments = results[0].RequestList;
+                } else {
+                    this.lastSearchDataExperiments = [results[0].RequestList.Request];
+                }
+
+                if (this.resultType === this.EXPERIMENTS && this.searchResultsGridApi) {
+                    this.searchResultsGridApi.setRowData(this.lastSearchDataExperiments);
+                }
+
+                this.numberOfExperimentResults = this.lastSearchDataExperiments.length;
+            } else {
+                this.numberOfExperimentResults = 0;
+            }
+
+            // Get "Analyses" Results
+            if (results[0].AnalysisList) {
+                if (Array.isArray(results[0].AnalysisList)) {
+                    this.lastSearchDataAnalyses = results[0].AnalysisList;
+                } else {
+                    this.lastSearchDataAnalyses = [results[0].AnalysisList.Analysis];
+                }
+
+                for (let analysisSearchResult of this.lastSearchDataAnalyses) {
+                    let submittedBy: string = '';
+                    let temp: string;
+                    let addedFirstName: boolean = false;
+
+                    if (analysisSearchResult.ownerFirstName && ('' + analysisSearchResult.ownerFirstName).length > 0) {
+                        addedFirstName = true;
+                        temp = ('' + analysisSearchResult.ownerFirstName);
+                        submittedBy += (temp.substr(0, 1).toUpperCase() + temp.substr(1, temp.length));
+                    }
+
+                    if (analysisSearchResult.ownerLastName && ('' + analysisSearchResult.ownerLastName).length > 0) {
+                        if (addedFirstName) {
+                            submittedBy += ' ';
+                        }
+
+                        temp = ('' + analysisSearchResult.ownerLastName);
+                        submittedBy += (temp.substr(0, 1).toUpperCase() + temp.substr(1, temp.length));
+                    }
+
+                    analysisSearchResult.submittedBy = submittedBy;
+                }
+
+                if (this.resultType === this.ANALYSES && this.searchResultsGridApi) {
+                    this.searchResultsGridApi.setRowData(this.lastSearchDataAnalyses);
+                }
+
+                this.numberOfAnalysisResults = this.lastSearchDataAnalyses.length;
+            } else {
+                this.numberOfAnalysisResults = 0;
+            }
+
+            // Get "Protocol" Results
+            if (results[0].ProtocolList) {
+                if (Array.isArray(results[0].ProtocolList)) {
+                    this.lastSearchDataProtocols = results[0].ProtocolList;
+                } else {
+                    this.lastSearchDataProtocols = [results[0].ProtocolList.Protocol];
+                }
+
+                if (this.resultType === this.PROTOCOLS && this.searchResultsGridApi) {
+                    this.searchResultsGridApi.setRowData(this.lastSearchDataProtocols);
+                }
+
+                this.numberOfProtocolResults= this.lastSearchDataProtocols.length;
+            } else {
+                this.numberOfProtocolResults = 0;
+            }
+
+            // Get "Data Track" Results
+            if (results[0].DataTrackList) {
+                if (Array.isArray(results[0].DataTrackList)) {
+                    this.lastSearchDataDataTracks = results[0].DataTrackList;
+                } else {
+                    this.lastSearchDataDataTracks = [results[0].DataTrackList.DataTrack];
+                }
+
+                for (let analysisSearchResult of this.lastSearchDataDataTracks) {
+                    let submittedBy: string = '';
+                    let temp: string;
+                    let addedFirstName: boolean = false;
+
+                    if (analysisSearchResult.ownerFirstName && ('' + analysisSearchResult.ownerFirstName).length > 0) {
+                        addedFirstName = true;
+                        temp = ('' + analysisSearchResult.ownerFirstName);
+                        submittedBy += (temp.substr(0, 1).toUpperCase() + temp.substr(1, temp.length));
+                    }
+
+                    if (analysisSearchResult.ownerLastName && ('' + analysisSearchResult.ownerLastName).length > 0) {
+                        if (addedFirstName) {
+                            submittedBy += ' ';
+                        }
+
+                        temp = ('' + analysisSearchResult.ownerLastName);
+                        submittedBy += (temp.substr(0, 1).toUpperCase() + temp.substr(1, temp.length));
+                    }
+
+                    analysisSearchResult.submittedBy = submittedBy;
+                }
+
+                if (this.resultType === this.DATA_TRACKS && this.searchResultsGridApi) {
+                    this.searchResultsGridApi.setRowData(this.lastSearchDataDataTracks);
+                }
+
+                this.numberOfDataTrackResults = this.lastSearchDataDataTracks.length;
+            } else {
+                this.numberOfDataTrackResults = 0;
+            }
+
+            // Get "Topic" Results
+            if (results[0].ProtocolList) {
+                if (Array.isArray(results[0].TopicList)) {
+                    this.lastSearchDataTopics = results[0].TopicList;
+                } else {
+                    this.lastSearchDataTopics = [results[0].TopicList.Topic];
+                }
+
+                if (this.resultType === this.TOPICS && this.searchResultsGridApi) {
+                    this.searchResultsGridApi.setRowData(this.lastSearchDataTopics);
+                }
+
+                this.numberOfTopicResults = this.lastSearchDataTopics.length;
+            } else {
+                this.numberOfTopicResults = 0;
+            }
+        }
+    }
+
+    get resultType(): string {
+        return this._resultType;
+    }
+    set resultType(resultType: string) {
+        if (resultType) {
+            switch (resultType) {
+                case this.ALL_OBJECTS : this._resultType = resultType; this.setupResultGridForAllObjects();  break;
+                case this.EXPERIMENTS : this._resultType = resultType; this.setupResultGridForExperiments(); break;
+                case this.ANALYSES    : this._resultType = resultType; this.setupResultGridForAnalyses();    break;
+                case this.PROTOCOLS   : this._resultType = resultType; this.setupResultGridForProtocols();   break;
+                case this.DATA_TRACKS : this._resultType = resultType; this.setupResultGridForDataTracks();  break;
+                case this.TOPICS      : this._resultType = resultType; this.setupResultGridForTopics();      break;
+                default : // do nothing.
+            }
+        }
+    }
+
+    private setupResultGridForAllObjects() : void {
+        let allObjectsColumnDefinitions: any[] = [
+            {
+                headerName: "Rank",
+                editable: false,
+                width: 15,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchRank"
+            },
+            {
+                headerName: "Score",
+                editable: false,
+                width: 15,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchScore"
+            },
+            {
+                headerName: "Number",
+                editable: false,
+                width: 30,
+                cellRendererFramework: IconTextRendererComponent,
+                field: "number"
+            },
+            {
+                headerName: "Name",
+                editable: false,
+                width: 100,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "name"
+            },
+            {
+                headerName: "Group",
+                editable: false,
+                width: 150,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "labName"
+            },
+            {
+                headerName: "Visibility",
+                editable: false,
+                width: 50,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this.visibilityDictionary,
+                selectOptionsValueField: 'value',
+                selectOptionsDisplayField: 'display',
+                field: "codeVisibility"
+            }
+        ];
+
+        if (this.searchResultsGridApi) {
+            this.searchResultsGridApi.setRowData(this.lastSearchDataAllObjects);
+            this.searchResultsGridApi.setColumnDefs(allObjectsColumnDefinitions);
+            this.searchResultsGridApi.sizeColumnsToFit();
+        }
+    }
+    private setupResultGridForExperiments() : void {
+        let dateParser: DateParserComponent = new DateParserComponent(
+            DateParserComponent.DEFAULT_RECEIVED_DATE_FORMAT,
+            DateParserComponent.DEFAULT_DISPLAY_DATE_FORMAT
+        );
+
+        let experimentsColumnDefinitions: any[] = [
+            {
+                headerName: "Rank",
+                editable: false,
+                width: 25,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchRank"
+            },
+            {
+                headerName: "Score",
+                editable: false,
+                width: 25,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchScore"
+            },
+            {
+                headerName: "Request",
+                editable: false,
+                width: 40,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                field: "requestNumber"
+            },
+            {
+                headerName: "Category",
+                editable: false,
+                width: 100,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this.requestCategoryDictionary,
+                selectOptionsValueField: 'value',
+                selectOptionsDisplayField: 'display',
+                field: "codeRequestCategory"
+            },
+            {
+                headerName: "Request Date",
+                editable: false,
+                width: 50,
+                cellRendererFramework: DateRenderer,
+                dateParser: dateParser,
+                field: "requestCreateDate"
+            },
+            {
+                headerName: "Group",
+                editable: false,
+                width: 100,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "labName"
+            },
+            {
+                headerName: "Project",
+                editable: false,
+                width: 150,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "projectName"
+            },
+            {
+                headerName: "Microarray",
+                editable: false,
+                width: 120,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "slideProductName"
+            },
+            {
+                headerName: "Visibility",
+                editable: false,
+                width: 50,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this.visibilityDictionary,
+                selectOptionsValueField: 'value',
+                selectOptionsDisplayField: 'display',
+                field: "codeVisibility"
+            }
+        ];
+
+        if (this.searchResultsGridApi) {
+            this.searchResultsGridApi.setRowData(this.lastSearchDataExperiments);
+            this.searchResultsGridApi.setColumnDefs(experimentsColumnDefinitions);
+            this.searchResultsGridApi.sizeColumnsToFit();
+        }
+    }
+    private setupResultGridForAnalyses() : void {
+        let dateParser: DateParserComponent = new DateParserComponent(
+            DateParserComponent.DEFAULT_RECEIVED_DATE_FORMAT,
+            DateParserComponent.DEFAULT_DISPLAY_DATE_FORMAT
+        );
+
+        let analysesColumnDefinitions: any[] = [
+            {
+                headerName: "Rank",
+                editable: false,
+                width: 30,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchRank"
+            },
+            {
+                headerName: "Score",
+                editable: false,
+                width: 35,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchScore"
+            },
+            {
+                headerName: "Analyis #",
+                editable: false,
+                width: 45,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "number"
+            },
+            {
+                headerName: "Type",
+                editable: false,
+                width: 70,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "analysisType"
+            },
+            {
+                headerName: "Organism",
+                editable: false,
+                width: 70,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "organism"
+            },
+            {
+                headerName: "Analysis Group",
+                editable: false,
+                width: 110,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "analysisGroupName"
+            },
+            {
+                headerName: "Group",
+                editable: false,
+                width: 110,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "labName"
+            },
+            {
+                headerName: "Analysis Name",
+                editable: false,
+                width: 100,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "name"
+            },
+            {
+                headerName: "Protocol",
+                editable: false,
+                width: 55,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "analysisProtocol"
+            },
+            {
+                headerName: "Submitted By",
+                editable: false,
+                width: 75,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "submittedBy"
+            },
+            {
+                headerName: "Submit Date",
+                editable: false,
+                width: 75,
+                cellRendererFramework: DateRenderer,
+                dateParser: dateParser,
+                field: "createDate"
+            },
+            {
+                headerName: "Visibility",
+                editable: false,
+                width: 50,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this.visibilityDictionary,
+                selectOptionsValueField: 'value',
+                selectOptionsDisplayField: 'display',
+                field: "codeVisibility"
+            }
+        ];
+
+        if (this.searchResultsGridApi) {
+            this.searchResultsGridApi.setRowData(this.lastSearchDataAnalyses);
+            this.searchResultsGridApi.setColumnDefs(analysesColumnDefinitions);
+            this.searchResultsGridApi.sizeColumnsToFit();
+        }
+    }
+    private setupResultGridForProtocols() : void {
+
+        let protocolColumnDefinitions: any[] = [
+            {
+                headerName: "Rank",
+                editable: false,
+                width: 30,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchRank"
+            },
+            {
+                headerName: "Score",
+                editable: false,
+                width: 35,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchScore"
+            },
+            {
+                headerName: "Type",
+                editable: false,
+                width: 100,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "protocolType"
+            },
+            {
+                headerName: "Name",
+                editable: false,
+                width: 300,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "name"
+            }
+        ];
+
+        if (this.searchResultsGridApi) {
+            this.searchResultsGridApi.setRowData(this.lastSearchDataProtocols);
+            this.searchResultsGridApi.setColumnDefs(protocolColumnDefinitions);
+            this.searchResultsGridApi.sizeColumnsToFit();
+        }
+    }
+    private setupResultGridForDataTracks() : void {
+        let dateParser: DateParserComponent = new DateParserComponent(
+            DateParserComponent.DEFAULT_RECEIVED_DATE_FORMAT,
+            DateParserComponent.DEFAULT_DISPLAY_DATE_FORMAT
+        );
+
+        let dataTracksColumnDefinitions: any[] = [
+            {
+                headerName: "Rank",
+                editable: false,
+                width: 20,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchRank"
+            },
+            {
+                headerName: "Score",
+                editable: false,
+                width: 25,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchScore"
+            },
+            {
+                headerName: "Data Track #",
+                editable: false,
+                width: 45,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "fileName"
+            },
+            {
+                headerName: "Group",
+                editable: false,
+                width: 110,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "labName"
+            },
+            {
+                headerName: "Data Track Name",
+                editable: false,
+                width: 100,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "name"
+            },
+            {
+                headerName: "Data Track Folder",
+                editable: false,
+                width: 150,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "dataTrackFolderName"
+            },
+            {
+                headerName: "Submitted By",
+                editable: false,
+                width: 60,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "submittedBy"
+            },
+            {
+                headerName: "Submit Date",
+                editable: false,
+                width: 40,
+                cellRendererFramework: DateRenderer,
+                dateParser: dateParser,
+                field: "createDate"
+            },
+            {
+                headerName: "Visibility",
+                editable: false,
+                width: 30,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this.visibilityDictionary,
+                selectOptionsValueField: 'value',
+                selectOptionsDisplayField: 'display',
+                field: "codeVisibility"
+            }
+        ];
+
+        if (this.searchResultsGridApi) {
+            this.searchResultsGridApi.setRowData(this.lastSearchDataDataTracks);
+            this.searchResultsGridApi.setColumnDefs(dataTracksColumnDefinitions);
+            this.searchResultsGridApi.sizeColumnsToFit();
+        }
+    }
+    private setupResultGridForTopics() : void {
+
+        let topicColumnDefinitions: any[] = [
+            {
+                headerName: "Rank",
+                editable: false,
+                width: 30,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchRank"
+            },
+            {
+                headerName: "Score",
+                editable: false,
+                width: 35,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "searchScore"
+            },
+            {
+                headerName: "Topic Name",
+                editable: false,
+                width: 300,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "name"
+            },
+            {
+                headerName: "Group",
+                editable: false,
+                width: 110,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                field: "labName"
+            },
+            {
+                headerName: "Visibility",
+                editable: false,
+                width: 75,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this.visibilityDictionary,
+                selectOptionsValueField: 'value',
+                selectOptionsDisplayField: 'display',
+                field: "codeVisibility"
+            }
+        ];
+
+        if (this.searchResultsGridApi) {
+            this.searchResultsGridApi.setRowData(this.lastSearchDataTopics);
+            this.searchResultsGridApi.setColumnDefs(topicColumnDefinitions);
+            this.searchResultsGridApi.sizeColumnsToFit();
+        }
     }
 }

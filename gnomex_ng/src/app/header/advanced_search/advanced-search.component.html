@@ -5,12 +5,38 @@
 </div>
 <div mat-dialog-content class="body background no-margin no-padding">
     <div class="body-size light-background">
-        <mat-tab-group class="full-height">
+        <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="full-height">
 
             <mat-tab label="New Search" class="full-height" #newSearchTab >
                 <div class="full-width fixed-height padding">
 
                     <div class="t full-width full-height">
+                        <div class="tr full-width">
+                            <div class="td mat-input-label">General Keywords</div>
+                            <div class="td">
+                                <mat-form-field class="medium-input">
+                                    <input  matInput
+                                            placeholder="Search"
+                                            [(ngModel)]="searchText">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="tr full-width">
+                            <div class="td horizontal-rule-label-container">
+                                <div class="full-width horizontal-rule-label">
+                                </div>
+                            </div>
+                            <div class="td horizontal-rule-container">
+                                <div class="full-width horizontal-rule">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tr full-width">
+                            <div class="td">
+                                <div class="row-vertical-spacing-a">
+                                </div>
+                            </div>
+                        </div>
                         <div class="tr full-width">
                             <div class="td label">
                                 Search Category
@@ -27,13 +53,9 @@
                             </div>
                         </div>
                         <div class="tr full-width">
-                            <div class="td mat-input-label">General Keywords</div>
                             <div class="td">
-                                <mat-form-field class="medium-input">
-                                    <input  matInput
-                                            placeholder="Search"
-                                            [(ngModel)]="searchText">
-                                </mat-form-field>
+                                <div class="row-vertical-spacing-b">
+                                </div>
                             </div>
                         </div>
                         <div class="tr full-width full-height">
@@ -55,6 +77,12 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="tr full-width">
+                            <div class="td">
+                                <div class="row-vertical-spacing-a">
+                                </div>
+                            </div>
+                        </div>
                         <div class="tr full-width full-height">
                             <div class="td label"></div>
                             <div class="td">
@@ -73,28 +101,28 @@
                 <div class="full-width fixed-height padding">
                     <div class="flex-container full-width full-height">
                         <div class="full-width button-bar">
-                            <button mat-button class="inline-block">
-                                All Results ({{0}} hit{{'s'}})
+                            <button mat-button class="inline-block" (click)="setupResultGridForAllObjects()">
+                                All Results ({{numberOfAllObjectResults}} hit{{numberOfAllObjectResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block">
-                                Experiments ({{0}} hit{{'s'}})
+                            <button mat-button class="inline-block" (click)="setupResultGridForExperiments()">
+                                Experiments ({{numberOfExperimentResults}} hit{{numberOfExperimentResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block">
-                                Analysis ({{0}} hit{{'s'}})
+                            <button mat-button class="inline-block" (click)="setupResultGridForAnalyses()">
+                                Analysis ({{numberOfAnalysisResults}} hit{{numberOfAnalysisResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block">
-                                Protocols ({{0}} hit{{'s'}})
+                            <button mat-button class="inline-block" (click)="setupResultGridForProtocols()">
+                                Protocols ({{numberOfProtocolResults}} hit{{numberOfProtocolResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block">
-                                Data Tracks ({{0}} hit{{'s'}})
+                            <button mat-button class="inline-block" (click)="setupResultGridForDataTracks()">
+                                Data Tracks ({{numberOfDataTrackResults}} hit{{numberOfDataTrackResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block">
-                                Topics ({{0}} hit{{'s'}})
+                            <button mat-button class="inline-block" (click)="setupResultGridForTopics()">
+                                Topics ({{numberOfTopicResults}} hit{{numberOfTopicResults == 1 ? '' : 's'}})
                             </button>
                         </div>
                         <div class="flex-fill full-width">
@@ -115,6 +143,37 @@
                     </div>
                 </div>
             </mat-tab>
+
+            <mat-tab label="Search Results (Tree)" class="full-height" #searchResultsTab >
+                <div class="full-width fixed-height padding">
+                    <div class="flex-container full-width full-height">
+                        <div class="full-width button-bar">
+                            <button mat-button class="inline-block" (click)="setupResultGridForExperiments()">
+                                Experiments ({{numberOfExperimentResults}} hit{{numberOfExperimentResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="setupResultGridForAnalyses()">
+                                Analysis ({{numberOfAnalysisResults}} hit{{numberOfAnalysisResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="setupResultGridForProtocols()">
+                                Protocols ({{numberOfProtocolResults}} hit{{numberOfProtocolResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="setupResultGridForDataTracks()">
+                                Data Tracks ({{numberOfDataTrackResults}} hit{{numberOfDataTrackResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="setupResultGridForTopics()">
+                                Topics ({{numberOfTopicResults}} hit{{numberOfTopicResults == 1 ? '' : 's'}})
+                            </button>
+                        </div>
+                        <div class="flex-fill full-width">
+
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
         </mat-tab-group>
     </div>
 </div>
@@ -122,7 +181,7 @@
     <div class="full-width button-container">
         <div class="t full-width">
             <div class="tr">
-                <div class="td">
+                <div *ngIf="selectedTabIndex === 0" class="td">
                     <button mat-button (click)="onClickSearchButton()"><img src="../../../assets/magnifier.png" alt="" /> Search</button>
                     <button mat-button (click)="onClickClearButton()">Clear</button>
                 </div>
