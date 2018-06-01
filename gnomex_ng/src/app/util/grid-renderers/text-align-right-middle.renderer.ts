@@ -7,7 +7,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 			<div class="t full-width full-height">
 				<div class="tr">
 					<div class="td vertical-center right-align padded">
-						{{ valueFormatted }}
+						{{ value }}
 					</div>
 				</div>
 			</div>
@@ -29,12 +29,12 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 })
 export class TextAlignRightMiddleRenderer implements ICellRendererAngularComp {
 	params: any;
-	valueFormatted: string;
+    value: string;
 
 	agInit(params: any): void {
 		this.params = params;
 
-		this.valueFormatted = (this.params && this.params.valueFormatted) ? this.params.valueFormatted : "";
+		this.value = (this.params && this.params.value) ? this.params.value : "";
 	}
 
 	refresh(params: any): boolean {
