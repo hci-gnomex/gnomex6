@@ -9,8 +9,8 @@ import {DATATRACKS_ROUTING} from "../datatracks.routes";
 import {ServicesModule} from "../../services/services.module";
 import {UtilModule} from "../../util/util.module";
 
-import {DatatracksDetailOverviewComponent,DatatracksAnnotationTabComponent,
-        DatatracksSummaryTabComponent,DatatrackDetailOverviewService,
+import {DatatracksDetailOverviewComponent,
+        DatatracksSummaryTabComponent,
         DatatracksVisibilityTabComponent,DatatracksRelatedDataTabComponent } from "./index"
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
@@ -41,14 +41,12 @@ import {TreeModule} from "angular-tree-component";
     ],
     declarations: [
         DatatracksDetailOverviewComponent,
-        DatatracksAnnotationTabComponent,
         DatatracksSummaryTabComponent,
         DatatracksVisibilityTabComponent,
         DatatracksRelatedDataTabComponent
 
     ],
-    entryComponents: [ConfigAnnotationDialogComponent],
-    providers: [DatatrackDetailOverviewService]
+    entryComponents: [ConfigAnnotationDialogComponent]
 })
 export class DatatracksDetailModule {
 }

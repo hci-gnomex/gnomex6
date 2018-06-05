@@ -1,17 +1,15 @@
 
-        import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, ViewChild} from "@angular/core";
+        import {Component, OnDestroy, OnInit} from "@angular/core";
         import {FormGroup,FormBuilder,Validators } from "@angular/forms"
         import {DataTrackService} from "../../services/data-track.service";
         import {ActivatedRoute} from "@angular/router";
         import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
         import {URLSearchParams} from "@angular/http";
-        import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
-        import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
         import {PropertyService} from "../../services/property.service";
         import {ConstantsService} from "../../services/constants.service";
         import {GnomexService} from "../../services/gnomex.service";
         import {GetLabService} from "../../services/get-lab.service";
-        import {MatSelectChange} from "@angular/material";
+
 
 
 
@@ -49,7 +47,6 @@
 
             constructor(protected fb: FormBuilder,private dtService: DataTrackService,
                         private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService,
-                        private dtOverviewService : DatatrackDetailOverviewService,
                         private propertyService: PropertyService, private constService: ConstantsService,
                         private gnomexService:GnomexService, private getLabService : GetLabService){
             }
@@ -75,8 +72,6 @@
 
                 this.labList = this.gnomexService.labList
                     .filter( lab => lab.canGuestSubmit === 'Y' || lab.canSubmitRequests == 'Y' ) ;
-
-                this.dtOverviewService.addFormToParent("visibilityForm", this.visibilityForm);
 
 
                 this.route.data.forEach(data => { // new datatrack
@@ -108,8 +103,6 @@
                                 this.visibilityForm.get("lab").setValue(data.Lab);
                                 this.visibilityForm.get("collaborators").setValue(currentCollaborators);
                                 this.updateCollaborators();
-
-                                this.visibilityForm.markAsPristine();
 
                             }
 

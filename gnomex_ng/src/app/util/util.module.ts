@@ -26,6 +26,7 @@ import {MonthPickerComponent} from "./pickers/month-picker.component";
 import {DatePickerComponent} from "./date-picker.component";
 import {DateRangeFilterComponent} from "./date-range-filter.component";
 import {DateRangeFilterPopupComponent} from "./date-range-filter-popup.component";
+import {AnnotationTabComponent} from "./annotation-tab.component";
 
 @NgModule({
     imports: [
@@ -57,7 +58,8 @@ import {DateRangeFilterPopupComponent} from "./date-range-filter-popup.component
         NewOrganismComponent,
         NewTopicComponent,
         SaveFooterComponent,
-        MonthPickerComponent
+        MonthPickerComponent,
+        AnnotationTabComponent
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -88,7 +90,8 @@ import {DateRangeFilterPopupComponent} from "./date-range-filter-popup.component
         NewTopicComponent,
         SaveFooterComponent,
         TabsModule,
-        MonthPickerComponent
+        MonthPickerComponent,
+        AnnotationTabComponent
     ]
 })
 export class UtilModule {
