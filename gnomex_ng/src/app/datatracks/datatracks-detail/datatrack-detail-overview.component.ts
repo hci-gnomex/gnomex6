@@ -1,115 +1,28 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, OnDestroy, OnInit} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
-import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
 import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
+import {DatatracksSummaryTabComponent} from "./datatracks-summary-tab.component";
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
+import {DatatracksVisibilityTabComponent} from "./datatracks-visibility-tab.component";
+import {FormGroup} from "@angular/forms";
 
 
 
 
 
 @Component({
-    template: `
-        <div style="display:flex; flex-direction:column; height:100%; width:100%;">
-            <div style="display:flex; font-size:small; " >
-                <label>
-                    <img class="icon" [src]="dataTrackService?.datatrackListTreeNode.icon">
-                    Data Track {{this.dataTrackService?.datatrackListTreeNode.number}}
-                </label>
-
-                <button [disabled]="!showUCSC" 
-                        mat-button color="link" 
-                        (click)="makeUCSCLink()"  
-                        matTooltip="Create file link(s) for viewing the selected data track in the UCSC Genome Browser">
-                    <img class="icon" [src]="constService.ICON_UCSC">
-                    UCSC Browser
-                </button>
-
-                <button [disabled]="!showIGV"
-                        mat-button color="link" 
-                        (click)="makeIGVLink()"
-                        matTooltip="Create file link(s) for viewing the selected data track in the IGV Genome Browser">
-                    <img class="icon" [src]="constService.ICON_IGV">
-                    IGV Browser
-                </button>
-                
-                <button [disabled]="!showIOBIO"
-                        mat-button color="link"
-                        matTooltip="Create file link(s) for viewing the selected data track in the IOBIO Genome Browser"
-                        (click)="makeIOBIOLink()">
-                    <img class="icon" [src]="constService.ICON_IOBIO">
-                    IOBIO Browser
-                </button>
-
-                <button  [disabled]="!showLink"
-                         mat-button color="link"
-                         matTooltip="Creates URL file link(s) for accessing the selected data tracks via HTTP"
-                         (click)="makeURLLink()">
-                    <img class="icon" [src]="constService.ICON_LINK">
-                    URL Links
-                </button>
-                
-                <button [disabled]="!showLink"
-                        mat-button color="link"
-                        matTooltip="Destroys all existing IGV, UCSC, IOBIO and URL links to user-owned datatracks.  Re-created links will have different random paths, making tracks private if old paths were distributed."
-                        (click)="destroyLinks()">
-                    <img class="icon" [src]="constService.ICON_DELETE_LINK">
-                    Clear file links
-                </button>
-                
-                <button [disabled]="!showDownload" *ngIf="showDownloadLink" mat-button color="link">
-                    Download
-                </button>
-
-
-                <button mat-button color="link" (click)="shareableLink()">
-                    <img class="icon" [src]="constService.GLOBE_LINK">
-                    Share
-                </button>
-                <mat-spinner  *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-                
-                
-            </div>
-            
-            
-            
-            <div style="display:flex; flex: 1;">
-
-                <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border"
-                               (selectedTabChange)="tabChanged($event)">
-                    <mat-tab style="height:100%" label="Summary">
-                        <dt-summary-tab></dt-summary-tab>
-                    </mat-tab>
-                    <mat-tab style="height:100%" label="Annotations">
-                        <dt-annotation-tab [annotations]="annotations"></dt-annotation-tab>
-                    </mat-tab>
-                    <mat-tab style="height:100%;" label="Visibility">
-                        <dt-visibility-tab></dt-visibility-tab>
-                    </mat-tab>
-                    <mat-tab *ngIf="showRelatedDataTab" style="height:100%;" label="Related Data">
-                        <dt-relate-data-tab [relatedTopics]="relatedTopics" [relatedObjects]="relatedObjects" >
-                        </dt-relate-data-tab>
-                    </mat-tab>
-                </mat-tab-group>
-            </div>
-            <div>
-                <save-footer (saveClicked)="save()"
-                             [disableSave]="this.dtOverviewService.dtOverviewForm.invalid"
-                             [dirty]="this.dtOverviewService.dtOverviewForm.dirty"></save-footer>
-            </div>
-            
-        </div>
-`,
+    templateUrl:'./datatrack-detail-overview.component.html',
 
     styles: [`
 
@@ -126,7 +39,8 @@ import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 
 `]
 })
-export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
+export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit, OnDestroy{
+    private dtOverviewForm:FormGroup;
     private datatrack: any;
     private datatrackFiles: Array<any> ;
     private datatrackDirectory:any;
@@ -141,9 +55,13 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
     public showLink: boolean = false;
     public showSpinner:boolean = false;
     private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
+    public types = OrderType;
+    @ViewChild(DatatracksSummaryTabComponent) summaryComponet:DatatracksSummaryTabComponent;
+    @ViewChild(AnnotationTabComponent) annotationComponent:AnnotationTabComponent;
+    @ViewChild(DatatracksVisibilityTabComponent) visibilityComponent: DatatracksVisibilityTabComponent;
+
 
     constructor(private dataTrackService:DataTrackService,private route:ActivatedRoute,
-                public dtOverviewService: DatatrackDetailOverviewService,
                 public constService: ConstantsService,
                 private gnomexService: GnomexService,
                 private dialogService: DialogsService,
@@ -155,38 +73,47 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
         console.log(this.dataTrackService.datatrackListTreeNode);
 
         this.route.data.forEach(data =>{
-           this.datatrack =  data.datatrack;
-           this.initLinkVisibility() ;
+            this.datatrack =  data.datatrack;
+            this.initLinkVisibility();
+            this.dtOverviewForm = new FormGroup({});
+            setTimeout(()=>{
+                this.dtOverviewForm.addControl("summaryForm", this.summaryComponet.summaryFormGroup);
+                this.dtOverviewForm.addControl("annotationForm", this.annotationComponent.annotationForm);
+                this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
+                this.dtOverviewForm.markAsPristine();
+            });
 
 
 
-           this.showDownloadLink = data.fromTopic ? data.fromTopic : false;
-           if(this.datatrack){
-               let annots = this.datatrack.DataTrackProperties;
-               this.showRelatedDataTab = this.initRelatedData(this.datatrack);
+            this.showDownloadLink = data.fromTopic ? data.fromTopic : false;
+            if(this.datatrack){
+                let annots = this.datatrack.DataTrackProperties;
+                this.showRelatedDataTab = this.initRelatedData(this.datatrack);
 
-               if(annots){
-                   this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
-                   for(let i = 0; i < this.annotations.length; i++){
-                       let propertyOptions = this.annotations[i].PropertyOption;
-                       if(propertyOptions){
-                           this.annotations[i].PropertyOption =  Array.isArray(propertyOptions)? propertyOptions :  <IAnnotationOption[]>[propertyOptions];
-                       }
-                   }
-               }else{
-                   this.annotations = [];
-               }
+                if(annots){
+                    this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
+                    for(let i = 0; i < this.annotations.length; i++){
+                        let propertyOptions = this.annotations[i].PropertyOption;
+                        if(propertyOptions){
+                            this.annotations[i].PropertyOption =  Array.isArray(propertyOptions)? propertyOptions :  <IAnnotationOption[]>[propertyOptions];
+                        }
+                    }
+                }else{
+                    this.annotations = [];
+                }
 
-           }else{
+            }else{
                 this.annotations = [];
                 this.relatedObjects = [];
                 this.relatedTopics = [];
-           }
-            this.dtOverviewService.dtOverviewForm.markAsPristine()
-
+            }
 
         })
 
+
+    }
+
+    ngAfterViewInit(){
 
     }
 
@@ -372,7 +299,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
     ngOnDestroy(){
     }
     save(){
-        console.log(this.dtOverviewService.dtOverviewForm);
+        console.log(this.dtOverviewForm);
     }
 
     tabChanged(event:any){
