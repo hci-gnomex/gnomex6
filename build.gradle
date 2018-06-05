@@ -56,13 +56,14 @@ dependencies {
     compile group: 'xom', name: 'xom', version: '1.2.5'
 
     //lib & libEnv
-    compile fileTree(dir: 'libEnv', include: 'hci-hibernate5-utils-1.0.jar');
-    compile fileTree(dir: 'lib', include: 'biojava.jar')
-    compile fileTree(dir: 'lib', include: 'metrixClient-1.4.jar')
-    compile fileTree(dir: 'libEnv', include: 'hci_framework.jar')
-    compile fileTree(dir: 'libEnv', include: 'hci_utils.jar')
-    compile fileTree(dir: 'libEnv', include: 'HCIReport.jar')
-    compile fileTree(dir: 'libEnv', include: 'jdom-2.0.6.jar')
+    compile fileTree (dir: 'libEnv', include: 'hci-hibernate5-utils-1.0.jar');
+    compile fileTree (dir: 'lib', include: 'biojava.jar')
+    compile fileTree (dir: 'lib', include: 'metrixClient-1.4.jar')
+    compile fileTree (dir: 'libEnv', include: 'hci_framework.jar')
+    compile fileTree (dir: 'libEnv', include: 'hci_utils.jar')
+    compile fileTree (dir: 'libEnv', include: 'HCIReport.jar')
+    compile fileTree (dir: 'libEnv', include: 'jdom-2.0.6.jar')
+    compile fileTree (dir: 'libEnv', include: 'jaxen-1.1.6.jar')
     compile fileTree(dir: 'libEnv', include: 'poi-3.10-FINAL.jar')
     compile fileTree(dir: 'libEnv', include: 'javax.json-api-1.0.jar')
 
@@ -123,11 +124,11 @@ def replaceString(fileName, fromString, toString) {
     new File(fileName).write(fileText)
 }
 
-task makeMySQL << {
+task makeMySQL <<{
     replaceString("${rescDir}/hibernate.tomcat.cfg.xml", "SQLServerDialect", "MySQLDialect")
 }
 
-task makeSQLServer << {
+task makeSQLServer <<{
     replaceString("${rescDir}/hibernate.tomcat.cfg.xml", "MySQLDialect", "SQLServerDialect")
 }
 
@@ -135,16 +136,16 @@ jar {
     archiveName = jarName
     manifest {
         attributes(
-                'Class-Path': 'log4j.jar'
+                'Class-Path':'log4j.jar'
         )
         attributes([
-                'Built-By'              : ant.properties['user.name'],
+                'Built-By': ant.properties['user.name'],
                 'Implementation-Version': "${gnomex_version}    (${formattedDate})"
-        ], 'gnomex')
+        ],'gnomex')
     }
 }
 
-task clientJar(type: Jar) {
+task clientJar (type: Jar) {
     println buildDir.getAbsolutePath()
     from buildDir.getAbsolutePath() + "/classes/main/"
     include "hci/gnomex/httpclient/*.class"
@@ -152,9 +153,9 @@ task clientJar(type: Jar) {
 
     manifest {
         attributes([
-                'Built-By'              : ant.properties['user.name'],
+                'Built-By': ant.properties['user.name'],
                 'Implementation-Version': gnomex_version
-        ], 'gnomexClient')
+        ],'gnomexClient')
     }
 }
 
@@ -170,7 +171,7 @@ task copyScripts {
     }
 }
 
-task opensourceWar(type: War) {
+task opensourceWar (type: War) {
     archiveName = warName
     //classpath = classpath - sourceSets.main.output
 
@@ -178,7 +179,7 @@ task opensourceWar(type: War) {
     dependsOn 'gnomex_ng:webpack'
 
     manifest {
-        attributes(
+        attributes (
                 'Built-By': ant.properties['user.name'],
                 'Implementation-Version': "${gnomex_version}    (${formattedDate})"
         )
@@ -192,7 +193,7 @@ task opensourceWar(type: War) {
         into 'scripts'
     }
 
-    from(buildDir.getAbsolutePath() + "/libs") {
+    from(buildDir.getAbsolutePath() + "/libs"){
         include jarName
         include clientJarName
         into 'WEB-INF/lib'
@@ -234,7 +235,7 @@ war {
     dependsOn 'gnomex_ng:webpack'
 
     manifest {
-        attributes(
+        attributes (
                 'Built-By': ant.properties['user.name'],
                 'Implementation-Version': "${gnomex_version}    (${formattedDate})",
                 'Dependencies': 'org.dom4j, org.apache.log4j'
@@ -252,7 +253,7 @@ war {
         include "**/*"
     }
 
-    from(buildDir.getAbsolutePath() + "/libs") {
+    from(buildDir.getAbsolutePath() + "/libs"){
         include jarName
         include clientJarName
         into 'WEB-INF/lib'
@@ -263,7 +264,7 @@ war {
         into 'META-INF'
     }
 
-    from("$buildDir/scripts") {
+    from("$buildDir/scripts"){
         into "scripts"
     }
     // move these files to src/main/resources file
@@ -289,7 +290,7 @@ war {
 }
 
 
-task createOpenSourceZip(type: Zip) {
+task createOpenSourceZip(type: Zip){
     archiveName = openSourceZipName
 
     from("$projectDir") {
@@ -349,17 +350,17 @@ task gnomex_deploy {
     dependsOn ':gnomex_tomcat_support:jar', ':gnomex_crypt:jar'
 
     doLast {
-        copy {
-            from war
+    copy {
+        from war
             into "${gnomexServerHome}/${gnomexDeployDir}"
-        }
+    }
 
-        copy {
+    copy {
             from 'gnomex_tomcat_support/build/libs'
             into "${gnomexServerHome}/lib"
-        }
+    }
 
-        copy {
+    copy {
             from 'gnomex_crypt/build/libs'
             into "${gnomexServerHome}/lib"
         }

@@ -1,10 +1,12 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.InternalAccountFieldsConfiguration;
 import hci.gnomex.model.OtherAccountFieldsConfiguration;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.InternalBillingAccountFieldsConfigurationParser;
 import hci.gnomex.utility.OtherBillingAccountFieldsConfigurationParser;
 

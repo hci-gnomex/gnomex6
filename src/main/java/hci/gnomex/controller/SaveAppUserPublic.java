@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.security.EncryptionUtility;
@@ -60,7 +62,7 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 	}
 
 	public Command execute() throws RollBackCommandException {
-		Session sess;
+		Session sess = null;
 		try {
 			sess = HibernateSession.currentSession(this.getUsername());
 			passwordEncrypter = new EncryptionUtility();
@@ -105,7 +107,7 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 	private boolean isDuplicateUserName(Session sess){
 
 		int idAppUser = appUserScreen.getIdAppUser();
-		List<Integer> l = new ArrayList<>();
+		List<Integer> l = new ArrayList<Integer>();
 		if(appUserScreen.getuNID() != null && !appUserScreen.getuNID().trim().equals("")){
 			Query q = sess.createQuery("SELECT idAppUser from AppUser where uNID = :uNID");
 			q.setString("uNID", appUserScreen.getuNID());

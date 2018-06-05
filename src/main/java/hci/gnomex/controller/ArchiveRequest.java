@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
@@ -10,7 +10,7 @@ import hci.gnomex.model.BillingStatus;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.RequestStatus;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.Serializable;

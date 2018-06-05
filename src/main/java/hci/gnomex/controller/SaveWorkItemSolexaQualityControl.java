@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.CoreFacility;
@@ -11,7 +13,7 @@ import hci.gnomex.model.Step;
 import hci.gnomex.model.WorkItem;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.MailUtil;
 import hci.gnomex.utility.MailUtilHelper;
 import hci.gnomex.utility.RequestEmailBodyFormatter;
@@ -120,6 +122,12 @@ public class SaveWorkItemSolexaQualityControl extends GNomExCommand implements S
               // ILLSEQ
               if(workItem.getCodeStepNext().equals(Step.SEQ_QC)) {
                 codeStepNext = Step.SEQ_PREP;
+              } else if (workItem.getCodeStepNext().equals(Step.HISEQ_QC)) {
+                codeStepNext = Step.HISEQ_PREP;
+              } else if (workItem.getCodeStepNext().equals(Step.MISEQ_QC)) {
+                codeStepNext = Step.MISEQ_PREP;
+              } else if (workItem.getCodeStepNext().equals(Step.NOSEQ_QC)) {
+                codeStepNext = Step.NOSEQ_PREP;
               } else {
                 codeStepNext = Step.ILLSEQ_PREP;
               }

@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AnalysisExperimentItem;
 import hci.gnomex.model.Hybridization;
@@ -8,7 +10,7 @@ import hci.gnomex.model.Request;
 import hci.gnomex.model.Sample;
 import hci.gnomex.model.SequenceLane;
 import hci.gnomex.utility.GNomExRollbackException;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -87,7 +89,7 @@ public class LinkExpToAnalysis extends GNomExCommand implements Serializable {
             AnalysisExperimentItem aei = new AnalysisExperimentItem();
             aei.setIdRequest(idRequest);
             aei.setIdAnalysis(idAnalysis);
-            aei.setIdSequenceLane(s.getIdSample());
+            aei.setIdSample(s.getIdSample());     // changed from setIdSequenceLane tim 02/27/2018
             sess.save(aei);
           }
         }

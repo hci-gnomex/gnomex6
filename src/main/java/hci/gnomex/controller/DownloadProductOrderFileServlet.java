@@ -33,7 +33,7 @@ public class DownloadProductOrderFileServlet extends HttpServlet {
   
   }
     
-  protected void doGet(HttpServletWrappedRequest req, HttpServletResponse response)
+  protected void doGet(HttpServletRequest req, HttpServletResponse response)
       throws ServletException, IOException {
     
     ArchiveHelper archiveHelper = new ArchiveHelper();

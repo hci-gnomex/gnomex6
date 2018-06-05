@@ -967,7 +967,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 		let idFundingAgency: string = "";
 
-		let startDate: string = !!this.expirationDate_creditcard ? this.expirationDate_creditcard.toLocaleDateString() : '';
+		let startDate: string = !!this.startDate_creditcard ? this.startDate_creditcard.toLocaleDateString() : '';
 		let expirationDate: string = !!this.expirationDate_creditcard ? this.expirationDate_creditcard.toLocaleDateString() : '';
 
 		let idCreditCardCompany: string = '' + this.selectedCreditCardCompany;

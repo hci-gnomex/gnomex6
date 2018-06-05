@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.Organism;
@@ -50,11 +52,11 @@ public class DeleteOrganism extends GNomExCommand implements Serializable {
 
   public Command execute() throws RollBackCommandException {
     Session sess = null;
-    Organism organism;
+    Organism organism = null;
 
     try {
       sess = HibernateSession.currentSession(this.getUsername());
-      organism = sess.load(Organism.class, idOrganism);
+      organism = (Organism)sess.load(Organism.class, idOrganism);
 
       // Check permissions
       if (this.getSecAdvisor().canDelete(organism)) {
@@ -71,6 +73,7 @@ public class DeleteOrganism extends GNomExCommand implements Serializable {
         List genomeBuilds = sess.createQuery(query.toString()).list();
 
         if (!genomeBuilds.isEmpty()) {
+          Element gbEle = new Element("genomeBuilds");
           for(Iterator j = genomeBuilds.iterator(); j.hasNext();) {
             GenomeBuild gb = (GenomeBuild)j.next();
             sess.delete(gb);

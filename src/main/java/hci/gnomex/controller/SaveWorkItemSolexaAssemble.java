@@ -3,14 +3,16 @@ package hci.gnomex.controller;
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FlowCellChannelComparator;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.WorkItemSolexaAssembleParser;
 import hci.gnomex.utility.WorkItemSolexaAssembleParser.ChannelContent;
@@ -23,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -107,8 +111,8 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
     }
     
     if (request.getParameter("workItemXMLString") != null && !request.getParameter("workItemXMLString").equals("")) {
-      workItemXMLString = "<WorkItemList>" + request.getParameter("workItemXMLString") + "</WorkItemList>";
-      
+      workItemXMLString = request.getParameter("workItemXMLString");
+
       StringReader reader = new StringReader(workItemXMLString);
       try {
         SAXBuilder sax = new SAXBuilder();
@@ -185,6 +189,12 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
             // ILLSEQQC
             if(codeStepNext.equals(Step.SEQ_DATA_PIPELINE)) {
               sequencingPlatform = SequencingPlatform.ILLUMINA_GAIIX_SEQUENCING_PLATFORM;
+            } else if (codeStepNext.equals(Step.HISEQ_FINALIZE_FC)) { // HSEQPIPE, needs to be changed to HSEQFINFC
+              sequencingPlatform = SequencingPlatform.ILLUMINA_HISEQ_2000_SEQUENCING_PLATFORM;
+            } else if (codeStepNext.equals(Step.MISEQ_FINALIZE_FC)) {
+              sequencingPlatform = SequencingPlatform.ILLUMINA_MISEQ_SEQUENCING_PLATFORM;
+            }  else if (codeStepNext.equals(Step.NOSEQ_FINALIZE_FC)) {
+              sequencingPlatform = SequencingPlatform.ILLUMINA_NOSEQ_SEQUENCING_PLATFORM;
             } else {
               sequencingPlatform = SequencingPlatform.ILLUMINA_SEQUENCING_PLATFORM;
             }
@@ -373,14 +383,14 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
 
           parser.resetIsDirty();
 
-          XMLOutputter out = new org.jdom.output.XMLOutputter();
           if (flowCell != null) {
-            this.xmlResult = "<SUCCESS flowCellNumber='" + flowCell.getNumber() + "'/>";            
-          } else {
-            this.xmlResult = "<SUCCESS/>";            
+            JsonObject value = Json.createObjectBuilder()
+                    .add("result", "SUCCESS")
+                    .add("flowCellNumber", flowCell.getNumber())
+                    .build();
+            this.jsonResult = value.toString();
           }
-          
-          setResponsePage(this.SUCCESS_JSP);          
+          setResponsePage(this.SUCCESS_JSP);
         } else {
           this.addInvalidField("Insufficient permissions", "Insufficient permission to manage workflow");
           setResponsePage(this.ERROR_JSP);

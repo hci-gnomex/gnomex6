@@ -329,12 +329,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     }
                 ]
             },
@@ -471,12 +471,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     }
                 ]
             },
@@ -755,7 +755,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/flowcellassmWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
@@ -863,7 +863,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/flowcellassmWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
@@ -933,12 +933,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     },
                     {
                         displayName: 'Configure Products',
@@ -1142,7 +1142,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/flowcellassmWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
@@ -1235,12 +1235,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     },
                     {
                         displayName: 'Configure Products',
@@ -1351,12 +1351,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     },
                 ]
             },
@@ -1441,12 +1441,12 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Product Orders',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/product-ledger'
                     },
                 ]
             },
@@ -1755,60 +1755,10 @@ export class HeaderComponent implements OnInit{
      */
 
 
-    private navByNumber(params:HttpParams,path:string[],initOrderSubject:BehaviorSubject<any> ){
-        this.gnomexService.getOrderFromNumber(params).first().subscribe(data =>{
-            if(data.result === 'SUCCESS'){
-                this.gnomexService.orderInitObj = data;
-                this.gnomexService.orderInitObj.urlSegList = path;
-                let url = this.gnomexService.makeURL(this.gnomexService.orderInitObj);
 
-                this.router.navigateByUrl(url);
-                initOrderSubject.next(this.gnomexService.orderInitObj);
-
-            }else{
-                console.log(data.ERROR);
-            }
-        });
-    }
 
     public searchNumber() {
-        let params: HttpParams = new HttpParams();
-
-        if(this.objNumber){
-            let match = this.objNumber.match(/([A-Za-z]*)([0-9]+)([A-Za-z]?)/);
-            let path:Array<string> = [];
-
-            if( match[3].toUpperCase() === 'R'){
-                params = params.set("requestNumber", this.objNumber);
-                //path = ["experiments","idProject","browsePanel","idRequest"];
-                path = ["experiments"];
-                let sub = this.gnomexService.navInitBrowseExperimentSubject;
-                this.navByNumber(params,path,sub);
-
-            }else if(match[1].toUpperCase() === 'A'){
-                params = params.set("analysisNumber", this.objNumber);
-                //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
-                path = ["analysis"];
-                let sub = this.gnomexService.navInitBrowseAnalysisSubject;
-                this.navByNumber(params,path,sub);
-
-            }else if(match[1].toUpperCase()=== 'DT' ){
-                params = params.set("dataTrackNumber", this.objNumber);
-                //path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
-                path = ["datatracks"];
-                let sub = this.gnomexService.navInitBrowseDatatrackSubject;
-                this.navByNumber(params,path,sub);
-            }else if(match[1].toUpperCase() === 'T'){
-                if(match[2]){
-                    params = params.set("topicNumber", match[2]);
-                }
-                //path = [ "topics","topicsPanel", "idLab" ] ;
-                path = [ "topics"] ;
-                let sub = this.gnomexService.navInitBrowseTopicSubject;
-                this.navByNumber(params,path,sub);
-            }
-
-        }
+        this.gnomexService.navByNumber(this.objNumber);
     }
 
     /**
@@ -1942,6 +1892,8 @@ export class HeaderComponent implements OnInit{
             if (menuItem.context === context) {
                 navMenu[menuItemCtr].hidden = true;
                 navMenu[menuItemCtr].class = 'header-flex0';
+                menuItemCtr++;
+            } else {
                 menuItemCtr++;
             }
             if (menuItem.children) {

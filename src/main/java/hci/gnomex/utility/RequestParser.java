@@ -32,6 +32,7 @@ public class RequestParser implements Serializable {
   private Map collaboratorUploadMap = new HashMap();
   private Map collaboratorUpdateMap = new HashMap();
   private Map sampleAnnotationMap = new HashMap();
+  private Map requestAnnotationMap = new HashMap<String,List<String>>();
   private boolean showTreatments = false;
   private Map sampleTreatmentMap = new HashMap();
   private Map sampleAnnotationCodeMap = new TreeMap();
@@ -88,6 +89,7 @@ public class RequestParser implements Serializable {
     showTreatments = false;
     sampleTreatmentMap = new HashMap();
     sampleAnnotationCodeMap = new TreeMap();
+    requestAnnotationMap = new TreeMap<String,List<String>>();
     hybInfos = new ArrayList();
     sequenceLaneInfos = new ArrayList();
     saveReuseOfSlides = false;
@@ -158,6 +160,7 @@ public class RequestParser implements Serializable {
   private void initializeRequest(Element n, Session sess, RequestCategory requestCategory) throws Exception {
 
     Integer idRequest = new Integer(n.getAttributeValue("idRequest"));
+    System.out.println ("[initializeRequest] idRequest: " + idRequest);
     if (idRequest.intValue() == 0) {
       request = new Request();
       request.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
@@ -167,6 +170,22 @@ public class RequestParser implements Serializable {
       // We use the experiment ID in the XML if this is an import
       if (isImport) {
         request.setNumber(n.getAttributeValue("number"));
+
+        Element requestProp = n.getChild("RequestProperties");
+        if(requestProp != null ){
+          List<Element> reqAnnotations = requestProp.getChildren();
+          for(Element requestAnnot: reqAnnotations){
+            String idProperty = requestAnnot.getAttributeValue("idProperty");
+            String name = requestAnnot.getAttributeValue("name");
+            String value = requestAnnot.getAttributeValue("value");
+            List<String> idPropertyValuePairList = new ArrayList<String>();
+            idPropertyValuePairList.add(idProperty);
+            idPropertyValuePairList.add(value);
+            this.requestAnnotationMap.put(name,idPropertyValuePairList);
+          }
+
+        }
+
       }
 
       if (n.getAttributeValue("idInstitution") != null && !n.getAttributeValue("idInstitution").equals("")) {
@@ -1220,7 +1239,9 @@ public class RequestParser implements Serializable {
   public Map getSampleAnnotationMap() {
     return sampleAnnotationMap;
   }
-
+  public Map<String,List<String>> getRequestAnnotationMap(){
+    return this.requestAnnotationMap;
+  }
   public Map getSampleMap() {
     return sampleMap;
   }

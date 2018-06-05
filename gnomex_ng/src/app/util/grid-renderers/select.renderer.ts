@@ -42,7 +42,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 		this.optionsDisplayField = "";
 
 		if (this.params) {
-			this.value = this.params.valueFormatted;
+			this.value = this.params.value;
 		}
 
 		if (this.params && this.params.column && this.params.column.colDef) {

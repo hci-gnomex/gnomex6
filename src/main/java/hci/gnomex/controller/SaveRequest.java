@@ -2,7 +2,9 @@ package hci.gnomex.controller;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.billing.BillingPlugin;
 import hci.gnomex.constants.Constants;
@@ -73,6 +75,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -169,7 +172,24 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 		Request request = requestParser.getRequest();
 
 		request.setDescription(description);
-		sess.save(request);
+		if(requestParser.isNewRequest() && isImport &&
+				(request.getNumber().equals("")|| request.getNumber().equals("0")) ){
+			sess.save(request);
+			request.setNumber(request.getIdRequest() + "R");
+			if(requestParser.getRequestAnnotationMap().get("Person ID") != null){
+				List<String> idPropertyValuePair = requestParser.getRequestAnnotationMap().get("Person ID");
+				request.setName(idPropertyValuePair.get(1));
+			}else{
+				request.setName(request.getIdRequest() + "");
+			}
+			request.setDescription("Person " +request.getIdRequest());
+			System.out.println("The newly generated request number: " + request.getNumber() );
+			//sess.save(request);
+			sess.flush();
+		}
+		else {
+			sess.save(request);
+		}
 
 		if (requestParser.isNewRequest() && !isImport) {
 			request.setNumber(getNextRequestNumber(requestParser, sess));

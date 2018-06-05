@@ -1,18 +1,18 @@
-<div mat-dialog-title style="background-color: #84b278; color: white; display: inline-block; width: 100%;">
-	<img src="../../../assets/work_auth_form.png" alt="Image not found" style="margin-right:0.2em;"/>
-	<h5 style="display: inline-block;">Submit Campus Billing Account</h5>
+<div mat-dialog-title class="full-width inline-block header">
+	<img src="../../../assets/work_auth_form.png" alt="Image not found" class="header-image"/>
+	<h5 class="inline-block">Edit Billing Account</h5>
 </div>
-<div mat-dialog-content style="background-color: #eeeeeb; overflow: auto; font-size: small;">
+<div mat-dialog-content class="mat-dialog-content">
 	<div class="full-width background-sideless">
-		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
+		<div class="padded">
 			<div class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Lab
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 100%; font-size: small;">
-							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" (change)="onLabListSelection($event)" required>
+						<mat-form-field class="full-width font-small">
+							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" disabled>
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let lab of labList" [value]="lab">
 									{{ lab.name }}
@@ -31,16 +31,18 @@
 						</div>
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 100%; font-size: small;">
+						<mat-form-field class="full-width font-small">
 							<mat-select
-									style="width: 100%;"
+									class="full-width"
 									placeholder="Select Core Facilities"
 									[(ngModel)]="selectedCoreFacilities"
 									(change)="onCoreFacilitiesSelected($event)"
 									multiple
 									required>
 								<mat-option *ngFor="let coreFacility of coreFacilityReducedList" [value]="coreFacility">
-									{{ coreFacility.display }}
+									{{ coreFacility.display
+									+ (!!coreFacility.contactName      ? ' (' + coreFacility.contactName + ')' : '')
+									+ (!!coreFacility.shortDescription ? ' - ' + coreFacility.shortDescription : '') }}
 								</mat-option>
 							</mat-select>
 						</mat-form-field>
@@ -61,10 +63,8 @@
 			</div>
 		</div>
 	</div>
-	<div class="full-width background" style="width: calc(100% - 8px); margin: 3px 4px;">
-		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
-
-
+	<div class="full-width background">
+		<div class="padded">
 			<div *ngIf="showField === CHARTFIELD" class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
@@ -102,9 +102,9 @@
 					<div class="td cell-label">
 						Chartfield to be charged
 					</div>
-					<div class="td" style="font-size: small;">
-						<div class="inline-block" style="vertical-align: top; font-size: small;">
-							<mat-form-field style="width: 3rem;">
+					<div class="td" class="font-small">
+						<div class="inline-block top-vertical-align font-small">
+							<mat-form-field class="shorter-input">
 								<input
 										matInput
 										placeholder="Bus"
@@ -124,8 +124,8 @@
 							</mat-form-field>
 						</div>
 						<div class="horizontal-break"></div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div class="inline-block top-vertical-align">
+							<mat-form-field class="shorter-input">
 								<input
 										matInput
 										placeholder="Org"
@@ -145,8 +145,8 @@
 							</mat-form-field>
 						</div>
 						<div class="horizontal-break"></div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div class="inline-block top-vertical-align">
+							<mat-form-field class="shorter-input">
 								<input
 										matInput
 										placeholder="Fund"
@@ -166,8 +166,8 @@
 							</mat-form-field>
 						</div>
 						<div class="horizontal-break"></div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div class="inline-block top-vertical-align">
+							<mat-form-field class="shorter-input">
 								<input
 										matInput
 										placeholder="Activity"
@@ -186,11 +186,11 @@
 								</mat-error>
 							</mat-form-field>
 						</div>
-						<div class="inline-block" style="vertical-align: top">
+						<div class="inline-block top-vertical-align">
 							<p>OR</p>
 						</div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 4.5rem;">
+						<div class="inline-block top-vertical-align">
+							<mat-form-field class="short-input">
 								<input
 										matInput
 										placeholder="Project"
@@ -210,8 +210,8 @@
 							</mat-form-field>
 						</div>
 						<div class="horizontal-break"></div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div class="inline-block top-vertical-align">
+							<mat-form-field class="shorter-input">
 								<input
 										matInput
 										placeholder="Account"
@@ -231,8 +231,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="isActivity" class="horizontal-break"></div>
-						<div *ngIf="isActivity" class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div *ngIf="isActivity" class="inline-block top-vertical-align">
+							<mat-form-field class="shorter-input">
 								<input
 										matInput
 										placeholder="A/U"
@@ -250,8 +250,8 @@
 						Chartfield to be charged
 					</div>
 					<div class="td">
-						<div *ngIf="internalAccountFieldsConfiguration[0]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[0]" class="inline-block top-vertical-align internal-account-field">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[0].displayName}}"
@@ -282,8 +282,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="internalAccountFieldsConfiguration[1]" class="horizontal-break"></div>
-						<div *ngIf="internalAccountFieldsConfiguration[1]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[1]" class="inline-block top-vertical-align internal-account-field">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[1].displayName}}"
@@ -314,8 +314,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="internalAccountFieldsConfiguration[2]" class="horizontal-break"></div>
-						<div *ngIf="internalAccountFieldsConfiguration[2]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[2]" class="inline-block top-vertical-align internal-account-field">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[2].displayName}}"
@@ -346,8 +346,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="internalAccountFieldsConfiguration[3]" class="horizontal-break"></div>
-						<div *ngIf="internalAccountFieldsConfiguration[3]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[3]" class="inline-block top-vertical-align internal-account-field">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[3].displayName}}"
@@ -378,8 +378,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="internalAccountFieldsConfiguration[4]" class="horizontal-break"></div>
-						<div *ngIf="internalAccountFieldsConfiguration[4]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[4]" class="inline-block top-vertical-align internal-account-field">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[4].displayName}}"
@@ -416,7 +416,7 @@
 						Funding Agency
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 100%; font-size: small;">
+						<mat-form-field class="long-input font-small">
 							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_chartfield" required="{{ requireFundingAgency }}">
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
@@ -433,36 +433,24 @@
 						Start Date
 					</div>
 					<div class="td">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="startDate_chartfield"
-										[matDatepicker]="startDatePicker_chartfield"
-										placeholder="Choose a date"
-										required="{{ requireStartDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="startDatePicker_chartfield"></mat-datepicker-toggle>
-								<mat-datepicker #startDatePicker_chartfield disabled="false"></mat-datepicker>
-							</mat-form-field>
+						<div class="date-picker-wrapper font-small">
+							<date-picker
+									[(ngModel)]="startDate_chartfield"
+									[placeholder]="'Choose a date'"
+									[required]="requireStartDate">
+							</date-picker>
 						</div>
-						<div class="inline-block" style="width:7em;">
+						<div class="inline-block date-horizontal-spacer">
 						</div>
-						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" class="inline-block cell-label" style="height: 100%;">
+						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" class="inline-block cell-label full-height">
 							Effective Until
 						</div>
-						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="effectiveUntilDate_chartfield"
-										[matDatepicker]="effectiveUntilDatePicker_chartfield"
-										placeholder="Choose a date"
-										required="{{ requireExpirationDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="effectiveUntilDatePicker_chartfield"></mat-datepicker-toggle>
-								<mat-datepicker #effectiveUntilDatePicker_chartfield disabled="false"></mat-datepicker>
-							</mat-form-field>
+						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" class="date-picker-wrapper font-small">
+							<date-picker
+									[(ngModel)]="effectiveUntilDate_chartfield"
+									[placeholder]="'Choose a date'"
+									[required]="requireExpirationDate">
+							</date-picker>
 						</div>
 					</div>
 				</div>
@@ -471,68 +459,11 @@
 						Effective Until
 					</div>
 					<div class="td">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="effectiveUntilDate_chartfield"
-										[matDatepicker]="effectiveUntilDatePicker_chartfield"
-										placeholder="Choose a date"
-										required="{{ requireExpirationDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="effectiveUntilDatePicker_chartfield"></mat-datepicker-toggle>
-								<mat-datepicker #effectiveUntilDatePicker_chartfield disabled="false"></mat-datepicker>
-							</mat-form-field>
-						</div>
-					</div>
-				</div>
-				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_totalDollarAmount" class="tr full-width">
-					<div class="td cell-label">
-						Total Dollar Amount
-					</div>
-					<div class="td">
-						<mat-form-field style="width: 18em;">
-							<span matPrefix>$ &nbsp;</span>
-							<input
-									matInput
-									placeholder="Total Dollar Amount"
-									[(ngModel)]="totalDollarAmount_Chartfield"
-									[formControl]="totalDollarAmountFormControl_chartfield"
-									[errorStateMatcher]="totalDollarAmountStateMatcher_chartfield"
-									required="{{ requireDollarAmount }}">
-							<mat-error *ngIf="totalDollarAmountFormControl_chartfield.hasError('pattern')">
-								Invalid dollar amount
-							</mat-error>
-						</mat-form-field>
-					</div>
-				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
-						Your email address
-					</div>
-					<div class="td">
-						<mat-form-field style="width: 100%;">
-							<input
-									matInput
-									placeholder="Your Email Address"
-									[(ngModel)]="submitterEmail_chartfield"
-									[formControl]="submitterEmailFormControl_chartfield"
-									[errorStateMatcher]="submitterEmailStateMatcher_chartfield"
-									required>
-							<mat-error *ngIf="submitterEmailFormControl_chartfield.hasError('pattern')">
-								Invalid email
-							</mat-error>
-						</mat-form-field>
-					</div>
-				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
-						Active
-					</div>
-					<div class="td center-vertical-align">
-						<div class="checkbox-container">
-							<mat-checkbox [(ngModel)]="activeCheckBox_chartfield"></mat-checkbox>
-						</div>
+						<date-picker
+								[(ngModel)]="effectiveUntilDate_chartfield"
+								[placeholder]="'Choose a date'"
+								[required]="requireExpirationDate">
+						</date-picker>
 					</div>
 				</div>
 			</div>
@@ -576,7 +507,7 @@
 						Funding Agency
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 100%; font-size: small;">
+						<mat-form-field class="long-input font-small">
 							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_po" required="{{ requireFundingAgency }}">
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
@@ -591,85 +522,24 @@
 						Start Date
 					</div>
 					<div class="td">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="startDate_po"
-										[matDatepicker]="startDatePicker_po"
-										placeholder="Choose a date"
-										required="{{ requireStartDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="startDatePicker_po"></mat-datepicker-toggle>
-								<mat-datepicker #startDatePicker_po disabled="false"></mat-datepicker>
-							</mat-form-field>
+						<div class="date-picker-wrapper font-small">
+							<date-picker
+									[(ngModel)]="startDate_po"
+									[placeholder]="'Choose a date'"
+									[required]="requireStartDate">
+							</date-picker>
 						</div>
-						<div class="inline-block" style="width:7em;">
+						<div class="inline-block  date-horizontal-spacer">
 						</div>
-						<div class="inline-block cell-label" style="height: 100%;">
+						<div class="inline-block cell-label full-height">
 							Effective Until
 						</div>
-						<div style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="expirationDate_po"
-										[matDatepicker]="expirationDatePicker_po"
-										placeholder="Choose a date"
-										required="{{ requireExpirationDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="expirationDatePicker_po"></mat-datepicker-toggle>
-								<mat-datepicker #expirationDatePicker_po disabled="false"></mat-datepicker>
-							</mat-form-field>
-						</div>
-					</div>
-				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
-						Total Dollar Amount
-					</div>
-					<div class="td">
-						<mat-form-field style="width: 18em;">
-							<span matPrefix>$ &nbsp;</span>
-							<input
-									matInput
-									placeholder="Total Dollar Amount"
-									[(ngModel)]="totalDollarAmount_po"
-									[formControl]="totalDollarAmountFormControl_po"
-									[errorStateMatcher]="totalDollarAmountStateMatcher_po"
-									required="{{ requireDollarAmount }}">
-							<mat-error *ngIf="totalDollarAmountFormControl_po.hasError('pattern')">
-								Invalid dollar amount
-							</mat-error>
-						</mat-form-field>
-					</div>
-				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
-						Your email address
-					</div>
-					<div class="td">
-						<mat-form-field style="width: 100%;">
-							<input
-									matInput
-									placeholder="Your Email Address"
-									[(ngModel)]="submitterEmail_po"
-									[formControl]="submitterEmailFormControl_po"
-									[errorStateMatcher]="submitterEmailStateMatcher_po"
-									required>
-							<mat-error *ngIf="submitterEmailFormControl_po.hasError('pattern')">
-								Invalid email
-							</mat-error>
-						</mat-form-field>
-					</div>
-				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
-						Active
-					</div>
-					<div class="td center-vertical-align">
-						<div class="checkbox-container">
-							<mat-checkbox [(ngModel)]="activeCheckBox_po"></mat-checkbox>
+						<div class="date-picker-wrapper font-small">
+							<date-picker
+									[(ngModel)]="expirationDate_po"
+									[placeholder]="'Choose a date'"
+									[required]="requireExpirationDate">
+							</date-picker>
 						</div>
 					</div>
 				</div>
@@ -698,7 +568,7 @@
 						Funding Agency
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 100%; font-size: small;">
+						<mat-form-field class="long-input font-small">
 							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_creditCard" required="{{ requireFundingAgency }}">
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
@@ -713,36 +583,24 @@
 						Start Date
 					</div>
 					<div class="td">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="startDate_creditcard"
-										[matDatepicker]="startDatePicker_creditcard"
-										placeholder="Choose a date"
-										required="{{ requireStartDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="startDatePicker_creditcard"></mat-datepicker-toggle>
-								<mat-datepicker #startDatePicker_creditcard disabled="false"></mat-datepicker>
-							</mat-form-field>
+						<div class="date-picker-wrapper font-small">
+							<date-picker
+									[(ngModel)]="startDate_creditcard"
+									[placeholder]="'Choose a date'"
+									[required]="requireStartDate">
+							</date-picker>
 						</div>
-						<div class="inline-block" style="width:7em;">
+						<div class="inline-block date-horizontal-spacer">
 						</div>
-						<div class="inline-block cell-label" style="height: 100%;">
+						<div class="inline-block cell-label full-height">
 							Expiration Date
 						</div>
-						<div style="display:inline-block; overflow:visible; font-size:small;">
-							<mat-form-field>
-								<input
-										matInput
-										[(ngModel)]="expirationDate_creditcard"
-										[matDatepicker]="expirationDatePicker_creditcard"
-										placeholder="Choose a date"
-										required="{{ requireExpirationDate }}"
-										disabled>
-								<mat-datepicker-toggle matSuffix [for]="expirationDatePicker_creditcard"></mat-datepicker-toggle>
-								<mat-datepicker #expirationDatePicker_creditcard disabled="false"></mat-datepicker>
-							</mat-form-field>
+						<div class="date-picker-wrapper font-small">
+							<date-picker
+									[(ngModel)]="expirationDate_creditcard"
+									[placeholder]="'Choose a date'"
+									[required]="requireExpirationDate">
+							</date-picker>
 						</div>
 					</div>
 				</div>
@@ -751,7 +609,7 @@
 						Zip Code
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 10em;">
+						<mat-form-field class="medium-input">
 							<input
 									matInput
 									placeholder="Zip Code"
@@ -770,7 +628,7 @@
 						Credit Card Company
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 40%;">
+						<mat-form-field class="medium-input">
 							<mat-select placeholder="Credit Card Company" [(value)]="selectedCreditCardCompany" required>
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let company of creditCardCompanies" [value]="company.value">
@@ -780,23 +638,44 @@
 						</mat-form-field>
 					</div>
 				</div>
+			</div>
+
+
+		</div>
+	</div>
+	<div class="full-width background-sideless">
+		<div class="padded">
+			<div class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
 						Total Dollar Amount
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 18em;">
+						<mat-form-field class="medium-input">
 							<span matPrefix>$ &nbsp;</span>
-							<input
-									matInput
-									placeholder="Total Dollar Amount"
-									[(ngModel)]="totalDollarAmount_creditCard"
-									[formControl]="totalDollarAmountFormControl_creditCard"
-									[errorStateMatcher]="totalDollarAmountStateMatcher_creditCard"
-									required="{{ requireDollarAmount }}">
-							<mat-error *ngIf="totalDollarAmountFormControl_creditCard.hasError('pattern')">
+							<input matInput
+								   placeholder="Total Dollar Amount"
+								   [(ngModel)]="totalDollarAmount"
+								   [formControl]="totalDollarAmountFormControl"
+								   [errorStateMatcher]="totalDollarAmountStateMatcher"
+								   required="{{ requireDollarAmount }}">
+							<mat-error *ngIf="totalDollarAmountFormControl.hasError('pattern')">
 								Invalid dollar amount
 							</mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="tr full-width">
+					<div class="td cell-label">
+						Approved Users
+					</div>
+					<div class="td" (click)="onClickApprovedUsers()">
+						<mat-form-field class="long-input">
+							<input
+									matInput
+									placeholder="Approved Users"
+									[(ngModel)]="_approvedUsersDisplay"
+									[disabled]="true">
 						</mat-form-field>
 					</div>
 				</div>
@@ -805,15 +684,15 @@
 						Your email address
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 100%;">
+						<mat-form-field class="long-input">
 							<input
 									matInput
 									placeholder="Your Email Address"
-									[(ngModel)]="submitterEmail_creditcard"
-									[formControl]="submitterEmailFormControl_creditcard"
-									[errorStateMatcher]="submitterEmailStateMatcher_creditcard"
-									required>
-							<mat-error *ngIf="submitterEmailFormControl_creditcard.hasError('pattern')">
+									[(ngModel)]="submitterEmail"
+									[formControl]="submitterEmailFormControl"
+									[errorStateMatcher]="submitterEmailStateMatcher"
+									required="{{ showField === CHARTFIELD }}">
+							<mat-error *ngIf="submitterEmailFormControl.hasError('pattern')">
 								Invalid email
 							</mat-error>
 						</mat-form-field>
@@ -825,35 +704,19 @@
 					</div>
 					<div class="td center-vertical-align">
 						<div class="checkbox-container">
-							<mat-checkbox [(ngModel)]="activeCheckBox_creditcard"></mat-checkbox>
+							<mat-checkbox [(ngModel)]="activeCheckBox"></mat-checkbox>
 						</div>
 					</div>
 				</div>
-			</div>
-
-
-		</div>
-	</div>
-	<div class="full-width background-sideless">
-		<div class="full-width" style="position: relative; padding: 0.4em 1.2em 0 1.2em;">
-			<div style="font-size: small;">
-				As the Principal Investigator (P.I.) or authorized personnel of the account listed
-				above I authorize the Core Facility to charge the account for work performed on my
-				laboratory’s behalf during the dates indicated, not to exceed the dollar amount.
-				I understand that this account will be billed automatically and that I will receive
-				a detailed statement of services for any month in which my account was charged.
-			</div>
-			<div style="text-align: center; margin: 0.5em;">
-				<mat-checkbox [(ngModel)]="agreementCheckbox" required>I agree</mat-checkbox>
 			</div>
 		</div>
 	</div>
 </div>
 <div mat-dialog-actions>
-	<div class="full-width" style="text-align:right; padding:0.4em;">
+	<div class="full-width button-container">
 		<div class="inline-block">
-			<button mat-raised-button (click)="onSaveButtonClicked()" autofocus>
-				<img src="../../../assets/save.png" alt=""/> Save
+			<button mat-raised-button (click)="onUpdateButtonClicked()" autofocus>
+				<img src="../../../assets/save.png" alt=""/> Update
 			</button>
 		</div>
 		<div class="inline-block">

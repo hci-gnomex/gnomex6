@@ -7,8 +7,8 @@ export class ConstantsService {
     public readonly SEGMENGT_REMOVE = "assets/segment_remove.png";
     public readonly SEGMENGT_NEW_DISABLE = "assets/segment_new_disable.png";
     public readonly SEGMENGT_REMOVE_DISABLE = "assets/segment_remove_disable.png";
-    public readonly SEGMENGT_IMPORT ="assets/segment_import.png";
-    public readonly SEGMENGT_IMPORT_DISABLE ="assets/segment_remove_disable.png";
+    public readonly SEGMENGT_IMPORT = "assets/segment_import.png";
+    public readonly SEGMENGT_IMPORT_DISABLE = "assets/segment_remove_disable.png";
     public readonly PAGE_ADD = "assets/page_add.png";
     public readonly PAGE_REMOVE = "assets/page_remove.png";
     public readonly PAGE_REMOVE_DISABLE = "assets/page_remove_disable.png";
@@ -54,13 +54,83 @@ export class ConstantsService {
         "Seq Lib Prep Status",
     ];
 
-    public readonly DEFAULT_TOOLBAR_SETTINGS:string = "bold italic underline | left center right |  format font size |" +
+    public readonly DEFAULT_TOOLBAR_SETTINGS: string = "bold italic underline | left center right |  format font size |" +
         " color | ul ol | outdent indent";
-    public readonly ICON_TOPIC_OWNER:string = "assets/topic_tag_owner.png";
-    public readonly ICON_TOPIC_MEMBER:string = "assets/topic_tag_members.png";
+
+    public readonly GLOBE_LINK: string = "assets/globe_link.png";
+    public readonly EMAIL_GO_LINK: string = "assets/email_go.png";
+    public readonly ICON_UCSC: string = "assets/ucscFavicon.png";
+    public readonly ICON_IGV: string = "assets/igv.png";
+    public readonly ICON_IOBIO: string = "assets/iobio.png";
+    public readonly ICON_LINK: string = "assets/icon_link.gif";
+    public readonly ICON_DELETE_LINK: string = "assets/link_delete.png";
+    public readonly ICON_DOWNLOAD: string = "assets/download.png";
+
+    public readonly ICON_ANALYSIS:string = "assets/map.png";
+    public readonly ICON_TOPIC:string = "assets/topic_tag.png";
     public readonly ICON_TOPIC_PUBLIC:string = "assets/topic_tag_public.png";
-    public readonly GLOBE_LINK:string ="assets/globe_link.png";
-    public readonly EMAIL_GO_LINK:string="assets/email_go.png";
+    public readonly ICON_TOPIC_MEMBER:string = "assets/topic_tag_members.png";
+    public readonly ICON_TOPIC_INSTITUTION:string = "assets/topic_tag_institution.png";
+    public readonly ICON_TOPIC_OWNER:string = "assets/topic_tag_owner.png";
+
+    public readonly ICON_DATATRACK:string = "assets/datatrack.png";
+    public readonly ICON_DATATRACK_PUBLIC:string = "assets/datatrack_world.png";
+    public readonly ICON_DATATRACK_MEMBER:string = "assets/datatrack_member.png";
+    public readonly ICON_DATATRACK_MEMBERCOLLAB:string = "assets/datatrack_member.png";
+    public readonly ICON_DATATRACK_INSTITUTION:string = "assets/datatrack_institution.png";
+    public readonly ICON_DATATRACK_OWNER:string = "assets/datatrack_owner.png" ;
+
+
+
+    public getTreeIcon(item:any,name:string) {
+
+        if (name === "DataTrack") {
+             this.getDataTrackIcon(item,name);
+        }else if(name === "Analysis" ){
+            item.icon = this.ICON_ANALYSIS;
+        }
+        else if (name === "Topic") {
+            if (item.codeVisibility === "MEM") {
+                item.icon = this.ICON_TOPIC_MEMBER;
+            } else if (item.codeVisibility === "MEMCOL") {
+                item.icon = this.ICON_TOPIC_MEMBER;
+            } else if (item.codeVisibility === "OWNER") {
+                item.icon = this.ICON_ANALYSIS;
+            } else if (item.codeVisibility === "INST") {
+                item.icon = this.ICON_TOPIC_INSTITUTION;
+            } else {
+                item.icon = this.ICON_TOPIC_PUBLIC;
+            }
+        }
+
+    }
+
+
+
+
+
+
+    private getDataTrackIcon(item:any,name:string):void {
+
+        if (item.codeVisibility === "MEM") {
+            item.icon = this.ICON_DATATRACK_MEMBER;
+        } else if (item.codeVisibility === "MEMCOL") {
+            item.icon = this.ICON_DATATRACK_MEMBERCOLLAB;
+        } else if (item.codeVisibility === "OWNER") {
+            item.icon = this.ICON_DATATRACK_OWNER;
+        } else if (item.codeVisibility === "INST") {
+            item.icon = this.ICON_DATATRACK_INSTITUTION;
+        } else if (item.codeVisibillty === "PUBLIC") {
+            item.icon = this.ICON_DATATRACK_PUBLIC;
+        }else {
+            item.icon = this.ICON_DATATRACK;
+        }
+
+    }
+
+
+
+
 
 
 

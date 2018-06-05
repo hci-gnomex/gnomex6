@@ -1,21 +1,22 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { URLSearchParams } from "@angular/http";
+import { Component, OnDestroy, OnInit, Inject } from "@angular/core";
 import { Router } from "@angular/router";
-import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
+import { FormControl, FormGroupDirective, NgForm, Validators } from "@angular/forms";
+
+import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig, MAT_DIALOG_DATA} from "@angular/material";
+import {Subscription} from "rxjs/Subscription";
 
 import { EditBillingAccountErrorDialogComponent } from "./dialogs/edit-billing-account-error-dialog.component";
 import { EditBillingAccountSuccessDialogComponent } from "./dialogs/edit-billing-account-success-dialog.component";
 
+import { BillingUsersSelectorComponent } from "../../usersGroups/billingAccountTab/billingUsersSelector/billing-users-selector.component";
+
+import { DateParserComponent } from "../../util/parsers/date-parser.component";
+
 import { AccountFieldsConfigurationService } from "../../services/account-fields-configuration.service";
-import { CreateSecurityAdvisorService } from "../../services/create-security-advisor.service";
 import { DictionaryService } from "../../services/dictionary.service";
 import { LabListService } from "../../services/lab-list.service";
-import { NewBillingAccountService } from "../../services/new-billing-account.service";
 import { PropertyService } from "../../services/property.service";
 
-
-import {MatDialogRef, MatDialog, ErrorStateMatcher} from "@angular/material";
-import {Subscription} from "rxjs/Subscription";
 
 @Component({
 	selector: "edit-billing-account-launcher",
@@ -24,8 +25,13 @@ import {Subscription} from "rxjs/Subscription";
 })
 export class EditBillingAccountLauncher {
 
-	constructor(private dialog: MatDialog, private router: Router) {
-		let dialogRef = this.dialog.open(EditBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+	constructor(private dialog: MatDialog,
+				private router: Router) {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+
+		let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
 
 		dialogRef.afterClosed().subscribe((result) => {
 			// After closing the dialog, route away from this component so that the dialog could
@@ -58,39 +64,29 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
           padding: 0;
       }
 
-      div.t {
-          display: table;
-      }
-      div.tr {
-          display: table-row;
-      }
-      div.td {
-          display: table-cell;
-      }
+      div.t  { display: table; }
+      div.tr { display: table-row; }
+      div.td { display: table-cell; }
 			
-			p {
-					margin: 1em 0.5em;
-			}
+	  p { 
+		  margin: 1em 0.5em;
+	  }
 			
-			.full-height {
-					height: 100%;
-			}
-			.full-width {
-					width: 100%;
-			}
+	  .full-height { height: 100%; }
+	  .full-width  { width: 100%;  }
 			
-			.center {
-					text-align: center;
-			}
-			
-			.cell-label {
+	  .center { text-align: center; }
+	  
+	  .font-small { font-size: small; }
+	  
+	  .cell-label {
           width: 8rem;
           height: 2.6em;
-					vertical-align: middle;
-					font-style: italic;
-					font-size: x-small;
-					color: #1601db;
-			}
+		  vertical-align: middle;
+		  font-style: italic;
+		  font-size: x-small;
+		  color: #1601db;
+	  }
 
       .radio-button {
           margin: 0 4em 0 0;
@@ -102,45 +98,88 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
           position: relative;
           background-color: white;
           border: #d2d2d2 solid 1px;
+          
+		  width: calc(100% - 8px); 
+		  margin: 3px 4px;
       }
       .background-sideless {
           display: block;
           position: relative;
           background-color: white;
           border-color: #d2d2d2;
-					border-style: solid;
-					border-top-width: 1px;
-					border-bottom-width: 1px;
+		  border-style: solid;
+		  border-top-width: 1px;
+		  border-bottom-width: 1px;
           border-left-width: 0;
           border-right-width: 0;
       }
+	  
+	  .padded {
+          position:relative; 
+		  width:calc(100% - 1.6em); 
+		  margin:0.4em 0.8em;
+	  }
 			
-			.inline-block {
-					display: inline-block;
-			}
-			
+	  .inline-block { display: inline-block; }
+      .top-vertical-align    { vertical-align: top; }
+      .center-vertical-align { vertical-align: middle; }
+	  
       .row-spacer {
-					height: 0.7em;
-			}
+		  height: 0.7em;
+	  }
 			
-			.center-vertical-align {
-					vertical-align: middle;
-			}
+	  .checkbox-container {
+		  display: inline-block;
+		  vertical-align: middle;
+		  width: fit-content;
+	  }
 			
-			.checkbox-container {
-					display: inline-block;
-					vertical-align: middle;
-					width: fit-content;
-			}
-			
-			.horizontal-break {
-					display: inline-block;
-					vertical-align: middle;
-					height: 3em;
-					width: 1px;
-					background-color: #c4cccc;
-					margin: 0.5em 0.5em 0.5em 0.5em;
-			}
+	  .horizontal-break {
+		  display: inline-block;
+		  vertical-align: middle;
+		  height: 3em;
+		  width: 1px;
+		  background-color: #c4cccc;
+		  margin: 0.5em 0.5em 0.5em 0.5em;
+	  }
+	  
+	  .mat-dialog-content {
+          background-color: #eeeeeb; 
+		  overflow: auto; 
+		  font-size: small;
+	  }
+	  
+		.long-input    { width: 100%; }
+		.medium-input  { width: 18em; }
+		.short-input   { width: 4.5rem; }
+		.shorter-input { width: 3rem; }
+		
+		.button-container {
+            text-align:right; 
+			padding:0.4em;
+		}
+		
+		.header {
+            background-color: #84b278; 
+			color: white; 
+		}
+		
+		.header-image {
+            margin-right:0.2em;
+		}
+		
+		.internal-account-field {
+            width: 15%;
+		}
+		
+		.date-picker-wrapper {
+            display:inline-block;
+			overflow:visible;
+        }
+		
+		.date-horizontal-spacer {
+            width:7em;
+		}
 	`]
 })
 export class EditBillingAccountComponent implements OnInit, OnDestroy {
@@ -200,52 +239,35 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 	accountNumberAU_Chartfield: string = '1';
 
-	startDate_chartfield = new Date();
-	startDate_po = new Date();
-	startDate_creditcard = new Date();
+    startDate_chartfield: string = '';
+	startDate_po: string = '';
+	startDate_creditcard: string = '';
 
 	requireStartDate: boolean = true;
 
-	effectiveUntilDate_chartfield: Date;
-	expirationDate_po: Date;
-	expirationDate_creditcard: Date;
+    effectiveUntilDate_chartfield: string;
+	expirationDate_po: string;
+	expirationDate_creditcard: string;
 
 	requireExpirationDate: boolean = true;
 
-	totalDollarAmount_Chartfield: string = '';
-	totalDollarAmountFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_chartfield = new EditBillingAccountStateMatcher();
-
-	totalDollarAmount_po: string = '';
-	totalDollarAmountFormControl_po  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_po = new EditBillingAccountStateMatcher();
-
-	totalDollarAmount_creditCard: string = '';
-	totalDollarAmountFormControl_creditCard  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_creditCard = new EditBillingAccountStateMatcher();
+    totalDollarAmount: string = '';
+    totalDollarAmountFormControl = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
+    totalDollarAmountStateMatcher = new EditBillingAccountStateMatcher();
 
 	// The definition of valid email addresses can be found at
 	//     https://en.wikipedia.org/wiki/Email_address#Domain
 	//   at the time of writing, which this does not fully support...
 	private emailPatternValidator = Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/);
 
-	submitterEmail_chartfield: string = '';
-	submitterEmailFormControl_chartfield  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_chartfield = new EditBillingAccountStateMatcher();
+    _approvedUsersValue: string = '';
+    private _approvedUsersDisplay: string = '';
 
-	submitterEmail_po: string = '';
-	submitterEmailFormControl_po  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_po = new EditBillingAccountStateMatcher();
+    submitterEmail: string = '';
+    submitterEmailFormControl = new FormControl('', [ this.emailPatternValidator ]);
+    submitterEmailStateMatcher = new EditBillingAccountStateMatcher();
 
-	submitterEmail_creditcard: string = '';
-	submitterEmailFormControl_creditcard  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_creditcard = new EditBillingAccountStateMatcher();
-
-	activeCheckBox_chartfield: boolean = false;
-	activeCheckBox_po: boolean = false;
-	activeCheckBox_creditcard: boolean = false;
-
-	agreementCheckbox: boolean = false;
+    activeCheckBox: boolean = false;
 
 	labList: any[] = [];
 	coreFacilityReducedList: any[] = [];
@@ -283,6 +305,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 	isActivity: boolean = false;
 	disableCoreFacilitiesSelector = true;
+
+	private _rowData: any;
 
 	internalAccountFieldsConfiguration: any = [
 		{
@@ -341,42 +365,25 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 	includeInCustomField_fundingAgency: boolean     = false;
 	includeInCustomField_totalDollarAmount: boolean = false;
 
+    labActiveSubmitters: any[] = [];
 
 	constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
-							private createSecurityAdvisorService: CreateSecurityAdvisorService,
-							private dialog: MatDialog,
-							private dialogRef: MatDialogRef<EditBillingAccountComponent>,
-							private dictionaryService: DictionaryService,
-							private labListService: LabListService,
-							private newBillingAccountService: NewBillingAccountService,
-							private propertyService: PropertyService) { }
+				private dialog: MatDialog,
+				private dialogRef: MatDialogRef<EditBillingAccountComponent>,
+				private dictionaryService: DictionaryService,
+				private labListService: LabListService,
+				private propertyService: PropertyService,
+                @Inject(MAT_DIALOG_DATA) private data) {
+        if (data) {
+            this.labActiveSubmitters = data.labActiveSubmitters;
+		}
+	}
 
 	ngOnInit(): void {
 		this.selectedLab = null;
 		this.selectedCoreFacilities = [];
 
-		this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
-			this.labList = response;
-		});
-
-		this.submitterEmail_chartfield = this.createSecurityAdvisorService.userEmail;
-		this.submitterEmail_po         = this.createSecurityAdvisorService.userEmail;
-		this.submitterEmail_creditcard = this.createSecurityAdvisorService.userEmail;
-
-		this.submitterEmailFormControl_chartfield.reset();
-		this.submitterEmailFormControl_po.reset();
-		this.submitterEmailFormControl_creditcard.reset();
-
-		let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
-		this.fundingAgencies = [];
-
-		if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
-			for (let i = 0; i < originalFundingAgencies.length; i++) {
-				if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
-					this.fundingAgencies.push(originalFundingAgencies[i]);
-				}
-			}
-		}
+        this.submitterEmailFormControl.reset();
 
 		let originalCreditCardCompanies = this.dictionaryService.getEntries('hci.gnomex.model.CreditCardCompany');
 		originalCreditCardCompanies.sort((a, b) => { return a.sortOrder - b.sortOrder; });
@@ -390,26 +397,39 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
+		this.initializeCustomElements();
+	}
 
-		if (this.usesCustomChartfields === 'Y') {
-			for (let i = 0; i < 5; i++) {
-				this.InternalCustomFieldsFormControl[i] = new FormControl('', []);
-				this.InternalCustomFieldsStateMatcher[i] = new EditBillingAccountStateMatcher();
+	private initializeCustomElements(): void {
+		if (!this.usesCustomChartfields || this.usesCustomChartfields === '') {
+            this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
+		}
+
+        if (this.usesCustomChartfields === 'Y') {
+            for (let i = 0; i < 5; i++) {
+            	if (!this.InternalCustomFieldsFormControl[i]) {
+                    this.InternalCustomFieldsFormControl[i] = new FormControl('', []);
+				}
+                if (!this.InternalCustomFieldsStateMatcher[i]) {
+                    this.InternalCustomFieldsStateMatcher[i] = new EditBillingAccountStateMatcher();
+				}
+            }
+
+            if (!this.internalAccountFieldsConfigurationSubscription) {
+                this.internalAccountFieldsConfigurationSubscription =
+                    this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
+                        this.processInternalAccountFieldsConfigurations(response);
+                    });
+			}
+			if (!this.otherAccountFieldsConfigurationSubscription) {
+                this.otherAccountFieldsConfigurationSubscription =
+                    this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
+                        this.processOtherAccountFieldsConfigurations(response);
+                    });
 			}
 
-			this.internalAccountFieldsConfigurationSubscription =
-					this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
-						this.processInternalAccountFieldsConfigurations(response);
-					});
-
-			this.otherAccountFieldsConfigurationSubscription =
-					this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
-						this.processOtherAccountFieldsConfigurations(response);
-					});
-
-			this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
-		}
+            this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
+        }
 	}
 
 	ngOnDestroy(): void {
@@ -507,7 +527,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private onSaveButtonClicked(): void {
+	private onUpdateButtonClicked(): void {
 		this.errorMessage = '';
 
 		if (this.showField == this.CHARTFIELD) {
@@ -579,8 +599,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
 		}
 
-		if (this.activeCheckBox_chartfield != null) {
-			if (this.activeCheckBox_chartfield) {
+		if (this.activeCheckBox != null) {
+			if (this.activeCheckBox) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
@@ -591,88 +611,46 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			idFundingAgency = this.selectedFundingAgency_chartfield;
 		}
 
-		// console.log("" +
-		// 		"You clicked the save button with parameters : \n" +
-		// 		"    idLab                    : " + idLab + "\n" +
-		// 		"    coreFacilitiesXMLString  : " + coreFacilitiesXMLString + "\n" +
-		// 		"    accountName              : " + this.accountName_Chartfield + "\n" +
-		// 		"    shortAcct                : " + this.shortAccountName_Chartfield + "\n" +
-		// 		"    accountNumberBus         : " + this.accountNumberBus_Chartfield + "\n" +
-		// 		"    accountNumberOrg         : " + this.accountNumberOrg_Chartfield + "\n" +
-		// 		"    accountNumberFund        : " + this.accountNumberFund_Chartfield + "\n" +
-		// 		"    accountNumberActivity    : " + this.accountNumberActivity_Chartfield + "\n" +
-		// 		"    accountNumberProject     : " + accountNumberProject + "\n" +
-		// 		"    accountNumberAccount     : " + accountNumberAccount + "\n" +
-		// 		"    accountNumberAu          : " + (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : '')+ "\n" +
-		// 		"    idFundingAgency          : " + idFundingAgency + "\n" +
-		// 		"    custom1                  : " + custom1 + "\n" +
-		// 		"    custom2                  : " + custom2 + "\n" +
-		// 		"    custom3                  : " + custom3 + "\n" +
-		// 		"    submitterEmail           : " + this.submitterEmail_chartfield + "\n" +
-		// 		"    startDate                : " + this.startDate_chartfield.toLocaleDateString() + "\n" +
-		// 		"    expirationDate           : " + (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : '') + "\n" +
-		// 		"    totalDollarAmountDisplay : " + this.totalDollarAmount_Chartfield + "\n" +
-		// 		"    activeAccount            : " + activeAccount + "\n" +
-		// 		"    isPO                     : " + isPO + "\n"
-		// );
+		if (this.areChartfieldValuesValid() && this._rowData) {
 
-		if (this.areChartfieldValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
+            let valueToDisplayParser: DateParserComponent = new DateParserComponent('YYYY-MM-DD', 'MM/DD/YYYY');
+            let startDateOther: string = '';
+            let expirationDateOther: string = '';
 
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_Chartfield);
-			parameters.set('shortAcct', this.shortAccountName_Chartfield);
-			parameters.set('accountNumberBus', this.accountNumberBus_Chartfield);
-			parameters.set('accountNumberOrg', this.accountNumberOrg_Chartfield);
-			parameters.set('accountNumberFund', this.accountNumberFund_Chartfield);
-			parameters.set('accountNumberActivity', this.accountNumberActivity_Chartfield);
-			parameters.set('accountNumberProject', accountNumberProject);
-			parameters.set('accountNumberAccount', accountNumberAccount);
-			parameters.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''));
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', this.submitterEmail_chartfield);
-			parameters.set('startDate', this.startDate_chartfield.toLocaleDateString());
-			parameters.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''));
-			parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
+            if (this.startDate_chartfield && this.startDate_chartfield !== '') {
+                startDateOther = valueToDisplayParser.parseDateString(this.startDate_chartfield);
+			}
+            if (this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield !== '') {
+                expirationDateOther = valueToDisplayParser.parseDateString(this.effectiveUntilDate_chartfield);
+            }
 
+			this._rowData.idLab                    = idLab;
+            this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+            this._rowData.accountName              = this.accountName_Chartfield;
+            this._rowData.shortAcct                = this.shortAccountName_Chartfield;
+            this._rowData.accountNumberBus         = this.accountNumberBus_Chartfield;
+            this._rowData.accountNumberOrg         = this.accountNumberOrg_Chartfield;
+            this._rowData.accountNumberFund        = this.accountNumberFund_Chartfield;
+            this._rowData.accountNumberActivity    = this.accountNumberActivity_Chartfield;
+            this._rowData.accountNumberProject     = accountNumberProject;
+            this._rowData.accountNumberAccount     = accountNumberAccount;
+            this._rowData.accountNumberAu          = (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : '');
+            this._rowData.idFundingAgency          = idFundingAgency;
+            this._rowData.custom1                  = custom1;
+            this._rowData.custom2                  = custom2;
+            this._rowData.custom3                  = custom3;
+            this._rowData.acctUsers                = this.approvedUsersValue;
+            this._rowData.submitterEmail           = this.submitterEmail;
+            this._rowData.startDate                = this.startDate_chartfield;
+            this._rowData.startDateOther           = startDateOther;
+            this._rowData.expirationDate           = this.effectiveUntilDate_chartfield;
+            this._rowData.expirationDateOther      = expirationDateOther;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount;
+            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.activeAccount            = activeAccount;
+            this._rowData.isPO                     = isPO;
 
-			// in original, called SubmitWorkAuthForm.gx with params :
-			//    idLab: "1507"
-			//    coreFacilitiesXMLString: "<coreFacilities> <CoreFacility ... /> </coreFacilities>"
-			//    accountName: "tempAccount"
-			//    shortAcct: ""
-			//    accountNumberBus: "01"
-			//    accountNumberOrg: "12345"
-			//    accountNumberFund: "1234"
-			//    accountNumberActivity: "12345"
-			//    accountNumberProject: ""
-			//    accountNumberAccount: "64300"
-			//    accountNumberAu: "1"
-			//    idFundingAgency: ""
-			//    custom1: ""
-			//    custom2: ""
-			//    custom3: ""
-			//    submitterEmail: "John.Hofer@hci.utah.edu"
-			//    startDate: "11/01/2017"
-			//    expirationDate: "03/01/2018"
-			//    totalDollarAmountDisplay: ""
-			//    activeAccount: "Y"
-			//    isPO: "N"
-
-			//  On the groups screen, the saving is done by SaveLab.gx
-
-			this.successMessage = 'Billing Account \"' + this.accountName_Chartfield + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
-
-			//this.window.close();
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
-				this.openSuccessDialog();
-			});
+            this.dialogRef.close(this._rowData);
 		} else {
 			// validation has caught problems - report them.
 			this.openErrorDialog();
@@ -683,35 +661,6 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 		this.errorMessage = '';
 		let errorFound: boolean = false;
-
-		// let isLabInvalid: boolean = !(this.selectedLab != undefined && this.selectedLab != null && this.selectedLab !== '');
-		// let isCoreFacilitiesInvalid: boolean = !(this.selectedCoreFacilities.length > 0);
-		//
-		// console.log("selectedLab                                   invalid : " + isLabInvalid);
-		// console.log("selectedCoreFacilitiesString                  invalid : " + isCoreFacilitiesInvalid);
-		//
-		// console.log("accountNameFormControl_Chartfield             invalid : " + this.accountNameFormControl_Chartfield.invalid);
-		// console.log("shortNameFormControl_Chartfield               invalid : " + this.shortNameFormControl_Chartfield.invalid);
-		//
-		// console.log("accountNumberBusFormControl_chartfield        invalid : " + this.accountNumberBusFormControl_chartfield.invalid);
-		// console.log("accountNumberOrgFormControl_chartfield        invalid : " + this.accountNumberOrgFormControl_chartfield.invalid);
-		// console.log("accountNumberFundFormControl_chartfield       invalid : " + this.accountNumberFundFormControl_chartfield.invalid);
-		// console.log("accountNumberActivityFormControl_chartfield   invalid : " + this.accountNumberActivityFormControl_chartfield.invalid);
-		// console.log("accountNumberProjectFormControl_chartfield    invalid : " + this.accountNumberProjectFormControl_chartfield.invalid);
-		// console.log("accountNumberAccountFormControl_chartfield    invalid : " + this.accountNumberAccountFormControl_chartfield.invalid);
-		//
-		// for (let i: number = 0; i < this.InternalCustomFieldsFormControl.length; i++) {
-		// 	console.log("InternalCustomFieldsFormControl[" + i + "]            invalid : " + this.InternalCustomFieldsFormControl[i].invalid);
-		// }
-		//
-		// console.log("startDate_chartfield                          invalid : " + !(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''));
-		// console.log("effectiveUntilDate_chartfield                 invalid : " + !(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() != ''));
-		//
-		// console.log("submitterEmailFormControl_chartfield          invalid : " + this.submitterEmailFormControl_chartfield.invalid);
-		//
-		// console.log("activeCheckBox_chartfield                     invalid : " + (false && this.activeCheckBox_chartfield));
-		//
-		// console.log("agreementCheckbox                             invalid : " + !this.agreementCheckbox.valueOf());
 
 		if (!(this.selectedLab != undefined && this.selectedLab != null && this.selectedLab !== '')) {
 			errorFound = errorFound || true;
@@ -773,31 +722,28 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		if ((!(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''))
-						&& (this.usesCustomChartfields !== 'Y' || this.includeInCustomField_startDate)) {
+        if (this.requireStartDate
+			&& ((!(this.startDate_chartfield && this.startDate_chartfield != ''))
+			&& (this.usesCustomChartfields !== 'Y' || this.includeInCustomField_startDate))) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if ((!(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() != ''))
+		if (this.requireExpirationDate &&
+			((!(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield != ''))
 				&& ((this.usesCustomChartfields !== 'Y' ||   this.includeInCustomField_startDate)  && this.includeInCustomField_expirationDate)
-				&& ((this.usesCustomChartfields  == 'Y' && (!this.includeInCustomField_startDate)) && this.includeInCustomField_expirationDate)) {
+				&& ((this.usesCustomChartfields  == 'Y' && (!this.includeInCustomField_startDate)) && this.includeInCustomField_expirationDate))) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
 
-		if(this.totalDollarAmountFormControl_chartfield.invalid) {
+		if(this.totalDollarAmountFormControl.invalid) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please enter an valid dollar limit\n';
 		}
 
-		if (this.submitterEmailFormControl_chartfield.invalid) {
+		if (this.submitterEmailFormControl.invalid) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please enter an email address you can be reached at\n';
-		}
-
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
 		}
 
 		return !errorFound;
@@ -813,8 +759,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 		let idFundingAgency: string = "";
 
-		let startDate: string = (this.startDate_po ? this.startDate_po.toLocaleDateString() : '');
-		let expirationDate: string = (this.expirationDate_po ? this.expirationDate_po.toLocaleDateString() : '');
+		let startDate: string = (this.startDate_po ? this.startDate_po : '');
+		let expirationDate: string = (this.expirationDate_po ? this.expirationDate_po : '');
 
 		let activeAccount: string = "";
 
@@ -849,57 +795,48 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			idFundingAgency = this.selectedFundingAgency_po;
 		}
 
-		if (this.activeCheckBox_po != null) {
-			if (this.activeCheckBox_po) {
+		if (this.activeCheckBox != null) {
+			if (this.activeCheckBox) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
 			}
 		}
 
-		// console.log("" +
-		// 		"You clicked the save button with parameters : \n" +
-		// 		"    idLab                    : " + idLab + "\n" +
-		// 		"    coreFacilitiesXMLString  : " + coreFacilitiesXMLString + "\n" +
-		// 		"    accountName              : " + this.accountName_po + "\n" +
-		// 		"    shortAcct                : " + this.shortAccountName_po + "\n" +
-		// 		"    idFundingAgency          : " + idFundingAgency + "\n" +
-		// 		"    custom1                  : " + custom1 + "\n" +
-		// 		"    custom2                  : " + custom2 + "\n" +
-		// 		"    custom3                  : " + custom3 + "\n" +
-		// 		"    submitterEmail           : " + this.submitterEmail_po + "\n" +
-		// 		"    startDate                : " + startDate + "\n" +
-		// 		"    expirationDate           : " + expirationDate + "\n" +
-		// 		"    totalDollarAmountDisplay : " + this.totalDollarAmount_po + "\n" +
-		// 		"    activeAccount            : " + activeAccount + "\n" +
-		// 		"    isPO                     : " + isPO + "\n" +
-		// 		"    isCreditCard             : " + isCreditCard + "\n"
-		// );
+		if (this.arePoValuesValid() && this._rowData) {
 
-		if (this.arePoValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
+            let valueToDisplayParser: DateParserComponent = new DateParserComponent('YYYY-MM-DD', 'MM/DD/YYYY');
+            let startDateOther: string = '';
+            let expirationDateOther: string = '';
 
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_po);
-			parameters.set('shortAcct', this.shortAccountName_po);
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', this.submitterEmail_po);
-			parameters.set('startDate', startDate);
-			parameters.set('expirationDate', expirationDate);
-			parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_po);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
-			parameters.set('isCreditCard', isCreditCard);
+            if (startDate && startDate !== '') {
+                startDateOther = valueToDisplayParser.parseDateString(startDate);
+            }
+            if (expirationDate && expirationDate !== '') {
+                expirationDateOther = valueToDisplayParser.parseDateString(expirationDate);
+            }
 
-			this.successMessage = 'Billing Account \"' + this.accountName_po + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
+            this._rowData.idLab                    = idLab;
+            this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+            this._rowData.accountName              = this.accountName_po;
+            this._rowData.shortAcct                = this.shortAccountName_po;
+            this._rowData.idFundingAgency          = idFundingAgency;
+            this._rowData.custom1                  = custom1;
+            this._rowData.custom2                  = custom2;
+            this._rowData.custom3                  = custom3;
+            this._rowData.acctUsers                = this.approvedUsersValue;
+            this._rowData.submitterEmail           = this.submitterEmail;
+            this._rowData.startDate                = startDate;
+            this._rowData.startDateOther           = startDateOther;
+            this._rowData.expirationDate           = expirationDate;
+            this._rowData.expirationDateOther      = expirationDateOther;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount;
+            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.activeAccount            = activeAccount;
+            this._rowData.isPO                     = isPO;
+            this._rowData.isCreditCard             = isCreditCard;
 
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
-				this.openSuccessDialog();
-			});
+            this.dialogRef.close(this._rowData);
 		} else {
 			// validation has caught problems - report them.
 			this.openErrorDialog();
@@ -928,28 +865,23 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			this.errorMessage += '- Error with short account name\n';
 		}
 
-		if (!(this.startDate_po && this.startDate_po.toLocaleDateString() != '')) {
+		if (this.requireStartDate && !(this.startDate_po && this.startDate_po != '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if (!(this.expirationDate_po && this.expirationDate_po.toLocaleDateString() != '')) {
+		if (this.requireExpirationDate && !(this.expirationDate_po && this.expirationDate_po != '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
 
-		if(this.totalDollarAmountFormControl_po.invalid) {
+		if(this.totalDollarAmountFormControl.invalid) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please enter an valid dollar limit\n';
 		}
 
-		if (this.submitterEmailFormControl_po.invalid) {
+		if (this.submitterEmailFormControl.invalid) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please enter an email address you can be reached at\n';
-		}
-
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
 		}
 
 		return !errorFound;
@@ -967,13 +899,13 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 		let idFundingAgency: string = "";
 
-		let startDate: string = !!this.expirationDate_creditcard ? this.expirationDate_creditcard.toLocaleDateString() : '';
-		let expirationDate: string = !!this.expirationDate_creditcard ? this.expirationDate_creditcard.toLocaleDateString() : '';
+		let startDate: string = !!this.startDate_creditcard ? this.startDate_creditcard : '';
+		let expirationDate: string = !!this.expirationDate_creditcard ? this.expirationDate_creditcard : '';
 
 		let idCreditCardCompany: string = '' + this.selectedCreditCardCompany;
 
-		let totalDollarAmountDisplay: string = "" + this.totalDollarAmount_creditCard;
-		let submitterEmail: string = "" + this.submitterEmail_creditcard;
+		let totalDollarAmountDisplay: string = "" + this.totalDollarAmount;
+		let submitterEmail: string = "" + this.submitterEmail;
 		let activeAccount: string = "";
 
 		// The custom fields only displayed in the flex version of GNomEx if there were certain entries in the
@@ -1008,60 +940,50 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			idFundingAgency = this.selectedFundingAgency_creditCard;
 		}
 
-		if (this.activeCheckBox_creditcard != null) {
-			if (this.activeCheckBox_creditcard) {
+		if (this.activeCheckBox != null) {
+			if (this.activeCheckBox) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
 			}
 		}
 
-		// console.log("" +
-		// 		"You clicked the save button with parameters : \n" +
-		// 		"    idLab                    : " + idLab + "\n" +
-		// 		"    coreFacilitiesXMLString  : " + coreFacilitiesXMLString + "\n" +
-		// 		"    accountName              : " + this.accountName_creditCard + "\n" +
-		// 		"    shortAcct                : " + shortAcct + "\n" +
-		// 		"    idFundingAgency          : " + idFundingAgency + "\n" +
-		// 		"    custom1                  : " + custom1 + "\n" +
-		// 		"    custom2                  : " + custom2 + "\n" +
-		// 		"    custom3                  : " + custom3 + "\n" +
-		// 		"    submitterEmail           : " + submitterEmail + "\n" +
-		// 		"    idCreditCardCompany      : " + idCreditCardCompany + "\n" +
-		// 		"    zipCode                  : " + this.zipCodeInput_creditCard + "\n" +
-		// 		"    startDate                : " + startDate + "\n" +
-		// 		"    expirationDate           : " + expirationDate + "\n" +
-		// 		"    totalDollarAmountDisplay : " + this.totalDollarAmount_po + "\n" +
-		// 		"    activeAccount            : " + activeAccount + "\n" +
-		// 		"    isPO                     : " + isPO + "\n" +
-		// 		"    isCreditCard             : " + isCreditCard + "\n");
-
 		if (this.areCreditCardValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
 
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_creditCard);
-			parameters.set('shortAcct', shortAcct);
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', submitterEmail);
-			parameters.set('idCreditCardCompany', idCreditCardCompany);
-			parameters.set('zipCode', this.zipCodeInput_creditCard);
-			parameters.set('startDate', startDate);
-			parameters.set('expirationDate', expirationDate);
-			parameters.set('totalDollarAmountDisplay', totalDollarAmountDisplay);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
-			parameters.set('isCreditCard', isCreditCard);
+            let valueToDisplayParser: DateParserComponent = new DateParserComponent('YYYY-MM-DD', 'MM/DD/YYYY');
+            let startDateOther: string = '';
+            let expirationDateOther: string = '';
 
-			this.successMessage = 'Billing Account \"' + this.accountName_creditCard + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
+            if (startDate && startDate !== '') {
+                startDateOther = valueToDisplayParser.parseDateString(startDate);
+            }
+            if (expirationDate && expirationDate !== '') {
+                expirationDateOther = valueToDisplayParser.parseDateString(expirationDate);
+            }
 
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
-				this.openSuccessDialog();
-			});
+            this._rowData.idLab                    = idLab;
+            this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+            this._rowData.accountName              = this.accountName_creditCard;
+            this._rowData.shortAcct                = shortAcct;
+            this._rowData.idFundingAgency          = idFundingAgency;
+            this._rowData.custom1                  = custom1;
+            this._rowData.custom2                  = custom2;
+            this._rowData.custom3                  = custom3;
+            this._rowData.submitterEmail           = submitterEmail;
+			this._rowData.idCreditCardCompany      = idCreditCardCompany;
+            this._rowData.zipCode                  = this.zipCodeInput_creditCard;
+            this._rowData.acctUsers                = this.approvedUsersValue;
+            this._rowData.startDate                = startDate;
+            this._rowData.startDateOther           = startDateOther;
+            this._rowData.expirationDate           = expirationDate;
+            this._rowData.expirationDateOther      = expirationDateOther;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount;
+            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.activeAccount            = activeAccount;
+            this._rowData.isPO                     = isPO;
+            this._rowData.isCreditCard             = isCreditCard;
+
+            this.dialogRef.close(this._rowData);
 		} else {
 			// validation has caught problems - report them.
 			this.openErrorDialog();
@@ -1086,11 +1008,11 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			this.errorMessage += '- Please provide a name for your account\n';
 		}
 
-		if (!(this.startDate_creditcard && this.startDate_creditcard.toLocaleDateString() != '')) {
+		if (this.requireStartDate && !(this.startDate_creditcard && this.startDate_creditcard != '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if (!(this.expirationDate_creditcard && this.expirationDate_creditcard.toLocaleDateString() != '')) {
+		if (this.requireExpirationDate && !(this.expirationDate_creditcard && this.expirationDate_creditcard != '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
@@ -1105,47 +1027,43 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			this.errorMessage += '- Please choose your credit card company\n';
 		}
 
-		if (this.totalDollarAmountFormControl_creditCard.invalid) {
+		if (this.totalDollarAmountFormControl.invalid) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please enter an valid dollar limit\n';
 		}
 
-		if (this.submitterEmailFormControl_creditcard.invalid) {
+		if (this.submitterEmailFormControl.invalid) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please enter an email address you can be reached at\n';
-		}
-
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
 		}
 
 		return !errorFound;
 	}
 
-	private onLabListSelection(event: any): void {
+	private onLabLoad(lab: any): void {
 		let coreFacilityApplicable: any[] = [];
 
-		if (event && event.value && event.value.coreFacilities) {
-			let coreFacilities = event.value.coreFacilities;
+		if (lab && lab.coreFacilities) {
+			let coreFacilities = lab.coreFacilities;
 
 			if (coreFacilities != undefined && coreFacilities != null) {
 				if (coreFacilities[0] != undefined && coreFacilities[0] != null) {
 					for (let i: number = 0; i < coreFacilities.length; i++) {
 						if (coreFacilities[i].acceptOnlineWorkAuth != null
-								&& coreFacilities[i].acceptOnlineWorkAuth != undefined
-								&& coreFacilities[i].acceptOnlineWorkAuth === 'Y') {
+							&& coreFacilities[i].acceptOnlineWorkAuth != undefined
+							&& coreFacilities[i].acceptOnlineWorkAuth === 'Y') {
 							coreFacilityApplicable.push(coreFacilities[i]);
 						}
 					}
 				} else {
 					if (coreFacilities.CoreFacility != undefined && coreFacilities.CoreFacility != null) {
 						if (coreFacilities.CoreFacility.acceptOnlineWorkAuth != null
-								&& coreFacilities.CoreFacility.acceptOnlineWorkAuth != undefined
-								&& coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
+							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth != undefined
+							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
 							coreFacilityApplicable.push(coreFacilities.CoreFacility);
 						}
 					}
+
 				}
 			}
 		}
@@ -1198,14 +1116,12 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 	}
 
 	private openSuccessDialog(): void {
-		let config = {
-			width: '40em',
-			panelClass: 'no-padding-dialog',
-			data: {
-				successMessage: this.successMessage
-			}
-		};
-		let successDialogReference = this.dialog.open(EditBillingAccountSuccessDialogComponent, config);
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+        configuration.data = { successMessage: this.successMessage };
+
+		let successDialogReference = this.dialog.open(EditBillingAccountSuccessDialogComponent, configuration);
 
 		successDialogReference.afterClosed().subscribe(() => {
 			this.dialogRef.close();
@@ -1213,12 +1129,12 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 	}
 
 	private openErrorDialog(): void {
-		let config = {
-			width: '40em',
-			panelClass: 'no-padding-dialog',
-			data: { errorMessage: this.errorMessage }
-		};
-		let errorDialogReference = this.dialog.open(EditBillingAccountErrorDialogComponent, config);
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+        configuration.data = { errorMessage: this.errorMessage };
+
+		let errorDialogReference = this.dialog.open(EditBillingAccountErrorDialogComponent, configuration);
 	}
 
 	private clearAccountNumberActivity(): void {
@@ -1235,4 +1151,239 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	set rowData(rowData: any) {
+		this._rowData = rowData;
+		this.applyRowData();
+	}
+
+	get rowData(): any {
+		return this._rowData;
+	}
+
+	set approvedUsersValue(approvedUsersValue: string) {
+        this._approvedUsersValue = approvedUsersValue;
+
+        this._approvedUsersDisplay = '';
+
+        if (!this._approvedUsersValue) {
+        	return;
+		}
+
+        let idTokens: string[] = this._approvedUsersValue.split(/,/);
+        let nameTokens: string[] = [];
+        let foundUser: boolean = false;
+
+        for (let id of idTokens) {
+        	foundUser = false;
+        	for (let user of this.labActiveSubmitters) {
+        		if (user.value === id) {
+        			foundUser = true;
+        			nameTokens.push(user.display);
+        			break;
+				}
+			}
+			if (!foundUser) {
+        		nameTokens.push(id);
+			}
+		}
+
+		nameTokens.sort((a, b) => {
+        	if (a > b) {
+        		return 1;
+			} else if (a === b) {
+        		return 0;
+			} else {
+        		return -1;
+			}
+		});
+
+        this._approvedUsersDisplay = nameTokens.join('    ');
+	}
+	get approvedUsersValue(): string {
+		return this._approvedUsersValue;
+	}
+
+	private applyRowData(): void {
+        this.initializeCustomElements();
+
+        if (this._rowData) {
+            if (this._rowData && this._rowData.isPO === 'Y') {
+                this.loadPOAccount();
+            } else if (this._rowData && this._rowData.isCreditCard === 'Y') {
+                this.loadCreditCardAccount();
+            } else {
+                this.loadChartfieldAccount();
+            }
+        }
+	}
+
+	private loadLabAndCoreFacilityFromRowData(): void {
+        if (!this._rowData) {
+            return;
+        }
+
+        // Set the selected lab!
+        this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
+            this.labList = response;
+
+            this.selectedLab = null;
+
+            for (let lab of this.labList) {
+                if (lab.idLab === this._rowData.idLab) {
+                    this.selectedLab = lab;
+                    this.onLabLoad(lab);
+                    break;
+                }
+            }
+
+            // This timeout is important to the sorting of the Core Facility list, for some reason.
+            setTimeout(() => {
+                if (!!this.selectedLab) {
+                    for (let coreFacility of this.coreFacilityReducedList) {
+                        if (coreFacility.idCoreFacility === this._rowData.idCoreFacility) {
+                            this.selectedCoreFacilities = [coreFacility];
+                            break;
+                        }
+                    }
+                }
+            });
+        });
+	}
+
+    private loadChartfieldAccount(): void {
+        this.showField = this.CHARTFIELD;
+
+        if (!this._rowData) {
+        	return;
+		}
+
+        this.loadLabAndCoreFacilityFromRowData();
+
+        let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
+        this.fundingAgencies = [];
+
+        if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
+            for (let i = 0; i < originalFundingAgencies.length; i++) {
+                if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
+                    this.fundingAgencies.push(originalFundingAgencies[i]);
+                }
+            }
+        }
+
+        this.accountName_Chartfield           = this._rowData.accountName;
+        this.shortAccountName_Chartfield      = this._rowData.shortAcct;
+
+        this.accountNumberBus_Chartfield      = this._rowData.accountNumberBus;
+        this.accountNumberOrg_Chartfield      = this._rowData.accountNumberOrg;
+        this.accountNumberFund_Chartfield     = this._rowData.accountNumberFund;
+        this.accountNumberActivity_Chartfield = this._rowData.accountNumberActivity;
+        this.accountNumberAU_Chartfield       = this._rowData.accountNumberAu;
+
+        this.selectedFundingAgency_chartfield = this._rowData.idFundingAgency;
+
+        if (this.usesCustomChartfields === 'Y') {
+            if (this.internalAccountFieldsConfiguration) {
+                for (let i: number = 0; i < this.internalAccountFieldsConfiguration.length; i++) {
+                    switch(this.internalAccountFieldsConfiguration[i].fieldName) {
+                        case 'project' : this.internalAccountFieldsConfiguration[i].value = this._rowData.accountNumberProject; break;
+                        case 'account' : this.internalAccountFieldsConfiguration[i].value = this._rowData.accountNumberAccount; break;
+                        case 'custom1' : this.internalAccountFieldsConfiguration[i].value = this._rowData.custom1; break;
+                        case 'custom2' : this.internalAccountFieldsConfiguration[i].value = this._rowData.custom2; break;
+                        case 'custom3' : this.internalAccountFieldsConfiguration[i].value = this._rowData.custom3; break;
+                        default : break;
+                    }
+                }
+            }
+        } else {
+            this.accountNumberProject_Chartfield = this._rowData.accountNumberProject;
+            this.accountNumberAccount_Chartfield = this._rowData.accountNumberAccount;
+        }
+
+		this.startDate_chartfield = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
+        this.effectiveUntilDate_chartfield = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
+
+        this.approvedUsersValue = this._rowData.approvedUsers;
+
+        this.submitterEmail = this._rowData.submitterEmail;
+        this.submitterEmailFormControl.reset();
+
+        this.totalDollarAmount = this._rowData.totalDollarAmount;
+        this.activeCheckBox = this._rowData.activeAccount === 'Y';
+    }
+
+    private loadPOAccount(): void {
+        this.showField = this.PO;
+
+        if (!this._rowData) {
+            return;
+        }
+
+        this.loadLabAndCoreFacilityFromRowData();
+
+        this.accountName_po = this._rowData.accountName;
+        this.shortAccountName_po = this._rowData.shortAcct;
+        this.selectedFundingAgency_po = this._rowData.idFundingAgency;
+        this.submitterEmail = this._rowData.submitterEmail;
+        this.startDate_po = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
+        this.expirationDate_po = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
+        this.totalDollarAmount = this._rowData.totalDollarAmountDisplay;
+        this.activeCheckBox = (this._rowData.activeAccount && this._rowData.activeAccount.toLowerCase() === 'y');
+
+        this.approvedUsersValue = this._rowData.approvedUsers;
+
+        this.submitterEmail = this._rowData.submitterEmail;
+        this.submitterEmailFormControl.reset();
+
+        this.totalDollarAmount = this._rowData.totalDollarAmount;
+        this.activeCheckBox = this._rowData.activeAccount === 'Y';
+    }
+
+    private loadCreditCardAccount(): void {
+        this.showField = this.CREDIT_CARD;
+
+        if (!this._rowData) {
+            return;
+        }
+
+        this.loadLabAndCoreFacilityFromRowData();
+
+        this.accountName_creditCard = this._rowData.accountName;
+        this.selectedFundingAgency_creditCard = this._rowData.idFundingAgency;
+        this.startDate_creditcard = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
+        this.expirationDate_creditcard = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
+        this.zipCodeInput_creditCard = this._rowData.zipCode;
+        this.selectedCreditCardCompany = this._rowData.idCreditCardCompany;
+
+        this.approvedUsersValue = this._rowData.acctUsers;
+
+        this.submitterEmail = this._rowData.submitterEmail;
+        this.submitterEmailFormControl.reset();
+
+        this.totalDollarAmount = this._rowData.totalDollarAmount;
+        this.activeCheckBox = this._rowData.activeAccount === 'Y';
+    }
+
+    private onClickApprovedUsers(): void {
+		let data = {
+			options: this.labActiveSubmitters,
+			optionName: "Users",
+			value: this.approvedUsersValue,
+			valueField: "value",
+			displayField: "display"
+		};
+
+		let configuration: MatDialogConfig = new MatDialogConfig();
+		configuration.width = '60em';
+		configuration.height = '45em';
+		configuration.panelClass = 'no-padding-dialog';
+		configuration.data = data;
+
+		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
+
+		dialogRef.afterClosed().subscribe((result) => {
+			if (dialogRef && dialogRef.componentInstance) {
+				this.approvedUsersValue = !!dialogRef.componentInstance.value ? dialogRef.componentInstance.value : '';
+			}
+		});
+	}
 }

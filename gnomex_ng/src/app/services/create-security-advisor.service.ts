@@ -145,6 +145,11 @@ export class CreateSecurityAdvisorService {
         return ids.indexOf(idCoreFacility) >= 0;
     }
 
+    public isMyCoreFacility(idCoreFacility: string): boolean {
+        let ids: string[] = this.extractCoreFacilityIds(this.myCoreFacilities);
+        return ids.indexOf(idCoreFacility) >= 0;
+    }
+
     createSecurityAdvisor(): Observable<any> {
         console.log("createSecurityAdvisor new");
         return this.http.get("/gnomex/CreateSecurityAdvisor.gx", {withCredentials: true}).map((response: Response) => {

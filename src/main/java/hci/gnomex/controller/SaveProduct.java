@@ -3,6 +3,7 @@ package hci.gnomex.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import javax.json.Json;
@@ -10,7 +11,9 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;
 import hci.gnomex.model.PriceCriteria;
@@ -46,7 +49,7 @@ public class SaveProduct extends GNomExCommand implements Serializable {
     this.addInvalidFields( errors );
 
     if( productScreen.getIdProduct() == null
-        || productScreen.getIdProduct() == 0 ) {
+        || productScreen.getIdProduct().intValue() == 0 ) {
       isNewProduct = true;
     }
 
@@ -101,7 +104,7 @@ public class SaveProduct extends GNomExCommand implements Serializable {
       DictionaryHelper dictionaryHelper = DictionaryHelper.getInstance( sess );
 
       ProductType pt = dictionaryHelper.getProductTypeObject(
-          productScreen.getIdProductType() );
+          productScreen.getIdProductType().intValue() );
 
       if( pt == null || pt.getIdCoreFacility() == null
           || this.getSecAdvisor().isCoreFacilityIManage(
@@ -109,7 +112,7 @@ public class SaveProduct extends GNomExCommand implements Serializable {
           || this.getSecAdvisor().hasPermission(
               SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES ) ) {
 
-        Product product;
+        Product product = null;
 
         if( isNewProduct ) {
           product = productScreen;
@@ -275,4 +278,14 @@ public class SaveProduct extends GNomExCommand implements Serializable {
     return false;
   }
 
+  private class ProductComparator implements Comparator, Serializable {
+
+    public int compare( Object o1, Object o2 ) {
+      Product org1 = ( Product ) o1;
+      Product org2 = ( Product ) o2;
+
+      return org1.getIdProduct().compareTo( org2.getIdProduct() );
+
+    }
+  }
 }

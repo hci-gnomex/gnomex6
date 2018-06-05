@@ -8,6 +8,11 @@ import {NgModule} from "@angular/core";
 import {ConfigureProductsComponent} from "./configure-products.component";
 import {TreeModule} from "angular-tree-component";
 import {ConfigureProductTypesComponent} from "./configure-product-types.component";
+import {ProductLedgerComponent} from "./product-ledger.component";
+import {AgGridModule} from "ag-grid-angular";
+import {AddLedgerEntryComponent} from "./add-ledger-entry.component";
+import {AddProductWindowComponent} from "./add-product-window.component";
+import {ProductOrdersComponent} from "./product-orders.component";
 
 @NgModule({
     imports: [
@@ -19,15 +24,22 @@ import {ConfigureProductTypesComponent} from "./configure-product-types.componen
         UtilModule,
         ReactiveFormsModule,
         TreeModule,
+        AgGridModule.withComponents([]),
     ],
     declarations: [
         ConfigureProductsComponent,
         ConfigureProductTypesComponent,
+        ProductLedgerComponent,
+        ProductOrdersComponent,
+        AddLedgerEntryComponent,
+        AddProductWindowComponent,
     ],
     exports: [
     ],
     entryComponents: [
         ConfigureProductTypesComponent,
+        AddLedgerEntryComponent,
+        AddProductWindowComponent,
     ]
 })
 

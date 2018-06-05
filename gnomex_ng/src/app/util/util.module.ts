@@ -23,7 +23,9 @@ import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
 import {SaveFooterComponent} from "./save-footer.component";
 import {DateParserComponent} from "./parsers/date-parser.component";
 import {MonthPickerComponent} from "./pickers/month-picker.component";
-
+import {DatePickerComponent} from "./date-picker.component";
+import {DateRangeFilterComponent} from "./date-range-filter.component";
+import {DateRangeFilterPopupComponent} from "./date-range-filter-popup.component";
 
 @NgModule({
     imports: [
@@ -37,50 +39,56 @@ import {MonthPickerComponent} from "./pickers/month-picker.component";
         AngularMaterialModule
     ],
     declarations: [
-			  BillingPeriodPickerComponent,
-			  BillingUsageReportComponent,
-			  BrowseFilterComponent,
-			  DateParserComponent,
-			  DateRangePickerComponent,
-			  DeleteDataTrackComponent,
-			  MenuHeaderBillingComponent,
-			  MenuHeaderDataTracksComponent,
-			  MenuHeaderTopicsComponent,
-			  NewDataTrackComponent,
-			  NewDataTrackFolderComponent,
-			  NewGenomeBuildComponent,
-			  NewOrganismComponent,
-			  NewTopicComponent,
-			  SaveFooterComponent,
-              MonthPickerComponent
-		],
+        BillingPeriodPickerComponent,
+        BillingUsageReportComponent,
+        BrowseFilterComponent,
+        DateParserComponent,
+        DatePickerComponent,
+        DateRangePickerComponent,
+        DateRangeFilterComponent,
+        DateRangeFilterPopupComponent,
+        DeleteDataTrackComponent,
+        MenuHeaderBillingComponent,
+        MenuHeaderDataTracksComponent,
+        MenuHeaderTopicsComponent,
+        NewDataTrackComponent,
+        NewDataTrackFolderComponent,
+        NewGenomeBuildComponent,
+        NewOrganismComponent,
+        NewTopicComponent,
+        SaveFooterComponent,
+        MonthPickerComponent
+    ],
     entryComponents: [
         BillingUsageReportComponent,
-			  DeleteDataTrackComponent,
-			  NewDataTrackComponent,
-			  NewDataTrackFolderComponent,
-			  NewGenomeBuildComponent,
-			  NewOrganismComponent,
-			  NewTopicComponent
+        DeleteDataTrackComponent,
+        NewDataTrackComponent,
+        NewDataTrackFolderComponent,
+        NewGenomeBuildComponent,
+        NewOrganismComponent,
+        DateRangeFilterPopupComponent,
+        NewTopicComponent
     ],
     exports: [
-			  BrowseFilterComponent,
-			  BillingPeriodPickerComponent,
-			  BillingUsageReportComponent,
-			  DateParserComponent,
-			  DateRangePickerComponent,
-			  DeleteDataTrackComponent,
-			  MenuHeaderBillingComponent,
-			  MenuHeaderDataTracksComponent,
-			  MenuHeaderTopicsComponent,
-			  NewDataTrackComponent,
-			  NewDataTrackFolderComponent,
-			  NewGenomeBuildComponent,
-			  NewOrganismComponent,
-			  NewTopicComponent,
-			  SaveFooterComponent,
-			  TabsModule,
-              MonthPickerComponent
+        BrowseFilterComponent,
+        BillingPeriodPickerComponent,
+        BillingUsageReportComponent,
+        DateParserComponent,
+        DatePickerComponent,
+        DateRangePickerComponent,
+        DateRangeFilterComponent,
+        DeleteDataTrackComponent,
+        MenuHeaderBillingComponent,
+        MenuHeaderDataTracksComponent,
+        MenuHeaderTopicsComponent,
+        NewDataTrackComponent,
+        NewDataTrackFolderComponent,
+        NewGenomeBuildComponent,
+        NewOrganismComponent,
+        NewTopicComponent,
+        SaveFooterComponent,
+        TabsModule,
+        MonthPickerComponent
     ]
 })
 export class UtilModule {

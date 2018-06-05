@@ -9,7 +9,9 @@ import { BarcodeSelectEditor } from "./barcode-select.editor";
 import { DateEditor } from './date.editor'
 import { MultipleSelectDialogComponent } from "./popups/multiple-select-dialog.component";
 import { SelectEditor } from './select.editor';
+import { SeqlaneSelectEditor } from "./seqlane-select.editor";
 import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.editor";
+
 
 @NgModule({
     imports: [
@@ -26,6 +28,7 @@ import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.ed
         DateEditor,
         MultipleSelectDialogComponent,
         SelectEditor,
+        SeqlaneSelectEditor,
         TextSelectXorMultiselectEditor
     ],
     entryComponents: [
@@ -36,6 +39,7 @@ import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.ed
         DateEditor,
         MultipleSelectDialogComponent,
         SelectEditor,
+        SeqlaneSelectEditor,
         TextSelectXorMultiselectEditor
     ]
 })

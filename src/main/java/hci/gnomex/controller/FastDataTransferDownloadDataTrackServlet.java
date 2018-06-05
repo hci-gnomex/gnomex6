@@ -9,7 +9,6 @@ import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.ServletUtil;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import org.hibernate.Session;
 
 import javax.servlet.ServletException;
