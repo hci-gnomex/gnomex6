@@ -7,9 +7,10 @@ import {
     OnDestroy,
     ViewChild
 } from "@angular/core";
-
 import {MatDialogRef, MatDialog, MAT_DIALOG_DATA, DialogPosition} from "@angular/material";
-import { TextAlignLeftMiddleRenderer } from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
+
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {AdvancedSearchService} from "./advanced-search.service";
 import {Subscription} from "rxjs/Subscription";
 import {DialogsService} from "../../util/popup/dialogs.service";
@@ -34,7 +35,8 @@ import {DateParserComponent} from "../../util/parsers/date-parser.component";
         .full-height { height: 100%; }
         .full-width  { width:  100%; }
         
-        .padding { padding: 0.6em; }
+        .padding     { padding:     0.6em; }
+        .padding-top { padding-top: 0.6em; }
         
         .no-margin  { margin:  0; }
         .no-padding { padding: 0; }
@@ -160,9 +162,25 @@ import {DateParserComponent} from "../../util/parsers/date-parser.component";
         .vertical-align-center { vertical-align: middle; }
         
         .font-large { font-size: large; }
+        
+        .box-border {
+            border-style: inset;
+            border-color: lightgrey;
+            border-width: 2px;
+            
+            overflow: auto;
+            object-fit: none;
+        }
+        
+        .maximum-size {
+            overflow: auto;
+            object-fit: none;
+        }
     `]
 })
 export class AdvancedSearchComponent implements OnInit, OnDestroy {
+
+    @ViewChild("searchResultsTree") treeComponent: TreeComponent;
 
     readonly ALL_OBJECTS : string = 'ALL_OBJECTS';
     readonly EXPERIMENTS : string = 'EXPERIMENTS';
@@ -181,6 +199,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     matchType:  string = this.MATCH_ALL_TERMS;
 
     private _resultType: string = this.ALL_OBJECTS;
+    private _treeResultType: string = this.EXPERIMENTS;
 
     context: any = this;
 
@@ -225,6 +244,55 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     private visibilityDictionary: any[];
     private requestCategoryDictionary: any[];
 
+    selectedTabIndex: number = 0;
+
+    private wholeLastSearchData: any[];
+
+    private lastSearchDataAllObjects:  any[];
+    private lastSearchDataExperiments: any[];
+    private lastSearchDataAnalyses:    any[];
+    private lastSearchDataProtocols:   any[];
+    private lastSearchDataDataTracks:  any[];
+    private lastSearchDataTopics:      any[];
+
+    private lastSearchTreeNodesExperiments: any[] = [];
+    private lastSearchTreeNodesAnalyses:    any[] = [];
+    private lastSearchTreeNodesProtocols:   any[] = [];
+    private lastSearchTreeNodesDataTracks:  any[] = [];
+    private lastSearchTreeNodesTopics:      any[] = [];
+
+    private numberOfAllObjectResults:  number = 0;
+    private numberOfExperimentResults: number = 0;
+    private numberOfAnalysisResults:   number = 0;
+    private numberOfProtocolResults:   number = 0;
+    private numberOfDataTrackResults:  number = 0;
+    private numberOfTopicResults:      number = 0;
+
+    treeNodes: any;
+
+    treeOptions: ITreeOptions = {
+        idField: "id",
+        displayField: "displayField",
+        childrenField: "childrenField"
+        // nodeClass: (node: TreeNode) => {
+        //     return "icon-" + node.data.gridIcon;
+        // },
+    };
+
+    private treeModel: TreeModel;
+
+    private nodeIndex: number = 0;
+
+    private searchAfterLoad: boolean = false;
+
+    private gotAllObjectSearchList : boolean   = false;
+    private gotExperimentSearchList : boolean  = false;
+    private gotAnalysisSearchList : boolean    = false;
+    private gotProtocolSearchList : boolean    = false;
+    private gotDataTrackSearchList : boolean   = false;
+    private gotTopicSearchList : boolean       = false;
+    private gotDictionaryMap : boolean         = false;
+
     constructor(private dialog: MatDialog,
                 private dialogRef: MatDialogRef<AdvancedSearchComponent>,
                 private dialogService: DialogsService,
@@ -233,50 +301,66 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (data) {
             this.searchText = !!data.searchText ? data.searchText : '';
+
+            if (!!data.searchText) {
+                this.searchAfterLoad = true;
+            }
         }
 
         this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
 
         this.allObjectSearchListSubscription = this.advancedSearchService.getAllObjectSearchListObservable().subscribe((list) => {
             this.allObjectSearchList = list;
+            this.gotAllObjectSearchList = true;
             this.onSearchTypeChanged();
         });
         this.experimentSearchListSubscription = this.advancedSearchService.getExperimentSearchListObservable().subscribe((list) => {
             this.experimentSearchList = list;
+            this.gotExperimentSearchList = true;
             this.onSearchTypeChanged();
         });
         this.analysisSearchListSubscription = this.advancedSearchService.getAnalysisSearchListObservable().subscribe((list) => {
             this.analysisSearchList = list;
+            this.gotAnalysisSearchList = true;
             this.onSearchTypeChanged();
         });
         this.protocolSearchListSubscription = this.advancedSearchService.getProtocolSearchListObservable().subscribe((list) => {
             this.protocolSearchList = list;
+            this.gotProtocolSearchList = true;
             this.onSearchTypeChanged();
         });
         this.dataTrackSearchListSubscription = this.advancedSearchService.getDataTrackSearchListObservable().subscribe((list) => {
             this.dataTrackSearchList = list;
+            this.gotDataTrackSearchList = true;
             this.onSearchTypeChanged();
         });
         this.topicSearchListSubscription = this.advancedSearchService.getTopicSearchListObservable().subscribe((list) => {
             this.topicSearchList = list;
+            this.gotTopicSearchList = true;
             this.onSearchTypeChanged();
         });
 
         this.dictionaryMapSubscription = this.advancedSearchService.getDictionaryMapObservable().subscribe((list) => {
             this.dictionaryMap = list;
+            this.gotDictionaryMap = true;
             this.onSearchTypeChanged();
         });
 
         this.searchResultsSubscription = this.advancedSearchService.getSearchResultObservable().subscribe((results) => {
-           this.processSearchResults(results);
-           this.selectedTabIndex = 1; // Change the tab to the Search Results
+            this.processSearchResults(results);
+            this.selectedTabIndex = 1; // Change the tab to the Search Results
+            if (!!this.spinnerRef) {
+                this.spinnerRef.close();
+            }
         });
 
         this.visibilityDictionary = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.Visibility");
         this.requestCategoryDictionary = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory");
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+        this.treeModel = this.treeComponent.treeModel;
+    }
     ngOnDestroy() { }
 
     assignNewSearchGridContents(): void {
@@ -310,13 +394,9 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     assignSearchResultsGridContents(): void {
         if (this.searchResultsGridApi) {
             this.searchResultsGridApi.setRowData([]);
-            this.searchResultsGridApi.setColumnDefs(this.getSearchResultsColumnDefinitions());
+            this.searchResultsGridApi.setColumnDefs([]);
             this.searchResultsGridApi.sizeColumnsToFit();
         }
-    }
-
-    private getSearchResultsColumnDefinitions(): any[] {
-        return [];
     }
 
     onNewSearchGridReady(event: any): void {
@@ -383,12 +463,13 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     }
 
     @HostListener('window:mouseup', ['$event'])
-    onMouseUp(event: any): void {
+    onMouseUp(): void {
         this.movingDialog = false;
     }
 
     onClickSearchButton(): void {
         this.resultType = this.searchType;
+        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
         this.advancedSearchService.search(this.searchType, this.searchText, this.currentlyDisplayedRowData, this.matchType);
     }
 
@@ -449,25 +530,19 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         if (!!this.spinnerRef) {
             this.spinnerRef.close();
         }
+
+        if (this.searchAfterLoad
+            && (this.gotAllObjectSearchList
+                && this.gotExperimentSearchList
+                && this.gotAnalysisSearchList
+                && this.gotProtocolSearchList
+                && this.gotDataTrackSearchList
+                && this.gotTopicSearchList
+                && this.gotDictionaryMap)) {
+            this.searchAfterLoad = false;
+            setTimeout(() => { this.onClickSearchButton(); });
+        }
     }
-
-    selectedTabIndex: number = 0;
-
-    private wholeLastSearchData: any[];
-
-    private lastSearchDataAllObjects:  any[];
-    private lastSearchDataExperiments: any[];
-    private lastSearchDataAnalyses:    any[];
-    private lastSearchDataProtocols:   any[];
-    private lastSearchDataDataTracks:  any[];
-    private lastSearchDataTopics:      any[];
-
-    private numberOfAllObjectResults:  number = 0;
-    private numberOfExperimentResults: number = 0;
-    private numberOfAnalysisResults:   number = 0;
-    private numberOfProtocolResults:   number = 0;
-    private numberOfDataTrackResults:  number = 0;
-    private numberOfTopicResults:      number = 0;
 
     private processSearchResults(results: any): void {
         console.log(results);
@@ -607,7 +682,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             }
 
             // Get "Topic" Results
-            if (results[0].ProtocolList) {
+            if (results[0].TopicList) {
                 if (Array.isArray(results[0].TopicList)) {
                     this.lastSearchDataTopics = results[0].TopicList;
                 } else {
@@ -622,6 +697,25 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             } else {
                 this.numberOfTopicResults = 0;
             }
+
+
+            // Get "Experiment" Tree Results
+            if (results[0].ProjectRequestList) {
+                if (Array.isArray(results[0].ProjectRequestList)) {
+                    this.lastSearchTreeNodesExperiments = results[0].ProjectRequestList;
+                }
+                // else {
+                //     this.lastSearchTreeNodesExperiments = [results[0].ProjectRequestList.Lab];
+                // }
+
+                if (this.treeResultType === this.EXPERIMENTS && this.lastSearchTreeNodesExperiments) {
+                    //this.setupResultTreeForExperiments();
+                }
+            }
+
+
+
+
         }
     }
 
@@ -637,6 +731,22 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 case this.PROTOCOLS   : this._resultType = resultType; this.setupResultGridForProtocols();   break;
                 case this.DATA_TRACKS : this._resultType = resultType; this.setupResultGridForDataTracks();  break;
                 case this.TOPICS      : this._resultType = resultType; this.setupResultGridForTopics();      break;
+                default : // do nothing.
+            }
+        }
+    }
+
+    get treeResultType(): string {
+        return this._treeResultType;
+    }
+    set treeResultType(treeResultType: string) {
+        if (treeResultType) {
+            switch (treeResultType) {
+                case this.EXPERIMENTS : this._treeResultType = treeResultType; this.setupResultTreeForExperiments(); break;
+                case this.ANALYSES    : this._treeResultType = treeResultType; this.setupResultTreeForAnalyses();    break;
+                case this.PROTOCOLS   : this._treeResultType = treeResultType; this.setupResultTreeForProtocols();   break;
+                case this.DATA_TRACKS : this._treeResultType = treeResultType; this.setupResultTreeForDataTracks();  break;
+                case this.TOPICS      : this._treeResultType = treeResultType; this.setupResultTreeForTopics();      break;
                 default : // do nothing.
             }
         }
@@ -1054,5 +1164,84 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             this.searchResultsGridApi.setColumnDefs(topicColumnDefinitions);
             this.searchResultsGridApi.sizeColumnsToFit();
         }
+    }
+
+
+    private setupResultTreeForExperiments(): void {
+        this.treeNodes = [];
+        this.nodeIndex = 0;
+
+        let root: TreeNode = new TreeNode({}, null, this.treeModel, this.nodeIndex++);
+        for (let node of this.lastSearchTreeNodesExperiments) {
+            this.treeNodes.push(this.recursivelySetupExperimentTreeNode(node, null));
+        }
+
+        this.treeModel.update();
+
+        console.log("trying to use nodes: " + this.treeNodes);
+    }
+    private recursivelySetupExperimentTreeNode(backEndData: any, //parentID: string): void {
+                                               parentNode: TreeNode): TreeNode {
+        if (!backEndData) {
+            return null;
+        }
+
+        let node: TreeNode = new TreeNode({}, parentNode, this.treeModel, this.nodeIndex++);
+        let inputChildren;
+
+        if (backEndData.idLab && (backEndData.label || backEndData.labName)) {
+            let label: string = backEndData.label ? backEndData.label :  backEndData.labName;
+            node.setField("display", label);
+            inputChildren = Array.isArray(backEndData.Project) ? backEndData.Project : [backEndData.Project];
+        } else if (backEndData.idProject && !backEndData.codeRequestCategory && (backEndData.label || backEndData.projectName)) {
+            let label: string = backEndData.label ? backEndData.label :  backEndData.projectName;
+            node.setField("display", label);
+            inputChildren = Array.isArray(backEndData.RequestCategory) ? backEndData.RequestCategory : [backEndData.RequestCategory];
+        } else if (backEndData.idProject && backEndData.codeRequestCategory && (backEndData.label || backEndData.codeRequestCategory)) {
+            let label: string = backEndData.label ? backEndData.label :  backEndData.codeRequestCategory;
+            node.setField("display", label);
+            inputChildren = Array.isArray(backEndData.RequestNode) ? backEndData.RequestNode : [backEndData.RequestNode];
+        } else if (backEndData.idRequest && (backEndData.label || backEndData.displayName)) {
+            let label: string = backEndData.label ? backEndData.label :  backEndData.displayName;
+            node.setField("display", label);
+        } else {
+            return;  // This is not a recognized node type. Stop.
+        }
+
+        let createdNodes: TreeNode[] = [];
+
+        if (!!inputChildren) {
+            if (Array.isArray(inputChildren)) {
+                for (let child of inputChildren) {
+                    createdNodes.push(this.recursivelySetupExperimentTreeNode(child, node));
+                    // this.recursivelySetupExperimentTreeNode(child, node);
+                }
+            } else {
+                createdNodes.push(this.recursivelySetupExperimentTreeNode(inputChildren, node.id));
+            }
+        }
+
+        node.children = createdNodes;
+        node.setField("children", createdNodes); // just added this - didn't work.
+        node.setField("childrenField", createdNodes); // just added this - didn't work.
+        return node;
+    }
+
+    private setupResultTreeForAnalyses(): void {
+
+    }
+    private setupResultTreeForProtocols(): void {
+
+    }
+    private setupResultTreeForDataTracks(): void {
+
+    }
+    private setupResultTreeForTopics(): void {
+
+    }
+
+
+    treeOnSelect(event: any) {
+        console.log("Selected " + event);
     }
 }

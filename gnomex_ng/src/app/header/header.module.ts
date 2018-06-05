@@ -46,6 +46,7 @@ import {TextSelectXorMultiselectEditor} from "../util/grid-editors/text-select-x
 import {TextSelectXorMultiselectRenderer} from "../util/grid-renderers/text-select-xor-multiselect.renderer";
 
 import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
+import {TreeModule} from "angular-tree-component";
 
 @NgModule({
     imports: [
@@ -70,7 +71,8 @@ import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
             TextAlignRightMiddleRenderer,
             TextSelectXorMultiselectEditor,
             TextSelectXorMultiselectRenderer
-        ])
+        ]),
+        TreeModule
     ],
     providers: [
        AdvancedSearchService,

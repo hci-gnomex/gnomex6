@@ -28,33 +28,33 @@ import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-us
 	templateUrl: "./billing-account-tab.component.html",
 	styles: [`
       .flex-base {  
-					display: flex;
-					flex-direction: column;
-			}
-			.flex-header { }
-			.flex-stretch {
-					display: flex;
-					flex: 1;
-			}
-			.flex-footer { }
+		  display: flex;
+		  flex-direction: column;
+	  }
+	  .flex-header { }
+	  .flex-stretch {
+		  display: flex;
+		  flex: 1;
+	  }
+	  .flex-footer { }
 			
-			.border {
-					width: 50%;
-					margin-bottom: 0.8em;
-					padding: 0.5em;
-					border: 1px solid lightgrey;
-					border-radius: 3px;
-			}
+	  .border {
+		  width: 50%;
+		  margin-bottom: 0.8em;
+		  padding: 0.5em;
+		  border: 1px solid lightgrey;
+		  border-radius: 3px;
+	  }
 			
-			.t  { display: table;      }
-			.tr { display: table-row;  }
-			.td { display: table-cell; }
-
-      .block        { display: block;        }
-			.inline-block { display: inline-block; }
+	  .t  { display: table;      }
+	  .tr { display: table-row;  }
+	  .td { display: table-cell; }  
+	  
+	  .block        { display: block;        }
+	  .inline-block { display: inline-block; }
 			
-			.full-width  { width: 100%;  }
-			.full-height { height: 100%; }
+	  .full-width  { width: 100%;  }
+	  .full-height { height: 100%; }
 	`]
 })
 export class BillingAccountTabComponent implements OnInit{

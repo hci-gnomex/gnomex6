@@ -145,31 +145,46 @@
             </mat-tab>
 
             <mat-tab label="Search Results (Tree)" class="full-height" #searchResultsTab >
-                <div class="full-width fixed-height padding">
+                <div class="full-width fixed-height maximum-size padding-top">
                     <div class="flex-container full-width full-height">
                         <div class="full-width button-bar">
-                            <button mat-button class="inline-block" (click)="setupResultGridForExperiments()">
+                            <button mat-button class="inline-block" (click)="setupResultTreeForExperiments()">
                                 Experiments ({{numberOfExperimentResults}} hit{{numberOfExperimentResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block" (click)="setupResultGridForAnalyses()">
+                            <button mat-button class="inline-block" (click)="setupResultTreeForAnalyses()">
                                 Analysis ({{numberOfAnalysisResults}} hit{{numberOfAnalysisResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block" (click)="setupResultGridForProtocols()">
+                            <button mat-button class="inline-block" (click)="setupResultTreeForProtocols()">
                                 Protocols ({{numberOfProtocolResults}} hit{{numberOfProtocolResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block" (click)="setupResultGridForDataTracks()">
+                            <button mat-button class="inline-block" (click)="setupResultTreeForDataTracks()">
                                 Data Tracks ({{numberOfDataTrackResults}} hit{{numberOfDataTrackResults == 1 ? '' : 's'}})
                             </button>
                             <div class="vertical-spacer"></div>
-                            <button mat-button class="inline-block" (click)="setupResultGridForTopics()">
+                            <button mat-button class="inline-block" (click)="setupResultTreeForTopics()">
                                 Topics ({{numberOfTopicResults}} hit{{numberOfTopicResults == 1 ? '' : 's'}})
                             </button>
                         </div>
-                        <div class="flex-fill full-width">
+                        <div class="flex-fill full-width maximum-size">
+                            <div class="full-width full-height maximum-size box-border">
+                                <tree-root #searchResultsTree
+                                           [nodes]="treeNodes"
+                                           [options]="treeOptions"
+                                           (activate)="treeOnSelect($event)">
+                                    <ng-template #treeNodeTemplate let-node let-index="index">
+                                        <span>{{ node.data[treeOptions.displayField] }}</span>
+                                    </ng-template>
 
+                                    <!--<ng-template #treeNodeTemplate let-node let-index="index">-->
+                                        <!--<img src="{{node.data.icon}}" alt="" height="16" width="16">-->
+                                        <!--<span>{{ node.data.label }}</span>-->
+                                    <!--</ng-template>-->
+                                    <!--<ng-template #loadingTemplate></ng-template>-->
+                                </tree-root>
+                            </div>
                         </div>
                     </div>
                 </div>
