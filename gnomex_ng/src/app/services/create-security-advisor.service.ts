@@ -188,10 +188,6 @@ export class CreateSecurityAdvisorService {
 
                 this.determineUsersCoreFacilities();
 
-                this.labListService.getLabList().subscribe((response: any[]) => {
-                    console.log("Lab List Loaded");
-                });
-
                 return this.result;
             } else {
                 throw new Error("Error");

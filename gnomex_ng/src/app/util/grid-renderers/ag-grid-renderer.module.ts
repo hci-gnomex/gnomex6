@@ -22,7 +22,7 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
     ],
     declarations: [
 			  ApproveButtonRenderer,
-			  CheckboxRenderer,
+        CheckboxRenderer,
 			  DateRenderer,
 			  IconLinkButtonRenderer,
         IconTextRendererComponent,

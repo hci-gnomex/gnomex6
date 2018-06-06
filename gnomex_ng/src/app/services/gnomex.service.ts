@@ -38,6 +38,7 @@ export class GnomexService {
     public iconDataTrackMember = "assets/datatrack_member.png";
     public iconDataTrackOwner = "assets/datatrack_owner.png";
     public iconDataTrackPublic = "assets/datatrack_world.png";
+    public PROPERTY_SHOW_SAMPLE_CONC_PM: string = "show_sample_conc_pm";
 
     public properties: Map<string, string> = new Map<string, string>();
     private requestCategoryTypeMap: Map<string, string> = new Map<string, string>();
@@ -126,6 +127,21 @@ export class GnomexService {
             this.properties[qualName] = prop.propertyValue;
         }
 
+    }
+
+    public getCoreFacilityProperty(idCoreFacility: string, name: string):string {
+        let result: string = "";
+        if (this.properties != null) {
+            let qualName: string = idCoreFacility + "\t" + name;
+            result = this.properties[qualName];
+            if (result === null || result === "") {
+                result = this.properties[name];
+            }
+            if (result == null) {
+                result = "";
+            }
+        }
+        return result;
     }
 
     /**

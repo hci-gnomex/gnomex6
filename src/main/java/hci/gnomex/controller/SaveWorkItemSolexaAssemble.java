@@ -182,15 +182,17 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
             
             // sess.save assigns an idFlowCell for the new flowcell, set the "number" attribute for display
             flowCell.setNumber("FC" + flowCell.getIdFlowCell());
-            
+            String codeRequestCategory = parser.getCodeRequestCategory();
             String sequencingPlatform = "";
             // ILLSEQQC
-            if(codeStepNext.equals(Step.SEQ_DATA_PIPELINE)) {
+            if(codeRequestCategory.equals(Step.SEQ_DATA_PIPELINE)) {
               sequencingPlatform = SequencingPlatform.ILLUMINA_GAIIX_SEQUENCING_PLATFORM;
-            } else {
-              sequencingPlatform = SequencingPlatform.ILLUMINA_SEQUENCING_PLATFORM;
+            } else if (codeRequestCategory.equals(RequestCategory.ILLUMINA_HISEQ_REQUEST_CATEGORY)) { // HSEQPIPE, needs to be changed to HSEQFINFC
+              sequencingPlatform = SequencingPlatform.ILLUMINA_HISEQ_2000_SEQUENCING_PLATFORM;
+            } else if (codeRequestCategory.equals(RequestCategory.ILLUMINA_MISEQ_REQUEST_CATEGORY)) {
+              sequencingPlatform = SequencingPlatform.ILLUMINA_MISEQ_SEQUENCING_PLATFORM;
             }
-            flowCell.setCodeSequencingPlatform(sequencingPlatform);    //HISEQ      
+            flowCell.setCodeSequencingPlatform(sequencingPlatform);    //HISEQ
             
             java.sql.Date flowCellDate = null;
             if (flowCellDateStr != null) {

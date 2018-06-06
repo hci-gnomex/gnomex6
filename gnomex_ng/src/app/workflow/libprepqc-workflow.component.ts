@@ -19,7 +19,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
             display: flex;
             flex-direction: column;
             background-color: white;
-            height: 99%;
+            height: 94%;
             width: 100%;
         }
         .flex-row-container {
@@ -69,11 +69,14 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     private label: string = "Illumina Library Prep QC";
     private codeStepNext: string = "ALL";
     private libraryPrepQCProtocols: any[] =[];
+    private seqLibProtocols: any[] = [];
+    private barCodes: any[] = [];
+    private coreAdmins: any[] = [];
 
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
-                private securityAdvisor: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
+                private securityAdvisor: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService) {
 
     }
@@ -189,7 +192,7 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
             )
 
         }
-        this.workflowService.assignBackgroundColor(items);
+        this.workflowService.assignBackgroundColor(items, "idRequest");
         return items;
     }
 
@@ -341,10 +344,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
                 this.initialize();
             });
         })
-    }
-
-    onClickLibPrepQc(event) {
-        this.initialize();
     }
 
     refreshWorklist(event) {

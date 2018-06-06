@@ -32,7 +32,8 @@ export class WorkflowService {
 
 
     constructor(private http: Http,
-                private cookieUtilService: CookieUtilService) {
+                private cookieUtilService: CookieUtilService,
+                private dictionaryService: DictionaryService) {
 
         this.assmGridRowClassRules = {
             "workFlowOnColor": "data.backgroundColor === 'ON' && !data.selected",
@@ -45,7 +46,7 @@ export class WorkflowService {
      *  Alternate background colors in the grid of items.
      * @param {any[]} items
      */
-    assignBackgroundColor (items: any[]) {
+    assignBackgroundColor (items: any[], alternateAttribute: string) {
         let first: boolean = true;
         let previousId: string = "";
         let previousColor: string = "";
@@ -55,7 +56,7 @@ export class WorkflowService {
                 wi.backgroundColor = 'ON';
                 first = false;
             } else {
-                if (wi.idRequest === previousId) {
+                if (wi[alternateAttribute] === previousId) {
                     wi.backgroundColor = previousColor;
                 } else {
                     if (previousColor === 'ON') {
@@ -65,7 +66,7 @@ export class WorkflowService {
                     }
                 }
             }
-            previousId = wi.idRequest;
+            previousId = wi[alternateAttribute];
             previousColor = wi.backgroundColor;
         }
     }
@@ -127,6 +128,64 @@ export class WorkflowService {
         } else {
             return 0;
         }
+    }
+
+    static convertDate(value: string): string  {
+        if (value === "") {
+            return value;
+        }
+        let date = new Date(value);
+        return date.getMonth() + 1 + '/' + date.getDate() + '/' +  date.getFullYear()
+    }
+
+    public lookupOligoBarcode(item: any): string {
+        if (item != null && item.sampleIdOligoBarcode) {
+            if (item.sampleIdOligoBarcode != '') {
+                return this.dictionaryService.getEntryDisplay("hci.gnomex.model.OligoBarcode", item.sampleIdOligoBarcode);
+            } else {
+                return item.barcodeSequence;
+            }
+        } else {
+            return "";
+        }
+
+    }
+
+    public lookupOligoBarcodeB(item: any): string {
+        if (item != null && item.sampleIdOligoBarcodeB) {
+            if (item.sampleIdOligoBarcodeB != '') {
+                return this.dictionaryService.getEntryDisplay("hci.gnomex.model.OligoBarcode", item.sampleIdOligoBarcodeB);
+            } else {
+                return item.barcodeSequenceB;
+            }
+        } else {
+            return "";
+        }
+
+    }
+
+    public lookupNumberSequencingCyclesAllowed(item: any, col: any): string {
+        if (item != null  && item.idNumberSequencingCyclesAllowed) {
+            let allowed = this.dictionaryService.getEntry('hci.gnomex.model.NumberSequencingCyclesAllowed', item.idNumberSequencingCyclesAllowed);
+            if (allowed != null) {
+                return allowed.name;
+            } else {
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
+
+    getFlowCellList(params: URLSearchParams):  Observable<any> {
+        return this.http.get("/gnomex/GetFlowCellList.gx", {search: params}).map((response: Response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error("Error");
+            }
+        });
+
     }
 
     getWorkItemList(params: URLSearchParams):  Observable<any> {
@@ -201,6 +260,24 @@ export class WorkflowService {
         let headers: Headers = new Headers();
         headers.set("Content-Type", "application/x-www-form-urlencoded");
         return this.http.post("/gnomex/SaveWorkItemSolexaAssemble.gx", params.toString(), {headers: headers});
+
+    }
+
+    saveFlowCell(params: URLSearchParams):  Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/SaveFlowCell.gx", params.toString(), {headers: headers});
+
+    }
+
+    deleteFlowCell(params: URLSearchParams):  Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/DeleteFlowCell.gx", params.toString(), {headers: headers});
 
     }
 

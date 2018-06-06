@@ -757,7 +757,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/finalizeWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Data Pipeline',
@@ -865,7 +865,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/finalizeWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Data Pipeline',
@@ -1144,7 +1144,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
                         iconName: '../../assets/DNA_diag_lightening.png',
-                        route: ''
+                        route: '/finalizeWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Data Pipeline',

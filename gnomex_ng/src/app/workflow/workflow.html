@@ -4,10 +4,8 @@
         <ng-template #closedNav>
             <img src="../../assets/arrow_right.png">
         </ng-template>
-        <qc-workflow [hidden]="codeStepNext!='QC'" #qcWorkflow class="workflow"></qc-workflow>
-        <libprep-workflow [hidden]="codeStepNext!='ILLSEQPREP'" #libPrepWorkflow class="workflow"></libprep-workflow>
-        <libprepqc-workflow [hidden]="codeStepNext!='ILLSEQPREPQC'" #libPrepQcWorkflow class="workflow"></libprepqc-workflow>
-        <flowcellassm-workflow [hidden]="codeStepNext!='ILLSEQASSEM'" #flowCellAssmWorkflow class="workflow"></flowcellassm-workflow>
+        <ndc-dynamic [ndcDynamicComponent]="workflowOutlet" [ndcDynamicInputs]="inputs"></ndc-dynamic>
+        <!--<ng-container *ngComponentOutlet="workflowOutlet;content: cdata"></ng-container>-->
     </mat-sidenav-content>
     <mat-sidenav style="width:15%;" #sidenav mode="side" (keydown.escape)="close('escape')">
         <mat-tab-group id="groupTabGroup" style="height: 100%" [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)">
@@ -26,11 +24,11 @@
                 </ng-template>
                 <div class="flex-column-container">
                     <mat-label>Illumina</mat-label>
-                    <button mat-button (click)="onClickLibPrep($event)"><img src="../../assets/flask.png">Lib Prep</button>
-                    <button mat-button (click)="onClickLibPrepQC($event)"><img src="../../assets/flask.png">Lib Prep QC</button>
-                    <button mat-button (click)="onClickFlowCellAssm($event)"><img src="../../assets/DNA_diag.png">Flow Cell Assem</button>
-                    <button mat-button (click)="onClickFinalizedFlowCell($event)"><img src="../../assets/DNA_diag.png">Finalize Flow Cell</button>
-                    <button mat-button (click)="onClickDataPipeline($event)"><img src="../../assets/server_go.png">Data Pipeline</button>
+                    <button mat-button (click)="onClickLibPrep()"><img src="../../assets/flask.png">Lib Prep</button>
+                    <button mat-button (click)="onClickLibPrepQC()"><img src="../../assets/flask.png">Lib Prep QC</button>
+                    <button mat-button (click)="onClickFlowCellAssm()"><img src="../../assets/DNA_diag.png">Flow Cell Assem</button>
+                    <button mat-button (click)="onClickFinalizedFlowCell()"><img src="../../assets/DNA_diag.png">Finalize Flow Cell</button>
+                    <button mat-button (click)="onClickDataPipeline()"><img src="../../assets/server_go.png">Data Pipeline</button>
                 </div>
             </mat-tab>
             <mat-tab id="workflowTabGroup" [hidden]="microarrayDisabled" *ngIf="!microarrayDisabled" style="height:100%;">

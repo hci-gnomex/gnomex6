@@ -7,6 +7,7 @@ import { DateEditor } from './date.editor'
 import { SelectEditor } from './select.editor';
 import {BarcodeSelectEditor} from "./barcode-select.editor";
 import {SeqlaneSelectEditor} from "./seqlane-select.editor";
+import {FillLikeEditor} from "./filllike-select.editor";
 
 
 @NgModule({
@@ -20,13 +21,15 @@ import {SeqlaneSelectEditor} from "./seqlane-select.editor";
         DateEditor,
         SelectEditor,
         BarcodeSelectEditor,
-        SeqlaneSelectEditor
+        SeqlaneSelectEditor,
+        FillLikeEditor
     ],
     exports: [
         DateEditor,
         SelectEditor,
         BarcodeSelectEditor,
-        SeqlaneSelectEditor
+        SeqlaneSelectEditor,
+        FillLikeEditor
     ]
 })
 export class AgGridEditorModule { }

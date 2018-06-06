@@ -27,6 +27,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -328,6 +330,11 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
 
         this.xmlResult = "<SUCCESS idFlowCell=\"" + flowCell.getIdFlowCell()
         + "\"/>";
+        JsonObject value = Json.createObjectBuilder()
+                .add("result", "SUCCESS")
+                .add("flowCellNumber", flowCell.getNumber())
+                .build();
+        this.jsonResult = value.toString();
 
         setResponsePage(this.SUCCESS_JSP);
       } else {
