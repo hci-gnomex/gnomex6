@@ -1,0 +1,89 @@
+<div style="display:flex; flex-direction:column; height:100%; width:100%;">
+    <div style="display:flex; font-size:small; " >
+        <label>
+            <img class="icon" [src]="dataTrackService?.datatrackListTreeNode.icon">
+            Data Track {{this.dataTrackService?.datatrackListTreeNode.number}}
+        </label>
+
+        <button [disabled]="!showUCSC"
+                mat-button color="link"
+                (click)="makeUCSCLink()"
+                matTooltip="Create file link(s) for viewing the selected data track in the UCSC Genome Browser">
+            <img class="icon" [src]="constService.ICON_UCSC">
+            UCSC Browser
+        </button>
+
+        <button [disabled]="!showIGV"
+                mat-button color="link"
+                (click)="makeIGVLink()"
+                matTooltip="Create file link(s) for viewing the selected data track in the IGV Genome Browser">
+            <img class="icon" [src]="constService.ICON_IGV">
+            IGV Browser
+        </button>
+
+        <button [disabled]="!showIOBIO"
+                mat-button color="link"
+                matTooltip="Create file link(s) for viewing the selected data track in the IOBIO Genome Browser"
+                (click)="makeIOBIOLink()">
+            <img class="icon" [src]="constService.ICON_IOBIO">
+            IOBIO Browser
+        </button>
+
+        <button  [disabled]="!showLink"
+                 mat-button color="link"
+                 matTooltip="Creates URL file link(s) for accessing the selected data tracks via HTTP"
+                 (click)="makeURLLink()">
+            <img class="icon" [src]="constService.ICON_LINK">
+            URL Links
+        </button>
+
+        <button [disabled]="!showLink"
+                mat-button color="link"
+                matTooltip="Destroys all existing IGV, UCSC, IOBIO and URL links to user-owned datatracks.  Re-created links will have different random paths, making tracks private if old paths were distributed."
+                (click)="destroyLinks()">
+            <img class="icon" [src]="constService.ICON_DELETE_LINK">
+            Clear file links
+        </button>
+
+        <button [disabled]="!showDownload" *ngIf="showDownloadLink" mat-button color="link">
+            Download
+        </button>
+
+
+        <button mat-button color="link" (click)="shareableLink()">
+            <img class="icon" [src]="constService.GLOBE_LINK">
+            Share
+        </button>
+        <mat-spinner  *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+
+
+    </div>
+
+
+
+    <div style="display:flex; flex: 1;">
+
+        <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border"
+                       (selectedTabChange)="tabChanged($event)">
+            <mat-tab style="height:100%" label="Summary">
+                <dt-summary-tab></dt-summary-tab>
+            </mat-tab>
+            <mat-tab style="height:100%" label="Annotations">
+                <annotation-tab [annotations]="annotations" [orderType]="types.DATATRACK"> </annotation-tab>
+            </mat-tab>
+            <mat-tab style="height:100%;" label="Visibility">
+                <dt-visibility-tab></dt-visibility-tab>
+            </mat-tab>
+            <mat-tab *ngIf="showRelatedDataTab" style="height:100%;" label="Related Data">
+                <dt-relate-data-tab [relatedTopics]="relatedTopics" [relatedObjects]="relatedObjects" >
+                </dt-relate-data-tab>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+    <div>
+        <save-footer (saveClicked)="save()"
+                     [disableSave]="this.dtOverviewForm.invalid"
+                     [dirty]="this.dtOverviewForm.dirty"></save-footer>
+    </div>
+
+</div>

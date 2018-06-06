@@ -35,7 +35,7 @@ import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {DialogsModule} from "../util/popup/dialogs.module";
 import {AnalysisOverviewModule} from "./analysis-overview/analysis-overview.module";
-import {AnalysisDetailComponent} from "./analysis-detail/analysis-detail.component";
+import {AnalysisDetailModule} from "./analysis-detail/analysis-detail.module";
 
 /**
  * @author jdewell
@@ -69,15 +69,15 @@ import {AnalysisDetailComponent} from "./analysis-detail/analysis-detail.compone
         WindowModule,
         ReactiveFormsModule,
         AngularSplitModule,
-        AnalysisOverviewModule
+        AnalysisOverviewModule,
+        AnalysisDetailModule
             ],
     declarations: [
         BrowseAnalysisComponent,
         DeleteAnalysisComponent,
         DragDropHintComponent,
         CreateAnalysisComponent,
-        CreateAnalysisGroupComponent,
-        AnalysisDetailComponent
+        CreateAnalysisGroupComponent
     ],
     entryComponents: [DeleteAnalysisComponent, DragDropHintComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent],
     exports: [DeleteAnalysisComponent, DragDropHintComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent]

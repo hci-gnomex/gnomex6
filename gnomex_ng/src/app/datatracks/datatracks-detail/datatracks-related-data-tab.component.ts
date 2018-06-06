@@ -63,9 +63,6 @@ export class DatatracksRelatedDataTabComponent implements OnInit, AfterViewInit{
     @ViewChild('aTree') private aTreeComponent: TreeComponent;
 
 
-    // if both grids are showing:
-    extraClass: string = 'half-width';
-
 
     @Input() set relatedTopics(val:any){
         this._relatedTopics = val;
