@@ -149,6 +149,12 @@ public class SaveWorkItemSolexaPrep extends GNomExCommand implements Serializabl
                       // ILLSEQQC
                       if(workItem.getCodeStepNext().equals(Step.SEQ_PREP)) {
                         codeStepNext = Step.SEQ_PREP_QC;
+                      } else if (workItem.getCodeStepNext().equals(Step.HISEQ_PREP)) {
+                        codeStepNext = Step.HISEQ_PREP_QC;
+                      } else if (workItem.getCodeStepNext().equals(Step.MISEQ_PREP)) {
+                        codeStepNext = Step.MISEQ_PREP_QC;
+                      } else if (workItem.getCodeStepNext().equals(Step.NOSEQ_PREP)) {
+                        codeStepNext = Step.NOSEQ_PREP_QC;
                       } else {
                         codeStepNext = Step.ILLSEQ_PREP_QC;
                       }

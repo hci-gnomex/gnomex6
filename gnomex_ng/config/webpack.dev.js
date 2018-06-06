@@ -4,6 +4,7 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var helpers = require("./helpers");
 const LoaderOptionsPlugin = require("webpack/lib/LoaderOptionsPlugin");
 var webpackMerge = require("webpack-merge");
+var Visualizer = require('webpack-visualizer-plugin');
 
 const ENV = process.env.NODE_ENV = process.env.ENV = "development";
 
@@ -28,6 +29,8 @@ module.exports = function (options) {
 
         plugins: [
             new ExtractTextPlugin("[name].css"),
+
+            new Visualizer(),
 
             new LoaderOptionsPlugin({
                 debug: true,

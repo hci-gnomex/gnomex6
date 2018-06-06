@@ -21,7 +21,6 @@ import java.util.*;
 
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import javax.servlet.http.HttpSession;
 
 import hci.gnomex.utility.Workflow;

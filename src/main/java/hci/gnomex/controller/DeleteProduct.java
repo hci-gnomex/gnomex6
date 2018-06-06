@@ -9,7 +9,9 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;
 import hci.gnomex.model.Product;
@@ -107,7 +109,8 @@ public class DeleteProduct extends GNomExCommand implements Serializable {
       return null;
     }
     String billingItemQuery = "SELECT bi from BillingItem as bi where bi.idPrice=" + price.getIdPrice();
-    return sess.createQuery( billingItemQuery ).list();
+    List bi = sess.createQuery( billingItemQuery ).list();
+    return bi;
   }
 
   private void inactivatePrice(Price price, Session sess) {
@@ -121,7 +124,8 @@ public class DeleteProduct extends GNomExCommand implements Serializable {
       return null;
     }
     String ledgerEntryQuery = "SELECT le from ProductLedger as le where le.idProduct=" + product.getIdProduct();
-    return sess.createQuery( ledgerEntryQuery ).list();
+    List le = sess.createQuery( ledgerEntryQuery ).list();
+    return le;
   }
 
   private void inactivateProduct(Product product, Session sess) {

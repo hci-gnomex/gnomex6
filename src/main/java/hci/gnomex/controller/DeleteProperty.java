@@ -12,7 +12,9 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Property;
 import hci.gnomex.model.PropertyEntry;
@@ -59,8 +61,8 @@ public class DeleteProperty extends GNomExCommand implements Serializable {
   }
 
   public Command execute() throws RollBackCommandException {
-    Session sess;
-    Property property;
+    Session sess = null;
+    Property property = null;
 
     Integer nonBlankSampleCount = 0;
     Integer nonBlankAnalysisCount = 0;

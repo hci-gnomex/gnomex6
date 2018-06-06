@@ -1,6 +1,7 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.model.*;
 import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
@@ -14,7 +15,7 @@ import hci.gnomex.utility.AnalysisGroupParser;
 import hci.gnomex.utility.AnalysisHybParser;
 import hci.gnomex.utility.AnalysisLaneParser;
 import hci.gnomex.utility.AnalysisSampleParser;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.PropertyOptionComparator;
 import hci.gnomex.utility.RequestParser;
@@ -89,6 +90,7 @@ private String newAnalysisGroupName;
 private String newAnalysisGroupDescription;
 private Integer newAnalysisGroupId = new Integer(-1);
 
+private boolean isLinkBySample = false;
 private boolean isBatchMode = false;
 private String organism;
 private String genomeBuild;
@@ -122,7 +124,7 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			&& !request.getParameter("analysisGroupsXMLString").equals("")) {
 		analysisGroupsXMLString = request.getParameter("analysisGroupsXMLString");
 
-		System.out.println("[SaveAnalysis] ****************** analysisGroupsXMLString: " + analysisGroupsXMLString);
+		// System.out.println("[SaveAnalysis] analysisGroupsXMLString: " + analysisGroupsXMLString);
 
 		reader = new StringReader(analysisGroupsXMLString);
 		try {
@@ -168,6 +170,13 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		}
 	}
 
+	if(request.getParameter("linkBySample") != null && request.getParameter("isBatchMode").equals("Y")){
+		isLinkBySample = true;
+	}
+
+	// Please look at this closely, if doing a batch mode createanalysis we are hiding the experiments
+	// passed with the -experiment argument in lanesXMLString
+	// WATCHOUT
 	if (request.getParameter("lanesXMLString") != null && !request.getParameter("lanesXMLString").equals("")) {
 		lanesXMLString = request.getParameter("lanesXMLString");
 	} else if (request.getParameter("experimentsXMLString") != null
@@ -330,7 +339,7 @@ public Command execute() throws RollBackCommandException {
 				hybParser.parse(sess);
 			}
 			if (laneParser != null) {
-				laneParser.parse(sess, isBatchMode);
+				laneParser.parse(sess, isBatchMode, isLinkBySample);
 			}
 			if (sampleParser != null) {
 				sampleParser.parse(sess);
@@ -478,26 +487,7 @@ public Command execute() throws RollBackCommandException {
 				}
 			}
 			if (laneParser != null) {
-				for (Iterator i = laneParser.getIdSequenceLanes().iterator(); i.hasNext();) {
-					Integer idSequenceLane = (Integer) i.next();
-					AnalysisExperimentItem experimentItem = null;
-					// The experiment item may already exist; if so, just
-					// save it.
-					for (Iterator i1 = analysis.getExperimentItems().iterator(); i1.hasNext();) {
-						AnalysisExperimentItem x = (AnalysisExperimentItem) i1.next();
-						if (x.getIdSequenceLane() != null && x.getIdSequenceLane().equals(idSequenceLane)) {
-							experimentItem = x;
-							break;
-						}
-					}
-					if (experimentItem == null) {
-						experimentItem = new AnalysisExperimentItem();
-						experimentItem.setIdAnalysis(analysis.getIdAnalysis());
-						experimentItem.setIdSequenceLane(idSequenceLane);
-						experimentItem.setIdRequest(laneParser.getIdRequest(idSequenceLane));
-					}
-					experimentItems.add(experimentItem);
-				}
+				addExperimentItem(laneParser, isLinkBySample,experimentItems,analysis);
 			}
 			if (sampleParser != null) {
 				for (Iterator<Integer> i = sampleParser.getIdSamples().iterator(); i.hasNext();) {
@@ -689,7 +679,54 @@ public Command execute() throws RollBackCommandException {
 	return this;
 }
 
-public void setVisibility(Session sess, Analysis analysis) {
+	private void addExperimentItem(AnalysisLaneParser laneParser, boolean isLinkBySample, TreeSet experimentItems, Analysis analysis) {
+		List linkerList = null;
+
+		if(isLinkBySample){
+			linkerList = laneParser.getIdSamples();
+		}else{
+			linkerList = laneParser.getIdSequenceLanes();
+		}
+
+		for (Iterator i = linkerList.iterator(); i.hasNext();) {
+			Integer id = (Integer) i.next();
+			AnalysisExperimentItem experimentItem = null;
+			// The experiment item may already exist; if so, just
+			// save it.
+			for (Iterator i1 = analysis.getExperimentItems().iterator(); i1.hasNext();) {
+				AnalysisExperimentItem x = (AnalysisExperimentItem) i1.next();
+				if(isLinkBySample){
+					if (x.getIdSample() != null && x.getIdSample().equals(id)) {
+						experimentItem = x;
+						break;
+					}
+				}else{
+					if (x.getIdSequenceLane() != null && x.getIdSequenceLane().equals(id)) {
+						experimentItem = x;
+						break;
+					}
+				}
+
+			}
+			if (experimentItem == null) {
+				experimentItem = new AnalysisExperimentItem();
+				if(isLinkBySample){
+					experimentItem.setIdAnalysis(analysis.getIdAnalysis());
+					experimentItem.setIdSample(id);
+					experimentItem.setIdRequest(laneParser.getIdRequest(id));
+				}else{
+					experimentItem.setIdAnalysis(analysis.getIdAnalysis());
+					experimentItem.setIdSequenceLane(id);
+					experimentItem.setIdRequest(laneParser.getIdRequest(id));
+
+				}
+			}
+			experimentItems.add(experimentItem);
+		}
+
+	}
+
+	public void setVisibility(Session sess, Analysis analysis) {
 	if (visibility != null && visibility.length() > 0) {
 		analysis.setCodeVisibility(visibility);
 		analysis.setIdInstitution(idInstitution);

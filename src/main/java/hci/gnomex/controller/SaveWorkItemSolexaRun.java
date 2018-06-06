@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.FlowCellChannel;
@@ -11,7 +13,7 @@ import hci.gnomex.model.Step;
 import hci.gnomex.model.WorkItem;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.WorkItemSolexaRunParser;
 
 import java.io.Serializable;
@@ -112,10 +114,16 @@ public class SaveWorkItemSolexaRun extends GNomExCommand implements Serializable
               // Create work item for data pipeline
               if (channel.getLastCycleDate() != null) {
                 WorkItem wi = new WorkItem();
-                String codeStepNext;
-                // ILLSEQ
+                String codeStepNext = "none";
                 if(workItem.getCodeStepNext().equals(Step.SEQ_RUN)) {
                   codeStepNext = Step.SEQ_DATA_PIPELINE;
+                } 
+		else if (workItem.getCodeStepNext().equals(Step.HISEQ_RUN)) {
+                  codeStepNext = Step.HISEQ_DATA_PIPELINE;
+                } else if (workItem.getCodeStepNext().equals(Step.MISEQ_RUN)) {
+                  codeStepNext = Step.MISEQ_DATA_PIPELINE;
+                } else if (workItem.getCodeStepNext().equals(Step.NOSEQ_RUN)) {
+                  codeStepNext = Step.NOSEQ_DATA_PIPELINE;
                 } else {
                   codeStepNext = Step.ILLSEQ_DATA_PIPELINE;
                 }

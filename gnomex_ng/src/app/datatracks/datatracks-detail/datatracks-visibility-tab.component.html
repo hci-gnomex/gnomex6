@@ -1,6 +1,6 @@
 <form [formGroup]="visibilityForm" style="display:flex;flex-direction: column;">
     <div style="display: flex; flex-direction: column">
-        <label style="font-size: small; font-style: italic">
+        <label class="gx-label">
             Select the level of visibility:
         </label>
         <mat-radio-group class="flexbox-column"  formControlName="codeVisibility" (change)="updateCollaborators()" >
@@ -12,7 +12,7 @@
     </div>
 
     <div style="margin-top: 1em; display: flex; flex-direction: column;">
-        <label style="font-size: small; font-style: italic"> Individual collaborators allowed access to this data track  </label>
+        <label class="gx-label"> Individual collaborators allowed access to this data track  </label>
 
         <div>
             <mat-form-field style="width:30%" >

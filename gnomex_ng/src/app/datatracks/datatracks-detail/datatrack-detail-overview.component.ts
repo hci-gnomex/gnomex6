@@ -1,48 +1,28 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, OnDestroy, OnInit} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
-import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
+import {ConstantsService} from "../../services/constants.service";
+import {GnomexService} from "../../services/gnomex.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {HttpParams} from "@angular/common/http";
+import {MatDialog, MatDialogRef} from "@angular/material";
+import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
+import {DatatracksSummaryTabComponent} from "./datatracks-summary-tab.component";
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
+import {DatatracksVisibilityTabComponent} from "./datatracks-visibility-tab.component";
+import {FormGroup} from "@angular/forms";
 
 
 
 
 
 @Component({
-    template: `
-        <div style="display:flex; flex-direction:column; height:100%; width:100%;">
-            <!--  <img [src]="dtService.datatrackListTreeNode.icon">Genome Build: -->
-            <div style="padding-bottom: .5em;padding-left:1em;">
-
-                {{"test"}}
-            </div>
-            <div style="display:flex; flex: 1;">
-
-                <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border"
-                               (selectedTabChange)="tabChanged($event)">
-                    <mat-tab style="height:100%" label="Summary">
-                        <dt-summary-tab></dt-summary-tab>
-                    </mat-tab>
-                    <mat-tab style="height:100%" label="Annotations">
-                        <dt-annotation-tab [annotations]="annotations"></dt-annotation-tab>
-                    </mat-tab>
-                    <mat-tab style="height:100%;" label="Visibility">
-                        <dt-visibility-tab></dt-visibility-tab>
-                    </mat-tab>
-                </mat-tab-group>
-            </div>
-            <div>
-                <save-footer (saveClicked)="save()"
-                             [disableSave]="this.dtOverviewService.dtOverviewForm.invalid"
-                             [dirty]="this.dtOverviewService.dtOverviewForm.dirty"></save-footer>
-            </div>
-            
-        </div>
-`,
+    templateUrl:'./datatrack-detail-overview.component.html',
 
     styles: [`
 
@@ -59,46 +39,267 @@ import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.servic
 
 `]
 })
-export class DatatracksDetailOverviewComponent implements OnInit, OnDestroy{
+export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit, OnDestroy{
+    private dtOverviewForm:FormGroup;
     private datatrack: any;
+    private datatrackFiles: Array<any> ;
+    private datatrackDirectory:any;
     private annotations: IAnnotation[];
+    public relatedObjects: any;
+    public relatedTopics: any;
+    public showRelatedDataTab:boolean = false;
+    public showDownloadLink:boolean = false;
+    public showUCSC:boolean = false;
+    public showIGV: boolean = true;
+    public showIOBIO: boolean = false;
+    public showLink: boolean = false;
+    public showSpinner:boolean = false;
+    private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
+    public types = OrderType;
+    @ViewChild(DatatracksSummaryTabComponent) summaryComponet:DatatracksSummaryTabComponent;
+    @ViewChild(AnnotationTabComponent) annotationComponent:AnnotationTabComponent;
+    @ViewChild(DatatracksVisibilityTabComponent) visibilityComponent: DatatracksVisibilityTabComponent;
+
 
     constructor(private dataTrackService:DataTrackService,private route:ActivatedRoute,
-                public dtOverviewService: DatatrackDetailOverviewService){
+                public constService: ConstantsService,
+                private gnomexService: GnomexService,
+                private dialogService: DialogsService,
+                private dialog: MatDialog,){
     }
 
     ngOnInit(){
 
+        console.log(this.dataTrackService.datatrackListTreeNode);
+
         this.route.data.forEach(data =>{
-           this.datatrack =  data.datatrack;
-           if(this.datatrack){
-               let annots = this.datatrack.DataTrackProperties;
-               if(annots){
-                   this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
-                   for(let i = 0; i < this.annotations.length; i++){
-                       let propertyOptions = this.annotations[i].PropertyOption;
-                       if(propertyOptions){
-                           this.annotations[i].PropertyOption =  Array.isArray(propertyOptions)? propertyOptions :  <IAnnotationOption[]>[propertyOptions];
-                       }
-                   }
-               }else{
-                   this.annotations = [];
-               }
+            this.datatrack =  data.datatrack;
+            this.initLinkVisibility();
+            this.dtOverviewForm = new FormGroup({});
+            setTimeout(()=>{
+                this.dtOverviewForm.addControl("summaryForm", this.summaryComponet.summaryFormGroup);
+                this.dtOverviewForm.addControl("annotationForm", this.annotationComponent.annotationForm);
+                this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
+                this.dtOverviewForm.markAsPristine();
+            });
 
-           }else{
+
+
+            this.showDownloadLink = data.fromTopic ? data.fromTopic : false;
+            if(this.datatrack){
+                let annots = this.datatrack.DataTrackProperties;
+                this.showRelatedDataTab = this.initRelatedData(this.datatrack);
+
+                if(annots){
+                    this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
+                    for(let i = 0; i < this.annotations.length; i++){
+                        let propertyOptions = this.annotations[i].PropertyOption;
+                        if(propertyOptions){
+                            this.annotations[i].PropertyOption =  Array.isArray(propertyOptions)? propertyOptions :  <IAnnotationOption[]>[propertyOptions];
+                        }
+                    }
+                }else{
+                    this.annotations = [];
+                }
+
+            }else{
                 this.annotations = [];
-           }
-
-
+                this.relatedObjects = [];
+                this.relatedTopics = [];
+            }
 
         })
 
 
     }
+
+    ngAfterViewInit(){
+
+    }
+
+    initLinkVisibility(){
+        if(this.datatrack.Files){
+            let ucscLinkFile:string = '';
+
+            this.datatrackDirectory = this.datatrack.Files.Dir;
+            if(this.datatrackDirectory){
+                ucscLinkFile = this.datatrack.Files.Dir.ucscLinkFile
+            }
+            this.datatrackFiles = this.gnomexService.getFiles(this.datatrack.Files);
+            this.showUCSC = ucscLinkFile != 'none' && this.datatrackFiles.length > 0;
+            this.showIOBIO = this.datatrackFiles.length > 0;
+            this.showLink = this.datatrackFiles.length > 0;
+
+        }
+
+
+
+    }
+
+    initRelatedData(datatrack:any):boolean {
+        this.relatedObjects = datatrack.relatedObjects;
+        this.relatedTopics = datatrack.relatedTopics;
+        if(this.relatedObjects){
+            let analysis:Array<any> = this.relatedObjects.Analysis;
+            if(analysis){
+                this.relatedObjects.Analysis = Array.isArray(analysis) ? analysis : [analysis];
+            }else{
+                this.relatedObjects.Analysis = [];
+            }
+
+        }
+        if(this.relatedTopics){
+            let topics:Array<any> = this.relatedTopics.Topic;
+            if(topics){
+                this.relatedTopics.Topic = Array.isArray(topics) ? topics : [topics];
+            }else{
+                this.relatedTopics.Topic = [];
+            }
+        }
+
+        return (this.relatedTopics.Topic.length > 0 || this.relatedObjects.Analysis.length > 0 );
+
+    }
+
+    makeUCSCLink(){
+        this.showSpinner = true;
+        let params: HttpParams = new HttpParams().set("idDataTrack", this.datatrack.idDataTrack);
+
+        if(this.datatrackDirectory){
+            if(this.datatrackDirectory.ucscLinkFile === 'convert'){
+                this.dialogService.alert("Patience, converting useq to bw/bb format.");
+            }
+        }
+
+        this.dataTrackService.makeUCSCLinks(params).first().subscribe(resp => {
+                if(resp && resp.result && resp.result === "SUCCESS"){
+                    console.log(resp.ucscURL1);
+                    window.open(resp.ucscURL1, "_blank");
+
+                }else{
+
+                    let message: string = "";
+                    if (resp && resp.message) {
+                        message = ": " + resp.message;
+                    }
+                    this.dialogService.confirm("An error occurred while making link. " + message, null);
+                }
+            });
+    }
+    makeIGVLink(){
+        this.showSpinner = true;
+
+        let IGVLinkCallBack = (resp):void =>{
+            console.log("I am the response ", resp);
+            if(resp && resp.result && resp.result === "SUCCESS" ){
+                this.dialogService.confirm(resp.igvURL,null);
+
+            }else{
+                let message: string = "";
+                if (resp && resp.message) {
+                    message = ": " + resp.message;
+                }
+                this.dialogService.confirm("An error occurred while making link. " + message, null);
+
+            }
+            this.showSpinner = false;
+        };
+
+        if(this.datatrackDirectory){
+            if(this.datatrackDirectory.ucscLinkFile === 'convert'){
+                this.dialogService.confirm("Creating an IGV data repository containing all user-visible datatracks affiliated with IGV-supported genome builds. " +
+                    "If there are unconverted USeq files, this can take a significant amount of time.  When finished, a URL link will be displayed. " +
+                    "Paste the link into IGV's Data Registry URL field.  If new data tracks are added, a new repository must be created, but the " +
+                    "link will remain valid.","Do you wish to continue?").first().subscribe((answer:boolean) =>{
+                        if(answer) {
+                            this.dataTrackService.makeIGVLink().first().subscribe(IGVLinkCallBack);
+                        }
+                    });
+            }
+        }
+        this.dataTrackService.makeIGVLink().first().subscribe(IGVLinkCallBack);
+
+
+    }
+    makeIOBIOLink(){
+        this.showSpinner = true;
+        let params: HttpParams = new HttpParams().set("requestType" ,"IOBIO")
+            .set("idDataTrack", this.datatrack.idDataTrack);
+
+        this.dataTrackService.makeIOBIOLink(params).first().subscribe( resp =>{
+            if(resp && resp.result && resp.result === "SUCCESS"){
+                window.open(resp.urlsToLink, "_blank");
+
+            }else{
+                let message: string = "";
+                if (resp && resp.message) {
+                    message = ": " + resp.message;
+                }
+                this.dialogService.confirm("An error occurred while making link. " + message, null);
+            }
+            this.showSpinner = false;
+
+        })
+
+
+
+    }
+    makeURLLink(){
+
+        this.showSpinner = true;
+        let params: HttpParams = new HttpParams().set("idDataTrack", this.datatrack.idDataTrack);
+
+        this.dataTrackService.makeURLLink(params).first().subscribe( resp =>{
+            if(resp && resp.result && resp.result === "SUCCESS"){
+                this.dialogService.confirm(resp.urlsToLink,null);
+
+            }else{
+                let message: string = "";
+                if (resp && resp.message) {
+                    message = ": " + resp.message;
+                }
+                this.dialogService.confirm("An error occurred while making link. " + message, null);
+            }
+            this.showSpinner = false;
+
+        })
+    }
+
+    destroyLinks():void{
+        this.showSpinner = true;
+        this.dataTrackService.destroyLinks().first()
+            .subscribe(resp =>{
+                if(resp && resp.result && resp.result === "SUCCESS"){
+                    this.dialogService.confirm("All Links Destroyed.",null);
+
+                }else{
+                    this.dialogService.confirm("Failed to delete links. Contact site admin.", null);
+                }
+                this.showSpinner = false;
+            });
+    }
+
+    shareableLink(): void{
+        this.shareWebLinkDialogRef = this.dialog.open(ShareLinkDialogComponent, {
+            width: '35em',
+            data: {
+                name: this.datatrack.name,
+                number: this.datatrack.number,
+                type: "dataTrackNumber"
+
+
+            }
+        });
+    }
+
+
+
+
+
     ngOnDestroy(){
     }
     save(){
-        console.log(this.dtOverviewService.dtOverviewForm);
+        console.log(this.dtOverviewForm);
     }
 
     tabChanged(event:any){

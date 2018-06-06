@@ -9,7 +9,8 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.UCSCLinkFiles;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.BufferedReader;
@@ -29,6 +30,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +62,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 	LOG.error("Post not implemented");
 }
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	String serverName = req.getServerName();
 	Session sess = null;
@@ -162,42 +166,49 @@ private String linkContents(String path, DataTrackFolder folder, int depth, Sess
 
 }
 
-public void execute(HttpServletResponse res, String serverName, SecurityAdvisor secAdvisor, Session sess, String username) throws RollBackCommandException {
+public void execute(HttpServletResponse res, String serverName, SecurityAdvisor secAdvisor, Session sess, String username) throws RollBackCommandException, IOException {
 	try {
 		String baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 				PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
+		System.out.println ("[MakeDataTrackIGVLink] (1) baseDir: " + baseDir);
 		String analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 				PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+		System.out.println ("[MakeDataTrackIGVLink] analysisBaseDir: " + analysisBaseDir);
 		String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
 		if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
 			analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
 					PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,username);
+			System.out.println ("[MakeDataTrackIGVLink] ALTERNATE analysisBaseDir: " + analysisBaseDir);
 		}
 
 		String dataTrackFileServerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(
 				PropertyDictionary.DATATRACK_FILESERVER_URL);
+		System.out.println ("[MakeDataTrackIGVLink] dataTrackFileServerURL: " + dataTrackFileServerURL);
 		String dataTrackFileServerWebContext = PropertyDictionaryHelper.getInstance(sess).getProperty(
 				PropertyDictionary.DATATRACK_FILESERVER_WEB_CONTEXT);
+		System.out.println ("[MakeDataTrackIGVLink] dataTrackFileServerWebContext: " + dataTrackFileServerWebContext);
 
 		// We have to serve files from Tomcat, so use das2 base url
 		String baseURL = dataTrackFileServerURL + Constants.FILE_SEPARATOR;
-
+		System.out.println ("[MakeDataTrackIGVLink] baseURL: " + baseURL);
 		// If the user already has a directory, get the existing name and destroy everything beneath it. This way,
 		// existing path still work. This will be nice if we set up a cron job that automatically populates these directories
 		// If the user doesn't have a directory, a new random string will be created.
 		File linkDir = checkIGVLinkDirectory(baseDir, dataTrackFileServerWebContext);
 		String linkPath = this.checkForIGVUserFolderExistence(linkDir, username);
-
+		System.out.println ("[MakeDataTrackIGVLink] linkPath: " + linkPath);
 		if (linkPath == null) {
 			linkPath = UUID.randomUUID().toString() + username;
+			System.out.println ("[MakeDataTrackIGVLink] (2) linkPath: " + linkPath);
 		}
 
 		// Create the users' data directory
 		File dir = new File(linkDir.getAbsoluteFile(), linkPath);
 		dir.mkdir();
 		String rootPath = dir.getAbsolutePath().replace("\\", Constants.FILE_SEPARATOR); // Path via server
+		System.out.println ("[MakeDataTrackIGVLink] rootPath: " + rootPath);
 		String htmlPath = dataTrackFileServerURL + Constants.IGV_LINK_DIR_NAME + Constants.FILE_SEPARATOR + linkPath + Constants.FILE_SEPARATOR; // Path wia web
-
+		System.out.println ("[MakeDataTrackIGVLink] htmlPath: " + htmlPath);
 		// Clear out links to make
 		ArrayList<String[]> linksToMake = new ArrayList<String[]>();
 
@@ -241,6 +252,11 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 
 				// Create data repository
 				String result = this.linkContents(rootPath, rootFolder, 1, sess, baseURL, baseDir, analysisBaseDir, secAdvisor, linksToMake);
+				String shortresult = result;
+				if (shortresult.length() > 300) {
+					shortresult = shortresult.substring(0,300);
+				}
+				System.out.println ("[MakeDataTrackIGVLink] result(short): " + shortresult);
 
 				// If there was a result, create the repository file and add to registry.
 				if (!result.equals("")) {
@@ -303,18 +319,41 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 						"Launch IGV and replace the default Data Registry URL (View->Preferences->Advanced) with the following link: \n\n");
 
 				StringBuilder sbo = new StringBuilder(preamble + htmlPath + "igv_registry_$$.txt");
+				JsonObject value = Json.createObjectBuilder()
+						.add("result", "SUCCESS")
+						.add("igvURL", sbo.toString())
+						.build();
+				JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 
-				res.setContentType("application/xml");
-				res.getOutputStream().println("<SUCCESS igvURL=\"" + sbo.toString() + "\"/>");
+				res.setContentType("application/json");
+				jsonWriter.writeObject(value);
+				jsonWriter.close();
+
 			} else {
+
 				throw new Exception("Could not create IGV Links");
 			}
 		} else {
-			LOG.error("MakeDataTrackIGVLink -- No data tracks associated with this user!");
+			throw new Exception("No data tracks associated with this user!");
 		}
 
 	} catch (Exception e) {
 		LOG.error("An exception has occurred in MakeDataTrackIGVLinks ", e);
+
+		JsonObject value = Json.createObjectBuilder()
+				.add("result", "INVALID")
+				.add("message", e.getMessage())
+				.build();
+
+		JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
+
+		res.setContentType("application/json");
+		jsonWriter.writeObject(value);
+		jsonWriter.close();
+
+
+
+
 		throw new RollBackCommandException(e.getMessage());
 	}
 }
@@ -350,6 +389,7 @@ private void delete(File f) throws IOException {
 }
 
 private File checkIGVLinkDirectory(String baseURL, String webContextPath) throws Exception {
+	System.out.println ("[checkIGVLinkDirectory] baserURL " + baseURL + " webConextPath: " + webContextPath );
 	File igvLinkDir = new File(webContextPath, Constants.IGV_LINK_DIR_NAME);
 	igvLinkDir.mkdirs();
 	if (igvLinkDir.exists() == false)
@@ -366,6 +406,7 @@ private File checkIGVLinkDirectory(String baseURL, String webContextPath) throws
 		out.close();
 	}
 
+	System.out.println ("[checkIGVLinkDirectory] " +igvLinkDir );
 	return igvLinkDir;
 }
 
@@ -445,6 +486,8 @@ private String makeIGVLink(Session sess, DataTrack dataTrack, String directory, 
 
 private boolean makeSoftLinkViaUNIXCommandLine(String path, ArrayList<String[]> linksToMake) {
 	try {
+
+		System.out.println ("[makeSoftLinkViaUNIXCommandLine] path: " + path + " linksToMake.size: " + linksToMake.size());
 		File script = new File(path, "makeLinks.sh");
 		script.createNewFile();
 		BufferedWriter bw = new BufferedWriter(new FileWriter(script));

@@ -260,10 +260,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             if( this.analysisService.analysisPanelParams && this.analysisService.analysisPanelParams["refreshParams"]){ // if user is searching
 
                 let navArray: any[] = ['/analysis',{outlets:{'analysisPanel':'overview'}}];
-                if(this.navAnalysisGroupList){
-                    navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idLab"));
-                }
-
                 this.router.navigate(navArray);
                 this.analysisService.analysisPanelParams["refreshParams"] = false;
             }
@@ -288,10 +284,20 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             })
         });
 
-        this.route.data.forEach(data => { // when navigating through url or lookup
-            this.navAnalysisGroupList = data.analysisGroupList;
-            if(this.navAnalysisGroupList){
-                this.analysisService.emitAnalysisGroupList(this.navAnalysisGroupList);
+        this.navAnalysisGroupList = this.gnomexService.navInitBrowseAnalysisSubject.subscribe( orderInitObj => {
+            if(orderInitObj){
+                let ids: URLSearchParams = new URLSearchParams;
+                let idLab = this.gnomexService.orderInitObj.idLab;
+                let idAnalysisGroup = this.gnomexService.orderInitObj.idAnalysisGroup;
+
+                ids.set('idLab', idLab);
+                ids.set("searchPublicProjects", "Y");
+                ids.set("showCategory", "N");
+                ids.set("idAnalysisGroup", idAnalysisGroup);
+                ids.set("showSamples", "N");
+
+                this.analysisService.analysisPanelParams = ids;
+                this.analysisService.getAnalysisGroupList_fromBackend(ids);
             }
         });
 
@@ -579,7 +585,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysisGroup = false;
             this.disableDelete = true;
             navArray = ['/analysis',{outlets:{'analysisPanel':'overview'}}];
-            this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
 
 
             //AnalysisGroup
@@ -588,7 +593,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
             navArray = ['/analysis', {outlets:{'analysisPanel':['overview',{'idAnalysisGroup':idAnalysisGroup,'idLab':idLab}]}}];
-            this.analysisService.emitAnalysisOverviewList(analysisGroupListNode)
+
 
 
 
@@ -609,10 +614,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 }
             });
         }
-
-        if(this.navAnalysisGroupList){
-            navArray.splice(1, 0, +this.route.snapshot.paramMap.get("idLab"));
-        }
+        this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
         this.router.navigate(navArray);
 
     }

@@ -28,6 +28,16 @@ public class Step extends DictionaryEntry implements Serializable {
     public static final String   ILLSEQ_RUN                 = "ILLSEQRUN";
     public static final String   ILLSEQ_DATA_PIPELINE       = "ILLSEQPIPE";
 
+    public static final String   NOSEQ_QC                  = "NOSEQQC";
+    public static final String   NOSEQ_PREP                = "NOSEQPREP";
+    public static final String   NOSEQ_PREP_QC             = "NOSEQPREPQC";
+    public static final String   NOSEQ_CLUSTER_GEN         = "NOSEQASSEM";
+    public static final String   NOSEQ_FINALIZE_FC		   = "NOSEQFINFC";
+    public static final String   NOSEQ_RUN                 = "NOSEQRUN";
+    public static final String   NOSEQ_DATA_PIPELINE       = "NOSEQPIPE";
+
+
+
     public static final String   HISEQ_QC                  = "HSEQQC";
     public static final String   HISEQ_PREP                = "HSEQPREP";
     public static final String   HISEQ_PREP_QC             = "HSEQPREPQC";
@@ -40,7 +50,8 @@ public class Step extends DictionaryEntry implements Serializable {
     public static final String   MISEQ_PREP                = "MISEQPREP";
     public static final String   MISEQ_PREP_QC             = "MISEQPREPQC";
     public static final String   MISEQ_CLUSTER_GEN         = "MISEQASSEM";
-    public static final String   MISEQ_FINALIZE_FC		 = "MISEQFINFC";
+    public static final String   MISEQ_FINALIZE_FC		   = "MISEQFINFC";
+    public static final String   MISEQ_RUN                 = "MISEQRUN";
     public static final String   MISEQ_DATA_PIPELINE       = "MISEQPIPE";
 
     public static final String   ALL_PREP                = "ALLPREP";

@@ -11,6 +11,7 @@ import {Observable} from "rxjs/Observable";
 import {HttpClient, HttpParams, HttpResponse} from "@angular/common/http";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Router} from "@angular/router";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -94,7 +95,8 @@ export class GnomexService {
                 private authenticationService:AuthenticationService,
                 private launchPropertiesService: LaunchPropertiesService,
                 //private http:Http
-                private http:HttpClient) {
+                private http:HttpClient,
+                private router:Router) {
     }
 
     /* The header only uses this for displaying itself.
@@ -720,7 +722,7 @@ export class GnomexService {
     }
 
 
-    getOrderFromNumber(p:HttpParams) : Observable<any> {
+    public getOrderFromNumber(p:HttpParams) : Observable<any> {
         return this.http.get("/gnomex/GetGNomExOrderFromNumberServlet.gx",{params:p});
     }
 
@@ -755,5 +757,91 @@ export class GnomexService {
             this.seqLibProtocolsWithAppFilters.push(seq);
         }
     }
+
+    private recurseGetFiles(fileStruct : any, flattenedFiles: any[] ):void{
+        Object.keys(fileStruct).forEach(objName =>{
+            if(objName === 'File'){
+                let files = Array.isArray(fileStruct.File) ? fileStruct.File : [fileStruct.File];
+                for(let f of files){
+                    flattenedFiles.push(f);
+                }
+
+            }else if(objName === 'Dir'){
+                this.recurseGetFiles(fileStruct[objName], flattenedFiles);
+            }
+        });
+
+
+    }
+
+    /**
+     * Will flatten File structure to get you all files in every folder
+     * @params: {any}fileStruct
+     * @returns {any[]}
+     */
+    public getFiles(fileStruct:any) :any[]{
+        let flatFiles : any[] = [];
+        this.recurseGetFiles(fileStruct, flatFiles);
+        return flatFiles;
+
+
+    }
+
+    public navByNumber(number:string){
+        let params: HttpParams = new HttpParams();
+
+        if(number){
+            let match = number.match(/([A-Za-z]*)([0-9]+)([A-Za-z]?)/);
+            let path:Array<string> = [];
+
+            if( match[3].toUpperCase() === 'R'){
+                params = params.set("requestNumber", number);
+                //path = ["experiments","idProject","browsePanel","idRequest"];
+                path = ["experiments"];
+                let sub = this.navInitBrowseExperimentSubject;
+                this.getOrderID(params,path,sub);
+
+            }else if(match[1].toUpperCase() === 'A'){
+                params = params.set("analysisNumber", number);
+                //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
+                path = ["analysis"];
+                let sub = this.navInitBrowseAnalysisSubject;
+                this.getOrderID(params,path,sub);
+
+            }else if(match[1].toUpperCase()=== 'DT' ){
+                params = params.set("dataTrackNumber",number);
+                //path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
+                path = ["datatracks"];
+                let sub = this.navInitBrowseDatatrackSubject;
+                this.getOrderID(params,path,sub);
+            }else if(match[1].toUpperCase() === 'T'){
+                if(match[2]){
+                    params = params.set("topicNumber", match[2]);
+                }
+                //path = [ "topics","topicsPanel", "idLab" ] ;
+                path = [ "topics"] ;
+                let sub = this.navInitBrowseTopicSubject;
+                this.getOrderID(params,path,sub);
+            }
+
+        }
+    }
+
+    private getOrderID(params:HttpParams,path:string[],initOrderSubject:BehaviorSubject<any> ){
+        this.getOrderFromNumber(params).first().subscribe(data =>{
+            if(data.result === 'SUCCESS'){
+                this.orderInitObj = data;
+                this.orderInitObj.urlSegList = path;
+                let url = this.makeURL(this.orderInitObj);
+
+                this.router.navigateByUrl(url);
+                initOrderSubject.next(this.orderInitObj);
+
+            }else{
+                console.log(data.ERROR);
+            }
+        });
+    }
+
 
 }

@@ -91,17 +91,17 @@ public class UploadAndBroadcastEmailServlet extends HttpServlet {
 				throw new ServletException("Insufficent permissions");
 			}
 
-			// Get a list of all active users with email accounts for selected cores.
-			String appUserQueryString = "SELECT DISTINCT a from AppUser a join a.labs l join l.coreFacilities c "
-					+ " where a.isActive = 'Y' and a.email is not NULL and a.email != '' and c.idCoreFacility in (:ids) ORDER BY a.lastName, a.firstName ";
+		// Get a list of all active users with email accounts for selected cores.
+		String appUserQueryString = "SELECT DISTINCT a from AppUser a join a.labs l join l.coreFacilities c "
+				+ " where a.isActive = 'Y' and a.email is not NULL and a.email != '' and c.idCoreFacility in (:ids) ORDER BY a.lastName, a.firstName ";
 			ArrayList<Integer> coreIds = new ArrayList<>();
 
-			if (req.getParameter("coreFacilityIds") != null && !req.getParameter("coreFacilityIds").equals("")) {
-				String idsFromReq = req.getParameter("coreFacilityIds");
+		if (req.getParameter("coreFacilityIds") != null && !req.getParameter("coreFacilityIds").equals("")) {
+			String idsFromReq = req.getParameter("coreFacilityIds");
 				coreIds.addAll(this.parseCoreFacilityIDs(idsFromReq));
-			} else {
-				coreIds.add(-1);
-			}
+		} else {
+			coreIds.add(-1);
+		}
 
 			if (req.getParameter("body") != null && !req.getParameter("body").equals("")) {
 

@@ -6,7 +6,6 @@ import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {URLSearchParams} from "@angular/http";
 import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
-import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
 
 
 
@@ -30,8 +29,7 @@ export class DatatracksSummaryTabComponent implements OnInit, AfterViewInit{
 
 
     constructor(protected fb: FormBuilder,private dtService: DataTrackService,
-                private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService,
-                private dtOverviewService : DatatrackDetailOverviewService){
+                private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService){
     }
 
 
@@ -53,8 +51,6 @@ export class DatatracksSummaryTabComponent implements OnInit, AfterViewInit{
         }
 
 
-        this.dtOverviewService.addFormToParent("summaryFormGroup", this.summaryFormGroup);
-
         this.route.paramMap.forEach(params =>{
 
 
@@ -63,8 +59,6 @@ export class DatatracksSummaryTabComponent implements OnInit, AfterViewInit{
 
             this.summaryFormGroup.get("folderName").setValue(folderName);
             this.summaryFormGroup.get("summary").setValue(summary);
-            this.summaryFormGroup.markAsPristine();
-
         });
 
     }

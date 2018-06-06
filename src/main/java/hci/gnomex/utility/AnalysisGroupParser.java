@@ -27,13 +27,13 @@ public class AnalysisGroupParser extends DetailObject implements Serializable {
     
     Element root = this.doc.getRootElement();
     
-    if(		root.getChildren("analysisGroup").size() == 1 &&
-    		root.getChild("analysisGroup").getAttributeValue("idAnalysisGroup").equals("") &&
-    		root.getChild("analysisGroup").getAttributeValue("name").equals("")
+    if(		root.getChildren("AnalysisGroup").size() == 1 && 
+    		root.getChild("AnalysisGroup").getAttributeValue("idAnalysisGroup").equals("") && 
+    		root.getChild("AnalysisGroup").getAttributeValue("name").equals("")
     	) {    	
     		return;	//we have a Lab with no AnalysisGroups. Leave the analysisGroupMap empty.    	
     }else{    
-	    for(Iterator i = root.getChildren("analysisGroup").iterator(); i.hasNext();) {
+	    for(Iterator i = root.getChildren("AnalysisGroup").iterator(); i.hasNext();) {
 	      Element node = (Element)i.next();
 	      
 	      String idAnalysisGroupString = node.getAttributeValue("idAnalysisGroup");      

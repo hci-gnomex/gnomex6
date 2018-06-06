@@ -1,6 +1,9 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.model.RequestCategory;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
@@ -14,11 +17,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +26,11 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.apache.log4j.Logger;
+
+import org.jdom.Element;
+
+
+
 public class SaveOrganism extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
@@ -82,7 +86,7 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
 
       if (this.getSecurityAdvisor().hasPermission(SecurityAdvisor.CAN_SUBMIT_REQUESTS)) {
 
-        Organism o;
+        Organism o = null;
 
         if (isNewOrganism) {
           o = organismScreen;
@@ -152,7 +156,7 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
                 folder.setIdParentDataTrackFolder(null);
                 sess.save(folder);
 
-                Set<DataTrackFolder> foldersToKeep = new TreeSet<>(new DataTrackFolderComparator());
+                Set<DataTrackFolder> foldersToKeep = new TreeSet<DataTrackFolder>(new DataTrackFolderComparator());
                 foldersToKeep.add(folder);
                 genomeBuild.setDataTrackFolders(foldersToKeep);
                 sess.flush();
@@ -178,6 +182,7 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
             List genomeBuilds = sess.createQuery(query.toString()).list();
 
             if (!genomeBuilds.isEmpty()) {
+              Element gbEle = new Element("genomeBuilds");
               for (Iterator j = genomeBuilds.iterator(); j.hasNext();) {
                 GenomeBuild gb = (GenomeBuild) j.next();
                 if (!genomeBuildMap.containsKey(gb.getIdGenomeBuild())) {
@@ -230,4 +235,23 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
 
   }
 
+  private class OrganismComparator implements Comparator, Serializable {
+    public int compare(Object o1, Object o2) {
+      Organism org1 = (Organism) o1;
+      Organism org2 = (Organism) o2;
+
+      return org1.getIdOrganism().compareTo(org2.getIdOrganism());
+
+    }
+  }
+
+  private class RequestCategoryComparator implements Comparator, Serializable {
+    public int compare(Object o1, Object o2) {
+      RequestCategory rc1 = (RequestCategory) o1;
+      RequestCategory rc2 = (RequestCategory) o2;
+
+      return rc1.getCodeRequestCategory().compareTo(rc2.getCodeRequestCategory());
+
+    }
+  }
 }

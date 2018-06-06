@@ -2,20 +2,24 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import { Component, Input,OnDestroy, OnInit} from "@angular/core";
-import {DataTrackService} from "../../services/data-track.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {IAnnotation} from "../../util/interfaces/annotation.model";
-import {selectRequired} from "../../util/validators/select-required.validator";
+import {IAnnotation} from "./interfaces/annotation.model";
+import {selectRequired} from "./validators/select-required.validator";
 import {MatDialog, MatDialogRef} from "@angular/material";
-import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
-import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.service";
+import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
 
+export enum OrderType{
+    ANALYSIS = 'a',
+    DATATRACK = 'dt',
+    EXPERIMENT = 'e',
+    NONE = ''
+}
 
 
 
 @Component({
-    selector: 'dt-annotation-tab',
-    templateUrl: './datatracks-annotation-tab.component.html',
+    selector: 'annotation-tab',
+    templateUrl: './annotation-tab.component.html',
 
     styles: [`
 
@@ -32,29 +36,45 @@ import {DatatrackDetailOverviewService} from "./datatrack-detail-overview.servic
 
 `]
 })
-export class DatatracksAnnotationTabComponent implements OnInit, OnDestroy{
+export class AnnotationTabComponent implements OnInit, OnDestroy{
     public annotationForm: FormGroup;
     private _annotations: IAnnotation[];
+    private _disabled: boolean = false;
     private urlAnnotations: any[] = [];
+    private types = OrderType;
+
+    @Input() orderType = OrderType.NONE;
+    @Input() set disabled(value:boolean){
+        this._disabled = value;
+        if(this.annotationForm){
+            if(this._disabled){
+                this.annotationForm.disable()
+            }else{
+                this.annotationForm.enable();
+            }
+        }
+
+    }
 
     @Input() set annotations( a: IAnnotation[]){
         this._annotations = a;
         if(!this.annotationForm){
             this.annotationForm =  new FormGroup({});
-            this.dtOverviewService.addFormToParent("annotationForm", this.annotationForm);
-
         }
 
         this._annotations.forEach(annot => {
             this.annotationForm.addControl(annot.name, new FormControl());
 
-            if(annot.codePropertyType === 'MOPTION'){
+            if(annot.codePropertyType === 'TEXT'){
+                this.annotationForm.controls[annot.name].setValue(annot.value);
+            }else if(annot.codePropertyType === 'CHECK'){
+                this.annotationForm.controls[annot.name].setValue(annot.value === 'Y');
+            }else if(annot.codePropertyType === 'MOPTION'){
                 let split: string[] = annot.value.split(",");
                 this.annotationForm.controls[annot.name].setValue(annot.value ? split : []);
-            }else{
+            }else if(annot.codePropertyType === 'OPTION'){
                 this.annotationForm.controls[annot.name].setValue(annot.value ? annot.value : '');
-            }
-            if(annot.codePropertyType === 'URL'){
+            } else if(annot.codePropertyType === 'URL'){
                 this.initUrlAnnotations(annot.value)
             }
 
@@ -80,11 +100,15 @@ export class DatatracksAnnotationTabComponent implements OnInit, OnDestroy{
 
 
 
-    constructor(private dataTrackService:DataTrackService,private fb:FormBuilder,
-                private dialog: MatDialog,private dtOverviewService: DatatrackDetailOverviewService){
+    constructor(private dialog: MatDialog){
     }
 
     ngOnInit(){
+        if(this._disabled){
+            this.annotationForm.disable();
+        }else{
+            this.annotationForm.enable();
+        }
 
     }
 
@@ -93,7 +117,7 @@ export class DatatracksAnnotationTabComponent implements OnInit, OnDestroy{
         let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.dialog.open(ConfigAnnotationDialogComponent, {
             height: '980px',
             data: {
-                orderType: 'dt'
+                orderType: this.orderType
             }
         });
     }
@@ -134,3 +158,4 @@ export class DatatracksAnnotationTabComponent implements OnInit, OnDestroy{
 
 
 }
+

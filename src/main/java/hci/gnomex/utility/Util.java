@@ -507,7 +507,7 @@ public class Util {
         return theName;
     }
 
-    public static void createTransferLogFile (String taskFileDir, String uuidStr, StringBuilder filesToTransfer ) {
+    public static void createTransferLogFile (String taskFileDir, String uuidStr, StringBuilder filesToTransfer, String transferLogPath ) {
         String taskFileName = taskFileDir + "/" + "fdtDownloadTransferLog" + "_" + uuidStr;
         File taskFile;
         int numTries = 10;
@@ -546,6 +546,13 @@ public class Util {
             return;
         }
     }
+
+    public static String getCurrentDateString() {
+        Calendar runDate = Calendar.getInstance();
+        return new SimpleDateFormat("MM-dd-yyyy_HH:mm:ss").format(runDate.getTime());
+
+    }
+
 
     public static String getAnalysisDirectory(String baseDir, Analysis analysis) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy");

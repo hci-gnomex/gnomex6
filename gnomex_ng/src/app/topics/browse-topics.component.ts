@@ -648,7 +648,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         let name = this.selectedItem.displayField;
         let topicListNode = _.cloneDeep(this.selectedItem.data);
 
-        this.topicService.emitSelectedTreeNode(topicListNode);
+
 
         if(this.selectedItem.isRoot){
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
@@ -658,12 +658,18 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             let pathPair:string = '';
             if(this.selectedItem.data.idAnalysis){
                 pathPair = "analysis/" + this.selectedItem.data.idAnalysis;
+                this.analysisService.emitAnalysisOverviewList(topicListNode);
             }else if(this.selectedItem.data.idRequest){
                 pathPair = "experiment/" + this.selectedItem.data.idRequest;
+                this.experimentsService.emitExperimentOverviewList(topicListNode);
+
             }else if(this.selectedItem.data.idDataTrack){
                 pathPair = "datatrack/" + this.selectedItem.data.idDataTrack;
+                this.datatrackService.datatrackListTreeNode = topicListNode;
+
             }else if(this.selectedItem.data.idTopic){
                 pathPair =  this.selectedItem.data.idLab;
+                this.topicService.emitSelectedTreeNode(topicListNode);
 
             }
             if(pathPair){

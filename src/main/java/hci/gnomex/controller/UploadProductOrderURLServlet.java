@@ -19,7 +19,7 @@ import org.hibernate.Session;
 public class UploadProductOrderURLServlet extends HttpServlet {
 private static final Logger LOG = Logger.getLogger(UploadProductOrderURLServlet.class);
 
-protected void doGet(HttpServletWrappedRequest req, HttpServletResponse res) throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 	// Restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(req)) {

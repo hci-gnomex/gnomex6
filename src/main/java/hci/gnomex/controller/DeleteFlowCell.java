@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.FlowCell;
 import hci.gnomex.model.FlowCellChannel;
@@ -8,7 +10,7 @@ import hci.gnomex.model.SequenceLane;
 import hci.gnomex.model.WorkItem;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FlowCellChannelParser;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -78,10 +80,14 @@ public class DeleteFlowCell extends GNomExCommand implements Serializable {
 					wi.setSequenceLane(sl);
 					wi.setCreateDate(new Date(System.currentTimeMillis()));
 					wi.setIdCoreFacility(flowCell.getIdCoreFacility());
-                     // ILLSEQ
 
-
-					if(flowCell.getCodeSequencingPlatform().equals("ILLSEQ")) {
+                     if(flowCell.getCodeSequencingPlatform().equals("NOSEQ")) {
+                         wi.setCodeStepNext("NOSEQASSEM");
+                     } else if(flowCell.getCodeSequencingPlatform().equals("HISEQ")) {
+						wi.setCodeStepNext("HSEQASSEM");
+					} else if(flowCell.getCodeSequencingPlatform().equals("MISEQ")) {
+						wi.setCodeStepNext("MISEQASSEM");
+					} else if(flowCell.getCodeSequencingPlatform().equals("ILLSEQ")) {
 						wi.setCodeStepNext("ILLSEQASSEM");
 					} else {
 						throw new RollBackCommandException();

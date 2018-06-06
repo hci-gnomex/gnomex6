@@ -9,12 +9,13 @@ import {DATATRACKS_ROUTING} from "../datatracks.routes";
 import {ServicesModule} from "../../services/services.module";
 import {UtilModule} from "../../util/util.module";
 
-import {DatatracksDetailOverviewComponent,DatatracksAnnotationTabComponent,
-        DatatracksSummaryTabComponent,DatatrackDetailOverviewService,
-        DatatracksVisibilityTabComponent } from "./index"
+import {DatatracksDetailOverviewComponent,
+        DatatracksSummaryTabComponent,
+        DatatracksVisibilityTabComponent,DatatracksRelatedDataTabComponent } from "./index"
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
 import {RichEditorModule} from "../../../modules/rich-editor.module";
+import {TreeModule} from "angular-tree-component";
 
 
 
@@ -32,6 +33,7 @@ import {RichEditorModule} from "../../../modules/rich-editor.module";
         FormsModule,
         ServicesModule,
         RichEditorModule,
+        TreeModule,
         UtilModule,
         ReactiveFormsModule,
         ConfigureAnnotationsModule
@@ -39,13 +41,12 @@ import {RichEditorModule} from "../../../modules/rich-editor.module";
     ],
     declarations: [
         DatatracksDetailOverviewComponent,
-        DatatracksAnnotationTabComponent,
         DatatracksSummaryTabComponent,
-        DatatracksVisibilityTabComponent
+        DatatracksVisibilityTabComponent,
+        DatatracksRelatedDataTabComponent
 
     ],
-    entryComponents: [ConfigAnnotationDialogComponent],
-    providers: [DatatrackDetailOverviewService]
+    entryComponents: [ConfigAnnotationDialogComponent]
 })
 export class DatatracksDetailModule {
 }

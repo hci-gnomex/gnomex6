@@ -73,6 +73,22 @@ public class PropertyDictionaryHelper implements Serializable {
     return addFileSepIfNec(property);
   }
 
+  public String getSFTPDirectoryForGNomEx(String serverName) {
+    String property = "";
+    String propertyName = null;
+
+    // First use the property qualified by server name. If
+    // it isn't found, get the property without any qualification.
+    propertyName = PROPERTY_FDT_DIRECTORY_GNOMEX + "_" + serverName;
+    property = this.getProperty(propertyName);
+    if (property == null || property.equals("")) {
+      propertyName = PROPERTY_FDT_DIRECTORY_GNOMEX;
+      property = this.getProperty(propertyName);
+    }
+    return addFileSepIfNec(property);
+  }
+
+
   public String GetFDTDirectory(String serverName) {
     String property = "";
     String propertyName = null;
@@ -535,6 +551,7 @@ public class PropertyDictionaryHelper implements Serializable {
     String experimentAlias = "Experiment";
 
     PropertyDictionary propexperimentAlias = null;
+    String thePropertyAlias = "";
     if (idCoreFacility != null) {
       Query propSiteQuery = sess.createQuery("from PropertyDictionary p where p.propertyName=:propName AND p.idCoreFacility = :idCoreFacility");
       propSiteQuery.setParameter("propName", PropertyDictionary.EXPERIMENTALIAS);
@@ -552,6 +569,7 @@ public class PropertyDictionaryHelper implements Serializable {
         experimentAlias = propexperimentAlias.getPropertyValue();
       }
 
+//      System.out.println ("[getExperimentAlias] " + experimentAlias);
       return experimentAlias;
   }
 
