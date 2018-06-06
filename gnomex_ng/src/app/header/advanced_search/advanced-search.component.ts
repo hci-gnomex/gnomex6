@@ -24,6 +24,7 @@ import {DateRenderer} from "../../util/grid-renderers/date.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
 import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
 import {DateParserComponent} from "../../util/parsers/date-parser.component";
+import {GnomexService} from "../../services/gnomex.service";
 
 @Component({
     selector: 'advanced-search-component',
@@ -289,6 +290,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 private dialogRef: MatDialogRef<AdvancedSearchComponent>,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
+                private gnomexService: GnomexService,
                 private advancedSearchService: AdvancedSearchService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (data) {
@@ -1395,6 +1397,8 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 node.name = backEndData.displayName;
             }
 
+            node.destination = "" + backEndData.requestNumber;
+
             node.icon = '../../../assets/flask.png';
 
         } else {
@@ -1477,6 +1481,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             } else {
                 node.name = '' + backEndData.number + ' ' + backEndData.name;
             }
+            node.destination = "" + backEndData.number;
 
             node.icon = '../../../assets/map.png';
 
@@ -1653,6 +1658,8 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 node.name = backEndData.name;
             }
 
+            node.destination = "" + backEndData.number;
+
             if (backEndData.codeVisibility === 'MEM') {
                 node.icon = '../../../assets/datatrack_member.png';
             } else if (backEndData.codeVisibility === 'MEMCOL') {
@@ -1758,6 +1765,8 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 node.name = backEndData.name;
             }
 
+            node.destination = "T" + backEndData.idTopic;
+
             node.icon = '../../../assets/topic_tag.png';
 
         } else {
@@ -1787,7 +1796,9 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
 
     treeOnSelect(event: any) {
-        console.log("Selected " + event);
+        if (event && event.node && event.node.data && event.node.data.destination) {
+            this.gnomexService.navByNumber(event.node.data.destination);
+        }
     }
 
 
