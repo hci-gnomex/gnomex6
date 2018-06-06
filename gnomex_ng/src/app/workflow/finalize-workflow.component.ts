@@ -1,42 +1,69 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
-import {MatAutocomplete, MatAutocompleteTrigger, MatDialog, MatDialogRef, MatOption} from "@angular/material";
+import {MatAutocomplete, MatDialog, MatOption} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
 import {GridOptions} from "ag-grid";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
-import {DeleteSeqlaneDialogComponent} from "./delete-seqlane-dialog.component";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
+import {FilllikeTextRendererComponent} from "../util/grid-renderers/filllike-text-renderer.component";
 
 @Component({
-    selector: 'flowcellassm-workflow',
-    templateUrl: 'flowcellassm-workflow.html',
+    selector: 'finalizeFlowCell-workflow',
+    templateUrl: 'finalizeFlowCell-workflow.html',
     styles: [`
         .flex-column-container-workflow {
             display: flex;
             flex-direction: column;
             background-color: white;
-            height: 99%;
+            height: 100%;
             width: 100%;
         }
         .flex-column-container-outlet {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            height: 94%;
             width: 100%;
-            height: 86%;
         }
         .flex-row-container {
             display: flex;
             flex-direction: row;
         }
-        mat-form-field.formField {
-            width: 20%;
-            margin: 0 0.5%;
+        .flex-row-container-itailic {
+            display: flex;
+            flex-direction: row;
+            font-style: italic;
+            color: #1601db;
+        }
+        .flex-row-container-margin {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: .5em;
+            font-style: italic;
+            color: #1601db;        
+        }
+        .normal-text {
+            font-style: normal;
+            color: black;
+        }
+        .flex-row-container-end {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            margin-top: 1.2em;
+        }
+        .fill-flex-row {
+            height: 10em;
+            display: flex;
+            flex-direction: row;
         }
         .row-one {
             display: flex;
@@ -46,19 +73,6 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
             width: 50%;
             margin: 0 0.5%;
         }
-        .flex-row-container-margin {
-            display: flex;
-            flex-direction: row;
-            margin-bottom: .5em;
-            font-style: italic;
-            color: #1601db;
-        }
-        .justify-label-left {
-            justify-content: flex-end;
-            margin-left: 10em;
-            margin-top: .4em;
-            color: black;
-        }
         /* Needed to style split-gutter white */
         ::ng-deep split-gutter {
             background-color: white !important;
@@ -66,56 +80,60 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
     `]
 })
 
-export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
+export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild("autoProtocol") autoProtocolComplete: MatAutocomplete;
     @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
     @ViewChild("labInput") labInput: ElementRef;
 
-    private static readonly COLOR = '#f1eed6';
-    private static readonly OFFCOLOR = 'white';
     private workItemList: any[] = [];
     private assmItemList: any[] = [];
+    private flowCellChannels: any[] = [];
     private workingWorkItemList: any[] = [];
     private sequenceProtocolsList: any[] = [];
     private filteredProtocolsList: any[] = [];
+    private assmFlowCellNumber: number;
+    private flowCellNumber: string;
+    private flowCell: any;
+    private idFlowCell: string;
+    private codeSequencingPlatform: string;
+    private pipelineProtoList: any[] = [];
     private instrumentList: any[] = [];
     private cores: any[] = [];
     private columnDefs;
     private assmColumnDefs;
-    private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
-    private protocol: any;
     private selectedLab: any;
-    private core: any;
-    private previousProtocolMatOption: MatOption;
     private previousLabMatOption: MatOption;
     private gridApi;
     private gridColumnApi;
     private assmGridApi;
     private assmGridColumnApi;
     private barCodes: any[] = [];
-    private label = "Illumina Flow Cell Assembly";
+    private label = "Illumina Finalize Flow Cell";
     private searchText: string;
     private gridOptions:GridOptions = {};
     private assmGridOptions:GridOptions = {};
     private lanes: any[] = [];
-    private selectedSeqlanes: any[] = [];
-    private deleteSeqlaneDialogRef: MatDialogRef<DeleteSeqlaneDialogComponent>;
+    private selectedFlowCell: any[] = [];
     private emptyLab = {idLab: "0",
         name: ""};
+    private emptyPipe = {idPipelineProtocol: "",
+        protocol: ""};
     private labList: any[] = [];
-    private previousId: string = "";
-    private previousColor: string = "";
     public assmGridRowClassRules: any;
     private selectedFlowcellRequestType: string;
     private firstSelectedFlowcellRequestType: boolean = true;
+    private flowCellRunFolder: string;
+    private originalProtocol: any;
+    private hideFCConcen: boolean = true;
     public allFG: FormGroup;
     public barcodeFC: FormControl;
     public runFC: FormControl;
     public createDateFC: FormControl;
     public instrumentFC: FormControl;
     public protocolFC: FormControl;
+    public notes: string;
 
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
@@ -123,10 +141,10 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dictionaryService: DictionaryService) {
-        this.barcodeFC = new FormControl("");
-        this.runFC = new FormControl("");
+        this.barcodeFC = new FormControl("", Validators.required);
+        this.runFC = new FormControl("", Validators.required);
         this.createDateFC = new FormControl("");
-        this.instrumentFC = new FormControl("");
+        this.instrumentFC = new FormControl("", Validators.required);
         this.protocolFC = new FormControl("", Validators.required);
         this.allFG = new FormGroup({
             barCode: this.barcodeFC,
@@ -146,9 +164,9 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
 
     initialize() {
         let params: URLSearchParams = new URLSearchParams();
-        params.set("codeStepNext", this.workflowService.ILLSEQ_CLUSTER_GEN);
+        params.set("codeStepNext", this.workflowService.ILLSEQ_FINALIZE_FC);
         this.cores = [];
-        this.workflowService.getWorkItemList(params).subscribe((response: any) => {
+        this.workflowService.getFlowCellList(params).subscribe((response: any) => {
             if (response) {
                 this.workItemList = response;
                 if (!this.securityAdvisor.isArray(response)) {
@@ -156,28 +174,11 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 } else {
                     this.workItemList = response;
                 }
-                this.buildWorkItemList();
                 this.workingWorkItemList = this.workItemList;
+                this.assmFlowCellNumber = this.workingWorkItemList.length;
                 this.columnDefs = [
                     {
-                        headerName: "Select Lane #",
-                        editable: true,
-                        field: "flowCellChannelNumber",
-                        width: 110,
-                        cellRendererFramework: TextAlignLeftMiddleRenderer,
-                        cellEditorFramework: SeqlaneSelectEditor,
-                        selectOptions: this.lanes,
-                        selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "value",
-                        showFillButton: true,
-                        fillGroupAttribute: 'idRequest',
-                        cellStyle: function(params) {
-                            return {'font-size': '.70rem'};
-                        }
-
-                    },
-                    {
-                        headerName: "Experiment",
+                        headerName: "Flow Cell",
                         editable: false,
                         width: 100,
                         field: "number",
@@ -185,40 +186,31 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                         cellStyle: function(params) {
                             return {'font-size': '.70rem'};
                         }
+                    },
+                    {
+                        headerName: "Barcode",
+                        editable: false,
+                        width: 100,
+                        field: "barcode",
+                        cellRendererFramework: TextAlignLeftMiddleRenderer,
+                        cellStyle: function(params) {
+                            return {'font-size': '.70rem'};
+                        }
 
                     },
                     {
-                        headerName: "Index A",
+                        headerName: "Create Date",
                         editable: false,
                         width: 100,
-                        field: "idOligoBarcode",
-                        cellRendererFramework: SelectRenderer,
-                        cellEditorFramework: BarcodeSelectEditor,
-                        selectOptions: this.barCodes,
-                        selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "idOligoBarcode",
-                        indexTagLetter: 'A',
+                        field: "createDate",
+                        cellRendererFramework: TextAlignLeftMiddleRenderer,
                         cellStyle: function(params) {
                             return {'font-size': '.70rem'};
                         }
+
                     },
                     {
-                        headerName: "Index B",
-                        editable: false,
-                        width: 100,
-                        field: "idOligoBarcodeB",
-                        cellRendererFramework: SelectRenderer,
-                        cellEditorFramework: BarcodeSelectEditor,
-                        selectOptions: this.barCodes,
-                        selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "idOligoBarcodeB",
-                        indexTagLetter: 'B',
-                        cellStyle: function(params) {
-                            return {'font-size': '.70rem'};
-                        }
-                    },
-                    {
-                        headerName: "Library Protocol",
+                        headerName: "Sequencing Protocol",
                         editable: false,
                         width: 275,
                         field: "idNumberSequencingCyclesAllowed",
@@ -233,82 +225,16 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                             return {'font-size': '.70rem'};
                         }
                     },
-
-                ];
-                this.assmColumnDefs = [
                     {
-                        headerName: "Experiment",
+                        headerName: "Content",
                         editable: false,
                         width: 100,
-                        field: "number",
+                        field: "notes",
                         cellRendererFramework: TextAlignLeftMiddleRenderer,
                         cellStyle: function(params) {
                             return {'font-size': '.70rem'};
                         }
 
-                    },
-                    {
-                        headerName: "Lane",
-                        editable: true,
-                        field: "flowCellChannelNumber",
-                        width: 110,
-                        cellRendererFramework: TextAlignLeftMiddleRenderer,
-                        cellEditorFramework: SeqlaneSelectEditor,
-                        selectOptions: this.lanes,
-                        selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "value",
-                        showFillButton: true,
-                        fillGroupAttribute: 'idRequest',
-                        cellStyle: function(params) {
-                            return {'font-size': '.70rem'};
-                        }
-
-                    },
-                    {
-                        headerName: "Index A",
-                        editable: false,
-                        width: 100,
-                        field: "idOligoBarcode",
-                        cellRendererFramework: SelectRenderer,
-                        cellEditorFramework: BarcodeSelectEditor,
-                        selectOptions: this.barCodes,
-                        selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "idOligoBarcode",
-                        indexTagLetter: 'A',
-                        cellStyle: function(params) {
-                            return {'font-size': '.70rem'};
-                        }
-                    },
-                    {
-                        headerName: "Index B",
-                        editable: false,
-                        width: 100,
-                        field: "idOligoBarcodeB",
-                        cellRendererFramework: SelectRenderer,
-                        cellEditorFramework: BarcodeSelectEditor,
-                        selectOptions: this.barCodes,
-                        selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "idOligoBarcodeB",
-                        indexTagLetter: 'B',
-                        cellStyle: function(params) {
-                            return {'font-size': '.70rem'};
-                        }
-                    },
-                    {
-                        headerName: "Library Protocol",
-                        editable: false,
-                        width: 275,
-                        field: "idNumberSequencingCyclesAllowed",
-                        cellRendererFramework: SelectRenderer,
-                        cellEditorFramework: SelectEditor,
-                        selectOptions: this.sequenceProtocolsList,
-                        selectOptionsDisplayField: "name",
-                        selectOptionsValueField: "idNumberSequencingCyclesAllowed",
-                        showFillButton: true,
-                        fillGroupAttribute: 'idRequest',
-                        cellStyle: function(params) {
-                            return {'font-size': '.70rem'};
-                        }
                     },
 
                 ];
@@ -319,20 +245,112 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
 
     }
 
-    buildWorkItemList() {
-        let workItems: any[] = [];
-
-        for (let item of this.workItemList) {
-
-            if (!this.securityAdvisor.isArray(item.MultiplexLane)) {
-                item.MultiplexLane = [item.MultiplexLane];
-            }
-            for (let multiplex of item.MultiplexLane) {
-                workItems = workItems.concat(multiplex.WorkItem);
-            }
+    onCellValueChanged(event) {
+        for (let lane of this.assmItemList) {
+            lane.flowCellChannelSampleConcentrationpM = event.data.flowCellChannelSampleConcentrationpM;
         }
-        this.workflowService.assignBackgroundColor(workItems, "idRequest");
-        this.workItemList = workItems;
+        this.assmGridApi.redrawRows();
+    }
+
+    initializeAssm(): any[] {
+        let columnDefs: any[] = [];
+        columnDefs = [
+            {
+                headerName: "Experiment",
+                editable: false,
+                width: 90,
+                field: "number",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellStyle: function(params) {
+                    return {'font-size': '.70rem'};
+                }
+
+            },
+            {
+                headerName: "Lane",
+                editable: true,
+                field: "flowCellChannelNumber",
+                width: 50,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: SeqlaneSelectEditor,
+                selectOptions: this.lanes,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
+                showFillButton: true,
+                fillGroupAttribute: 'idRequest',
+                cellStyle: function(params) {
+                    return {'font-size': '.70rem'};
+                }
+
+            },
+            {
+                headerName: "Index A",
+                editable: false,
+                width: 100,
+                field: "seqADisplay",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellStyle: function(params) {
+                    return {'font-size': '.70rem'};
+                }
+
+            },
+            {
+                headerName: "Index B",
+                editable: false,
+                width: 100,
+                field: "seqBDisplay",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellStyle: function(params) {
+                    return {'font-size': '.70rem'};
+                }
+
+            },
+            {
+                headerName: "Pipeline Protocol",
+                editable: true,
+                width: 120,
+                field: "idPipelineProtocol",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: FillLikeEditor,
+                selectOptions: this.pipelineProtoList,
+                selectOptionsDisplayField: "protocol",
+                selectOptionsValueField: "idPipelineProtocol",
+                defaultDisplayField: "isDefault",
+                defaultDisplayValue: "Y",
+                fillLikeAttribute: "flowCellChannelNumber",
+                cellStyle: function(params) {
+                    return {'font-size': '.70rem'};
+                }
+            },
+            {
+                headerName: "Sequencing Protocol",
+                editable: false,
+                width: 255,
+                field: "idNumberSequencingCyclesAllowed",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.filteredProtocolsList,
+                selectOptionsDisplayField: "name",
+                selectOptionsValueField: "idNumberSequencingCyclesAllowed",
+                showFillButton: true,
+                fillGroupAttribute: 'idRequest',
+                cellStyle: function(params) {
+                    return {'font-size': '.70rem'};
+                }
+            },
+            {
+                headerName: "Sample conc. pM",
+                editable: true,
+                width: 100,
+                field: "flowCellChannelSampleConcentrationpM",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellStyle: function(params) {
+                    return {'font-size': '.70rem'};
+                }
+            },
+
+        ];
+        return columnDefs;
     }
 
     ngAfterViewInit() {
@@ -340,7 +358,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.sequenceProtocolsList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.NumberSequencingCyclesAllowed").filter(proto =>
-            proto.isActive === 'Y'
+            (proto.codeRequestCategory ===  "HISEQ" || proto.codeRequestCategory === "MISEQ" || proto.codeRequestCategory === "NOSEQ") && proto.isActive === 'Y'
         );
         this.instrumentList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.Instrument").filter(instrument =>
             instrument.isActive === 'Y'
@@ -352,72 +370,111 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         }
         this.labList.push(this.emptyLab);
         this.labList = this.labList.concat(this.gnomexService.labList);
+        this.pipelineProtoList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.PipelineProtocol");
+        this.pipelineProtoList.push(this.emptyPipe);
 
     }
-
-    chooseFirstProtocolOption() {
-        if (this.autoProtocolComplete.options.first) {
-            this.autoProtocolComplete.options.first.select();
-        }
-    }
-
-    chooseFirstLabOption() {
-        if (this.autoLabComplete.options.first) {
-            this.autoLabComplete.options.first.select();
-        }
-    }
-
-    filterLabList(selectedLab: any): any[] {
-        let fLabs: any[];
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                if (selectedLab.idLab === "0") {
-                    this.initialize();
-                    this.selectedLab = null;
-                    this.labInput.nativeElement.blur();
-                } else {
-                    fLabs = this.labList.filter(lab =>
-                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                    return fLabs;
-                }
-            } else {
-                fLabs = this.labList.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.labList;
-        }
-
-    }
-
-    onSeqListSelection(event: any): void {
-        this.workingWorkItemList = this.workingWorkItemList.filter(workItem =>
-            workItem.idNumberSequencingCyclesAllowed === event.value.idNumberSequencingCyclesAllowed
-        );
-    }
-
 
     selectedRow(event) {
         if(event.node.selected) {
             this.buildReqCatSeqLibs(event);
-            event.data.selected = true;
-            this.selectedSeqlanes.push(event.data);
-        } else {
-            event.data.selected = false;
-            this.selectedSeqlanes.forEach( (item, index) => {
-                if(item === event.data) this.selectedSeqlanes.splice(index,1);
-            });
-
+            this.selectedFlowCell = [];
+            this.selectedFlowCell.push(event.data);
+            this.setFinalizedForm(event);
         }
-        this.gridApi.redrawRows();
     }
 
     buildReqCatSeqLibs(event) {
         this.filteredProtocolsList = this.sequenceProtocolsList.filter(proto =>
-            proto.codeRequestCategory === event.data.codeRequestCategory && proto.isActive === 'Y'
+            proto.codeRequestCategory === event.data.codeSequencingPlatform && proto.isActive === 'Y'
         );
 
+    }
+
+    setFinalizedForm(event) {
+        this.codeSequencingPlatform = event.data.codeSequencingPlatform;
+        this.flowCell = event.data;
+        this.assmItemList = [];
+        this.assmColumnDefs = [];
+        this.assmGridApi.setRowData([]);
+        this.flowCellNumber = event.data.number;
+        this.idFlowCell = event.data.idFlowCell;
+        this.notes = event.data.notes;
+        this.barcodeFC.setValue(event.data.barcode);
+        this.runFC.setValue(event.data.runNumber);
+        this.createDateFC.setValue(event.data.createDate);
+        this.instrumentFC.setValue(event.data.idInstrument);
+        for (let instrument of this.instrumentList) {
+            if (instrument.idInstrument === event.data.idInstrument) {
+                this.instrumentFC.setValue(instrument);
+                break;
+            }
+        }
+        for (let proto of this.filteredProtocolsList) {
+            if (proto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed) {
+                this.protocolFC.setValue(proto);
+                this.originalProtocol = proto;
+                break;
+            }
+        }
+        if (!this.securityAdvisor.isArray(event.data.flowCellChannels)) {
+            this.flowCellChannels = [event.data.flowCellChannels.FlowCellChannel];
+        } else {
+            this.flowCellChannels = event.data.flowCellChannels;
+        }
+        for (let channel of this.flowCellChannels) {
+            let seqLanes: any[] = [];
+            if (!this.securityAdvisor.isArray(channel.sequenceLanes)) {
+                seqLanes = [channel.sequenceLanes.SequenceLane];
+            } else {
+                seqLanes = channel.sequenceLanes;
+            }
+            this.assmItemList = this.assmItemList.concat(seqLanes);
+        }
+        for (let flow of this.assmItemList) {
+            flow.seqADisplay = this.workflowService.lookupOligoBarcode(flow);
+            flow.seqBdisplay = this.workflowService.lookupOligoBarcodeB(flow);
+        }
+
+        let showConc = this.gnomexService.getCoreFacilityProperty(this.flowCell.idCoreFacility, this.gnomexService.PROPERTY_SHOW_SAMPLE_CONC_PM);
+        if (showConc === 'Y') {
+            this.hideFCConcen = false;
+        }
+        let columnDefs = this.initializeAssm();
+        this.assmColumnDefs = columnDefs;
+        this.assmGridApi.setColumnDefs(columnDefs);
+
+
+        this.assmGridApi.setRowData(this.assmItemList);
+
+        this.refreshPipeline(this.assmItemList);
+        this.createFlowCellFileName();
+        this.touchFields();
+        this.workflowService.assignBackgroundColor(this.assmItemList, "flowCellChannelNumber");
+    }
+
+    touchFields() {
+        for (let field in this.allFG.controls) {
+            const control = this.allFG.get(field);
+            if (control) {
+                if (control.valid === false) {
+                    control.markAsTouched();
+                }
+            }
+        }
+    }
+
+    refreshPipeline(nodes) {
+        let defaultPipeline: any;
+        for (let pipeline of this.pipelineProtoList) {
+            if (pipeline.isDefault === 'Y') {
+                defaultPipeline = pipeline;
+            }
+        }
+
+        for (let node of nodes) {
+            node.idPipelineProtocol = defaultPipeline.idPipelineProtocol;
+        }
     }
 
     filterWorkItemsByLab() {
@@ -468,34 +525,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         this.lanes = rLanes;
     }
 
-    onCellValueChanged(event) {
-        if (this.assmItemList.filter(lane=>
-            lane.laneNumber === event.data.laneNumber).length === 0) {
-            if (!this.firstSelectedFlowcellRequestType && event.data.codeRequestCategory != this.selectedFlowcellRequestType) {
-                this.dialogsService.confirm("Only one type of experiment can be assembled on a flow cell", null);
-            } else {
-                for (let proto of this.filteredProtocolsList) {
-                    if (proto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed) {
-                        this.protocolFC.setValue(proto);
-                        // this.originalProtocol = proto;
-                        break;
-                    }
-                }
-
-
-                this.assmItemList.push(event.data);
-                this.assmItemList = this.assmItemList.sort(this.workflowService.sortSampleNumber);
-                this.assmGridApi.setRowData(this.assmItemList);
-                this.firstSelectedFlowcellRequestType = false;
-                this.selectedFlowcellRequestType = event.data.codeRequestCategory;
-                if (this.lanes.length === 0) {
-                    this.buildLanes();
-                }
-                this.allFG.markAsDirty();
-            }
-        }
-    }
-
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
@@ -506,8 +535,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     onAssmGridReady(params) {
         this.assmGridApi = params.api;
         this.assmGridColumnApi = params.columnApi;
-        params.api.sizeColumnsToFit();
-
     }
 
     lanesHasFlowcellChannel(channelNumber: number): boolean {
@@ -555,7 +582,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 break;
             }
         }
-        return  {errorMessage: errorMessage, warningMessage: warningMessage};
+        return  {errorMessage: errorMessage, warningMessage: warningMessage, code: 1};
     }
 
     save() {
@@ -586,7 +613,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 warningMessage += validIndexTags.warningMessage;
             }
             if (warningMessage) {
-                this.dialogsService.confirm(warningMessage, " Continue saving?").subscribe((answer: boolean) => {
+                this.dialogsService.confirm(warningMessage + " Continue saving?", " ").subscribe((answer: boolean) => {
                     if (answer) {
                         this.saveWorkItems();
                     }
@@ -597,21 +624,45 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         })
     }
 
+    buildChannel(seqLane: any) {
+        for (let channel of this.flowCellChannels) {
+            if (!this.securityAdvisor.isArray(channel.sequenceLanes)) {
+                channel.sequenceLanes = [channel.sequenceLanes.SequenceLane];
+            }
+            for (let seq of channel.sequenceLanes) {
+                if (seq.idSequenceLane === seqLane.idSequenceLane) {
+                    channel = seqLane;
+                    return;
+                }
+            }
+        }
+    }
+
     saveWorkItems() {
         let params: URLSearchParams = new URLSearchParams();
 
-        params.set("codeStepNext", this.workflowService.ILLSEQ_FINALIZE_FC);
-        params.set("flowCellDate", WorkflowService.convertDate(this.createDateFC.value));
+        params.set("barcode", this.barcodeFC.value);
+        params.set("codeSequencingPlatform", this.codeSequencingPlatform);
+        params.set("createDate", WorkflowService.convertDate(this.createDateFC.value));
+        params.set("idCoreFacility", this.flowCell.idCoreFacility);
+        // params.set("idFlowCell", this.flowCell.idFlowCell);
         params.set("idInstrument", this.instrumentFC.value.idInstrument);
+        params.set("idNumberSequencingCycles", this.protocolFC.value.idNumberSequencingCycles);
         params.set("idNumberSequencingCyclesAllowed", this.protocolFC.value.idNumberSequencingCyclesAllowed);
         params.set("idSeqRunType", this.protocolFC.value.idSeqRunType);
-        params.set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesDisplay);
+        params.set("notes", this.flowCell.notes);
+        params.set("number", this.flowCell.number);
+        params.set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesActual);
+        params.set("runFolder", this.flowCellRunFolder);
         params.set("runNumber", this.runFC.value);
-        params.set("flowCellBarcode", this.barcodeFC.value);
-        params.set("workItemXMLString", JSON.stringify(this.assmItemList));
+        for (let seqLane of this.assmItemList) {
+            this.buildChannel(seqLane);
+        }
+
+        params.set("channelsXMLString", JSON.stringify(this.flowCellChannels));
 
         this.showSpinner = true;
-        this.workflowService.saveWorkItemSolexaAssemble(params).subscribe((response: any) => {
+        this.workflowService.saveFlowCell(params).subscribe((response: any) => {
             if (response.status === 200) {
                 let responseJSON: any = response.json();
                 if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
@@ -647,37 +698,45 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         this.gridOptions.api.setQuickFilter(this.searchText);
     }
 
-    deleteWorkItem(event) {
-        let seqLanes: string = "";
-        let laneString: string = "";
-        this.selectedSeqlanes.forEach((item => {
-            seqLanes = seqLanes.concat(item.idWorkItem);
-            seqLanes = seqLanes.concat(',');
+    deleteFlowCell(event) {
+        this.dialogsService.confirm( "Delete Flow Cell "+this.selectedFlowCell[0].number, "Continue?").subscribe((answer: boolean) => {
+            if (answer) {
+                this.delete();
             }
-        ));
-        seqLanes = seqLanes.substring(0, seqLanes.lastIndexOf(','));
-        if (this.selectedSeqlanes.length === 1) {
-            laneString = "lane";
-        } else {
-            laneString = "lanes";
-        }
-        this.deleteSeqlaneDialogRef = this.dialog.open(DeleteSeqlaneDialogComponent, {
-            height: '12em',
-            width: '22em',
-            data: {
-                seqLanes: seqLanes,
-                laneLength: this.selectedSeqlanes.length,
-                laneString: laneString
-            }
+        })
 
-        });
-        this.deleteSeqlaneDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.deleteSeqlaneDialogRef.componentInstance.rebuildSeqlanes) {
+    }
+
+    delete() {
+        let params: URLSearchParams = new URLSearchParams();
+
+        params.set("idFlowCell", this.flowCell.idFlowCell);
+
+        this.showSpinner = true;
+        this.workflowService.deleteFlowCell(params).subscribe((response: any) => {
+            if (response.status === 200) {
+                let responseJSON: any = response.json();
+                if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
+                    this.allFG.markAsPristine();
+                    if (!responseJSON.flowCellNumber) {
+                        responseJSON.flowCellNumber = "";
+                    }
+                    this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " deleted", null);
+                    this.assmItemList = [];
                     this.initialize();
+                } else {
+                    let message: string = "";
+                    if (responseJSON && responseJSON.message) {
+                        message = ": " + responseJSON.message;
+                    }
+                    this.dialogsService.confirm("An error occurred while deleting" + message, null);
                 }
-            })
+            } else {
+                this.dialogsService.confirm("An error occurred while deleting " + response.status, null);
 
+            }
+            this.showSpinner = false;
+        });
     }
 
     private validateIndexTags(): any {
@@ -726,6 +785,31 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
             }
         }
         return (uniqueBaseCount >= 3);
+    }
+
+    private createFlowCellFileName():void {
+        let runFolder: string = '';
+        if(this.barcodeFC.value.length > 0 && this.runFC.value.length > 0 && this.createDateFC.value && this.instrumentFC.value && this.protocolFC.value) {
+            let cDate = new Date(this.createDateFC.value);
+            let year: string = (cDate.getFullYear().toString()).substr(2,3);
+            let month: string = (cDate.getMonth() + 1).toString();
+            if(month.length == 1) { month = "0" + month; }
+            let date: string =  cDate.getDate().toString();
+            if(date.length == 1) { date = "0" + date; }
+            runFolder += year + month + date;
+            runFolder += "_";
+            runFolder += this.instrumentFC.value.instrument;
+            runFolder += "_";
+            let runNumberPlus: number = Number(this.runFC.value) + 10000;
+            runFolder += runNumberPlus.toString().substring(1,5);
+            runFolder += "_";
+            runFolder += this.barcodeFC.value;
+
+        }
+        if (this.originalProtocol && this.protocolFC.value.idNumberSequencingCyclesAllowed !== this.originalProtocol.value) {
+            this.dialogsService.confirm("Changing the protocol for the flow cell will change the protocol for all the samples it contains.", null);
+        }
+        this.flowCellRunFolder = runFolder;
     }
 
 }

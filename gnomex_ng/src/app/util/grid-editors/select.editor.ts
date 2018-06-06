@@ -21,7 +21,7 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 			}
 	`]
 }) export class SelectEditor implements ICellEditorAngularComp, OnDestroy {
-	private params: any;
+	params: any;
 	value: any;
 	options: any;
 	optionsValueField: string;
