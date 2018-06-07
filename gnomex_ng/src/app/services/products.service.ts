@@ -106,4 +106,9 @@ export class ProductsService {
         return this.httpClient.post("/gnomex/ChangeProductOrderStatus.gx", null, {params: params});
     }
 
+    public getProductOrder(idProductOrder: string): Observable<any> {
+        let params: HttpParams = new HttpParams().set("idProductOrder", idProductOrder);
+        return this.httpClient.get("/gnomex/GetProductOrder.gx", {params: params});
+    }
+
 }
