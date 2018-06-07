@@ -6,6 +6,15 @@ import {HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
 import {CookieUtilService} from "./cookie-util.service";
 
+export enum qcModes
+{
+    All = "All",
+    Illumina = "Illumina",
+    Microarray = "Microarray",
+    Samplequality = "Sample Quality",
+    Nanostring = "Nano String"
+}
+
 @Injectable()
 export class WorkflowService {
     public readonly ILLUMINA_SEQQC = "ILLSEQQC";
@@ -29,7 +38,6 @@ export class WorkflowService {
         {display: 'Terminate', value: 'Terminated'},
         {display: 'Bypass', value: 'Bypassed'}
     ];
-
 
     constructor(private http: Http,
                 private cookieUtilService: CookieUtilService,

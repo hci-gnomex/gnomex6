@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
-import {WorkflowService} from "../services/workflow.service";
+import {WorkflowService, qcModes} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {MatAutocomplete, MatAutocompleteTrigger, MatInput, MatOption, MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
@@ -86,16 +86,16 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
 
     ngOnChanges() {
         switch(this.mode) {
-            case 'all' :
+            case qcModes.All:
                 this.onClickAll();
                 break;
-            case 'illumina' :
+            case qcModes.Illumina :
                 this.onClickIlluminaQC();
                 break;
-            case 'samplequality' :
+            case qcModes.Samplequality :
                 this.onClickSampleQualityQC();
                 break;
-            case 'nano' :
+            case qcModes.Nanostring :
                 this.onClickNanostringQC();
                 break;
         }

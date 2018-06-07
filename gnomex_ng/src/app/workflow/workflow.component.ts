@@ -8,7 +8,7 @@ import {LibprepWorkflowComponent} from "./libprep-workflow.component";
 import {GnomexService} from "../services/gnomex.service";
 import {LibprepQcWorkflowComponent} from "./libprepqc-workflow.component";
 import {FlowcellassmWorkflowComponent} from "./flowcellassm-workflow.component";
-import {WorkflowService} from "../services/workflow.service";
+import {WorkflowService, qcModes} from "../services/workflow.service";
 import {FinalizeWorkflowComponent} from "./finalize-workflow.component";
 
 @Component({
@@ -159,20 +159,20 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
 
     onClickQC (event) {
         switch(event.currentTarget.innerText) {
-            case 'All' :
-                this.inputs.mode = 'all'
+            case qcModes.All :
+                this.inputs.mode = qcModes.All
                 break;
-            case 'Illumina' :
-                this.inputs.mode = 'illumina';
+            case qcModes.Illumina :
+                this.inputs.mode = qcModes.Illumina;
                 break;
-            case 'Microarray' :
-                this.inputs.mode = "microarray";
+            case qcModes.Microarray :
+                this.inputs.mode = qcModes.Microarray;
                 break;
-            case 'Sample Quality' :
-                this.inputs.mode = "samplequality";
+            case qcModes.Samplequality :
+                this.inputs.mode = qcModes.Samplequality;
                 break;
-            case 'Nano String' :
-                this.inputs.mode = "nano";
+            case qcModes.Nanostring :
+                this.inputs.mode = qcModes.Nanostring;
                 break;
         }
     }
