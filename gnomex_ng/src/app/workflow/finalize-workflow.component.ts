@@ -13,7 +13,6 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
-import {FilllikeTextRendererComponent} from "../util/grid-renderers/filllike-text-renderer.component";
 
 @Component({
     selector: 'finalizeFlowCell-workflow',

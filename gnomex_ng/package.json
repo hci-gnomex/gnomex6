@@ -76,6 +76,7 @@
     "svg-loader": "0.0.2",
     "transform-loader": "^0.2.4",
     "url-loader": "^0.5.9",
+    "webassemblyjs": "1.4.3",
     "webpack": "^4.5.0",
     "webpack-visualizer-plugin": "^0.1.11",
     "zone.js": "0.8.12"
