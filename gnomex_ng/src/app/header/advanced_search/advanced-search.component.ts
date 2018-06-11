@@ -1822,25 +1822,20 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         this.newSearchGridColumnApi = event.columnApi;
 
         this.assignNewSearchGridContents();
-        this.onNewSearchGridSizeChanged();
+        this.onGridSizeChanged(event)
     }
     onSearchResultsGridReady(event: any): void {
         this.searchResultsGridApi = event.api;
         this.searchResultsGridColumnApi = event.columnApi;
 
         this.assignSearchResultsGridContents();
-        this.onSearchResultsGridSizeChanged();
+        this.onGridSizeChanged(event);
     }
 
 
-    onNewSearchGridSizeChanged(): void {
-        if (this.newSearchGridApi) {
-            this.newSearchGridApi.sizeColumnsToFit();
-        }
-    }
-    onSearchResultsGridSizeChanged(): void {
-        if (this.searchResultsGridApi) {
-            this.searchResultsGridApi.sizeColumnsToFit();
+    onGridSizeChanged(event: any): void {
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
         }
     }
 
