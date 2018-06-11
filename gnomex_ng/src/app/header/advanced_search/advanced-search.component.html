@@ -71,7 +71,7 @@
                                             [enableColResize]="true"
                                             [suppressNoRowsOverlay]="true"
                                             [stopEditingWhenGridLosesFocus]="true"
-                                            (gridSizeChanged)="onNewSearchGridSizeChanged()"
+                                            (gridSizeChanged)="onGridSizeChanged($event)"
                                             (gridReady)="onNewSearchGridReady($event)">
                                     </ag-grid-angular>
                                 </div>
@@ -135,7 +135,7 @@
                                         [enableSorting]="true"
                                         [enableColResize]="true"
                                         [suppressNoRowsOverlay]="true"
-                                        (gridSizeChanged)="onSearchResultsGridSizeChanged()"
+                                        (gridSizeChanged)="onGridSizeChanged($event)"
                                         (gridReady)="onSearchResultsGridReady($event)">
                                 </ag-grid-angular>
                             </div>
