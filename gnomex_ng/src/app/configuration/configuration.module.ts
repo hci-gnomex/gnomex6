@@ -19,6 +19,7 @@ import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
 import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {ConfigureAnnotationsModule} from "../util/configure-annotations.module";
+import {ManageProtocolsComponent} from "./manage-protocols.component";
 
 
 
@@ -48,6 +49,7 @@ import {ConfigureAnnotationsModule} from "../util/configure-annotations.module";
         ConfigCoreFacilityComponent,
         ConfigCoreFacilityEditComponent,
         ConfigureOrganismsComponent,
+        ManageProtocolsComponent
     ],
     exports: [
         BrowseDictionaryComponentLauncher

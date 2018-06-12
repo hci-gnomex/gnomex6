@@ -42,6 +42,7 @@ import {WorkflowService} from "./workflow.service";
 import {GridColumnValidateService} from "./grid-column-validate.service";
 import {BillingPOFormService} from "./billingPOForm.service";
 import {ProductsService} from "./products.service";
+import {ProtocolService} from "./protocol.service";
 
 
 @NgModule({
@@ -95,7 +96,8 @@ import {ProductsService} from "./products.service";
         DatatrackResolverService,
         LabResolverService,
         BillingPOFormService,
-        ProductsService
+        ProductsService,
+        ProtocolService
     ]})
 export class ServicesModule {
 }

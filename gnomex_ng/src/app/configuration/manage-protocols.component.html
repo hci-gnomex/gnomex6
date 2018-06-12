@@ -1,0 +1,111 @@
+<div class="full-width full-height">
+    <split>
+        <split-area [size]="20">
+            <div class="flex-container-col full-width full-height padded-left-right border">
+                <div class="full-width no-overflow padded-top-bottom">
+                    Protocols
+                </div>
+                <div class="full-width flex-grow no-overflow">
+                    <div class="full-width full-height border no-overflow">
+                        <tree-root #datatracksTree
+                                   [nodes]="protocolList"
+                                   [options]="treeOptions"
+                                   (activate)="treeOnSelect($event)">
+                            <ng-template #treeNodeTemplate let-node let-index="index">
+                                <div class="flex-container-row full-width">
+                                    <div class="padded-right">
+                                        <img src="{{node.data.icon}}" alt="" height="16" width="16">
+                                    </div>
+                                    <div>
+                                        <span>{{ node.data.label }}</span>
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template #loadingTemplate></ng-template>
+                        </tree-root>
+                    </div>
+                </div>
+                <div class="full-width no-overflow padded-top-bottom">
+                    <div class="full-width flex-container-row">
+                        <div>
+                            <div>
+                                <button mat-button (click)="onNewProtocolButtonClicked()">New Protocol</button>
+                            </div>
+                            <div>
+                                <button mat-button (click)="onDeleteProtocolButtonClicked()">Delete Protocol</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="full-width full-height t">
+                                <div class="tr">
+                                    <div class="td vertical-center">
+                                        <button mat-button (click)="onRefreshButtonClicked()">Refresh</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </split-area>
+        <split-area [size]="80">
+            <div class="flex-container-col full-width full-height padded-left-right border">
+                <div class="full-width no-overflow padded-top-bottom">
+                    Protocol:
+                </div>
+                <div class="full-width flex-grow no-overflow">
+                    <div class="full-width full-height border">
+                        <div *ngIf="!!selectedProtocol" class="full-width full-height padded">
+
+                            <div class="full-width flex-container-row">
+                                <div class="flex-grow padded">
+                                    <mat-form-field class="full-width">
+                                        <input  matInput
+                                                placeholder="Account Name"
+                                                [(ngModel)]="selectedProtocolName">
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex-grow padded">
+                                    <mat-form-field class="full-width font-small">
+                                        <mat-select
+                                                class="full-width"
+                                                placeholder="Select Core Facilities"
+                                                [(ngModel)]="selectedExperimentPlatform"
+                                                required>
+                                            <mat-option *ngFor="let experimentPlatform of experimentPlatformList" [value]="experimentPlatform">
+                                                {{ experimentPlatform.display }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="t special-checkbox-text-alignment-padding">
+                                    <div class="tr">
+                                        <div class="td">
+                                            <div class="inline-block checkbox-container">
+                                                <mat-checkbox [(ngModel)]="activeCheckBox"></mat-checkbox>
+                                            </div>
+                                        </div>
+                                        <div class="td">
+                                            <div class="inline-block vertical-center">
+                                                <label>Active</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <mat-form-field class="full-width">
+                                <input  matInput
+                                        placeholder="URL"
+                                        [(ngModel)]="selectedProtocolUrl">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="full-width no-overflow padded-top-bottom right-align">
+                    <button mat-button (click)="onSaveButtonClicked()">Save</button>
+                </div>
+            </div>
+        </split-area>
+    </split>
+</div>
