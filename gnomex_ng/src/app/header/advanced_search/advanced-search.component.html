@@ -1,0 +1,211 @@
+<div mat-dialog-title class="full-width header no-margin no-padding">
+    <div #topmostLeftmost (mousedown)="onMouseDownHeader($event)" class="full-width padding {{ movingDialog ? 'grabbed' : 'grabbable' }}">
+        <h5 class="inline-block">Advanced Search</h5>
+    </div>
+</div>
+<div mat-dialog-content class="body background no-margin no-padding">
+    <div class="body-size light-background">
+        <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="full-height">
+
+            <mat-tab label="New Search" class="full-height" #newSearchTab >
+                <div class="full-width fixed-height padding">
+
+                    <div class="t full-width full-height">
+                        <div class="tr full-width">
+                            <div class="td mat-input-label">General Keywords</div>
+                            <div class="td">
+                                <mat-form-field class="medium-input">
+                                    <input  matInput
+                                            placeholder="Search"
+                                            [(ngModel)]="searchText">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="tr full-width">
+                            <div class="td horizontal-rule-label-container">
+                                <div class="full-width horizontal-rule-label">
+                                </div>
+                            </div>
+                            <div class="td horizontal-rule-container">
+                                <div class="full-width horizontal-rule">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tr full-width">
+                            <div class="td">
+                                <div class="row-vertical-spacing-a">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tr full-width">
+                            <div class="td label">
+                                Search Category
+                            </div>
+                            <div class="td">
+                                <mat-radio-group [(ngModel)]="searchType" (change)="onSearchTypeChanged()">
+                                    <mat-radio-button class="radio-button" [value]="ALL_OBJECTS">All Objects</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="EXPERIMENTS">Experiments</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="ANALYSES"   >Analyses</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="PROTOCOLS"  >Protocols</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="DATA_TRACKS">Data Tracks</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="TOPICS"     >Topics</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </div>
+                        <div class="tr full-width">
+                            <div class="td">
+                                <div class="row-vertical-spacing-b">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tr full-width full-height">
+                            <div class="td label">Field Search</div>
+                            <div class="td">
+                                <div class="grid-container full-height">
+                                    <ag-grid-angular
+                                            style="font-size:x-small; width:100%; height:100%;"
+                                            class="ag-fresh"
+                                            [context]="context"
+                                            [singleClickEdit]="true"
+                                            [enableSorting]="true"
+                                            [enableColResize]="true"
+                                            [suppressNoRowsOverlay]="true"
+                                            [stopEditingWhenGridLosesFocus]="true"
+                                            (gridSizeChanged)="onGridSizeChanged($event)"
+                                            (gridReady)="onNewSearchGridReady($event)">
+                                    </ag-grid-angular>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tr full-width">
+                            <div class="td">
+                                <div class="row-vertical-spacing-a">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tr full-width full-height">
+                            <div class="td label"></div>
+                            <div class="td">
+                                <mat-radio-group [(ngModel)]="matchType">
+                                    <mat-radio-button class="radio-button" [value]="MATCH_ALL_TERMS">Match ALL terms</mat-radio-button>
+                                    <mat-radio-button class="radio-button" [value]="MATCH_ANY_TERM">Match ANY term</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </mat-tab>
+
+            <mat-tab label="Search Results" class="full-height" #searchResultsTab >
+                <div class="full-width fixed-height padding">
+                    <div class="flex-container full-width full-height">
+                        <div class="full-width button-bar">
+                            <button mat-button class="inline-block" (click)="onGridAllObjectsButtonClicked()">
+                                All Results ({{numberOfAllObjectResults}} hit{{numberOfAllObjectResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onGridExperimentButtonClicked()">
+                                Experiments ({{numberOfExperimentResults}} hit{{numberOfExperimentResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onGridAnalyisButtonClicked()">
+                                Analysis ({{numberOfAnalysisResults}} hit{{numberOfAnalysisResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onGridProtocolButtonClicked()">
+                                Protocols ({{numberOfProtocolResults}} hit{{numberOfProtocolResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onGridDataTrackButtonClicked()">
+                                Data Tracks ({{numberOfDataTrackResults}} hit{{numberOfDataTrackResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onGridTopicButtonClicked()">
+                                Topics ({{numberOfTopicResults}} hit{{numberOfTopicResults == 1 ? '' : 's'}})
+                            </button>
+                        </div>
+                        <div class="flex-fill full-width">
+                            <div class="grid-container full-width full-height">
+                                <ag-grid-angular
+                                        style="font-size:x-small; width:100%; height:100%;"
+                                        class="ag-fresh"
+                                        [context]="context"
+                                        [singleClickEdit]="true"
+                                        [enableSorting]="true"
+                                        [enableColResize]="true"
+                                        [suppressNoRowsOverlay]="true"
+                                        (gridSizeChanged)="onGridSizeChanged($event)"
+                                        (gridReady)="onSearchResultsGridReady($event)">
+                                </ag-grid-angular>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+
+            <mat-tab label="Search Results (Tree)" class="full-height" #searchResultsTab >
+                <div class="full-width fixed-height maximum-size padding-top">
+                    <div class="flex-container full-width full-height">
+                        <div class="full-width button-bar">
+                            <button mat-button class="inline-block" (click)="onTreeExperimentButtonClicked()">
+                                Experiments ({{numberOfExperimentResults}} hit{{numberOfExperimentResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onTreeAnalyisButtonClicked()">
+                                Analysis ({{numberOfAnalysisResults}} hit{{numberOfAnalysisResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onTreeProtocolButtonClicked()">
+                                Protocols ({{numberOfProtocolResults}} hit{{numberOfProtocolResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onTreeDataTrackButtonClicked()">
+                                Data Tracks ({{numberOfDataTrackResults}} hit{{numberOfDataTrackResults == 1 ? '' : 's'}})
+                            </button>
+                            <div class="vertical-spacer"></div>
+                            <button mat-button class="inline-block" (click)="onTreeTopicButtonClicked()">
+                                Topics ({{numberOfTopicResults}} hit{{numberOfTopicResults == 1 ? '' : 's'}})
+                            </button>
+                        </div>
+                        <div class="flex-fill full-width maximum-size">
+                            <div class="full-width full-height maximum-size box-border">
+                                <tree-root #searchResultsTree
+                                           [nodes]="treeNodes"
+                                           [options]="treeOptions"
+                                           (activate)="treeOnSelect($event)">
+                                    <ng-template #treeNodeTemplate let-node let-index="index">
+                                        <div style="display: table-cell; vertical-align: middle;">
+                                            <img src="{{node.data.icon}}" alt="" height="16" width="16">
+                                            <span style="padding-top: 0.2em; padding-left: 0.3em;">{{ node.data.name }}</span>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #loadingTemplate></ng-template>
+                                </tree-root>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</div>
+<div mat-dialog-actions class="background no-margin no-padding">
+    <div class="full-width button-container">
+        <div class="t full-width">
+            <div class="tr">
+                <div *ngIf="selectedTabIndex === 0" class="td">
+                    <button mat-button (click)="onClickSearchButton()"><img src="../../../assets/magnifier.png" alt="" /> Search</button>
+                    <button mat-button (click)="onClickClearButton()">Clear</button>
+                </div>
+                <div *ngIf="selectedTabIndex === 2" class="td">
+                    <button mat-button (click)="onClickExpandButton()">Expand Tree</button>
+                    <button mat-button (click)="onClickCollapseButton()">Collapse Tree</button>
+                </div>
+                <div class="td right-aligned">
+                    <button mat-button (click)="onClickCancelButton()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

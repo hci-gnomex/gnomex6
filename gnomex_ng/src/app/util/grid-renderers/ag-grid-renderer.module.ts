@@ -12,6 +12,7 @@ import { RemoveLinkButtonRenderer } from "./remove-link-button.renderer";
 import { SelectRenderer } from "./select.renderer";
 import { TextAlignLeftMiddleRenderer } from "./text-align-left-middle.renderer";
 import { TextAlignRightMiddleRenderer } from "./text-align-right-middle.renderer";
+import { TextSelectXorMultiselectRenderer } from "./text-select-xor-multiselect.renderer";
 import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 
 @NgModule({
@@ -21,32 +22,34 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
         ReactiveFormsModule,
     ],
     declarations: [
-			  ApproveButtonRenderer,
-        CheckboxRenderer,
-			  DateRenderer,
-			  IconLinkButtonRenderer,
+		ApproveButtonRenderer,
+		CheckboxRenderer,
+		DateRenderer,
+		IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
-			  RemoveLinkButtonRenderer,
-			  SelectRenderer,
-			  SplitStringToMultipleLinesRenderer,
-			  TextAlignLeftMiddleRenderer,
-			  TextAlignRightMiddleRenderer,
-			  UploadViewRemoveRenderer
+		RemoveLinkButtonRenderer,
+		SelectRenderer,
+		SplitStringToMultipleLinesRenderer,
+		TextAlignLeftMiddleRenderer,
+		TextAlignRightMiddleRenderer,
+        TextSelectXorMultiselectRenderer,
+		UploadViewRemoveRenderer
     ],
     exports: [
-			  ApproveButtonRenderer,
-			  CheckboxRenderer,
-			  DateRenderer,
-			  IconLinkButtonRenderer,
+		ApproveButtonRenderer,
+		CheckboxRenderer,
+		DateRenderer,
+		IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
-			  RemoveLinkButtonRenderer,
-		    SelectRenderer,
-		    SplitStringToMultipleLinesRenderer,
-		    TextAlignLeftMiddleRenderer,
-			  TextAlignRightMiddleRenderer,
-			  UploadViewRemoveRenderer
+		RemoveLinkButtonRenderer,
+		SelectRenderer,
+		SplitStringToMultipleLinesRenderer,
+		TextAlignLeftMiddleRenderer,
+		TextAlignRightMiddleRenderer,
+        TextSelectXorMultiselectRenderer,
+		UploadViewRemoveRenderer
     ]
 })
 export class AgGridRendererModule { }

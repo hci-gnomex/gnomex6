@@ -2,34 +2,47 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule} from "@angular/forms";
 
+import { AgGridModule } from "ag-grid-angular";
 import { AngularMaterialModule } from "../../../modules/angular-material.module";
+
+import { BarcodeSelectEditor } from "./barcode-select.editor";
 import { DateEditor } from './date.editor'
+import { FillLikeEditor } from "./filllike-select.editor";
+import { MultipleSelectDialogComponent } from "./popups/multiple-select-dialog.component";
 import { SelectEditor } from './select.editor';
-import {BarcodeSelectEditor} from "./barcode-select.editor";
-import {SeqlaneSelectEditor} from "./seqlane-select.editor";
-import {FillLikeEditor} from "./filllike-select.editor";
+import { SeqlaneSelectEditor } from "./seqlane-select.editor";
+import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.editor";
 
 
 @NgModule({
     imports: [
-			  AngularMaterialModule,
+        AgGridModule.withComponents([
+            DateEditor,
+            SelectEditor,
+        ]),
+        AngularMaterialModule,
         CommonModule,
-			  FormsModule
+        FormsModule
     ],
-
     declarations: [
-        DateEditor,
-        SelectEditor,
         BarcodeSelectEditor,
+        DateEditor,
+        FillLikeEditor,
+        MultipleSelectDialogComponent,
+        SelectEditor,
         SeqlaneSelectEditor,
-        FillLikeEditor
+        TextSelectXorMultiselectEditor
+    ],
+    entryComponents: [
+        MultipleSelectDialogComponent,
     ],
     exports: [
-        DateEditor,
-        SelectEditor,
         BarcodeSelectEditor,
-        SeqlaneSelectEditor,
-        FillLikeEditor
+        DateEditor,
+        FillLikeEditor,
+        MultipleSelectDialogComponent,
+        SelectEditor,
+        TextSelectXorMultiselectEditor
     ]
 })
 export class AgGridEditorModule { }
