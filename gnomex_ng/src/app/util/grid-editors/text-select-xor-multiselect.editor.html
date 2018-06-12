@@ -1,0 +1,11 @@
+<div class="full-height full-width">
+    <div *ngIf="displayType === TEXT" class="full-height full-width">
+        <input [(ngModel)]="value" type="text" class="full-width full-height"/>
+    </div>
+    <div *ngIf="displayType === SELECT" class="full-height full-width">
+        {{value}}
+    </div>
+    <div *ngIf="displayType === MULTISELECT" class="full-height full-width">
+        {{value}}
+    </div>
+</div>
