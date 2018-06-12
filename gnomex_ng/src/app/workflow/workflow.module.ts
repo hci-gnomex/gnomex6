@@ -35,7 +35,9 @@ import {FlowcellassmWorkflowComponent} from "./flowcellassm-workflow.component";
 import {AngularSplitModule} from "angular-split";
 import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
 import {DeleteSeqlaneDialogComponent} from "./delete-seqlane-dialog.component";
-
+import {FinalizeWorkflowComponent} from "./finalize-workflow.component";
+import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
+import { DynamicModule } from 'ng-dynamic-component';
 /**
  * @author jdewell
  * @since 12/19/16
@@ -53,15 +55,15 @@ import {DeleteSeqlaneDialogComponent} from "./delete-seqlane-dialog.component";
             RemoveLinkButtonRenderer,
             SelectEditor,
             BarcodeSelectEditor,
+            FillLikeEditor,
             SeqlaneSelectEditor,
             SelectRenderer,
             SplitStringToMultipleLinesRenderer,
             TextAlignLeftMiddleRenderer,
             TextAlignRightMiddleRenderer,
-            UploadViewRemoveRenderer
+            UploadViewRemoveRenderer,
         ]),
         AgGridRendererModule,
-
         AngularMaterialModule,
         AngularSplitModule,
         DialogsModule,
@@ -73,10 +75,15 @@ import {DeleteSeqlaneDialogComponent} from "./delete-seqlane-dialog.component";
         ServicesModule,
         UtilModule,
         ReactiveFormsModule,
+        DynamicModule.withComponents([QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
+            FlowcellassmWorkflowComponent,  FinalizeWorkflowComponent])
     ],
-    declarations: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent, FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent],
-    entryComponents: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent, FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent],
-    exports: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent, FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent]
+    declarations: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent],
+    entryComponents: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent],
+    exports: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent]
 })
 export class WorkflowModule {
 }

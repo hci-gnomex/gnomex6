@@ -7,6 +7,7 @@ import { AngularMaterialModule } from "../../../modules/angular-material.module"
 
 import { BarcodeSelectEditor } from "./barcode-select.editor";
 import { DateEditor } from './date.editor'
+import { FillLikeEditor } from "./filllike-select.editor";
 import { MultipleSelectDialogComponent } from "./popups/multiple-select-dialog.component";
 import { SelectEditor } from './select.editor';
 import { SeqlaneSelectEditor } from "./seqlane-select.editor";
@@ -26,6 +27,7 @@ import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.ed
     declarations: [
         BarcodeSelectEditor,
         DateEditor,
+        FillLikeEditor,
         MultipleSelectDialogComponent,
         SelectEditor,
         SeqlaneSelectEditor,
@@ -37,9 +39,9 @@ import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.ed
     exports: [
         BarcodeSelectEditor,
         DateEditor,
+        FillLikeEditor,
         MultipleSelectDialogComponent,
         SelectEditor,
-        SeqlaneSelectEditor,
         TextSelectXorMultiselectEditor
     ]
 })

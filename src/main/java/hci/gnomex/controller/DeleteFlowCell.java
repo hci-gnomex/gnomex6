@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -110,6 +112,11 @@ public class DeleteFlowCell extends GNomExCommand implements Serializable {
         sess.flush();
 
         this.xmlResult = "<SUCCESS idFlowCell=\"" + flowCell.getIdFlowCell() + "\" flowCellNumber=\"" + flowCell.getNumber() + "\"/>";
+        JsonObject value = Json.createObjectBuilder()
+              .add("result", "SUCCESS")
+              .add("flowCellNumber", flowCell.getNumber())
+              .build();
+        this.jsonResult = value.toString();
 
         setResponsePage(this.SUCCESS_JSP);
       } else {

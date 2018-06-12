@@ -19,7 +19,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
             display: flex;
             flex-direction: column;
             background-color: white;
-            height: 99%;
+            height: 94%;
             width: 100%;
         }
         .flex-row-container {
@@ -191,7 +191,9 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                         cellEditorFramework: SelectEditor,
                         selectOptions: this.coreAdmins,
                         selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "idAppUser"
+                        selectOptionsValueField: "idAppUser",
+                        showFillButton: true,
+                        fillGroupAttribute: 'idRequest'
                     },
                     {
                         headerName: "Status",
@@ -242,7 +244,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                 request.idCoreFacility === this.core.idCoreFacility
             )
         }
-        this.workflowService.assignBackgroundColor(items);
+        this.workflowService.assignBackgroundColor(items, "idRequest");
         return items;
     }
 
@@ -522,13 +524,6 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                 this.initialize();
             });
         })
-    }
-
-    close() {
-    }
-
-    onClickLibPrep(event) {
-        this.initialize();
     }
 
     refreshWorklist(event) {

@@ -39,14 +39,84 @@
             </mat-button-toggle-group>
         </div>
     </div>
-    <div class="flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_DETAIL">
-        Detail Screen Placeholder
+    <div class="flex-container-row flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_DETAIL">
+        <div class="full-height flex-one border">
+            <tree-root #tree [nodes]="this.productOrderList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)">
+                <ng-template #treeNodeTemplate  let-node>
+                    <img src="{{node?.data?.icon}}" class="icon">
+                    <span>{{ node?.data?.display }}</span>
+                </ng-template>
+            </tree-root>
+        </div>
+        <div class="full-height flex-three padded">
+            <div class="full-height flex-container-col" [hidden]="this.detailDisplayMode !== this.DETAIL_LAB_MODE">
+                <div class="flex-one">
+                    <label *ngIf="this.selectedTreeNode">Product Orders for {{this.selectedTreeNode.data.display}}</label>
+                </div>
+                <div class="flex-thirteen">
+                    <ag-grid-angular class="ag-fresh full-height full-width"
+                                     (gridReady)="this.onLabGridReady($event)"
+                                     (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                     [rowData]="this.labLineItems">
+                    </ag-grid-angular>
+                </div>
+            </div>
+            <div class="full-height" [hidden]="this.detailDisplayMode !== this.DETAIL_ORDER_MODE">
+                <mat-tab-group class="full-height">
+                    <mat-tab label="Product Order Info">
+                        <label *ngIf="this.currentProductOrder"><img src="../../assets/review.png" class="icon">Product Order {{this.currentProductOrder.productOrderNumber}}</label>
+                        <table *ngIf="this.currentProductOrder" class="half-width">
+                            <tr>
+                                <td class="italics">Submitter</td>
+                                <td>{{this.currentProductOrder.submitter}}</td>
+                            </tr>
+                            <tr>
+                                <td class="italics">Lab</td>
+                                <td>{{this.currentProductOrder.labName}}</td>
+                            </tr>
+                            <tr>
+                                <td class="italics">Submit Date</td>
+                                <td>{{this.currentProductOrder.submitDate}}</td>
+                            </tr>
+                            <tr>
+                                <td class="italics">Order Status</td>
+                                <td>{{this.currentProductOrder.orderStatus}}</td>
+                            </tr>
+                            <tr>
+                                <td class="italics">Billing Account</td>
+                                <td>{{this.currentProductOrder.billingAccount}}</td>
+                            </tr>
+                            <tr>
+                                <td class="italics">Quote Number</td>
+                                <td>{{this.currentProductOrder.quoteNumber}}</td>
+                            </tr>
+                            <tr>
+                                <td class="italics">Quote Received</td>
+                                <td>{{this.currentProductOrder.quoteReceivedDate}}</td>
+                            </tr>
+                        </table>
+                    </mat-tab>
+                    <mat-tab label="Line Items">
+                        <div class="full-height full-width padded">
+                            <ag-grid-angular class="ag-fresh full-height full-width"
+                                             (gridReady)="this.onProductOrderGridReady($event)"
+                                             (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                             [rowData]="this.productOrderLineItems">
+                            </ag-grid-angular>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Files">
+                        Files Placeholder
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+        </div>
     </div>
     <div class="flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">
         <ag-grid-angular class="ag-fresh full-height full-width"
-                         (gridReady)="this.onGridReady($event)"
+                         (gridReady)="this.onOverviewGridReady($event)"
                          (gridSizeChanged)="this.onGridSizeChanged($event)"
-                         (selectionChanged)="this.onGridSelectionChanged($event)"
+                         (selectionChanged)="this.onOverviewGridSelectionChanged($event)"
                          [rowSelection]="'multiple'"
                          [suppressRowClickSelection]="true"
                          [rowData]="this.productOrderLineItemList">

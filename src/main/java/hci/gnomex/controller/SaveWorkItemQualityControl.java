@@ -29,6 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -182,6 +184,11 @@ public class SaveWorkItemQualityControl extends GNomExCommand implements Seriali
 
           XMLOutputter out = new org.jdom.output.XMLOutputter();
           this.xmlResult = out.outputString(workItemDoc);
+
+          JsonObject value = Json.createObjectBuilder()
+                  .add("result", "SUCCESS")
+                  .build();
+          this.jsonResult = value.toString();
 
           setResponsePage(this.SUCCESS_JSP);          
         } else {

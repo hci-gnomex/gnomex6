@@ -1,5 +1,5 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
-import {WorkflowService} from "../services/workflow.service";
+import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
+import {WorkflowService, qcModes} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {MatAutocomplete, MatAutocompleteTrigger, MatInput, MatOption, MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
@@ -20,7 +20,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
             display: flex;
             flex-direction: column;
             background-color: white;
-            height: 99%;
+            height: 94%;
             width: 100%;
         }
         .flex-row-container {
@@ -45,6 +45,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild("autoCore") autoCoreComplete: MatAutocomplete;
     @ViewChild("autoRequest") trigger: MatAutocompleteTrigger;
     @ViewChild('sidenav') sidenav: MatSidenav;
+    @Input() mode: string;
 
     private workItemList: any[] = [];
     private workingWorkItemList: any[] = [];
@@ -81,6 +82,23 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
+    }
+
+    ngOnChanges() {
+        switch(this.mode) {
+            case qcModes.All:
+                this.onClickAll();
+                break;
+            case qcModes.Illumina :
+                this.onClickIlluminaQC();
+                break;
+            case qcModes.Samplequality :
+                this.onClickSampleQualityQC();
+                break;
+            case qcModes.Nanostring :
+                this.onClickNanostringQC();
+                break;
+        }
     }
 
     initialize() {
@@ -239,10 +257,10 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         }
         if (this.codeStepNext && this.codeStepNext !== this.workflowService.ALL) {
             items = items.filter(request =>
-                request.requestCategoryType === this.codeStepNext
+                request.codeStepNext === this.codeStepNext
             );
         }
-        this.workflowService.assignBackgroundColor(items);
+        this.workflowService.assignBackgroundColor(items, "idRequest");
         return items;
     }
 
@@ -270,7 +288,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             }
             return false;
         });
-        this.workflowService.assignBackgroundColor(items);
+        this.workflowService.assignBackgroundColor(items, "idRequest");
         return items;
     }
 
@@ -285,7 +303,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         items = items.filter(workItem =>
             workItem.codeStepNext === code
         );
-        this.workflowService.assignBackgroundColor(items);
+        this.workflowService.assignBackgroundColor(items, "idRequest");
         return items;
     }
 
@@ -448,16 +466,15 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
 
     setQualCodeApplication(item: any) {
         let warningMessage: string = "";
-            if (item.qualCodeBioanalyzerChipType) {
-                item.qualCodeApplication = this.gnomexService.getCodeApplicationForBioanalyzerChipType(item.qualCodeBioanalyzerChipType);
-            } else if (item.qualStatus == 'Completed' || item.qualStatus == 'Terminated') {
-                warningMessage = item.sampleNumber + " is completed or terminated and does not have a QC Protocol specified.";
-                this.dialogsService.confirm(warningMessage, null);
-            }
-
+        if (item.qualCodeBioanalyzerChipType) {
+            item.qualCodeApplication = this.gnomexService.getCodeApplicationForBioanalyzerChipType(item.qualCodeBioanalyzerChipType);
+        } else if (item.qualStatus == 'Completed' || item.qualStatus == 'Terminated') {
+            warningMessage = item.sampleNumber + " is completed or terminated and does not have a QC Protocol specified.";
+            this.dialogsService.confirm(warningMessage, null);
+        }
     }
 
-    onClickAll(event) {
+    onClickAll() {
         this.workItem = "";
         this.label = "Combined Sample Quality";
         this.codeStepNext = this.workflowService.ALL;
@@ -465,7 +482,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.buildRequestIds(this.workItemList, "main");
     }
 
-    onClickIlluminaQC(event) {
+    onClickIlluminaQC() {
         this.workItem = "";
         this.label = "Illumina Sample Quality";
         this.codeStepNext = this.workflowService.ILLUMINA_SEQQC;
@@ -474,7 +491,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.buildRequestIds(this.workingWorkItemList, '');
     }
 
-    onClickMicroarrayQC(event) {
+    onClickMicroarrayQC() {
         this.workItem = "";
         this.label = "Microarray Sample Quality";
         this.core = this.hiSeqCoreObject;
@@ -483,7 +500,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.buildRequestIds(this.workingWorkItemList, "");
     }
 
-    onClickSampleQualityQC(event) {
+    onClickSampleQualityQC() {
         this.workItem = "";
         this.label = "Sample Quality";
         this.core = this.hiSeqCoreObject;
@@ -492,7 +509,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.buildRequestIds(this.workingWorkItemList, "");
     }
 
-    onClickNanostringQC(event) {
+    onClickNanostringQC() {
         this.workItem = "";
         this.label = "Nanostring";
         this.core = this.hiSeqCoreObject;

@@ -65,6 +65,7 @@
     "json-loader": "^0.5.7",
     "less-loader": "^2.2.3",
     "moment": "2.20.1",
+    "ng-dynamic-component": "^3.0.0",
     "ng2-bootstrap": "1.4.2",
     "ng2-charts": "^1.6.0",
     "ng2-img-max": "^2.1.15",
@@ -75,6 +76,7 @@
     "svg-loader": "0.0.2",
     "transform-loader": "^0.2.4",
     "url-loader": "^0.5.9",
+    "webassemblyjs": "1.4.3",
     "webpack": "^4.5.0",
     "webpack-visualizer-plugin": "^0.1.11",
     "zone.js": "0.8.12"

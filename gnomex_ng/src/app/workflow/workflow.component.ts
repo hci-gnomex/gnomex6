@@ -8,7 +8,8 @@ import {LibprepWorkflowComponent} from "./libprep-workflow.component";
 import {GnomexService} from "../services/gnomex.service";
 import {LibprepQcWorkflowComponent} from "./libprepqc-workflow.component";
 import {FlowcellassmWorkflowComponent} from "./flowcellassm-workflow.component";
-import {WorkflowService} from "../services/workflow.service";
+import {WorkflowService, qcModes} from "../services/workflow.service";
+import {FinalizeWorkflowComponent} from "./finalize-workflow.component";
 
 @Component({
     selector: 'workflow',
@@ -47,6 +48,7 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild('libPrepWorkflow') libPrepWorkflow: LibprepWorkflowComponent;
     @ViewChild('libPrepQcWorkflow') libPrepQcWorkflow: LibprepQcWorkflowComponent;
     @ViewChild('flowCellAssmWorkflow') flowCellAssmWorkflow: FlowcellassmWorkflowComponent;
+    @ViewChild('finalizeWorkflow') finalizeWorkflow: FinalizeWorkflowComponent;
 
     private showNav: boolean = true;
     private codeStepNext: any = 'QC';
@@ -54,6 +56,11 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     private resetTab = 0;
     private microarrayDisabled: boolean = true;
     private combinedQCTabItems: any[] = [];
+    workflowOutlet: any = LibprepWorkflowComponent;
+    private isATabChange: boolean = true;
+    inputs = {
+        mode: 'all'
+    };
     constructor(private route: ActivatedRoute,
                 private router: Router,
                 private workflowService: WorkflowService,
@@ -70,6 +77,7 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
                 this.codeStepNext = v.codeStepNext;
             });
         this.buildCombinedQCTabItems();
+        this.routeToWorkflow();
     }
 
     buildCombinedQCTabItems() {
@@ -102,8 +110,9 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
+        this.isATabChange = false;
         switch (this.codeStepNext) {
-            case 'QC' :
+            case this.workflowService.QC :
                 this.resetTab = 0;
                 break;
             case this.workflowService.ILLSEQ_PREP :
@@ -115,26 +124,55 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
             case this.workflowService.ILLSEQ_CLUSTER_GEN :
                 this.resetTab = 1;
                 break;
+            case this.workflowService.ILLSEQ_FINALIZE_FC :
+                this.resetTab = 1;
+                break;
 
         }
     }
 
+    routeToWorkflow() {
+        switch (this.codeStepNext) {
+            case this.workflowService.QC :
+                this.routeToQC();
+                break;
+            case this.workflowService.ILLSEQ_PREP :
+                this.onClickLibPrep();
+                break;
+            case this.workflowService.ILLSEQ_PREP_QC :
+                this.onClickLibPrepQC();
+                break;
+            case this.workflowService.ILLSEQ_CLUSTER_GEN :
+                this.onClickFlowCellAssm();
+                break;
+            case this.workflowService.ILLSEQ_FINALIZE_FC :
+                this.onClickFinalizedFlowCell();
+                break;
+
+        }
+
+    }
+
+    routeToQC() {
+        this.workflowOutlet = QcWorkflowComponent;
+    }
+
     onClickQC (event) {
         switch(event.currentTarget.innerText) {
-            case 'All' :
-                this.qcWorkflow.onClickAll(event);
+            case qcModes.All :
+                this.inputs.mode = qcModes.All
                 break;
-            case 'Illumina' :
-                this.qcWorkflow.onClickIlluminaQC(event);
+            case qcModes.Illumina :
+                this.inputs.mode = qcModes.Illumina;
                 break;
-            case 'Microarray' :
-                this.qcWorkflow.onClickMicroarrayQC(event);
+            case qcModes.Microarray :
+                this.inputs.mode = qcModes.Microarray;
                 break;
-            case 'Sample Quality' :
-                this.qcWorkflow.onClickSampleQualityQC(event);
+            case qcModes.Samplequality :
+                this.inputs.mode = qcModes.Samplequality;
                 break;
-            case 'Nano String' :
-                this.qcWorkflow.onClickNanostringQC(event);
+            case qcModes.Nanostring :
+                this.inputs.mode = qcModes.Nanostring;
                 break;
         }
     }
@@ -163,36 +201,39 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     }
 
     onGroupsTabChange(event) {
-        switch (event.index) {
-            case 0 :
-                this.codeStepNext = this.workflowService.QC;
-                break;
-            case 1 :
-                if (this.codeStepNext === this.workflowService.QC) {
-                    this.router.navigate(['libprepWorkFlow']);
-                    // this.libPrepWorkflow.initialize();
+        if (this.isATabChange) {
+            switch (event.index) {
+                case 0 :
+                    this.codeStepNext = this.workflowService.QC;
+                    break;
+                case 1 :
                     this.codeStepNext = this.workflowService.ILLSEQ_PREP;
-                }
-                break;
+                    break;
+            }
+            this.routeToWorkflow();
+        } else {
+            this.isATabChange = true;
         }
     }
 
-    onClickLibPrep(event) {
+    onClickLibPrep() {
         this.codeStepNext = this.workflowService.ILLSEQ_PREP;
-        this.router.navigate(['libprepWorkFlow']);
+        this.workflowOutlet = LibprepWorkflowComponent
     }
 
-    onClickLibPrepQC(event) {
+    onClickLibPrepQC() {
         this.codeStepNext = this.workflowService.ILLSEQ_PREP_QC;
-        this.router.navigate(['libprepQcWorkFlow']);
+        this.workflowOutlet = LibprepQcWorkflowComponent;
     }
 
-    onClickFlowCellAssm(event) {
+    onClickFlowCellAssm() {
         this.codeStepNext = this.workflowService.ILLSEQ_CLUSTER_GEN;
-        this.router.navigate(['flowcellassmWorkFlow']);
+        this.workflowOutlet = FlowcellassmWorkflowComponent;
     }
 
-    onClickFinalizedFlowCell(event) {
+    onClickFinalizedFlowCell() {
+        this.codeStepNext = this.workflowService.ILLSEQ_FINALIZE_FC;
+        this.workflowOutlet = FinalizeWorkflowComponent;
     }
 
     onClickDataPipeline(event) {

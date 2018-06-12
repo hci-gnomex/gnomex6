@@ -28,7 +28,7 @@ public class WorkItemSolexaAssembleParser implements Serializable {
   private TreeMap<String, String>               controlMap = new TreeMap<String, String>();
   private ArrayList<WorkItem>                   dirtyWorkItemList = new ArrayList<WorkItem>();
   private Integer    idCoreFacility = null;     // core facility for chosen work items.
-  
+  private String     codeRequestCategory = "";
   
   public WorkItemSolexaAssembleParser(Document docFlowCellChannels, Document docDirtyWorkItem) {
     this.docFlowCellChannels = docFlowCellChannels;
@@ -57,7 +57,7 @@ public class WorkItemSolexaAssembleParser implements Serializable {
           SequenceLane lane = (SequenceLane)sess.load(SequenceLane.class, new Integer(idSequenceLaneString));
           WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
           idCoreFacility = workItem.getIdCoreFacility();
-          
+          codeRequestCategory = node.getAttributeValue("codeRequestCategory");
           cc.setSequenceLane(lane);
           cc.setWorkItem(workItem);
         } else { // if it is not a <WorkItem> then it must be a <DictionaryEntry> for a SequencingControl
@@ -185,7 +185,10 @@ public class WorkItemSolexaAssembleParser implements Serializable {
     return this.idCoreFacility;
   }
   
-  
+  public String getCodeRequestCategory() {
+    return this.codeRequestCategory;
+  }
+
   public static class ChannelContent implements Serializable{
     private SequenceLane sequenceLane;
     private SequencingControl sequenceControl;
