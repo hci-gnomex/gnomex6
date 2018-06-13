@@ -77,6 +77,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig),
         NgbModule.forRoot(),
+        AuthenticationModule.forRoot(),
         CommonModule,
         UserModule,
         BrowserAnimationsModule,

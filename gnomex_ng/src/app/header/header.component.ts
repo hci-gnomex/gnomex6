@@ -763,7 +763,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
                         iconName: '../../assets/page_go.png',
-                        route: ''
+                        route: '/pipelineWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Flow Cells',
@@ -871,7 +871,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
                         iconName: '../../assets/page_go.png',
-                        route: ''
+                        route: '/pipelineWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Flow Cells',
@@ -1150,7 +1150,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
                         iconName: '../../assets/page_go.png',
-                        route: ''
+                        route: '/pipelineWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Flow Cells',

@@ -38,6 +38,7 @@ import {DeleteSeqlaneDialogComponent} from "./delete-seqlane-dialog.component";
 import {FinalizeWorkflowComponent} from "./finalize-workflow.component";
 import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
 import { DynamicModule } from 'ng-dynamic-component';
+import {PipelineWorkflowComponent} from "./pipeline-workflow.component";
 /**
  * @author jdewell
  * @since 12/19/16
@@ -79,11 +80,11 @@ import { DynamicModule } from 'ng-dynamic-component';
             FlowcellassmWorkflowComponent,  FinalizeWorkflowComponent])
     ],
     declarations: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent],
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent],
     entryComponents: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent],
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent],
     exports: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent]
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent]
 })
 export class WorkflowModule {
 }

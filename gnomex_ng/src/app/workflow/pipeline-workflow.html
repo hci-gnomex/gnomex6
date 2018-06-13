@@ -1,0 +1,27 @@
+<div class="flex-column-container-workflow">
+    <div class="flex-row-container">
+        <img src="../../assets/server_go.png" height="16" width="16" style="margin-top: .65em">
+        <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
+    </div>
+    <div class="row-one" style="width: 100%;height: 90%">
+        <ag-grid-angular id="userTable" style="width: 100%;" class="ag-fresh"
+                         [rowData]="workingWorkItemList"
+                         [columnDefs]="columnDefs"
+                         (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                         (gridReady)="onGridReady($event)"
+                         [enableSorting]="true"
+                         (cellValueChanged) = "onCellValueChanged($event)"
+                         [enableFilter]="true"
+                         [rowClassRules]="this.workflowService.assmGridRowClassRules"
+                         (gridSizeChanged)="this.sizeColumnsToFit(this.gridApi)"
+                         [enableColResize]="true">
+        </ag-grid-angular>
+    </div>
+    <div class="flex-row-container">
+        <button mat-button style="margin-top: 1.2em" matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img src="../../assets/action_refresh.gif">Refresh</button>
+        <save-footer style="width: 100%" (saveClicked)="save()"
+                     [dirty]="this.dirty"
+                     [showSpinner]="this.showSpinner">
+        </save-footer>
+    </div>
+</div>
