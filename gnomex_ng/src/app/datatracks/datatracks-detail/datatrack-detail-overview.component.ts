@@ -46,7 +46,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     private datatrackDirectory:any;
     private annotations: IAnnotation[];
     public relatedObjects: any;
-    public relatedTopics: any;
     public showRelatedDataTab:boolean = false;
     public showDownloadLink:boolean = false;
     public showUCSC:boolean = false;
@@ -105,7 +104,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             }else{
                 this.annotations = [];
                 this.relatedObjects = [];
-                this.relatedTopics = [];
             }
 
         })
@@ -137,27 +135,35 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     }
 
     initRelatedData(datatrack:any):boolean {
-        this.relatedObjects = datatrack.relatedObjects;
-        this.relatedTopics = datatrack.relatedTopics;
-        if(this.relatedObjects){
-            let analysis:Array<any> = this.relatedObjects.Analysis;
-            if(analysis){
-                this.relatedObjects.Analysis = Array.isArray(analysis) ? analysis : [analysis];
-            }else{
-                this.relatedObjects.Analysis = [];
+        this.relatedObjects = {};
+        let rObjects = datatrack.relatedObjects;
+        let relatedTopics = datatrack.relatedTopics;
+
+        if(rObjects){
+
+            if(rObjects.Analysis){
+                let order:Array<any> =  rObjects.Analysis;
+                this.relatedObjects.Analysis = Array.isArray(order) ? order : [order];
+            }
+            if(rObjects.DataTrack){
+                let order:Array<any> =   rObjects.DataTrack;
+                this.relatedObjects.DataTrack = Array.isArray(order) ? order : [order];
+            }
+            if(rObjects.Request){
+                let order:Array<any> =   rObjects.Request;
+                this.relatedObjects.Request = Array.isArray(order) ? order : [order];
+            }
+            if(relatedTopics){
+                let topics:Array<any> = relatedTopics.Topic;
+                if(topics){
+                    this.relatedObjects.Topic = Array.isArray(topics) ? topics : [topics];
+                }
             }
 
+            return !!(this.relatedObjects.Topic || this.relatedObjects.Analysis || this.relatedObjects.Request || this.relatedObjects.DataTrack); // !! converts to boolean statement
+        }else{
+            return false;
         }
-        if(this.relatedTopics){
-            let topics:Array<any> = this.relatedTopics.Topic;
-            if(topics){
-                this.relatedTopics.Topic = Array.isArray(topics) ? topics : [topics];
-            }else{
-                this.relatedTopics.Topic = [];
-            }
-        }
-
-        return (this.relatedTopics.Topic.length > 0 || this.relatedObjects.Analysis.length > 0 );
 
     }
 

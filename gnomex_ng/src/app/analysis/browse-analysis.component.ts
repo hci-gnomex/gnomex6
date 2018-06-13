@@ -222,7 +222,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private parentProject: any;
     public showSpinner: boolean = false;
     public newAnalysisName: any;
-    private navAnalysisGroupList:any;
+    private navAnalysisGroupListSubscription:Subscription;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
@@ -284,7 +284,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             })
         });
 
-        this.navAnalysisGroupList = this.gnomexService.navInitBrowseAnalysisSubject.subscribe( orderInitObj => {
+        this.navAnalysisGroupListSubscription = this.gnomexService.navInitBrowseAnalysisSubject.subscribe( orderInitObj => {
             if(orderInitObj){
                 let ids: URLSearchParams = new URLSearchParams;
                 let idLab = this.gnomexService.orderInitObj.idLab;
@@ -621,6 +621,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     ngOnDestroy(): void {
         this.analysisGroupListSubscription.unsubscribe();
-        this.navAnalysisGroupList = null;
+        this.navAnalysisGroupListSubscription.unsubscribe();
+        this.gnomexService.navInitBrowseAnalysisSubject.next(null);
     }
 }
