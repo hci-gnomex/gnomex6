@@ -2,7 +2,7 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, Headers} from "@angular/http";
 import {Observable} from "rxjs/Observable";
-import {HttpParams} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
 import {CookieUtilService} from "./cookie-util.service";
 
@@ -22,6 +22,7 @@ export class WorkflowService {
     public readonly ILLSEQ_PREP_QC = "ILLSEQPREPQC";
     public readonly ILLSEQ_CLUSTER_GEN = "ILLSEQASSEM";
     public readonly ILLSEQ_FINALIZE_FC = "ILLSEQFINFC";
+    public readonly ILLSEQ_DATA_PIPELINE = "ILLSEQPIPE";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";
     public readonly NANOSTRING = "NANO";
@@ -39,9 +40,17 @@ export class WorkflowService {
         {display: 'Bypass', value: 'Bypassed'}
     ];
 
+    public readonly pipelineCompletionStatus = [
+        {display: '', value: ''},
+        {display: 'Complete', value: 'Completed'},
+        {display: 'On Hold', value: 'On Hold'},
+        {display: 'Terminate', value: 'Terminated'},
+    ];
+
     constructor(private http: Http,
                 private cookieUtilService: CookieUtilService,
-                private dictionaryService: DictionaryService) {
+                private dictionaryService: DictionaryService,
+                private httpClient: HttpClient) {
 
         this.assmGridRowClassRules = {
             "workFlowOnColor": "data.backgroundColor === 'ON' && !data.selected",
@@ -280,13 +289,15 @@ export class WorkflowService {
 
     }
 
-    deleteFlowCell(params: URLSearchParams):  Observable<any> {
+    deleteFlowCell(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/DeleteFlowCell.gx", params.toString(), {headers: headers});
+        return this.httpClient.post("/gnomex/DeleteFlowCell.gx", null, {params: params});
 
     }
 
+    SaveWorkItemSolexaPipeline(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/SaveWorkItemSolexaPipeline.gx", null, {params: params});
+
+    }
 }

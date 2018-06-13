@@ -233,6 +233,34 @@
       ]
     },
     {
+      "command": "SaveFlowCell",
+      "parameter": "channelsXMLString",
+      "nodeheader": "fcChannels",
+      "nodeprefix": "FlowCellChannel",
+      "elementhints": [
+        {
+          "elementname": "sequenceLanes",
+          "elementheader": "SequenceLane"
+        },
+        {
+          "elementname": "flowCell",
+          "elementheader": "FlowCell"
+        }
+      ]
+    },
+    {
+      "command": "SaveWorkItemSolexaPipeline",
+      "parameter": "workItemXMLString",
+      "nodeheader": "WorkItemList",
+      "nodeprefix": "WorkItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
       "command": "MoveAnalysis",
       "parameter": "analysisGroupsXMLString",
       "nodeheader": "analysisGroups",

@@ -3,15 +3,11 @@ package hci.gnomex.controller;
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.FlowCell;
-import hci.gnomex.model.FlowCellChannel;
-import hci.gnomex.model.Notification;
-import hci.gnomex.model.NumberSequencingCyclesAllowed;
-import hci.gnomex.model.SequenceLane;
-import hci.gnomex.model.WorkItem;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FlowCellChannelParser;
 import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
@@ -156,19 +152,11 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
                   wi.setIdRequest(sl.getIdRequest());
                   wi.setSequenceLane(sl);
 
-                  if(x.getCodeStepNext().equals("HSEQFINFC") || x.getCodeStepNext().equals("HSEQPIPE")) {
-                    wi.setCodeStepNext("HSEQASSEM");  
-                  } else if (x.getCodeStepNext().equals("MISEQFINFC") || x.getCodeStepNext().equals("MISEQPIPE")) {
-                    wi.setCodeStepNext("MISEQASSEM");            		  
-                  } else if (x.getCodeStepNext().equals("NOSEQFINFC") || x.getCodeStepNext().equals("NOSEQPIPE")) {
-                    wi.setCodeStepNext("NOSEQASSEM");
-                  } else if(x.getCodeStepNext().equals("ILLSEQFINFC") || x.getCodeStepNext().equals("ILLSEQPIPE")) {
-                    wi.setCodeStepNext("ILLSEQASSEM");
-
-
+                  if (x.getCodeStepNext().equals(Step.ILLSEQ_FINALIZE_FC) || x.getCodeStepNext().equals(Step.HISEQ_DATA_PIPELINE)) {
+                    wi.setCodeStepNext(Step.ILLSEQ_DATA_PIPELINE);
                   }
-	          
-		sess.save(wi);
+
+		          sess.save(wi);
                 }
               }
               sess.delete(x);
@@ -322,17 +310,8 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
           List workItems = sess.createQuery(sb.toString()).list();
           for(Iterator i = workItems.iterator(); i.hasNext();) {
             WorkItem wi = (WorkItem)i.next();
-            if(wi.getCodeStepNext().equals("HSEQFINFC")) {
-              wi.setCodeStepNext("HSEQPIPE");
-              sess.save(wi);
-            } else if (wi.getCodeStepNext().equals("MISEQFINFC")) {
-              wi.setCodeStepNext("MISEQPIPE");
-              sess.save(wi);
-            } else if (wi.getCodeStepNext().equals("NOSEQFINFC")) {
-              wi.setCodeStepNext("NOSEQPIPE");
-	      sess.save(wi);
-            } else if(wi.getCodeStepNext().equals("ILLSEQFINFC")) {
-              wi.setCodeStepNext("ILLSEQPIPE");
+            if (wi.getCodeStepNext().equals(Step.ILLSEQ_FINALIZE_FC)) {
+              wi.setCodeStepNext(Step.ILLSEQ_DATA_PIPELINE);
               sess.save(wi);
             }
           }

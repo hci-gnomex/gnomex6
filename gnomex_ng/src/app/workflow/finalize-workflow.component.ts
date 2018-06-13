@@ -13,6 +13,8 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
+import {FilllikeTextRendererComponent} from "../util/grid-renderers/filllike-text-renderer.component";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: 'finalizeFlowCell-workflow',
@@ -707,32 +709,24 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     delete() {
-        let params: URLSearchParams = new URLSearchParams();
-
-        params.set("idFlowCell", this.flowCell.idFlowCell);
+        let params: HttpParams = new HttpParams().set("idFlowCell", this.flowCell.idFlowCell);
 
         this.showSpinner = true;
         this.workflowService.deleteFlowCell(params).subscribe((response: any) => {
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.allFG.markAsPristine();
-                    if (!responseJSON.flowCellNumber) {
-                        responseJSON.flowCellNumber = "";
-                    }
-                    this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " deleted", null);
-                    this.assmItemList = [];
-                    this.initialize();
-                } else {
-                    let message: string = "";
-                    if (responseJSON && responseJSON.message) {
-                        message = ": " + responseJSON.message;
-                    }
-                    this.dialogsService.confirm("An error occurred while deleting" + message, null);
+            if (response && response.result && response.result === 'SUCCESS') {
+                this.allFG.markAsPristine();
+                if (!response.flowCellNumber) {
+                    response.flowCellNumber = "";
                 }
+                this.dialogsService.confirm("Flowcell " + response.flowCellNumber + " deleted", null);
+                this.assmItemList = [];
+                this.initialize();
             } else {
-                this.dialogsService.confirm("An error occurred while deleting " + response.status, null);
-
+                let message: string = "";
+                if (response && response.message) {
+                    message = ": " + response.message;
+                }
+                this.dialogsService.confirm("An error occurred while deleting" + message, null);
             }
             this.showSpinner = false;
         });
