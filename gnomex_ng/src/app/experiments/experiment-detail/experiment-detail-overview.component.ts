@@ -11,7 +11,7 @@ import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 
 @Component({
 
-    templateUrl:'./analysis-detail-overview.component.html'
+    templateUrl:'./experiment-detail-overview.component.html'
     ,
     styles:[`
         .mat-tab-group-border{
@@ -20,12 +20,12 @@ import {IRelatedObject} from "../../util/interfaces/related-objects.model";
         }
     `]
 })
-export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
+export class ExperimentDetailOverviewComponent  implements OnInit, OnDestroy{
     public annotations:any = [];
-    private analysis:any;
+    private experiment:any;
     types = OrderType;
     private overviewListSubscription : Subscription;
-    private analysisOverviewNode:any;
+    private experimentOverviewNode:any;
     private relatedObjects:IRelatedObject = {};
     private showRelatedDataTab:boolean =false;
 
@@ -38,17 +38,17 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
 
         this.overviewListSubscription  = this.analysisService.getAnalysisOverviewListSubject()
             .subscribe(data =>{
-                this.analysisOverviewNode = data;
+                this.experimentOverviewNode = data;
 
-                });
+            });
 
 
 
         this.route.data.forEach(data => {
-            this.analysis = data.analysis.Analysis;
-            if(this.analysis){
-                let annots = this.analysis.AnalysisProperties;
-                this.showRelatedDataTab = this.initRelatedData(this.analysis);
+            this.experiment = data.experiment.Request;
+            if(this.experiment){
+                let annots = this.experiment.RequestProperties;
+                this.showRelatedDataTab = this.initRelatedData(this.experiment);
 
                 if(annots){
                     this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
@@ -67,10 +67,10 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
         });
     }
 
-    initRelatedData(analysis:any):boolean {
+    initRelatedData(experiment:any):boolean {
 
-        let rObjects = analysis.relatedObjects;
-        let relatedTopics = analysis.relatedTopics;
+        let rObjects = experiment.relatedObjects;
+        let relatedTopics = experiment.relatedTopics;
 
         if(rObjects){
 

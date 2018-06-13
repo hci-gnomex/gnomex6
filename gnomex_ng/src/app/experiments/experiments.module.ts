@@ -35,19 +35,8 @@ import {BrowsePanelComponent} from "./browse-panel.component";
 import {AgGridModule} from 'ag-grid-angular/main';
 
 import {
-    TestComponent,
-    DescriptionTab,
-    PrepTab,
-    ExperimentDetail,
-    NewExperimentComponent,
-    SamplesTabComponent,
-    SequenceLanesTabComponent,
-} from './experiment-detail/index'
-import {
-    RichEditorModule,
     DropDownModule
 } from '../../modules/index';
-
 
 import {
     ExperimentsBrowseTab,
@@ -65,6 +54,7 @@ import {AgGridRendererModule,IconTextRendererComponent} from "../util/grid-rende
 import {MatDialogModule} from "@angular/material";
 import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
 import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
+import {ExperimentDetailModule} from "./experiment-detail/experiment-detail-module";
 
 /**
  * @author mbyrne
@@ -72,18 +62,6 @@ import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.compon
  */
 
 
-export const componentFactories =
-    [
-        TestComponent,
-        DescriptionTab,
-        PrepTab,
-        ExperimentsBrowseTab,
-        ProgressBrowseTab,
-        ProjectBrowseTab,
-        VisiblityBrowseTab,
-        SamplesTabComponent,
-        SequenceLanesTabComponent,
-    ];
 /**/
                                 // need add components that will be tabs here
                                                                           // could be put in gnomexFlex as w
@@ -109,25 +87,18 @@ export const componentFactories =
         UtilModule,
         WindowModule,
         ReactiveFormsModule,
-        RichEditorModule,
         DropDownModule,
         AngularMaterialModule,
         TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
-        AgGridModule.withComponents([IconTextRendererComponent,IconRendererComponent])
+        AgGridModule.withComponents([IconTextRendererComponent,IconRendererComponent]),
+        ExperimentDetailModule
     ],
     declarations: [
                     BrowseExperimentsComponent,
                     ExperimentOrdersComponent,
                     ViewExperimentComponent,
-                    TestComponent,
-                    DescriptionTab,
-                    SamplesTabComponent,
-                    SequenceLanesTabComponent,
-                    ExperimentDetail,
-                    PrepTab,
-                    NewExperimentComponent,
                     BrowsePanelComponent,
                     BrowseOverviewComponent,
                     ExperimentsBrowseTab,
@@ -140,7 +111,7 @@ export const componentFactories =
                     DeleteExperimentComponent,
                     CreateProjectLauncherComponent
     ],
-    entryComponents:[...componentFactories, CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent],
+    entryComponents:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent],
     exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent]
 })
 export class ExperimentsModule {

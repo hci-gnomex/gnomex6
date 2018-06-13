@@ -80,6 +80,8 @@ export class ConstantsService {
     public readonly ICON_DATATRACK_INSTITUTION:string = "assets/datatrack_institution.png";
     public readonly ICON_DATATRACK_OWNER:string = "assets/datatrack_owner.png" ;
 
+    public readonly ICON_GREEN_BULLET:string = "assets/bullet_green.png";
+
 
 
     public getTreeIcon(item:any,name:string) {
@@ -101,6 +103,9 @@ export class ConstantsService {
             } else {
                 item.icon = this.ICON_TOPIC_PUBLIC;
             }
+        }
+        else if(name === "SequenceLane"){
+            item.icon = this.ICON_GREEN_BULLET;
         }
 
     }

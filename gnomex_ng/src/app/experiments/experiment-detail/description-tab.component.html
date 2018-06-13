@@ -9,17 +9,17 @@
             </div>
         </div>
         <div class="form-group" >
-            <label class="col-md-2 control-label" for="experimentDescriptionId">Experiment Description </label>
+            <label class="col-md-2 control-label">Experiment Description </label>
             <br/>
 
             <div class="col-md-8">
-                <jqxEditor #editorReference id="experimentDescriptionId" [width]="800" [height]="400"
+               <!-- <jqxEditor #editorReference id="experimentDescriptionId" [width]="800" [height]="400"
                            [editable]="edit"
                            [tools]="toolbarSettings"
                            formControlName="expDescript"
                            [formControl]="descriptionForm.get('expDescript')"
                            [toolbarPosition]="'bottom'">
-                </jqxEditor>
+                </jqxEditor> -->
             </div>
             <span style="color:red;" class="help-block" *ngIf="(descriptionForm.get('expDescript').touched || descriptionForm.get('expDescript').dirty) && descriptionForm.get('expDescript').errors">
                 <span *ngIf="descriptionForm.get('expDescript').errors.required">
