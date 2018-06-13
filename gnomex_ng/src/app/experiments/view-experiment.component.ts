@@ -9,8 +9,7 @@ import {Request} from "@angular/http";
 
 @Component({
     selector: "experiment",
-    template: `
-        <experiment-detail></experiment-detail>
+    template: `        
         <div *ngIf="experiment" class="container-fluid" style="padding-top: 10px">
         
             <div class="row">

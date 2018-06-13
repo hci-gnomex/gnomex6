@@ -48,9 +48,6 @@ export class SaveFooterComponent implements OnInit,OnDestroy {
     @Output() saveClicked = new EventEmitter<any>();
 
     ngOnInit(){
-        console.log(this.showSpinner);
-        console.log(this.dirty);
-        console.log(this.message);
         //console.log(this.disableSave);
 
     }

@@ -75,8 +75,8 @@
                 <dt-visibility-tab></dt-visibility-tab>
             </mat-tab>
             <mat-tab *ngIf="showRelatedDataTab" style="height:100%;" label="Related Data">
-                <dt-relate-data-tab [relatedTopics]="relatedTopics" [relatedObjects]="relatedObjects" >
-                </dt-relate-data-tab>
+                <related-data-tab [relatedObjects]="relatedObjects" >
+                </related-data-tab>
             </mat-tab>
         </mat-tab-group>
     </div>

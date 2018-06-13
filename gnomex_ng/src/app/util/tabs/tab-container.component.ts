@@ -19,7 +19,7 @@ import { PrimaryTab } from './primary-tab.component'
 import { TabChangeEvent } from './tab-change-event'
 import { TabsStatusEvent } from './tab-status-event'
 import {ComponentCommunicatorEvent} from './component-status-event'
-import {PrepTab} from "../../experiments/experiment-detail/prep-tab.component";
+//import {PrepTab} from "../../experiments/experiment-detail/prep-tab.component";
 import 'rxjs/add/operator/distinctUntilChanged';
 
 
@@ -190,11 +190,11 @@ export class TabContainer implements OnInit, OnDestroy{
     }
     private createTab():void{
         let tabsInstance = this.tabsRef.instance;
-        tabsInstance.insertTab(PrepTab,this.theForm,this.state);
+        //tabsInstance.insertTab(PrepTab,this.theForm,this.state);
         tabsInstance.initContent(tabsInstance.tabs);
 
-        let prepTab =<PrepTab>tabsInstance.tabs[0].getComp();
-        prepTab.initNewExperiment.subscribe(initEvent => this.initNew(initEvent)); // when new experiment selected
+        //let prepTab =<PrepTab>tabsInstance.tabs[0].getComp();
+        //prepTab.initNewExperiment.subscribe(initEvent => this.initNew(initEvent)); // when new experiment selected
 
     }
 

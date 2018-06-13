@@ -11,11 +11,11 @@ import {UtilModule} from "../../util/util.module";
 
 import {DatatracksDetailOverviewComponent,
         DatatracksSummaryTabComponent,
-        DatatracksVisibilityTabComponent,DatatracksRelatedDataTabComponent } from "./index"
+        DatatracksVisibilityTabComponent} from "./index"
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
 import {RichEditorModule} from "../../../modules/rich-editor.module";
-import {TreeModule} from "angular-tree-component";
+import {RelatedDataModule} from "../../util/related-data.module";
 
 
 
@@ -33,17 +33,16 @@ import {TreeModule} from "angular-tree-component";
         FormsModule,
         ServicesModule,
         RichEditorModule,
-        TreeModule,
         UtilModule,
         ReactiveFormsModule,
-        ConfigureAnnotationsModule
+        ConfigureAnnotationsModule,
+        RelatedDataModule
 
     ],
     declarations: [
         DatatracksDetailOverviewComponent,
         DatatracksSummaryTabComponent,
-        DatatracksVisibilityTabComponent,
-        DatatracksRelatedDataTabComponent
+        DatatracksVisibilityTabComponent
 
     ],
     entryComponents: [ConfigAnnotationDialogComponent]

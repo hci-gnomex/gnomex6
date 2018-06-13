@@ -3,16 +3,14 @@
  */
 import { Routes, RouterModule } from "@angular/router";
 import { BrowseExperimentsComponent } from "./browse-experiments.component";
-import { ViewExperimentComponent } from "./view-experiment.component";
-import {NewExperimentComponent} from "./experiment-detail/new-experiment.component";
 import { ExperimentOrdersComponent } from "./orders/experiment-orders.component";
 import { BrowseOverviewComponent } from "./browse-overview/browse-overview.component";
-import { ExperimentDetail } from "./experiment-detail/experiment-detail.component";
 import { ExperimentResolverService, ProjectResolverService } from "../services/resolvers/index";
 import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
 import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
 import {ProjectListResolverService} from "../services/resolvers/project-list-resolver.service";
+import {ExperimentDetailOverviewComponent} from "./experiment-detail/experiment-detail-overview.component";
 
 
 /**
@@ -28,13 +26,13 @@ const ROUTES: Routes = [
     { path: 'experiments', component: BrowseExperimentsComponent , children:[ // for stepping through app to this page
         {path: '', pathMatch: 'full', redirectTo: '/experiments/(browsePanel:overview)' },
         {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
-        {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
+        {path:':id', component: ExperimentDetailOverviewComponent, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
         canActivate: [SubRouteGuardService]
     },
     { path: "experiments/:idProject", component:BrowseExperimentsComponent, children:[
         {path: '', pathMatch: 'full', redirectTo: '/experiments/:idProject/(browsePanel:overview)' },
         {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
-        {path:':id', component: ExperimentDetail, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
+        {path:':id', component: ExperimentDetailOverviewComponent, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
         canActivate: [SubRouteGuardService], resolve:{projectList:ProjectListResolverService}, runGuardsAndResolvers: 'paramsChange'
     },
 
