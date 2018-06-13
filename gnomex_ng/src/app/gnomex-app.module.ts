@@ -69,7 +69,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         HeaderModule,
         HomeModule,
         UserModule,
-        AuthenticationModule,
+        AuthenticationModule.forRoot(),
         ExperimentsModule,
         ConfigurationModule,
         AboutModule,

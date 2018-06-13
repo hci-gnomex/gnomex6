@@ -70,15 +70,38 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 				&& this.optionsValueField && this.optionsValueField != ""
 				&& this.optionsDisplayField && this.optionsDisplayField != "") {
 
+			let foundOption: boolean = false;
+
 			for (let option of this.options) {
 				if (option[this.optionsValueField] && option[this.optionsValueField] === this.value) {
 					if (option[this.optionsDisplayField]) {
 						this.display = option[this.optionsDisplayField];
+                        foundOption = true;
 					} else {
 						this.display = this.value;
 					}
 					break;
 				}
+			}
+
+			// if we didn't find the item in the dictionary, check if the items are strings in different cases
+            if (!foundOption) {
+                for (let option of this.options) {
+                    if (option[this.optionsValueField] && ('' + option[this.optionsValueField]).toLowerCase() === ('' + this.value).toLowerCase()) {
+                        if (option[this.optionsDisplayField]) {
+                            this.display = option[this.optionsDisplayField];
+                            foundOption = true;
+                        } else {
+                            this.display = this.value;
+                        }
+                        break;
+                    }
+                }
+			}
+
+			// if we still didn't find the item, at least display the id.
+			if (!foundOption) {
+                this.display = this.value;
 			}
         } else if (this.defaultOption && this.value != "") {
             this.display = this.defaultOption[this.optionsDisplayField];

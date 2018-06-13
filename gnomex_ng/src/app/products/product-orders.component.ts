@@ -1,5 +1,5 @@
-import {Component, Inject, OnInit} from "@angular/core";
-import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators} from "@angular/forms";
+import {Component, Inject, OnInit, ViewChild} from "@angular/core";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {GridReadyEvent, GridSizeChangedEvent, SelectionChangedEvent} from "ag-grid";
 import {LabListService} from "../services/lab-list.service";
 import {DictionaryService} from "../services/dictionary.service";
@@ -9,6 +9,8 @@ import {HttpParams} from "@angular/common/http";
 import {ProductsService} from "../services/products.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {MatSnackBar} from "@angular/material";
+import {ITreeOptions, TreeComponent} from "angular-tree-component";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Component({
     selector: 'product-orders',
@@ -20,8 +22,14 @@ import {MatSnackBar} from "@angular/material";
         .flex-two {
             flex: 2;
         }
+        .flex-three {
+            flex: 3;
+        }
         .flex-ten {
             flex: 10;
+        }
+        .flex-thirteen {
+            flex: 13;
         }
         div.filter-col {
             display: flex;
@@ -43,16 +51,24 @@ import {MatSnackBar} from "@angular/material";
         .reduced-font {
             font-size: 13px;
         }
+        .half-width {
+            width: 50%;
+        }
+        .italics {
+            font-style: italic;
+        }
     `]
 })
 
 export class ProductOrdersComponent implements OnInit {
     public readonly DISPLAY_DETAIL: string = "d";
     public readonly DISPLAY_OVERVIEW: string = "o";
+    public readonly DETAIL_LAB_MODE: string = "lm";
+    public readonly DETAIL_ORDER_MODE: string = "om";
 
     public showSpinner: boolean = false;
     public displayMode: string = this.DISPLAY_OVERVIEW;
-    public productOrderList: any[] = [];
+    public detailDisplayMode: string;
     public productOrderLineItemList: any[] = [];
 
     public filterForm: FormGroup;
@@ -64,7 +80,17 @@ export class ProductOrdersComponent implements OnInit {
     public changeStatus: any;
     public changeProductOrders: any[] = [];
 
-    public gridColumnDefs: any[];
+    public overviewGridColumnDefs: any[];
+    public labGridColumnDefs: any[];
+    public productOrderGridColumnDefs: any[];
+    public labLineItems: any[] = [];
+    public productOrderLineItems: any[] = [];
+
+    @ViewChild(TreeComponent) private treeComponent: TreeComponent;
+    public treeOptions: ITreeOptions;
+    public productOrderList: ITreeNode[] = [];
+    public selectedTreeNode: ITreeNode;
+    public currentProductOrder: any;
 
     constructor(@Inject(FormBuilder) private fb: FormBuilder,
                 private labListService: LabListService,
@@ -80,7 +106,7 @@ export class ProductOrdersComponent implements OnInit {
             productType: '',
             date: null
         });
-        this.gridColumnDefs = [
+        this.overviewGridColumnDefs = [
             {headerName: "Product Order #", field: "productOrderNumber", width: 100, checkboxSelection: true, headerCheckboxSelection: true, tooltipField: "productOrderNumber"},
             {headerName: "Lab", field: "labName", width: 100, tooltipField: "labName"},
             {headerName: "Submitter", field: "submitter", width: 100, tooltipField: "submitter"},
@@ -90,6 +116,19 @@ export class ProductOrdersComponent implements OnInit {
             {headerName: "Qty", field: "qty", width: 100, tooltipField: "qty"},
             {headerName: "Total Price", field: "totalPrice", width: 100, tooltipField: "totalPrice"},
             {headerName: "Status", field: "status", width: 100, tooltipField: "status"},
+        ];
+        this.labGridColumnDefs = [
+            {headerName: "Product Order #", field: "productOrderNumber", width: 100},
+            {headerName: "Submitter", field: "submitter", width: 100},
+            {headerName: "Submit Date", field: "submitDate", width: 100},
+            {headerName: "Status", field: "status", width: 100},
+        ];
+        this.productOrderGridColumnDefs = [
+            {headerName: "Product", field: "name", width: 100},
+            {headerName: "Quantity Ordered", field: "qty", width: 100},
+            {headerName: "Unit Price", field: "unitPrice", width: 100},
+            {headerName: "Total Price", field: "totalPrice", width: 100},
+            {headerName: "Status", field: "status", width: 100},
         ];
     }
 
@@ -106,16 +145,23 @@ export class ProductOrdersComponent implements OnInit {
         this.filterProductTypeList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PRODUCT_TYPE).filter((pt: any) => {
             return this.createSecurityAdvisorService.isMyCoreFacility(pt.idCoreFacility);
         });
+
+        this.treeOptions = {
+            displayField: 'display',
+        };
     }
 
     public dateRangeChange(event: DateRange): void {
         this.filterForm.controls['date'].setValue(event);
     }
 
-    private getProductOrderLists(): void {
+    private getProductOrderLists(lab?: string, idProductOrder?: string): void {
         this.productOrderList = [];
         this.productOrderLineItemList = [];
         this.changeProductOrders = [];
+        this.labLineItems = [];
+        this.productOrderLineItems = [];
+        this.selectedTreeNode = null;
 
         let params: HttpParams = new HttpParams();
         if (this.filterForm.controls['lab'].value) {
@@ -141,9 +187,11 @@ export class ProductOrdersComponent implements OnInit {
         this.productsService.getProductOrderList(params).subscribe((result: any) => {
             if (result) {
                 if (Array.isArray(result)) {
-                    this.productOrderList = result;
+                    for (let lab of result) {
+                        this.productOrderList.push(this.makeLabNode(lab));
+                    }
                 } else if (result.Lab) {
-                    this.productOrderList = [result.Lab];
+                    this.productOrderList.push(this.makeLabNode(result.Lab));
                 } else {
                     let message: string = "";
                     if (result && result.message) {
@@ -151,24 +199,35 @@ export class ProductOrdersComponent implements OnInit {
                     }
                     this.dialogsService.confirm("An error occurred while retrieving the product order list" + message, null);
                 }
+                this.treeComponent.treeModel.update();
             }
-        });
 
-        this.productsService.getProductOrderLineItemList(params).subscribe((result: any) => {
-            if (result) {
-                if (Array.isArray(result)) {
-                    this.productOrderLineItemList = result;
-                } else if (result.LineItem) {
-                    this.productOrderLineItemList = [result.LineItem];
-                } else {
-                    let message: string = "";
-                    if (result && result.message) {
-                        message = ": " + result.message;
+            this.productsService.getProductOrderLineItemList(params).subscribe((result: any) => {
+                if (result) {
+                    if (Array.isArray(result)) {
+                        this.productOrderLineItemList = result;
+                    } else if (result.LineItem) {
+                        this.productOrderLineItemList = [result.LineItem];
+                    } else {
+                        let message: string = "";
+                        if (result && result.message) {
+                            message = ": " + result.message;
+                        }
+                        this.dialogsService.confirm("An error occurred while retrieving the product order line item list" + message, null);
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving the product order line item list" + message, null);
                 }
-            }
+
+                if (lab) {
+                    this.selectTreeNode(lab, idProductOrder);
+                }
+            });
         });
+    }
+
+    private makeLabNode(obj: any): ITreeNode {
+        let labNode: any = obj;
+        labNode.children = labNode.ProductOrder && Array.isArray(labNode.ProductOrder) ? labNode.ProductOrder : [labNode.ProductOrder];
+        return labNode;
     }
 
     public promptToSave(): void {
@@ -178,20 +237,30 @@ export class ProductOrdersComponent implements OnInit {
                 return;
             }
 
-            // TODO if lab node is selected give dialog
-
-            this.save();
+            if (this.displayMode === this.DISPLAY_DETAIL && this.detailDisplayMode === this.DETAIL_LAB_MODE) {
+                this.dialogsService.confirm("Do you want to change the status of all orders in this lab?", " ").subscribe((response: boolean) => {
+                    if (response) {
+                        this.save();
+                    }
+                });
+            } else {
+                this.save();
+            }
         }
     }
 
     private save(): void {
+        let lab: string;
+        let idProductOrder: string;
         let params: HttpParams = new HttpParams()
             .set("noJSONToXMLConversionNeeded", "Y")
-            .set("codeProductOrderStatus", this.changeStatus);
-        if (this.displayMode === this.DISPLAY_DETAIL) {
-            // TODO
-        } else if (this.displayMode === this.DISPLAY_OVERVIEW) {
-            params = params.set("selectedLineItems", JSON.stringify(this.changeProductOrders));
+            .set("codeProductOrderStatus", this.changeStatus)
+            .set("selectedLineItems", JSON.stringify(this.changeProductOrders));
+        if (this.displayMode === this.DISPLAY_DETAIL && this.detailDisplayMode === this.DETAIL_ORDER_MODE) {
+            lab = this.selectedTreeNode.parent.data.display;
+            idProductOrder = this.selectedTreeNode.data.idProductOrder;
+        } else if (this.detailDisplayMode === this.DETAIL_LAB_MODE) {
+            lab = this.selectedTreeNode.data.display;
         }
         this.productsService.changeProductOrderStatus(params).subscribe((response: any) => {
             if (response && response.result && response.result === 'SUCCESS') {
@@ -201,7 +270,7 @@ export class ProductOrdersComponent implements OnInit {
                 this.snackBar.open("Item(s) Saved", "Product Orders", {
                     duration: 2000,
                 });
-                this.getProductOrderLists();
+                this.getProductOrderLists(lab, idProductOrder);
             } else {
                 let message: string = "";
                 if (response && response.message) {
@@ -215,7 +284,11 @@ export class ProductOrdersComponent implements OnInit {
     public promptToDelete(): void {
         if (this.changeProductOrders && this.changeProductOrders.length > 0) {
             if (this.displayMode === this.DISPLAY_DETAIL) {
-                // TODO
+                this.dialogsService.confirm("Any completed line item(s) will be skipped. Continue?", " ").subscribe((response: boolean) => {
+                    if (response) {
+                        this.deleteLineItems();
+                    }
+                });
             } else if (this.displayMode === this.DISPLAY_OVERVIEW) {
                 let allComplete: boolean = true;
                 let hasComplete: boolean = false;
@@ -243,12 +316,9 @@ export class ProductOrdersComponent implements OnInit {
     }
 
     private deleteLineItems(): void {
-        let params: HttpParams = new HttpParams().set("noJSONToXMLConversionNeeded", "Y");
-        if (this.displayMode === this.DISPLAY_DETAIL) {
-            // TODO
-        } else if (this.displayMode === this.DISPLAY_OVERVIEW) {
-            params = params.set("productLineItemsToDeleteJSONString", JSON.stringify(this.changeProductOrders));
-        }
+        let params: HttpParams = new HttpParams()
+            .set("noJSONToXMLConversionNeeded", "Y")
+            .set("productLineItemsToDeleteJSONString", JSON.stringify(this.changeProductOrders));
         this.productsService.deleteProductLineItems(params).subscribe((response: any) => {
             if (response && response.result && response.result === 'SUCCESS') {
                 if (response.message) {
@@ -268,8 +338,22 @@ export class ProductOrdersComponent implements OnInit {
         });
     }
 
-    public onGridReady(event: GridReadyEvent): void {
-        event.api.setColumnDefs(this.gridColumnDefs);
+    private getProductOrder(idProductOrder: string): void {
+        this.productsService.getProductOrder(idProductOrder).subscribe((response: any) => {
+            if (response && response.idProductOrder) {
+                this.currentProductOrder = response;
+            } else {
+                let message: string = "";
+                if (response && response.message) {
+                    message = ": " + response.message;
+                }
+                this.dialogsService.confirm("An error occurred while retrieving product order" + message, null);
+            }
+        });
+    }
+
+    public onOverviewGridReady(event: GridReadyEvent): void {
+        event.api.setColumnDefs(this.overviewGridColumnDefs);
         event.api.sizeColumnsToFit();
     }
 
@@ -277,8 +361,57 @@ export class ProductOrdersComponent implements OnInit {
         event.api.sizeColumnsToFit();
     }
 
-    public onGridSelectionChanged(event: SelectionChangedEvent): void {
+    public onOverviewGridSelectionChanged(event: SelectionChangedEvent): void {
         this.changeProductOrders = event.api.getSelectedRows();
+    }
+
+    public onLabGridReady(event: GridReadyEvent): void {
+        event.api.setColumnDefs(this.labGridColumnDefs);
+        event.api.sizeColumnsToFit();
+    }
+
+    public onProductOrderGridReady(event: GridReadyEvent): void {
+        event.api.setColumnDefs(this.productOrderGridColumnDefs);
+        event.api.sizeColumnsToFit();
+    }
+
+    public onTreeActivate(event: any): void {
+        let node: ITreeNode = event.node;
+        this.selectedTreeNode = node;
+        if (!node.hasChildren) {
+            this.getProductOrder(node.data.idProductOrder);
+            this.productOrderLineItems = this.productOrderLineItemList.filter((lineItem: any) => {
+                return lineItem.idProductOrder === node.data.idProductOrder;
+            });
+            this.changeProductOrders = this.productOrderLineItems;
+            this.detailDisplayMode = this.DETAIL_ORDER_MODE;
+        } else {
+            this.labLineItems = this.productOrderLineItemList.filter((lineItem: any) => {
+                return lineItem.labName === node.data.display;
+            });
+            this.changeProductOrders = this.labLineItems;
+            this.detailDisplayMode = this.DETAIL_LAB_MODE;
+            node.expand();
+        }
+    }
+
+    private selectTreeNode(lab: string, idProductOrder?: string): void {
+        for (let labNode of this.treeComponent.treeModel.roots) {
+            if (labNode.data.display === lab) {
+                labNode.expand();
+                if (idProductOrder) {
+                    for (let productOrderNode of labNode.children) {
+                        if (productOrderNode.data.idProductOrder === idProductOrder) {
+                            productOrderNode.toggleActivated(null);
+                            break;
+                        }
+                    }
+                } else {
+                    labNode.toggleActivated(null);
+                }
+                break;
+            }
+        }
     }
 
 }

@@ -18,6 +18,8 @@ import * as _ from "lodash";
 import {HttpParams} from "@angular/common/http";
 import {TopicService} from "../services/topic.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {MatDialog, MatDialogConfig} from "@angular/material";
+import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 
 @Component({
     selector: "gnomex-header",
@@ -94,7 +96,9 @@ export class HeaderComponent implements OnInit{
                 private router:Router,
                 private labListService: LabListService,
                 private gnomexService: GnomexService,
-                private formBuilder: FormBuilder) {
+                private formBuilder: FormBuilder,
+                private dialog: MatDialog
+    ) {
 
         this.options = this.formBuilder.group({
             hideRequired: false,
@@ -1761,8 +1765,20 @@ export class HeaderComponent implements OnInit{
      * Search by text
      */
     public searchByText() {
-        //  TODO Implement search text
-        console.log(this.searchText);
+        let data = { searchText: this.searchText };
+
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '60em';
+        configuration.panelClass = 'no-padding-dialog';
+        configuration.data = data;
+        configuration.disableClose = true;
+        configuration.hasBackdrop = false;
+
+        let dialogRef = this.dialog.open(AdvancedSearchComponent, configuration);
+
+        dialogRef.afterClosed().subscribe((result) => {
+            console.log("Advanced Search popup closed!");
+        });
     }
 
     public resetNavItems() {
