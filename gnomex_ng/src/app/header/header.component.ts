@@ -324,7 +324,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Order Products',
                         context: 'newProductOrder',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
@@ -466,7 +466,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Order Products',
                         context: 'newProductOrder',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
@@ -928,7 +928,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Order Products',
                         context: 'newProductOrder',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
@@ -1230,7 +1230,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Order Products',
                         context: 'newProductOrder',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
@@ -1436,7 +1436,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Order Products',
                         iconName: '../../assets/review.png',
-                        route: ''
+                        route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
@@ -1812,7 +1812,8 @@ export class HeaderComponent implements OnInit{
             displayName: displayName,
             context: context,
             iconName: icon,
-            children: children
+            children: children,
+            route: route
         }
         return obj;
     }
@@ -1986,9 +1987,8 @@ export class HeaderComponent implements OnInit{
         for (let core  of this.gnomexService.myCoreFacilities) {
             for (let pt of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.ProductType")) {
                 if (pt.idCoreFacility == core.idCoreFacility) {
-                    // TODO Need to put route info on core facility
                     let label: string = template.displayName + " for " + core.facilityName;
-                    let menuItem = this.createMenuItem(label, "", template.iconName, "", core.idCoreFacility,  []);
+                    let menuItem = this.createMenuItem(label, "", template.iconName, template.route + '/' + core.idCoreFacility, core.idCoreFacility,  []);
                     children[coreCtr] = menuItem;
                     coreCtr++;
                     break;

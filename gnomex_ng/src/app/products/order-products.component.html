@@ -1,0 +1,68 @@
+<div class="full-height full-width padded flex-container-col">
+    <div class="padding-bottom">
+        <h5>Order Products for {{this.currentCoreFacility?.display}}</h5>
+    </div>
+    <div class="full-width">
+        <mat-form-field class="half-width">
+            <mat-select placeholder="Verify your lab group" [(value)]="this.idLab" (change)="this.onLabChange()">
+                <mat-option>None</mat-option>
+                <mat-option *ngFor="let lab of this.labList" [value]="lab.idLab">{{lab.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div *ngIf="this.isAdminState" [hidden]="!this.idLab" class="full-width">
+        <mat-form-field class="half-width">
+            <mat-select placeholder="Verify your name" [(value)]="this.idAppUser">
+                <mat-option>None</mat-option>
+                <mat-option *ngFor="let user of this.userList" [value]="user.idAppUser">{{user.displayName}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div [hidden]="!this.idLab" class="full-width padding-bottom">
+        <mat-form-field class="half-width">
+            <mat-select placeholder="Select a billing account" [(value)]="this.idBillingAccount">
+                <mat-option>None</mat-option>
+                <mat-option *ngFor="let ba of this.billingAccountList" [value]="ba.idBillingAccount">{{ba.accountNameAndNumber}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <button mat-button (click)="this.showSubmitWorkAuthorization()">Submit Work Authorization</button>
+        <button mat-button *ngIf="this.showSplitBillingButton" (click)="this.showSplitBilling()">Split Billing</button>
+    </div>
+    <table [hidden]="!this.idLab || !this.idAppUser || !this.idBillingAccount" class="full-width">
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Current Lab Inventory</th>
+        </tr>
+        <tr *ngFor="let p of this.productList">
+            <td>
+                <mat-checkbox [(ngModel)]="p.isSelected" [disabled]="true">{{p.name}} (Order Qty: {{p.orderQty}})</mat-checkbox>
+                <img class="description-icon" *ngIf="p.description" src="../../assets/white_information.png" matTooltip="{{p.description}}">
+            </td>
+            <td>
+                <input matInput class="half-width user-input" type="number" [(ngModel)]="p.quantity" (change)="this.checkQuantity(p)">
+                <label class="left-padding">x</label>
+            </td>
+            <td>
+                <label>${{p.unitPrice}}</label>
+            </td>
+            <td>
+                <label>= ${{p.total}}</label>
+            </td>
+            <td>
+                <label>{{p.currentProductCount}}</label>
+            </td>
+        </tr>
+    </table>
+    <div [hidden]="!this.idLab || !this.idAppUser || !this.idBillingAccount" class="full-width flex-container-row justify-end">
+        <label class="bold-font">Grand Total: ${{this.grandTotal}}</label>
+    </div>
+    <div [hidden]="!this.idLab || !this.idAppUser || !this.idBillingAccount" class="full-width flex-container-row justify-space-between padding-top">
+        <mat-checkbox [(ngModel)]="this.userConsent">
+            As the Principal Investigator or authorized personnel of the account(s) listed above I authorize the Core Facility to charge the account for the products selected.
+        </mat-checkbox>
+        <button mat-button [disabled]="!this.userConsent || !this.enableSubmit" color="primary" (click)="this.submitOrder()"><img src="../../assets/save.png" class="icon">Submit</button>
+    </div>
+</div>
