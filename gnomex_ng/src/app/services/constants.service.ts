@@ -18,6 +18,7 @@ export class ConstantsService {
     public readonly X_XSRF_TOKEN_HEADER: string = "X-XSRF-TOKEN";
     public readonly X_XSRF_TOKEN_SESSION_KEY: string = "X-XSRF-SESSION-TOKEN";
     public readonly X_XSRF_TOKEN_PARAM_KEY: string = "xsrfToken";
+    public static readonly CODE_PRODUCT_ORDER_STATUS_NEW: string = "NEW";
     public readonly RESERVED_SAMPLE_SHEET_COL_NAMES: string[] = [
         "Multiplex #",
         "Plate",
