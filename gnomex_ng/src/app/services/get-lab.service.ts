@@ -4,11 +4,14 @@ import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {HttpClient, HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class GetLabService {
 
-    constructor(private http: Http) {
+    constructor(private http: Http,
+                private httpClient: HttpClient) {
+
     }
 
     public labMembersSubject: BehaviorSubject<any[]> = new BehaviorSubject([]);
@@ -99,6 +102,10 @@ export class GetLabService {
     public getLabBasic(idLab: string): Observable<Response> {
         let params: URLSearchParams = this.makeParams(idLab, false, false, false, false, false, false, false, false);
         return this.getLabCall(params);
+    }
+
+    public getExperimentPickList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetExperimentPickList.gx", {params: params});
     }
 
     public getLabMembers(idLab: string): Observable<any[]> {

@@ -1,0 +1,38 @@
+<div class="flex-column-container-workflow">
+    <div class="flex-row-container">
+        <img src="../../assets/rectangle.png" height="16" width="16" style="margin-top: .65em">
+        <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
+    </div>
+    <div class="flex-row-container">
+
+        <mat-form-field class="formField">
+            <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Experiment or FlowCell #">
+        </mat-form-field>
+        <date-range-filter class="filter-by-date" (onChange)="this.dateRangeChange($event)"></date-range-filter>
+        <div class="flow-cell-counter">{{this.workingWorkItemList.length}} Flow Cells</div>
+    </div>
+    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+    <div *ngIf="selectedFlowCell&&selectedFlowCell.number" class="flex-row-container">
+        <span style="font-weight: bold;margin-left: .3em">Flow Cell {{selectedFlowCell.number}}
+        </span>
+        <button mat-button (click)="onClickPrepReport()"><mat-icon>launch</mat-icon>Preparation Report</button>
+        <button mat-button (click)="onClickRunReport()"><mat-icon>launch</mat-icon>Run Report</button>
+        <button mat-button (click)="onClickEditFlowCell()"><mat-icon>edit</mat-icon>Edit Flow Cell</button>
+    </div>
+    <div class="row-one" style="width: 100%;height: 90%">
+        <ag-grid-angular id="userTable" style="width: 100%;" class="ag-fresh"
+                         [gridOptions]="gridOptions"
+                         [rowData]="workingWorkItemList"
+                         [columnDefs]="columnDefs"
+                         (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                         (rowSelected)="selectedRow($event)"
+                         [rowSelection]="'single'"
+                         (gridReady)="onGridReady($event)"
+                         [enableSorting]="true"
+                         (cellValueChanged) = "onCellValueChanged($event)"
+                         [enableFilter]="true"
+                         (cellDoubleClicked)="launchEditFlowCell($event)"
+                         [enableColResize]="true">
+        </ag-grid-angular>
+    </div>
+</div>

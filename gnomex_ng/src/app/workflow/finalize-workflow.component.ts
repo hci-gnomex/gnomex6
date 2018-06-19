@@ -13,7 +13,6 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
-import {FilllikeTextRendererComponent} from "../util/grid-renderers/filllike-text-renderer.component";
 import {HttpParams} from "@angular/common/http";
 
 @Component({
@@ -82,10 +81,6 @@ import {HttpParams} from "@angular/common/http";
 })
 
 export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
-    @ViewChild("autoProtocol") autoProtocolComplete: MatAutocomplete;
-    @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
-    @ViewChild("labInput") labInput: ElementRef;
-
     private workItemList: any[] = [];
     private assmItemList: any[] = [];
     private flowCellChannels: any[] = [];
@@ -99,32 +94,23 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     private codeSequencingPlatform: string;
     private pipelineProtoList: any[] = [];
     private instrumentList: any[] = [];
-    private cores: any[] = [];
     private columnDefs;
     private assmColumnDefs;
     private showSpinner: boolean = false;
     private workItem: any;
-    private selectedLab: any;
-    private previousLabMatOption: MatOption;
     private gridApi;
     private gridColumnApi;
     private assmGridApi;
     private assmGridColumnApi;
-    private barCodes: any[] = [];
     private label = "Illumina Finalize Flow Cell";
     private searchText: string;
     private gridOptions:GridOptions = {};
-    private assmGridOptions:GridOptions = {};
     private lanes: any[] = [];
     private selectedFlowCell: any[] = [];
-    private emptyLab = {idLab: "0",
-        name: ""};
     private emptyPipe = {idPipelineProtocol: "",
         protocol: ""};
-    private labList: any[] = [];
     public assmGridRowClassRules: any;
     private selectedFlowcellRequestType: string;
-    private firstSelectedFlowcellRequestType: boolean = true;
     private flowCellRunFolder: string;
     private originalProtocol: any;
     private hideFCConcen: boolean = true;
@@ -155,21 +141,14 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             protocol: this.protocolFC,
 
         });
-        this.assmGridRowClassRules = {
-            "workFlowOnColor": "data.backgroundColor === 'ON' && !data.selected",
-            "workFlowOffColor": "data.backgroundColor === 'OFF' && !data.selected",
-            "workFlowSelectedColor": "data.selected",
-        };
-
     }
 
     initialize() {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("codeStepNext", this.workflowService.ILLSEQ_FINALIZE_FC);
-        this.cores = [];
+        let params: HttpParams = new HttpParams();
+
+        params = params.set("codeStepNext", this.workflowService.ILLSEQ_FINALIZE_FC);
         this.workflowService.getFlowCellList(params).subscribe((response: any) => {
             if (response) {
-                this.workItemList = response;
                 if (!this.securityAdvisor.isArray(response)) {
                     this.workItemList = [response.Request];
                 } else {
@@ -229,7 +208,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
                     {
                         headerName: "Content",
                         editable: false,
-                        width: 100,
+                        width: 130,
                         field: "notes",
                         cellRendererFramework: TextAlignLeftMiddleRenderer,
                         cellStyle: function(params) {
@@ -254,8 +233,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     initializeAssm(): any[] {
-        let columnDefs: any[] = [];
-        columnDefs = [
+        let columnDefs = [
             {
                 headerName: "Experiment",
                 editable: false,
@@ -364,13 +342,6 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         this.instrumentList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.Instrument").filter(instrument =>
             instrument.isActive === 'Y'
         );
-        let codes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcode");
-        for (let code of codes) {
-            code.idOligoBarcodeB = code.idOligoBarcode;
-            this.barCodes.push(code);
-        }
-        this.labList.push(this.emptyLab);
-        this.labList = this.labList.concat(this.gnomexService.labList);
         this.pipelineProtoList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.PipelineProtocol");
         this.pipelineProtoList.push(this.emptyPipe);
 
@@ -478,36 +449,6 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    filterWorkItemsByLab() {
-        this.workingWorkItemList = this.workingWorkItemList.filter(workItem =>
-            workItem.idLab === this.selectedLab.idLab
-        )
-    }
-
-    highlightFirstLabOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.autoLabComplete.options.first) {
-            if (this.previousLabMatOption) {
-                this.previousLabMatOption.setInactiveStyles();
-            }
-            this.autoLabComplete.options.first.setActiveStyles();
-            this.previousLabMatOption = this.autoLabComplete.options.first;
-        }
-    }
-
-    displayLab(lab) {
-        return lab ? lab.name : lab;
-    }
-
-    selectLabOption(event) {
-        if (event.source.selected) {
-            this.selectedLab = event.source.value;
-            this.filterWorkItemsByLab();
-        }
-    }
-
     onNotifyGridRowDataChanged(event) {
         if (this.gridApi) {
             this.gridApi.hideOverlay();
@@ -589,9 +530,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     save() {
         this.gridApi.stopEditing();
         setTimeout(() => {
-            let errorMessage: string = "";
             let warningMessage: string = "";
-            let message: string = "";
             let validProtoAndLanes = this.validateProtocolAndLanes();
             let validNumberOfLanes = this.validateNumberOfLanes();
             let validIndexTags = this.validateIndexTags();
@@ -640,27 +579,25 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     saveWorkItems() {
-        let params: URLSearchParams = new URLSearchParams();
-
-        params.set("barcode", this.barcodeFC.value);
-        params.set("codeSequencingPlatform", this.codeSequencingPlatform);
-        params.set("createDate", WorkflowService.convertDate(this.createDateFC.value));
-        params.set("idCoreFacility", this.flowCell.idCoreFacility);
-        // params.set("idFlowCell", this.flowCell.idFlowCell);
-        params.set("idInstrument", this.instrumentFC.value.idInstrument);
-        params.set("idNumberSequencingCycles", this.protocolFC.value.idNumberSequencingCycles);
-        params.set("idNumberSequencingCyclesAllowed", this.protocolFC.value.idNumberSequencingCyclesAllowed);
-        params.set("idSeqRunType", this.protocolFC.value.idSeqRunType);
-        params.set("notes", this.flowCell.notes);
-        params.set("number", this.flowCell.number);
-        params.set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesActual);
-        params.set("runFolder", this.flowCellRunFolder);
-        params.set("runNumber", this.runFC.value);
+        let params: HttpParams = new HttpParams().set("barcode" ,this.barcodeFC.value)
+        .set("codeSequencingPlatform", this.codeSequencingPlatform)
+        .set("createDate", WorkflowService.convertDate(this.createDateFC.value))
+        .set("idCoreFacility", this.flowCell.idCoreFacility)
+        .set("idFlowCell", this.flowCell.idFlowCell)
+        .set("idInstrument", this.instrumentFC.value.idInstrument)
+        .set("idNumberSequencingCycles", this.protocolFC.value.idNumberSequencingCycles)
+        .set("idNumberSequencingCyclesAllowed", this.protocolFC.value.idNumberSequencingCyclesAllowed)
+        .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
+        .set("notes", this.flowCell.notes)
+        .set("number", this.flowCell.number)
+        .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesActual)
+        .set("runFolder", this.flowCellRunFolder)
+        .set("runNumber", this.runFC.value);
         for (let seqLane of this.assmItemList) {
             this.buildChannel(seqLane);
         }
 
-        params.set("channelsXMLString", JSON.stringify(this.flowCellChannels));
+        params = params.set("channelsXMLString", JSON.stringify(this.flowCellChannels));
 
         this.showSpinner = true;
         this.workflowService.saveFlowCell(params).subscribe((response: any) => {
@@ -737,7 +674,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         let errorMessage: string = "";
         for (let channelNumber of this.lanes) {
 
-            var i: string = channelNumber;
+            let i: string = channelNumber;
             if (!this.areBarcodeSequenceTagsUnique(i)) {
                 warningMessage += "Two or more samples in channel " + i + " do not differ by at least 3 base pairs.\n\n";
             }
@@ -760,7 +697,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
         for(var i: number = 0; i < barcodes.length; i++){
             let sequenceOne: any[] = barcodes[i].split("");
-            for(var j: number = i+1; j < barcodes.length; j++){
+            for(let j: number = i+1; j < barcodes.length; j++){
                 let sequenceTwo: any[] = barcodes[j].split("");
                 if(!this.atLeastThreeUnique(sequenceOne, sequenceTwo)){
                     return false;

@@ -1,6 +1,6 @@
 
 import {Injectable} from "@angular/core";
-import {Http, Response, Headers} from "@angular/http";
+import {Http, Response, Headers, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
@@ -23,6 +23,7 @@ export class WorkflowService {
     public readonly ILLSEQ_CLUSTER_GEN = "ILLSEQASSEM";
     public readonly ILLSEQ_FINALIZE_FC = "ILLSEQFINFC";
     public readonly ILLSEQ_DATA_PIPELINE = "ILLSEQPIPE";
+    public readonly FLOWCELL = "FLOWCELL";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";
     public readonly NANOSTRING = "NANO";
@@ -194,16 +195,15 @@ export class WorkflowService {
         }
     }
 
-    getFlowCellList(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/GetFlowCellList.gx", {search: params}).map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        });
-
+    public getFlowCellList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetFlowCellList.gx", {params: params});
     }
+
+    public getFlowCell(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetFlowCell.gx", {params: params});
+    }
+
+
 
     getWorkItemList(params: URLSearchParams):  Observable<any> {
         return this.http.get("/gnomex/GetWorkItemList.gx", {search: params}).map((response: Response) => {
@@ -280,15 +280,11 @@ export class WorkflowService {
 
     }
 
-    saveFlowCell(params: URLSearchParams):  Observable<any> {
+    saveFlowCell(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/SaveFlowCell.gx", params.toString(), {headers: headers});
+        return this.httpClient.post("/gnomex/SaveFlowCell.gx", null, {params: params});
 
     }
-
     deleteFlowCell(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/DeleteFlowCell.gx", null, {params: params});

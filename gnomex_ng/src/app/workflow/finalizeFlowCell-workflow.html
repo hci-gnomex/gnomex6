@@ -22,7 +22,7 @@
                                  [rowSelection]="'single'"
                                  (gridReady)="onGridReady($event)"
                                  [enableSorting]="true"
-                                 [rowClassRules]="this.assmGridRowClassRules"
+                                 [rowClassRules]="this.workflowService.assmGridRowClassRules"
                                  [enableFilter]="true"
                                  [enableColResize]="true">
                 </ag-grid-angular>
@@ -48,8 +48,8 @@
                     <mat-error *ngIf="this.runFC.hasError('required')">Required</mat-error>
                 </mat-form-field>
                 <mat-form-field>
-                    <input matInput [matDatepicker]="createDatePicker" placeholder="Create Date" (change)="createFlowCellFileName()" [formControl]="this.createDateFC" disabled>
-                    <mat-datepicker-toggle matSuffix [disabled]="true" [for]="createDatePicker"></mat-datepicker-toggle>
+                    <input matInput [matDatepicker]="createDatePicker" placeholder="Create Date" (change)="createFlowCellFileName()" [formControl]="this.createDateFC">
+                    <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
                     <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
                 </mat-form-field>
             </div>
@@ -83,7 +83,7 @@
                                  [enableFilter]="true"
                                  (cellValueChanged) = "onCellValueChanged($event)"
                                  [enableColResize]="true"
-                                 [rowClassRules]="this.assmGridRowClassRules">
+                                 [rowClassRules]="this.workflowService.assmGridRowClassRules">
                 </ag-grid-angular>
             </div>
 

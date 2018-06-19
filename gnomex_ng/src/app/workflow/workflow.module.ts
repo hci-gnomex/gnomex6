@@ -39,6 +39,10 @@ import {FinalizeWorkflowComponent} from "./finalize-workflow.component";
 import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
 import { DynamicModule } from 'ng-dynamic-component';
 import {PipelineWorkflowComponent} from "./pipeline-workflow.component";
+import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
+import {EditFlowcellDialogComponent} from "./edit-flowcell-dialog.component";
+import { TreeModule } from "angular-tree-component";
+
 /**
  * @author jdewell
  * @since 12/19/16
@@ -76,15 +80,19 @@ import {PipelineWorkflowComponent} from "./pipeline-workflow.component";
         ServicesModule,
         UtilModule,
         ReactiveFormsModule,
+        TreeModule,
         DynamicModule.withComponents([QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
             FlowcellassmWorkflowComponent,  FinalizeWorkflowComponent])
     ],
     declarations: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent],
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
+                    FlowcellWorkflowComponent, EditFlowcellDialogComponent],
     entryComponents: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent],
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
+                    FlowcellWorkflowComponent, EditFlowcellDialogComponent],
     exports: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent]
+                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
+                    FlowcellWorkflowComponent, EditFlowcellDialogComponent]
 })
 export class WorkflowModule {
 }
