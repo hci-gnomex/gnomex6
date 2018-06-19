@@ -773,7 +773,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
                         iconName: '../../assets/rectangle.png',
-                        route: ''
+                        route: '/flowcellWorkFlow'
                     },
                     {
                         divider: true
@@ -881,7 +881,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
                         iconName: '../../assets/rectangle.png',
-                        route: ''
+                        route: '/flowcellWorkFlow'
                     },
                     {
                         divider: true
@@ -1160,7 +1160,7 @@ export class HeaderComponent implements OnInit{
                         displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
                         iconName: '../../assets/rectangle.png',
-                        route: ''
+                        route: '/flowcellWorkFlow'
                     },
                     {
                         divider: true
