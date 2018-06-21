@@ -7,7 +7,7 @@
                 </div>
                 <div class="full-width flex-grow no-overflow">
                     <div class="full-width full-height border no-overflow">
-                        <tree-root #datatracksTree
+                        <tree-root #navigationTree
                                    [nodes]="protocolList"
                                    [options]="treeOptions"
                                    (activate)="treeOnSelect($event)">
@@ -29,17 +29,17 @@
                     <div class="full-width flex-container-row">
                         <div>
                             <div>
-                                <button mat-button (click)="onNewProtocolButtonClicked()">New Protocol</button>
+                                <button mat-button (click)="onNewProtocolButtonClicked()"><img src="../../assets/brick_add.png" alt="" /> New Protocol</button>
                             </div>
                             <div>
-                                <button mat-button (click)="onDeleteProtocolButtonClicked()">Delete Protocol</button>
+                                <button mat-button (click)="onDeleteProtocolButtonClicked()"><img *ngIf="!disableDelete" src="../../assets/delete.png" alt="" /><img *ngIf="disableDelete"src="../../assets/delete_disable.png" alt="" /> Delete Protocol</button>
                             </div>
                         </div>
                         <div>
                             <div class="full-width full-height t">
                                 <div class="tr">
                                     <div class="td vertical-center">
-                                        <button mat-button (click)="onRefreshButtonClicked()">Refresh</button>
+                                        <button mat-button (click)="onRefreshButtonClicked()"><img src="../../assets/refresh.png" alt="" /> Refresh</button>
                                     </div>
                                 </div>
                             </div>
@@ -51,7 +51,7 @@
         <split-area [size]="80">
             <div class="flex-container-col full-width full-height padded-left-right border">
                 <div class="full-width no-overflow padded-top-bottom">
-                    Protocol:
+                    {{ mainPaneTitle }}
                 </div>
                 <div class="full-width flex-grow no-overflow">
                     <div class="full-width full-height border">
@@ -62,21 +62,59 @@
                                     <mat-form-field class="full-width">
                                         <input  matInput
                                                 placeholder="Account Name"
-                                                [(ngModel)]="selectedProtocolName">
+                                                [(ngModel)]="selectedProtocolName"
+                                                required>
                                     </mat-form-field>
                                 </div>
                                 <div class="flex-grow padded">
-                                    <mat-form-field class="full-width font-small">
-                                        <mat-select
-                                                class="full-width"
-                                                placeholder="Select Core Facilities"
-                                                [(ngModel)]="selectedExperimentPlatform"
-                                                required>
-                                            <mat-option *ngFor="let experimentPlatform of experimentPlatformList" [value]="experimentPlatform">
-                                                {{ experimentPlatform.display }}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
+                                    <div *ngIf="mostRecentlyDisplayedProtocolProtocolClassName && mostRecentlyDisplayedProtocolProtocolClassName !== 'hci.gnomex.model.AnalysisProtocol'" class="full-width full-height">
+                                        <mat-form-field class="full-width font-small">
+                                            <mat-select
+                                                    class="full-width"
+                                                    placeholder="Experiment Platform"
+                                                    [(ngModel)]="selectedExperimentPlatformCodeRequestCategory">
+                                                <mat-option [value]="">
+                                                    --
+                                                </mat-option>
+                                                <mat-option *ngFor="let experimentPlatform of experimentPlatformList" [value]="experimentPlatform.codeRequestCategory">
+                                                    {{ experimentPlatform.display }}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+
+                                    <div *ngIf="mostRecentlyDisplayedProtocolProtocolClassName && mostRecentlyDisplayedProtocolProtocolClassName === 'hci.gnomex.model.AnalysisProtocol'" class="full-width full-height flex-container-row">
+                                        <div class="flex-grow padded-left-right">
+                                            <mat-form-field class="full-width font-small">
+                                                <mat-select
+                                                        class="full-width"
+                                                        placeholder="Analysis Type:"
+                                                        [(ngModel)]="selectedProtocolIdAnalysisType">
+                                                    <mat-option [value]="">
+                                                        --
+                                                    </mat-option>
+                                                    <mat-option *ngFor="let analysisType of analysisTypeList" [value]="analysisType.idAnalysisType">
+                                                        {{ analysisType.display }}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="flex-grow padded-left-right">
+                                            <mat-form-field class="full-width font-small">
+                                                <mat-select
+                                                        class="full-width"
+                                                        placeholder="Owner:"
+                                                        [(ngModel)]="selectedProtocolIdAppUser">
+                                                    <mat-option [value]="">
+                                                        --
+                                                    </mat-option>
+                                                    <mat-option *ngFor="let user of userList" [value]="user.idAppUser">
+                                                        {{ user.display }}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="t special-checkbox-text-alignment-padding">
                                     <div class="tr">
@@ -94,16 +132,39 @@
                                 </div>
                             </div>
 
-                            <mat-form-field class="full-width">
-                                <input  matInput
-                                        placeholder="URL"
-                                        [(ngModel)]="selectedProtocolUrl">
+                            <div class="flex-container-row full-width">
+                                <div class="flex-grow padded">
+                                    <mat-form-field class="full-width">
+                                        <input  matInput
+                                                placeholder="URL"
+                                                (input)="checkToEnableViewURLButton($event)"
+                                                [(ngModel)]="selectedProtocolUrl">
+                                    </mat-form-field>
+                                </div>
+                                <div class="special-button-text-alignment-padding">
+                                    <button mat-button [disabled]="disableViewURLButton" (click)="onViewURLButtonClicked()">
+                                        <img *ngIf="!disableViewURLButton" src="../../assets/page_go.png" alt="" />
+                                        <img *ngIf="disableViewURLButton"  src="../../assets/page_go_disabled.png" alt="" />
+                                        View URL
+                                    </button>
+                                </div>
+                            </div>
+
+                            <mat-form-field class="full-width padded">
+                                <textarea
+                                        matInput
+                                        placeholder="Protocol Description"
+                                        [(ngModel)]="selectedProtocolDescription"
+                                        matTextareaAutosize
+                                        matAutosizeMinRows="14"
+                                        matAutosizeMaxRows="14">
+                                </textarea>
                             </mat-form-field>
                         </div>
                     </div>
                 </div>
                 <div class="full-width no-overflow padded-top-bottom right-align">
-                    <button mat-button (click)="onSaveButtonClicked()">Save</button>
+                    <button mat-button (click)="onSaveButtonClicked()"><img src="../../assets/save.png" alt="" /> Save</button>
                 </div>
             </div>
         </split-area>

@@ -20,6 +20,7 @@ import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {ConfigureAnnotationsModule} from "../util/configure-annotations.module";
 import {ManageProtocolsComponent} from "./manage-protocols.component";
+import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component";
 
 
 
@@ -49,7 +50,11 @@ import {ManageProtocolsComponent} from "./manage-protocols.component";
         ConfigCoreFacilityComponent,
         ConfigCoreFacilityEditComponent,
         ConfigureOrganismsComponent,
+        CreateProtocolDialogComponent,
         ManageProtocolsComponent
+    ],
+    entryComponents: [
+        CreateProtocolDialogComponent
     ],
     exports: [
         BrowseDictionaryComponentLauncher

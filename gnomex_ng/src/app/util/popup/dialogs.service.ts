@@ -40,14 +40,18 @@ export class DialogsService {
         return dialogRef.afterClosed();
     }
 
-    public yesNoDialog(message: string, parent: any, onYesFunctionName: string): Observable<boolean> {
+    public yesNoDialog(message: string|string[], parent: any, onYesFunctionName: string): Observable<boolean> {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '20em';
 
         let dialogRef: MatDialogRef<YesNoDialogComponent>;
 
         dialogRef = this.dialog.open(YesNoDialogComponent, configuration);
-        dialogRef.componentInstance.message = message;
+        if (Array.isArray(message)) {
+            dialogRef.componentInstance.lines = message;
+        } else {
+            dialogRef.componentInstance.message = message;
+        }
         dialogRef.componentInstance.parent = parent;
         dialogRef.componentInstance.onYesFunctionName = onYesFunctionName;
 
