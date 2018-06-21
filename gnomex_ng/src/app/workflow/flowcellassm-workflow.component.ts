@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
-import {MatAutocomplete, MatAutocompleteTrigger, MatDialog, MatDialogRef, MatOption} from "@angular/material";
+import {MatAutocomplete, MatDialog, MatDialogRef, MatOption} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
 import {GridOptions} from "ag-grid";
 import {DictionaryService} from "../services/dictionary.service";
@@ -79,16 +79,10 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     private sequenceProtocolsList: any[] = [];
     private filteredProtocolsList: any[] = [];
     private instrumentList: any[] = [];
-    private cores: any[] = [];
     private columnDefs;
     private assmColumnDefs;
-    private dirty: boolean = false;
     private showSpinner: boolean = false;
-    private workItem: any;
-    private protocol: any;
     private selectedLab: any;
-    private core: any;
-    private previousProtocolMatOption: MatOption;
     private previousLabMatOption: MatOption;
     private gridApi;
     private gridColumnApi;
@@ -105,8 +99,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     private emptyLab = {idLab: "0",
         name: ""};
     private labList: any[] = [];
-    private previousId: string = "";
-    private previousColor: string = "";
     public assmGridRowClassRules: any;
     private selectedFlowcellRequestType: string;
     private firstSelectedFlowcellRequestType: boolean = true;
@@ -136,18 +128,11 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
             protocol: this.protocolFC,
 
         });
-        this.assmGridRowClassRules = {
-            "workFlowOnColor": "data.backgroundColor === 'ON' && !data.selected",
-            "workFlowOffColor": "data.backgroundColor === 'OFF' && !data.selected",
-            "workFlowSelectedColor": "data.selected",
-        };
-
     }
 
     initialize() {
         let params: URLSearchParams = new URLSearchParams();
         params.set("codeStepNext", this.workflowService.ILLSEQ_CLUSTER_GEN);
-        this.cores = [];
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             if (response) {
                 this.workItemList = response;
@@ -477,7 +462,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 for (let proto of this.filteredProtocolsList) {
                     if (proto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed) {
                         this.protocolFC.setValue(proto);
-                        // this.originalProtocol = proto;
                         break;
                     }
                 }

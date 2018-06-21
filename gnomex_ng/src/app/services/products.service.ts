@@ -111,4 +111,9 @@ export class ProductsService {
         return this.httpClient.get("/gnomex/GetProductOrder.gx", {params: params});
     }
 
+    public saveProductOrder(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/SaveProductOrder.gx", null, {params: params});
+    }
+
 }

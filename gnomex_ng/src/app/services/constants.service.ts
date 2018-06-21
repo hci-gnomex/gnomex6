@@ -18,6 +18,7 @@ export class ConstantsService {
     public readonly X_XSRF_TOKEN_HEADER: string = "X-XSRF-TOKEN";
     public readonly X_XSRF_TOKEN_SESSION_KEY: string = "X-XSRF-SESSION-TOKEN";
     public readonly X_XSRF_TOKEN_PARAM_KEY: string = "xsrfToken";
+    public static readonly CODE_PRODUCT_ORDER_STATUS_NEW: string = "NEW";
     public readonly RESERVED_SAMPLE_SHEET_COL_NAMES: string[] = [
         "Multiplex #",
         "Plate",
@@ -57,6 +58,7 @@ export class ConstantsService {
     public readonly DEFAULT_TOOLBAR_SETTINGS: string = "bold italic underline | left center right |  format font size |" +
         " color | ul ol | outdent indent";
 
+    public readonly ICON_FOLDER: string = "assets/folder.png";
     public readonly GLOBE_LINK: string = "assets/globe_link.png";
     public readonly EMAIL_GO_LINK: string = "assets/email_go.png";
     public readonly ICON_UCSC: string = "assets/ucscFavicon.png";
@@ -80,6 +82,8 @@ export class ConstantsService {
     public readonly ICON_DATATRACK_INSTITUTION:string = "assets/datatrack_institution.png";
     public readonly ICON_DATATRACK_OWNER:string = "assets/datatrack_owner.png" ;
 
+    public readonly ICON_GREEN_BULLET:string = "assets/bullet_green.png";
+
 
 
     public getTreeIcon(item:any,name:string) {
@@ -101,6 +105,9 @@ export class ConstantsService {
             } else {
                 item.icon = this.ICON_TOPIC_PUBLIC;
             }
+        }
+        else if(name === "SequenceLane"){
+            item.icon = this.ICON_GREEN_BULLET;
         }
 
     }

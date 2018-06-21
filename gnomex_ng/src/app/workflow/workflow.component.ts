@@ -10,6 +10,8 @@ import {LibprepQcWorkflowComponent} from "./libprepqc-workflow.component";
 import {FlowcellassmWorkflowComponent} from "./flowcellassm-workflow.component";
 import {WorkflowService, qcModes} from "../services/workflow.service";
 import {FinalizeWorkflowComponent} from "./finalize-workflow.component";
+import {PipelineWorkflowComponent} from "./pipeline-workflow.component";
+import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
 
 @Component({
     selector: 'workflow',
@@ -127,6 +129,12 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
             case this.workflowService.ILLSEQ_FINALIZE_FC :
                 this.resetTab = 1;
                 break;
+            case this.workflowService.ILLSEQ_DATA_PIPELINE :
+                this.resetTab = 1;
+                break;
+            case this.workflowService.FLOWCELL :
+                this.resetTab = 1;
+                break;
 
         }
     }
@@ -147,6 +155,12 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
                 break;
             case this.workflowService.ILLSEQ_FINALIZE_FC :
                 this.onClickFinalizedFlowCell();
+                break;
+            case this.workflowService.ILLSEQ_DATA_PIPELINE :
+                this.onClickDataPipeline();
+                break;
+            case this.workflowService.FLOWCELL :
+                this.onClickFlowCells();
                 break;
 
         }
@@ -236,7 +250,14 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
         this.workflowOutlet = FinalizeWorkflowComponent;
     }
 
-    onClickDataPipeline(event) {
+    onClickDataPipeline() {
+        this.codeStepNext = this.workflowService.ILLSEQ_DATA_PIPELINE;
+        this.workflowOutlet = PipelineWorkflowComponent;
+    }
+
+    onClickFlowCells() {
+        this.codeStepNext = this.workflowService.FLOWCELL;
+        this.workflowOutlet = FlowcellWorkflowComponent;
     }
 
 }

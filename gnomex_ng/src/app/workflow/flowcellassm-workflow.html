@@ -44,7 +44,7 @@
                                  (gridReady)="onGridReady($event)"
                                  [enableSorting]="true"
                                  (cellValueChanged) = "onCellValueChanged($event)"
-                                 [rowClassRules]="this.assmGridRowClassRules">
+                                 [rowClassRules]="this.workflowService.assmGridRowClassRules">
 
                 [enableFilter]="true"
                                  [enableColResize]="true">
@@ -70,7 +70,7 @@
                     <mat-error *ngIf="this.runFC.hasError('required')">Required</mat-error>
                 </mat-form-field>
                 <mat-form-field>
-                    <input matInput [matDatepicker]="createDatePicker" placeholder="Create Date" [formControl]="this.createDateFC" disabled>
+                    <input matInput [matDatepicker]="createDatePicker" placeholder="Create Date" [formControl]="this.createDateFC">
                     <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
                     <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
                 </mat-form-field>

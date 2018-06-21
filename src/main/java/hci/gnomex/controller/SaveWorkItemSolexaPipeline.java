@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -77,9 +79,10 @@ public class SaveWorkItemSolexaPipeline extends GNomExCommand implements Seriali
   
   private HashMap                      requestNotifyMap = new HashMap();
   private HashMap                      requestNotifyLaneMap = new HashMap();
-  
-  
-  
+
+  private StringBuilder                resultMessage = new StringBuilder("");
+
+
   public void validate() {
   }
   
@@ -87,7 +90,7 @@ public class SaveWorkItemSolexaPipeline extends GNomExCommand implements Seriali
     
     
     if (request.getParameter("workItemXMLString") != null && !request.getParameter("workItemXMLString").equals("")) {
-      workItemXMLString = "<WorkItemList>" + request.getParameter("workItemXMLString") + "</WorkItemList>";
+      workItemXMLString = request.getParameter("workItemXMLString");
       
       StringReader reader = new StringReader(workItemXMLString);
       try {
@@ -205,11 +208,12 @@ public class SaveWorkItemSolexaPipeline extends GNomExCommand implements Seriali
             try {
               this.sendConfirmationEmail(sess, request, (Collection)requestNotifyLaneMap.get(request.getNumber()));
             } catch (Exception e) {
+              resultMessage.append("Unable to notify " + request.getAppUser().getFirstLastDisplayName() + " that their sequence lanes have been completed because either they have no email address listed in gnomex or their email address is malformed.");
+              resultMessage.append(" deleted.\r\n");
               LOG.error("Error in SaveWorkItemSolexaPipeline", e);
-              this.xmlResult = "<InvalidSubmitterEmail notice=\"Unable to notify " + request.getAppUser().getFirstLastDisplayName() +" that their sequence lanes have been completed because either they have no email address listed in gnomex or their email address is malformed." + "\"" + "/>";
-
             }
           }
+          this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").add("message", resultMessage.toString()).build().toString();
           setResponsePage(this.SUCCESS_JSP);
         } else {
           this.addInvalidField("Insufficient permissions", "Insufficient permission to manage workflow");

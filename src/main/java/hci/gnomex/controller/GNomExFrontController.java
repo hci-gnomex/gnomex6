@@ -303,7 +303,10 @@ public static boolean areWeLite() {
 
 	// get our response page
 	String forwardJSP = commandInstance.getResponsePage();
-
+    boolean skip = false;
+    if (forwardJSP != null) {
+        skip = forwardJSP.equals("/getHTML.jsp");
+    }
 	// if command didn't provide one, default to getJSON.jsp (for error)
 	if (forwardJSP == null || forwardJSP.equals("")) {
 		forwardJSP = "/message.jsp";
@@ -319,7 +322,7 @@ public static boolean areWeLite() {
 		out.print(theJSON);
 		out.flush();
 		out.close();
-	} else if (thexml != null && !thexml.equals("")) {
+	} else if (thexml != null && !thexml.equals("") && !skip) {
 
 		if (thexml.equals("<SUCCESS/>")) {
 			request.setAttribute("statusCode", "SUCCESS");
