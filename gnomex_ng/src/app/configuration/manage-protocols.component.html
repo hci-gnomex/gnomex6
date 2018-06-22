@@ -63,6 +63,7 @@
                                         <input  matInput
                                                 placeholder="Account Name"
                                                 [(ngModel)]="selectedProtocolName"
+                                                [formControl]="accountNameFormControl"
                                                 required>
                                     </mat-form-field>
                                 </div>
@@ -72,7 +73,8 @@
                                             <mat-select
                                                     class="full-width"
                                                     placeholder="Experiment Platform"
-                                                    [(ngModel)]="selectedExperimentPlatformCodeRequestCategory">
+                                                    [(ngModel)]="selectedExperimentPlatformCodeRequestCategory"
+                                                    [formControl]="experimentPlatformFormControl">
                                                 <mat-option [value]="">
                                                     --
                                                 </mat-option>
@@ -89,7 +91,8 @@
                                                 <mat-select
                                                         class="full-width"
                                                         placeholder="Analysis Type:"
-                                                        [(ngModel)]="selectedProtocolIdAnalysisType">
+                                                        [(ngModel)]="selectedProtocolIdAnalysisType"
+                                                        [formControl]="analysisTypeFormControl">
                                                     <mat-option [value]="">
                                                         --
                                                     </mat-option>
@@ -104,7 +107,8 @@
                                                 <mat-select
                                                         class="full-width"
                                                         placeholder="Owner:"
-                                                        [(ngModel)]="selectedProtocolIdAppUser">
+                                                        [(ngModel)]="selectedProtocolIdAppUser"
+                                                        [formControl]="ownerFormControl">
                                                     <mat-option [value]="">
                                                         --
                                                     </mat-option>
@@ -120,7 +124,8 @@
                                     <div class="tr">
                                         <div class="td">
                                             <div class="inline-block checkbox-container">
-                                                <mat-checkbox [(ngModel)]="activeCheckBox"></mat-checkbox>
+                                                <mat-checkbox [(ngModel)]="activeCheckBox"
+                                                              [formControl]="activeFormControl"></mat-checkbox>
                                             </div>
                                         </div>
                                         <div class="td">
@@ -138,7 +143,8 @@
                                         <input  matInput
                                                 placeholder="URL"
                                                 (input)="checkToEnableViewURLButton($event)"
-                                                [(ngModel)]="selectedProtocolUrl">
+                                                [(ngModel)]="selectedProtocolUrl"
+                                                [formControl]="urlFormControl">
                                     </mat-form-field>
                                 </div>
                                 <div class="special-button-text-alignment-padding">
@@ -155,6 +161,7 @@
                                         matInput
                                         placeholder="Protocol Description"
                                         [(ngModel)]="selectedProtocolDescription"
+                                        [formControl]="protocolDescriptionFormControl"
                                         matTextareaAutosize
                                         matAutosizeMinRows="14"
                                         matAutosizeMaxRows="14">
@@ -164,7 +171,12 @@
                     </div>
                 </div>
                 <div class="full-width no-overflow padded-top-bottom right-align">
-                    <button mat-button (click)="onSaveButtonClicked()"><img src="../../assets/save.png" alt="" /> Save</button>
+                    <div class="inline-block minimize padded-left-right ">
+                        <div *ngIf="isAnyFieldNotPristine()" class="inline-block padded warning-block">Your changes have not been saved</div>
+                    </div>
+                    <div class="inline-block minimize padded-left-right">
+                        <button mat-button [disabled]="!isAnyFieldNotPristine()" (click)="onSaveButtonClicked()"><img *ngIf="isAnyFieldNotPristine()" src="../../assets/save.png" alt="" /><img *ngIf="!isAnyFieldNotPristine()" src="../../assets/save_disable.png" alt="" /> Save</button>
+                    </div>
                 </div>
             </div>
         </split-area>

@@ -14,7 +14,7 @@ import { PropertyService } from "../../services/property.service";
 
 import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
-import {MatDialogRef, MatDialog, ErrorStateMatcher} from "@angular/material";
+import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig} from "@angular/material";
 import {Subscription} from "rxjs/Subscription";
 
 @Component({
@@ -25,7 +25,11 @@ import {Subscription} from "rxjs/Subscription";
 export class NewBillingAccountLauncher {
 
 	constructor(private dialog: MatDialog, private router: Router) {
-		let dialogRef = this.dialog.open(NewBillingAccountComponent, { width: '60em', panelClass: 'no-padding-dialog' });
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = '60em';
+        config.panelClass = 'no-padding-dialog';
+
+		let dialogRef = this.dialog.open(NewBillingAccountComponent, config);
 
 		dialogRef.afterClosed().subscribe((result) => {
 			// After closing the dialog, route away from this component so that the dialog could
@@ -1198,13 +1202,12 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	}
 
 	private openSuccessDialog(): void {
-		let config = {
-			width: '40em',
-			panelClass: 'no-padding-dialog',
-			data: {
-				successMessage: this.successMessage
-			}
-		};
+		let data: any = { successMessage: this.successMessage };
+
+        let config: MatDialogConfig = new MatDialogConfig();
+		config.width = '40em';
+		config.panelClass = 'no-padding-dialog';
+
 		let successDialogReference = this.dialog.open(NewBillingAccountSuccessDialogComponent, config);
 
 		successDialogReference.afterClosed().subscribe(() => {
@@ -1213,11 +1216,12 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	}
 
 	private openErrorDialog(): void {
-		let config = {
-			width: '40em',
-			panelClass: 'no-padding-dialog',
-			data: { errorMessage: this.errorMessage }
-		};
+		let data: any = { errorMessage: this.errorMessage };
+
+		let config: MatDialogConfig = new MatDialogConfig();
+        config.width = '40em';
+        config.panelClass = 'no-padding-dialog';
+
 		let errorDialogReference = this.dialog.open(NewBillingAccountErrorDialogComponent, config);
 	}
 

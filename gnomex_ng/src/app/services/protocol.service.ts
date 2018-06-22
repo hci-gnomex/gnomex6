@@ -86,10 +86,8 @@ export class ProtocolService {
     }
 
     public saveExistingProtocol(protocolName: string,
-                                adapterSequenceThreePrime: string,
                                 protocolDescription: string,
                                 idAnalysisType: string,
-                                adapterSequenceFivePrime: string,
                                 protocolClassName: string,
                                 codeRequestCategory: string,
                                 idAppUser: string,
@@ -100,10 +98,8 @@ export class ProtocolService {
 
         let params: HttpParams = new HttpParams()
             .set('protocolName',              protocolName)
-            .set('adapterSequenceThreePrime', adapterSequenceThreePrime)
             .set('protocolDescription',       protocolDescription)
             .set('idAnalysisType',            idAnalysisType)
-            .set('adapterSequenceFivePrime',  adapterSequenceFivePrime)
             .set('protocolClassName',         protocolClassName)
             .set('codeRequestCategory',       codeRequestCategory)
             .set('idAppUser',                 idAppUser)

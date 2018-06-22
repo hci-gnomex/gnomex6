@@ -12,6 +12,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {ProtocolService} from "../services/protocol.service";
 import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component";
+import {FormControl} from "@angular/forms";
 
 @Component({
     selector: 'manage-protocols',
@@ -23,19 +24,21 @@ import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component"
         .tr { display: table-row; }
         .td { display: table-cell; }
         
+        .inline-block { display: inline-block; }
+        
         .vertical-center { vertical-align: middle; }
         
-        .padded { padding: 0.6em; }
+        .padded { padding: 0.4em; }
         
-        .padded-right { padding-right: 0.6em; }
+        .padded-right { padding-right: 0.4em; }
         
         .padded-left-right {
-            padding-left: 0.6em;
-            padding-right: 0.6em;
+            padding-left: 0.4em;
+            padding-right: 0.4em;
         }
         .padded-top-bottom {
-            padding-top: 0.6em;
-            padding-bottom: 0.6em;
+            padding-top: 0.4em;
+            padding-bottom: 0.4em;
         }
         
         .border { border: 1px lightgray solid; }
@@ -50,11 +53,21 @@ import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component"
             padding: 0.2em 0.6em 0 0.6em;
         }
         
+        .minimize {
+            width: fit-content;
+        }
+        
         .special-checkbox-text-alignment-padding {
             padding: 1.6em 0.6em 0 0;
         }
         .special-button-text-alignment-padding {
             padding: 1.1em 0.6em 0 0.6em;
+        }
+        
+        .warning-block {
+            background: yellow;
+            border: 1px lightgray solid;
+            border-radius: 4px;
         }
     `]
 })
@@ -65,6 +78,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private protocolSubscription: Subscription;
     private protocolListSubscription: Subscription;
     private deleteProtocolSubscription: Subscription;
+    private saveExistingProtocolSubscription: Subscription;
 
     private selectedProtocol: any;
     private protocolList: any[];
@@ -108,6 +122,18 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private spinnerNeedsToWaitForList: boolean = false;
     private spinnerNeedsToWaitForProtocol: boolean = false;
 
+    private spinnerIsOpened: boolean = false;
+
+    private spinnerOpenSubscription: Subscription;
+    private spinnerClosedSubscription: Subscription;
+
+    protected accountNameFormControl         = new FormControl('', [ ]);
+    protected experimentPlatformFormControl  = new FormControl('', [ ]);
+    protected analysisTypeFormControl        = new FormControl('', [ ]);
+    protected ownerFormControl               = new FormControl('', [ ]);
+    protected activeFormControl              = new FormControl('', [ ]);
+    protected urlFormControl                 = new FormControl('', [ ]);
+    protected protocolDescriptionFormControl = new FormControl('', [ ]);
 
     constructor(private dialog: MatDialog,
                 private dialogService: DialogsService,
@@ -121,11 +147,19 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
         if (!this.protocolSubscription) {
             this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {
                 this.selectedProtocol = result;
+
                 this.selectedProtocolName = !!result.name ? '' + result.name: '';
-                this.selectedProtocolUrl  = !!result.url  ? '' + result.url:  '';
-                this.activeCheckBox       = ('' + result.isActive).toLowerCase() === 'y';
                 this.selectedExperimentPlatformCodeRequestCategory = result.codeRequestCategory;
+                // Handled in on node select... selectedProtocolIdAppUser
+                this.activeCheckBox       = ('' + result.isActive).toLowerCase() === 'y';
+                this.selectedProtocolUrl  = !!result.url  ? '' + result.url:  '';
                 this.selectedProtocolDescription = !!result.description ? '' + result.description: '';
+
+                this.accountNameFormControl.markAsPristine();
+                this.experimentPlatformFormControl.markAsPristine();
+                this.activeFormControl.markAsPristine();
+                this.urlFormControl.markAsPristine();
+                this.protocolDescriptionFormControl.markAsPristine();
 
                 if (this.selectedProtocolUrl && this.selectedProtocolUrl !== "") {
                     this.disableViewURLButton = false;
@@ -137,6 +171,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 } else {
                     this.selectedProtocolIdAnalysisType = '';
                 }
+                this.analysisTypeFormControl.markAsPristine();
 
                 this.spinnerNeedsToWaitForProtocol = false;
                 if (!this.spinnerNeedsToWaitForList && !this.spinnerNeedsToWaitForProtocol) {
@@ -162,7 +197,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             setTimeout(() => {
                 this.spinnerNeedsToWaitForList     = true;
                 this.spinnerNeedsToWaitForProtocol = false;
-                this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+
+                if (!this.spinnerIsOpened) {
+                    this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+                }
 
                 this.protocolService.getProtocolList();
             });
@@ -180,6 +218,50 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             });
         }
 
+        if (!this.saveExistingProtocolSubscription) {
+            this.saveExistingProtocolSubscription = this.protocolService.getSaveExistingProtocolObservable().subscribe((result) => {
+                this.spinnerRef.close();
+
+                this.refresh();
+            });
+        }
+
+        if (!this.spinnerRef) {
+            setTimeout(() => {
+                if (!this.spinnerRef && !this.spinnerIsOpened) {
+                    this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+                }
+
+                setTimeout(() => {
+                    if (!this.spinnerOpenSubscription) {
+                        this.spinnerOpenSubscription = this.spinnerRef.afterOpen().subscribe(() => {
+                            this.spinnerIsOpened = true;
+                        });
+                    }
+
+                    if (!this.spinnerClosedSubscription) {
+                        this.spinnerClosedSubscription = this.spinnerRef.afterOpen().subscribe(() => {
+                            this.spinnerIsOpened = false;
+                        });
+                    }
+
+                    this.spinnerRef.close();
+                });
+            });
+        } else {
+            if (!this.spinnerOpenSubscription) {
+                this.spinnerOpenSubscription = this.spinnerRef.afterOpen().subscribe(() => {
+                    this.spinnerIsOpened = true;
+                });
+            }
+
+            if (!this.spinnerClosedSubscription) {
+                this.spinnerClosedSubscription = this.spinnerRef.afterOpen().subscribe(() => {
+                    this.spinnerIsOpened = false;
+                });
+            }
+        }
+
         this.experimentPlatformList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
         this.analysisTypeList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
         this.userList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.APP_USER);
@@ -194,6 +276,15 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
         }
         if (this.deleteProtocolSubscription) {
             this.deleteProtocolSubscription.unsubscribe();
+        }
+        if (this.saveExistingProtocolSubscription) {
+            this.saveExistingProtocolSubscription.unsubscribe();
+        }
+        if (this.spinnerOpenSubscription) {
+            this.spinnerOpenSubscription.unsubscribe();
+        }
+        if (this.spinnerClosedSubscription) {
+            this.spinnerClosedSubscription.unsubscribe();
         }
     }
 
@@ -242,7 +333,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
 
             this.spinnerNeedsToWaitForList     = false;
             this.spinnerNeedsToWaitForProtocol = true;
-            this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+
+            if (!this.spinnerIsOpened) {
+                this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+            }
 
             this.mostRecentlyDisplayedProtocolId                = event.node.data.id;
             this.mostRecentlyDisplayedProtocolProtocolClassName = event.node.data.protocolClassName;
@@ -252,6 +346,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             } else {
                 this.selectedProtocolIdAppUser = '';
             }
+            this.ownerFormControl.markAsPristine();
 
             this.protocolService.getProtocolByIdAndClass(event.node.data.id, event.node.data.protocolClassName);
 
@@ -349,12 +444,14 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     }
     private onSaveButtonClicked() {
         if (this.selectedProtocol) {
+            if (!this.spinnerIsOpened) {
+                this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+            }
+
             this.protocolService.saveExistingProtocol(
                 '' + this.selectedProtocolName,
-                '',
                 '' + this.selectedProtocolDescription,
                 '' + this.selectedProtocolIdAnalysisType,
-                '',
                 '' + this.mostRecentlyDisplayedProtocolProtocolClassName,
                 '' + this.selectedExperimentPlatformCodeRequestCategory,
                 '' + this.selectedProtocolIdAppUser,
@@ -366,7 +463,9 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     }
 
     private refresh(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        if (!this.spinnerIsOpened) {
+            this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        }
 
         this.spinnerNeedsToWaitForList = true;
 
@@ -378,4 +477,13 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
         this.protocolService.getProtocolList();
     }
 
+    protected isAnyFieldNotPristine(): boolean {
+        return this.accountNameFormControl.dirty
+            || this.experimentPlatformFormControl.dirty
+            || this.analysisTypeFormControl.dirty
+            || this.ownerFormControl.dirty
+            || this.activeFormControl.dirty
+            || this.urlFormControl.dirty
+            || this.protocolDescriptionFormControl.dirty;
+    }
 }
