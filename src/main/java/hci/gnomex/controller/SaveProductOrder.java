@@ -56,9 +56,6 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.query.NativeQuery;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 public class SaveProductOrder extends GNomExCommand implements Serializable {
 
@@ -70,8 +67,7 @@ public class SaveProductOrder extends GNomExCommand implements Serializable {
     private Integer idCoreFacility;
     private String codeProductOrderStatus;
     private JsonArray productArray;
-    private String billingTemplateXMLString;
-    private Document billingTemplateDoc;
+    private JsonObject billingTemplate = null;
 
     private ProductPlugin productPlugin = new ProductPlugin();
 
@@ -83,20 +79,19 @@ public class SaveProductOrder extends GNomExCommand implements Serializable {
 
         if (request.getParameter("idBillingAccount") != null && !request.getParameter("idBillingAccount").equals("")) {
             idBillingAccount = Integer.parseInt(request.getParameter("idBillingAccount"));
-        } else if (request.getParameter("billingTemplate") != null && !request.getParameter("billingTemplate").equals("")) {
-            billingTemplateXMLString = request.getParameter("billingTemplate");
-            StringReader reader = new StringReader(billingTemplateXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                billingTemplateDoc = sax.build(reader);
-            } catch (JDOMException je) {
-                LOG.error("Cannot parse billingTemplateXMLString", je);
-                this.addInvalidField("billingTemplateXMLString", "Invalid billingTemplate xml");
-                this.errorDetails = Util.GNLOG(LOG, "Cannot parse billingTemplateXMLString", je);
+        } else {
+            String billingTemplateJSONString = request.getParameter("billingTemplateJSONString");
+            if (Util.isParameterNonEmpty(billingTemplateJSONString)) {
+                try (JsonReader jsonReader = Json.createReader(new StringReader(billingTemplateJSONString))) {
+                    this.billingTemplate = jsonReader.readObject();
+                } catch (Exception e) {
+                    this.addInvalidField("billingTemplateJSONString", "Invalid billingTemplateJSONString");
+                    this.errorDetails = Util.GNLOG(LOG, "Cannot parse billingTemplateJSONString", e);
+                }
             }
         }
 
-        if (idBillingAccount == null && billingTemplateXMLString == null) {
+        if (idBillingAccount == null && billingTemplate == null) {
             this.addInvalidField("Billing Information", "Missing either idBillingAccount or billingTemplate");
         }
 
@@ -190,7 +185,7 @@ public class SaveProductOrder extends GNomExCommand implements Serializable {
                             }
                             sess.flush();
                         } else {
-                            BillingTemplateParser btParser = new BillingTemplateParser(billingTemplateDoc.getRootElement());
+                            BillingTemplateParser btParser = new BillingTemplateParser(this.billingTemplate);
                             btParser.parse(sess);
                             billingTemplate = btParser.getBillingTemplate();
                             billingTemplate.setOrder(po);
