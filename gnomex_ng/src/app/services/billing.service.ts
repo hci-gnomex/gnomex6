@@ -3,11 +3,13 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
+import {HttpClient, HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class BillingService {
 
-    constructor(private http: Http) {
+    constructor(private http: Http,
+                private httpClient: HttpClient) {
     }
 
     getBillingRequestList(params: URLSearchParams): Observable<any> {
@@ -48,6 +50,10 @@ export class BillingService {
                 throw new Error("Error");
             }
         });
+    }
+
+    public getAuthorizedBillingAccounts(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetAuthorizedBillingAccounts.gx", {params: params});
     }
 
 }

@@ -37,7 +37,11 @@ export class CheckboxRenderer implements ICellRendererAngularComp {
 		this.checked = (this.params && this.params.value && this.params.value === 'Y') ? true : false;
 
 		if (this.params && this.params.colDef && this.params.colDef.checkboxEditable) {
-			this.editable = this.params.colDef.checkboxEditable(this.params);
+			if (this.params.colDef.checkboxEditable === true) {
+				this.editable = true;
+			} else {
+                this.editable = this.params.colDef.checkboxEditable(this.params);
+			}
 		}
 	}
 

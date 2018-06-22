@@ -8,6 +8,12 @@ import {ProductsService} from "../services/products.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../services/constants.service";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {
+    BillingTemplate, BillingTemplateWindowComponent,
+    BillingTemplateWindowParams
+} from "../util/billing-template-window.component";
+import {BillingService} from "../services/billing.service";
 
 @Component({
     selector: 'order-products',
@@ -52,7 +58,7 @@ import {ConstantsService} from "../services/constants.service";
 export class OrderProductsComponent implements OnInit {
 
     public isAdminState: boolean = false;
-    public showSplitBillingButton: boolean = true;
+    public showSplitBillingButton: boolean = false;
     public enableSubmit: boolean = false;
     public userConsent: boolean = false;
 
@@ -61,6 +67,7 @@ export class OrderProductsComponent implements OnInit {
     public lab: any;
     public idAppUser: string;
     public idBillingAccount: string;
+    private billingTemplate: BillingTemplate;
     public grandTotal: number = 0;
 
     public labList: any[] = [];
@@ -77,7 +84,9 @@ export class OrderProductsComponent implements OnInit {
                 private dictionaryService: DictionaryService,
                 private productsService: ProductsService,
                 private dialogsService: DialogsService,
-                private router: Router) {
+                private router: Router,
+                private dialog: MatDialog,
+                private billingService: BillingService) {
     }
 
     ngOnInit() {
@@ -91,7 +100,9 @@ export class OrderProductsComponent implements OnInit {
             if (this.isAdminState) {
                 this.idAppUser = "";
             }
+            this.showSplitBillingButton = false;
             this.idBillingAccount = "";
+            this.billingTemplate = null;
             this.labList = [];
             this.onLabChange();
             this.productTypeList = [];
@@ -130,6 +141,11 @@ export class OrderProductsComponent implements OnInit {
 
                 this.productTypeList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PRODUCT_TYPE).filter((pt: any) => {
                     return pt.idCoreFacility === this.currentCoreFacility.idCoreFacility;
+                });
+
+                let authorizedBillingAccountsParams: HttpParams = new HttpParams().set("idCoreFacility", this.currentCoreFacility.idCoreFacility);
+                this.billingService.getAuthorizedBillingAccounts(authorizedBillingAccountsParams).subscribe((response: any) => {
+                    this.showSplitBillingButton = response && response.hasAccountsWithinCore && response.hasAccountsWithinCore === 'Y';
                 });
             }
         });
@@ -237,8 +253,9 @@ export class OrderProductsComponent implements OnInit {
                 .set("idLab", this.idLab)
                 .set("idCoreFacility", this.currentCoreFacility.idCoreFacility)
                 .set("codeProductOrderStatus", ConstantsService.CODE_PRODUCT_ORDER_STATUS_NEW);
-            // TODO When split billing is added, add billing template logic
-            if (this.idBillingAccount) {
+            if (this.billingTemplate) {
+                params = params.set("billingTemplateJSONString", JSON.stringify(this.billingTemplate));
+            } else {
                 params = params.set("idBillingAccount", this.idBillingAccount);
             }
             this.productsService.saveProductOrder(params).subscribe((response: any) => {
@@ -261,7 +278,27 @@ export class OrderProductsComponent implements OnInit {
     }
 
     public showSplitBilling(): void {
-        // TODO
+        let params: BillingTemplateWindowParams = new BillingTemplateWindowParams();
+        params.idCoreFacility = this.currentCoreFacility.idCoreFacility;
+        if (this.billingTemplate) {
+            params.billingTemplate = this.billingTemplate;
+        }
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.data = {
+            params: params
+        };
+
+        let dialogRef: MatDialogRef<BillingTemplateWindowComponent> = this.dialog.open(BillingTemplateWindowComponent, config);
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.billingTemplate = result as BillingTemplate;
+                this.idBillingAccount = "";
+            }
+        });
+    }
+
+    public cancelSplitBilling(): void {
+        this.billingTemplate = null;
     }
 
 }
