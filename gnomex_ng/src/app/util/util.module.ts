@@ -30,6 +30,7 @@ import {AnnotationTabComponent} from "./annotation-tab.component";
 import {BillingTemplateWindowComponent} from "./billing-template-window.component";
 import {AgGridModule} from "ag-grid-angular";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
+import {UrlAnnotationComponent} from "./url-annotation.component";
 
 @NgModule({
     imports: [
@@ -66,7 +67,8 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
         SaveFooterComponent,
         MonthPickerComponent,
         BillingTemplateWindowComponent,
-        AnnotationTabComponent
+        AnnotationTabComponent,
+        UrlAnnotationComponent
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -100,7 +102,10 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
         TabsModule,
         MonthPickerComponent,
         BillingTemplateWindowComponent,
-        AnnotationTabComponent
+        AnnotationTabComponent,
+        UrlAnnotationComponent,
+
+
     ]
 })
 export class UtilModule {

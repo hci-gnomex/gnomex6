@@ -37,10 +37,6 @@ import {URLSearchParams} from "@angular/http"
             
         </div>
         
-        <!--<div> {{experimentService.experimentList[0] | json}} </div> -->
-
-        
-        
         
     `,
     styles: [`

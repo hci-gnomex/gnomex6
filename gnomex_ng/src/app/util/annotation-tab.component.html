@@ -1,9 +1,9 @@
 <div style="display:flex">
     <form [formGroup]="annotationForm" style=" height:100%;width:100%; display:flex; flex-direction:column;">
-        <ng-container  [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations">
+        <ng-container  [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations; let i = index">
             <div *ngSwitchCase="'CHECK'" class="annot-control">
                 <label style="margin-right: 1em;"  >{{annot.name}}  </label>
-                <mat-checkbox  [formControlName]="annot.name" >
+                <mat-checkbox  [formControl]="this.annotationForm.controls[annot.name]" >
                 </mat-checkbox>
                 <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('required')">
                     This field is required
@@ -11,64 +11,42 @@
 
             </div>
             <mat-form-field *ngSwitchCase="'TEXT'" class="annot-control" >
-                <input matInput placeholder="{{annot.name}}" [formControlName]="annot.name">
+                <input matInput placeholder="{{annot.name}}" [formControl]="this.annotationForm.controls[annot.name]">
                 <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
             </mat-form-field>
             <mat-form-field *ngSwitchCase="'MOPTION'" class="annot-control" >
-                <mat-select  [placeholder]="annot.name" multiple [formControlName]="annot.name">
-                    <mat-option *ngFor="let opt of annot.PropertyOption" [value]="opt.name">{{opt.name}}</mat-option>
+                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.annotationForm.controls[annot.name]">
+                    <mat-option *ngFor="let opt of annot.PropertyOption; let j = index"
+                                #mOptRef
+                                (onSelectionChange)="selectOption(mOptRef.selected,i,j)"
+                                [value]="opt" > {{opt.name}}
+                    </mat-option>
                 </mat-select>
                 <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('selectRequired')">
                     This field is required
                 </mat-error>
             </mat-form-field>
-            <mat-form-field *ngSwitchCase="'OPTION'" class="annot-control">
-                <mat-select  [placeholder]="annot.name" [formControlName]="annot.name">
-                    <mat-option *ngFor="let opt of annot.PropertyOption" [value]="opt.name">{{opt.name}}</mat-option>
+            <mat-form-field  *ngSwitchCase="'OPTION'" class="annot-control">
+                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" [formControl]="this.annotationForm.controls[annot.name]">
+                    <mat-option
+                            *ngFor="let opt of annot.PropertyOption; let k = index"
+                            #optRef
+                            (onSelectionChange)="selectOption(optRef.selected,i,k)"
+                            [value]="opt" >{{opt.name}}
+                    </mat-option>
                 </mat-select>
                 <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('selectRequired')">
                     This field is required
                 </mat-error>
             </mat-form-field>
             <div *ngSwitchCase="'URL'" class="annot-control">
-                <div *ngFor="let url of urlAnnotations; let i = index " >
-                    <div [hidden]="url.edit " style="display:flex">
-                        <mat-form-field style="margin-right:.5em;" >
-                            <input matInput [(ngModel)]="url.name" placeholder="name"  [ngModelOptions]="{standalone: true}" />
-                        </mat-form-field>
-                        <mat-form-field>
-                            <input matInput [(ngModel)]="url.link" placeholder="URL"  [ngModelOptions]="{standalone: true}"   />
-                        </mat-form-field>
-
-                        <button mat-button (click)="toggleMode(url)"> edit </button>
-                    </div>
-                    <div [hidden]="!url.edit" style="display:flex; justify-content: space-between;">
-                        <a [href]="url.link" target="_blank"> {{url.name}}</a>
-                        <div>
-                            <button  mat-button color="primary" (click)="toggleMode(url)"> show </button>
-                            <button  mat-button color="warn" (click)="removeLink(i)"> remove </button>
-                        </div>
-
-                    </div>
-
-                </div>
-                <div style="display:flex" >
-                    <mat-form-field style="margin-right: .5em;">
-                        <input #name matInput  placeholder="name"  />
-                    </mat-form-field>
-                    <mat-form-field>
-                        <input #url  matInput placeholder="URL"  />
-                    </mat-form-field>
-
-                    <button mat-button (click)="makeLink(name,url)"> show  </button>
-                </div>
+                <url-annotation [formControl]="this.annotationForm.controls[annot.name]" >  </url-annotation>
             </div>
 
-
-
         </ng-container>
+
     </form>
     <div style="flex:1">
         <button mat-button color="primary" style="margin:1em" (click)="loadConfigAnnotations()"> Configure Annotations </button>

@@ -9,7 +9,17 @@ export interface IAnnotation {
     idPropertyEntry: string
     isRequired: string
     value: string;
+    PropertyEntryValue? : IPropertyEntryValue[];
 
     PropertyOption? : IAnnotationOption[];
 
+}
+
+export interface IPropertyEntryValue {
+    idPropertyEntryValue: string,
+    urlAlias: string,
+    urlDisplay: string ,
+    url:string ,
+    value: string,
+    edit:boolean
 }

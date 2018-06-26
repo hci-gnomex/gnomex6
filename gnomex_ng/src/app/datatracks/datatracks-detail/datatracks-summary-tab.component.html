@@ -13,17 +13,29 @@
 
 
 
-    <div style="width:100%; font-size:small;">
+    <div style="width:99%; font-size:small;">
 
-        <label for="dtDescriptionId" > Description </label>
-        <jqxEditor #editorReference
-                   formControlName="description"
-                   id="dtDescriptionId"
-                   width="100%"
-                   [height]="350"
-                   [tools]="toolBarSettings"
-                   [toolbarPosition]="'bottom'">
-        </jqxEditor>
+        <!--<label for="dtDescriptionId" > Description </label>-->
+        <!--<jqxEditor #editorReference-->
+                   <!--formControlName="description"-->
+                   <!--id="dtDescriptionId"-->
+                   <!--width="100%"-->
+                   <!--[height]="350"-->
+                   <!--[tools]="toolBarSettings"-->
+                   <!--[toolbarPosition]="'bottom'">-->
+        <!--</jqxEditor>-->
+
+        <!-- Will be implementing need to get artifactory to pull in latest tinymce editor
+        <!-- <editor
+                [toolbar]="'insertfile undo redo | styleselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'"
+                formControlName="description"  apiKey="test"
+                [init]="{plugins:['advlist autolink lists link image charmap print preview anchor textcolor'], resize: false}">
+
+        </editor> -->
+        <!--<div>-->
+            <!--{{this.summaryFormGroup.value | json }}-->
+        <!--</div>-->
+
     </div>
 
 
