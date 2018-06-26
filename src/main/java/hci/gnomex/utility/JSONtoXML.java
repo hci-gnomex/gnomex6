@@ -11,6 +11,7 @@ import java.io.*;
 public class JSONtoXML {
     public static boolean debugHint = false;
     public static boolean debugConvert = true;
+    public static boolean debugTesting = false;
 
     public HashMap initHints(String fileName) throws Exception {
         HashMap xmlHintMap = new HashMap();
@@ -759,20 +760,28 @@ public class JSONtoXML {
                             if (theHint.getNodePrefix().equals("analysisGroup")) {
                                 // end this up
                                 theXML += "</" + theHint.getNodePrefix() + ">\n";
-                                if (debugConvert) System.out.println("[convertJSONtoXML ** after switch ** *** ADDING nodeprefix <" + theHint.getNodePrefix() + "> *** the end] theXML:\n" + theXML);
+                                if (debugConvert) System.out.println("[convertJSONtoXML ** after switch ** *** ADDING nodeprefix </" + theHint.getNodePrefix() + "> *** the end] theXML:\n" + theXML);
 //                                nameStackptr--;
-
                             }
-                            // end this up
-                            theXML += "</" + nodeheader + ">\n";
-                            if (debugConvert) System.out.println("[convertJSONtoXML ** after switch ** *** ADDING <" + nodeheader + "> *** the end] theXML:\n" + theXML);
-                            nameStackptr--;
+
+                            if (!jsonNavigator.hasNext()) {
+                                // end this up
+                                theXML += "</" + nodeheader + ">\n";
+                                if (debugConvert)
+                                    System.out.println("[convertJSONtoXML ** after switch ** *** ADDING </" + nodeheader + "> *** the end *** breaking out of it] theXML:\n" + theXML);
+                                nameStackptr--;
+                                break;
+                            } else {
+                                theXML += "</" + theHint.getNodePrefix() + ">\n";
+                                if (debugConvert) System.out.println("[convertJSONtoXML ** after switch ** *** ADDING nodeprefix </" + theHint.getNodePrefix() + "> *** the end] theXML:\n" + theXML);
+//                                nameStackptr--;
+                            }
                         }
                         else
                         { // otherwise we emit </nodeprefix>
                             if (!nodePrefix.equals("")) {
                                 theXML += "</" + nodePrefix + ">\n";
-                                if (debugConvert) System.out.println("[convertJSONtoXML ** after switch ** *** ADDING <nodeprefix> *** the end] theXML:\n" + theXML);
+                                if (debugConvert) System.out.println("[convertJSONtoXML ** ZZZafter switch ** *** ADDING </" + theHint.getNodePrefix() + "> *** the end] theXML:\n" + theXML);
                                 nameStackptr--;
                             }
 
@@ -829,9 +838,10 @@ public class JSONtoXML {
         try {
             debugConvert = true;
             debugHint = false;
+            debugTesting = true;
 
             // setup hintKey, the json to convert
-            String hintKey = args[0] + "." + args[1];
+            String hintKey = args[1];
 
             // read the file containing the json
             BufferedReader br = new BufferedReader(new FileReader(args[2]));

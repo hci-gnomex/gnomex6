@@ -16,6 +16,7 @@ import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dial
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
 import {RichEditorModule} from "../../../modules/rich-editor.module";
 import {RelatedDataModule} from "../../util/related-data.module";
+//import {EditorModule} from "@tinymce/tinymce-angular"
 
 
 
@@ -37,6 +38,7 @@ import {RelatedDataModule} from "../../util/related-data.module";
         ReactiveFormsModule,
         ConfigureAnnotationsModule,
         RelatedDataModule
+        //EditorModule  will be using once artifactory is pulling in latest version correctly
 
     ],
     declarations: [

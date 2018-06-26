@@ -67,7 +67,7 @@
                     codeVisibility:['',Validators.required],
                     idAppUser: ['',Validators.required],
                     lab: ['',Validators.required],
-                    collaborators: ['']
+                    collaborators: [[]]
                 });
 
                 this.labList = this.gnomexService.labList
@@ -92,7 +92,7 @@
                     let labParams: URLSearchParams = new URLSearchParams();
 
                     let idLab = this.dtService.datatrackListTreeNode.idLab;
-                    if(idLab){
+                    if(idLab !== null  && idLab !== undefined){ //empty string is valid
                         labParams.set('idLab', idLab);
                         labParams.set('includeBillingAccounts', 'N');
                         labParams.set('includeProductCounts','N');
@@ -105,8 +105,6 @@
                                 this.updateCollaborators();
 
                             }
-
-
                         });
                     }
 
@@ -204,12 +202,14 @@
 
                 if(visCode === 'MEM'){
                     let memCollabs = Array.isArray(lab.membersCollaborators) ? lab.membersCollaborators : [lab.membersCollaborators];
+                    lab.membersCollaborators = memCollabs;
                     prepCollabsList = memCollabs.filter(mem => mem.isActive === 'Y');
                     this.visibilityForm.get('collaborators').enable();
                     this.isSelectable = true;
 
                 }else if(visCode === 'OWNER'){
                     let ownCollabs = Array.isArray(lab.possibleCollaborators) ? lab.possibleCollaborators : [lab.possibleCollaborators];
+                    lab.possibleCollaborators = ownCollabs;
                     prepCollabsList = ownCollabs.filter(own => own.isActive === 'Y');
                     this.visibilityForm.get('collaborators').enable();
                     this.isSelectable = true;

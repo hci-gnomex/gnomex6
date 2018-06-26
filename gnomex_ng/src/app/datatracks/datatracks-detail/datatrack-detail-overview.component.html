@@ -80,9 +80,24 @@
             </mat-tab>
         </mat-tab-group>
     </div>
-    <div>
+    <div style="display: flex; justify-content: space-between; ">
+        <ng-template #folderRef>
+            <mat-list>
+                <mat-list-item  *ngFor="let folder of folderList" >
+                    <img class="icon" [src]="constService.ICON_FOLDER"> {{folder?.name }}
+                </mat-list-item>
+            </mat-list>
+        </ng-template>
+
+        <button mat-button *ngIf="this.secAdvisorService.isAdmin"
+                (click)="showFolders(folderRef)" color="primary">
+            <img class="icon" [src]="constService.ICON_FOLDER">
+            Show Folder(s)
+        </button>
+
         <save-footer (saveClicked)="save()"
-                     [disableSave]="this.dtOverviewForm.invalid"
+                     [disableSave]="this.dtOverviewForm.invalid || !this.canWrite"
+                     [showSpinner]="showSaveSpinner"
                      [dirty]="this.dtOverviewForm.dirty"></save-footer>
     </div>
 

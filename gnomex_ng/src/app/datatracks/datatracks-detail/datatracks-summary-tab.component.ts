@@ -1,6 +1,6 @@
 
 import {AfterViewInit,Component, OnInit, ViewChild} from "@angular/core";
-import {FormGroup,FormBuilder,Validators } from "@angular/forms"
+import {FormGroup, FormBuilder, Validators, FormControl} from "@angular/forms"
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -23,7 +23,7 @@ export class DatatracksSummaryTabComponent implements OnInit, AfterViewInit{
     public summaryFormGroup: FormGroup;
     private labList:Array<string> = [];
     private idLabString: string;
-    @ViewChild('editorReference') myEditor: jqxEditorComponent;
+    //@ViewChild('editorReference') myEditor: jqxEditorComponent;
 
 
 
@@ -41,7 +41,7 @@ export class DatatracksSummaryTabComponent implements OnInit, AfterViewInit{
         this.summaryFormGroup=  this.fb.group({
             folderName:[ '', [ Validators.required, Validators.maxLength(100)]],
             summary:['', [ Validators.maxLength(5000)]],
-            description:['']
+            description: ''
         });
         if(!this.edit){
             this.toolBarSettings = '';
@@ -51,25 +51,22 @@ export class DatatracksSummaryTabComponent implements OnInit, AfterViewInit{
         }
 
 
-        this.route.paramMap.forEach(params =>{
+        this.route.data.forEach(params =>{
 
 
             let folderName = this.dtService.datatrackListTreeNode.name;
             let summary = this.dtService.datatrackListTreeNode.summary;
+            let description = this.dtService.datatrackListTreeNode.description;
 
             this.summaryFormGroup.get("folderName").setValue(folderName);
             this.summaryFormGroup.get("summary").setValue(summary);
+            this.summaryFormGroup.get("description").setValue(description)
         });
 
     }
 
     ngAfterViewInit():void{
 
-
-        this.route.paramMap.forEach(params =>{
-            let description = this.dtService.datatrackListTreeNode.description;
-            this.myEditor.val(description);
-        });
     }
 
 
