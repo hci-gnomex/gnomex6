@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable, TemplateRef} from '@angular/core';
 import { MatDialogRef, MatDialog, MatDialogConfig } from '@angular/material';
 
 import { Observable } from 'rxjs/Rx';
@@ -7,6 +7,7 @@ import { ConfirmDialog } from './confirm-dialog.component';
 import { AlertDialogComponent } from "./alert-dialog.component";
 import { YesNoDialogComponent } from "./yes-no-dialog.component";
 import { SpinnerDialogComponent } from "./spinner-dialog.component";
+import {CustomDialogComponent} from "./custom-dialog.component";
 
 @Injectable()
 export class DialogsService {
@@ -37,6 +38,20 @@ export class DialogsService {
         dialogRef.componentInstance.title = title;
         dialogRef.componentInstance.message = message;
 
+        return dialogRef.afterClosed();
+    }
+    public createCustomDialog(tempRef:TemplateRef<any>, title?:string){
+
+        let configuration: MatDialogConfig = new MatDialogConfig();
+
+
+        if(title){
+            configuration.data ={templateRef: tempRef,title:title};
+        }else{
+            configuration.data = {templateRef:tempRef}
+        }
+
+        let dialogRef = this.dialog.open(CustomDialogComponent, configuration);
         return dialogRef.afterClosed();
     }
 

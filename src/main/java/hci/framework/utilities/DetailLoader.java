@@ -1,6 +1,7 @@
 package hci.framework.utilities;
 import hci.framework.model.DetailObject;
 import hci.framework.model.FieldInputValidator;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -36,7 +37,7 @@ public class DetailLoader extends FieldInputValidator implements Serializable {
    *@param  detail   The DetailObject to be populated
    *@return          The processed DetailObject
    */
-  public DetailObject loadDetailFromRequest(HttpServletRequest request, DetailObject detail) {
+  public DetailObject loadDetailFromRequest(HttpServletWrappedRequest request, DetailObject detail) {
 
     Class detailClass = detail.getClass();
 

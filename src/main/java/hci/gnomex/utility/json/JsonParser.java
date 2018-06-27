@@ -1,6 +1,8 @@
 package hci.gnomex.utility.json;
 
+import static hci.gnomex.utility.JSONtoXML.debugConvert;
 import static hci.gnomex.utility.JSONtoXML.debugHint;
+import static hci.gnomex.utility.JSONtoXML.debugTesting;
 
 /**
  *
@@ -124,7 +126,7 @@ public class JsonParser {
         this.elementBuffer.position[this.elementIndex] = tokenizer.tokenPosition();
         this.elementBuffer.length  [this.elementIndex] = tokenizer.tokenLength();
         this.elementBuffer.type    [this.elementIndex] = elementType;
-        if (debugHint) System.out.println ("[setElementData] elementIndex: " + elementIndex + " token position: " + tokenizer.tokenPosition() + " token length: " + tokenizer.tokenLength() + " elementType: " + elementType + " -->" + ElementTypes.toString(elementType));
+         if (debugHint || debugTesting)   System.out.println ("[setElementData] elementIndex: " + elementIndex + " token position: " + tokenizer.tokenPosition() + " token length: " + tokenizer.tokenLength() + " elementType: " + elementType + " -->" + ElementTypes.toString(elementType));
         this.elementIndex++;
     }
 

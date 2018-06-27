@@ -27,6 +27,10 @@ import {DatePickerComponent} from "./date-picker.component";
 import {DateRangeFilterComponent} from "./date-range-filter.component";
 import {DateRangeFilterPopupComponent} from "./date-range-filter-popup.component";
 import {AnnotationTabComponent} from "./annotation-tab.component";
+import {BillingTemplateWindowComponent} from "./billing-template-window.component";
+import {AgGridModule} from "ag-grid-angular";
+import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
+import {UrlAnnotationComponent} from "./url-annotation.component";
 
 @NgModule({
     imports: [
@@ -37,7 +41,10 @@ import {AnnotationTabComponent} from "./annotation-tab.component";
         ComboBoxModule,
         FormsModule,
         ReactiveFormsModule,
-        AngularMaterialModule
+        AngularMaterialModule,
+        AgGridModule.withComponents([
+            CheckboxRenderer,
+        ]),
     ],
     declarations: [
         BillingPeriodPickerComponent,
@@ -59,7 +66,9 @@ import {AnnotationTabComponent} from "./annotation-tab.component";
         NewTopicComponent,
         SaveFooterComponent,
         MonthPickerComponent,
-        AnnotationTabComponent
+        BillingTemplateWindowComponent,
+        AnnotationTabComponent,
+        UrlAnnotationComponent
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -69,6 +78,7 @@ import {AnnotationTabComponent} from "./annotation-tab.component";
         NewGenomeBuildComponent,
         NewOrganismComponent,
         DateRangeFilterPopupComponent,
+        BillingTemplateWindowComponent,
         NewTopicComponent
     ],
     exports: [
@@ -91,7 +101,11 @@ import {AnnotationTabComponent} from "./annotation-tab.component";
         SaveFooterComponent,
         TabsModule,
         MonthPickerComponent,
-        AnnotationTabComponent
+        BillingTemplateWindowComponent,
+        AnnotationTabComponent,
+        UrlAnnotationComponent,
+
+
     ]
 })
 export class UtilModule {

@@ -35,12 +35,6 @@ import {GnomexStringUtilService} from "../../services/gnomex-string-util.service
             </div>
         </div>
         
-       
-        
-        
-        <!--<div> {{experimentService.experimentList[0] | json}} </div> -->
-
-        
         
         
     `,
