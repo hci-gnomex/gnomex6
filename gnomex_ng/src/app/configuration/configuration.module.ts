@@ -7,20 +7,24 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ServicesModule} from "../services/services.module";
 import {TreeModule} from "angular-tree-component";
 
-import {BrowseDictionaryComponent, BrowseDictionaryComponentLauncher} from "./browse-dictionary.component";
 import {AgGridModule} from "ag-grid-angular";
-import {ConfigCoreFacilityComponent} from "./config-core-facility.component"
 import {AngularSplitModule} from "angular-split";
-import {ConfigCoreFacilityEditComponent} from "./config-core-facility-edit.component";
-import {UtilModule} from "../util/util.module";
+import {BrowseDictionaryComponent, BrowseDictionaryComponentLauncher} from "./browse-dictionary.component";
+import {ConfigureAnnotationsModule} from "../util/configure-annotations.module";
 import {RichEditorModule} from "../../modules/rich-editor.module";
+import {UtilModule} from "../util/util.module";
+
+import {ConfigCoreFacilityComponent} from "./config-core-facility.component"
+import {ConfigCoreFacilityEditComponent} from "./config-core-facility-edit.component";
 import {ConfigureOrganismsComponent} from "./configure-organisms.component";
 import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
+import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component";
 import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
-import {ConfigureAnnotationsModule} from "../util/configure-annotations.module";
+import {EditProtocolComponent} from "./edit-protocol.component";
 import {ManageProtocolsComponent} from "./manage-protocols.component";
-import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component";
+import {ConfigurationBrowsePanelComponent} from "./configuration-browse-panel.component";
+import {OverviewProtocolComponent} from "./overview-protocol.component";
 
 
 
@@ -42,16 +46,18 @@ import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component"
         RichEditorModule,
         ReactiveFormsModule,
         AngularSplitModule
-
     ],
     declarations: [
         BrowseDictionaryComponent,
         BrowseDictionaryComponentLauncher,
         ConfigCoreFacilityComponent,
         ConfigCoreFacilityEditComponent,
+        ConfigurationBrowsePanelComponent,
         ConfigureOrganismsComponent,
         CreateProtocolDialogComponent,
-        ManageProtocolsComponent
+        EditProtocolComponent,
+        ManageProtocolsComponent,
+        OverviewProtocolComponent
     ],
     entryComponents: [
         CreateProtocolDialogComponent
