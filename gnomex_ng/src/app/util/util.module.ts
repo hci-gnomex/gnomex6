@@ -6,7 +6,6 @@ import {DateRangePickerComponent} from "./date-range-picker.component";
 import {BrowseFilterComponent} from "./browse-filter.component";
 import {ComboBoxModule} from '../../modules/combobox.module';
 import {CalendarModule} from "../../modules/calendar.module";
-import {BillingPeriodPickerComponent} from "./billing-period-picker.component";
 import {TabsModule} from "./tabs/tabs.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -31,6 +30,8 @@ import {BillingTemplateWindowComponent} from "./billing-template-window.componen
 import {AgGridModule} from "ag-grid-angular";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {UrlAnnotationComponent} from "./url-annotation.component";
+import {BillingPeriodSelectorComponent} from "./billing-period-selector.component";
+import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-popup.component";
 
 @NgModule({
     imports: [
@@ -47,7 +48,6 @@ import {UrlAnnotationComponent} from "./url-annotation.component";
         ]),
     ],
     declarations: [
-        BillingPeriodPickerComponent,
         BillingUsageReportComponent,
         BrowseFilterComponent,
         DateParserComponent,
@@ -68,7 +68,9 @@ import {UrlAnnotationComponent} from "./url-annotation.component";
         MonthPickerComponent,
         BillingTemplateWindowComponent,
         AnnotationTabComponent,
-        UrlAnnotationComponent
+        UrlAnnotationComponent,
+        BillingPeriodSelectorComponent,
+        BillingPeriodSelectorPopupComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -79,11 +81,11 @@ import {UrlAnnotationComponent} from "./url-annotation.component";
         NewOrganismComponent,
         DateRangeFilterPopupComponent,
         BillingTemplateWindowComponent,
-        NewTopicComponent
+        NewTopicComponent,
+        BillingPeriodSelectorPopupComponent,
     ],
     exports: [
         BrowseFilterComponent,
-        BillingPeriodPickerComponent,
         BillingUsageReportComponent,
         DateParserComponent,
         DatePickerComponent,
@@ -104,8 +106,7 @@ import {UrlAnnotationComponent} from "./url-annotation.component";
         BillingTemplateWindowComponent,
         AnnotationTabComponent,
         UrlAnnotationComponent,
-
-
+        BillingPeriodSelectorComponent,
     ]
 })
 export class UtilModule {

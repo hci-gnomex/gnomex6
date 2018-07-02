@@ -1,10 +1,16 @@
 import {Component, Inject} from '@angular/core';
 import {DOCUMENT} from "@angular/common";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {BillingPeriod} from "./billing-period-selector.component";
 
 @Component({
     selector: 'billing-usage-report',
     templateUrl: "./billing-usage-report.component.html",
+    styles: [`
+        .margin-right {
+            margin-right: 1em;
+        }
+    `]
 })
 
 export class BillingUsageReportComponent {
@@ -31,7 +37,23 @@ export class BillingUsageReportComponent {
         this.title = this.mode + " Report for Bioinformatics";
     }
 
-    private submit(): void {
+    public onStartChange(value: BillingPeriod): void {
+        if (value && value.startDate) {
+            this.startDate = value.startDate;
+        } else {
+            this.startDate = "";
+        }
+    }
+
+    public onEndChange(value: BillingPeriod): void {
+        if (value && value.startDate) {
+            this.endDate = value.endDate;
+        } else {
+            this.endDate = "";
+        }
+    }
+
+    public submit(): void {
         if (this.mode === this.MODE_TOTAL_BILLING_BY_LAB) {
             let url: string = this.document.location.href;
             url += "/ShowBillingTotalByLabReport.gx?startDate=" + this.startDate;

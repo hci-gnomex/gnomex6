@@ -1,8 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {MatDialogRef, MatDialog} from '@angular/material';
+import {MatDialog, MatDialogConfig} from '@angular/material';
 
-import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {BillingUsageReportComponent} from "../billing-usage-report.component";
+import {DialogsService} from "../popup/dialogs.service";
 
 @Component({
     selector: 'menu-header-billing',
@@ -10,27 +10,17 @@ import {BillingUsageReportComponent} from "../billing-usage-report.component";
 })
 
 export class MenuHeaderBillingComponent implements OnInit {
-    private _showMenuBilling: boolean = false;
-    public get showMenuBilling(): boolean {
-        return this._showMenuBilling;
-    }
 
-    @Input() private idBillingPeriodString: string = "";
-    @Input() private idCoreFacilityString: string = "";
+    @Input() private idBillingPeriod: string = "";
+    @Input() private idCoreFacility: string = "";
     @Input() private isDirty: boolean = false;
     @Input() private selectedItem: any = null;
 
-    constructor(private createSecurityAdvisorService: CreateSecurityAdvisorService,
-                private dialog: MatDialog) {
+    constructor(private dialog: MatDialog,
+                private dialogsService: DialogsService) {
     }
 
     ngOnInit() {
-        let isAdminState: boolean = this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin;
-        let isBillingAdminState: boolean = this.createSecurityAdvisorService.isBillingAdmin;
-
-        if (isAdminState || isBillingAdminState) {
-            this._showMenuBilling = true;
-        }
     }
 
     public showGeneralLedgerInterface(): void {
@@ -38,19 +28,19 @@ export class MenuHeaderBillingComponent implements OnInit {
     }
 
     public showBillingInvoice(sendEmail: boolean): void {
-        // TODO
-        if (this.idBillingPeriodString === "") {
-            // TODO Alert.show("Please select a billing period");
+        if (this.idBillingPeriod === "") {
+            this.dialogsService.confirm("Please select a billing period", null);
             return;
         }
         if (this.isDirty) {
-            // TODO Alert.show("Please save or discard unsaved changes");
+            this.dialogsService.confirm("Please save or discard unsaved changes", null);
             return;
         }
         if (this.selectedItem === null) {
-            // TODO Alert.show("Please select a lab folder");
+            this.dialogsService.confirm("Please select a lab folder", null);
             return;
         }
+        // TODO
     }
 
     public showInvoiceReport(): void {
@@ -62,21 +52,21 @@ export class MenuHeaderBillingComponent implements OnInit {
     }
 
     public showBillingByLabReport(): void {
-        let dialogRef: MatDialogRef<BillingUsageReportComponent> = this.dialog.open(BillingUsageReportComponent, {
-            data: {
-                mode: "Total Billing by Lab",
-                idCoreFacility: this.idCoreFacilityString
-            }
-        });
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.data = {
+            mode: "Total Billing by Lab",
+            idCoreFacility: this.idCoreFacility
+        };
+        this.dialog.open(BillingUsageReportComponent, config);
     }
 
     public showUsageReport(): void {
-        let dialogRef: MatDialogRef<BillingUsageReportComponent> = this.dialog.open(BillingUsageReportComponent, {
-            data: {
-                mode: "Lab Usage",
-                idCoreFacility: this.idCoreFacilityString
-            }
-        });
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.data = {
+            mode: "Lab Usage",
+            idCoreFacility: this.idCoreFacility
+        };
+        this.dialog.open(BillingUsageReportComponent, config);
     }
 
     public showNotesToCore(): void {
