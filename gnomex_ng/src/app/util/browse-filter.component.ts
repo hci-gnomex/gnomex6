@@ -42,7 +42,6 @@ export class BrowseFilterComponent implements OnInit {
     private dateFromString: string;
     private dateToString: string;
 
-    private showBillingPeriodPicker: boolean = false;
     private idBillingPeriodString: string;
 
     private showSearchTextInput: boolean = false;
@@ -246,7 +245,6 @@ export class BrowseFilterComponent implements OnInit {
                 this.showExperimentNumberInput = true;
                 this.showInvoiceNumberInput = true;
                 this.showBillingAccountComboBox = true;
-                this.showBillingPeriodPicker = true;
                 this.showEmptyFoldersCheckbox = true;
                 this.showEmptyFoldersCheckboxLabel = this.HIDE_REQUESTS_WITH_NO_BILLING_ITEMS;
 
@@ -660,9 +658,6 @@ export class BrowseFilterComponent implements OnInit {
 
         let params: URLSearchParams = new URLSearchParams();
 
-        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
-            params.set("idBillingPeriod", this.idBillingPeriodString);
-        }
         if (this.showLabComboBox && !(this.idLabString === "")) {
             params.set("idLab", this.idLabString);
         }
@@ -694,9 +689,6 @@ export class BrowseFilterComponent implements OnInit {
         if (this.showEmptyFoldersCheckbox) {
             params.set("showOtherBillingItems", this.showEmptyFoldersFlag ? "Y" : "N");
         }
-        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
-            params.set("idBillingPeriod", this.idBillingPeriodString);
-        }
         if (this.showLabComboBox && !(this.idLabString === "") && (this.experimentNumberString === "" && this.invoiceNumberString === "")) {
             params.set("idLab", this.idLabString);
         }
@@ -725,9 +717,6 @@ export class BrowseFilterComponent implements OnInit {
         }
         if (this.showInvoiceNumberInput && !(this.invoiceNumberString === "")) {
             params.set("invoiceNumber", this.invoiceNumberString);
-        }
-        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
-            params.set("idBillingPeriod", this.idBillingPeriodString);
         }
         if (this.showLabComboBox && !(this.idLabString === "") && noRequestOrInvoiceNumber) {
             params.set("idLab", this.idLabString);

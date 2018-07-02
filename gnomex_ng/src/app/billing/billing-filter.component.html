@@ -1,0 +1,39 @@
+<div class="flex-container-row align-center padded bordered">
+    <label class="small-margin-right"><img src="../../assets/money.png" class="icon">Billing</label>
+    <div class="flex-container-col">
+        <div class="flex-container-row">
+            <menu-header-billing class="large-margin-right"
+                    [idBillingPeriod]="this.form.controls['idBillingPeriod'].value"
+                    [idCoreFacility]="this.form.controls['idCoreFacility'].value"></menu-header-billing>
+            <div>
+                <mat-form-field class="small-margin-right">
+                    <input matInput placeholder="Experiment #" (change)="this.onRequestNumberChange()" [ngModelOptions]="{standalone: true}" [(ngModel)]="this.requestNumberModel">
+                </mat-form-field>
+                <mat-form-field>
+                    <input matInput placeholder="Invoice #" (change)="this.onInvoiceNumberChange()" [ngModelOptions]="{standalone: true}" [(ngModel)]="this.invoiceNumberModel">
+                </mat-form-field>
+            </div>
+        </div>
+        <form [formGroup]="this.form">
+            <mat-form-field class="small-margin-right">
+                <mat-select placeholder="Core Facility" [formControlName]="'idCoreFacility'">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let cf of this.coreFacilityList" [value]="cf.idCoreFacility">{{cf.display}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <billing-period-selector (onChange)="this.onBillingPeriodChange($event)" class="small-margin-right"></billing-period-selector>
+            <mat-form-field class="small-margin-right">
+                <mat-select placeholder="Lab Group" [formControlName]="'idLab'">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let l of this.filteredLabList" [value]="l.idLab">{{l.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-select placeholder="Account" [formControlName]="'idBillingAccount'">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let a of this.billingAccountList" [value]="a.idBillingAccount">{{a.accountNameDisplay}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+    </div>
+</div>
