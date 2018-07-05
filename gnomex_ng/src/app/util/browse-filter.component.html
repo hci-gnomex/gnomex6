@@ -59,7 +59,6 @@
                 </jqxComboBox>
             </div>
         </div>
-        <billing-period-picker *ngIf="showBillingPeriodPicker" [(billingPeriod)]="idBillingPeriodString"></billing-period-picker>
         <date-range-picker-custom *ngIf="showDateRangePicker" [(from)]="dateFromString" [(to)]="dateToString"></date-range-picker-custom>
         <div class="divider" *ngIf="showDateRangePicker && showOrderNumberInput"></div>
         <div class="inlineDiv" *ngIf="showOrderNumberInput">
