@@ -5,7 +5,6 @@ import {ConfigureAnnotationsComponent} from "../util/configure-annotations.compo
 import {ConfigureOrganismsComponent} from "./configure-organisms.component";
 import {ManageProtocolsComponent} from "./manage-protocols.component";
 import {EditProtocolComponent} from "./edit-protocol.component";
-import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
 import {OverviewProtocolComponent} from "./overview-protocol.component";
 
 const ROUTES: Routes = [

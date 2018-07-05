@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, OnDestroy, OnInit} from "@angular/core";
+import {Component} from "@angular/core";
 
 
 @Component({
@@ -12,17 +12,6 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
         </div>
 `
 })
-export class ConfigurationBrowsePanelComponent implements OnInit, OnDestroy{
+export class ConfigurationBrowsePanelComponent {
 
-    constructor(){
-    }
-
-    ngOnInit(){
-
-    }
-    ngOnDestroy(){
-    }
-    save(){
-
-    }
 }
