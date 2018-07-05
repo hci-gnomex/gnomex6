@@ -6,6 +6,7 @@ import {ConfigureOrganismsComponent} from "./configure-organisms.component";
 import {ManageProtocolsComponent} from "./manage-protocols.component";
 import {EditProtocolComponent} from "./edit-protocol.component";
 import {OverviewProtocolComponent} from "./overview-protocol.component";
+import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
 
 const ROUTES: Routes = [
     { path: "browse-dictionary", component: BrowseDictionaryComponent },
@@ -35,6 +36,7 @@ const ROUTES: Routes = [
                 outlet: 'browsePanel'
             }
         ],
+        canActivate: [SubRouteGuardService]
     },
 ];
 
