@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
 
-import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 
 import {Subscription} from "rxjs/Subscription";
 
@@ -12,7 +12,6 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {ProtocolService} from "../services/protocol.service";
 import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component";
-import {FormControl} from "@angular/forms";
 
 @Component({
     selector: 'manage-protocols',
@@ -75,10 +74,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
 
     @ViewChild("navigationTree") treeComponent: TreeComponent;
 
-    // private protocolSubscription: Subscription;
+    private protocolSubscription: Subscription;
     private protocolListSubscription: Subscription;
+    private saveProtocolSubscription: Subscription;
     private deleteProtocolSubscription: Subscription;
-    // private saveExistingProtocolSubscription: Subscription;
 
     private selectedProtocol: any;
     private protocolList: any[];
@@ -87,22 +86,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     protected protocolType: string = '';
     protected protocolName: string = '';
 
-    // private selectedProtocolName: string;
-    // private selectedProtocolUrl: string;
-    // private selectedExperimentPlatformCodeRequestCategory: string;
-    // private selectedProtocolDescription: string;
-
-    // protected selectedProtocolIdAnalysisType: string;
-    // protected selectedProtocolIdAppUser: string;
-
     protected analysisTypeList: any[];
     protected userList: any[];
 
     private experimentPlatformList: any[];
-
-    // private activeCheckBox: boolean = false;
-
-    // private disableViewURLButton: boolean = true;
 
     private treeOptions: ITreeOptions = {
         idField: "idComposite",
@@ -117,24 +104,6 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private mostRecentlyDisplayedProtocolId: string;
     private mostRecentlyDisplayedProtocolProtocolClassName: string;
 
-    private spinnerRef: MatDialogRef<SpinnerDialogComponent>;
-
-    private spinnerNeedsToWaitForList: boolean = false;
-    private spinnerNeedsToWaitForProtocol: boolean = false;
-
-    private spinnerIsOpened: boolean = false;
-
-    private spinnerOpenSubscription: Subscription;
-    private spinnerClosedSubscription: Subscription;
-
-    // protected accountNameFormControl         = new FormControl('', [ ]);
-    // protected experimentPlatformFormControl  = new FormControl('', [ ]);
-    // protected analysisTypeFormControl        = new FormControl('', [ ]);
-    // protected ownerFormControl               = new FormControl('', [ ]);
-    // protected activeFormControl              = new FormControl('', [ ]);
-    // protected urlFormControl                 = new FormControl('', [ ]);
-    // protected protocolDescriptionFormControl = new FormControl('', [ ]);
-
     constructor(private dialog: MatDialog,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
@@ -145,41 +114,11 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     ngOnInit(): void {
         this.treeModel = this.treeComponent.treeModel;
 
-        // if (!this.protocolSubscription) {
-        //     this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {
-        //         this.selectedProtocol = result;
-        //
-        //         // this.selectedProtocolName = !!result.name ? '' + result.name: '';
-        //         // this.selectedExperimentPlatformCodeRequestCategory = result.codeRequestCategory;
-        //         // Handled in on node select... selectedProtocolIdAppUser
-        //         // this.activeCheckBox       = ('' + result.isActive).toLowerCase() === 'y';
-        //         // this.selectedProtocolUrl  = !!result.url  ? '' + result.url:  '';
-        //         // this.selectedProtocolDescription = !!result.description ? '' + result.description: '';
-        //
-        //         // this.accountNameFormControl.markAsPristine();
-        //         // this.experimentPlatformFormControl.markAsPristine();
-        //         // this.activeFormControl.markAsPristine();
-        //         // this.urlFormControl.markAsPristine();
-        //         // this.protocolDescriptionFormControl.markAsPristine();
-        //
-        //         // if (this.selectedProtocolUrl && this.selectedProtocolUrl !== "") {
-        //         //     this.disableViewURLButton = false;
-        //         // } else {
-        //         //     this.disableViewURLButton = true;
-        //         // }
-        //         // if (result.idAnalysisType && result.idAnalysisType !== '') {
-        //         //     this.selectedProtocolIdAnalysisType = result.idAnalysisType;
-        //         // } else {
-        //         //     this.selectedProtocolIdAnalysisType = '';
-        //         // }
-        //         // this.analysisTypeFormControl.markAsPristine();
-        //
-        //         this.spinnerNeedsToWaitForProtocol = false;
-        //         if (!this.spinnerNeedsToWaitForList && !this.spinnerNeedsToWaitForProtocol) {
-        //             this.spinnerRef.close();
-        //         }
-        //     });
-        // }
+        if (!this.protocolSubscription) {
+            this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {
+                this.dialogService.stopAllSpinnerDialogs();
+            });
+        }
 
         if (!this.protocolListSubscription) {
             this.protocolListSubscription = this.protocolService.getProtocolListObservable().subscribe((list) => {
@@ -188,79 +127,41 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 setTimeout(() => {
                     this.treeModel.expandAll();
 
-                    this.spinnerNeedsToWaitForList = false;
-                    if (!this.spinnerNeedsToWaitForList && !this.spinnerNeedsToWaitForProtocol) {
-                        this.spinnerRef.close();
+                    this.dialogService.stopAllSpinnerDialogs();
+                    if (this.treeModel && this.treeModel.getNodeById('' + this.mostRecentlyDisplayedProtocolId + this.mostRecentlyDisplayedProtocolProtocolClassName)) {
+                        this.treeModel.getNodeById('' + this.mostRecentlyDisplayedProtocolId + this.mostRecentlyDisplayedProtocolProtocolClassName).setIsActive(true, false);
                     }
                 });
             });
 
             setTimeout(() => {
-                this.spinnerNeedsToWaitForList     = true;
-                this.spinnerNeedsToWaitForProtocol = false;
-
-                if (!this.spinnerIsOpened) {
-                    this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-                }
+                this.dialogService.startDefaultSpinnerDialog();
 
                 this.protocolService.getProtocolList();
             });
         }
 
+        if (!this.saveProtocolSubscription) {
+            this.saveProtocolSubscription = this.protocolService.getSaveNewProtocolObservable().subscribe((result) => {
+                if (result && result.idProtocolSaved && result.savedProtocolClassName) {
+                    this.programaticallySelectTreeNode(result.idProtocolSaved, result.savedProtocolClassName);
+                }
+            });
+        }
+
         if (!this.deleteProtocolSubscription) {
             this.deleteProtocolSubscription = this.protocolService.getDeleteProtocolObservable().subscribe((result) => {
-                this.spinnerRef.close();
+                this.dialogService.stopAllSpinnerDialogs();
+
                 this.selectedProtocol = null;
                 this.mainPaneTitle = 'Protocol:';
                 this.mostRecentlyDisplayedProtocolId = '';
                 this.mostRecentlyDisplayedProtocolProtocolClassName = '';
 
                 this.refresh();
+
+                this.router.navigate(['/manage-protocols', { outlets: { 'browsePanel': ['overview'] } }]);
             });
-        }
-        //
-        // if (!this.saveExistingProtocolSubscription) {
-        //     this.saveExistingProtocolSubscription = this.protocolService.getSaveExistingProtocolObservable().subscribe((result) => {
-        //         this.spinnerRef.close();
-        //
-        //         this.refresh();
-        //     });
-        // }
-
-        if (!this.spinnerRef) {
-            setTimeout(() => {
-                if (!this.spinnerRef && !this.spinnerIsOpened) {
-                    this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-                }
-
-                setTimeout(() => {
-                    if (!this.spinnerOpenSubscription) {
-                        this.spinnerOpenSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-                            this.spinnerIsOpened = true;
-                        });
-                    }
-
-                    if (!this.spinnerClosedSubscription) {
-                        this.spinnerClosedSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-                            this.spinnerIsOpened = false;
-                        });
-                    }
-
-                    this.spinnerRef.close();
-                });
-            });
-        } else {
-            if (!this.spinnerOpenSubscription) {
-                this.spinnerOpenSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-                    this.spinnerIsOpened = true;
-                });
-            }
-
-            if (!this.spinnerClosedSubscription) {
-                this.spinnerClosedSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-                    this.spinnerIsOpened = false;
-                });
-            }
         }
 
         this.experimentPlatformList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
@@ -269,23 +170,17 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     }
 
     ngOnDestroy(): void {
-        // if (this.protocolSubscription) {
-        //     this.protocolSubscription.unsubscribe();
-        // }
+        if (this.protocolSubscription) {
+            this.protocolSubscription.unsubscribe();
+        }
         if (this.protocolListSubscription) {
             this.protocolListSubscription.unsubscribe();
         }
+        if (this.saveProtocolSubscription) {
+            this.saveProtocolSubscription.unsubscribe();
+        }
         if (this.deleteProtocolSubscription) {
             this.deleteProtocolSubscription.unsubscribe();
-        }
-        // if (this.saveExistingProtocolSubscription) {
-        //     this.saveExistingProtocolSubscription.unsubscribe();
-        // }
-        if (this.spinnerOpenSubscription) {
-            this.spinnerOpenSubscription.unsubscribe();
-        }
-        if (this.spinnerClosedSubscription) {
-            this.spinnerClosedSubscription.unsubscribe();
         }
     }
 
@@ -297,7 +192,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             for (let protocolFolder of this.protocolList) {
                 protocolFolder.icon = '../../assets/folder.png';
                 protocolFolder.isProtocol = 'N';
-                protocolFolder.idComposite = '' + protocolFolder.label;
+                protocolFolder.idComposite = '' + protocolFolder.protocolClassName;
                 protocolFolder.protocolType = '' + protocolFolder.label;
                 protocolFolder.protocolClassName = '' + protocolFolder.protocolClassName;
 
@@ -313,7 +208,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                     for (let protocol of protocolFolder.Protocol) {
                         protocol.icon = '../../assets/brick.png';
                         protocol.isProtocol = 'Y';
-                        protocol.idComposite = '' + protocol.id + protocolFolder.label;
+                        protocol.idComposite = '' + protocol.id + protocolFolder.protocolClassName;
 
                         protocol.protocolType = '' + protocolFolder.label;
                         protocol.protocolClassName = '' + protocolFolder.protocolClassName
@@ -323,7 +218,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
         }
     }
 
-    private treeOnSelect(event: any) {
+    private treeOnSelect(event: any): void {
         if (event
             && event.node
             && event.node.data
@@ -332,24 +227,15 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             && event.node.data.isProtocol
             && event.node.data.isProtocol === 'Y') {
 
-            this.spinnerNeedsToWaitForList     = false;
-            this.spinnerNeedsToWaitForProtocol = true;
-
-            if (!this.spinnerIsOpened) {
-                this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+            if (this.mostRecentlyDisplayedProtocolId === event.node.data.id
+                && this.mostRecentlyDisplayedProtocolProtocolClassName === event.node.data.protocolClassName) {
+                return;
             }
+
+            this.dialogService.startDefaultSpinnerDialog();
 
             this.mostRecentlyDisplayedProtocolId                = event.node.data.id;
             this.mostRecentlyDisplayedProtocolProtocolClassName = event.node.data.protocolClassName;
-
-            // if (event.node.data.idAppUser && event.node.data.idAppUser !== '') {
-            //     this.selectedProtocolIdAppUser = event.node.data.idAppUser;
-            // } else {
-            //     this.selectedProtocolIdAppUser = '';
-            // }
-            // this.ownerFormControl.markAsPristine();
-
-            // this.protocolService.getProtocolByIdAndClass(event.node.data.id, event.node.data.protocolClassName);
 
             if (event.node.parent
                 && event.node.parent.data
@@ -361,20 +247,16 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 this.mainPaneTitle = '' + event.node.parent.data.label + ': ' + event.node.data.label;
             }
 
-            this.router.navigate([
-                '/manage-protocols',
-                {
-                    outlets: {
-                        'browsePanel': ['details', event.node.data.protocolClassName,  event.node.data.id]
-
+            setTimeout(() => {
+                this.router.navigate([
+                    '/manage-protocols',
+                    {
+                        outlets: {
+                            'browsePanel': ['details', event.node.data.protocolClassName,  event.node.data.id]
+                        }
                     }
-                }
-            ]);
-            //http://localhost:8080/gnomex/manage-protocols/
-            // this.router.navigateByUrl('/(browsePanel;modelName='
-            //     + event.node.data.protocolClassName
-            //     // + '3'
-            //     +';id='+ event.node.data.id + ')');
+                ]);
+            });
         } else {
             this.mainPaneTitle = 'Protocol:'
         }
@@ -384,13 +266,17 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
         }
     }
 
-    // private checkToEnableViewURLButton(event: any) {
-    //     if (event && event.currentTarget && event.currentTarget.value && event.currentTarget.value !== "") {
-    //         this.disableViewURLButton = false;
-    //     } else {
-    //         this.disableViewURLButton = true;
-    //     }
-    // }
+    private programaticallySelectTreeNode(idProtocol: string, protocolClassName: string): void {
+        setTimeout(() => {
+            if (this.treeModel && this.treeModel.getNodeById('' + idProtocol + protocolClassName)) {
+                // this.mostRecentlyDisplayedProtocolId                = idProtocol;
+                // this.mostRecentlyDisplayedProtocolProtocolClassName = protocolClassName;
+
+                // this.treeModel.getNodeById('' + this.mostRecentlyDisplayedProtocolId + this.mostRecentlyDisplayedProtocolProtocolClassName).setIsActive(true, false);
+                this.treeModel.getNodeById('' + idProtocol + protocolClassName).setIsActive(true, false);
+            }
+        });
+    }
 
     private onNewProtocolButtonClicked() {
 
@@ -447,7 +333,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             && this.mostRecentlyDisplayedProtocolId !== ''
             && this.mostRecentlyDisplayedProtocolProtocolClassName
             && this.mostRecentlyDisplayedProtocolProtocolClassName !== '') {
-            this.protocolService.deleteProtocol(this.mostRecentlyDisplayedProtocolId, this.mostRecentlyDisplayedProtocolProtocolClassName);
+            this.dialogService.startDefaultSpinnerDialog();
+            setTimeout(() => {
+                this.protocolService.deleteProtocol(this.mostRecentlyDisplayedProtocolId, this.mostRecentlyDisplayedProtocolProtocolClassName);
+            });
         } else {
             this.dialogService.alert("Error : No selected protocol");
         }
@@ -455,51 +344,31 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private onRefreshButtonClicked() {
         this.refresh();
     }
-    // private onViewURLButtonClicked() {
-    //     window.open(this.selectedProtocolUrl, '_blank');
-    // }
-    // private onSaveButtonClicked() {
-    //     if (this.selectedProtocol) {
-    //         if (!this.spinnerIsOpened) {
-    //             this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-    //         }
-    //
-    //         this.protocolService.saveExistingProtocol(
-    //             '' + this.selectedProtocolName,
-    //             '' + this.selectedProtocolDescription,
-    //             '' + this.selectedProtocolIdAnalysisType,
-    //             '' + this.mostRecentlyDisplayedProtocolProtocolClassName,
-    //             '' + this.selectedExperimentPlatformCodeRequestCategory,
-    //             '' + this.selectedProtocolIdAppUser,
-    //             (this.activeCheckBox ? 'Y' : 'N'),
-    //             '' + this.mostRecentlyDisplayedProtocolId,
-    //             '' + this.selectedProtocolUrl
-    //         );
-    //     }
-    // }
 
     private refresh(): void {
-        if (!this.spinnerIsOpened) {
-            this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-        }
+        this.dialogService.startDefaultSpinnerDialog();
 
-        this.spinnerNeedsToWaitForList = true;
+        setTimeout(() => {
+            if (this.mostRecentlyDisplayedProtocolProtocolClassName && this.mostRecentlyDisplayedProtocolId) {
+                this.router.navigate([
+                    '/manage-protocols',
+                    {
+                        outlets: {
+                            'browsePanel': [
+                                'details',
+                                this.mostRecentlyDisplayedProtocolProtocolClassName,
+                                this.mostRecentlyDisplayedProtocolId
+                            ]
+                        }
+                    }
+                ]);
+            }
 
-        if (this.mostRecentlyDisplayedProtocolId && this.mostRecentlyDisplayedProtocolProtocolClassName) {
-            this.spinnerNeedsToWaitForProtocol = true;
+            if (this.mostRecentlyDisplayedProtocolId && this.mostRecentlyDisplayedProtocolProtocolClassName) {
+                this.protocolService.getProtocolByIdAndClass(this.mostRecentlyDisplayedProtocolId, this.mostRecentlyDisplayedProtocolProtocolClassName);
+            }
 
-            this.protocolService.getProtocolByIdAndClass(this.mostRecentlyDisplayedProtocolId, this.mostRecentlyDisplayedProtocolProtocolClassName);
-        }
-        this.protocolService.getProtocolList();
+            this.protocolService.getProtocolList();
+        });
     }
-
-    // protected isAnyFieldNotPristine(): boolean {
-    //     return this.accountNameFormControl.dirty
-    //         || this.experimentPlatformFormControl.dirty
-    //         || this.analysisTypeFormControl.dirty
-    //         || this.ownerFormControl.dirty
-    //         || this.activeFormControl.dirty
-    //         || this.urlFormControl.dirty
-    //         || this.protocolDescriptionFormControl.dirty;
-    // }
 }

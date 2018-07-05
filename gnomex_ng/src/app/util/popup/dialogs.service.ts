@@ -12,7 +12,13 @@ import {CustomDialogComponent} from "./custom-dialog.component";
 @Injectable()
 export class DialogsService {
 
+    private _spinnerDialogIsOpen: boolean = false;
+
     public spinnerDialogRefs: MatDialogRef<SpinnerDialogComponent>[] = [];
+
+    public get spinnerDialogIsOpen(): boolean {
+        return true && this._spinnerDialogIsOpen;
+    }
 
     constructor(private dialog: MatDialog) { }
 
@@ -78,6 +84,12 @@ export class DialogsService {
     }
 
     public startSpinnerDialog(message: string, strokeWidth: number, diameter: number): MatDialogRef<SpinnerDialogComponent> {
+        if (this._spinnerDialogIsOpen) {
+            return null;
+        }
+
+        this._spinnerDialogIsOpen = true;
+
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.data = {
             message: message,
@@ -89,6 +101,8 @@ export class DialogsService {
 
         let dialogRef: MatDialogRef<SpinnerDialogComponent> = this.dialog.open(SpinnerDialogComponent, configuration);
 
+        dialogRef.afterClosed().subscribe(() => { this._spinnerDialogIsOpen = false; });
+
         this.spinnerDialogRefs.push(dialogRef);
 
         return dialogRef;
@@ -97,7 +111,9 @@ export class DialogsService {
     // Let there be an alternative, global way to stop all active spinner dialogs.
     public stopAllSpinnerDialogs(): void {
         for (let dialogRef of this.spinnerDialogRefs) {
-            dialogRef.close();
+            setTimeout(() => {
+                dialogRef.close();
+            });
         }
     }
 }

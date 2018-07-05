@@ -93,19 +93,19 @@ export class ProtocolService {
                                 idAppUser: string,
                                 isActive: string,
                                 idProtocol: string,
-                                protocolURL: string): void {
+                                protocolUrl: string): void {
         this.cookieUtilService.formatXSRFCookie();
 
         let params: HttpParams = new HttpParams()
-            .set('protocolName',              protocolName)
-            .set('protocolDescription',       protocolDescription)
-            .set('idAnalysisType',            idAnalysisType)
-            .set('protocolClassName',         protocolClassName)
-            .set('codeRequestCategory',       codeRequestCategory)
-            .set('idAppUser',                 idAppUser)
-            .set('isActive',                  isActive)
-            .set('idProtocol',                idProtocol)
-            .set('protocolURL',               protocolURL);
+            .set('protocolName',        protocolName)
+            .set('protocolDescription', protocolDescription)
+            .set('idAnalysisType',      idAnalysisType)
+            .set('protocolClassName',   protocolClassName)
+            .set('codeRequestCategory', codeRequestCategory)
+            .set('idAppUser',           idAppUser)
+            .set('isActive',            isActive)
+            .set('idProtocol',          idProtocol)
+            .set('protocolUrl',         protocolUrl);
 
         this.httpClient.post('/gnomex/SaveProtocol.gx', null, {params: params}).subscribe((result) => {
             this.saveExistingProtocolSubject.next(result);

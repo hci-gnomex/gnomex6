@@ -67,8 +67,6 @@ import {DictionaryService} from "../services/dictionary.service";
 })
 export class EditProtocolComponent implements OnInit, OnDestroy {
 
-    @Input('spinnerNeedsToWait') spinnerNeedsToWaitForList: boolean = false;
-
     @Output('protocolLoaded') protocolLoaded: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     protected mainPaneTitle: string = 'Protocol:';
@@ -104,11 +102,7 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
     private protocolSubscription: Subscription;
     private saveExistingProtocolSubscription: Subscription;
 
-    private spinnerOpenSubscription: Subscription;
-    private spinnerClosedSubscription: Subscription;
-
     private spinnerRef: MatDialogRef<SpinnerDialogComponent>;
-    private spinnerIsOpened: boolean = false;
 
     constructor(private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
@@ -149,114 +143,39 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
                 this.analysisTypeFormControl.markAsPristine();
 
                 this.protocolLoaded.emit(true);
-                if (!this.spinnerNeedsToWaitForList) {
-                    this.spinnerRef.close();
-                }
+
+                this.dialogService.stopAllSpinnerDialogs();
             });
         }
 
         if (!this.saveExistingProtocolSubscription) {
             this.saveExistingProtocolSubscription = this.protocolService.getSaveExistingProtocolObservable().subscribe((result) => {
-                this.spinnerRef.close();
-
                 this.refresh();
+
+                this.dialogService.stopAllSpinnerDialogs();
             });
         }
-
-
-        // if (!this.spinnerRef) {
-        //
-        //     setTimeout(() => {
-        //         if (!this.spinnerRef && !this.spinnerIsOpened) {
-        //             this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-        //         }
-        //
-        //         setTimeout(() => {
-        //             if (!this.spinnerOpenSubscription) {
-        //                 this.spinnerOpenSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-        //                     this.spinnerIsOpened = true;
-        //                 });
-        //             }
-        //
-        //             if (!this.spinnerClosedSubscription) {
-        //                 this.spinnerClosedSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-        //                     this.spinnerIsOpened = false;
-        //                 });
-        //             }
-        //
-        //             this.spinnerRef.close();
-        //         });
-        //     });
-        // } else {
-        //     if (!this.spinnerOpenSubscription) {
-        //         this.spinnerOpenSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-        //             this.spinnerIsOpened = true;
-        //         });
-        //     }
-        //
-        //     if (!this.spinnerClosedSubscription) {
-        //         this.spinnerClosedSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-        //             this.spinnerIsOpened = false;
-        //         });
-        //     }
-        // }
 
         this.analysisTypeList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
         this.experimentPlatformList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
         this.userList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.APP_USER);
 
-
         if (this.route && this.route.params && !this.routeParameterSubscription) {
             this.routeParameterSubscription = this.route.params.subscribe((params) => {
-                this.protocolId = params['id'];
-                this.protocolClassName = params['modelName'];
 
-                this.dialogService.stopAllSpinnerDialogs();
+                setTimeout(() => {
+                    this.protocolId = params['id'];
+                    this.protocolClassName = params['modelName'];
 
-                if (!this.spinnerRef) {
+                    this.dialogService.stopAllSpinnerDialogs();
 
-                    setTimeout(() => {
-                        if (!this.spinnerRef && !this.spinnerIsOpened) {
-                            this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-                        }
-
-                        setTimeout(() => {
-                            if (!this.spinnerOpenSubscription) {
-                                this.spinnerOpenSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-                                    this.spinnerIsOpened = true;
-                                });
-                            }
-
-                            if (!this.spinnerClosedSubscription) {
-                                this.spinnerClosedSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-                                    this.spinnerIsOpened = false;
-                                });
-                            }
-
-                            this.spinnerRef.close();
-                        });
-                    });
-                } else {
-                    if (!this.spinnerOpenSubscription) {
-                        this.spinnerOpenSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-                            this.spinnerIsOpened = true;
-                        });
-                    }
-
-                    if (!this.spinnerClosedSubscription) {
-                        this.spinnerClosedSubscription = this.spinnerRef.afterOpen().subscribe(() => {
-                            this.spinnerIsOpened = false;
-                        });
-                    }
-                }
-
-                if (this.protocolId && this.protocolClassName) {
-                    if (!this.spinnerIsOpened) {
+                    if (this.protocolId && this.protocolClassName) {
                         this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-                    }
 
-                    this.protocolService.getProtocolByIdAndClass(this.protocolId, this.protocolClassName);
-                }
+                        this.protocolService.getProtocolByIdAndClass(this.protocolId, this.protocolClassName);
+                    }
+                });
+
             });
         }
     }
@@ -268,22 +187,12 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
         if (this.saveExistingProtocolSubscription) {
             this.saveExistingProtocolSubscription.unsubscribe();
         }
-        if (this.spinnerOpenSubscription) {
-            this.spinnerOpenSubscription.unsubscribe();
-        }
-        if (this.spinnerClosedSubscription) {
-            this.spinnerClosedSubscription.unsubscribe();
-        }
         if (this.routeParameterSubscription) {
             this.routeParameterSubscription.unsubscribe();
         }
     }
 
     private refresh(): void {
-        if (!this.spinnerIsOpened) {
-            this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-        }
-
         if (this.protocolId && this.protocolClassName) {
             this.protocolService.getProtocolByIdAndClass(this.protocolId, this.protocolClassName);
         }
@@ -314,9 +223,7 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
 
     private onSaveButtonClicked() {
         if (this.selectedProtocol) {
-            if (!this.spinnerIsOpened) {
-                this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-            }
+            this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
 
             this.protocolService.saveExistingProtocol(
                 '' + this.selectedProtocolName,
