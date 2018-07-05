@@ -12,6 +12,8 @@ import { MultipleSelectDialogComponent } from "./popups/multiple-select-dialog.c
 import { SelectEditor } from './select.editor';
 import { SeqlaneSelectEditor } from "./seqlane-select.editor";
 import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.editor";
+import { TextAlignLeftMiddleEditor } from "./text-align-left-middle.editor";
+import {TextAlignRightMiddleEditor} from "./text-align-right-middle.editor";
 
 
 @NgModule({
@@ -31,6 +33,8 @@ import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.ed
         MultipleSelectDialogComponent,
         SelectEditor,
         SeqlaneSelectEditor,
+        TextAlignLeftMiddleEditor,
+        TextAlignRightMiddleEditor,
         TextSelectXorMultiselectEditor
     ],
     entryComponents: [
@@ -42,6 +46,8 @@ import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.ed
         FillLikeEditor,
         MultipleSelectDialogComponent,
         SelectEditor,
+        TextAlignLeftMiddleEditor,
+        TextAlignRightMiddleEditor,
         TextSelectXorMultiselectEditor
     ]
 })
