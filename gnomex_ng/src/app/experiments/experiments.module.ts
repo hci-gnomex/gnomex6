@@ -55,6 +55,11 @@ import {MatDialogModule} from "@angular/material";
 import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
 import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
 import {ExperimentDetailModule} from "./experiment-detail/experiment-detail-module";
+import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
+import {DateRenderer} from "../util/grid-renderers/date.renderer";
+import {TwoButtonRenderer} from "../util/grid-renderers/two-button.renderer";
+import {MultipleLineTextRenderer} from "../util/grid-renderers/multiple-line-text.renderer";
 
 /**
  * @author mbyrne
@@ -92,7 +97,15 @@ import {ExperimentDetailModule} from "./experiment-detail/experiment-detail-modu
         TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
-        AgGridModule.withComponents([IconTextRendererComponent,IconRendererComponent]),
+        AgGridModule.withComponents([
+            DateRenderer,
+            IconTextRendererComponent,
+            IconRendererComponent,
+            MultipleLineTextRenderer,
+            TextAlignLeftMiddleRenderer,
+            TextAlignRightMiddleRenderer,
+            TwoButtonRenderer
+        ]),
         ExperimentDetailModule
     ],
     declarations: [
