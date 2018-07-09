@@ -459,7 +459,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         this.originalXClick = event.screenX;
         this.originalYClick = event.screenY;
 
-         this.movingDialog = true;
+        this.movingDialog = true;
     }
     @HostListener('window:mousemove', ['$event'])
     onMouseMove(event: any): void {

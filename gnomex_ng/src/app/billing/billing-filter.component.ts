@@ -54,6 +54,9 @@ export class BillingFilterComponent implements OnInit {
 
     ngOnInit() {
         this.coreFacilityList = this.createSecurityAdvisorService.coreFacilitiesICanManage;
+        if (this.coreFacilityList.length > 0) {
+            this.form.controls['idCoreFacility'].setValue(this.coreFacilityList[0].idCoreFacility);
+        }
         this.labListService.getLabList().subscribe((labs: any[]) => {
             this.labList = labs;
             this.filteredLabList = labs;

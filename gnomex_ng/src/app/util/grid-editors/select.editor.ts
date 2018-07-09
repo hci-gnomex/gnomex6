@@ -117,6 +117,6 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 			});
 
 			this.params.column.gridApi.refreshCells();
-		}
+        }
 	}
 }

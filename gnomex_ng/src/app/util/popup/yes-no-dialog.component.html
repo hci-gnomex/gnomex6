@@ -1,4 +1,13 @@
-<mat-dialog-content>{{message}}</mat-dialog-content>
+<mat-dialog-content>
+    <div *ngIf="message" class="full-width full-height">
+        {{message}}
+    </div>
+    <div *ngIf="lines" class="full-width full-height">
+        <div *ngFor="let line of lines" class="full-width">
+            {{ line }}
+        </div>
+    </div>
+</mat-dialog-content>
 <mat-dialog-actions>
     <div class="full-width full-height centered-text">
         <button mat-button (click)="onClickYes()">Yes</button>
