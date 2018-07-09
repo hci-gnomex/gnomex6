@@ -60,6 +60,7 @@ import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-ri
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {TwoButtonRenderer} from "../util/grid-renderers/two-button.renderer";
 import {MultipleLineTextRenderer} from "../util/grid-renderers/multiple-line-text.renderer";
+import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 
 /**
  * @author mbyrne
@@ -102,6 +103,7 @@ import {MultipleLineTextRenderer} from "../util/grid-renderers/multiple-line-tex
             IconTextRendererComponent,
             IconRendererComponent,
             MultipleLineTextRenderer,
+            SelectRenderer,
             TextAlignLeftMiddleRenderer,
             TextAlignRightMiddleRenderer,
             TwoButtonRenderer

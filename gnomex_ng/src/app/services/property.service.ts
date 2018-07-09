@@ -14,6 +14,7 @@ export class PropertyService {
     public static readonly PROPERTY_CONTACT_EMAIL_BIOINFORMATICS: string = 'contact_email_bioinformatics';
     public static readonly PROPERTY_NO_PUBLIC_VISIBILITY:string = "no_public_visibility";
     public static readonly PROPERTY_PRODUCT_SHEET_NAME: string = 'product_sheet_name';
+    public static readonly SHOW_ADMIN_NOTES_ON_REQUEST: string = 'show_admin_notes_on_request';
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
