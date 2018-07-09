@@ -19,8 +19,8 @@
     {
       "command": "DeleteRequest",
       "parameter": "requestsToDeleteXMLString",
-      "nodeheader": "",
-      "nodeprefix": "",
+      "nodeheader": "requests",
+      "nodeprefix": "Request",
       "elementhints": [
         {
           "elementname": "requests",
