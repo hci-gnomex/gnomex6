@@ -9,10 +9,10 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 export class BillingService {
 
     constructor(private http: Http,
-                private httpClient: HttpClient) {
+                 private httpClient: HttpClient) {
     }
 
-    getBillingRequestList(params: URLSearchParams): Observable<any> {
+    getBillingRequestListDep(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/GetBillingRequestList.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
@@ -22,7 +22,7 @@ export class BillingService {
         });
     }
 
-    getBillingItemList(params: URLSearchParams): Observable<any> {
+    getBillingItemListDep(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/GetBillingItemList.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
@@ -32,7 +32,7 @@ export class BillingService {
         });
     }
 
-    getBillingInvoiceList(params: URLSearchParams): Observable<any> {
+    getBillingInvoiceListDep(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/GetBillingInvoiceList.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
@@ -54,6 +54,18 @@ export class BillingService {
 
     public getAuthorizedBillingAccounts(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAuthorizedBillingAccounts.gx", {params: params});
+    }
+
+    public getBillingRequestList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetBillingRequestList.gx", {params: params});
+    }
+
+    public getBillingItemList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetBillingItemList.gx", {params: params});
+    }
+
+    public getBillingInvoiceList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetBillingInvoiceList.gx", {params: params});
     }
 
 }

@@ -756,17 +756,17 @@ export class BrowseFilterComponent implements OnInit {
             this.dataTrackService.getDatatracksList_fromBackend(params);
         } else if (this.mode === this.BILLING_BROWSE) {
             let billingRequestListParams: URLSearchParams = this.getBillingRequestListParameters();
-            this.billingService.getBillingRequestList(billingRequestListParams).subscribe((response: any) => {
+            this.billingService.getBillingRequestListDep(billingRequestListParams).subscribe((response: any) => {
                 console.log("GetBillingRequestList called");
             });
 
             let billingItemListParams: URLSearchParams = this.getBillingItemListParameters();
-            this.billingService.getBillingItemList(billingItemListParams).subscribe((response: any) => {
+            this.billingService.getBillingItemListDep(billingItemListParams).subscribe((response: any) => {
                 console.log("GetBillingItemList called");
             });
 
             let billingInvoiceListParams: URLSearchParams = this.getBillingInvoiceListParameters();
-            this.billingService.getBillingInvoiceList(billingInvoiceListParams).subscribe((response: any) => {
+            this.billingService.getBillingInvoiceListDep(billingInvoiceListParams).subscribe((response: any) => {
                 console.log("GetBillingInvoiceList called");
             });
         }

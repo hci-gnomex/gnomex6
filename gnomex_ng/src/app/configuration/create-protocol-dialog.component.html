@@ -1,0 +1,53 @@
+<div mat-dialog-title class="full-width header no-margin no-padding">
+    <div class="full-width full-height padded">
+        <div class="title inline-block">Create New {{protocolType}}</div>
+    </div>
+</div>
+<div mat-dialog-content class="body background no-margin no-padding">
+    <div class="full-width full-height padded">
+        <div class="full-width">
+            <mat-form-field class="full-width">
+                <input  matInput
+                        placeholder="Protocol Name"
+                        [(ngModel)]="protocolName"
+                        required>
+            </mat-form-field>
+        </div>
+        <div *ngIf="protocolClassName && protocolClassName !== 'hci.gnomex.model.AnalysisProtocol'" class="full-width">
+            <mat-form-field class="full-width">
+                <mat-select
+                        class="full-width"
+                        placeholder="Experiment Platform"
+                        [(ngModel)]="selectedExperimentPlatformCodeRequestCategory">
+                    <mat-option [value]="">
+                        --
+                    </mat-option>
+                    <mat-option *ngFor="let experimentPlatform of experimentPlatformList" [value]="experimentPlatform.codeRequestCategory">
+                        {{ experimentPlatform.display }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div *ngIf="protocolClassName && protocolClassName === 'hci.gnomex.model.AnalysisProtocol'" class="full-width">
+            <mat-form-field class="full-width">
+                <mat-select
+                        class="full-width"
+                        placeholder="Analysis Type"
+                        [(ngModel)]="selectedIdAnalysisType">
+                    <mat-option [value]="">
+                        --
+                    </mat-option>
+                    <mat-option *ngFor="let analysisType of analysisTypeList" [value]="analysisType.idAnalysisType">
+                        {{ analysisType.display }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+</div>
+<div mat-dialog-actions class="full-width background right-align no-margin no-padding">
+    <div class="full-width full-height padded right-align">
+        <button mat-button (click)="onClickCreateProtocolButton()"><img src="../../assets/save.png" alt=""/> Create Protocol</button>
+        <button mat-button mat-dialog-close><img src="../../assets/delete.png" alt=""/> Cancel</button>
+    </div>
+</div>

@@ -14,6 +14,7 @@ import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServlet
 
 import java.io.Serializable;
 
+import javax.json.Json;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -39,8 +40,6 @@ public class SaveProtocol extends GNomExCommand implements Serializable {
   private Integer   idAppUser;
   private String    adapterSequenceThreePrime;
   private String    adapterSequenceFivePrime;
-  
-  private Integer   idProtocolSaved;
   
   private boolean newProtocol = false;
   
@@ -234,9 +233,22 @@ public class SaveProtocol extends GNomExCommand implements Serializable {
         if (this.isValid()) {
           sess.flush();
 
-          idProtocolSaved = new Integer(protocol.getValue());
-          
-          this.xmlResult = "<SUCCESS idProtocolSaved=\"" + idProtocolSaved + "\"protocolName=\""+protocolName +"\" savedProtocolClassName=\""+protocolClassName+"\" newProtocol=\""+newProtocol+"\"/>";
+          if (protocol != null) {
+            this.jsonResult = Json.createObjectBuilder()
+                                  .add("result",                 "SUCCESS")
+                                  .add("idProtocolSaved",        "" + protocol.getValue())
+                                  .add("protocolName",           "" + protocolName)
+                                  .add("savedProtocolClassName", "" + protocolClassName)
+                                  .add("newProtocol",            "" + newProtocol)
+                                  .build().toString();
+          } else {
+            this.jsonResult = Json.createObjectBuilder()
+                                  .add("result", "ERROR")
+                                  .add("protocolName",           "" + protocolName)
+                                  .add("savedProtocolClassName", "" + protocolClassName)
+                                  .add("newProtocol",            "" + newProtocol)
+                                  .build().toString();
+          }
         }
 
         if (this.isValid()) {
@@ -248,9 +260,8 @@ public class SaveProtocol extends GNomExCommand implements Serializable {
         this.addInvalidField("Insufficient permissions", "Insufficient permission to edit dictionareis.");
         setResponsePage(this.ERROR_JSP);
       }
-      
-      
-    }catch (Exception e){
+
+    } catch (Exception e){
       this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in SaveProtocol ", e);
       throw new RollBackCommandException(e.getMessage());
         

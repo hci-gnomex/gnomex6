@@ -46,6 +46,8 @@ import { VerifyUsersDialogComponent } from "./verify-users-dialog.component";
 import { USERS_GROUPS_ROUTING } from "./users-groups.routes";
 
 import {AccountFieldsConfigurationService} from "../services/account-fields-configuration.service";
+import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
+import {TextAlignRightMiddleEditor} from "../util/grid-editors/text-align-right-middle.editor";
 
 /**
  * @author jdewell
@@ -65,7 +67,9 @@ import {AccountFieldsConfigurationService} from "../services/account-fields-conf
             SelectEditor,
             SelectRenderer,
             SplitStringToMultipleLinesRenderer,
+            TextAlignLeftMiddleEditor,
             TextAlignLeftMiddleRenderer,
+            TextAlignRightMiddleEditor,
             TextAlignRightMiddleRenderer,
             UploadViewRemoveRenderer
         ]),
