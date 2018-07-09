@@ -1,0 +1,55 @@
+<div class="full-width full-height">
+    <split>
+        <split-area [size]="20">
+            <div class="flex-container-col full-width full-height padded-left-right border">
+                <div class="full-width no-overflow padded-top-bottom">
+                    Protocols
+                </div>
+                <div class="full-width flex-grow no-overflow">
+                    <div class="full-width full-height border no-overflow">
+                        <tree-root #navigationTree
+                                   [nodes]="protocolList"
+                                   [options]="treeOptions"
+                                   (activate)="treeOnSelect($event)">
+                            <ng-template #treeNodeTemplate let-node let-index="index">
+                                <div class="flex-container-row full-width">
+                                    <div class="padded-right">
+                                        <img src="{{node.data.icon}}" alt="" height="16" width="16">
+                                    </div>
+                                    <div>
+                                        <span>{{ node.data.label }}</span>
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template #loadingTemplate></ng-template>
+                        </tree-root>
+                    </div>
+                </div>
+                <div class="full-width no-overflow padded-top-bottom">
+                    <div class="full-width flex-container-row">
+                        <div>
+                            <div>
+                                <button mat-button (click)="onNewProtocolButtonClicked()"><img src="../../assets/brick_add.png" alt="" /> New Protocol</button>
+                            </div>
+                            <div>
+                                <button mat-button (click)="onDeleteProtocolButtonClicked()"><img *ngIf="!disableDelete" src="../../assets/delete.png" alt="" /><img *ngIf="disableDelete"src="../../assets/delete_disable.png" alt="" /> Delete Protocol</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="full-width full-height t">
+                                <div class="tr">
+                                    <div class="td vertical-center">
+                                        <button mat-button (click)="onRefreshButtonClicked()"><img src="../../assets/refresh.png" alt="" /> Refresh</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </split-area>
+        <split-area [size]="80">
+            <configuration-browse-panel></configuration-browse-panel>
+        </split-area>
+    </split>
+</div>

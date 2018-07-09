@@ -15,6 +15,7 @@ import { MatDialogRef } from '@angular/material';
     public message: string = '';
     public parent: any = null;
     public onYesFunctionName: string = '';
+    public lines: string[] = null;
 
     constructor(public dialogRef: MatDialogRef<YesNoDialogComponent>) { }
 
