@@ -64,7 +64,9 @@ export class BillingPeriodSelectorComponent implements OnInit {
         config.width = '400px';
         let dialog: MatDialogRef<BillingPeriodSelectorPopupComponent> = this.dialog.open(BillingPeriodSelectorPopupComponent, config);
         dialog.afterClosed().subscribe((val: any) => {
-            this.selectBillingPeriod(val as BillingPeriod);
+            if (val !== undefined) {
+                this.selectBillingPeriod(val as BillingPeriod);
+            }
         });
     }
 

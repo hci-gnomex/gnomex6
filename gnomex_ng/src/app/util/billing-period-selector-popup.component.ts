@@ -19,7 +19,7 @@ import {BillingPeriod} from "./billing-period-selector.component";
             </div>
         </mat-dialog-content>
         <mat-dialog-actions>
-            <button mat-button [mat-dialog-close]>Clear</button>
+            <button mat-button (click)="this.clear()">Clear</button>
         </mat-dialog-actions>
     `,
     styles: [`
@@ -59,6 +59,10 @@ export class BillingPeriodSelectorPopupComponent implements OnInit {
     public changeYear(delta: number): void {
         this.currentYear = this.currentYear + delta;
         this.updateCurrentBillingPeriods();
+    }
+
+    public clear(): void {
+        this.dialogRef.close(null);
     }
 
     public selectBillingPeriod(bp: BillingPeriod): void {
