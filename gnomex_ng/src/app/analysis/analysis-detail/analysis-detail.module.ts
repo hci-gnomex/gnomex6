@@ -3,14 +3,16 @@ import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 import {
-    AnalysisDetailOverviewComponent
+    AnalysisDetailOverviewComponent,
+    AnalysisExperimentTabComponent
 } from './index'
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {AgGridModule} from "ag-grid-angular";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {UtilModule} from "../../util/util.module";
-import {TreeModule} from "angular-tree-component";
 import {RelatedDataModule} from "../../util/related-data.module";
+import {AngularSplitModule} from "angular-split";
+import {TreeModule} from "angular-tree-component";
 
 
 
@@ -20,13 +22,16 @@ import {RelatedDataModule} from "../../util/related-data.module";
         AgGridModule.withComponents([IconTextRendererComponent]),
         AngularMaterialModule,
         FormsModule,
+        TreeModule,
         ReactiveFormsModule,
         UtilModule,
-        RelatedDataModule
+        RelatedDataModule,
+        AngularSplitModule
     ],
 
     declarations: [
-        AnalysisDetailOverviewComponent
+        AnalysisDetailOverviewComponent,
+        AnalysisExperimentTabComponent
     ],
     providers: [],
     entryComponents: [],

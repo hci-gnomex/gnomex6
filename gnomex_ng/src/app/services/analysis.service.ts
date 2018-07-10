@@ -5,6 +5,8 @@ import {Observable} from "rxjs/Observable";
 import 'rxjs/add/operator/map';
 import {Subject} from "rxjs/Subject";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class AnalysisService {
@@ -24,7 +26,8 @@ export class AnalysisService {
     public dirty:boolean = false;
 
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private httpClient:HttpClient,
+                private cookieUtilService:CookieUtilService) {
     }
 
 
@@ -234,6 +237,10 @@ export class AnalysisService {
                 throw new Error("Error: In SaveVisibility");
             }
         });
+    }
+
+    getExperimentPickList(params:HttpParams):Observable<any>{
+        return this.httpClient.get("/gnomex/GetExperimentPickList.gx",{params: params});
     }
 
 
