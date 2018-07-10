@@ -1,6 +1,6 @@
 <div style="display:flex; flex-direction:column ; height:100%; width:100%;">
-    <div style="display:flex; flex: 1;">
-        <mat-tab-group class="mat-tab-group-border">
+    <div style="display:flex; flex: 9">
+        <mat-tab-group class="mat-tab-group-border"  (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Annotations">
                 <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.ANALYSIS"> </annotation-tab>
             </mat-tab>
@@ -8,12 +8,16 @@
                 <related-data-tab [relatedObjects]="relatedObjects" >
                 </related-data-tab>
             </mat-tab>
+            <mat-tab  label="Experiment" style="height:100%;">
+               <analysis-experiment-tab [tabVisible]="showExpAnalysisTab"> </analysis-experiment-tab>
+            </mat-tab>
+
         </mat-tab-group>
     </div>
-    <div>
+    <div style="flex:1;">
         <save-footer (saveClicked)="save()"
                      [disableSave]="true"
-                     [dirty]="false">
+                     [dirty]="this.orderValidateService.dirtyNote">
         </save-footer>
     </div>
 </div>

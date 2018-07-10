@@ -7,6 +7,7 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {OrderType} from "../../util/annotation-tab.component";
 import {Subscription} from "rxjs/Subscription";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
+import {ExperimentsService} from "../experiments.service";
 
 
 @Component({
@@ -30,19 +31,16 @@ export class ExperimentDetailOverviewComponent  implements OnInit, OnDestroy{
     private showRelatedDataTab:boolean =false;
 
 
-    constructor(private analysisService: AnalysisService,
+    constructor(private experimentService: ExperimentsService,
                 private route:ActivatedRoute) {
     }
 
     ngOnInit():void{
 
-        this.overviewListSubscription  = this.analysisService.getAnalysisOverviewListSubject()
+        this.overviewListSubscription  = this.experimentService.getExperimentOverviewListSubject()
             .subscribe(data =>{
                 this.experimentOverviewNode = data;
-
             });
-
-
 
         this.route.data.forEach(data => {
             this.experiment = data.experiment.Request;
