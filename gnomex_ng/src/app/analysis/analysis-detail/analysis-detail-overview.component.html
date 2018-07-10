@@ -17,7 +17,7 @@
     <div style="flex:1;">
         <save-footer (saveClicked)="save()"
                      [disableSave]="true"
-                     [dirty]="false">
+                     [dirty]="this.orderValidateService.dirtyNote">
         </save-footer>
     </div>
 </div>

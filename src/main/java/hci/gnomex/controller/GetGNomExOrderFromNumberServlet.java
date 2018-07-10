@@ -61,6 +61,11 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
             topicNumber = req.getParameter("topicNumber");
             hasID = req.getParameter("hasID");
 
+            Integer idRequest = -1;
+            Integer idAnalysis = -1;
+            Integer idDataTrack = -1;
+
+
             if(hasID == null){
                 hasID = "N";
             }
@@ -71,8 +76,6 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             if(requestNumber != null){
                 String requestNumberBase = Request.getBaseRequestNumber(requestNumber);
-                Integer idRequest = new Integer(requestNumber);
-
                 String  queryStr ="";
                 System.out.println("requestNumber: " + requestNumberBase);
                 Query query = null;
@@ -83,6 +86,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                     query = sess.createQuery(queryStr).setParameter(0 , requestNumberBase + "%" )
                             .setParameter(1, requestNumberBase );
                 }else{
+                    idRequest = new Integer(this.requestNumber);
                     queryStr = "SELECT req from Request as req where req.idRequest = :idRequest";
                     query = sess.createQuery(queryStr).setParameter("idRequest", idRequest );
                 }
@@ -106,7 +110,6 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             }else if(analysisNumber != null){
                 analysisNumber = analysisNumber.replaceAll("#", "");
-                Integer idAnalysis = new Integer(analysisNumber);
                 System.out.println("analysisNumber: " + analysisNumber );
                 String queryStr = "";
                 Query query = null;
@@ -116,6 +119,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                     queryStr ="SELECT a from Analysis as a where a.number = :analysisNumber" ;
                     query = sess.createQuery(queryStr).setParameter("analysisNumber", analysisNumber );
                 }else{
+                    idAnalysis = new Integer(this.analysisNumber);
                     queryStr ="SELECT a from Analysis as a where a.idAnalysis = :idAnalysis" ;
                     query = sess.createQuery(queryStr).setParameter("idAnalysis", idAnalysis );
                 }
@@ -137,7 +141,6 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             }else if(dataTrackNumber != null){
                 dataTrackNumber = dataTrackNumber.replaceAll("#", "");
-                Integer idDataTrack = new Integer(dataTrackNumber);
                 dataTrackNumber.toUpperCase();
                 System.out.println("dataTrackNumber: " + dataTrackNumber );
                 String queryStr = "";
@@ -150,6 +153,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                             "WHERE dt.fileName = :dataTrackNumber";
                     query = sess.createQuery(queryStr).setParameter("dataTrackNumber" , dataTrackNumber );
                 }else{
+                    idDataTrack = new Integer(this.dataTrackNumber);
                     queryStr = "SELECT dt.fileName, dt.codeVisibility, dt.idDataTrack, dt.idLab,dt.idGenomeBuild, gb.idOrganism " +
                             "FROM DataTrack as dt JOIN dt.folders as dtfold JOIN dtfold.genomeBuild as gb " +
                             "WHERE dt.idDataTrack = :idDataTrack";
@@ -243,11 +247,6 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
     }
 
-    /*
-     * SPECIAL NOTE - This servlet must be run on non-secure socket layer (http) in order to keep track of previously created session. (see note below concerning
-     * flex upload bug on Safari and FireFox). Otherwise, session is not maintained. Although the code tries to work around this problem by creating a new security
-     * advisor if one is not found, the Safari browser cannot handle authenicating the user (this second time). So for now, this servlet must be run non-secure.
-     */
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
     }

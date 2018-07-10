@@ -8,6 +8,7 @@ import {OrderType} from "../../util/annotation-tab.component";
 import {Subscription} from "rxjs/Subscription";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {MatTabChangeEvent} from "@angular/material";
+import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 
 
 @Component({
@@ -32,12 +33,15 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
 
 
     constructor(private analysisService: AnalysisService,
-                private route:ActivatedRoute) {
+                private route:ActivatedRoute,
+                public orderValidateService: BrowseOrderValidateService) {
     }
 
     ngOnInit():void{
 
         this.route.data.forEach(data => {
+            this.orderValidateService.dirtyNote = false;
+
             this.analysis = data.analysis.Analysis;
             this.lab = data.analysis.Lab;
             if(this.analysis){

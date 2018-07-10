@@ -12,6 +12,7 @@ import {ITreeOptions} from "angular-tree-component";
 import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
+import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 
 
 @Component({
@@ -96,7 +97,8 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
 
 
-    @Input() edit:boolean = true;
+    @Input() edit:boolean = true; // true should not be default when all of analysis detail  tabs are implemented
+                                  // this is for demonstration till that is implemented
 
     get seqProtocolDataProvider():any[]{
         if(!this._seqProtocolDataProvider){
@@ -227,6 +229,7 @@ export class AnalysisExperimentTabComponent implements OnInit{
         }
 
         this.prepareExperimentItem(items);
+        this.orderValidateService.dirtyNote = true;
 
 
     }
@@ -456,6 +459,7 @@ export class AnalysisExperimentTabComponent implements OnInit{
             this.sampleList = [];
             this.gridOpt.api.setRowData(this.sampleList);
         }
+        this.orderValidateService.dirtyNote = true;
     }
     removeItems() {
         let tmpRowData: Array<any> = [];
@@ -477,12 +481,13 @@ export class AnalysisExperimentTabComponent implements OnInit{
             this.sampleList = tmpRowData;
             this.gridOpt.api.setRowData(this.sampleList);
         }
-
+        this.orderValidateService.dirtyNote = true;
 
     }
 
 
     constructor(private analysisService:AnalysisService, private gnomexService: GnomexService,
+                private orderValidateService: BrowseOrderValidateService,
                 private secAdvisor: CreateSecurityAdvisorService,
                 private constService:ConstantsService,
                 private dialogService: DialogsService,
