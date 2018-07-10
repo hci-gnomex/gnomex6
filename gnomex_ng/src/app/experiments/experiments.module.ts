@@ -15,7 +15,6 @@ import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import { ExpanderModule }     from "../../modules/expander.module";
-import { GnomexStyledGridModule } from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import { TreeGridModule } from "../../modules/tree-grid.module";
 import { InputModule } from "../../modules/input.module";
 import { LoaderModule }       from "../../modules/loader.module";
@@ -81,7 +80,6 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
         EmailRelatedUsersPopupModule,
         ExpanderModule,
         FormsModule,
-        GnomexStyledGridModule,
         InputModule,
         LoaderModule,
         NotificationModule,

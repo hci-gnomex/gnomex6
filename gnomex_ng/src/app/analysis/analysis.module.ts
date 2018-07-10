@@ -12,7 +12,6 @@ import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import { ExpanderModule }     from "../../modules/expander.module";
-import { GnomexStyledGridModule } from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import { InputModule } from "../../modules/input.module";
 import { LoaderModule }       from "../../modules/loader.module";
 import { PanelModule }        from "../../modules/panel.module";
@@ -71,7 +70,7 @@ import {AnalysisDetailModule} from "./analysis-detail/analysis-detail.module";
         AngularSplitModule,
         AnalysisOverviewModule,
         AnalysisDetailModule
-            ],
+    ],
     declarations: [
         BrowseAnalysisComponent,
         DeleteAnalysisComponent,

@@ -2,7 +2,6 @@ import {AfterViewChecked, Component, OnDestroy, OnInit, ViewChild} from "@angula
 import {PrimaryTab} from "../../util/tabs/primary-tab.component";
 import {FormBuilder} from "@angular/forms";
 import {ExperimentsService} from "../experiments.service";
-import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
 import {Subscription} from "rxjs/Subscription";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ConstantsService} from "../../services/constants.service";
@@ -18,7 +17,6 @@ import {GridOptions} from "ag-grid/main";
         <!--- <grid dataProvider={} > -->
         <div style="height:100%; width:100%; display:flex; flex-direction: column;">
             <div style="display:flex; flex-direction:column; flex:1; width:100%;">
-                
                 <ag-grid-angular class="ag-fresh" style="width: 100%;  height: 100%;" 
                                  (cellDoubleClicked)="forwardToExperiment($event)"
                                  (gridSizeChanged)="adjustColumnSize($event)"
@@ -29,7 +27,6 @@ import {GridOptions} from "ag-grid/main";
                                  [rowDeselection]="true" 
                                  [enableSorting]="true"
                                  [enableColResize]="true">
-                    
                 </ag-grid-angular>
             </div>
         </div>
@@ -40,8 +37,6 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
     private filteredExperimentOverviewListSubscript: Subscription;
     public readonly rowSelection: string = "single";
     private gridOpt:GridOptions = {};
-
-
 
     name:string = "Experiments";
 
@@ -58,25 +53,21 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
 
     rowData:Array<any> = [];
 
-    constructor(protected fb: FormBuilder, private experimentService:ExperimentsService,
-                private dictionary: DictionaryService, private appConstants: ConstantsService,
+    constructor(protected fb: FormBuilder,
+                private experimentService:ExperimentsService,
+                private dictionary: DictionaryService,
+                private appConstants: ConstantsService,
                 private router:Router) {
         super(fb);
     }
 
-
     ngOnInit(){
-
-
-        this.filteredExperimentOverviewListSubscript = this.experimentService.getFilteredOverviewListObservable()
-            .subscribe( data =>{
-                this.rowData = data;
-            });
-        this.selectedTreeNodeSubscript = this.experimentService.getExperimentOverviewListSubject()
-            .subscribe(data =>{
-                this.rowData = this.experimentService.experimentList;
-            });
-
+        this.filteredExperimentOverviewListSubscript = this.experimentService.getFilteredOverviewListObservable().subscribe( data =>{
+            this.rowData = data;
+        });
+        this.selectedTreeNodeSubscript = this.experimentService.getExperimentOverviewListSubject().subscribe(data =>{
+            this.rowData = this.experimentService.experimentList;
+        });
     }
 
     adjustColumnSize(event:any){
@@ -85,23 +76,15 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
         }
     }
 
-
-
-
     forwardToExperiment(event:any){
         let rowData = event.data;
         let experimentNode = this.experimentService.experimentList
             .find(reqObj => reqObj.requestNumber === rowData.requestNumber);
         this.router.navigate(['/experiments',{outlets:{'browsePanel':[experimentNode.idRequest]}}]);
-
     }
 
     ngOnDestroy():void{
         this.filteredExperimentOverviewListSubscript.unsubscribe();
         this.selectedTreeNodeSubscript.unsubscribe();
     }
-
-
-
-
 }

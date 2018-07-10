@@ -3,7 +3,6 @@ import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output} from 
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {Subscription} from "rxjs/Subscription";
-import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component";
 import {ExperimentsService} from "../experiments.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -20,8 +19,8 @@ import {URLSearchParams} from "@angular/http"
         
         <div style="width:100%; height:100%; display:flex; flex-direction: column ">
             <div style="display:flex; flex-direction:column; flex:1; width:100%;">
-
-                <ag-grid-angular style="width: 100%; height: 100%;" class="ag-fresh"
+                <ag-grid-angular style="width: 100%; height: 100%;" 
+                                 class="ag-fresh"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"
@@ -31,17 +30,11 @@ import {URLSearchParams} from "@angular/http"
                                  [enableSorting]="true"
                                  [enableColResize]="true">
                 </ag-grid-angular>
-
-
             </div>
-            
         </div>
-        
         
     `,
     styles: [`
-       
-        
         
         .flex-container{
            
@@ -55,15 +48,14 @@ import {URLSearchParams} from "@angular/http"
 })
 export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
     name = "visibility";
-    //@ViewChild(GnomexStyledGridComponent) myGrid: GnomexStyledGridComponent;
+
     private filteredExperimentOverviewListSubscript: Subscription;
     private selectedTreeNodeSubscript: Subscription;
     private visList:Array<any>;
     private instList:Array<any>;
     private gridOpt:GridOptions = {};
+
     @Output() saveSuccess = new EventEmitter();
-
-
 
     /*setState(){
 
@@ -85,19 +77,19 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
         let rowData = params.data;
         let field = params.colDef.field;
 
-
-        if(params.newValue !== params.oldValue){
+        if (params.newValue !== params.oldValue) {
             if(rowData.canUpdateVisibility === 'Y'
-                || this.secAdvisor.hasPermission(CreateSecurityAdvisorService.CAN_ACCESS_ANY_OBJECT)){
+                || this.secAdvisor.hasPermission(CreateSecurityAdvisorService.CAN_ACCESS_ANY_OBJECT)) {
                 rowData.isDirty='Y';
                 rowData[field] = params.newValue;
                 this.experimentService.dirty = true;
                 return true;
-            }else{
-                this.dialogService.confirm("Visibility can only be changed by owner, lab manager, or GNomEx admins.",null)
+            } else {
+                this.dialogService.confirm("Visibility can only be changed by owner, lab manager, or GNomEx admins.",null);
                 rowData[field] = params.oldValue;
             }
         }
+
         return false;
     };
 
