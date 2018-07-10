@@ -7,6 +7,7 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {OrderType} from "../../util/annotation-tab.component";
 import {Subscription} from "rxjs/Subscription";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
+import {MatTabChangeEvent} from "@angular/material";
 
 
 @Component({
@@ -22,12 +23,12 @@ import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 })
 export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
     public annotations:any = [];
-    private analysis:any;
+    public analysis:any;
+    public lab: any;
     types = OrderType;
-    private overviewListSubscription : Subscription;
-    private analysisOverviewNode:any;
     private relatedObjects:IRelatedObject = {};
     private showRelatedDataTab:boolean =false;
+    private showExpAnalysisTab: boolean =false ;
 
 
     constructor(private analysisService: AnalysisService,
@@ -36,16 +37,9 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
 
     ngOnInit():void{
 
-        this.overviewListSubscription  = this.analysisService.getAnalysisOverviewListSubject()
-            .subscribe(data =>{
-                this.analysisOverviewNode = data;
-
-                });
-
-
-
         this.route.data.forEach(data => {
             this.analysis = data.analysis.Analysis;
+            this.lab = data.analysis.Lab;
             if(this.analysis){
                 let annots = this.analysis.AnalysisProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);
@@ -69,6 +63,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
 
     initRelatedData(analysis:any):boolean {
 
+        this.relatedObjects = {};
         let rObjects = analysis.relatedObjects;
         let relatedTopics = analysis.relatedTopics;
 
@@ -99,13 +94,16 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
         }
 
     }
+    tabChanged(event:MatTabChangeEvent){
+       this.showExpAnalysisTab = event.tab.textLabel === "Experiment"
+    }
+
 
     save(){
 
     }
 
     ngOnDestroy(){
-        this.overviewListSubscription.unsubscribe();
     }
 
 

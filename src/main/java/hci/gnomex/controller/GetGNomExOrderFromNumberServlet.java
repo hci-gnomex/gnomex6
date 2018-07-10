@@ -26,6 +26,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
     private String dataTrackNumber;
     private String topicNumber;
     private String analysisNumber;
+    private String hasID;
     private static String webContextPath;
 
 
@@ -58,6 +59,11 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
             analysisNumber = req.getParameter("analysisNumber");
             dataTrackNumber = req.getParameter("dataTrackNumber");
             topicNumber = req.getParameter("topicNumber");
+            hasID = req.getParameter("hasID");
+
+            if(hasID == null){
+                hasID = "N";
+            }
 
             sess = HibernateSession.currentReadOnlySession("guest");
             PropertyDictionaryHelper.getInstance(sess);
@@ -65,10 +71,22 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             if(requestNumber != null){
                 String requestNumberBase = Request.getBaseRequestNumber(requestNumber);
+                Integer idRequest = new Integer(requestNumber);
 
-                String  queryStr = "SELECT req from Request as req where req.number like ? OR req.number = ?";
-                Query query = sess.createQuery(queryStr).setParameter(0 , requestNumberBase + "%" )
-                              .setParameter(1, requestNumberBase );
+                String  queryStr ="";
+                System.out.println("requestNumber: " + requestNumberBase);
+                Query query = null;
+
+
+                if(hasID.equals("N")){
+                    queryStr = "SELECT req from Request as req where req.number like ? OR req.number = ?";
+                    query = sess.createQuery(queryStr).setParameter(0 , requestNumberBase + "%" )
+                            .setParameter(1, requestNumberBase );
+                }else{
+                    queryStr = "SELECT req from Request as req where req.idRequest = :idRequest";
+                    query = sess.createQuery(queryStr).setParameter("idRequest", idRequest );
+                }
+
                 List reqRow = query.list();
 
                 if(reqRow.size() ==  0){
@@ -88,10 +106,20 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             }else if(analysisNumber != null){
                 analysisNumber = analysisNumber.replaceAll("#", "");
+                Integer idAnalysis = new Integer(analysisNumber);
                 System.out.println("analysisNumber: " + analysisNumber );
+                String queryStr = "";
+                Query query = null;
 
-                String queryStr ="SELECT a from Analysis as a where a.number = :analysisNumber" ;
-                Query query = sess.createQuery(queryStr).setParameter("analysisNumber", analysisNumber );
+
+                if(hasID.equals("N")){
+                    queryStr ="SELECT a from Analysis as a where a.number = :analysisNumber" ;
+                    query = sess.createQuery(queryStr).setParameter("analysisNumber", analysisNumber );
+                }else{
+                    queryStr ="SELECT a from Analysis as a where a.idAnalysis = :idAnalysis" ;
+                    query = sess.createQuery(queryStr).setParameter("idAnalysis", idAnalysis );
+                }
+
                 List analysisRow = query.list();
                 if(analysisRow.size() == 0){
                     throw new Exception("Analysis number " + analysisNumber + " does not exists" );
@@ -109,14 +137,25 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             }else if(dataTrackNumber != null){
                 dataTrackNumber = dataTrackNumber.replaceAll("#", "");
+                Integer idDataTrack = new Integer(dataTrackNumber);
                 dataTrackNumber.toUpperCase();
                 System.out.println("dataTrackNumber: " + dataTrackNumber );
+                String queryStr = "";
+                Query query = null;
 
 
-                String queryStr = "SELECT dt.fileName, dt.codeVisibility, dt.idDataTrack, dt.idLab,dt.idGenomeBuild, gb.idOrganism " +
-                                  "FROM DataTrack as dt JOIN dt.folders as dtfold JOIN dtfold.genomeBuild as gb " +
-                                   "WHERE dt.fileName = :dataTrackNumber";
-                Query query = sess.createQuery(queryStr).setParameter("dataTrackNumber" , dataTrackNumber );
+                if(hasID.equals("N")) {
+                    queryStr = "SELECT dt.fileName, dt.codeVisibility, dt.idDataTrack, dt.idLab,dt.idGenomeBuild, gb.idOrganism " +
+                            "FROM DataTrack as dt JOIN dt.folders as dtfold JOIN dtfold.genomeBuild as gb " +
+                            "WHERE dt.fileName = :dataTrackNumber";
+                    query = sess.createQuery(queryStr).setParameter("dataTrackNumber" , dataTrackNumber );
+                }else{
+                    queryStr = "SELECT dt.fileName, dt.codeVisibility, dt.idDataTrack, dt.idLab,dt.idGenomeBuild, gb.idOrganism " +
+                            "FROM DataTrack as dt JOIN dt.folders as dtfold JOIN dtfold.genomeBuild as gb " +
+                            "WHERE dt.idDataTrack = :idDataTrack";
+                    query = sess.createQuery(queryStr).setParameter("idDataTrack" , idDataTrack );
+                }
+
                 List<Object[]> dtResults = query.list();
                 if(dtResults.size() ==  0){
                     throw new Exception("Datatrack number " + requestNumber + " does not exists" );

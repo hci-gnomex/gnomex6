@@ -18,7 +18,7 @@ import {IRelatedObject} from "./interfaces/related-objects.model";
     template: `
         <div style="display:flex; height:100%;">
             <ng-container *ngFor="let key of relatedKeys">
-                <div class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key].length > 0">
+                <div class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key]?.length > 0">
                     <tree-root [nodes]="this.relatedObjects[key]" [options]="options" (activate)="onActivateTree($event)">
                         <ng-template #treeNodeTemplate let-node >
                             <img src="{{node?.data?.icon}}" height="16" width="16">

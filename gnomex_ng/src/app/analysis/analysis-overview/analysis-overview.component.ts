@@ -272,7 +272,6 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
 
 
     ngOnDestroy():void{
-        this.analysisService.resetAnalysisOverviewListSubject();
         this.overviewListSuscript.unsubscribe();
     }
 
