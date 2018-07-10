@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {URLSearchParams} from "@angular/http";
 
 import {Subscription} from "rxjs/Subscription";
@@ -16,6 +16,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ExperimentsService} from "../experiments.service";
 import {PropertyService} from "../../services/property.service";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
@@ -102,8 +103,6 @@ import {PropertyService} from "../../services/property.service";
 	`]
 })
 export class ExperimentOrdersComponent implements OnInit, OnDestroy {
-
-	@ViewChild('windowReference') window: EmailRelatedUsersPopupComponent;
 
     protected gridApi;
     protected gridColumnApi;
@@ -251,6 +250,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	debug: string;
 
 	constructor (private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                 private dialog: MatDialog,
                  private dialogService: DialogsService,
                  private dictionaryService: DictionaryService,
 				 private experimentsService: ExperimentsService,
@@ -479,8 +479,12 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
                 idRequests.push(Number.parseInt(requestNumber.slice(0, requestNumber.length - 1)));
             }
 
-            this.window.setIdRequests(idRequests);
-            this.window.window.open();
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.panelClass = 'no-padding-dialog';
+            configuration.width  = '40%';
+            configuration.data   = { idRequests: idRequests };
+
+            this.dialog.open(EmailRelatedUsersPopupComponent, configuration);
         }
 	}
 
