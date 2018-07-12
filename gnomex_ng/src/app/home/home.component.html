@@ -1,16 +1,37 @@
-<span [ngStyle]= "{'background-image': 'url(' + site_splash + ')'}" style="height: 20em;
-        width: 35em;
-        margin-left: 40em;
-        display: block;
-        background-repeat: no-repeat;" *ngIf="hideLoader | async;else loading"></span>
-<ng-template #loading>
-    <div #loadingWindow class="gnomex-splash">
-        <div style="text-align: center;vertical-align: top">
-            <img src={{site_logo}}>
+<div class="full-width full-height horizontal-center">
+    <!--<div *ngIf="false | async;else loading"-->
+         <!--class="full-width full-height flex-container-col">-->
+    <div *ngIf="hideLoader | async;else loading"
+         class="full-width full-height flex-container-col">
+        <div class="flex-grow">
         </div>
-        <div style="position: absolute;bottom: 5em; width: 100%">
-            <jqxProgressBar #loadingProgress [width]="270" [height]="15" [value]="10" [colorRanges]="colorRanges">
-            </jqxProgressBar>
+        <div class="horizontal-center">
+            <img src="{{site_splash}}" alt="">
+        </div>
+        <div class="flex-grow-large">
         </div>
     </div>
-</ng-template>
+    <ng-template #loading>
+        <div class="full-width full-height flex-container-col">
+            <div class="flex-grow">
+            </div>
+            <div class="flex-container-row">
+                <div class="flex-grow">
+                </div>
+                <div #loadingWindow class="gnomex-splash">
+                    <div style="text-align: center;vertical-align: top">
+                        <img src={{site_logo}}>
+                    </div>
+                    <div style="position: absolute;bottom: 5em; width: 100%">
+                        <jqxProgressBar #loadingProgress [width]="270" [height]="15" [value]="10" [colorRanges]="colorRanges">
+                        </jqxProgressBar>
+                    </div>
+                </div>
+                <div class="flex-grow">
+                </div>
+            </div>
+            <div class="flex-grow">
+            </div>
+        </div>
+    </ng-template>
+</div>

@@ -1,6 +1,14 @@
 <timeout-notification></timeout-notification>
-<gnomex-header></gnomex-header>
 <main>
-    <router-outlet></router-outlet>
-    <router-outlet name="modal"></router-outlet>
+    <div class="full-height full-width flex-container-col">
+        <div class="full-width">
+            <gnomex-header></gnomex-header>
+        </div>
+        <div class="full-width flex-grow main-display-area">
+            <div class="full-width full-height" style="display: block; max-height: 100%; max-width: 100%;">
+                <router-outlet></router-outlet>
+                <router-outlet name="modal"></router-outlet>
+            </div>
+        </div>
+    </div>
 </main>

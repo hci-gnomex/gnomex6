@@ -1,7 +1,10 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, OnInit, ViewEncapsulation} from "@angular/core";
+import {
+    AfterViewChecked, Component, ElementRef, HostListener, OnInit, ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 import {ProgressService} from "../home/progress.service";
 import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {Observable} from "rxjs/Observable";
@@ -18,7 +21,7 @@ import * as _ from "lodash";
 import {HttpParams} from "@angular/common/http";
 import {TopicService} from "../services/topic.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatToolbar} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 
 @Component({
@@ -81,7 +84,10 @@ import {AdvancedSearchComponent} from "./advanced_search/advanced-search.compone
     encapsulation: ViewEncapsulation.None
 })
 
-export class HeaderComponent implements OnInit{
+export class HeaderComponent implements OnInit, AfterViewChecked{
+
+    @ViewChild('headerRef') headerRef: MatToolbar;
+    @ViewChild('spacerRef') spacerRef: ElementRef;
 
     isLoggedIn: Observable<boolean>;
     options: FormGroup;
@@ -133,7 +139,6 @@ export class HeaderComponent implements OnInit{
     ngOnInit() {
         console.log("Initializing app dependencies ");
 
-
         this.gnomexService.isAppInitCompleteObservable().subscribe(complete => {
             this.buildNavItems();
             this.checkSecurity();
@@ -142,8 +147,34 @@ export class HeaderComponent implements OnInit{
 
         });
 
-
         // Links, Help, Report Problem and Account
+    }
+
+    ngAfterViewChecked() {
+        if (this.spacerRef
+            && this.spacerRef.nativeElement
+            && this.spacerRef.nativeElement.style
+            && this.headerRef
+            && this.headerRef._elementRef
+            && this.headerRef._elementRef.nativeElement) {
+
+            this.spacerRef.nativeElement.style.height = 'initial';
+            this.spacerRef.nativeElement.style.height = '' + this.headerRef._elementRef.nativeElement.offsetHeight + 'px';
+        }
+    }
+
+    @HostListener('window:resize')
+    onResize() {
+        if (this.spacerRef
+            && this.spacerRef.nativeElement
+            && this.spacerRef.nativeElement.style
+            && this.headerRef
+            && this.headerRef._elementRef
+            && this.headerRef._elementRef.nativeElement) {
+
+            this.spacerRef.nativeElement.style.height = 'initial';
+            this.spacerRef.nativeElement.style.height = '' + this.headerRef._elementRef.nativeElement.offsetHeight + 'px';
+        }
     }
 
     public buildNavItems() {

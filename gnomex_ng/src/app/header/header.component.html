@@ -1,4 +1,4 @@
-<mat-toolbar class="header-one" *ngIf="this.gnomexService.isLoggedIn">
+<mat-toolbar #headerRef class="header-one" *ngIf="this.gnomexService.isLoggedIn">
   <mat-toolbar-row>
   <span class="top-menu-item">
     <a [routerLink]="['/home']">
@@ -63,4 +63,5 @@
     </span>
   </mat-toolbar-row>
 </mat-toolbar>
+<div #spacerRef></div>
 

@@ -1,26 +1,35 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {
-    Component, OnInit, ViewChild, ViewEncapsulation, AfterViewInit, OnDestroy,
-    ChangeDetectorRef
-} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {ProgressService} from "../home/progress.service";
-import {LaunchPropertiesService} from "../services/launch-properites.service";
-import {jqxWindowComponent} from "jqwidgets-framework";
-import {jqxProgressBarComponent} from "jqwidgets-framework";
-import {Subscription} from "rxjs/Subscription";
+import {Component, OnInit, ViewChild, ViewEncapsulation, AfterViewInit, OnDestroy} from "@angular/core";
 import {URLSearchParams} from "@angular/http";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {GnomexService} from "../services/gnomex.service";
 import {Router} from "@angular/router";
+
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable} from "rxjs/Observable";
+import {Subscription} from "rxjs/Subscription";
+
+import {jqxProgressBarComponent} from "../../assets/jqwidgets-ts/angular_jqxprogressbar"; //jqwidgets-framework
+
+import {GnomexService} from "../services/gnomex.service";
+import {LaunchPropertiesService} from "../services/launch-properites.service";
+import {ProgressService} from "./progress.service";
 
 @Component({
     selector: "gnomex-home",
     template: require("./home.component.html"),
     // template: require("./home.component.html"),
     styles: [`
+        
+        .t  { display: table;      }
+        .tr { display: table-row;  }
+        .td { display: table-cell; }
+
+        .horizontal-center { text-align: center; }
+        .vertical-center   { vertical-align: middle; }
+        
+        .flex-grow-large { flex: 5; }
+        
     .login-view{
         height: 20em;
         width: 35em;
@@ -42,10 +51,14 @@ import {Router} from "@angular/router";
     }
     .gnomex-splash {
         background-image: url(../gnomex/assets/gnomex_splash_credits.png);
-        width: 19em;height: 15em;
-        padding-bottom: 1em;padding-left: 1em;padding-right: 1em;padding-top: 1em;position: relative;
+        width: 19em;
+        height: 15em;
+        padding-bottom: 1em;
+        padding-left: 1em;
+        padding-right: 1em;
+        padding-top: 1em;
+        position: relative;
         background-repeat: no-repeat;
-        top: 10em; left: 41em; float: left
     }
     `],
     encapsulation: ViewEncapsulation.None
