@@ -80,6 +80,12 @@ import {AdvancedSearchComponent} from "./advanced_search/advanced-search.compone
         .mat-menu-panel.no-max-width {
             max-width: none;
         }
+
+        .inline-block { display: inline-block; }
+        
+        .horizontal-padding { padding: 0 0.4em; }
+        
+        .horizontal-center { text-align: center; }
     `],
     encapsulation: ViewEncapsulation.None
 })

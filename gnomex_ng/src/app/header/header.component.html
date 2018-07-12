@@ -1,52 +1,61 @@
 <mat-toolbar #headerRef class="header-one" *ngIf="this.gnomexService.isLoggedIn">
   <mat-toolbar-row>
-  <span class="top-menu-item">
-    <a [routerLink]="['/home']">
-      <img src="../../assets/gnomex_logo_hdr.png">
-    </a>
-  </span>
-    <span class="top-menu-item lookup">
-    <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
-                    [floatPlaceholder]="options.value.floatPlaceholder">
-      <input matInput type="text" [(ngModel)]="objNumber"  placeholder="Lookup by #">
-    </mat-form-field>
-    <button (click)="searchNumber()">
-      <img src="../../assets/arrow_right.png">
-    </button>
-    <mat-form-field floatPlaceholder='auto'>
-      <input matInput [(ngModel)]="searchText"  placeholder="Search">
-    </mat-form-field>
-    <button (click)="searchByText()">
-      <img src="../../assets/magnifier.png">
-    </button>
-  </span>
+    <span class="top-menu-item">
+      <a [routerLink]="['/home']">
+        <img src="../../assets/gnomex_logo_hdr.png">
+      </a>
+    </span>
+    <span class="top-menu-item lookup horizontal-center">
+      <div class="inline-block horizontal-padding">
+        <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
+                        [floatPlaceholder]="options.value.floatPlaceholder">
+          <input matInput type="text" [(ngModel)]="objNumber"  placeholder="Lookup by #">
+        </mat-form-field>
+        <button (click)="searchNumber()">
+          <img src="../../assets/arrow_right.png">
+        </button>
+      </div>
+      <div class="inline-block horizontal-padding">
+        <mat-form-field floatPlaceholder='auto'>
+          <input matInput [(ngModel)]="searchText"  placeholder="Search">
+        </mat-form-field>
+        <button (click)="searchByText()">
+          <img src="../../assets/magnifier.png">
+        </button>
+      </div>
+    </span>
     <span class="links-menu">
-    <span class="top-menu-item" *ngFor="let item of linkNavItems">
-      <!-- Handle branch node buttons here -->
-      <span *ngIf="item.children && item.children.length > 0">
-        <button [ngClass]="item.class" mat-button [matMenuTriggerFor]="menu.childMenu"
-                [disabled]="item.disabled">
-          <img *ngIf="item.iconName" src="{{item.iconName}}">
-          <span> {{item.displayName}} </span>
-        </button>
-        <app-menu-item #menu [items]="item.children"></app-menu-item>
-      </span>
-      <!-- Leaf node buttons here -->
-      <span *ngIf="!item.children || item.children.length === 0">
-        <button [ngClass]="item.class" mat-button [routerLink]="item.route">
-          <img *ngIf="item.iconName" src="{{item.iconName}}">
-          <span>{{item.displayName}}</span>
-        </button>
+      <span class="top-menu-item" *ngFor="let item of linkNavItems">
+        <!-- Handle branch node buttons here -->
+        <span *ngIf="item.children && item.children.length > 0">
+          <button mat-button
+                  [ngClass]="item.class"
+                  [matMenuTriggerFor]="menu.childMenu"
+                  [disabled]="item.disabled">
+            <img *ngIf="item.iconName" src="{{item.iconName}}">
+            <span> {{item.displayName}} </span>
+          </button>
+          <app-menu-item #menu [items]="item.children"></app-menu-item>
+        </span>
+        <!-- Leaf node buttons here -->
+        <span *ngIf="!item.children || item.children.length === 0">
+          <button [ngClass]="item.class" mat-button [routerLink]="item.route">
+            <img *ngIf="item.iconName" src="{{item.iconName}}">
+            <span>{{item.displayName}}</span>
+          </button>
+        </span>
       </span>
     </span>
-  </span>
     <mat-list></mat-list>
   </mat-toolbar-row>
   <mat-toolbar-row class="header-two">
     <span [ngClass]="item.class" *ngFor="let item of navItems">
       <!-- Handle branch node buttons here -->
       <span *ngIf="item.children && item.children.length > 0">
-        <button mat-button class="top-menu-item" [hidden]="item.hidden" [matMenuTriggerFor]="menu.childMenu"
+        <button mat-button
+                class="top-menu-item full-height full-width"
+                [hidden]="item.hidden"
+                [matMenuTriggerFor]="menu.childMenu"
                 [disabled]="item.disabled">
           <img *ngIf="item.iconName" src="{{item.iconName}}">
           <span> {{item.displayName}} </span>
@@ -55,7 +64,7 @@
       </span>
       <!-- Leaf node buttons here -->
       <span *ngIf="!item.children || item.children.length === 0">
-        <button mat-button class="top-menu-item" [hidden]="item.hidden" [routerLink]="item.route">
+        <button mat-button class="top-menu-item full-height full-width" [hidden]="item.hidden" [routerLink]="item.route">
           <img *ngIf="item.iconName" src="{{item.iconName}}">
           <span>{{item.displayName}}</span>
         </button>

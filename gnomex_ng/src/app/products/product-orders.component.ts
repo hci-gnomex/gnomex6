@@ -57,6 +57,9 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
         .italics {
             font-style: italic;
         }
+        
+        .overflow    { overflow: auto;   }
+        .no-overflow { overflow: hidden; }
     `]
 })
 

@@ -1,38 +1,41 @@
-<div class="flex-container-col full-height padded">
-    <div class="flex-container-row justify-space-between padded align-center border flex-two">
-        <form class="flex-container-row align-center" [formGroup]="this.filterForm">
-            <label class="margin-right reduced-font"><img src="../../assets/basket.png" class="icon">Product Orders</label>
-            <div class="filter-col margin-right">
-                <mat-form-field class="reduced-font">
-                    <mat-select placeholder="Lab" [formControlName]="'lab'">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let lab of this.filterLabList" [value]="lab.idLab">{{lab.name}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="reduced-font">
-                    <mat-select placeholder="Core Facility" [formControlName]="'coreFacility'">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let core of this.filterCoreFacilityList" [value]="core.idCoreFacility">{{core.display}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <div class="filter-col margin-right">
-                <mat-form-field class="reduced-font">
-                    <mat-select placeholder="Status" [formControlName]="'status'">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let status of this.filterStatusList" [value]="status.codeProductOrderStatus">{{status.productOrderStatus}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="reduced-font">
-                    <mat-select placeholder="Product Type" [formControlName]="'productType'">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let pt of this.filterProductTypeList" [value]="pt.idProductType">{{pt.description}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <date-range-filter (onChange)="this.dateRangeChange($event)"></date-range-filter>
-        </form>
+<div class="flex-container-col full-height padded no-overflow">
+    <div class="flex-container-row justify-space-between padded align-center border flex-two overflow">
         <div>
+            <form class="flex-container-row align-center" [formGroup]="this.filterForm">
+                <label class="margin-right reduced-font"><img src="../../assets/basket.png" class="icon">Product Orders</label>
+                <div class="filter-col margin-right">
+                    <mat-form-field class="reduced-font">
+                        <mat-select placeholder="Lab" [formControlName]="'lab'">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let lab of this.filterLabList" [value]="lab.idLab">{{lab.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="reduced-font">
+                        <mat-select placeholder="Core Facility" [formControlName]="'coreFacility'">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let core of this.filterCoreFacilityList" [value]="core.idCoreFacility">{{core.display}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="filter-col margin-right">
+                    <mat-form-field class="reduced-font">
+                        <mat-select placeholder="Status" [formControlName]="'status'">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let status of this.filterStatusList" [value]="status.codeProductOrderStatus">{{status.productOrderStatus}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="reduced-font">
+                        <mat-select placeholder="Product Type" [formControlName]="'productType'">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let pt of this.filterProductTypeList" [value]="pt.idProductType">{{pt.description}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <date-range-filter (onChange)="this.dateRangeChange($event)"></date-range-filter>
+            </form>
+        </div>
+        <div>
+            <!-- For some reason, the filter div keeps getting a disabled scrollbar when the "Overview" toggle is selected... -->
             <mat-button-toggle-group [(ngModel)]="this.displayMode" class="reduced-font">
                 <mat-button-toggle value="{{this.DISPLAY_DETAIL}}">Detail</mat-button-toggle>
                 <mat-button-toggle value="{{this.DISPLAY_OVERVIEW}}">Overview</mat-button-toggle>

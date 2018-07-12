@@ -147,11 +147,11 @@ import {GnomexService} from "../services/gnomex.service";
             flex-direction: column;
         }
         .experiment-detail-panel {
-            height:98%;
-            width:100%;
+            height: 100%;
+            width:  100%;
+            
             border: #C8C8C8 solid thin;
             padding: 1em;
-            
         }
         .exp-overview-item {
             flex: 1 1 auto;

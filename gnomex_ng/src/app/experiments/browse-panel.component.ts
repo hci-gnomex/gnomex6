@@ -9,7 +9,7 @@ import {ExperimentsService} from "./experiments.service";
 @Component({
     selector: 'browse-panel',
     template: `        
-        <div style="height: calc(100% - 2em);">
+        <div class="full-height full-width">
             <router-outlet name="browsePanel"></router-outlet>
         </div>
 `
