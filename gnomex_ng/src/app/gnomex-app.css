@@ -177,6 +177,9 @@ div.mainnav {
 img.icon {
   margin-right: 0.5em;
 }
+.ellipsis {
+  text-overflow: ellipsis;
+}
 
 /******************************/
 /**** Primary Nav / Header ****/

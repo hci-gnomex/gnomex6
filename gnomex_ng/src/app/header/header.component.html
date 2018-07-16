@@ -49,9 +49,9 @@
     <mat-list></mat-list>
   </mat-toolbar-row>
   <mat-toolbar-row class="header-two">
-    <span [ngClass]="item.class" *ngFor="let item of navItems">
+    <span *ngFor="let item of navItems" class="full-height" [ngClass]="item.class" >
       <!-- Handle branch node buttons here -->
-      <span *ngIf="item.children && item.children.length > 0">
+      <span *ngIf="item.children && item.children.length > 0" class="full-height">
         <button mat-button
                 class="top-menu-item full-height full-width"
                 [hidden]="item.hidden"
@@ -63,7 +63,7 @@
         <app-menu-item #menu [items]="item.children"></app-menu-item>
       </span>
       <!-- Leaf node buttons here -->
-      <span *ngIf="!item.children || item.children.length === 0">
+      <span *ngIf="!item.children || item.children.length === 0" class="full-height">
         <button mat-button class="top-menu-item full-height full-width" [hidden]="item.hidden" [routerLink]="item.route">
           <img *ngIf="item.iconName" src="{{item.iconName}}">
           <span>{{item.displayName}}</span>

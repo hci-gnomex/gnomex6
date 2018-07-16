@@ -1,60 +1,75 @@
-<div class="background">
-    <div class="flex-column-container">
-        <div style="flex-grow: .01;" class="br-exp-item br-exp-one">
-            <div style="margin-bottom: 0.3em;">
-                <browse-filter [label]="'Analysis'" [iconSource]="'assets/flask.png'"
-                               [mode]="'analysisBrowse'"></browse-filter>
-            </div>
+<div class="full-width full-height flex-container-col background major-border padded">
+    <div class="full-width full-height flex-container-col foreground">
+        <div class="full-width">
+            <browse-filter [label]="'Analysis'"
+                           [iconSource]="'assets/flask.png'"
+                           [mode]="'analysisBrowse'">
+            </browse-filter>
         </div>
-
-        <div style="flex:1;"class="flex-row-container">
+        <div class="full-width vertical-spacer background"></div>
+        <div class="full-width flex-container-row flex-grow">
             <split>
                 <split-area size="20">
-                    <div class="br-exp-item" style="height:100%"> <!-- start tree container -->
-                        <div class="flex-column-container" style="height:100%;">
-                            <div class="br-exp-item br-exp-help-drag-drop">
-                                <div class="flex-row-container">
-                                    <div class="br-exp-item-row-one" style="position: relative;top: .65em; left: .25em ">
-                                        {{analysisCount}} analysis
-                                    </div>
-                                    <div class="br-exp-item-row-two" style="left: 1.5em">
-                                        <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"><img src="../../assets/information.png">Drag-and-drop hint</button>
-                                    </div>
-                                </div>
+                    <div class="full-width full-height foreground border flex-container-col"> <!-- start tree container -->
+                        <div class="full-width flex-container-row align-center padded">
+                            <div class="flex-grow major-left-right-padded no-word-wrap">
+                                {{ "" + analysisCount + " " + ((analysisCount && analysisCount != 1) ? 'analyses' : 'analysis')}}
                             </div>
-                            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-                            <div class="br-exp-item br-exp-three">
-                                <tree-root #analysisTree (moveNode)="onMoveNode($event)"
+                            <div>
+                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()">
+                                    <img src="../../assets/information.png">
+                                    Drag-and-drop hint
+                                </button>
+                            </div>
+                        </div>
+                        <div class="full-width flex-grow left-right-padded no-overflow">
+                            <div class="full-width full-height border">
+                                <tree-root #analysisTree
+                                           [nodes]="items"
+                                           [options]="options"
                                            (activate)="treeOnSelect($event)"
-                                           (updateData)="treeUpdateData($event)"
-                                           [nodes]="items" [options]="options">
+                                           (moveNode)="onMoveNode($event)"
+                                           (updateData)="treeUpdateData($event)">
                                     <ng-template #treeNodeTemplate let-node let-index="index">
-                                        <img src="{{node.data.icon}}" height="16" width="16">
-                                        <span>{{ node.data.label }}</span>
+                                        <div class="full-width no-word-wrap">
+                                            <img src="{{node.data.icon}}" alt="" height="16" width="16">
+                                            <span>{{ node.data.label }}</span>
+                                        </div>
                                     </ng-template>
                                     <ng-template #loadingTemplate></ng-template>
                                 </tree-root>
                             </div>
-                            <div class="br-exp-item br-exp-four">
-                                <div class="flex-row-container">
-                                    <div class="br-exp-item-row-one" style="position: relative; top: 1em">
-                                        <button mat-button [disabled]="disableNewAnalysis" (click)="createAnalysisClicked()"><img src="../../assets/map.png">New Analysis</button>
+                        </div>
+                        <div class="full-width padded">
+                            <div class="t">
+                                <div class="tr">
+                                    <div class="td">
+                                        <button mat-button [disabled]="disableNewAnalysis" (click)="createAnalysisClicked()">
+                                            <img src="../../assets/map.png" alt="">
+                                            New Analysis
+                                        </button>
                                     </div>
-                                    <div class="br-exp-item-row-two" style="position: relative; top: 1em">
-                                        <button mat-button [disabled]="disableDelete" (click)="deleteAnalysisClicked()"><img src="../../assets/delete.png">Delete</button>
+                                    <div class="td">
+                                        <button mat-button [disabled]="disableDelete" (click)="deleteAnalysisClicked()">
+                                            <img src="../../assets/delete.png" alt="">
+                                            Delete
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="br-exp-item br-exp-five">
-                                <div class="br-exp-item-row-two">
-                                    <button mat-button [disabled]="disableNewAnalysisGroup" (click)="createAnalysisGroupClicked()"><img src="../../assets/folder_add.png">New analysis group</button>
+                                <div class="tr">
+                                    <div class="td">
+                                        <button mat-button [disabled]="disableNewAnalysisGroup" (click)="createAnalysisGroupClicked()">
+                                            <img src="../../assets/folder_add.png">
+                                            New analysis group
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div> <!-- end tree container -->
                 </split-area>
                 <split-area size="80">
-                    <div  class="br-anal-item analysis-panel ">
+                    <div class="full-width full-height border padded">
                         <analysis-panel></analysis-panel>
                     </div>
                 </split-area>
