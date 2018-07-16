@@ -11,7 +11,6 @@ import {DialogsModule} from "../util/popup/dialogs.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {UtilModule} from "../util/util.module";
 import {WORKFLOW_ROUTING} from "./workflow.routes";
-import {GnomexStyledGridModule} from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import {QcWorkflowComponent} from "./qc-workflow.component";
 import { AgGridModule } from 'ag-grid-angular/main';
 import { AgGridEditorModule } from "../util/grid-editors/ag-grid-editor.module";
@@ -76,7 +75,6 @@ import { TreeModule } from "angular-tree-component";
         WORKFLOW_ROUTING,
         CommonModule,
         FormsModule,
-        GnomexStyledGridModule,
         ServicesModule,
         UtilModule,
         ReactiveFormsModule,

@@ -8,13 +8,30 @@ import {DictionaryService} from "../../services/dictionary.service";
 @Component({
 
     template: `
-        <div >
-            <img [src]="iconSource" alt=""/> {{text}}
+        <div class="full-width full-height">
+            <div class="t full-width full-height fix-table">
+                <div class="tr">
+                    <div class="td vertical-align ellipsis">
+                        <img [src]="iconSource" alt=""/> {{text}}
+                    </div>
+                </div>
+            </div>
         </div>
     
     `,
     styles: [`
+        .t  { display: table;      }
+        .tr { display: table-row;  }
+        .td { display: table-cell; }
         
+        .vertical-align { vertical-align: middle; }
+        
+        .fix-table { table-layout:fixed; }
+        
+        .ellipsis {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     `]
 })
 export class IconTextRendererComponent implements ICellRendererAngularComp, AfterViewInit, OnInit {

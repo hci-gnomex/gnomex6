@@ -6,28 +6,25 @@ import { NgModule } 		from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } 	from "@angular/forms";
 
-import { ButtonModule } 	from "../../../modules/button.module";
-import { InputModule }    from "../../../modules/input.module";
-import { TextAreaModule } from "../../../modules/textarea.module";
-import { WindowModule }		from "../../../modules/window.module";
+import { AngularMaterialModule } from "../../../modules/angular-material.module";
 
 import { EmailRelatedUsersPopupComponent } from "./email-related-users-popup.component";
 import { EmailRelatedUsersService } 			 from "./email-related-users.service";
 
 @NgModule({
 	imports: [
-		ButtonModule,
+        AngularMaterialModule,
 		CommonModule,
-		FormsModule,
-		InputModule,
-		TextAreaModule,
-		WindowModule
+		FormsModule
 	],
 	declarations: [
 		EmailRelatedUsersPopupComponent
 	],
 	exports: [
 		EmailRelatedUsersPopupComponent
+	],
+	entryComponents: [
+        EmailRelatedUsersPopupComponent
 	],
 	providers: [
 		EmailRelatedUsersService
