@@ -139,6 +139,8 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
     public linkNavItems: any[] = [];
     private authSubscription: Subscription;
 
+    private headerHeight: number = 0;
+
     /**
      * Initialize
      */
@@ -157,29 +159,29 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
     }
 
     ngAfterViewChecked() {
-        if (this.spacerRef
-            && this.spacerRef.nativeElement
-            && this.spacerRef.nativeElement.style
-            && this.headerRef
-            && this.headerRef._elementRef
-            && this.headerRef._elementRef.nativeElement) {
-
-            this.spacerRef.nativeElement.style.height = 'initial';
-            this.spacerRef.nativeElement.style.height = '' + this.headerRef._elementRef.nativeElement.offsetHeight + 'px';
-        }
+        this.resizeHeaderSpacing();
     }
 
     @HostListener('window:resize')
     onResize() {
+        this.resizeHeaderSpacing();
+    }
+
+    private resizeHeaderSpacing(): void {
         if (this.spacerRef
             && this.spacerRef.nativeElement
             && this.spacerRef.nativeElement.style
             && this.headerRef
             && this.headerRef._elementRef
-            && this.headerRef._elementRef.nativeElement) {
+            && this.headerRef._elementRef.nativeElement
+            && this.headerRef._elementRef.nativeElement.offsetHeight
+            && this.headerRef._elementRef.nativeElement.offsetHeight > 0
+            && this.headerRef._elementRef.nativeElement.offsetHeight != this.headerHeight) {
+
+            this.headerHeight = this.headerRef._elementRef.nativeElement.offsetHeight;
 
             this.spacerRef.nativeElement.style.height = 'initial';
-            this.spacerRef.nativeElement.style.height = '' + this.headerRef._elementRef.nativeElement.offsetHeight + 'px';
+            this.spacerRef.nativeElement.style.height = '' + Math.ceil(this.headerHeight) + 'px';
         }
     }
 

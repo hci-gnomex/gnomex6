@@ -1,145 +1,149 @@
-<div class="flex-container-col full-height padded no-overflow">
-    <div class="flex-container-row justify-space-between padded align-center border flex-two overflow">
-        <div>
-            <form class="flex-container-row align-center" [formGroup]="this.filterForm">
-                <label class="margin-right reduced-font"><img src="../../assets/basket.png" class="icon">Product Orders</label>
-                <div class="filter-col margin-right">
-                    <mat-form-field class="reduced-font">
-                        <mat-select placeholder="Lab" [formControlName]="'lab'">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let lab of this.filterLabList" [value]="lab.idLab">{{lab.name}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <mat-form-field class="reduced-font">
-                        <mat-select placeholder="Core Facility" [formControlName]="'coreFacility'">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let core of this.filterCoreFacilityList" [value]="core.idCoreFacility">{{core.display}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+<div class="full-width full-height padded">
+    <div class="flex-container-col full-width full-height">
+        <div class="flex-container-row full-width align-center padded border">
+            <div class="full-height">
+                <form class="flex-container-row align-center" [formGroup]="this.filterForm">
+                    <label class="margin-right reduced-font"><img src="../../assets/basket.png" class="icon">Product Orders</label>
+                    <div class="filter-col margin-right">
+                        <mat-form-field class="reduced-font">
+                            <mat-select placeholder="Lab" [formControlName]="'lab'">
+                                <mat-option>None</mat-option>
+                                <mat-option *ngFor="let lab of this.filterLabList" [value]="lab.idLab">{{lab.name}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field class="reduced-font">
+                            <mat-select placeholder="Core Facility" [formControlName]="'coreFacility'">
+                                <mat-option>None</mat-option>
+                                <mat-option *ngFor="let core of this.filterCoreFacilityList" [value]="core.idCoreFacility">{{core.display}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="filter-col margin-right">
+                        <mat-form-field class="reduced-font">
+                            <mat-select placeholder="Status" [formControlName]="'status'">
+                                <mat-option>None</mat-option>
+                                <mat-option *ngFor="let status of this.filterStatusList" [value]="status.codeProductOrderStatus">{{status.productOrderStatus}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field class="reduced-font">
+                            <mat-select placeholder="Product Type" [formControlName]="'productType'">
+                                <mat-option>None</mat-option>
+                                <mat-option *ngFor="let pt of this.filterProductTypeList" [value]="pt.idProductType">{{pt.description}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <date-range-filter (onChange)="this.dateRangeChange($event)"></date-range-filter>
+                </form>
+            </div>
+            <div class="full-height flex-grow right-align">
+                <!-- For some reason, the filter div keeps getting a disabled scrollbar when the "Overview" toggle is selected... -->
+                <mat-button-toggle-group [(ngModel)]="this.displayMode" class="reduced-font">
+                    <mat-button-toggle value="{{this.DISPLAY_DETAIL}}">Detail</mat-button-toggle>
+                    <mat-button-toggle value="{{this.DISPLAY_OVERVIEW}}">Overview</mat-button-toggle>
+                </mat-button-toggle-group>
+            </div>
+        </div>
+        <div class="flex-container-row flex-ten padding-top" *ngIf="!(this.displayMode !== this.DISPLAY_DETAIL)">
+            <div class="full-height flex-one border">
+                <tree-root #tree [nodes]="this.productOrderList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)">
+                    <ng-template #treeNodeTemplate  let-node>
+                        <img src="{{node?.data?.icon}}" class="icon">
+                        <span>{{ node?.data?.display }}</span>
+                    </ng-template>
+                </tree-root>
+            </div>
+            <div class="full-height flex-three padded">
+                <div class="full-height flex-container-col" *ngIf="!(this.detailDisplayMode !== this.DETAIL_LAB_MODE)">
+                    <div class="flex-one">
+                        <label *ngIf="this.selectedTreeNode">Product Orders for {{this.selectedTreeNode.data.display}}</label>
+                    </div>
+                    <div class="flex-thirteen">
+                        <ag-grid-angular class="ag-fresh full-height full-width"
+                                         (gridReady)="this.onLabGridReady($event)"
+                                         (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                         [rowData]="this.labLineItems">
+                        </ag-grid-angular>
+                    </div>
                 </div>
-                <div class="filter-col margin-right">
-                    <mat-form-field class="reduced-font">
-                        <mat-select placeholder="Status" [formControlName]="'status'">
+                <div class="full-height" *ngIf="!(this.detailDisplayMode !== this.DETAIL_ORDER_MODE)">
+                    <mat-tab-group class="full-height">
+                        <mat-tab label="Product Order Info">
+                            <label *ngIf="this.currentProductOrder"><img src="../../assets/review.png" class="icon">Product Order {{this.currentProductOrder.productOrderNumber}}</label>
+                            <table *ngIf="this.currentProductOrder" class="half-width">
+                                <tr>
+                                    <td class="italics">Submitter</td>
+                                    <td>{{this.currentProductOrder.submitter}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="italics">Lab</td>
+                                    <td>{{this.currentProductOrder.labName}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="italics">Submit Date</td>
+                                    <td>{{this.currentProductOrder.submitDate}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="italics">Order Status</td>
+                                    <td>{{this.currentProductOrder.orderStatus}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="italics">Billing Account</td>
+                                    <td>{{this.currentProductOrder.billingAccount}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="italics">Quote Number</td>
+                                    <td>{{this.currentProductOrder.quoteNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="italics">Quote Received</td>
+                                    <td>{{this.currentProductOrder.quoteReceivedDate}}</td>
+                                </tr>
+                            </table>
+                        </mat-tab>
+                        <mat-tab label="Line Items">
+                            <div class="full-height full-width padded">
+                                <ag-grid-angular class="ag-fresh full-height full-width"
+                                                 (gridReady)="this.onProductOrderGridReady($event)"
+                                                 (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                                 [rowData]="this.productOrderLineItems">
+                                </ag-grid-angular>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Files">
+                            Files Placeholder
+                        </mat-tab>
+                    </mat-tab-group>
+                </div>
+            </div>
+        </div>
+        <div class="flex-grow padding-top" *ngIf="!(this.displayMode !== this.DISPLAY_OVERVIEW)">
+            <ag-grid-angular class="ag-fresh full-height full-width"
+                             (gridReady)="this.onOverviewGridReady($event)"
+                             (gridSizeChanged)="this.onGridSizeChanged($event)"
+                             (selectionChanged)="this.onOverviewGridSelectionChanged($event)"
+                             [rowSelection]="'multiple'"
+                             [suppressRowClickSelection]="true"
+                             [rowData]="this.productOrderLineItemList">
+            </ag-grid-angular>
+        </div>
+        <div class="full-width">
+            <div class="flex-container-row padding-top justify-space-between align-center">
+                <div class="align-center">
+                    <label class="margin-right" *ngIf="!(this.displayMode !== this.DISPLAY_OVERVIEW)">{{this.changeProductOrders.length}} selected</label>
+                    <mat-form-field class="reduced-font margin-right">
+                        <mat-select placeholder="Change Status" [(ngModel)]="this.changeStatus">
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let status of this.filterStatusList" [value]="status.codeProductOrderStatus">{{status.productOrderStatus}}</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field class="reduced-font">
-                        <mat-select placeholder="Product Type" [formControlName]="'productType'">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let pt of this.filterProductTypeList" [value]="pt.idProductType">{{pt.description}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <button mat-button class="margin-right" color="primary"
+                            [disabled]="!this.changeStatus || !this.changeProductOrders || this.changeProductOrders.length < 1"
+                            (click)="this.promptToSave()"><img class="icon" src="../../assets/bullet_go.png">Go</button>
+                    <button mat-button color="warn" [disabled]="!this.changeProductOrders || this.changeProductOrders.length < 1"
+                            (click)="this.promptToDelete()"><img class="icon" src="../../assets/delete.png">Delete</button>
                 </div>
-                <date-range-filter (onChange)="this.dateRangeChange($event)"></date-range-filter>
-            </form>
-        </div>
-        <div>
-            <!-- For some reason, the filter div keeps getting a disabled scrollbar when the "Overview" toggle is selected... -->
-            <mat-button-toggle-group [(ngModel)]="this.displayMode" class="reduced-font">
-                <mat-button-toggle value="{{this.DISPLAY_DETAIL}}">Detail</mat-button-toggle>
-                <mat-button-toggle value="{{this.DISPLAY_OVERVIEW}}">Overview</mat-button-toggle>
-            </mat-button-toggle-group>
-        </div>
-    </div>
-    <div class="flex-container-row flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_DETAIL">
-        <div class="full-height flex-one border">
-            <tree-root #tree [nodes]="this.productOrderList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)">
-                <ng-template #treeNodeTemplate  let-node>
-                    <img src="{{node?.data?.icon}}" class="icon">
-                    <span>{{ node?.data?.display }}</span>
-                </ng-template>
-            </tree-root>
-        </div>
-        <div class="full-height flex-three padded">
-            <div class="full-height flex-container-col" [hidden]="this.detailDisplayMode !== this.DETAIL_LAB_MODE">
-                <div class="flex-one">
-                    <label *ngIf="this.selectedTreeNode">Product Orders for {{this.selectedTreeNode.data.display}}</label>
-                </div>
-                <div class="flex-thirteen">
-                    <ag-grid-angular class="ag-fresh full-height full-width"
-                                     (gridReady)="this.onLabGridReady($event)"
-                                     (gridSizeChanged)="this.onGridSizeChanged($event)"
-                                     [rowData]="this.labLineItems">
-                    </ag-grid-angular>
-                </div>
-            </div>
-            <div class="full-height" [hidden]="this.detailDisplayMode !== this.DETAIL_ORDER_MODE">
-                <mat-tab-group class="full-height">
-                    <mat-tab label="Product Order Info">
-                        <label *ngIf="this.currentProductOrder"><img src="../../assets/review.png" class="icon">Product Order {{this.currentProductOrder.productOrderNumber}}</label>
-                        <table *ngIf="this.currentProductOrder" class="half-width">
-                            <tr>
-                                <td class="italics">Submitter</td>
-                                <td>{{this.currentProductOrder.submitter}}</td>
-                            </tr>
-                            <tr>
-                                <td class="italics">Lab</td>
-                                <td>{{this.currentProductOrder.labName}}</td>
-                            </tr>
-                            <tr>
-                                <td class="italics">Submit Date</td>
-                                <td>{{this.currentProductOrder.submitDate}}</td>
-                            </tr>
-                            <tr>
-                                <td class="italics">Order Status</td>
-                                <td>{{this.currentProductOrder.orderStatus}}</td>
-                            </tr>
-                            <tr>
-                                <td class="italics">Billing Account</td>
-                                <td>{{this.currentProductOrder.billingAccount}}</td>
-                            </tr>
-                            <tr>
-                                <td class="italics">Quote Number</td>
-                                <td>{{this.currentProductOrder.quoteNumber}}</td>
-                            </tr>
-                            <tr>
-                                <td class="italics">Quote Received</td>
-                                <td>{{this.currentProductOrder.quoteReceivedDate}}</td>
-                            </tr>
-                        </table>
-                    </mat-tab>
-                    <mat-tab label="Line Items">
-                        <div class="full-height full-width padded">
-                            <ag-grid-angular class="ag-fresh full-height full-width"
-                                             (gridReady)="this.onProductOrderGridReady($event)"
-                                             (gridSizeChanged)="this.onGridSizeChanged($event)"
-                                             [rowData]="this.productOrderLineItems">
-                            </ag-grid-angular>
-                        </div>
-                    </mat-tab>
-                    <mat-tab label="Files">
-                        Files Placeholder
-                    </mat-tab>
-                </mat-tab-group>
+                <label [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">({{this.productOrderLineItemList.length}} line items)</label>
             </div>
         </div>
-    </div>
-    <div class="flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">
-        <ag-grid-angular class="ag-fresh full-height full-width"
-                         (gridReady)="this.onOverviewGridReady($event)"
-                         (gridSizeChanged)="this.onGridSizeChanged($event)"
-                         (selectionChanged)="this.onOverviewGridSelectionChanged($event)"
-                         [rowSelection]="'multiple'"
-                         [suppressRowClickSelection]="true"
-                         [rowData]="this.productOrderLineItemList">
-        </ag-grid-angular>
-    </div>
-    <div class="flex-container-row flex-one padding-top justify-space-between align-center">
-        <div class="align-center">
-            <label class="margin-right" [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">{{this.changeProductOrders.length}} selected</label>
-            <mat-form-field class="reduced-font margin-right">
-                <mat-select placeholder="Change Status" [(ngModel)]="this.changeStatus">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let status of this.filterStatusList" [value]="status.codeProductOrderStatus">{{status.productOrderStatus}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <button mat-button class="margin-right" color="primary"
-                    [disabled]="!this.changeStatus || !this.changeProductOrders || this.changeProductOrders.length < 1"
-                    (click)="this.promptToSave()"><img class="icon" src="../../assets/bullet_go.png">Go</button>
-            <button mat-button color="warn" [disabled]="!this.changeProductOrders || this.changeProductOrders.length < 1"
-                    (click)="this.promptToDelete()"><img class="icon" src="../../assets/delete.png">Delete</button>
-        </div>
-        <label [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">({{this.productOrderLineItemList.length}} line items)</label>
     </div>
 </div>

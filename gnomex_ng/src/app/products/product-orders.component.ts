@@ -58,8 +58,7 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
             font-style: italic;
         }
         
-        .overflow    { overflow: auto;   }
-        .no-overflow { overflow: hidden; }
+        .right-align { text-align: right; }
     `]
 })
 
