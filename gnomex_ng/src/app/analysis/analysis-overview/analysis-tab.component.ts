@@ -3,7 +3,6 @@ import {Component, OnInit, ViewChild,AfterViewInit} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {Subscription} from "rxjs/Subscription";
-import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
@@ -15,7 +14,7 @@ import {AnalysisService} from "../../services/analysis.service";
 import {GnomexStringUtilService} from "../../services/gnomex-string-util.service";
 import {LabListService} from "../../services/lab-list.service";
 import {CreateAnalysisComponent} from "../create-analysis.component";
-import {MatDialogRef, MatDialog} from "@angular/material";
+import {MatDialogRef, MatDialog, MatDialogConfig} from "@angular/material";
 import {DeleteAnalysisComponent} from "../delete-analysis.component";
 import {ConstantsService} from "../../services/constants.service";
 
@@ -78,8 +77,6 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
     public  newSegment:string;
     public  removeSegment:string;
 
-
-
     columnDefs = [
         {
             headerName: "#",
@@ -134,28 +131,22 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
             field: "stripDescription",
             editable: false,
             width: 400
-        },
-
-
+        }
     ];
 
     rowData:Array<any> =[];
 
+    onGridReady(params) { }
 
-
-
-
-    onGridReady(params) {
-    }
-
-
-
-    constructor(protected fb: FormBuilder, private analysisService:AnalysisService,
-                private dictionaryService:DictionaryService, private router:Router,
-                private StrUtil:GnomexStringUtilService,private labListService:LabListService,
-                private dialog: MatDialog,private createSecurityAdvisorService:CreateSecurityAdvisorService,
-                private constService:ConstantsService
-                ) {
+    constructor(protected fb: FormBuilder,
+                private analysisService:AnalysisService,
+                private dictionaryService:DictionaryService,
+                private router:Router,
+                private StrUtil:GnomexStringUtilService,
+                private labListService:LabListService,
+                private dialog: MatDialog,
+                private createSecurityAdvisorService:CreateSecurityAdvisorService,
+                private constService:ConstantsService) {
         super(fb);
     }
 
@@ -167,53 +158,46 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
             this.labList = response;
         });
 
-        this.analysisService.getCreateAnaylsisDataSubject()
-            .subscribe(data =>{
-                this.createAnalysisData = data;
+        this.analysisService.getCreateAnaylsisDataSubject().subscribe(data =>{
+            this.createAnalysisData = data;
+        });
+
+        this.filteredAnalysistOverviewListSubscript = this.analysisService.getFilteredOverviewListObservable().subscribe( data =>{
+            this.rowData = data;
+        });
+
+        this.selectedTreeNodeSubscript = this.analysisService.getAnalysisOverviewListSubject().subscribe(data => {
+            this.enableRemoveAnalysis = false;
+            this.analysisService.analysisList.forEach(aObj => {
+                this.enableCreateAnalysis = true;
+
+                let analysisTypeList = this.dictionaryService.getEntries(DictionaryService.ANALYSIS_TYPE);
+                aObj["analysisType"]= this.findFromId(analysisTypeList,aObj["idAnalysisType"]);
+
+                let analysisProtocolList = this.dictionaryService.getEntries(DictionaryService.ANALYSIS_PROTOCOL);
+                aObj["analysisProtocol"] = this.findFromId(analysisProtocolList,aObj["idAnalysisProtocol"]);
+
+                let organismList = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
+                aObj["organism"] = this.findFromId(organismList,aObj["idOrganism"]);
+                aObj["stripDescription"] = GnomexStringUtilService.stripHTMLText(aObj["description"]);
             });
 
+            this.rowData = this.analysisService.analysisList;
 
-        this.filteredAnalysistOverviewListSubscript = this.analysisService.getFilteredOverviewListObservable()
-            .subscribe( data =>{
-                this.rowData = data;
-            });
-        this.selectedTreeNodeSubscript = this.analysisService.getAnalysisOverviewListSubject()
-            .subscribe(data => {
-                this.enableRemoveAnalysis = false;
-                this.analysisService.analysisList.forEach(aObj => {
-                    this.enableCreateAnalysis = true;
-
-                    let analysisTypeList = this.dictionaryService.getEntries(DictionaryService.ANALYSIS_TYPE);
-                    aObj["analysisType"]= this.findFromId(analysisTypeList,aObj["idAnalysisType"]);
-
-                    let analysisProtocolList = this.dictionaryService.getEntries(DictionaryService.ANALYSIS_PROTOCOL);
-                    aObj["analysisProtocol"] = this.findFromId(analysisProtocolList,aObj["idAnalysisProtocol"]);
-
-                    let organismList = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
-                    aObj["organism"] = this.findFromId(organismList,aObj["idOrganism"]);
-                    aObj["stripDescription"] = GnomexStringUtilService.stripHTMLText(aObj["description"]);
-                });
-                this.rowData = this.analysisService.analysisList;
-                if (this.createAnalysisDialogRef != undefined && this.createAnalysisDialogRef.componentInstance != undefined) {
-                    if (this.createAnalysisDialogRef.componentInstance.showSpinner) {
-                        this.createAnalysisDialogRef.componentInstance.showSpinner = false;
-                    }
-                    this.createAnalysisDialogRef.close();
+            if (this.createAnalysisDialogRef != undefined && this.createAnalysisDialogRef.componentInstance != undefined) {
+                if (this.createAnalysisDialogRef.componentInstance.showSpinner) {
+                    this.createAnalysisDialogRef.componentInstance.showSpinner = false;
                 }
-                if (this.deleteAnalysisDialogRef != undefined && this.deleteAnalysisDialogRef.componentInstance != undefined) {
-                    if (this.deleteAnalysisDialogRef.componentInstance.showSpinner) {
-                        this.deleteAnalysisDialogRef.componentInstance.showSpinner = false;
-                    }
-                    this.deleteAnalysisDialogRef.close();
+                this.createAnalysisDialogRef.close();
+            }
+            if (this.deleteAnalysisDialogRef != undefined && this.deleteAnalysisDialogRef.componentInstance != undefined) {
+                if (this.deleteAnalysisDialogRef.componentInstance.showSpinner) {
+                    this.deleteAnalysisDialogRef.componentInstance.showSpinner = false;
                 }
-
-
-            });
-
+                this.deleteAnalysisDialogRef.close();
+            }
+        });
     }
-
-
-
 
     startEditingCell(event:any){
         //console.log(event)
@@ -225,58 +209,52 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
         }
     }
 
-
-
     forwardToAnalysis(event:any){
-        console.log(event);
+        // console.log(event);
         let rowData = event.data;
-        let analysisNode = this.analysisService.analysisList
-            .find(aObj => aObj.idAnalysis === rowData.idAnalysis);
+        let analysisNode = this.analysisService.analysisList.find(aObj => aObj.idAnalysis === rowData.idAnalysis);
         this.router.navigate(['/analysis',{outlets:{'analysisPanel':[analysisNode.idAnalysis]}}]);
     }
 
-
-
     findFromId(nameList:Array<any>, id:string):string{
-       let nameObj = nameList.find(name => {
+        let nameObj = nameList.find(name => {
             return name["value"] === id
         });
         return nameObj["display"];
     }
-    remove():void{
 
+    remove():void{
         let selectedAnalysisList:Array<any> = this.gridOpt.api.getSelectedRows();
         if (selectedAnalysisList && selectedAnalysisList.length > 0) {
-            this.deleteAnalysisDialogRef = this.dialog.open(DeleteAnalysisComponent, {
-                data: {
-                    idAnalysisGroup: selectedAnalysisList[0].idAnalysisGroup,
-                    nodes: selectedAnalysisList
-                }
-            });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.data = {
+                idAnalysisGroup: selectedAnalysisList[0].idAnalysisGroup,
+                nodes: selectedAnalysisList
+            };
+
+            this.deleteAnalysisDialogRef = this.dialog.open(DeleteAnalysisComponent, configuration);
         }
 
 
     }
-    create():void{
 
+    create():void{
         let items = [];
         let labs = [];
         let selectedIdLab:string = "";
         let selectedLabLabel:string= "";
-        if(this.createAnalysisData){
+
+        if (this.createAnalysisData) {
             items = this.createAnalysisData.items;
             labs = this.createAnalysisData.labs ? this.createAnalysisData.labs : [];
             selectedIdLab = this.analysisService.analysisList[0].idLab;
             selectedLabLabel = this.analysisService.analysisList[0].labName;
-
         }
-
-
-
 
         let labListString = this.labList.map(function (item) {
             return item['name'];
         });
+
         var useThisLabList: any[];
         if (this.createSecurityAdvisorService.isSuperAdmin) {
             useThisLabList = this.labList;
@@ -284,20 +262,21 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
             useThisLabList = labs;
         }
 
-        this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, {
-            data: {
-                labList: useThisLabList,
-                items: items,
-                selectedLab: selectedIdLab,
-                selectedLabLabel: selectedLabLabel
-                //selectedItem: this.selectedItem
-            }
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = {
+            labList: useThisLabList,
+            items: items,
+            selectedLab: selectedIdLab,
+            selectedLabLabel: selectedLabLabel
+            //selectedItem: this.selectedItem
+        };
 
-
+        this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
     }
+
     selectedRow(event:any){
         let selectedRows:Array<any> = this.gridOpt.api.getSelectedRows();
+
         if(selectedRows.length === 0){
             this.enableRemoveAnalysis = false;
             this.removeSegment = this.constService.SEGMENGT_REMOVE_DISABLE;
@@ -305,18 +284,12 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
             this.enableRemoveAnalysis = true;
             this.removeSegment = this.constService.SEGMENGT_REMOVE;
         }
-
-
     }
-
-
-
 
     ngOnDestroy():void{
         this.filteredAnalysistOverviewListSubscript.unsubscribe();
         this.selectedTreeNodeSubscript.unsubscribe();
     }
-
 }
 
 
