@@ -126,6 +126,10 @@ div.mainnav {
   font-style: italic !important;
   color: #647478 !important;
 }
+.ag-fresh .otherBillingItem {
+  font-style: italic !important;
+  color: grey !important;
+}
 .ag-fresh .workFlowOnColor {
   background-color: #f1eed6 !important;
 }
