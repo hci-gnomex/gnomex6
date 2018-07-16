@@ -35,8 +35,41 @@
                 </mat-tab>
             </mat-tab-group>
         </div>
-        <div class="full-height padding flex-seven">
-            Billing Item Grid Placeholder
+        <div class="full-height padding flex-seven flex-container-col">
+            <div class="flex-container-row justify-space-between align-center flex-one">
+                <label>Billing Items {{this.billingItemGridLabel}}</label>
+                <mat-checkbox [(ngModel)]="this.showRelatedCharges" (change)="this.onShowRelatedChargesChange($event)"
+                              matTooltip="When a request has billing items spanning multiple billing periods or split with other accounts, show the related charges">Show Related Charges</mat-checkbox>
+            </div>
+            <div class="flex-container-row align-center flex-one justify-space-between">
+                <label>{{this.invoiceLabel}}</label>
+                <div class="flex-container-row">
+                    <button mat-button>Move to next billing period</button>
+                    <mat-form-field matTooltip="This will update the status for all the selected items. If no items are selected, all of the displayed items' statuses will update">
+                        <mat-select placeholder="Change Status">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let status of this.statusListShort" [value]="status">{{status.display}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="flex-ten">
+                <ag-grid-angular class="ag-fresh full-height full-width"
+                                 (gridReady)="this.onBillingItemGridReady($event)"
+                                 (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                 [getNodeChildDetails]="this.getBillingItemNodeChildDetails"
+                                 [singleClickEdit]="true"
+                                 [rowClassRules]="this.billingItemGridRowClassRules"
+                                 [rowData]="this.billingItemGridData">
+                </ag-grid-angular>
+            </div>
+            <div class="flex-container-row align-center flex-one justify-space-between">
+                <div>
+                    <button mat-button color="accent" mat-button><img src="../../assets/account_split.png" class="icon">Reassign/Split</button>
+                    <button mat-button color="warn" mat-button><img src="../../assets/delete.png" class="icon">Remove</button>
+                </div>
+                <button mat-button color="primary" mat-button><img src="../../assets/action_save.gif" class="icon">Save</button>
+            </div>
         </div>
     </div>
 </div>

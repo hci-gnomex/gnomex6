@@ -11,6 +11,11 @@ import {UtilModule} from "../util/util.module";
 import {BILLING_ROUTING} from "./billing.routes";
 import {BillingFilterComponent} from "./billing-filter.component";
 import {NavBillingComponent} from "./nav-billing.component";
+import {DateEditor} from "../util/grid-editors/date.editor";
+import {DateRenderer} from "../util/grid-renderers/date.renderer";
+import {SelectEditor} from "../util/grid-editors/select.editor";
+import {SelectRenderer} from "../util/grid-renderers/select.renderer";
+import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 
 @NgModule({
     imports: [
@@ -20,7 +25,13 @@ import {NavBillingComponent} from "./nav-billing.component";
         AngularMaterialModule,
         ServicesModule,
         TreeModule,
-        AgGridModule.withComponents([]),
+        AgGridModule.withComponents([
+            DateEditor,
+            DateRenderer,
+            SelectEditor,
+            SelectRenderer,
+            IconTextRendererComponent
+        ]),
         UtilModule,
         ReactiveFormsModule,
     ],
