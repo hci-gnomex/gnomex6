@@ -18,73 +18,68 @@ import {AnalysisVisibleTabComponent} from "./analysis-visible-tab.component";
 
 @Component({
     template: `
-        <div class="flexbox-column">
-            <div class="flex-container">
-
-                <div >
-                    {{ this.analysisService.analysisList.length + " Analyses"}}
+        <div class="full-width full-height">
+            <div class="full-width full-height flex-container-col">
+                <div class="full-width flex-container-row align-center">
+                    <div class="flex-grow padded">
+                        {{ this.analysisService.analysisList.length + ((this.analysisService.analysisList.length != 1) ? " Analyses" : " Analysis")}}
+                    </div>
+                    <div class="flex-container-row align-center right-padding">
+                        <div class="padded">Analysis #</div>
+                        <jqxComboBox class="no-top-margin"
+                                     [width]="170"
+                                     [height]="20"
+                                     [source]="orderedAnalysisIds"
+                                     (onSelect)="onIDSelect($event)" 
+                                     (onUnselect)="onUnselectID($event)">
+                        </jqxComboBox>
+                    </div>
                 </div>
-                <div style="display:flex;" >
-                    <label>Experiment #</label>
-                    <jqxComboBox  class="inlineComboBox"
-                                  [width]="170"
-                                  [height]="20"
-                                  [source]="orderedAnalysisIds"
-                                  (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
-                    </jqxComboBox>
+                <div class="full-width vertical-spacer"></div>
+                <div class="full-width flex-grow">
+                    <mat-tab-group class="full-height full-width border" (selectedTabChange)="tabChanged($event)">
+                        <mat-tab class="full-height full-width" label="Analysis">
+                            <analysis-tab></analysis-tab>
+                        </mat-tab>
+                        <mat-tab class="full-height full-width" label="Visibility">
+                            <analysis-visiblity-tab (saveSuccess)="saveVis()" ></analysis-visiblity-tab>
+                        </mat-tab>
+                        <mat-tab *ngIf="this.analysisGroup" class="full-height full-width" label="Analysis Group">
+                            <analysis-group-tab (saveSuccess)="saveGroup()"></analysis-group-tab>
+                        </mat-tab>
+                    </mat-tab-group>
                 </div>
-
-
+                <div class="full-width">
+                    <save-footer (saveClicked)="saveManager()"
+                                 [dirty]="this.analysisService.dirty"
+                                 [showSpinner]="this.showSpinner"
+                                 [disableSave]="this.analysisService.invalid || this.noSave">
+                    </save-footer>
+                </div>
             </div>
-
-            <div style="flex:10; width:100%">
-                <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
-                    <mat-tab style="height:100%" label="Analysis">
-                       <analysis-tab></analysis-tab> 
-                    </mat-tab>
-                    <mat-tab style="height:100%" label="Visibility">
-                        <analysis-visiblity-tab (saveSuccess)="saveVis()" ></analysis-visiblity-tab>
-                    </mat-tab>
-                    <mat-tab *ngIf="this.analysisGroup" style="height:100%;" label="Analysis Group">
-                        <analysis-group-tab (saveSuccess)="saveGroup()"></analysis-group-tab>
-                    </mat-tab>
-                </mat-tab-group>
-                
-            </div>
-            
-            <save-footer (saveClicked)="saveManager()"
-                         [dirty]="this.analysisService.dirty"
-                         [showSpinner]="this.showSpinner"
-                         [disableSave]="this.analysisService.invalid || this.noSave">
-                
-            </save-footer>
-            
         </div>
-            
-`,
+    `,
     styles: [`
-       
         
+        .padded { padding: 0.3em; }
+
+        .right-padding { padding-right: 0.5em; }
         
+        .border { border: 1px solid #e8e8e8; }
+        
+        .vertical-spacer { height: 0.3em; }
+        
+        .no-top-margin { margin-top: 0; }
+        
+
         .flex-container{
             display: flex;
             justify-content: space-between;
             flex:1;
         }
-        .flexbox-column{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            width:100%;
-        }
         /deep/ .mat-tab-body-wrapper {
             flex-grow: 1 !important;
         }
-        .mat-tab-group-border{
-            border: 1px solid #e8e8e8;
-        }
-        
-        
         
     `]
 })

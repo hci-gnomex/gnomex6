@@ -30,25 +30,12 @@ import {ProgressService} from "./progress.service";
         
         .flex-grow-large { flex: 5; }
         
-    .login-view{
-        height: 20em;
-        width: 35em;
-        margin-left: 40em;
-        display: block;
-        background-image: url("../gnomex/assets/gnomex_splash_logo.png");
-        background-repeat:no-repeat;
-    }
-    .flex-column-container {
-        display: flex;
-        flex-direction: column;
-        background-color: white;
-        height: 100%;
-    }
-    div.background {
-        width: 100%;
-        height: 100%;
-        background-color: white;
-    }
+        
+        .progress-bar-container {
+            position: absolute;
+            bottom: 5em;
+        }
+        
     .gnomex-splash {
         background-image: url(../gnomex/assets/gnomex_splash_credits.png);
         width: 19em;

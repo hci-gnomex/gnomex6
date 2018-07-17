@@ -1,7 +1,5 @@
 <div class="full-width full-height horizontal-center">
-    <!--<div *ngIf="false | async;else loading"-->
-         <!--class="full-width full-height flex-container-col">-->
-    <div *ngIf="hideLoader | async;else loading"
+    <div *ngIf="hideLoader | async; else loading"
          class="full-width full-height flex-container-col">
         <div class="flex-grow">
         </div>
@@ -19,10 +17,10 @@
                 <div class="flex-grow">
                 </div>
                 <div #loadingWindow class="gnomex-splash">
-                    <div style="text-align: center;vertical-align: top">
-                        <img src={{site_logo}}>
+                    <div class="horizontal-center">
+                        <img src={{site_logo}} alt="">
                     </div>
-                    <div style="position: absolute;bottom: 5em; width: 100%">
+                    <div class="full-width progress-bar-container">
                         <jqxProgressBar #loadingProgress [width]="270" [height]="15" [value]="10" [colorRanges]="colorRanges">
                         </jqxProgressBar>
                     </div>

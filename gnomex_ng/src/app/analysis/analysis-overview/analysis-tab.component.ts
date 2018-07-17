@@ -23,42 +23,52 @@ import {ConstantsService} from "../../services/constants.service";
 
     selector: "analysis-tab",
     template: `
-        <div style="display:flex; flex-direction: column; height:100%; width:100%;">
-            <div style="flex:1;">
-                <button mat-button [disabled]="!enableCreateAnalysis"   (click)="create()"> <img [src]="this.newSegment" > New</button>
-                <button mat-button   [disabled]="!enableRemoveAnalysis" (click)="remove()"> <img [src]="this.removeSegment" > Remove</button>
+        
+        <div class="full-height full-width">
+            <div class="full-height full-width flex-container-col">
+                <div class="full-width flex-container-row">
+                    <div class="padded">
+                        <button mat-button [disabled]="!enableCreateAnalysis" (click)="create()">
+                            <img [src]="this.newSegment" alt="">
+                            New
+                        </button>
+                    </div>
+                    <div class="padded">
+                        <button mat-button [disabled]="!enableRemoveAnalysis" (click)="remove()">
+                            <img [src]="this.removeSegment" alt="">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+                <div class="full-width flex-grow">
+                    <ag-grid-angular class="full-width full-height ag-fresh"
+                                     [gridOptions]="gridOpt"
+                                     [columnDefs]="columnDefs"
+                                     [rowData]="rowData"
+                                     [rowSelection]="rowSelection"
+                                     [rowDeselection]="true"
+                                     [enableColResize]="true"
+                                     [enableSorting]="true"
+                                     (gridReady)="onGridReady($event)"
+                                     (gridSizeChanged)="adjustColumnSize($event)"
+                                     (rowSelected)="selectedRow($event)"
+                                     (cellDoubleClicked)="forwardToAnalysis($event)"
+                                     (cellEditingStarted)="startEditingCell($event)">
+                    </ag-grid-angular>
+                </div>
             </div>
-            <div style="display:flex; flex:9; width:100%;">
-                <ag-grid-angular style="width: 100%;" class="ag-fresh"
-                                 [gridOptions]="gridOpt"
-                                 (cellDoubleClicked)="forwardToAnalysis($event)"
-                                 (rowSelected)="selectedRow($event)"
-                                 [rowDeselection]="true"
-                                 [rowData]="rowData"
-                                 [columnDefs]="columnDefs"
-                                 [rowSelection]="rowSelection"
-                                 (gridReady)="onGridReady($event)"
-                                 (gridSizeChanged)="adjustColumnSize($event)"
-                                 (cellEditingStarted)="startEditingCell($event)"
-                                 [enableSorting]="true"
-                                 [enableColResize]="true">
-                </ag-grid-angular>
-                
-            </div>
-            
         </div>
         
     `,
     styles: [`
-       
         
+        .padded { padding: 0.3em; }
         
-        .flex-container{
-            display: flex;
-            justify-content: space-between;
-            margin-left: auto;
-            margin-top: 1em;
+        .left-right-padded {
+            padding-left:  0.3em;
+            padding-right: 0.3em;
         }
+        
     `]
 })
 export class AnalysisTab extends PrimaryTab implements OnInit{
