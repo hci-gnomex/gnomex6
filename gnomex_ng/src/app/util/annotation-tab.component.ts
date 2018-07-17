@@ -5,7 +5,7 @@ import { Component, Input,OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "./interfaces/annotation.model";
 import {selectRequired} from "./validators/select-required.validator";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogRef, MatOptionSelectionChange} from "@angular/material";
 import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
 import {BrowseOrderValidateService} from "../services/browse-order-validate.service";
 import {IAnnotationOption} from "./interfaces/annotation-option.model";
@@ -162,7 +162,6 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
         }else{
             this.annotationForm.enable();
         }
-        console.log(this._annotations);
 
         this.orderValidateService.getOrderValidateObservable()
             .subscribe(this.prepAnnotationForSave);
@@ -183,8 +182,9 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
     }
 
 
-    selectOption(selected:boolean, i:number,j:number){
-        this._annotations[i].PropertyOption[j].selected =  selected ? 'Y' : 'N';
+    selectOption(opt:any){
+        let selected:boolean = opt.selected;
+        opt.value.selected = selected ? 'Y' : 'N';
     }
 
 

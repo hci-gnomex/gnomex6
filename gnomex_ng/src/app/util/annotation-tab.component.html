@@ -1,6 +1,6 @@
 <div style="display:flex">
     <form [formGroup]="annotationForm" style=" height:100%;width:100%; display:flex; flex-direction:column;">
-        <ng-container  [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations; let i = index">
+        <ng-container  [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations">
             <div *ngSwitchCase="'CHECK'" class="annot-control">
                 <label style="margin-right: 1em;"  >{{annot.name}}  </label>
                 <mat-checkbox  [formControl]="this.annotationForm.controls[annot.name]" >
@@ -18,9 +18,9 @@
             </mat-form-field>
             <mat-form-field *ngSwitchCase="'MOPTION'" class="annot-control" >
                 <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.annotationForm.controls[annot.name]">
-                    <mat-option *ngFor="let opt of annot.PropertyOption; let j = index"
+                    <mat-option *ngFor="let opt of annot.PropertyOption"
                                 #mOptRef
-                                (onSelectionChange)="selectOption(mOptRef.selected,i,j)"
+                                (onSelectionChange)="selectOption(mOptRef)"
                                 [value]="opt" > {{opt.name}}
                     </mat-option>
                 </mat-select>
@@ -31,9 +31,9 @@
             <mat-form-field  *ngSwitchCase="'OPTION'" class="annot-control">
                 <mat-select [compareWith]="compareByID" [placeholder]="annot.name" [formControl]="this.annotationForm.controls[annot.name]">
                     <mat-option
-                            *ngFor="let opt of annot.PropertyOption; let k = index"
+                            *ngFor="let opt of annot.PropertyOption"
                             #optRef
-                            (onSelectionChange)="selectOption(optRef.selected,i,k)"
+                            (onSelectionChange)="selectOption(optRef)"
                             [value]="opt" >{{opt.name}}
                     </mat-option>
                 </mat-select>
