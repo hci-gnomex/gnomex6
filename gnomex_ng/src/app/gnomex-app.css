@@ -181,6 +181,9 @@ img.icon {
   text-overflow: ellipsis;
 }
 
+button.mat-button.minimize      { min-width: 0; }
+button.mat-button.minimize span { min-width: 0; }
+
 /******************************/
 /**** Primary Nav / Header ****/
 /******************************/

@@ -24,6 +24,7 @@ import {MatDialog, MatDialogRef} from "@angular/material";
 import * as _ from "lodash";
 import {GnomexService} from "../services/gnomex.service";
 import {URLSearchParams} from "@angular/http";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -39,117 +40,38 @@ const actionMapping:IActionMapping = {
     selector: "datatracks",
     templateUrl: "./browse-datatracks.component.html",
     styles: [`
-        .inlineComboBox {
-            display: inline-block;
+        
+        .short-width { width: 10em; }
+        
+        .padded { padding: 0.3em; }
+        
+        .left-right-padded {
+            padding-left:  0.3em;
+            padding-right: 0.3em;
+        }
+        .major-left-right-padded {
+            padding-left:  1em;
+            padding-right: 1em;
         }
 
-        .hintLink {
-            fontSize: 9;
-            paddingLeft: 1;
-            paddingRight: 1;
-            paddingBottom: 1;
-            paddingTop: 1;
-        }
-
-        .sidebar {
-            width: 25%;
-            position: relative;
-            left: 0;
-            background-color: #ccc;
-            transition: all .25s;
-        }
-
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 100%;
-        }
-
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .br-exp-row-one {
-            flex-grow: 1;
-        }
-
-        .br-exp-item-row-two {
-            flex-grow: 1;
-        }
-
-        .br-exp-item {
-            flex: 1 1 auto;
-            font-size: small;
-        }
-
-        .br-exp-one {
-            width: 100%;
-            flex-grow: .25;
-
-        }
-
-        .br-exp-help-drag-drop {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .br-exp-three {
-            width: 100%;
-            height: 5px;
-            flex-grow: 2;
-        }
-
-        .br-exp-four {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .br-exp-five {
-            width: 100%;            
-            flex-grow: .10;
-        }
-
-        .t {
-            display: table;
-            width: 100%;
-        }
-
-        .tr {
-            display: table-row;
-            width: 100%;
-        }
-
-        .td {
-            display: table-cell;
-        }
-
-        .jqx-tree {
-            height: 100%;
-        }
-
-        .jqx-notification {
-            margin-top: 30em;
-            margin-left: 20em;
-        }
-
-        div.background {
-            width: 100%;
-            height: 100%;
-            background-color: #EEEEEE;
-            padding: 0.3em;
+        .vertical-spacer { height: 0.3em; }
+        
+        .foreground { background-color: white;   }
+        .background { background-color: #EEEEEE; }
+        
+        .border { border: #C8C8C8 solid thin; }
+        
+        .major-border {
             border-radius: 0.3em;
             border: 1px solid darkgrey;
-            display: flex;
-            flex-direction: column;
         }
-        .datatracks-panel {
-            height:100%;
-            width:100%;
-            border: #C8C8C8 solid thin;
-            padding: 1em;
-        }
+        
+        .small-font      { font-size: small; }
+        
+        .no-overflow { overflow: hidden; }
+        
+        .no-word-wrap { white-space: nowrap; }
+        
     `]
 })
 
@@ -192,12 +114,11 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     public labMembers: any;
     private billingAccounts: any;
     private selectedItem: ITreeNode;
-    public datatracksCount: number;
+    public datatracksCount: number = 0;
     private dataTracksListSubscription: Subscription;
     private labList: any[] = [];
     public disabled: boolean = true;
     public disableDelete: boolean = true;
-    public showSpinner: boolean = false;
     public searchText: string;
     private dragEndItems: any[] = [];
     private navDatatrackList: any;
@@ -213,6 +134,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     constructor(private datatracksService: DataTrackService,
+                private dialogsService: DialogsService,
                 private router: Router,
                 private route: ActivatedRoute,
                 private labListService: LabListService,
@@ -277,7 +199,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         this.datatracksService.startSearchSubject.subscribe((value) =>{
             if (value) {
-                this.showSpinner = true;
+                this.dialogsService.startDefaultSpinnerDialog();
             }
         })
     }
@@ -326,7 +248,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     treeUpdateData(event) {
         if (this.datatracksService.startSearchSubject.getValue() === true) {
-            this.showSpinner = false;
+            this.dialogsService.stopAllSpinnerDialogs();
             this.datatracksService.startSearchSubject.next(false);
             this.changeDetectorRef.detectChanges();
         }
@@ -407,7 +329,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 }
             }
         }
-        this.showSpinner = false;
+        this.dialogsService.stopAllSpinnerDialogs();
         if(this.treeModel){
             this.treeModel.clearFilter();
         }
