@@ -23,7 +23,7 @@ import {Subscription} from "rxjs/Subscription";
 import {ActivatedRoute, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
 import {DialogsService} from '../util/popup/dialogs.service';
 import {DeleteProjectComponent} from "./delete-project.component";
@@ -40,10 +40,6 @@ import {GnomexService} from "../services/gnomex.service";
     selector: "experiments",
     templateUrl: "./browse-experiments.component.html",
     styles: [`
-
-        .jqx-tree {
-            height: 100%;
-        }
 
         .jqx-notification {
             margin-top: 30em;
@@ -84,6 +80,7 @@ import {GnomexService} from "../services/gnomex.service";
             border: 1px solid darkgrey;
         }
         
+        .no-overflow  { overflow:    hidden; }
         .no-word-wrap { white-space: nowrap; }
     `]
 })
@@ -159,32 +156,28 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         if (this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS) != null) {
             this.viewLimit = this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS).propertyValue;
         }
-
     }
 
-    ngAfterViewInit(){
-    }
+    ngAfterViewInit() { }
 
 
-    constructor(public experimentsService: ExperimentsService,private router:Router,
+    constructor(public experimentsService: ExperimentsService,
+                private changeDetectorRef: ChangeDetectorRef,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
-                private changeDetectorRef: ChangeDetectorRef,
                 private dictionaryService: DictionaryService,
+                private gnomexService: GnomexService,
                 private labListService: LabListService,
                 private propertyService: PropertyService,
-                private gnomexService: GnomexService,
-                private route:ActivatedRoute) {
-
+                private route:ActivatedRoute,
+                private router:Router) {
 
         this.items = [];
         this.dragEndItems = [];
         this.labMembers = [];
         this.billingAccounts = [];
         this.labs = [];
-
-
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
@@ -380,24 +373,24 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     showReassignWindow() {
-        this.reassignExperimentDialogRef= this.dialog.open(ReassignExperimentComponent, {
-            data: {
-                currentItemId: this.currentItem.id,
-                idProject: this.targetItem.id,
-                labMembers: this.labMembers,
-                billingAccounts: this.billingAccounts,
-                currentItem: this.currentItem,
-                targetItem: this.targetItem,
-                showBillingCombo: this.showBillingCombo
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = {
+            currentItemId:      this.currentItem.id,
+            idProject:          this.targetItem.id,
+            labMembers:         this.labMembers,
+            billingAccounts:    this.billingAccounts,
+            currentItem:        this.currentItem,
+            targetItem:         this.targetItem,
+            showBillingCombo:   this.showBillingCombo
+        };
 
+        this.reassignExperimentDialogRef = this.dialog.open(ReassignExperimentComponent, configuration);
+
+        this.reassignExperimentDialogRef.afterClosed().subscribe(result => {
+            if (this.reassignExperimentDialogRef && this.reassignExperimentDialogRef.componentInstance.noButton) {
+                this.resetTree();
             }
-        });
-        this.reassignExperimentDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.reassignExperimentDialogRef && this.reassignExperimentDialogRef.componentInstance.noButton) {
-                    this.resetTree();
-                }
-            })
+        })
     }
 
 
@@ -507,13 +500,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 useThisLabList = this.labs;
             }
 
-            this.createProjectDialogRef= this.dialog.open(CreateProjectComponent, {
-                data: {
-                    labList: useThisLabList,
-                    items: this.items,
-                    selectedLabItem: this.selectedItem
-                }
-            });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+
+            configuration.data = {
+                labList:            useThisLabList,
+                items:              this.items,
+                selectedLabItem:    this.selectedItem
+            };
+
+            this.createProjectDialogRef= this.dialog.open(CreateProjectComponent, configuration);
         }
     }
 
@@ -522,22 +517,17 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     deleteProjectClicked(event: any) {
-        //this.deleteProjectWindow.open();
-        this.deleteProjectDialogRef = this.dialog.open(DeleteProjectComponent, {
-            data: {
-                selectedItem: this.selectedItem,
-            }
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = { selectedItem: this.selectedItem };
+
+        this.deleteProjectDialogRef = this.dialog.open(DeleteProjectComponent, configuration);
     }
 
     deleteExperimentClicked() {
-        this.deleteExperimentDialogRef = this.dialog.open(DeleteExperimentComponent, {
-            data: {
-                selectedExperiment: this.selectedExperiment
-            }
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = { selectedExperiment: this.selectedExperiment };
 
-
+        this.deleteExperimentDialogRef = this.dialog.open(DeleteExperimentComponent, configuration);
     }
     /**
      * A node is selected in the tree.
@@ -611,8 +601,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     };
 
     dragDropHintClicked(event: any) {
-        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, {
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+
+        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, configuration);
     }
 
     /**

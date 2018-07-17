@@ -48,75 +48,7 @@ const actionMapping:IActionMapping = {
     selector: "analysis",
     templateUrl: "./browse-topics.component.html",
     styles: [`
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 100%;
-        }
-
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .br-topic-row-one {
-            flex-grow: 1;
-        }
-
-        .br-topic-item-row-two {
-            flex-grow: 1;
-            position: relative;
-        }
-
-        .br-topic-item {
-            width: 100%;
-            flex: 1 1 auto;
-            font-size: small;
-        }
-
-        .br-topic-one {
-            width: 100%;
-            flex-grow: .25;
-
-        }
-
-        .br-topic-help-drag-drop {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .br-topic-three {
-            width: 100%;
-            height: 5px;
-            flex-grow: 2;
-        }
-
-        .br-topic-four {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .br-topic-five {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        div.background {
-            width: 100%;
-            height: 100%;
-            background-color: #EEEEEE;
-            padding: 0.3em;
-            border-radius: 0.3em;
-            border: 1px solid darkgrey;
-            display: flex;
-            flex-direction: column;
-        }
-        div.labelAndIcon {
-            display: inline-block;
-            margin: 0.3rem 0rem 0.3rem 0.5rem;
-            width: 9.5rem;
-        }
+        
         mat-form-field.formField {
             margin: 0 2.0%;
             width: 20%
@@ -128,21 +60,36 @@ const actionMapping:IActionMapping = {
             width: fit-content;
             margin-top: 1.1em;
         }
-        .topics-radio-button {
-            margin: 0 0.5%;
+
+
+
+        .absolute { position: absolute; }
+        
+        .foreground { background-color: white;   }
+        .background { background-color: #EEEEEE; }
+
+        .vertical-spacer { height: 0.3em; }
+        
+        .border { border: #C8C8C8 solid thin; }
+        .major-border {
+            border-radius: 0.3em;
+            border: 1px solid darkgrey;
         }
-        .topics-radio-group {
-            display: inline-flex;
-            flex-direction: row;
-        }
-        .link-data-header {
-            margin-bottom: 1em;
-            display: flex;
-        }
-        .add-link-object-icon {
-            margin: .25rem 0rem 0rem 0.5rem;
-            height: 16px;
-        }
+        
+        .padded { padding: 0.3em; }
+        
+        .top-padded { padding-top: 0.3em; }
+        
+        .left-right-padded {
+            padding-left:  0.3em;
+            padding-right: 0.3em;
+        } 
+        
+        .small-font { font-size: small; }
+        
+        .no-overflow  { overflow:    hidden; }
+        .no-word-wrap { white-space: nowrap; }
+        
     `]
 })
 
@@ -193,7 +140,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     private selectedIdLab: any;
     public organisms: any[] = [];
     public oldOrganisms: any[] = [];
-    private showSpinner: boolean = false;
+    // private showSpinner: boolean = false;
     private idAnalysis: string = "";
     private idExperiment: string = "";
     private emptyLab = {idLab: "0",
@@ -324,16 +271,16 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
-        this.showSpinner = true;
-
-
+        // this.showSpinner = true;
+        this.dialogService.startDefaultSpinnerDialog();
 
         this.topicListSubscription = this.topicService.getTopicsListObservable().subscribe(response => {
             this.items = [].concat([]);
             this.buildTree(response);
             setTimeout(() => {
 
-                this.showSpinner = false;
+                this.dialogService.stopAllSpinnerDialogs();
+                // this.showSpinner = false;
                 this.treeModel.update();
                 this.treeModel.expandAll();
 
@@ -417,14 +364,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     onMoveNode($event) {
-        console.log(
-            "Moved",
-            $event.node.name,
-            "to",
-            $event.to.parent.name,
-            "at index",
-            $event.to.index);
-        this.showSpinner = true;
+        this.dialogService.startDefaultSpinnerDialog()
+        // this.showSpinner = true;
         this.currentItem = $event.node;
         this.targetItem = $event.to.parent;
         this.doMove($event);
@@ -734,7 +675,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     selectExperimentLabOption(event) {
         if (event.source.value) {
             this.experimentLab = event.source.value;
-            this.showSpinner = true;
+            this.dialogService.startDefaultSpinnerDialog();
+            // this.showSpinner = true;
             this.getExperiments(this.experimentLab.idLab, this.selectedExpTimeFrame);
         }
     }
@@ -742,7 +684,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     selectAnalysisLabOption(event) {
         if (event.source.value && event.source.selected && event.source.value.idLab !== "0") {
             this.analysisLab = event.source.value;
-            this.showSpinner = true;
+            this.dialogService.startDefaultSpinnerDialog();
+            // this.showSpinner = true;
             this.getAnalysis(this.analysisLab.idLab, this.selectedAnalTimeFrame);
         }
     }
@@ -752,7 +695,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.oldOrganisms = [];
             this.datatrackLab = event.source.value;
             let orgs = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
-            this.showSpinner = true;
+            this.dialogService.startDefaultSpinnerDialog();
+            // this.showSpinner = true;
             this.getDatatracks(this.datatrackLab.idLab, "", "");
             console.log("datatrack lab");
         }
@@ -795,7 +739,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         if (selectedLab) {
             if (selectedLab.idLab) {
                 if (selectedLab.idLab === "0") {
-                    this.showSpinner = true;
+                    this.dialogService.startDefaultSpinnerDialog();
+                    // this.showSpinner = true;
                     this.resetAnalysis = true;
                     this.analysisLab = null;
                     this.analysisInput.nativeElement.blur();
@@ -819,7 +764,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         if (selectedLab) {
             if (selectedLab.idLab) {
                 if (selectedLab.idLab === "0") {
-                    this.showSpinner = true;
+                    this.dialogService.startDefaultSpinnerDialog();
+                    // this.showSpinner = true;
                     this.resetDatatrack = true;
                     this.datatrackLab = null;
                     this.datatrackInput.nativeElement.blur();
@@ -844,7 +790,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         if (selectedLab) {
             if (selectedLab.idLab) {
                 if (selectedLab.idLab === "0") {
-                    this.showSpinner = true;
+                    this.dialogService.startDefaultSpinnerDialog();
+                    // this.showSpinner = true;
                     this.resetExperiment = true;
                     this.experimentLab = null;
                     this.experimentInput.nativeElement.blur();
@@ -984,18 +931,21 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     onTabChange(event) {
         if (event.tab.textLabel === "Experiments") {
+            this.dialogService.startDefaultSpinnerDialog();
             this.isAnalysisTab = false;
             this.isDatatracksTab = false;
             this.isExperimentsTab = true;
             this.getExperiments("",'3 months');
         } else if (event.tab.textLabel === "Analysis") {
-            this.showSpinner = true;
+            this.dialogService.startDefaultSpinnerDialog();
+            // this.showSpinner = true;
             this.isAnalysisTab = true;
             this.isDatatracksTab = false;
             this.isExperimentsTab = false;
             this.getAnalysis("",'3 months');
         } else {
-            this.showSpinner = true;
+            this.dialogService.startDefaultSpinnerDialog();
+            // this.showSpinner = true;
             this.isAnalysisTab = false;
             this.isDatatracksTab = true;
             this.isExperimentsTab = false;
@@ -1039,7 +989,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             console.log("requestlist");
             this.buildExperimentsTree(response);
             this.experimentTreeModel = this.experimentTreeComponent.treeModel;
-            this.showSpinner = false;
+
+            this.dialogService.stopAllSpinnerDialogs();
+            // this.showSpinner = false;
             setTimeout(() => {
                 this.expandChildNodes(this.experimentTreeModel);
                 if(this.gnomexService.orderInitObj){
@@ -1098,7 +1050,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.buildAnalysisTree(response);
 
             this.analysisTreeModel = this.analysisTreeComponent.treeModel;
-            this.showSpinner = false;
+
+            this.dialogService.stopAllSpinnerDialogs();
+            // this.showSpinner = false;
             setTimeout(() => {
                 this.expandChildNodes(this.analysisTreeModel);
             });
@@ -1121,7 +1075,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.buildDatatracksTree(response);
 
                 this.datatrackTreeModel = this.datatrackTreeComponent.treeModel;
-                this.showSpinner = false;
+                this.dialogService.stopAllSpinnerDialogs();
+                // this.showSpinner = false;
                 this.previousURLParams = params;
                 setTimeout(() => {
                     this.expandChildNodes(this.datatrackTreeModel);
@@ -1406,7 +1361,8 @@ Build the tree data
     }
 
     expandChildNodes(model: TreeModel) {
-        this.showSpinner = true;
+        this.dialogService.startDefaultSpinnerDialog();
+        // this.showSpinner = true;
         if (model) {
             if (this.createSecurityAdvisorService.isSuperAdmin) {
                 if (model.roots) {
@@ -1425,7 +1381,10 @@ Build the tree data
                 model.expandAll();
             }
         }
-        this.showSpinner = false;
+        setTimeout(() => {
+            this.dialogService.stopAllSpinnerDialogs();
+        });
+        // this.showSpinner = false;
     }
 
     searchExperiment() {
@@ -1459,7 +1418,8 @@ Build the tree data
                 if (frame === this.previousExpTimeFrame) {
                     this.selectedExpTimeFrame = '';
                 } else {
-                    this.showSpinner = true;
+                    this.dialogService.startDefaultSpinnerDialog();
+                    // this.showSpinner = true;
                     this.getExperiments(this.experimentLab ? this.experimentLab.idLab : "", frame);
                 }
                 break;
@@ -1468,7 +1428,8 @@ Build the tree data
                 if (frame === this.previousAnalTimeFrame) {
                     this.selectedAnalTimeFrame = '';
                 } else {
-                    this.showSpinner = true;
+                    this.dialogService.startDefaultSpinnerDialog();
+                    // this.showSpinner = true;
                     this.getAnalysis(this.analysisLab ? this.analysisLab.idLab : "", frame);
                 }
                 break;

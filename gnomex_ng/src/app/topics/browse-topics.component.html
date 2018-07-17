@@ -1,186 +1,217 @@
-<div class="background">
-    <div class="flex-column-container">
-        <div style="flex-grow: .01;" class="br-topic-item br-topic-one">
-            <div style="margin-bottom: 0.3em;">
-                <menu-header-topics [selectedNode]="selectedItem" (messageEvent)="doLinkData($event)"></menu-header-topics>
-            </div>
+<div class="full-width full-height major-border padded background">
+    <div class="full-width full-height flex-container-col foreground">
+        <div class="full-width small-font border">
+            <menu-header-topics [selectedNode]="selectedItem" (messageEvent)="doLinkData($event)"></menu-header-topics>
         </div>
-        <div style="flex:1;"class="flex-row-container">
+        <div class="full-width vertical-spacer background">
+        </div>
+        <div class="flex-container-row flex-grow">
             <split>
                 <split-area size="20">
-                <div class="br-topic-item" style="height:100%">
-                    <div class="flex-column-container" style="height:100%;">
-                        <div class="br-topic-item br-topic-three">
-                            <tree-root #topicsTree (moveNode)="onMoveNode($event)"
-                                       [nodes]="items" [options]="options"
-                                       (activate)="treeOnSelect($event)"
-                            >
-
-                                <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <img *ngIf="node.data.icon" src="{{node.data.icon}}" height="16" width="16">
-                                    <span>{{ node.data.label }}</span>
-                                </ng-template>
-                                <ng-template #loadingTemplate></ng-template>
-                            </tree-root>
-                        </div>
-
-                        <div class="br-topic-item br-topic-four">
-                            <div class="flex-row-container">
-                                <div class="br-topic-item-row-one" style="position: relative; top: 1em">
-                                    <button mat-button (click)="expandClicked()">Expand</button>
+                    <div class="full-width full-height small-font border">
+                        <div class="full-height full-width flex-container-col foreground">
+                            <div class="full-width flex-grow left-right-padded top-padded small-font no-overflow">
+                                <div class="full-width full-height border">
+                                    <tree-root #topicsTree
+                                               [nodes]="items"
+                                               [options]="options"
+                                               (moveNode)="onMoveNode($event)"
+                                               (activate)="treeOnSelect($event)">
+                                        <ng-template #treeNodeTemplate let-node let-index="index">
+                                            <div class="full-width no-word-wrap">
+                                                <img *ngIf="node.data.icon" src="{{node.data.icon}}" alt="" height="16" width="16">
+                                                <span>{{ node.data.label }}</span>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #loadingTemplate></ng-template>
+                                    </tree-root>
                                 </div>
-                                <div class="br-topic-item-row-two" style="position: relative; top: 1em">
-                                    <button mat-button (click)="collapseClicked()">Collapse</button>
+                            </div>
+                            <div class="full-width small-font">
+                                <div class="flex-container-row">
+                                    <div class="padded">
+                                        <button mat-button (click)="expandClicked()">Expand</button>
+                                    </div>
+                                    <div class="padded flex-grow">
+                                        <button mat-button (click)="collapseClicked()">Collapse</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div> <!-- end tree container -->
                 </split-area>
-
                 <split-area size="80">
-                    <div [hidden]="!linkDataView" class="flex-column-container">
-                        <div *ngIf="isExperimentsTab">
-                            <div class="link-data-header">
-                                <img src="../../assets/flask.png" class="add-link-object-icon">
-                                <mat-label style="margin-left: .5em">Add Experiment (Find and drag to topic)</mat-label>
-                            </div>
-                            <div style="display: flex">
-                                <mat-form-field class="formField">
-                                    <input #experimentInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoExpLab"
-                                           [(ngModel)]="experimentLab" (keyup.enter)="chooseFirstExpLabOption()" (keyup)="highlightExpLabFirstOption($event)">
-                                    <mat-autocomplete #autoExpLab="matAutocomplete" [displayWith]="displayLab">
-                                        <mat-option (onSelectionChange)="selectExperimentLabOption($event)" *ngFor="let lab of filterExperimentLabs(this.experimentLab)" [value]="lab">{{lab.name}}</mat-option>
-                                    </mat-autocomplete>
-                                </mat-form-field>
-                                <mat-form-field class="formField">
-                                    <input matInput [(ngModel)]="experimentSearchText" placeholder="Search" (keyup)="searchExperiementsOnEnter($event)">
-                                </mat-form-field>
-                                <button mat-button (click)="searchExperiment()"><img src="../../assets/magnifier.png"></button>
-                                <mat-radio-group class="radio-group-container" (change)="onExpRadioChange($event)" [(ngModel)]="selectedExpTimeFrame">
-                                    <mat-radio-button class="topics-radio-button" (click)="selectFrame(frame, 'experiment')" *ngFor="let frame of timeFrames" [value]="frame">
-                                        {{frame}}
-                                    </mat-radio-button>
-                                </mat-radio-group>
-                            </div>
-                            <div class="link-data-header">
-                                <mat-label style="margin-left: .5em">Experiment {{experimentLabel}}</mat-label>
-                            </div>
+                    <div class="full-width full-height border padded small-font">
+                        <div [hidden]="!linkDataView" class="full-width full-height foreground">
+                            <div class="full-width full-height flex-container-col">
+                                <!-- Only one header should be shown-->
+                                <div *ngIf="isExperimentsTab" class="flex-container-row align-center">
+                                    <img src="../../assets/flask.png" alt="">
+                                    <mat-label class="padded">Add Experiment (Find and drag to topic)</mat-label>
+                                </div>
+                                <div *ngIf="isAnalysisTab" class="flex-container-row align-center">
+                                    <img src="../../assets/map.png" alt="">
+                                    <mat-label class="padded">Add Analysis (Find and drag to topic)</mat-label>
+                                </div>
+                                <div *ngIf="isDatatracksTab" class="flex-container-row align-center">
+                                    <img src="../../assets/datatrack.png" alt="">
+                                    <mat-label class="padded">Add Data Track (Find and drag to topic)</mat-label>
+                                </div>
+                                <!-- End headers-->
+                                <div class="full-width flex-grow flex-container-col padded border">
+                                    <!-- Only one group of search criteria should be shown -->
+                                    <div *ngIf="isExperimentsTab" class="full-width flex-container-row align-center">
+                                        <mat-form-field class="formField">
+                                            <input #experimentInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoExpLab"
+                                                   [(ngModel)]="experimentLab" (keyup.enter)="chooseFirstExpLabOption()" (keyup)="highlightExpLabFirstOption($event)">
+                                            <mat-autocomplete #autoExpLab="matAutocomplete" [displayWith]="displayLab">
+                                                <mat-option (onSelectionChange)="selectExperimentLabOption($event)" *ngFor="let lab of filterExperimentLabs(this.experimentLab)" [value]="lab">{{lab.name}}</mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <mat-form-field class="formField">
+                                            <input matInput [(ngModel)]="experimentSearchText" placeholder="Search" (keyup)="searchExperiementsOnEnter($event)">
+                                        </mat-form-field>
+                                        <button mat-button class="minimize" (click)="searchExperiment()">
+                                            <img src="../../assets/magnifier.png">
+                                        </button>
+                                        <div class="flex-grow">
+                                        </div>
+                                        <mat-radio-group class="radio-group-container" (change)="onExpRadioChange($event)" [(ngModel)]="selectedExpTimeFrame">
+                                            <mat-radio-button class="padded" (click)="selectFrame(frame, 'experiment')" *ngFor="let frame of timeFrames" [value]="frame">
+                                                {{ frame }}
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                        <div class="flex-grow">
+                                        </div>
+                                    </div>
 
-                        </div>
-                        <div *ngIf="isAnalysisTab">
-                            <div class="link-data-header">
-                                <img src="../../assets/map.png" class="add-link-object-icon">
-                                <mat-label style="margin-left: .5em">Add Analysis (Find and drag to topic)</mat-label>
-                            </div>
-                            <div style="display: flex">
-                                <mat-form-field class="formField">
-                                    <input #analysisInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoAnalLab"
-                                           [(ngModel)]="analysisLab" (keyup.enter)="chooseFirstAnalLabOption()" (keyup)="highlightAnalLabFirstOption($event)">
-                                    <mat-autocomplete #autoAnalLab="matAutocomplete" [displayWith]="displayLab">
-                                        <mat-option (onSelectionChange)="selectAnalysisLabOption($event)" *ngFor="let lab of filterAnalysisLabs(this.analysisLab)" [value]="lab">{{lab.name}}</mat-option>
-                                    </mat-autocomplete>
-                                </mat-form-field>
-                                <mat-form-field class="formField">
-                                    <input matInput [(ngModel)]="analysisSearchText" placeholder="Search" (keyup)="searchAnalysisOnEnter($event)">
-                                </mat-form-field>
-                                <button mat-button (click)="searchAnalysis()"><img src="../../assets/magnifier.png"></button>
-                                <mat-radio-group class="radio-group-container" (change)="onAnalRadioChange($event)" [(ngModel)]="selectedAnalTimeFrame">
-                                    <mat-radio-button class="topics-radio-button" (click)="selectFrame(frame, 'analysis')" *ngFor="let frame of timeFrames" [value]="frame">
-                                        {{frame}}
-                                    </mat-radio-button>
-                                </mat-radio-group>
-                            </div>
-                            <div class="link-data-header">
-                                <mat-label style="margin-left: .5em">Analyses {{analysisLabel}}</mat-label>
-                            </div>
+                                    <div *ngIf="isAnalysisTab" class="full-width flex-container-row align-center">
+                                        <mat-form-field class="formField">
+                                            <input #analysisInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoAnalLab"
+                                                   [(ngModel)]="analysisLab" (keyup.enter)="chooseFirstAnalLabOption()" (keyup)="highlightAnalLabFirstOption($event)">
+                                            <mat-autocomplete #autoAnalLab="matAutocomplete" [displayWith]="displayLab">
+                                                <mat-option (onSelectionChange)="selectAnalysisLabOption($event)" *ngFor="let lab of filterAnalysisLabs(this.analysisLab)" [value]="lab">{{lab.name}}</mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <mat-form-field class="formField">
+                                            <input matInput [(ngModel)]="analysisSearchText" placeholder="Search" (keyup)="searchAnalysisOnEnter($event)">
+                                        </mat-form-field>
+                                        <button mat-button (click)="searchAnalysis()"><img src="../../assets/magnifier.png"></button>
+                                        <mat-radio-group class="radio-group-container" (change)="onAnalRadioChange($event)" [(ngModel)]="selectedAnalTimeFrame">
+                                            <mat-radio-button class="topics-radio-button" (click)="selectFrame(frame, 'analysis')" *ngFor="let frame of timeFrames" [value]="frame">
+                                                {{frame}}
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
 
+                                    <div *ngIf="isDatatracksTab" class="full-width flex-container-row align-center">
+                                        <mat-form-field class="formField">
+                                            <input #datatrackInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoLab"
+                                                   [(ngModel)]="datatrackLab" (keyup.enter)="chooseFirstLabOption()" (keyup)="highlightDtLabFirstOption($event)">
+                                            <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
+                                                <mat-option (onSelectionChange)="selectDatatrackLabOption($event)" *ngFor="let lab of filterDatatrackLabs(this.datatrackLab)" [value]="lab">{{lab.name}}</mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <mat-form-field class="formField">
+                                            <input matInput placeholder="Organism" aria-label="Organism" [matAutocomplete]="autoOrg"
+                                                   [(ngModel)]="organism" (keyup.enter)="chooseFirstOrgOption()" (keyup)="highlightDtOrgFirstOption($event)">
+                                            <mat-autocomplete [displayWith]="displayOrg" #autoOrg="matAutocomplete">
+                                                <mat-option (onSelectionChange)="selectDatatrackOrgOption($event)" *ngFor="let org of filterOrganism(this.organism)" [value]="org">{{org.binomialName}}</mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <mat-form-field class="formField" *ngIf="datatrackLab && organism">
+                                            <input matInput
+                                                   placeholder="Genome Build"
+                                                   aria-label="Genome Build"
+                                                   [matAutocomplete]="autoGen"
+                                                   [(ngModel)]="genomeBuild"
+                                                   (keyup.enter)="chooseFirstGenomeOption()">
+                                            <mat-autocomplete [displayWith]="displayGen" #autoGen="matAutocomplete">
+                                                <mat-option (onSelectionChange)="selectDatatrackGenOption($event)" *ngFor="let gen of filterGenomeBuild(this.genomeBuild)" [value]="gen">{{gen.genomeBuildName}}</mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                        <mat-form-field class="formField">
+                                            <input matInput [(ngModel)]="datatrackSearchText" placeholder="Search" (keyup)="searchDatatrackOnEnter($event)">
+                                        </mat-form-field>
+                                        <button mat-button (click)="searchDatatrack()"><img src="../../assets/magnifier.png"></button>
+                                    </div>
+                                    <!-- End search criteria filters -->
+                                    <!-- Only one counter should be shown -->
+                                    <div *ngIf="isExperimentsTab">
+                                        <mat-label class="left-right-padded">Experiment {{experimentLabel}}</mat-label>
+                                    </div>
+                                    <div *ngIf="isAnalysisTab">
+                                        <mat-label class="left-right-padded">Analyses {{analysisLabel}}</mat-label>
+                                    </div>
+                                    <div *ngIf="isDatatracksTab">
+                                        <mat-label class="left-right-padded">Data Track {{datatrackLabel}}</mat-label>
+                                    </div>
+                                    <!-- End counters -->
+                                    <div class="full-width flex-grow">
+                                        <div class="full-width full-height border">
+                                            <mat-tab-group class="full-width full-height"
+                                                           [selectedIndex]="selectedGroupTab"
+                                                           (selectedTabChange)="onTabChange($event)">
+                                                <mat-tab label="Experiments" class="full-height">
+                                                    <div class="full-height full-width no-overflow">
+                                                        <div class="full-height full-width absolute">
+                                                            <tree-root #experimentsTree
+                                                                       [nodes]="experimentItems"
+                                                                       [options]="experimentOptions"
+                                                                       (activate)="expTreeOnSelect($event)"
+                                                                       (moveNode)="onMoveExperimentNode($event)"
+                                                                       (updateData)="treeUpdateData($event)">
+                                                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                                                    <img src="{{node.data.icon}}" height="16" width="16">
+                                                                    <span>{{ node.data.label }}</span>
+                                                                </ng-template>
+                                                                <ng-template #loadingTemplate></ng-template>
+                                                            </tree-root>
+                                                        </div>
+                                                    </div>
+                                                </mat-tab>
+                                                <mat-tab label="Analysis" class="full-height">
+                                                    <div class="full-height full-width no-overflow">
+                                                        <div class="full-height full-width absolute">
+                                                            <tree-root #analysisTree
+                                                                       [nodes]="analysisItems"
+                                                                       [options]="analysisOptions"
+                                                                       (activate)="analTreeOnSelect($event)">
+                                                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                                                    <img src="{{node.data.icon}}" height="16" width="16">
+                                                                    <span>{{ node.data.label }}</span>
+                                                                </ng-template>
+                                                                <ng-template #loadingTemplate></ng-template>
+                                                            </tree-root>
+                                                        </div>
+                                                    </div>
+                                                </mat-tab>
+                                                <mat-tab label="Data Tracks" class="full-height">
+                                                    <div class="full-height full-width no-overflow">
+                                                        <div class="full-height full-width absolute">
+                                                            <tree-root #datatrackTree
+                                                                       [nodes]="datatrackItems"
+                                                                       [options]="datatrackOptions"
+                                                                       (activate)="dTTreeOnSelect($event)">
+                                                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                                                    <img src="{{node.data.icon}}" height="16" width="16">
+                                                                    <span>{{ node.data.label }}</span>
+                                                                </ng-template>
+                                                                <ng-template #loadingTemplate></ng-template>
+                                                            </tree-root>
+                                                        </div>
+                                                    </div>
+                                                </mat-tab>
+                                            </mat-tab-group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div *ngIf="isDatatracksTab">
-                            <div class="link-data-header">
-                                <img src="../../assets/datatrack.png" class="add-link-object-icon">
-                                <mat-label style="margin-left: .5em">Add Data Track (Find and drag to topic)</mat-label>
-                            </div>
-                            <div style="display: flex">
-                                <mat-form-field class="formField">
-                                    <input #datatrackInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoLab"
-                                           [(ngModel)]="datatrackLab" (keyup.enter)="chooseFirstLabOption()" (keyup)="highlightDtLabFirstOption($event)">
-                                    <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
-                                        <mat-option (onSelectionChange)="selectDatatrackLabOption($event)" *ngFor="let lab of filterDatatrackLabs(this.datatrackLab)" [value]="lab">{{lab.name}}</mat-option>
-                                    </mat-autocomplete>
-                                </mat-form-field>
-                                <mat-form-field class="formField">
-                                    <input matInput placeholder="Organism" aria-label="Organism" [matAutocomplete]="autoOrg"
-                                           [(ngModel)]="organism" (keyup.enter)="chooseFirstOrgOption()" (keyup)="highlightDtOrgFirstOption($event)">
-                                    <mat-autocomplete [displayWith]="displayOrg" #autoOrg="matAutocomplete">
-                                        <mat-option (onSelectionChange)="selectDatatrackOrgOption($event)" *ngFor="let org of filterOrganism(this.organism)" [value]="org">{{org.binomialName}}</mat-option>
-                                    </mat-autocomplete>
-                                </mat-form-field>
-                                <mat-form-field class="formField" *ngIf="datatrackLab && organism">
-                                    <input matInput placeholder="Genome Build" aria-label="Genome Build" [matAutocomplete]="autoGen"
-                                           [(ngModel)]="genomeBuild" (keyup.enter)="chooseFirstGenomeOption()">
-                                    <mat-autocomplete [displayWith]="displayGen" #autoGen="matAutocomplete">
-                                        <mat-option (onSelectionChange)="selectDatatrackGenOption($event)" *ngFor="let gen of filterGenomeBuild(this.genomeBuild)" [value]="gen">{{gen.genomeBuildName}}</mat-option>
-                                    </mat-autocomplete>
-                                </mat-form-field>
-                                <mat-form-field class="formField">
-                                    <input matInput [(ngModel)]="datatrackSearchText" placeholder="Search" (keyup)="searchDatatrackOnEnter($event)">
-                                </mat-form-field>
-                                <button mat-button (click)="searchDatatrack()"><img src="../../assets/magnifier.png"></button>
-                            </div>
-                            <div class="link-data-header">
-                                <mat-label style="margin-left: .5em">Data Track {{datatrackLabel}}</mat-label>
-                            </div>
-                        </div>
-                        <div style="height: 100%;display: flex">
-                            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-                            <mat-tab-group style="height: 100%;width: 100%" id="linkDataTabs" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onTabChange($event)">
-                                <mat-tab label="Experiments" style="height:100%;">
-                                    <tree-root #experimentsTree
-                                               [nodes]="experimentItems" [options]="experimentOptions"
-                                               (activate)="expTreeOnSelect($event)"
-                                               (moveNode)="onMoveExperimentNode($event)"
-                                               (updateData)="treeUpdateData($event)">
-                                        <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <img src="{{node.data.icon}}" height="16" width="16">
-                                            <span>{{ node.data.label }}</span>
-                                        </ng-template>
-                                        <ng-template #loadingTemplate></ng-template>
-                                    </tree-root>
-                                    <span> </span>
-                                </mat-tab>
-                                <mat-tab label="Analysis"  style="height:100%;">
-                                    <tree-root #analysisTree
-                                               [nodes]="analysisItems" [options]="analysisOptions"
-                                               (activate)="analTreeOnSelect($event)"
-                                    >
-                                        <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <img src="{{node.data.icon}}" height="16" width="16">
-                                            <span>{{ node.data.label }}</span>
-                                        </ng-template>
-                                        <ng-template #loadingTemplate></ng-template>
-                                    </tree-root>
-                                </mat-tab>
-                                <mat-tab label="Data Tracks"  style="height:100%;">
-                                    <tree-root #datatrackTree
-                                               [nodes]="datatrackItems" [options]="datatrackOptions"
-                                               (activate)="dTTreeOnSelect($event)"
-                                    >
-                                        <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <img src="{{node.data.icon}}" height="16" width="16">
-                                            <span>{{ node.data.label }}</span>
-                                        </ng-template>
-                                        <ng-template #loadingTemplate></ng-template>
-                                    </tree-root>
-                                </mat-tab>
-                            </mat-tab-group>
-
+                        <div  class="full-width full-height" [hidden]="linkDataView">
+                            <topics-panel></topics-panel>
                         </div>
                     </div>
-                    <div  class="exp-overview-item topics-panel" [hidden]="linkDataView">
-                        <topics-panel></topics-panel>
-                    </div>
-
                 </split-area>
             </split>
         </div>

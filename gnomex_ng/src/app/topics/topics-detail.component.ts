@@ -8,7 +8,10 @@ import {Subscription} from "rxjs/Subscription";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {MatAutocomplete, MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
+import {
+    MatAutocomplete, MatDialog, MatDialogConfig, MatDialogRef,
+    MatSnackBar
+} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
 import {URLSearchParams} from "@angular/http";
 import {PropertyService} from "../services/property.service";
@@ -246,15 +249,15 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
 
 
     onShareLinkClick():void{
-        this.shareWebLinkDialogRef = this.dialog.open(ShareLinkDialogComponent, {
-            width: '35em',
-            data: {
-                name: this.topicNode.name,
-                number: this.topicNode.idTopic,
-                type: "topicNumber"
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '35em';
+        configuration.data = {
+            name:   this.topicNode.name,
+            number: this.topicNode.idTopic,
+            type:   "topicNumber"
+        };
 
-            }
-        });
+        this.shareWebLinkDialogRef = this.dialog.open(ShareLinkDialogComponent, configuration);
     }
     onEmailClick():void{
 
@@ -292,22 +295,14 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
             });
         };
 
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '40em';
+        configuration.data = { saveFn: saveFn };
 
-        this.emailImportDialogRef = this.dialog.open(BasicEmailDialogComponent, {
-            width: '40em',
-            data: {
-                saveFn: saveFn
-            }
-        });
+        this.emailImportDialogRef = this.dialog.open(BasicEmailDialogComponent, configuration);
     }
-
-
-
 
     ngOnDestroy(){
         this.topicListNodeSubscription.unsubscribe();
     }
-
-
-
 }

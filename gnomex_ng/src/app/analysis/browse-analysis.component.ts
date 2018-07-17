@@ -21,7 +21,7 @@ import * as _ from "lodash";
 import {Subscription} from "rxjs/Subscription";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AnalysisService} from "../services/analysis.service";
-import {MatDialogRef, MatDialog} from '@angular/material';
+import {MatDialogRef, MatDialog, MatDialogConfig} from '@angular/material';
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DragDropHintComponent} from "./drag-drop-hint.component";
@@ -405,16 +405,18 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
      */
     deleteAnalysisClicked(event: any) {
         if (this.selectedItem && this.selectedItem.level != 1 && this.items.length > 0) {
-            this.deleteAnalysisDialogRef = this.dialog.open(DeleteAnalysisComponent, {
-                height: '375px',
-                width: '300px',
-                data: {
-                    idAnalysisGroup: this.selectedItem.data.idAnalysisGroup,
-                    label: this.selectedItem.data.label,
-                    selectedItem: this.selectedItem,
-                    nodes: this.treeModel.activeNodes
-                }
-            });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.height = '375px';
+            configuration.width  = '300px';
+
+            configuration.data = {
+                idAnalysisGroup:    this.selectedItem.data.idAnalysisGroup,
+                label:              this.selectedItem.data.label,
+                selectedItem:       this.selectedItem,
+                nodes:              this.treeModel.activeNodes
+            };
+
+            this.deleteAnalysisDialogRef = this.dialog.open(DeleteAnalysisComponent, configuration);
         }
         this.selectedItem = null;
     }
@@ -435,15 +437,16 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 useThisLabList = this.labs;
             }
 
-            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, {
-                data: {
-                    labList: useThisLabList,
-                    items: this.items,
-                    selectedLab: this.selectedIdLab,
-                    selectedLabLabel: this.selectedLabLabel,
-                    selectedItem: this.selectedItem
-                }
-            });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.data = {
+                labList:            useThisLabList,
+                items:              this.items,
+                selectedLab:        this.selectedIdLab,
+                selectedLabLabel:   this.selectedLabLabel,
+                selectedItem:       this.selectedItem
+            };
+
+            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
         }
     }
 
@@ -462,12 +465,12 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             } else {
                 useThisLabList = this.labs;
             }
-            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, {
-                width: '40em',
-                data: {
-                    labList: useThisLabList
-                }
-            });
+
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.width = '40em';
+            configuration.data = { labList: useThisLabList };
+
+            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration);
         }
     }
 
@@ -476,8 +479,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
      * @param event
      */
     dragDropHintClicked(event: any) {
-        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, {
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+
+        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, configuration);
     }
 
     /**

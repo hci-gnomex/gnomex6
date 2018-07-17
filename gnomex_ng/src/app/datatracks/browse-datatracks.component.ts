@@ -20,7 +20,7 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {LabListService} from "../services/lab-list.service";
 import {DataTrackService} from "../services/data-track.service";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import * as _ from "lodash";
 import {GnomexService} from "../services/gnomex.service";
 import {URLSearchParams} from "@angular/http";
@@ -231,19 +231,19 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     doMove(event) {
-        this.moveDatatrackDialogRef= this.dialog.open(MoveDataTrackComponent, {
-            data: {
-                currentItem: this.currentItem,
-                targetItem: this.targetItem
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = {
+            currentItem: this.currentItem,
+            targetItem: this.targetItem
+        };
+
+        this.moveDatatrackDialogRef= this.dialog.open(MoveDataTrackComponent, configuration);
+
+        this.moveDatatrackDialogRef.afterClosed().subscribe(result => {
+            if (this.moveDatatrackDialogRef.componentInstance.noButton) {
+                this.resetTree();
             }
         });
-        this.moveDatatrackDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.moveDatatrackDialogRef.componentInstance.noButton) {
-                    this.resetTree();
-                }
-            })
-
     }
 
     treeUpdateData(event) {

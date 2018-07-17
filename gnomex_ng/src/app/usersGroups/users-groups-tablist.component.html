@@ -3,19 +3,19 @@
         <div style="flex:1;"class="flex-row-container">
             <split (dragEnd)="onSplitDragEnd($event)">
                 <split-area size="30">
-
-                <mat-tab-group style="height: 100%" [selectedIndex]="selectedTab" (selectedTabChange)="onTabChange($event)">
-                <mat-tab *ngIf="rowData.length>0" #userTab label="Users"  style="height:100%;">
-                        <div class="users-groups-item" style="height:100%">
-                            <div class="flex-column-container" style="height:100%;">
-                                <div class="users-groups-item users-groups-one">
-                                    <mat-form-field>
-                                        <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Search by name or email...">
-                                    </mat-form-field>
-
-                                </div>
-                                <div class="users-groups-item users-groups-three" style="width: 100%">
-                                        <ag-grid-angular id="userTable" style="width: 100%; height: 42em;" class="ag-fresh"
+                    <mat-tab-group style="height: 100%" [selectedIndex]="selectedTab" (selectedTabChange)="onTabChange($event)">
+                        <mat-tab *ngIf="rowData.length>0" #userTab label="Users"  style="height:100%;">
+                            <div class="users-groups-item" style="height:100%">
+                                <div class="flex-column-container" style="height:100%;">
+                                    <div class="users-groups-item users-groups-one">
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Search by name or email...">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="users-groups-item users-groups-three" style="width: 100%">
+                                        <ag-grid-angular id="userTable"
+                                                         style="width: 100%; height: 42em;"
+                                                         class="ag-fresh"
                                                          [gridOptions]="gridOptions"
                                                          [rowData]="rowData"
                                                          [columnDefs]="columnDefs"
@@ -28,313 +28,141 @@
                                                          [enableFilter]="true"
                                                          [enableColResize]="true">
                                         </ag-grid-angular>
+                                    </div>
+                                    <div class="users-groups-item users-groups-four">
+                                        <div class="flex-row-container">
+                                            <div class="users-groups-item-row-one" style="position: relative; top: 1em">
+                                                <button mat-button (click)="newUser()"><img src="../../assets/user.png">New User</button>
+                                            </div>
+                                            <div class="users-groups-item-row-two" style="position: relative; top: 1em">
+                                                <button mat-button (click)="deleteUser()"><img src="../../assets/delete.png">Delete User</button>
+                                            </div>
+                                            <div class="users-groups-item-row-two" style="position: relative; top: 1em">
+                                                <mat-label>{{userLabel}}</mat-label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tab>
+                        <mat-tab #groupTab label="Groups"  style="height:100%;">
+                            <div class="flex-column-container" style="height:100%;">
+                                <div class="users-groups-item users-groups-one">
+                                    <mat-form-field>
+                                        <input matInput [(ngModel)]="searchText" (input)="searchGroups($event)" placeholder="Enter search here...">
+                                    </mat-form-field>
+                                    <mat-accordion *ngIf="secAdvisor.isSuperAdmin || secAdvisor.isAdmin">
+                                        <mat-expansion-panel (opened)="panelOpenState = true"
+                                                             (closed)="panelOpenState = false">
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    {{panelOpenState ? 'less' : 'more'}}
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+                                            <mat-form-field>
+                                                <mat-select placeholder="Core facility" (change)="searchCoreFacility($event)">
+                                                    <mat-option *ngFor="let core of this.myCoreFacilitiesIManage" [value]="core.value">
+                                                        {{core.facilityName}}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                            <mat-checkbox [(ngModel)]="externalGroup" (change)="onExternalGroupChange($event)">External</mat-checkbox>
+                                            <mat-form-field>
+                                                <mat-select placeholder="Institution" (change)="searchInstitution($event)">
+                                                    <mat-option *ngFor="let institute of this.institutions" [value]="institute.value">
+                                                        {{institute.institution}}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </mat-expansion-panel>
+                                    </mat-accordion>
+                                </div>
+                                <div class="users-groups-item users-groups-three">
+                                    <ag-grid-angular style="width: 100%; height: 100%;"
+                                                     class="ag-fresh"
+                                                     [gridOptions]="groupsGridOptions"
+                                                     [rowData]="groupsData"
+                                                     [columnDefs]="groupsColumnDefs"
+                                                     [rowSelection]="rowSelection"
+                                                     (gridReady)="onGroupsGridReady($event)"
+                                                     (selectionChanged)="onGroupsSelectionChanged($event)"
+                                                     [enableSorting]="true"
+                                                     [enableColResize]="true">
+                                    </ag-grid-angular>
                                 </div>
                                 <div class="users-groups-item users-groups-four">
                                     <div class="flex-row-container">
                                         <div class="users-groups-item-row-one" style="position: relative; top: 1em">
-                                            <button mat-button (click)="newUser()"><img src="../../assets/user.png">New User</button>
+                                            <button mat-button (click)="newGroup()"><img src="../../assets/group_add.png">New Group</button>
                                         </div>
                                         <div class="users-groups-item-row-two" style="position: relative; top: 1em">
-                                            <button mat-button (click)="deleteUser()"><img src="../../assets/delete.png">Delete User</button>
+                                            <button mat-button [disabled]="!selectedGroup" (click)="deleteGroup()"><img src="../../assets/delete.png">Delete Group</button>
                                         </div>
                                         <div class="users-groups-item-row-two" style="position: relative; top: 1em">
-                                            <mat-label>{{userLabel}}</mat-label>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                </mat-tab>
-                <mat-tab #groupTab label="Groups"  style="height:100%;">
-                    <div class="flex-column-container" style="height:100%;">
-                        <div class="users-groups-item users-groups-one">
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="searchText" (input)="searchGroups($event)" placeholder="Enter search here...">
-                            </mat-form-field>
-                            <mat-accordion *ngIf="secAdvisor.isSuperAdmin || secAdvisor.isAdmin">
-                                <mat-expansion-panel (opened)="panelOpenState = true"
-                                                     (closed)="panelOpenState = false">
-                                    <mat-expansion-panel-header>
-                                        <mat-panel-title>
-                                            {{panelOpenState ? 'less' : 'more'}}
-                                        </mat-panel-title>
-                                    </mat-expansion-panel-header>
-
-                                    <mat-form-field>
-                                        <mat-select placeholder="Core facility" (change)="searchCoreFacility($event)">
-                                            <mat-option *ngFor="let core of this.myCoreFacilitiesIManage" [value]="core.value">
-                                                {{core.facilityName}}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                    <mat-checkbox [(ngModel)]="externalGroup" (change)="onExternalGroupChange($event)">External</mat-checkbox>
-                                    <mat-form-field>
-                                        <mat-select placeholder="Institution" (change)="searchInstitution($event)">
-                                            <mat-option *ngFor="let institute of this.institutions" [value]="institute.value">
-                                                {{institute.institution}}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-
-                                </mat-expansion-panel>
-                            </mat-accordion>
-
-                        </div>
-                        <div class="users-groups-item users-groups-three">
-                            <ag-grid-angular style="width: 100%; height: 100%;" class="ag-fresh"
-                                             [gridOptions]="groupsGridOptions"
-                                             [rowData]="groupsData"
-                                             [columnDefs]="groupsColumnDefs"
-                                             [rowSelection]="rowSelection"
-                                             (gridReady)="onGroupsGridReady($event)"
-                                             (selectionChanged)="onGroupsSelectionChanged($event)"
-                                             [enableSorting]="true"
-                                             [enableColResize]="true">
-                            </ag-grid-angular>
-                        </div>
-                        <div class="users-groups-item users-groups-four">
-                            <div class="flex-row-container">
-                                <div class="users-groups-item-row-one" style="position: relative; top: 1em">
-                                    <button mat-button (click)="newGroup()"><img src="../../assets/group_add.png">New Group</button>
-                                </div>
-                                <div class="users-groups-item-row-two" style="position: relative; top: 1em">
-                                    <button mat-button [disabled]="!selectedGroup" (click)="deleteGroup()"><img src="../../assets/delete.png">Delete Group</button>
-                                </div>
-                                <div class="users-groups-item-row-two" style="position: relative; top: 1em">
-                                    <mat-label>{{groupLabel}}</mat-label>
-                                </div>
-                            </div>
-                        </div>
-                        <div *ngIf="secAdvisor.isSuperAdmin" class="users-groups-item users-groups-four">
-                            <div class="flex-row-container">
-                                <div class="users-groups-item-row-one" style="position: relative; top: 1em">
-                                    <button mat-button (click)="verify('all')"><img src="../../assets/email_go.png">Verify all users</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </mat-tab>
-
-            </mat-tab-group>
-            </split-area>
-            <split-area size="70">
-                <div *ngIf="isUserTab && selectedUser" #userDetail class="flex-column-container ug-background" style="width: 100%">
-                    <split direction="vertical">
-                    <split-area size="75" style="background: white">
-                    <!--user detail-->
-                        <div class="flex-column-container">
-                            <form style="width: 100%" [formGroup]="userForm">
-                                <div class="users-groups-row-one">
-                                    <div class="formRow">
-                                        <mat-form-field class="formField">
-                                            <input matInput formControlName="firstName" placeholder="First name">
-                                            <mat-error *ngIf="userForm.controls['firstName'].hasError('required')">
-                                                First name is <strong>required</strong>
-                                            </mat-error>
-                                        </mat-form-field>
-                                        <mat-form-field class="formField">
-                                            <input matInput formControlName="lastName" placeholder="Last Name">
-                                            <mat-error *ngIf="userForm.controls['lastName'].hasError('required')">
-                                                Last name is <strong>required</strong>
-                                            </mat-error>
-                                        </mat-form-field>
-                                        <mat-checkbox formControlName="isActive" (change)="onIsActiveChange($event)">User is Active</mat-checkbox>
-                                    </div>
-                                </div>
-                                <div class="users-groups-row-one">
-                                    <div class="formRow" cellspacing="0">
-                                        <mat-form-field class="formField">
-                                            <input matInput formControlName="phone" placeholder="Phone">
-                                        </mat-form-field>
-                                        <mat-form-field class="formField">
-                                            <input matInput formControlName="email" placeholder="Email">
-                                            <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
-                                            <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
-                                        </mat-form-field>
-                                        <mat-form-field class="formField">
-                                            <input matInput formControlName="ucscUrl" placeholder="UCSC Url">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="users-groups-row-one">
-                                    <div class="formRow" cellspacing="0">
-                                        <mat-form-field class="formField">
-                                            <input matInput formControlName="institute" placeholder="Institution (Optional)">
-                                        </mat-form-field>
-                                        <mat-form-field class="formField">
-                                            <input matInput formControlName="department" placeholder="Department (Optional)">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="users-groups-row-one">
-                                    <div class="flex-row-container" style="width: 100%">
-                                        <div class="users-groups-row-one ug-white-background">
-                                            <!--need flex row container-->
-                                            <div class="flex-row-container" style="width: 100%">
-                                                <div  class="users-groups-row-one" style="margin-right: 2em">
-                                                    <div class="flex-column-container">
-                                                        <div class="users-groups-type-row">
-                                                            <mat-radio-group formControlName="userType" (change)="onUserTypeChange($event)">
-                                                                <mat-radio-button [value]="USER_TYPE_UNIVERSITY">University User</mat-radio-button>
-                                                                <mat-radio-button [value]="USER_TYPE_EXTERNAL">External User</mat-radio-button>
-                                                            </mat-radio-group>
-                                                        </div>
-                                                        <div *ngIf="usertypeFC.value===USER_TYPE_UNIVERSITY" class="users-groups-unid-row">
-                                                            <mat-form-field>
-                                                                <input matInput formControlName="uNid" placeholder="uNID">
-                                                                <mat-error *ngIf="userForm.controls['uNid'].hasError('required') || userForm.controls['uNid'].hasError('pattern')">Invalid uNID</mat-error>
-                                                            </mat-form-field>
-                                                        </div>
-                                                        <div *ngIf="usertypeFC.value===USER_TYPE_EXTERNAL" class="users-groups-unid-row">
-                                                            <div class="formRow" cellspacing="0">
-                                                                <mat-form-field class="formField">
-                                                                    <input matInput formControlName="userName" placeholder="User name">
-                                                                    <mat-error *ngIf="this.usernameFC.hasError('required')">Required</mat-error>
-                                                                </mat-form-field>
-                                                                    <mat-form-field class="formField">
-                                                                        <input matInput type="password" formControlName="password" placeholder="Password">
-                                                                        <mat-error *ngIf="this.passwordFC.hasError('validatePassword')">{{this.passwordUtilService.PASSWORD_COMPLEXITY_ERROR}}</mat-error>
-                                                                    </mat-form-field>
-                                                                <mat-form-field class="formField">
-                                                                    <input matInput type="password" formControlName="passwordConfirm" placeholder="Confirm Password">
-                                                                    <mat-error *ngIf="this.passwordConfirmFC.hasError('validatePasswordConfirm')">{{this.passwordUtilService.PASSWORD_MATCH_ERROR}}</mat-error>
-                                                                </mat-form-field>
-                                                            </div>
-                                                        </div>
-                                                        <div *ngIf="userType===USER_TYPE_EXTERNAL" class="users-groups-unid-row">
-                                                            <p>
-                                                            Passwords must be 8-25 characters long, contain no spaces
-                                                            <br>
-                                                            or slashes, and contain three or more of the following:
-                                                            <br>
-                                                            lowercase letter, uppercase letter, digit, or symbol.
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="users-groups-row-one">
-                                                    <div class="flex-column-container">
-                                                        <div class="users-groups-unid-row" style="height: 2em">
-                                                            <label class="ug-label">Permission Level</label>
-                                                        </div>
-                                                        <div class="users-groups-unid-row">
-                                                            <mat-radio-group class="permission-radio-group" formControlName="permissionLevel" (change)="onPermissionLevelChange($event)">
-                                                                        <mat-radio-button value="LAB">Group</mat-radio-button>
-                                                                        <mat-radio-button value="ADMIN">Admin</mat-radio-button>
-                                                                        <mat-radio-button value="BILLING">Billing Admin</mat-radio-button>
-                                                                        <mat-radio-button value="SUPER" [disabled] = !secAdvisor.isSuperAdmin>Super Admin</mat-radio-button>
-                                                            </mat-radio-group>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div *ngIf="codeUserPermissionKind==='BILLING'||codeUserPermissionKind==='ADMIN'" class="users-groups-row-one ug-white-background">
-                                            <section class="permission-radio-group">
-                                                <div style="text-align: right;height: 2em">
-                                                    <label class="ug-label" style="width: 100%">Core facilities this user manages</label>
-                                                </div>
-                                                <mat-checkbox *ngFor="let cfm of coreFacilitiesIManage" [checked]=cfm.isSelected [formControlName]=cfm.mDisplay>
-                                                    {{cfm.display}}
-                                                </mat-checkbox>
-                                            </section>
-                                        </div>
-                                        <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && (this.secAdvisor.isSuperAdmin||this.secAdvisor.isBillingAdmin)" class="users-groups-row-one ug-white-background">
-                                            <section class="permission-radio-group">
-                                                <div style="text-align: right;height: 2em">
-                                                    <label class="ug-label" style="width: 100%">Submit experiments in all labs in core</label>
-                                                </div>
-                                                <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>
-                                                    {{cf.display}}
-                                                </mat-checkbox>
-                                            </section>
+                                            <mat-label>{{groupLabel}}</mat-label>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
-                    </split-area>
-                    <split-area size="25" style="background: white">
-                    <div class="users-groups-row-one ug-background" style="height:100%">
-                        <div class="flex-row-container" style="width: 100%">
-                            <div class="users-groups-row-one-shrink">
-                                <ag-grid-angular style="width: 30em; height: 100%;" class="ag-fresh"
-                                                 [gridOptions]="labGridOptions"
-                                                 [rowData]="labs"
-                                                 [columnDefs]="labColumnDefs"
-                                                 [rowSelection]="rowSelection"
-                                                 (gridReady)="onLabGridReady($event)"
-                                                 [enableSorting]="true">
-                                </ag-grid-angular>
+                                <div *ngIf="secAdvisor.isSuperAdmin" class="users-groups-item users-groups-four">
+                                    <div class="flex-row-container">
+                                        <div class="users-groups-item-row-one" style="position: relative; top: 1em">
+                                            <button mat-button (click)="verify('all')">
+                                                <img src="../../assets/email_go.png">
+                                                Verify all users
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="users-groups-row-one-shrink">
-                                <ag-grid-angular style="width: 30em; height: 100%;" class="ag-fresh"
-                                                 [gridOptions]="collGridOptions"
-                                                 [rowData]="collaboratingLabs"
-                                                 [columnDefs]="collColumnDefs"
-                                                 [rowSelection]="rowSelection"
-                                                 (gridReady)="onCollGridReady($event)"
-                                                 [enableSorting]="true">
-                                </ag-grid-angular>
-                            </div>
-                            <div class="users-groups-row-one-shrink">
-                                <ag-grid-angular style="width: 30em; height: 100%;" class="ag-fresh"
-                                                 [gridOptions]="manGridOptions"
-                                                 [rowData]="managingLabs"
-                                                 [columnDefs]="manColumnDefs"
-                                                 [rowSelection]="rowSelection"
-                                                 (gridReady)="onManGridReady($event)"
-                                                 (onGridSizeChanged)="onManGridSizeChanged($event)"
-                                                 [enableSorting]="true">
-                                </ag-grid-angular>
-
-                            </div>
-                            </div>
-                        </div>
-                    </split-area>
-                    </split>
-                    <div class="flex-container users-groups-row-one" style="flex-grow:.1">
-                        <span *ngIf="userForm.dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
-                            Your changes have not been saved
-                        </span>
-
-                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveUser()"><img src="../../assets/save.png">Save</button>
-                    </div>
-                </div>
-                <div *ngIf="isGroupsTab && selectedGroup" style="height: 100%">
-                    <!--groups tab group-->
-                    <mat-tab-group id="groupTabGroup" style="height: 90%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
-                        <mat-tab groupTab label="Group"  style="height:100%;">
-                            <div *ngIf="isGroupSubTab && selectedGroup" #groupsDetail class="flex-column-container ug-background" style="width: 100%">
+                        </mat-tab>
+                    </mat-tab-group>
+                </split-area>
+                <split-area size="70">
+                    <div *ngIf="isUserTab && selectedUser" #userDetail class="flex-column-container ug-background" style="width: 100%">
+                        <split direction="vertical">
+                            <split-area size="75" style="background: white">
+                                <!--user detail-->
                                 <div class="flex-column-container">
-                                    <form style="width: 100%" [formGroup]="groupForm">
+                                    <form style="width: 100%" [formGroup]="userForm">
                                         <div class="users-groups-row-one">
                                             <div class="formRow">
                                                 <mat-form-field class="formField">
                                                     <input matInput formControlName="firstName" placeholder="First name">
-                                                    <mat-error *ngIf="groupForm.controls['firstName'].hasError('incorrect')">
-                                                        First name or Last name <strong>required</strong>
+                                                    <mat-error *ngIf="userForm.controls['firstName'].hasError('required')">
+                                                        First name is <strong>required</strong>
                                                     </mat-error>
                                                 </mat-form-field>
                                                 <mat-form-field class="formField">
-                                                    <input matInput formControlName="lastName" placeholder="Last Name (or lab name)">
-                                                    <mat-error *ngIf="groupForm.controls['lastName'].hasError('incorrect')">
-                                                        Last name or First name <strong>required</strong>
+                                                    <input matInput formControlName="lastName" placeholder="Last Name">
+                                                    <mat-error *ngIf="userForm.controls['lastName'].hasError('required')">
+                                                        Last name is <strong>required</strong>
                                                     </mat-error>
-                                                    <mat-hint>PI gets billing emails + notifications.</mat-hint>
+                                                </mat-form-field>
+                                                <mat-checkbox formControlName="isActive" (change)="onIsActiveChange($event)">User is Active</mat-checkbox>
+                                            </div>
+                                        </div>
+                                        <div class="users-groups-row-one">
+                                            <div class="formRow" cellspacing="0">
+                                                <mat-form-field class="formField">
+                                                    <input matInput formControlName="phone" placeholder="Phone">
+                                                </mat-form-field>
+                                                <mat-form-field class="formField">
+                                                    <input matInput formControlName="email" placeholder="Email">
+                                                    <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
+                                                    <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
+                                                </mat-form-field>
+                                                <mat-form-field class="formField">
+                                                    <input matInput formControlName="ucscUrl" placeholder="UCSC Url">
                                                 </mat-form-field>
                                             </div>
                                         </div>
                                         <div class="users-groups-row-one">
                                             <div class="formRow" cellspacing="0">
                                                 <mat-form-field class="formField">
-                                                    <input matInput formControlName="contactPhone" placeholder="Phone">
+                                                    <input matInput formControlName="institute" placeholder="Institution (Optional)">
                                                 </mat-form-field>
                                                 <mat-form-field class="formField">
-                                                    <input matInput formControlName="contactEmail" placeholder="Email">
-                                                    <mat-error *ngIf="this.groupEmailFC.hasError('required')">Required</mat-error>
-                                                    <mat-error *ngIf="this.groupEmailFC.hasError('email') && !this.groupEmailFC.hasError('required')">Valid Email Required</mat-error>
+                                                    <input matInput formControlName="department" placeholder="Department (Optional)">
                                                 </mat-form-field>
                                             </div>
                                         </div>
@@ -343,29 +171,81 @@
                                                 <div class="users-groups-row-one ug-white-background">
                                                     <!--need flex row container-->
                                                     <div class="flex-row-container" style="width: 100%">
+                                                        <div  class="users-groups-row-one" style="margin-right: 2em">
+                                                            <div class="flex-column-container">
+                                                                <div class="users-groups-type-row">
+                                                                    <mat-radio-group formControlName="userType" (change)="onUserTypeChange($event)">
+                                                                        <mat-radio-button [value]="USER_TYPE_UNIVERSITY">University User</mat-radio-button>
+                                                                        <mat-radio-button [value]="USER_TYPE_EXTERNAL">External User</mat-radio-button>
+                                                                    </mat-radio-group>
+                                                                </div>
+                                                                <div *ngIf="usertypeFC.value===USER_TYPE_UNIVERSITY" class="users-groups-unid-row">
+                                                                    <mat-form-field>
+                                                                        <input matInput formControlName="uNid" placeholder="uNID">
+                                                                        <mat-error *ngIf="userForm.controls['uNid'].hasError('required') || userForm.controls['uNid'].hasError('pattern')">Invalid uNID</mat-error>
+                                                                    </mat-form-field>
+                                                                </div>
+                                                                <div *ngIf="usertypeFC.value===USER_TYPE_EXTERNAL" class="users-groups-unid-row">
+                                                                    <div class="formRow" cellspacing="0">
+                                                                        <mat-form-field class="formField">
+                                                                            <input matInput formControlName="userName" placeholder="User name">
+                                                                            <mat-error *ngIf="this.usernameFC.hasError('required')">Required</mat-error>
+                                                                        </mat-form-field>
+                                                                        <mat-form-field class="formField">
+                                                                            <input matInput type="password" formControlName="password" placeholder="Password">
+                                                                            <mat-error *ngIf="this.passwordFC.hasError('validatePassword')">{{this.passwordUtilService.PASSWORD_COMPLEXITY_ERROR}}</mat-error>
+                                                                        </mat-form-field>
+                                                                        <mat-form-field class="formField">
+                                                                            <input matInput type="password" formControlName="passwordConfirm" placeholder="Confirm Password">
+                                                                            <mat-error *ngIf="this.passwordConfirmFC.hasError('validatePasswordConfirm')">{{this.passwordUtilService.PASSWORD_MATCH_ERROR}}</mat-error>
+                                                                        </mat-form-field>
+                                                                    </div>
+                                                                </div>
+                                                                <div *ngIf="userType===USER_TYPE_EXTERNAL" class="users-groups-unid-row">
+                                                                    <p>
+                                                                        Passwords must be 8-25 characters long, contain no spaces
+                                                                        <br>
+                                                                        or slashes, and contain three or more of the following:
+                                                                        <br>
+                                                                        lowercase letter, uppercase letter, digit, or symbol.
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <div class="users-groups-row-one">
                                                             <div class="flex-column-container">
                                                                 <div class="users-groups-unid-row" style="height: 2em">
                                                                     <label class="ug-label">Permission Level</label>
                                                                 </div>
                                                                 <div class="users-groups-unid-row">
-                                                                    <mat-radio-group class="permission-radio-group" formControlName="pricing">
-                                                                        <mat-radio-button value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
-                                                                        <mat-radio-button value="EXACADEMIC"><img src="../../assets/graduation_cap.png"> External Academic</mat-radio-button>
-                                                                        <mat-radio-button value="EXCOMM"><img src="../../assets/building.png"> External Commercial</mat-radio-button>
+                                                                    <mat-radio-group class="permission-radio-group" formControlName="permissionLevel" (change)="onPermissionLevelChange($event)">
+                                                                        <mat-radio-button value="LAB">Group</mat-radio-button>
+                                                                        <mat-radio-button value="ADMIN">Admin</mat-radio-button>
+                                                                        <mat-radio-button value="BILLING">Billing Admin</mat-radio-button>
+                                                                        <mat-radio-button value="SUPER" [disabled] = !secAdvisor.isSuperAdmin>Super Admin</mat-radio-button>
                                                                     </mat-radio-group>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="users-groups-row-one ug-white-background">
+                                                <div *ngIf="codeUserPermissionKind==='BILLING'||codeUserPermissionKind==='ADMIN'" class="users-groups-row-one ug-white-background">
                                                     <section class="permission-radio-group">
                                                         <div style="text-align: right;height: 2em">
-                                                            <label class="ug-label" style="width: 100%">Core facilities</label>
+                                                            <label class="ug-label" style="width: 100%">Core facilities this user manages</label>
                                                         </div>
-                                                        <mat-checkbox *ngFor="let core of myCoreFacilities" [formControlName]="core.display">
-                                                            {{core.display}}
+                                                        <mat-checkbox *ngFor="let cfm of coreFacilitiesIManage" [checked]=cfm.isSelected [formControlName]=cfm.mDisplay>
+                                                            {{cfm.display}}
+                                                        </mat-checkbox>
+                                                    </section>
+                                                </div>
+                                                <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && (this.secAdvisor.isSuperAdmin||this.secAdvisor.isBillingAdmin)" class="users-groups-row-one ug-white-background">
+                                                    <section class="permission-radio-group">
+                                                        <div style="text-align: right;height: 2em">
+                                                            <label class="ug-label" style="width: 100%">Submit experiments in all labs in core</label>
+                                                        </div>
+                                                        <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>
+                                                            {{cf.display}}
                                                         </mat-checkbox>
                                                     </section>
                                                 </div>
@@ -373,41 +253,158 @@
                                         </div>
                                     </form>
                                 </div>
-                            </div>
-                        </mat-tab>
-                        <mat-tab label="Billing Admin"  style="height:100%;">
-                            <div *ngIf="selectedGroup">
-                                <billing-admin-tab [group]="selectedGroup" #billingAdminTab ></billing-admin-tab>
-                            </div>
-                        </mat-tab>
-                        <mat-tab label="Membership"  style="height:100%;">
-                            <div *ngIf="selectedGroup">
-                                <membership-tab [memberGroup]="selectedGroup" [users]="rowData" #membershipTab ></membership-tab>
-                            </div>
-                        </mat-tab>
-                        <mat-tab #groupTab label="Billing Accounts"  style="height:100%;">
-                            <billing-account-tab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
-                        </mat-tab>
-                        <mat-tab label="Invoices"  style="height:100%;">
-                            <div *ngIf="selectedGroup">
-                                <invoices-tab [memberGroup]="selectedGroup" #invoicesTab></invoices-tab>
-                            </div>
-                        </mat-tab>
-                    </mat-tab-group>
-                    <div *ngIf="isGroupsTab" class="flex-container users-groups-row-one" style="flex-grow:.1">
-                        <button mat-button (click)="verify('lab')"><img src="../../assets/email_go.png">Send email to verify users</button>
-                        <span *ngIf="groupFormDirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
-                                    Your changes have not been saved
-                                </span>
-                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!groupFormValid" (click)="saveGroup()"><img src="../../assets/save.png">Save</button>
-                        <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+                            </split-area>
+                            <split-area size="25" style="background: white">
+                                <div class="users-groups-row-one ug-background" style="height:100%">
+                                    <div class="flex-row-container" style="width: 100%">
+                                        <div class="users-groups-row-one-shrink">
+                                            <ag-grid-angular style="width: 30em; height: 100%;"
+                                                             class="ag-fresh"
+                                                             [gridOptions]="labGridOptions"
+                                                             [rowData]="labs"
+                                                             [columnDefs]="labColumnDefs"
+                                                             [rowSelection]="rowSelection"
+                                                             (gridReady)="onLabGridReady($event)"
+                                                             [enableSorting]="true">
+                                            </ag-grid-angular>
+                                        </div>
+                                        <div class="users-groups-row-one-shrink">
+                                            <ag-grid-angular style="width: 30em; height: 100%;"
+                                                             class="ag-fresh"
+                                                             [gridOptions]="collGridOptions"
+                                                             [rowData]="collaboratingLabs"
+                                                             [columnDefs]="collColumnDefs"
+                                                             [rowSelection]="rowSelection"
+                                                             (gridReady)="onCollGridReady($event)"
+                                                             [enableSorting]="true">
+                                            </ag-grid-angular>
+                                        </div>
+                                        <div class="users-groups-row-one-shrink">
+                                            <ag-grid-angular style="width: 30em; height: 100%;"
+                                                             class="ag-fresh"
+                                                             [gridOptions]="manGridOptions"
+                                                             [rowData]="managingLabs"
+                                                             [columnDefs]="manColumnDefs"
+                                                             [rowSelection]="rowSelection"
+                                                             (gridReady)="onManGridReady($event)"
+                                                             (onGridSizeChanged)="onManGridSizeChanged($event)"
+                                                             [enableSorting]="true">
+                                            </ag-grid-angular>
+                                        </div>
+                                    </div>
+                                </div>
+                            </split-area>
+                        </split>
+                        <div class="flex-container users-groups-row-one" style="flex-grow:.1">
+                            <span *ngIf="userForm.dirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
+                                Your changes have not been saved
+                            </span>
+                            <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveUser()"><img src="../../assets/save.png">Save</button>
+                        </div>
                     </div>
-                </div>
-
+                    <div *ngIf="isGroupsTab && selectedGroup" style="height: 100%">
+                        <!--groups tab group-->
+                        <mat-tab-group id="groupTabGroup" style="height: 90%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
+                            <mat-tab groupTab label="Group"  style="height:100%;">
+                                <div *ngIf="isGroupSubTab && selectedGroup" #groupsDetail class="flex-column-container ug-background" style="width: 100%">
+                                    <div class="flex-column-container">
+                                        <form style="width: 100%" [formGroup]="groupForm">
+                                            <div class="users-groups-row-one">
+                                                <div class="formRow">
+                                                    <mat-form-field class="formField">
+                                                        <input matInput formControlName="firstName" placeholder="First name">
+                                                        <mat-error *ngIf="groupForm.controls['firstName'].hasError('incorrect')">
+                                                            First name or Last name <strong>required</strong>
+                                                        </mat-error>
+                                                    </mat-form-field>
+                                                    <mat-form-field class="formField">
+                                                        <input matInput formControlName="lastName" placeholder="Last Name (or lab name)">
+                                                        <mat-error *ngIf="groupForm.controls['lastName'].hasError('incorrect')">
+                                                            Last name or First name <strong>required</strong>
+                                                        </mat-error>
+                                                        <mat-hint>PI gets billing emails + notifications.</mat-hint>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                            <div class="users-groups-row-one">
+                                                <div class="formRow" cellspacing="0">
+                                                    <mat-form-field class="formField">
+                                                        <input matInput formControlName="contactPhone" placeholder="Phone">
+                                                    </mat-form-field>
+                                                    <mat-form-field class="formField">
+                                                        <input matInput formControlName="contactEmail" placeholder="Email">
+                                                        <mat-error *ngIf="this.groupEmailFC.hasError('required')">Required</mat-error>
+                                                        <mat-error *ngIf="this.groupEmailFC.hasError('email') && !this.groupEmailFC.hasError('required')">Valid Email Required</mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                            <div class="users-groups-row-one">
+                                                <div class="flex-row-container" style="width: 100%">
+                                                    <div class="users-groups-row-one ug-white-background">
+                                                        <!--need flex row container-->
+                                                        <div class="flex-row-container" style="width: 100%">
+                                                            <div class="users-groups-row-one">
+                                                                <div class="flex-column-container">
+                                                                    <div class="users-groups-unid-row" style="height: 2em">
+                                                                        <label class="ug-label">Permission Level</label>
+                                                                    </div>
+                                                                    <div class="users-groups-unid-row">
+                                                                        <mat-radio-group class="permission-radio-group" formControlName="pricing">
+                                                                            <mat-radio-button value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
+                                                                            <mat-radio-button value="EXACADEMIC"><img src="../../assets/graduation_cap.png"> External Academic</mat-radio-button>
+                                                                            <mat-radio-button value="EXCOMM"><img src="../../assets/building.png"> External Commercial</mat-radio-button>
+                                                                        </mat-radio-group>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="users-groups-row-one ug-white-background">
+                                                        <section class="permission-radio-group">
+                                                            <div style="text-align: right;height: 2em">
+                                                                <label class="ug-label" style="width: 100%">Core facilities</label>
+                                                            </div>
+                                                            <mat-checkbox *ngFor="let core of myCoreFacilities" [formControlName]="core.display">
+                                                                {{core.display}}
+                                                            </mat-checkbox>
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </mat-tab>
+                            <mat-tab label="Billing Admin"  style="height:100%;">
+                                <div *ngIf="selectedGroup">
+                                    <billing-admin-tab [group]="selectedGroup" #billingAdminTab ></billing-admin-tab>
+                                </div>
+                            </mat-tab>
+                            <mat-tab label="Membership"  style="height:100%;">
+                                <div *ngIf="selectedGroup">
+                                    <membership-tab [memberGroup]="selectedGroup" [users]="rowData" #membershipTab ></membership-tab>
+                                </div>
+                            </mat-tab>
+                            <mat-tab #groupTab label="Billing Accounts"  style="height:100%;">
+                                <billing-account-tab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
+                            </mat-tab>
+                            <mat-tab label="Invoices"  style="height:100%;">
+                                <div *ngIf="selectedGroup">
+                                    <invoices-tab [memberGroup]="selectedGroup" #invoicesTab></invoices-tab>
+                                </div>
+                            </mat-tab>
+                        </mat-tab-group>
+                        <div *ngIf="isGroupsTab" class="flex-container users-groups-row-one" style="flex-grow:.1">
+                            <button mat-button (click)="verify('lab')"><img src="../../assets/email_go.png">Send email to verify users</button>
+                            <span *ngIf="groupFormDirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
+                                Your changes have not been saved
+                            </span>
+                            <button mat-button *ngIf="!this.showSpinner" [disabled]="!groupFormValid" (click)="saveGroup()"><img src="../../assets/save.png">Save</button>
+                            <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+                        </div>
+                    </div>
                 </split-area>
             </split>
-
         </div>
     </div>
 </div>
-
