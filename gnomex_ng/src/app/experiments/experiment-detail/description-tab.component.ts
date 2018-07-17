@@ -1,76 +1,121 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {ExperimentViewService} from "../../services/experiment-view.service";
 import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
+import {ActivatedRoute} from "@angular/router";
 
 
 
 
 @Component({
-    selector: "description",
+    selector: "description-tab",
     templateUrl: "./description-tab.component.html",
     styles:[`textarea { resize: none; } `]
 
 })
-export class DescriptionTab extends PrimaryTab implements OnInit{
-    public static readonly tbarSettings:string  ="bold italic underline | left center right";
+export class DescriptionTab implements OnInit, AfterViewInit {
+    public static readonly tbarSettings:string = "bold italic underline | left center right";
     @ViewChild('editorReference') myEditor: jqxEditorComponent;
-    private toolbarSettings:string;
-    descriptionForm:FormGroup;
-    name: string = "Description Tab";
-    //@Override
-    protected _state:string;
+    public toolbarSettings:string;
 
-    constructor(protected fb: FormBuilder,private expViewRules:ExperimentViewService) {
-        super(fb,expViewRules);
+    private experiment:any;
+    descriptionForm:FormGroup;
+    private _showEditor:boolean = false;
+    private _edit:boolean = false;
+
+    private description:string = '';
+
+
+    @Input() set edit(val:boolean){
+        this._edit = val;
+        if(this.descriptionForm){
+            if(this._edit){
+                this.descriptionForm.get("expName").enable();
+                this.descriptionForm.get("notesForCore").enable();
+                this.toolbarSettings = DescriptionTab.tbarSettings;
+            }else{
+                this.descriptionForm.get("expName").enable();
+                this.descriptionForm.get("notesForCore").enable();
+                this.toolbarSettings = '';
+            }
+        }
+    }
+    get edit():boolean{
+        return this._edit;
     }
 
 
+    @Input() set showEditor(val:boolean){ // mat-tab removes tab when changing to another tab
+        this._showEditor = val;
+        if(this.myEditor){
+            if(val){
+                this.myEditor.val(this.description);
+            }else{
+                this.description = this.myEditor.val();
+            }
 
-    //@Override
-    public setState(value: string) {
-        /*
-            Put Your logic for your controls in setState() when state changes (ex. edit to view).
-            this.tabIsActive should be checked like below so you know the component is visible when state changes.
-            If you change state (ex. Edit or View) while the tab is invisible jqwidgets won't be able to redraw itself properly.
-            If you don't do this check it will not break anything it's just not a neccessary expense
-            Erik
-         */
-        this._state = value;
-        super.setState(this._state);
-        if(this.tabIsActive){ 
-            if(this.edit){
-                this.toolbarSettings = DescriptionTab.tbarSettings;
-            }
-            else{
-                this.toolbarSettings = '';
-            }
+        }else{
+            setTimeout(()=>{
+                if(this.myEditor){
+                    if(val){
+                        this.myEditor.val(this.description);
+                    }else{
+                        this.description = this.myEditor.val();
+                    }
+                }
+            });
 
         }
 
+
     }
-    //@Override
-    public getState(){
-        return this._state
+
+    get showEditor():boolean{
+        return this._showEditor;
+    }
+
+
+    constructor(private fb: FormBuilder,private expViewRules:ExperimentViewService,
+                private route:ActivatedRoute) {
     }
 
 
     ngOnInit(){
         this.descriptionForm = this.fb.group({
             expName: '',
-            expDescript: ['',this.rules.getControlValidator("expDescript")],
-            notesForCore:['',this.rules.getControlValidator("notesForCore")],
+            notesForCore:['',Validators.maxLength(500)],
         });
-        this.setupForm('capSeq',this.descriptionForm);
+        this.toolbarSettings = DescriptionTab.tbarSettings;
+        this.route.data.forEach(data => {
+            let exp = data.experiment;
+            if(exp && exp.Request){
+                this.experiment = exp.Request;
+                this.descriptionForm.get("expName").setValue( this.experiment.name);
+                this.descriptionForm.get("notesForCore").setValue( this.experiment.notes);
+                this.description =  this.experiment.description;
+                if(this.showEditor){
+                    this.myEditor.val(this.description);
+                }
+
+                // default is view mode
+                this.descriptionForm.get("expName").disable();
+                this.descriptionForm.get("notesForCore").disable();
+                this.toolbarSettings = "";
+
+
+            }
+        });
+
+
 
     }
 
-    save(){
-        //this.changeStatus.emit({status:true, component: this});
+    ngAfterViewInit(){
     }
+
 
 }

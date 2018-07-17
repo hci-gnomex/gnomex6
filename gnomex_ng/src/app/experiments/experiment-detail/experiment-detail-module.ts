@@ -15,6 +15,11 @@ import {
 } from './index'
 
 
+import {
+    RichEditorModule,
+} from '../../../modules/index';
+
+
 
 @NgModule({
     imports: [
@@ -24,7 +29,8 @@ import {
         FormsModule,
         ReactiveFormsModule,
         UtilModule,
-        RelatedDataModule
+        RelatedDataModule,
+        RichEditorModule
     ],
 
     declarations: [

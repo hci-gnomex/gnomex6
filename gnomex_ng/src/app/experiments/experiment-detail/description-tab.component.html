@@ -1,63 +1,30 @@
-<form class="form-horizontal" (ngSubmit)="save()" [formGroup]="descriptionForm">
-    <fieldset>
-        <div *ngIf="edit" class="form-group" >
-            <label class="col-md-2 control-label" for="experimentNameId">Experiment Name </label>
+<form class="flex-container-col" style="margin:1em;font-size:small;" [formGroup]="descriptionForm">
 
-            <div class="col-md-8">
-                <input class="form-control" id="experimentNameId" type="text" placeholder="Experiment Name" formControlName="expName"
-                />
-            </div>
-        </div>
-        <div class="form-group" >
-            <label class="col-md-2 control-label">Experiment Description </label>
-            <br/>
+    <mat-form-field style="width:calc(100% - 2em);margin-top:0.5em; margin-bottom:0.5em; " *ngIf="edit" >
+        <input matInput type="text" placeholder="Experiment Name" formControlName="expName"/>
+    </mat-form-field>
 
-            <div class="col-md-8">
-               <!-- <jqxEditor #editorReference id="experimentDescriptionId" [width]="800" [height]="400"
-                           [editable]="edit"
-                           [tools]="toolbarSettings"
-                           formControlName="expDescript"
-                           [formControl]="descriptionForm.get('expDescript')"
-                           [toolbarPosition]="'bottom'">
-                </jqxEditor> -->
-            </div>
-            <span style="color:red;" class="help-block" *ngIf="(descriptionForm.get('expDescript').touched || descriptionForm.get('expDescript').dirty) && descriptionForm.get('expDescript').errors">
-                <span *ngIf="descriptionForm.get('expDescript').errors.required">
-                    Please enter your description
-                </span>
-                <span style="color:red;" *ngIf="descriptionForm.get('expDescript').errors.maxlength">
-                    The description should be less than 5000 characters
-                </span>
-            </span>
 
-        </div>
-        <div class="form-group" >
-            <label class="col-md-2 control-label" for="notesForCoreId">Notes for Core </label>
-            <br/>
+    <div style="width:calc(100% - 2em)">
+        <label style="margin-bottom:0.5em;" for="experimentDescriptionId" >Experiment Description </label>
+        <jqxEditor *ngIf="this.showEditor"
+                   #editorReference
+                   id="experimentDescriptionId"
+                   width="100%"
+                   [height]="300"
+                   [editable]="edit"
+                   [tools]="toolbarSettings"
+                   [toolbarPosition]="'bottom'">
+        </jqxEditor>
 
-            <div class="col-md-8">
-                <textarea id="notesForCoreId"
-                          [readonly]="!edit"
-                          formControlName="notesForCore"
-                          rows="15"
-                          cols="120">
+    </div>
 
-                </textarea>
 
-            </div>
-        </div>
+    <mat-form-field style="width:calc(100% - 2em);margin-top:0.5em; margin-bottom:0.5em;font-size:small;">
+        <textarea matInput placeholder="Notes for Core" formControlName="notesForCore" matTextareaAutosize matAutosizeMinRows="4" matAutosizeMaxRows="8"></textarea>
+        <mat-error *ngIf="descriptionForm.get('notesForCore').hasError('maxlength')"> Summary can be at most 5000 characters</mat-error>
+    </mat-form-field>
 
-        <div class="form-group">
 
-            <button type="submit" [disabled]="!descriptionForm.valid"> Save </button>
-        </div>
-
-    </fieldset>
 </form>
-<br>Dirty: {{ descriptionForm.dirty }}
-<br>Touched: {{ descriptionForm.touched }}
-<br>Valid: {{ descriptionForm.valid }}
-<br>Value: {{ descriptionForm.value | json }}
-<br>Form Errors: {{descriptionForm.errors | json}}
-<br>Parent Valid: {{ this.theForm.valid | json}}
 <!--[tools]="toolbarSettings"> -->

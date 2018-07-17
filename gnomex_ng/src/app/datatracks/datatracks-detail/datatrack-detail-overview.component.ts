@@ -10,7 +10,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogRef, MatTabChangeEvent} from "@angular/material";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {DatatracksSummaryTabComponent} from "./datatracks-summary-tab.component";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
@@ -59,6 +59,8 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     public showSaveSpinner:boolean = false;
     public canWrite= false;
     public folderList:any[];
+    public initSummaryView: boolean = true;
+
 
     private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
     public types = OrderType;
@@ -327,7 +329,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.orderValidateService.emitOrderValidateSubject();
         let name = this.dtOverviewForm.get("summaryForm.folderName").value;
         let summary = this.dtOverviewForm.get("summaryForm.summary").value;
-        let description:string = this.dtOverviewForm.get("summaryForm.description").value;
+        let description:string = this.orderValidateService.propsNotOnForm['description'];
         let idAppUser:string = '';
         let codeVisibility:string = this.dtOverviewForm.get("visibilityForm.codeVisibility").value;
         let idLab:string = this.dtOverviewForm.get("visibilityForm.lab").value.idLab;
@@ -392,8 +394,12 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             })
     }
 
-    tabChanged(event:any){
-
+    tabChanged(event:MatTabChangeEvent){
+        if(event.tab.textLabel === "Summary"){
+           this.initSummaryView = true;
+        }else{
+            this.initSummaryView = false;
+        }
     }
 
 
