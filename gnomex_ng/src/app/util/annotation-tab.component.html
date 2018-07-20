@@ -3,21 +3,20 @@
         <ng-container  [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations">
             <div *ngSwitchCase="'CHECK'" class="annot-control">
                 <label style="margin-right: 1em;"  >{{annot.name}}  </label>
-                <mat-checkbox  [formControl]="this.annotationForm.controls[annot.name]" >
+                <mat-checkbox  [formControl]="this.form.controls[annot.name]" >
                 </mat-checkbox>
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
-
             </div>
             <mat-form-field *ngSwitchCase="'TEXT'" class="annot-control" >
-                <input matInput placeholder="{{annot.name}}" [formControl]="this.annotationForm.controls[annot.name]">
+                <input matInput placeholder="{{annot.name}}" [formControl]="this.form.controls[annot.name]">
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
             </mat-form-field>
             <mat-form-field *ngSwitchCase="'MOPTION'" class="annot-control" >
-                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.annotationForm.controls[annot.name]">
+                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.form.controls[annot.name]">
                     <mat-option *ngFor="let opt of annot.PropertyOption"
                                 #mOptRef
                                 (onSelectionChange)="selectOption(mOptRef)"
@@ -29,7 +28,7 @@
                 </mat-error>
             </mat-form-field>
             <mat-form-field  *ngSwitchCase="'OPTION'" class="annot-control">
-                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" [formControl]="this.annotationForm.controls[annot.name]">
+                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" [formControl]="this.form.controls[annot.name]">
                     <mat-option
                             *ngFor="let opt of annot.PropertyOption"
                             #optRef
@@ -42,7 +41,7 @@
                 </mat-error>
             </mat-form-field>
             <div *ngSwitchCase="'URL'" class="annot-control">
-                <url-annotation [formControl]="this.annotationForm.controls[annot.name]" >  </url-annotation>
+                <url-annotation [formControl]="this.form.controls[annot.name]">  </url-annotation>
             </div>
 
         </ng-container>
