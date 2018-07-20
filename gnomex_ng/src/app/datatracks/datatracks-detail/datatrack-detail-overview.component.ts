@@ -107,7 +107,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
                 setTimeout(()=>{
                     this.dtOverviewForm.addControl("summaryForm", this.summaryComponet.summaryFormGroup);
-                    this.dtOverviewForm.addControl("annotationForm", this.annotationComponent.annotationForm);
+                    this.dtOverviewForm.addControl("annotationForm", this.annotationComponent.form);
                     this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
                     this.dtOverviewForm.markAsPristine();
                 });
@@ -316,7 +316,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 name: this.datatrack.name,
                 number: this.datatrack.number,
                 type: "dataTrackNumber"
-
 
             }
         });

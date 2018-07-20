@@ -99,7 +99,7 @@ import {BrowseOrderValidateService} from "./browse-order-validate.service";
         LabResolverService,
         BillingPOFormService,
         ProductsService,
-        NewExperimentService
+        NewExperimentService,
         ProtocolService,
         BrowseOrderValidateService
     ]})

@@ -105,7 +105,7 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
         AngularSplitModule,
         DynamicModule,
         DynamicModule.withComponents([TabNotesViewComponent, AnnotationTabComponent, TabSampleSetupViewComponent, TabSeqSetupView,
-            TabSeqProtoView])
+            TabSeqProtoView]),
 
         AgGridModule.withComponents([
             DateRenderer,
