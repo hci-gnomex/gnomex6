@@ -7,6 +7,8 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {OrderType} from "../../util/annotation-tab.component";
 import {Subscription} from "rxjs/Subscription";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
+import {ExperimentsService} from "../experiments.service";
+import {MatTabChangeEvent} from "@angular/material";
 
 
 @Component({
@@ -28,21 +30,19 @@ export class ExperimentDetailOverviewComponent  implements OnInit, OnDestroy{
     private experimentOverviewNode:any;
     private relatedObjects:IRelatedObject = {};
     private showRelatedDataTab:boolean =false;
+    public initDescriptionTab = false;
 
 
-    constructor(private analysisService: AnalysisService,
+    constructor(private experimentService: ExperimentsService,
                 private route:ActivatedRoute) {
     }
 
     ngOnInit():void{
 
-        this.overviewListSubscription  = this.analysisService.getAnalysisOverviewListSubject()
+        this.overviewListSubscription  = this.experimentService.getExperimentOverviewListSubject()
             .subscribe(data =>{
                 this.experimentOverviewNode = data;
-
             });
-
-
 
         this.route.data.forEach(data => {
             this.experiment = data.experiment.Request;
@@ -99,6 +99,17 @@ export class ExperimentDetailOverviewComponent  implements OnInit, OnDestroy{
         }
 
     }
+
+    tabChanged(event:MatTabChangeEvent){
+        if(event.tab.textLabel === "Description"){
+            this.initDescriptionTab = true;
+        }else{
+            this.initDescriptionTab = false;
+        }
+    }
+
+
+
 
     save(){
 

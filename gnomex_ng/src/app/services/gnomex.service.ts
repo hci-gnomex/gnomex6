@@ -95,17 +95,17 @@ export class GnomexService {
 
 
     constructor(
-                private dictionaryService: DictionaryService,
-                private propertyService: PropertyService,
-                private progressService: ProgressService,
-                private labListService: LabListService,
-                private projectService: ProjectService,
-                private createSecurityAdvisorService: CreateSecurityAdvisorService,
-                private authenticationService:AuthenticationService,
-                private launchPropertiesService: LaunchPropertiesService,
-                //private http:Http
-                private http:HttpClient,
-                private router:Router) {
+              private dictionaryService: DictionaryService,
+              private propertyService: PropertyService,
+              private progressService: ProgressService,
+              private labListService: LabListService,
+              private projectService: ProjectService,
+              private createSecurityAdvisorService: CreateSecurityAdvisorService,
+              private authenticationService:AuthenticationService,
+              private launchPropertiesService: LaunchPropertiesService,
+              //private http:Http
+              private http:HttpClient,
+              private router:Router) {
     }
 
     /* The header only uses this for displaying itself.
@@ -320,7 +320,7 @@ export class GnomexService {
 
 
 
-    // Sort core facilities by sort order
+        // Sort core facilities by sort order
         if (this.myCoreFacilities)
             this.myCoreFacilities = this.myCoreFacilities.sort((n1, n2) => n1.sortOrder - n2.sortOrder);
 
@@ -400,7 +400,7 @@ export class GnomexService {
 
     /**
      * Determine if the admin uses the Plate Based workflow screens (Fill Plate, Build Run, Review results)
-      * @returns {boolean}
+     * @returns {boolean}
      */
     doesManagePlateBasedWorkflow(): boolean {
         if (!this.createSecurityAdvisorService.isGuest) {
@@ -624,7 +624,7 @@ export class GnomexService {
 
     hasGroupsToManage(): boolean {
         if (this.getGroupsToManage())
-        return this.getGroupsToManage().length > 0;
+            return this.getGroupsToManage().length > 0;
     }
 
     getGroupsToManage(): any[] {
@@ -812,34 +812,81 @@ export class GnomexService {
 
     }
 
-    public navByNumber(number:string){
+    private recurseTargetNodeList(targetName:string,queryObj:any, targetNodeList:Array<any> ){
+        let keys = Object.keys(queryObj);
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i] === targetName) {
+                targetNodeList.push(queryObj[keys[i]]);
+                break;
+            }
+            else if(typeof queryObj[keys[i]] === "object" || Array.isArray(queryObj[keys[i]])) {
+                this.recurseTargetNodeList(targetName, queryObj[keys[i]], targetNodeList);
+
+            }
+
+
+        }
+
+    }
+    public getTargetNodeList(targetName:string, queryObj:any):Array<any>{
+        let targetNodeList:Array<any> = [];
+        this.recurseTargetNodeList(targetName,queryObj, targetNodeList);
+        return targetNodeList;
+
+    }
+
+    public navByNumber(number:string,idInstead?:boolean){
         let params: HttpParams = new HttpParams();
+        //idInstead equals true means using you'll be using the id in place of the number
+        // it still should have a letter in it for example for a request '12425R'
 
         if(number){
             let match = number.match(/([A-Za-z]*)([0-9]+)([A-Za-z]?)/);
             let path:Array<string> = [];
 
             if( match[3].toUpperCase() === 'R'){
-                params = params.set("requestNumber", number);
+
                 //path = ["experiments","idProject","browsePanel","idRequest"];
                 path = ["experiments"];
                 let sub = this.navInitBrowseExperimentSubject;
-                this.getOrderID(params,path,sub);
+                if(!idInstead){
+                    params = params.set("requestNumber", number);
+                    this.getOrderID(params,path,sub);
+                }else{
+                    params = params.set("requestNumber", match[2])
+                        .set("hasID","Y");
+                    this.getOrderID(params,path,sub);
+                }
 
             }else if(match[1].toUpperCase() === 'A'){
-                params = params.set("analysisNumber", number);
+
                 //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
                 path = ["analysis"];
                 let sub = this.navInitBrowseAnalysisSubject;
-                this.getOrderID(params,path,sub);
+                if(!idInstead){
+                    params = params.set("analysisNumber", number);
+                    this.getOrderID(params,path,sub);
+                }else{
+                    params = params.set("analysisNumber",match[2])
+                        .set("hasID", "Y");
+                    this.getOrderID(params,path,sub);
+                }
 
             }else if(match[1].toUpperCase()=== 'DT' ){
-                params = params.set("dataTrackNumber",number);
+
                 //path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
                 path = ["datatracks"];
                 let sub = this.navInitBrowseDatatrackSubject;
-                this.getOrderID(params,path,sub);
-            }else if(match[1].toUpperCase() === 'T'){
+                if(!idInstead){
+                    params = params.set("dataTrackNumber",number);
+                    this.getOrderID(params,path,sub);
+                }else{
+                    params = params.set("dataTrackNumber",match[2])
+                        .set("hasID","Y");
+                    this.getOrderID(params,path,sub);
+                }
+
+            }else if(match[1].toUpperCase() === 'T'){ // topic doesn't have number only ID
                 if(match[2]){
                     params = params.set("topicNumber", match[2]);
                 }

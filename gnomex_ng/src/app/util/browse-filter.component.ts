@@ -12,6 +12,7 @@ import {AnalysisService} from "../services/analysis.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {DataTrackService} from "../services/data-track.service";
 import {BillingService} from "../services/billing.service";
+import {DialogsService} from "./popup/dialogs.service";
 
 @Component({
     selector: 'browse-filter',
@@ -42,7 +43,6 @@ export class BrowseFilterComponent implements OnInit {
     private dateFromString: string;
     private dateToString: string;
 
-    private showBillingPeriodPicker: boolean = false;
     private idBillingPeriodString: string;
 
     private showSearchTextInput: boolean = false;
@@ -125,7 +125,8 @@ export class BrowseFilterComponent implements OnInit {
     constructor(private labListService: LabListService, private getLabService: GetLabService,
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
-                private dictionaryService: DictionaryService, private billingService: BillingService) {
+                private dictionaryService: DictionaryService, private billingService: BillingService,
+                private dialogService: DialogsService) {
         this.showMore = false;
         this.resetFields();
     }
@@ -246,7 +247,6 @@ export class BrowseFilterComponent implements OnInit {
                 this.showExperimentNumberInput = true;
                 this.showInvoiceNumberInput = true;
                 this.showBillingAccountComboBox = true;
-                this.showBillingPeriodPicker = true;
                 this.showEmptyFoldersCheckbox = true;
                 this.showEmptyFoldersCheckboxLabel = this.HIDE_REQUESTS_WITH_NO_BILLING_ITEMS;
 
@@ -660,9 +660,6 @@ export class BrowseFilterComponent implements OnInit {
 
         let params: URLSearchParams = new URLSearchParams();
 
-        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
-            params.set("idBillingPeriod", this.idBillingPeriodString);
-        }
         if (this.showLabComboBox && !(this.idLabString === "")) {
             params.set("idLab", this.idLabString);
         }
@@ -694,9 +691,6 @@ export class BrowseFilterComponent implements OnInit {
         if (this.showEmptyFoldersCheckbox) {
             params.set("showOtherBillingItems", this.showEmptyFoldersFlag ? "Y" : "N");
         }
-        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
-            params.set("idBillingPeriod", this.idBillingPeriodString);
-        }
         if (this.showLabComboBox && !(this.idLabString === "") && (this.experimentNumberString === "" && this.invoiceNumberString === "")) {
             params.set("idLab", this.idLabString);
         }
@@ -726,9 +720,6 @@ export class BrowseFilterComponent implements OnInit {
         if (this.showInvoiceNumberInput && !(this.invoiceNumberString === "")) {
             params.set("invoiceNumber", this.invoiceNumberString);
         }
-        if (this.showBillingPeriodPicker && !(this.idBillingPeriodString === "")) {
-            params.set("idBillingPeriod", this.idBillingPeriodString);
-        }
         if (this.showLabComboBox && !(this.idLabString === "") && noRequestOrInvoiceNumber) {
             params.set("idLab", this.idLabString);
         }
@@ -747,6 +738,8 @@ export class BrowseFilterComponent implements OnInit {
             this.experimentsService.browsePanelParams["refreshParams"] = true;
             this.experimentsService.getProjectRequestList_fromBackend(params);
         } else if (this.mode === this.ORDER_BROWSE) {
+            this.dialogService.startDefaultSpinnerDialog();
+
             let params: URLSearchParams = this.getOrderBrowseParameters();
             this.experimentsService.getExperiments_fromBackend(params);
         } else if (this.mode === this.ANALYSIS_BROWSE) {
@@ -763,17 +756,17 @@ export class BrowseFilterComponent implements OnInit {
             this.dataTrackService.getDatatracksList_fromBackend(params);
         } else if (this.mode === this.BILLING_BROWSE) {
             let billingRequestListParams: URLSearchParams = this.getBillingRequestListParameters();
-            this.billingService.getBillingRequestList(billingRequestListParams).subscribe((response: any) => {
+            this.billingService.getBillingRequestListDep(billingRequestListParams).subscribe((response: any) => {
                 console.log("GetBillingRequestList called");
             });
 
             let billingItemListParams: URLSearchParams = this.getBillingItemListParameters();
-            this.billingService.getBillingItemList(billingItemListParams).subscribe((response: any) => {
+            this.billingService.getBillingItemListDep(billingItemListParams).subscribe((response: any) => {
                 console.log("GetBillingItemList called");
             });
 
             let billingInvoiceListParams: URLSearchParams = this.getBillingInvoiceListParameters();
-            this.billingService.getBillingInvoiceList(billingInvoiceListParams).subscribe((response: any) => {
+            this.billingService.getBillingInvoiceListDep(billingInvoiceListParams).subscribe((response: any) => {
                 console.log("GetBillingInvoiceList called");
             });
         }

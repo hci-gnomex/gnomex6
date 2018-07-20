@@ -19,8 +19,8 @@
     {
       "command": "DeleteRequest",
       "parameter": "requestsToDeleteXMLString",
-      "nodeheader": "",
-      "nodeprefix": "",
+      "nodeheader": "requests",
+      "nodeprefix": "Request",
       "elementhints": [
         {
           "elementname": "requests",
@@ -269,6 +269,30 @@
         {
           "elementname": "notpresent",
           "elementheader": "notpresent1"
+        }
+      ]
+    },
+    {
+      "command": "SaveDataTrack",
+      "parameter": "collaboratorsXML",
+      "nodeheader": "collaborators",
+      "nodeprefix": "AppUser",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveDataTrack",
+      "parameter": "propertiesXML",
+      "nodeheader": "DataTrackProperties",
+      "nodeprefix": "PropertyEntry",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
         }
       ]
     }

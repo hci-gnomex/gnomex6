@@ -58,7 +58,6 @@ export class ConstantsService {
     public readonly DEFAULT_TOOLBAR_SETTINGS: string = "bold italic underline | left center right |  format font size |" +
         " color | ul ol | outdent indent";
 
-    public readonly ICON_FOLDER: string = "assets/folder.png";
     public readonly GLOBE_LINK: string = "assets/globe_link.png";
     public readonly EMAIL_GO_LINK: string = "assets/email_go.png";
     public readonly ICON_UCSC: string = "assets/ucscFavicon.png";
@@ -83,6 +82,11 @@ export class ConstantsService {
     public readonly ICON_DATATRACK_OWNER:string = "assets/datatrack_owner.png" ;
 
     public readonly ICON_GREEN_BULLET:string = "assets/bullet_green.png";
+    public readonly ICON_FOLDER:string = "assets/folder.png";
+    public readonly ICON_FLASK:string = "assets/flask.png";
+
+    public readonly ICON_DELETE:string = "assets/delete.png";
+    public readonly ICON_FOLDER_DELETE:string= "assets/folder_delete.png";
 
 
 
@@ -108,6 +112,9 @@ export class ConstantsService {
         }
         else if(name === "SequenceLane"){
             item.icon = this.ICON_GREEN_BULLET;
+        }
+        else if(name === "Request"){
+            item.icon = this.ICON_FLASK;
         }
 
     }

@@ -10,12 +10,15 @@ import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogRef, MatTabChangeEvent} from "@angular/material";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {DatatracksSummaryTabComponent} from "./datatracks-summary-tab.component";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {DatatracksVisibilityTabComponent} from "./datatracks-visibility-tab.component";
 import {FormGroup} from "@angular/forms";
+import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {URLSearchParams} from "@angular/http";
 
 
 
@@ -53,6 +56,12 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     public showIOBIO: boolean = false;
     public showLink: boolean = false;
     public showSpinner:boolean = false;
+    public showSaveSpinner:boolean = false;
+    public canWrite= false;
+    public folderList:any[];
+    public initSummaryView: boolean = true;
+
+
     private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
     public types = OrderType;
     @ViewChild(DatatracksSummaryTabComponent) summaryComponet:DatatracksSummaryTabComponent;
@@ -64,10 +73,13 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 public constService: ConstantsService,
                 private gnomexService: GnomexService,
                 private dialogService: DialogsService,
-                private dialog: MatDialog,){
+                private dialog: MatDialog,
+                private orderValidateService: BrowseOrderValidateService,
+                public secAdvisorService: CreateSecurityAdvisorService){
     }
 
     ngOnInit(){
+
 
         console.log(this.dataTrackService.datatrackListTreeNode);
 
@@ -81,13 +93,28 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
                 this.dtOverviewForm.markAsPristine();
             });
-
-
-
-            this.showDownloadLink = data.fromTopic ? data.fromTopic : false;
             if(this.datatrack){
-                let annots = this.datatrack.DataTrackProperties;
+                this.canWrite = this.datatrack.canWrite === 'Y';
+                this.initLinkVisibility();
+                this.showDownloadLink = data.fromTopic ? data.fromTopic : false;
                 this.showRelatedDataTab = this.initRelatedData(this.datatrack);
+                this.dtOverviewForm = new FormGroup({});
+                if(this.datatrack.DataTrackFolders){
+                    let folder = this.datatrack.DataTrackFolders;
+                    this.folderList =  Array.isArray(folder) ? folder : [folder.DataTrackFolder];
+                }
+
+
+                setTimeout(()=>{
+                    this.dtOverviewForm.addControl("summaryForm", this.summaryComponet.summaryFormGroup);
+                    this.dtOverviewForm.addControl("annotationForm", this.annotationComponent.annotationForm);
+                    this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
+                    this.dtOverviewForm.markAsPristine();
+                });
+
+
+
+                let annots = this.datatrack.DataTrackProperties;
 
                 if(annots){
                     this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
@@ -101,9 +128,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                     this.annotations = [];
                 }
 
-            }else{
-                this.annotations = [];
-                this.relatedObjects = [];
             }
 
         })
@@ -297,6 +321,9 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             }
         });
     }
+    showFolders(showFolders:any){
+       this.dialogService.createCustomDialog(showFolders,"Folders for " + this.datatrack.name);
+    }
 
 
 
@@ -305,11 +332,82 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     ngOnDestroy(){
     }
     save(){
+        this.showSaveSpinner = true;
         console.log(this.dtOverviewForm);
+        this.orderValidateService.emitOrderValidateSubject();
+        let name = this.dtOverviewForm.get("summaryForm.folderName").value;
+        let summary = this.dtOverviewForm.get("summaryForm.summary").value;
+        let description:string = this.orderValidateService.propsNotOnForm['description'];
+        let idAppUser:string = '';
+        let codeVisibility:string = this.dtOverviewForm.get("visibilityForm.codeVisibility").value;
+        let idLab:string = this.dtOverviewForm.get("visibilityForm.lab").value.idLab;
+
+        let c: Array<any> = this.dtOverviewForm.get("visibilityForm.collaborators").value;
+        let collaborators:string = "";
+        if(c.length > 0){
+           collaborators = JSON.stringify(c);
+        }
+
+
+        let dataTrackProperties:string = JSON.stringify(this.orderValidateService.annotationsToSave);
+        let filesToRemove:string = null; // needs to be implemented by download tab
+
+
+
+        if(this.secAdvisorService.isAdmin){
+            idAppUser =  this.dtOverviewForm.get("visibilityForm.idAppUser").value;
+        }else{
+            idAppUser = this.datatrack? this.datatrack.idAppUser : '';
+        }
+
+        let params: URLSearchParams = new URLSearchParams();
+
+        params.set("idDataTrack", this.datatrack.idDataTrack);
+        params.set("name",name);
+        params.set("summary",summary);
+        params.set("description",description);
+        params.set("idAppUser",idAppUser);
+        params.set("codeVisibility",codeVisibility);
+        params.set("idLab",idLab);
+        if(collaborators){
+            params.set("collaboratorsXML", collaborators);
+        }
+        params.set("propertiesXML",dataTrackProperties);
+        params.set("filesToRemoveXML",filesToRemove);
+
+        this.dataTrackService.saveDataTrack(params)
+            .subscribe(resp =>{
+                this.showSaveSpinner = false;
+
+                if(resp && resp.result &&  resp.result === "SUCCESS" ){
+                    this.dtOverviewForm.markAsPristine();
+                    let treeNode = this.dataTrackService.datatrackListTreeNode;
+                    if(treeNode){
+                        this.gnomexService.orderInitObj = {};
+                        this.gnomexService.orderInitObj.idDataTrack = treeNode.idDataTrack;
+                        this.gnomexService.orderInitObj.idGenomeBuild = treeNode.idGenomeBuild;
+                        this.gnomexService.orderInitObj.idOrganism = treeNode.idOrganism;
+                        this.gnomexService.orderInitObj.idLab = idLab;
+                        this.gnomexService.navInitBrowseDatatrackSubject.next(this.gnomexService.orderInitObj);
+
+                    }
+                }else if(resp && resp.message){
+                    console.log(this.dataTrackService.datatrackListTreeNode);
+                    this.dialogService.confirm(resp.message, null);
+                }else{
+                    this.dialogService.confirm("An error occur while saving this Datatrack", null);
+                }
+
+                console.log(resp)
+            })
     }
 
-    tabChanged(event:any){
-
+    tabChanged(event:MatTabChangeEvent){
+        if(event.tab.textLabel === "Summary"){
+           this.initSummaryView = true;
+        }else{
+            this.initSummaryView = false;
+        }
     }
 
 

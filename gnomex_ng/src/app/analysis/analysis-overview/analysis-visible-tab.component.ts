@@ -3,7 +3,6 @@ import {Component, OnInit, ViewChild, AfterViewInit, Output, EventEmitter} from 
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {Subscription} from "rxjs/Subscription";
-import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
@@ -35,18 +34,10 @@ import {GnomexStringUtilService} from "../../services/gnomex-string-util.service
             </div>
         </div>
         
-       
-        
-        
-        <!--<div> {{experimentService.experimentList[0] | json}} </div> -->
-
-        
         
         
     `,
     styles: [`
-       
-        
         
         .flexbox-column{
 
@@ -61,7 +52,6 @@ import {GnomexStringUtilService} from "../../services/gnomex-string-util.service
 export class AnalysisVisibleTabComponent implements OnInit{
 
     public readonly name = "visibility";
-    //@ViewChild(GnomexStyledGridComponent) myGrid: GnomexStyledGridComponent;
     private filteredExperimentOverviewListSubscript: Subscription;
     private selectedTreeNodeSubscript: Subscription;
     private visList:Array<any>;
@@ -171,21 +161,14 @@ export class AnalysisVisibleTabComponent implements OnInit{
             valueFormatter: this.displayModelFormatter,
             valueSetter: this.valueChanging
         }
-
-
-
-
     ];
 
     rowData:Array<any> =[];
+
     constructor(protected fb: FormBuilder, private analysisService:AnalysisService,
                 private dictionaryService:DictionaryService,private secAdvisor: CreateSecurityAdvisorService,
                 private dialogService: DialogsService, private route:ActivatedRoute,) {
     }
-
-
-
-
 
     onGridReady(params) {
     }
@@ -196,43 +179,35 @@ export class AnalysisVisibleTabComponent implements OnInit{
     }
 
 
-
-
     ngOnInit(){
-
-
         this.visList = this.dictionaryService.getEntries(DictionaryService.VISIBILTY);
         this.instList = this.dictionaryService.getEntries(DictionaryService.INSTITUTION);
 
-        this.filteredExperimentOverviewListSubscript = this.analysisService.getFilteredOverviewListObservable()
-            .subscribe( data =>{
-                this.rowData = data;
+        this.filteredExperimentOverviewListSubscript = this.analysisService.getFilteredOverviewListObservable().subscribe( data =>{
+            this.rowData = data;
+        });
+
+        this.selectedTreeNodeSubscript = this.analysisService.getAnalysisOverviewListSubject().subscribe(data => {
+            this.analysisService.analysisList.forEach(aObj => {
+                this.setVisibility(aObj);
+                this.setInstitution(aObj);
+
+                let analysisTypeList = this.dictionaryService.getEntries(DictionaryService.ANALYSIS_TYPE);
+                aObj["analysisType"]= this.findFromId(analysisTypeList,aObj["idAnalysisType"]);
+
+                let organismList = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
+                aObj["organism"] = this.findFromId(organismList,aObj["idOrganism"]);
+
             });
-        this.selectedTreeNodeSubscript = this.analysisService.getAnalysisOverviewListSubject()
-            .subscribe(data => {
-                this.analysisService.analysisList.forEach(aObj => {
-                    this.setVisibility(aObj);
-                    this.setInstitution(aObj);
+            this.rowData = this.analysisService.analysisList;
+        });
 
-                    let analysisTypeList = this.dictionaryService.getEntries(DictionaryService.ANALYSIS_TYPE);
-                    aObj["analysisType"]= this.findFromId(analysisTypeList,aObj["idAnalysisType"]);
-
-                    let organismList = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
-                    aObj["organism"] = this.findFromId(organismList,aObj["idOrganism"]);
-
-                });
-                this.rowData = this.analysisService.analysisList;
-            });
-        this.analysisService.getSaveMangerObservable()
-            .subscribe(saveType =>{
-                if(this.name === saveType){
-                    this.save();
-                }
-            });
-
+        this.analysisService.getSaveMangerObservable().subscribe(saveType =>{
+            if(this.name === saveType){
+                this.save();
+            }
+        });
     }
-
-
 
     setVisibility(reqObj: any): void{
 
@@ -253,8 +228,7 @@ export class AnalysisVisibleTabComponent implements OnInit{
         //console.log(event)
     }
 
-
-    save():void{
+    save(): void{
         let aList:Array<any> = this.analysisService.analysisList;
 
         let dirtyRequests =aList.filter(reqObj => reqObj.isDirty === 'Y');
@@ -269,7 +243,6 @@ export class AnalysisVisibleTabComponent implements OnInit{
             dr.idInstitution = dr.instStr.split(",")[1];
         }
 
-
         for(let i = 0; i < aList.length; i++){
             if(aList[i].codeVisibility === "INST" && aList[i].idInstitution === ''){
                 this.saveSuccess.emit();
@@ -278,40 +251,38 @@ export class AnalysisVisibleTabComponent implements OnInit{
             }
         }
 
-
-
         let params: URLSearchParams = new URLSearchParams();
         let strBody:string = JSON.stringify(dirtyRequests);
         params.set("visibilityXMLString", strBody );
 
-
-        this.analysisService.saveVisibility(params)
-            .subscribe(resp =>{
-                this.saveSuccess.emit();
-                this.analysisService.getAnalysisGroupList_fromBackend(this.analysisService.analysisPanelParams,true);
-            });
+        this.analysisService.saveVisibility(params).subscribe(resp =>{
+            this.saveSuccess.emit();
+            this.analysisService.getAnalysisGroupList_fromBackend(this.analysisService.analysisPanelParams,true);
+        });
     }
 
     prepVisList():Array<string>{
-
         if(!this.visList){
             this.visList= this.dictionaryService.getEntries(DictionaryService.VISIBILTY);
         }
+
         let visDisplays = [];
+
         if(this.visList){
             for(let vObj of this.visList){
                 visDisplays.push(vObj.display +  "," + vObj.value );
             }
             return visDisplays;
         }
+
         return visDisplays;
-
     }
-    prepInstitutionList():Array<string>{
 
+    prepInstitutionList():Array<string>{
         if(!this.instList){ // for first time you need to set it, this code runs before ngOinit
             this.instList = this.dictionaryService.getEntries(DictionaryService.INSTITUTION);
         }
+
         let instDisplays = [];
 
         if(this.instList) {
@@ -320,17 +291,17 @@ export class AnalysisVisibleTabComponent implements OnInit{
             }
             return instDisplays;
         }
-        return instDisplays
 
+        return instDisplays;
     }
 
     findFromId(nameList:Array<any>, id:string):string{
         let nameObj = nameList.find(name => {
             return name["value"] === id
         });
+
         return nameObj["display"];
     }
-
 
     ngOnDestroy():void{
         this.filteredExperimentOverviewListSubscript.unsubscribe();

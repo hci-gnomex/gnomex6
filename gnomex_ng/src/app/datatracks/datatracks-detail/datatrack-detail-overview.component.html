@@ -63,10 +63,9 @@
 
     <div style="display:flex; flex: 1;">
 
-        <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border"
-                       (selectedTabChange)="tabChanged($event)">
+        <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
             <mat-tab style="height:100%" label="Summary">
-                <dt-summary-tab></dt-summary-tab>
+                <dt-summary-tab [showEditor]="initSummaryView" ></dt-summary-tab>
             </mat-tab>
             <mat-tab style="height:100%" label="Annotations">
                 <annotation-tab [annotations]="annotations" [orderType]="types.DATATRACK"> </annotation-tab>
@@ -80,10 +79,27 @@
             </mat-tab>
         </mat-tab-group>
     </div>
-    <div>
+    <div style="display: flex; justify-content: space-between; ">
+        <ng-template #folderRef>
+            <mat-list>
+                <mat-list-item  *ngFor="let folder of folderList" >
+                    <img class="icon" [src]="constService.ICON_FOLDER"> {{folder?.name }}
+                </mat-list-item>
+            </mat-list>
+        </ng-template>
+
+        <button mat-button *ngIf="this.secAdvisorService.isAdmin"
+                (click)="showFolders(folderRef)" color="primary">
+            <img class="icon" [src]="constService.ICON_FOLDER">
+            Show Folder(s)
+        </button>
+
         <save-footer (saveClicked)="save()"
-                     [disableSave]="this.dtOverviewForm.invalid"
-                     [dirty]="this.dtOverviewForm.dirty"></save-footer>
+                     [disableSave]="this.dtOverviewForm.invalid || !this.canWrite"
+                     [showSpinner]="showSaveSpinner"
+                     [dirty]="this.dtOverviewForm.dirty || this.orderValidateService.dirtyNote ">
+
+        </save-footer>
     </div>
 
 </div>

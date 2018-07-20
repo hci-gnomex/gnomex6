@@ -6,7 +6,6 @@ import {DateRangePickerComponent} from "./date-range-picker.component";
 import {BrowseFilterComponent} from "./browse-filter.component";
 import {ComboBoxModule} from '../../modules/combobox.module';
 import {CalendarModule} from "../../modules/calendar.module";
-import {BillingPeriodPickerComponent} from "./billing-period-picker.component";
 import {TabsModule} from "./tabs/tabs.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -30,6 +29,9 @@ import {AnnotationTabComponent} from "./annotation-tab.component";
 import {BillingTemplateWindowComponent} from "./billing-template-window.component";
 import {AgGridModule} from "ag-grid-angular";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
+import {UrlAnnotationComponent} from "./url-annotation.component";
+import {BillingPeriodSelectorComponent} from "./billing-period-selector.component";
+import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-popup.component";
 
 @NgModule({
     imports: [
@@ -46,7 +48,6 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
         ]),
     ],
     declarations: [
-        BillingPeriodPickerComponent,
         BillingUsageReportComponent,
         BrowseFilterComponent,
         DateParserComponent,
@@ -66,7 +67,10 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
         SaveFooterComponent,
         MonthPickerComponent,
         BillingTemplateWindowComponent,
-        AnnotationTabComponent
+        AnnotationTabComponent,
+        UrlAnnotationComponent,
+        BillingPeriodSelectorComponent,
+        BillingPeriodSelectorPopupComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -77,11 +81,11 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
         NewOrganismComponent,
         DateRangeFilterPopupComponent,
         BillingTemplateWindowComponent,
-        NewTopicComponent
+        NewTopicComponent,
+        BillingPeriodSelectorPopupComponent,
     ],
     exports: [
         BrowseFilterComponent,
-        BillingPeriodPickerComponent,
         BillingUsageReportComponent,
         DateParserComponent,
         DatePickerComponent,
@@ -100,7 +104,9 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
         TabsModule,
         MonthPickerComponent,
         BillingTemplateWindowComponent,
-        AnnotationTabComponent
+        AnnotationTabComponent,
+        UrlAnnotationComponent,
+        BillingPeriodSelectorComponent,
     ]
 })
 export class UtilModule {

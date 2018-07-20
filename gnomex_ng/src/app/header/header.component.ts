@@ -950,7 +950,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Billing',
                 class: 'top-menu-item',
                 iconName: '../../assets/money.png',
-                route: ''
+                route: '/browse-billing'
             },
             {
                 displayName: 'Users & Groups',
@@ -996,7 +996,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Manage Protocols',
                         iconName: '../../assets/brick.png',
-                        route: ''
+                        route: '/manage-protocols'
                     },
                     {
                         displayName: 'Configure Billing Account Fields',
@@ -1363,7 +1363,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Billing',
                 class: 'top-menu-item',
                 iconName: '../../assets/money.png',
-                route: ''
+                route: '/browse-billing'
             },
             {
                 displayName: 'Users & Groups',
@@ -1453,7 +1453,7 @@ export class HeaderComponent implements OnInit{
                 displayName: 'Billing',
                 class: 'top-menu-item',
                 iconName: '../../assets/money.png',
-                route: ''
+                route: '/browse-billing'
             },
             {
                 displayName: 'Users & Groups',

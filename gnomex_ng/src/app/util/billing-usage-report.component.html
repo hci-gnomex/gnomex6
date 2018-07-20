@@ -1,14 +1,13 @@
 <h6 mat-dialog-title>{{title}}</h6>
 <mat-dialog-content>
     <div>
-        <label>For billing periods:</label>
-        <billing-period-picker [(startDate)]="startDate"></billing-period-picker>
-        <label>through</label>
-        <billing-period-picker [(endDate)]="endDate"></billing-period-picker>
+        <billing-period-selector (onChange)="this.onStartChange($event)" class="margin-right"></billing-period-selector>
+        <label class="margin-right">through</label>
+        <billing-period-selector (onChange)="this.onEndChange($event)"></billing-period-selector>
     </div>
     <div *ngIf="showIsExternalRadioGroup">
         <input [(ngModel)]="isExternalString" id="radioInternal" value="N" type="radio" name="isExternalRadio">
-        <label for="radioInternal">Internal</label>
+        <label for="radioInternal" class="margin-right">Internal</label>
         <input [(ngModel)]="isExternalString" id="radioExternal" value="Y" type="radio" name="isExternalRadio">
         <label for="radioExternal">External</label>
     </div>

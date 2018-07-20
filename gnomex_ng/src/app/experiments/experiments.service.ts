@@ -4,6 +4,7 @@ import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -70,12 +71,9 @@ export class ExperimentsService {
 			withCredentials: true,
 			search: this.previousURLParams
 		}).subscribe((response: Response) => {
-			console.log("GetRequestList called");
-
 			if (response.status === 200) {
 				this.projectRequestList = response.json().Lab;
 				this.emitProjectRequestList();
-				//return response.json().Request;
 			} else {
 				throw new Error("Error");
 			}
@@ -88,12 +86,9 @@ export class ExperimentsService {
         this.previousURLParams = parameters;
 
         this._http.get("/gnomex/GetRequestList.gx", {withCredentials: true, search: parameters}).subscribe((response: Response) => {
-            // console.log("GetRequestList called");
-
             if (response.status === 200) {
                 this.experimentOrders = response.json().Request;
                 this.emitExperimentOrders();
-                //return response.json().Request;
             } else {
                 throw new Error("Error");
             }
@@ -103,6 +98,10 @@ export class ExperimentsService {
     repeatGetExperiments_fromBackend(): void {
         this.haveLoadedExperimentOrders = false;
         this.getExperiments_fromBackend(this.previousURLParams);
+    }
+
+    getPreviousURLParamsCoreFacilityFilter(): string {
+        return this.previousURLParams.get('idCoreFacility');
     }
 
 	getChangeExperimentStatusObservable(): Observable<any> {
@@ -156,17 +155,13 @@ export class ExperimentsService {
             withCredentials: true,
             search: params
         }).subscribe((response: Response) => {
-            console.log("GetRequestList called");
-
             if (response.status === 200) {
                 this.projectRequestList = response.json().Lab;
                 this.emitProjectRequestList();
-                //return response.json().Request;
             } else {
                 throw new Error("Error");
             }
         });
-        //  }
     }
 
     emitExperiment(exp:any):void{

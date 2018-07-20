@@ -43,6 +43,8 @@ import {GridColumnValidateService} from "./grid-column-validate.service";
 import {BillingPOFormService} from "./billingPOForm.service";
 import {ProductsService} from "./products.service";
 import {NewExperimentService} from "./new-experiment.service";
+import {ProtocolService} from "./protocol.service";
+import {BrowseOrderValidateService} from "./browse-order-validate.service";
 
 
 @NgModule({
@@ -98,6 +100,8 @@ import {NewExperimentService} from "./new-experiment.service";
         BillingPOFormService,
         ProductsService,
         NewExperimentService
+        ProtocolService,
+        BrowseOrderValidateService
     ]})
 export class ServicesModule {
 }

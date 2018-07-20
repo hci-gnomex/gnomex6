@@ -4,9 +4,9 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 @Component({
 	template: `
 		<div class="full-width full-height">
-			<div class="t full-width full-height">
+			<div class="t full-width full-height fix-table">
 				<div class="tr">
-					<div class="td cell-text-container">
+					<div class="td cell-text-container ellipsis">
 						{{display}}
 					</div>
 				</div>
@@ -23,8 +23,15 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 					padding-left: 0.3rem;
 			}
 			
-      .full-width  { width:  100%; } 
+			.full-width  { width:  100%; } 
 			.full-height { height: 100%; }
+
+            .fix-table { table-layout:fixed; }
+
+            .ellipsis {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
 	`]
 }) export class SelectRenderer implements ICellRendererAngularComp {
 	private params: any;

@@ -15,7 +15,6 @@ import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import { ExpanderModule }     from "../../modules/expander.module";
-import { GnomexStyledGridModule } from "../util/gnomexStyledJqxGrid/gnomex-styled-grid.module";
 import { TreeGridModule } from "../../modules/tree-grid.module";
 import { InputModule } from "../../modules/input.module";
 import { LoaderModule }       from "../../modules/loader.module";
@@ -62,6 +61,12 @@ import {TabSeqSetupView} from "./new-experiment/tab-seq-setup-view";
 import {NewExperimentComponent} from "./new-experiment/new-experiment.component";
 import {AnnotationTabComponent} from "../util/annotation-tab.component";
 import {TabSeqProtoView} from "./new-experiment/tab-seq-proto-view";
+import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
+import {DateRenderer} from "../util/grid-renderers/date.renderer";
+import {TwoButtonRenderer} from "../util/grid-renderers/two-button.renderer";
+import {MultipleLineTextRenderer} from "../util/grid-renderers/multiple-line-text.renderer";
+import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 
 /**
  * @author mbyrne
@@ -82,7 +87,6 @@ import {TabSeqProtoView} from "./new-experiment/tab-seq-proto-view";
         EmailRelatedUsersPopupModule,
         ExpanderModule,
         FormsModule,
-        GnomexStyledGridModule,
         InputModule,
         LoaderModule,
         NotificationModule,
@@ -99,12 +103,21 @@ import {TabSeqProtoView} from "./new-experiment/tab-seq-proto-view";
         TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
-        AgGridModule.withComponents([IconTextRendererComponent,IconRendererComponent]),
-        ExperimentDetailModule,
         DynamicModule,
         DynamicModule.withComponents([TabNotesViewComponent, AnnotationTabComponent, TabSampleSetupViewComponent, TabSeqSetupView,
             TabSeqProtoView])
 
+        AgGridModule.withComponents([
+            DateRenderer,
+            IconTextRendererComponent,
+            IconRendererComponent,
+            MultipleLineTextRenderer,
+            SelectRenderer,
+            TextAlignLeftMiddleRenderer,
+            TextAlignRightMiddleRenderer,
+            TwoButtonRenderer
+        ]),
+        ExperimentDetailModule
     ],
     declarations: [
                     BrowseExperimentsComponent,

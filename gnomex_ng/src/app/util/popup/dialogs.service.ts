@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable, TemplateRef} from '@angular/core';
 import { MatDialogRef, MatDialog, MatDialogConfig } from '@angular/material';
 
 import { Observable } from 'rxjs/Rx';
@@ -7,11 +7,18 @@ import { ConfirmDialog } from './confirm-dialog.component';
 import { AlertDialogComponent } from "./alert-dialog.component";
 import { YesNoDialogComponent } from "./yes-no-dialog.component";
 import { SpinnerDialogComponent } from "./spinner-dialog.component";
+import {CustomDialogComponent} from "./custom-dialog.component";
 
 @Injectable()
 export class DialogsService {
 
+    private _spinnerDialogIsOpen: boolean = false;
+
     public spinnerDialogRefs: MatDialogRef<SpinnerDialogComponent>[] = [];
+
+    public get spinnerDialogIsOpen(): boolean {
+        return true && this._spinnerDialogIsOpen;
+    }
 
     constructor(private dialog: MatDialog) { }
 
@@ -39,15 +46,33 @@ export class DialogsService {
 
         return dialogRef.afterClosed();
     }
+    public createCustomDialog(tempRef:TemplateRef<any>, title?:string){
 
-    public yesNoDialog(message: string, parent: any, onYesFunctionName: string): Observable<boolean> {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+
+
+        if(title){
+            configuration.data ={templateRef: tempRef,title:title};
+        }else{
+            configuration.data = {templateRef:tempRef}
+        }
+
+        let dialogRef = this.dialog.open(CustomDialogComponent, configuration);
+        return dialogRef.afterClosed();
+    }
+
+    public yesNoDialog(message: string|string[], parent: any, onYesFunctionName: string): Observable<boolean> {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '20em';
 
         let dialogRef: MatDialogRef<YesNoDialogComponent>;
 
         dialogRef = this.dialog.open(YesNoDialogComponent, configuration);
-        dialogRef.componentInstance.message = message;
+        if (Array.isArray(message)) {
+            dialogRef.componentInstance.lines = message;
+        } else {
+            dialogRef.componentInstance.message = message;
+        }
         dialogRef.componentInstance.parent = parent;
         dialogRef.componentInstance.onYesFunctionName = onYesFunctionName;
 
@@ -59,6 +84,12 @@ export class DialogsService {
     }
 
     public startSpinnerDialog(message: string, strokeWidth: number, diameter: number): MatDialogRef<SpinnerDialogComponent> {
+        if (this._spinnerDialogIsOpen) {
+            return null;
+        }
+
+        this._spinnerDialogIsOpen = true;
+
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.data = {
             message: message,
@@ -70,6 +101,8 @@ export class DialogsService {
 
         let dialogRef: MatDialogRef<SpinnerDialogComponent> = this.dialog.open(SpinnerDialogComponent, configuration);
 
+        dialogRef.afterClosed().subscribe(() => { this._spinnerDialogIsOpen = false; });
+
         this.spinnerDialogRefs.push(dialogRef);
 
         return dialogRef;
@@ -78,7 +111,9 @@ export class DialogsService {
     // Let there be an alternative, global way to stop all active spinner dialogs.
     public stopAllSpinnerDialogs(): void {
         for (let dialogRef of this.spinnerDialogRefs) {
-            dialogRef.close();
+            setTimeout(() => {
+                dialogRef.close();
+            });
         }
     }
 }

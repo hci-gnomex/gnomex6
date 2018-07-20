@@ -4,9 +4,9 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 @Component({
 	template: `
 		<div class="full-width full-height">
-			<div class="t full-width full-height">
+			<div class="t full-width full-height fix-table">
 				<div class="tr">
-					<div class="td vertical-center left-align padded">
+					<div class="td vertical-center left-align padded ellipsis">
 						{{ value }}
 					</div>
 				</div>
@@ -25,6 +25,13 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 			.vertical-center { vertical-align: middle;   }
 			.left-align      { text-align:     left;     }
 			.padded          { padding:        0 0.3rem; }
+
+            .fix-table { table-layout:fixed; }
+
+            .ellipsis {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
 	`]
 })
 export class TextAlignLeftMiddleRenderer implements ICellRendererAngularComp {

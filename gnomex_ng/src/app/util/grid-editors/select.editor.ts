@@ -101,8 +101,6 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 	}
 
 	onFillButtonClicked(): void {
-        console.log("Fill button clicked!");
-
         if (!this.fillGroupAttribute || this.fillGroupAttribute === '') {
         	throw new Error('No column attribute "fillGroupAttribute" specified. This is required to use the Fill functionality.');
 		}
@@ -110,15 +108,15 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 		if (this.params && this.params.column && this.params.column.gridApi && this.params.node && this.fillGroupAttribute && this.fillGroupAttribute !== '') {
 			let thisRowNode = this.params.node;
 
-      this.params.column.gridApi.forEachNode((rowNode, index) => {
-          if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
+			this.params.column.gridApi.forEachNode((rowNode, index) => {
+				if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
 					&& rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
-                    rowNode.data[this.gridValueField] = this.value;
-                    rowNode.setDataValue(this.gridValueField, this.value);
-          }
+					rowNode.data[this.gridValueField] = this.value;
+					rowNode.setDataValue(this.gridValueField, this.value);
+				}
 			});
 
 			this.params.column.gridApi.refreshCells();
-		}
+        }
 	}
 }
