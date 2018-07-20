@@ -5,7 +5,7 @@
             <mat-tab-group class="full-height">
                 <mat-tab label="Billing Items">
                     <div [hidden]="!this.showFilterByOrderType">
-                        <mat-radio-group [(ngModel)]="this.filterByOrderType" (change)="this.onFilterByOrderTypeChange($event)">
+                        <mat-radio-group [(ngModel)]="this.filterByOrderType" (change)="this.onFilterByOrderTypeChange()">
                             <mat-radio-button class="filter-by-order-type-opt" [value]="this.FILTER_ALL">Show All</mat-radio-button>
                             <mat-radio-button [hidden]="!this.showFilterByExp" class="filter-by-order-type-opt" [value]="this.FILTER_EXP">Experiments</mat-radio-button>
                             <mat-radio-button [hidden]="!this.showFilterByDsk" class="filter-by-order-type-opt" [value]="this.FILTER_DSK">Disk</mat-radio-button>
@@ -57,7 +57,10 @@
                 <ag-grid-angular class="ag-fresh full-height full-width"
                                  (gridReady)="this.onBillingItemGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                 (cellValueChanged)="this.onBillingItemGridChange($event)"
+                                 (selectionChanged)="this.onBillingItemGridSelection($event)"
                                  [getNodeChildDetails]="this.getBillingItemNodeChildDetails"
+                                 [rowSelection]="'multiple'"
                                  [singleClickEdit]="true"
                                  [rowClassRules]="this.billingItemGridRowClassRules"
                                  [rowData]="this.billingItemGridData">
@@ -65,10 +68,11 @@
             </div>
             <div class="flex-container-row align-center flex-one justify-space-between">
                 <div>
-                    <button mat-button color="accent" mat-button><img src="../../assets/account_split.png" class="icon">Reassign/Split</button>
-                    <button mat-button color="warn" mat-button><img src="../../assets/delete.png" class="icon">Remove</button>
+                    <button mat-button [disabled]="this.disableSplitButton" color="accent"><img src="../../assets/account_split.png" class="icon">Reassign/Split</button>
+                    <button mat-button [disabled]="this.selectedBillingItems.length < 1" color="warn" (click)="this.removeBillingItems()"><img src="../../assets/delete.png" class="icon">Remove</button>
+                    <span *ngIf="this.showDirtyNote" class="dirtyNote">Changes Have Not Been Saved</span>
                 </div>
-                <button mat-button color="primary" mat-button><img src="../../assets/action_save.gif" class="icon">Save</button>
+                <button mat-button color="primary" (click)="this.validateAndSave()"><img src="../../assets/action_save.gif" class="icon">Save</button>
             </div>
         </div>
     </div>

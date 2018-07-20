@@ -8,7 +8,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
 import {MatCheckboxChange} from "@angular/material";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent} from "ag-grid";
+import {CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent, SelectionChangedEvent} from "ag-grid";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -53,6 +53,11 @@ import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-render
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        span.dirtyNote {
+            background: yellow;
+            padding: 0.5rem;
+            margin-left: 1rem;
+        }
     `]
 })
 
@@ -95,6 +100,11 @@ export class NavBillingComponent implements OnInit {
     public showRelatedCharges: boolean = true;
     public billingItemGridRowClassRules: any;
     public billingItemGridApi: GridApi;
+
+    public showDirtyNote: boolean = false;
+    public selectedBillingItems: any[] = [];
+    public disableSplitButton: boolean = true;
+    public billingItemsToDelete: any[] = [];
 
     private invoiceMap: any = {};
     public invoiceLabel: string = "";
@@ -144,7 +154,7 @@ export class NavBillingComponent implements OnInit {
                 return {
                     group: true,
                     expanded: true,
-                    children: rowItem.BillingItem ? Array.isArray(rowItem.BillingItem) ? rowItem.BillingItem : [rowItem.BillingItem] : [],
+                    children: rowItem.BillingItem,
                     key: rowItem.requestNumber
                 };
             } else {
@@ -170,6 +180,19 @@ export class NavBillingComponent implements OnInit {
 
     public onGridSizeChanged(event: GridSizeChangedEvent): void {
         event.api.sizeColumnsToFit();
+    }
+
+    public onBillingItemGridChange(event: CellValueChangedEvent): void {
+        event.data.isDirty = 'Y';
+        if (event.data.idBillingItem) {
+            let parent: any = this.findRequestParent(event.data);
+            parent.isDirty = 'Y';
+        }
+        this.showDirtyNote = true;
+    }
+
+    public onBillingItemGridSelection(event: SelectionChangedEvent): void {
+        this.selectedBillingItems = this.billingItemGridApi.getSelectedRows();
     }
 
     public onFilterChange(event: BillingFilterEvent): void {
@@ -239,6 +262,10 @@ export class NavBillingComponent implements OnInit {
     }
 
     public refreshBillingItemList(event: BillingFilterEvent, reselectIfPossible?: boolean): void {
+        this.showDirtyNote = false;
+        this.selectedBillingItems = [];
+        this.billingItemsToDelete = [];
+
         this.billingItemGridLabel = '';
         this.billingItemList = [];
         this.billingItemGridData = [];
@@ -276,6 +303,9 @@ export class NavBillingComponent implements OnInit {
                     for (let b of billingItems) {
                         b.icon = "assets/money.png";
                     }
+                    r.BillingItem = billingItems;
+                } else {
+                    r.BillingItem = [];
                 }
             }
 
@@ -290,6 +320,7 @@ export class NavBillingComponent implements OnInit {
 
         this.billingItemGridLabel = '';
         this.billingItemGridData = [];
+        this.selectedBillingItems = [];
 
         this.billingItemsTreeSelectedNode = null;
         this.billingItemsTreeNodes = [];
@@ -458,6 +489,7 @@ export class NavBillingComponent implements OnInit {
             this.invoiceLabel = "";
         }
 
+        this.selectedBillingItems = [];
         this.billingItemGridData = billingItems;
     }
 
@@ -480,7 +512,7 @@ export class NavBillingComponent implements OnInit {
         }
     }
 
-    public onFilterByOrderTypeChange(event: any): void {
+    public onFilterByOrderTypeChange(): void {
         this.buildBillingItemsTree(this.billingItemsTreeLastResult);
     }
 
@@ -554,10 +586,135 @@ export class NavBillingComponent implements OnInit {
         }
     }
 
-    public saveBillingItems(): void {
+    public removeBillingItems(): void {
+        if (this.selectedBillingItems.length > 0) {
+            for (let item of this.selectedBillingItems) {
+                if (item.idBillingItem) {
+                    item.remove = 'Y';
+                    this.billingItemsToDelete.push(item);
+                    let r: any = this.findRequestParent(item, true);
+                    let billingItems: any[] = r.BillingItem;
+                    billingItems.splice(billingItems.indexOf(item), 1);
+                    r.isDirty = 'Y';
+                }
+            }
+            this.showDirtyNote = true;
+            this.selectTreeNode(this.billingItemsTreeSelectedNode);
+        }
+    }
+
+    private findRequestParent(billingItem: any, restrictToCurrentData: boolean = false): any {
+        let requests: any[] = restrictToCurrentData ? this.billingItemGridData : this.billingItemList;
+        let key: string;
+        if (billingItem.idRequest) {
+            key = "idRequest";
+        } else if (billingItem.idProductOrder) {
+            key = "idProductOrder";
+        } else if (billingItem.idDiskUsageMonth) {
+            key = "idDiskUsageMonth";
+        }
+        if (key) {
+            for (let r of requests) {
+                if (r[key] === billingItem[key] && r.idBillingAccount === billingItem.idBillingAccount) {
+                    return r;
+                }
+            }
+        }
+        return null;
+    }
+
+    public validateAndSave(): void {
         this.billingItemGridApi.stopEditing();
-        // TODO
-        // TODO add dirty note when editing grid
+
+        let isExternalApproved: boolean = false;
+        let isEmptyPriceOrQty: boolean = false;
+        let isNegativeQtyAndPrice: boolean = false;
+
+        for (let r of this.billingItemList) {
+            if (r.isDirty === 'Y') {
+                if (r.isExternalPricing === 'Y' || r.isExternalCommercialPricing === 'Y') {
+                    for (let bi of r.BillingItem) {
+                        if (bi.codeBillingStatus === this.STATUS_APPROVED) {
+                            isExternalApproved = true;
+                            break;
+                        }
+                    }
+                }
+
+                for (let bi of r.BillingItem) {
+                    if (bi.qty === '' || bi.unitPrice === '' || bi.unitPrice === '0' || bi.invoicePrice === '' || bi.invoicePrice === '0') {
+                        isEmptyPriceOrQty = true;
+                    } else if (bi.qty && bi.unitPrice) {
+                        let qtyParsed: number = Number.parseInt(bi.qty);
+                        let unitPriceParsed: number = Number.parseFloat(bi.unitPrice.replace("$", ''));
+                        if (qtyParsed < 0 && unitPriceParsed < 0) {
+                            this.dialogsService.confirm("Either unit price or qty can be negative but not both", null);
+                            return;
+                        }
+                    }
+                    if (bi.idBillingPeriod === '') {
+                        this.dialogsService.confirm("Each price must have an associated billing period", null);
+                        return;
+                    }
+                }
+            }
+        }
+
+        let msg: string = '';
+        if (isExternalApproved) {
+            msg += "External account to be approved. has pricing been verified?";
+        }
+        if (isEmptyPriceOrQty) {
+            msg += " Price or qty is blank. Proceed anyway?";
+        }
+
+        if (msg != '') {
+            this.dialogsService.confirm(msg, " ").subscribe((result: boolean) => {
+                if (result) {
+                    this.saveBillingItems();
+                }
+            });
+        } else {
+            this.saveBillingItems();
+        }
+    }
+
+    private saveBillingItems(): void {
+        let saveListArray: any[] = [];
+        for (let r of this.billingItemList) {
+            if (r.isDirty === 'Y') {
+                for (let bi of r.BillingItem) {
+                    if (bi.isDirty === 'Y') {
+                        bi.completeDate = bi.completeDateOther;
+                        saveListArray.push(bi);
+                    }
+                }
+            }
+        }
+
+        let invoiceListArray: any[] = []; // TODO somewhere invoices can be edited
+
+        let paramObject: any = {};
+        paramObject.saveList = saveListArray;
+        paramObject.removeList = this.billingItemsToDelete;
+        paramObject.invoiceList = invoiceListArray;
+
+        let params: HttpParams = new HttpParams()
+            .set("billingItemJSONString", JSON.stringify(paramObject))
+            .set("noJSONToXMLConversionNeeded", "Y");
+        this.billingService.saveBillingItemList(params).subscribe((result: any) => {
+            if (result && result.result === "SUCCESS") {
+                if (this.lastFilterEvent) {
+                    this.onFilterChange(this.lastFilterEvent);
+                }
+            } else {
+                let message: string = "";
+                if (result && result.message) {
+                    message = ": " + result.message;
+                }
+                this.dialogsService.confirm("An error occurred while saving billing items" + message, null);
+            }
+        });
     }
 
 }
