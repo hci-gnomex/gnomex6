@@ -4,12 +4,14 @@ import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
 import {HttpClient, HttpParams} from "@angular/common/http";
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class BillingService {
 
     constructor(private http: Http,
-                 private httpClient: HttpClient) {
+                private httpClient: HttpClient,
+                private cookieUtilService: CookieUtilService) {
     }
 
     getBillingRequestListDep(params: URLSearchParams): Observable<any> {
@@ -66,6 +68,11 @@ export class BillingService {
 
     public getBillingInvoiceList(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetBillingInvoiceList.gx", {params: params});
+    }
+
+    public saveBillingItemList(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/SaveBillingItemList.gx", null, {params: params});
     }
 
 }
