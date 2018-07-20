@@ -1,18 +1,18 @@
 <div style="display:flex">
-    <form [formGroup]="annotationForm" style=" height:100%;width:100%; display:flex; flex-direction:column;">
+    <form [formGroup]="form" style=" height:100%;width:100%; display:flex; flex-direction:column;">
         <ng-container  [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations">
             <div *ngSwitchCase="'CHECK'" class="annot-control">
                 <label style="margin-right: 1em;"  >{{annot.name}}  </label>
                 <mat-checkbox  [formControlName]="annot.name" >
                 </mat-checkbox>
-                <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('required')">
+                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
 
             </div>
             <mat-form-field *ngSwitchCase="'TEXT'" class="annot-control" >
                 <input matInput placeholder="{{annot.name}}" [formControlName]="annot.name">
-                <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('required')">
+                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
             </mat-form-field>
@@ -20,7 +20,7 @@
                 <mat-select  [placeholder]="annot.name" multiple [formControlName]="annot.name">
                     <mat-option *ngFor="let opt of annot.PropertyOption" [value]="opt.name">{{opt.name}}</mat-option>
                 </mat-select>
-                <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('selectRequired')">
+                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('selectRequired')">
                     This field is required
                 </mat-error>
             </mat-form-field>
@@ -28,7 +28,7 @@
                 <mat-select  [placeholder]="annot.name" [formControlName]="annot.name">
                     <mat-option *ngFor="let opt of annot.PropertyOption" [value]="opt.name">{{opt.name}}</mat-option>
                 </mat-select>
-                <mat-error *ngIf="this.annotationForm?.controls[annot.name]?.hasError('selectRequired')">
+                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('selectRequired')">
                     This field is required
                 </mat-error>
             </mat-form-field>

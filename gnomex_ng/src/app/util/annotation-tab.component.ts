@@ -37,7 +37,7 @@ export enum OrderType{
 `]
 })
 export class AnnotationTabComponent implements OnInit, OnDestroy{
-    public annotationForm: FormGroup;
+    public form: FormGroup;
     private _annotations: IAnnotation[];
     private _disabled: boolean = false;
     private urlAnnotations: any[] = [];
@@ -46,11 +46,11 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
     @Input() orderType = OrderType.NONE;
     @Input() set disabled(value:boolean){
         this._disabled = value;
-        if(this.annotationForm){
+        if(this.form){
             if(this._disabled){
-                this.annotationForm.disable()
+                this.form.disable()
             }else{
-                this.annotationForm.enable();
+                this.form.enable();
             }
         }
 
@@ -58,38 +58,38 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
 
     @Input() set annotations( a: IAnnotation[]){
         this._annotations = a;
-        if(!this.annotationForm){
-            this.annotationForm =  new FormGroup({});
+        if(!this.form){
+            this.form =  new FormGroup({});
         }
 
         this._annotations.forEach(annot => {
-            this.annotationForm.addControl(annot.name, new FormControl());
+            this.form.addControl(annot.name, new FormControl());
 
-            if(annot.codePropertyType === 'TEXT'){
-                this.annotationForm.controls[annot.name].setValue(annot.value);
-            }else if(annot.codePropertyType === 'CHECK'){
-                this.annotationForm.controls[annot.name].setValue(annot.value === 'Y');
-            }else if(annot.codePropertyType === 'MOPTION'){
+            if (annot.codePropertyType === 'TEXT') {
+                this.form.controls[annot.name].setValue(annot.value);
+            } else if (annot.codePropertyType === 'CHECK') {
+                this.form.controls[annot.name].setValue(annot.value === 'Y');
+            } else if (annot.codePropertyType === 'MOPTION') {
                 let split: string[] = annot.value.split(",");
-                this.annotationForm.controls[annot.name].setValue(annot.value ? split : []);
-            }else if(annot.codePropertyType === 'OPTION'){
-                this.annotationForm.controls[annot.name].setValue(annot.value ? annot.value : '');
-            } else if(annot.codePropertyType === 'URL'){
+                this.form.controls[annot.name].setValue(annot.value ? split : []);
+            } else if (annot.codePropertyType === 'OPTION') {
+                this.form.controls[annot.name].setValue(annot.value ? annot.value : '');
+            } else if (annot.codePropertyType === 'URL') {
                 this.initUrlAnnotations(annot.value)
             }
 
-            if(annot.isRequired === 'Y'){
-                if(annot.codePropertyType === 'TEXT'){
-                    this.annotationForm.controls[annot.name].setValidators([Validators.required]);
-                }else if(annot.codePropertyType === 'CHECK'){
-                    this.annotationForm.controls[annot.name].setValidators([Validators.requiredTrue]);
-                }else if(annot.codePropertyType === 'MOPTION' || annot.codePropertyType === 'OPTION' ){
-                    this.annotationForm.controls[annot.name].setValidators(selectRequired());
+            if (annot.isRequired === 'Y') {
+                if (annot.codePropertyType === 'TEXT') {
+                    this.form.controls[annot.name].setValidators([Validators.required]);
+                } else if (annot.codePropertyType === 'CHECK') {
+                    this.form.controls[annot.name].setValidators([Validators.requiredTrue]);
+                } else if (annot.codePropertyType === 'MOPTION' || annot.codePropertyType === 'OPTION') {
+                    this.form.controls[annot.name].setValidators(selectRequired());
                 }
             }
 
         });
-        this.annotationForm.markAsPristine();
+        this.form.markAsPristine();
 
     }
 
@@ -105,9 +105,9 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
 
     ngOnInit(){
         if(this._disabled){
-            this.annotationForm.disable();
+            this.form.disable();
         }else{
-            this.annotationForm.enable();
+            this.form.enable();
         }
 
     }

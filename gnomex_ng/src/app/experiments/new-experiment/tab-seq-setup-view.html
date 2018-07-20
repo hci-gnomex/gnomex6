@@ -1,0 +1,99 @@
+<form [formGroup]="form" class="flexbox-column">
+    <div>
+        <div class="flex-column-container">
+            <ng-container *ngIf="isPreppedContainer">
+                <div class="flex-row-container">
+                    <div style="flex-grow: .3">
+                        <mat-list>
+                            <h3 mat-subheader style="color: black">Do you want the Core Facility to perform library preparation on the samples?
+                            </h3>
+                            <mat-radio-group style="margin-left: 5em" (change)="onLipPrepChange($event)" formControlName="seqLibPrep">
+                                <mat-radio-button [value]="YES">
+                                    <span class="inline-span">
+                                        Yes, please prep the library
+                                   </span>
+                                </mat-radio-button>
+                                <mat-radio-button  style="margin-left: 10em" [value]="NO">
+                                    <span class="inline-span">
+                                        No, library has already been prepped
+                                   </span>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </mat-list>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="showPool">
+                <div class="flex-row-container">
+                    <div style="flex-grow: .3">
+                        <mat-list>
+                            <h3 mat-subheader style="color: black">How are the samples pooled?
+                            </h3>
+                            <mat-radio-group style="margin-left: 5em" (change)="onPooledChanged($event)" formControlName="pooledLib">
+                                <mat-radio-button [value]="SEPARATE">
+                                    <span class="inline-span">
+                                        Each library will be submitted in a separate microfuge tube.
+                                   </span>
+                                </mat-radio-button>
+                                <mat-radio-button  style="margin-left: 10em" [value]="POOLED">
+                                    <span class="inline-span">
+                                        Libraries will be pre-pooled prior to drop off at the core facility and will be submitted in
+                                   </span>
+                                    <span style="margin-left: 18em">
+                                        <mat-form-field class="formField" [floatLabel]="'auto'">
+                                            <input matInput formControlName="numTubes" placeholder="Number of samples.">
+                                        </mat-form-field>
+                                    </span>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </mat-list>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container>
+                <div class="flex-row-container">
+                    <div style="flex-grow: .3">
+                        <mat-list>
+                            <h3 mat-subheader style="color: black">Select a sequencing experiment type
+                            </h3>
+                            <mat-radio-group style="margin-left: 5em" class="radio-group-container" (change)="onSeqTypeChanged($event)" formControlName="seqType" layout="row">
+                                <div *ngFor="let theme of this.themes">
+                                    <mat-radio-button class="type-radio-button" (click)="selectTheme($event)" [value]="theme" ng-style="{'display':'inline'}">
+                                        {{theme.display}}
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </mat-list>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="showAppPrice">
+                <div class="flex-row-container">
+                    <div style="flex-grow: .3">
+                        <mat-radio-group (change)="onAppPriceChanged($event)" formControlName="appPrice">
+                            <div *ngFor="let appPrice of this.appPrices">
+                                <mat-radio-button class="type-radio-button" [value]="appPrice">
+                                    <span class="inline-span">
+                                        {{appPrice.display}}
+                                        </span>
+                                    <span *ngIf="this.form.get('seqLibPrep').value === 'yes'" style="margin-left: 25em">
+                                        {{appPrice.price}}
+                                    </span>
+                                </mat-radio-button>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="libraryDesign">
+                <div class="flex-row-container">
+                    <div style="flex-grow: .3">
+                        <mat-form-field class="formField" [floatLabel]="'auto'">
+                            <input matInput formControlName="libraryDesign" placeholder="Capture Library Design ID.">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</form>

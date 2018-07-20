@@ -12,6 +12,7 @@ import {HttpClient, HttpParams, HttpResponse} from "@angular/common/http";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Router} from "@angular/router";
+import {ProjectService} from "./project.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -40,6 +41,11 @@ export class GnomexService {
     public iconDataTrackOwner = "assets/datatrack_owner.png";
     public iconDataTrackPublic = "assets/datatrack_world.png";
     public PROPERTY_SHOW_SAMPLE_CONC_PM: string = "show_sample_conc_pm";
+    public PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT: string = "request_work_auth_link_text";
+    public PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT: string = "access_auth_account_link_text";
+    public PROPERTY_WORKAUTH_INSTRUCTIONS: string = "workauth_instructions";
+    public PROPERTY_AUTH_ACCOUNTS_DESCRIPTION: string = "auth_accounts_description";
+    public PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD: string = "hiseq_run_type_label_standard";
 
     public properties: Map<string, string> = new Map<string, string>();
     private requestCategoryTypeMap: Map<string, string> = new Map<string, string>();
@@ -58,6 +64,8 @@ export class GnomexService {
     public isInternalExperimentSubmission: boolean = true;
     public uploadSampleSheetURL: string = "";
     public labList: any[] = [];
+    public propertyList: any[] = [];
+    public projectList: any[] = [];
     public submitRequestLabList: any[] = [];
     public manageLabList: any[] = [];
     public workAuthLabList: any[] = [];
@@ -91,6 +99,7 @@ export class GnomexService {
                 private propertyService: PropertyService,
                 private progressService: ProgressService,
                 private labListService: LabListService,
+                private projectService: ProjectService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private authenticationService:AuthenticationService,
                 private launchPropertiesService: LaunchPropertiesService,
@@ -199,6 +208,10 @@ export class GnomexService {
         this.setShowUsage();
         this.setDefaultSubmissionState();
         this.buildSeqLibProtocolListWithAppFilters();
+        this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
+            this.propertyList = response;
+        });
+
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.onGetLabList(response);
         })
@@ -550,11 +563,20 @@ export class GnomexService {
                 this.activeOrganismList.push(organism);
             }
         }
-        //TODO
-        // activeOrganismList.sort = new Sort();
-        // activeOrganismList.sort.compareFunction = sortActiveOrganismList;
-        // activeOrganismList.refresh();
+        this.activeOrganismList = this.activeOrganismList.sort((obj1, obj2) => {
+            let so1: Number = (obj1.sortOrder == '' || obj1.sortOrder == null) ? Number(999999) : new Number(obj1.sortOrder);
+            let so2: Number = (obj2.sortOrder == '' || obj2.sortOrder == null) ? Number(999999) : new Number(obj2.sortOrder);
 
+            if (so1 < so2) {
+                return -1;
+            } else if (so1 > so2) {
+                return 1;
+            } else {
+                if (obj1.combinedName < obj2.combinedName) return -1;
+                if (obj1.combinedName > obj2.combinedName) return 1;
+                return 0;
+            }
+        });
     }
 
     public isCoreFacilityIManage(idCoreFacility:String): boolean {
@@ -650,6 +672,9 @@ export class GnomexService {
             if (authenticated) {
                 this.createSecurityAdvisorService.createSecurityAdvisor().first().subscribe(response => {
                     this.progressService.displayLoader(15);
+                    this.projectService.getProjectList().subscribe((response: any) => {
+                        this.projectList = response;
+                    });
                     this.dictionaryService.reload(() => {
                         this.progressService.displayLoader(30);
                         this.labListService.getLabList().first().subscribe((response: any[]) => {
@@ -827,6 +852,11 @@ export class GnomexService {
         }
     }
 
+    submitInternalExperiment(): boolean {
+        return this.isInternalExperimentSubmission;
+    }
+
+
     private getOrderID(params:HttpParams,path:string[],initOrderSubject:BehaviorSubject<any> ){
         this.getOrderFromNumber(params).first().subscribe(data =>{
             if(data.result === 'SUCCESS'){
@@ -842,6 +872,34 @@ export class GnomexService {
             }
         });
     }
+
+    public getSampleProperty(idProperty: string):Object {
+        let property = null;
+        for (let prop of this.propertyList) {
+            if (prop.idProperty === idProperty) {
+                if (Array.isArray(prop)) {
+                    property = prop[0];
+                } else {
+                    property = prop;
+                }
+                break;
+            }
+        }
+        return property;
+    }
+
+    public getRequestCategoryProperty(idCoreFacility: string, codeRequestCategory: string, name: string): string {
+        let result: string = "";
+        if (this.properties != null) {
+            let qualName: string = codeRequestCategory + '\t' + idCoreFacility + "\t" + name;
+            result = this.properties[qualName];
+            if (!result) {
+                result = this.getCoreFacilityProperty(idCoreFacility, name);
+            }
+        }
+        return result;
+    }
+
 
 
 }

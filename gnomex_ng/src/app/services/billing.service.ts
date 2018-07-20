@@ -52,6 +52,10 @@ export class BillingService {
         });
     }
 
+    public getLibPrepApplicationPriceList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetLibPrepApplicationPriceList.gx", {params: params});
+    }
+
     public getAuthorizedBillingAccounts(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAuthorizedBillingAccounts.gx", {params: params});
     }

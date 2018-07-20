@@ -77,7 +77,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             this.dtOverviewForm = new FormGroup({});
             setTimeout(()=>{
                 this.dtOverviewForm.addControl("summaryForm", this.summaryComponet.summaryFormGroup);
-                this.dtOverviewForm.addControl("annotationForm", this.annotationComponent.annotationForm);
+                this.dtOverviewForm.addControl("form", this.annotationComponent.form);
                 this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
                 this.dtOverviewForm.markAsPristine();
             });
