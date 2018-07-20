@@ -85,6 +85,14 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
         this.route.data.forEach(data =>{
             this.datatrack =  data.datatrack;
+            this.initLinkVisibility();
+            this.dtOverviewForm = new FormGroup({});
+            setTimeout(()=>{
+                this.dtOverviewForm.addControl("summaryForm", this.summaryComponet.summaryFormGroup);
+                this.dtOverviewForm.addControl("form", this.annotationComponent.form);
+                this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
+                this.dtOverviewForm.markAsPristine();
+            });
             if(this.datatrack){
                 this.canWrite = this.datatrack.canWrite === 'Y';
                 this.initLinkVisibility();

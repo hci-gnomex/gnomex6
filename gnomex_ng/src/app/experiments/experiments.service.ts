@@ -3,7 +3,7 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {HttpHeaders, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 
 
@@ -43,7 +43,9 @@ export class ExperimentsService {
     public invalid:boolean = false;
     public dirty:boolean = false;
 
+
     constructor(private _http: Http,
+                private httpClient: HttpClient,
                 @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
     getExperiments() {
@@ -165,6 +167,7 @@ export class ExperimentsService {
     emitExperiment(exp:any):void{
         this.experimentSubject.next(exp);
     }
+
     getExperimentObservable():Observable<any>{
         return this.experimentSubject.asObservable();
     }
@@ -177,6 +180,11 @@ export class ExperimentsService {
                 throw new Error("Error");
             }
         });
+    }
+
+    public getNewRequest(): Observable<any> {
+        let params: HttpParams = new HttpParams().set("idRequest", '0');
+        return this.httpClient.get("/gnomex/GetRequest.gx", {params: params});
     }
 
     getLab(params: URLSearchParams): Observable<any> {

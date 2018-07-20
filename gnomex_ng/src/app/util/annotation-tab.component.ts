@@ -39,7 +39,7 @@ export enum OrderType{
     `]
 })
 export class AnnotationTabComponent implements OnInit, OnDestroy{
-    public annotationForm: FormGroup;
+    public form: FormGroup;
     private _annotations: IAnnotation[];
     private _disabled: boolean = false;
     private urlAnnotations: any[] = [];
@@ -54,11 +54,11 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
     @Input() orderType = OrderType.NONE;
     @Input() set disabled(value:boolean){
         this._disabled = value;
-        if(this.annotationForm){
+        if(this.form){
             if(this._disabled){
-                this.annotationForm.disable()
+                this.form.disable()
             }else{
-                this.annotationForm.enable();
+                this.form.enable();
             }
         }
 
@@ -66,17 +66,17 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
 
     @Input() set annotations( a: IAnnotation[]){
         this._annotations = a;
-        if(!this.annotationForm){
-            this.annotationForm =  new FormGroup({});
+        if(!this.form){
+            this.form =  new FormGroup({});
         }
 
         this._annotations.forEach(annot => {
-            this.annotationForm.addControl(annot.name, new FormControl());
+            this.form.addControl(annot.name, new FormControl());
 
             if(annot.codePropertyType === this.TEXT){
-                this.annotationForm.controls[annot.name].setValue(annot.value);
+                this.form.controls[annot.name].setValue(annot.value);
             }else if(annot.codePropertyType === this.CHECK){
-                this.annotationForm.controls[annot.name].setValue(annot.value === 'Y');
+                this.form.controls[annot.name].setValue(annot.value === 'Y');
             }else if(annot.codePropertyType === this.MOPTION){
                 let selectedOpts: IAnnotationOption[] = [];
                 for (let opt  of annot.PropertyOption){
@@ -84,28 +84,28 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
                          selectedOpts.push(opt);
                      }
                 }
-                this.annotationForm.controls[annot.name].setValue(selectedOpts);
+                this.form.controls[annot.name].setValue(selectedOpts);
             }else if(annot.codePropertyType === this.OPTION){
-                this.annotationForm.controls[annot.name].setValue(annot.value ? annot.value : '');
+                this.form.controls[annot.name].setValue(annot.value ? annot.value : '');
 
 
 
             } else if(annot.codePropertyType === this.URL){
-                this.annotationForm.controls[annot.name].setValue(annot);
+                this.form.controls[annot.name].setValue(annot);
             }
 
             if(annot.isRequired === 'Y'){
                 if(annot.codePropertyType === this.TEXT){
-                    this.annotationForm.controls[annot.name].setValidators([Validators.required]);
+                    this.form.controls[annot.name].setValidators([Validators.required]);
                 }else if(annot.codePropertyType === this.CHECK){
-                    this.annotationForm.controls[annot.name].setValidators([Validators.requiredTrue]);
+                    this.form.controls[annot.name].setValidators([Validators.requiredTrue]);
                 }else if(annot.codePropertyType === this.MOPTION || annot.codePropertyType === this.OPTION ){
-                    this.annotationForm.controls[annot.name].setValidators(selectRequired());
+                    this.form.controls[annot.name].setValidators(selectRequired());
                 }
             }
 
         });
-        this.annotationForm.markAsPristine();
+        this.form.markAsPristine();
 
 
     }
@@ -120,17 +120,17 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
         for (let annot of this._annotations) {
 
             if (annot.codePropertyType === this.TEXT) {
-                annot.value = this.annotationForm.controls[annot.name].value;
+                annot.value = this.form.controls[annot.name].value;
                 annotationToSave.push(annot);
             } else if (annot.codePropertyType === this.CHECK) {
-                annot.value = this.annotationForm.controls[annot.name].value ? 'Y' : 'N';
+                annot.value = this.form.controls[annot.name].value ? 'Y' : 'N';
                 annotationToSave.push(annot);
             } else if (annot.codePropertyType === this.OPTION) {
                 annot.value = '';
                 annotationToSave.push(annot);
 
             } else if (annot.codePropertyType === this.MOPTION) {
-                let mOptList =  <IAnnotationOption[]>this.annotationForm.controls[annot.name].value;
+                let mOptList =  <IAnnotationOption[]>this.form.controls[annot.name].value;
                 annot.value = '';
                 for(let i = 0; i <  mOptList.length; i++  ){
                     if( i  < mOptList.length - 1){
@@ -142,7 +142,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
                 annotationToSave.push(annot);
 
             } else if (annot.codePropertyType === this.URL) {
-                annotationToSave.push(this.annotationForm.controls[annot.name].value);
+                annotationToSave.push(this.form.controls[annot.name].value);
             }
         }
         this.orderValidateService.annotationsToSave = annotationToSave;
@@ -158,9 +158,9 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
 
     ngOnInit(){
         if(this._disabled){
-            this.annotationForm.disable();
+            this.form.disable();
         }else{
-            this.annotationForm.enable();
+            this.form.enable();
         }
 
         this.orderValidateService.getOrderValidateObservable()
