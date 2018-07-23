@@ -32,6 +32,8 @@ import {ExperimentOrdersComponent} from "./orders/experiment-orders.component";
 import {ViewExperimentComponent} from "./view-experiment.component";
 import {BrowsePanelComponent} from "./browse-panel.component";
 import {AgGridModule} from 'ag-grid-angular/main';
+import { DynamicModule } from 'ng-dynamic-component';
+
 
 import {
     DropDownModule
@@ -48,12 +50,17 @@ import {CreateProjectComponent} from "./create-project.component";
 import {DeleteProjectComponent} from "./delete-project.component";
 import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
-import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {AgGridRendererModule,IconTextRendererComponent} from "../util/grid-renderers/index";
-import {MatDialogModule} from "@angular/material";
 import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
 import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
 import {ExperimentDetailModule} from "./experiment-detail/experiment-detail-module";
+import {TabNotesViewComponent} from "./new-experiment/tab-notes-view.component";
+import {TabSampleSetupViewComponent} from "./new-experiment/tab-sample-setup-view.component";
+import {TabPropertiesViewComponent} from "./new-experiment/tab-properties-view.component";
+import {TabSeqSetupView} from "./new-experiment/tab-seq-setup-view";
+import {NewExperimentComponent} from "./new-experiment/new-experiment.component";
+import {AnnotationTabComponent} from "../util/annotation-tab.component";
+import {TabSeqProtoView} from "./new-experiment/tab-seq-proto-view";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
@@ -96,6 +103,10 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
         TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
+        DynamicModule,
+        DynamicModule.withComponents([TabNotesViewComponent, AnnotationTabComponent, TabSampleSetupViewComponent, TabSeqSetupView,
+            TabSeqProtoView]),
+
         AgGridModule.withComponents([
             DateRenderer,
             IconTextRendererComponent,
@@ -122,10 +133,18 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
                     DeleteProjectComponent,
                     ReassignExperimentComponent,
                     DeleteExperimentComponent,
-                    CreateProjectLauncherComponent
+                    CreateProjectLauncherComponent,
+                    TabNotesViewComponent,
+                    TabSampleSetupViewComponent,
+                    TabPropertiesViewComponent,
+                    TabSeqSetupView,
+                    TabSeqProtoView,
+                    NewExperimentComponent
     ],
-    entryComponents:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent],
-    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent]
+    entryComponents:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupView, NewExperimentComponent,
+        TabSeqProtoView],
+    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupView, NewExperimentComponent,
+        TabSeqProtoView]
 })
 export class ExperimentsModule {
 }

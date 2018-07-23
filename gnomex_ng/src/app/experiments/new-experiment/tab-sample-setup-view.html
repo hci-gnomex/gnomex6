@@ -1,0 +1,105 @@
+<form [formGroup]="form" class="flexbox-column">
+    <div>
+        <div class="flex-column-container">
+            <ng-container *ngIf="sampleSetupContainer">
+                <ng-container>
+                    <div>
+                        <mat-form-field class="formField" [floatLabel]="auto">
+                            <mat-label>How many samples will be sequenced in this experiment order?</mat-label>
+                            <input matInput formControlName="numSamples" placeholder="Number of samples.">
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="this.currState === 'QCState'">
+                    <ng-container *ngTemplateOutlet="qcSetup"></ng-container>
+                </ng-container>
+                <ng-container>
+                    <div class="flex-row-container">
+                        <div style="flex-grow: .3">
+                            <mat-list>
+                                <h3 mat-subheader style="color: #5bc0de">DNA
+                                <span style="color:black;margin-left: 14em">Which category best describes your samples?</span>
+                                </h3>
+                                <mat-radio-group placeholder="Which category best describes your samples?" (change)="onDnaChange($event)" formControlName="selectedDna">
+                                    <div *ngFor="let dnaCategory of filteredSampleTypeListDna">
+                                        <mat-radio-button (click)="selectDna($event)" [value]="dnaCategory">
+                                                        <span class="inline-span">
+                                                            {{dnaCategory.display}}
+                                                       </span>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </mat-list>
+                        </div>
+                        <div class="row-one-quarter">
+                            <mat-list>
+                                <h3 mat-subheader style="color: #5bc0de">RNA</h3>
+                                <mat-radio-group placeholder="Which category best describes your samples?" (change)="onRnaChange($event)" formControlName="selectedRna">
+                                    <div *ngFor="let rnaCategory of filteredSampleTypeListRna">
+                                        <mat-radio-button (click)="selectRna($event)" [value]="rnaCategory">
+                                                        <span class="inline-span">
+                                                            {{rnaCategory.display}}
+                                                        </span>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </mat-list>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="showSampleNotes" >
+                <mat-form-field class="formField">
+                    <textarea matInput formControlName="notes" formControlName="sampleTypeNotes" matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="5"></textarea>
+                </mat-form-field>
+                </ng-container>
+                <ng-container>
+                    <div>
+                        <mat-form-field class="formField">
+                            <input matInput placeholder="Organism" aria-label="Organism" [matAutocomplete]="autoOrg"
+                                   formControlName="organism" (keyup.enter)="chooseFirstOrgOption()" (keyup)="highlightDtOrgFirstOption($event)">
+                            <mat-autocomplete [displayWith]="displayOrg" #autoOrg="matAutocomplete">
+                                <mat-option (onSelectionChange)="selectOrgOption($event)" *ngFor="let org of filterOrganism(form.get('organism').value)" [value]="org">{{org.combinedName}}</mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </ng-container>
+                <ng-container>
+                    <div class="flex-row-container">
+                        <div class="flex-column-container" style="width: 100%">
+                            <mat-form-field class="formField" [floatLabel]="auto">
+                                <mat-label>Specify the kit or reagents used for the purification of the samples you will be submitting.</mat-label>
+                                <input matInput formControlName="reagent" placeholder="Reagent">
+                            </mat-form-field>
+                            <mat-form-field class="formField" [floatLabel]="auto">
+                                <mat-label>Specify the elution buffer used for the purification of the samples you will be submitting.</mat-label>
+                                <input matInput formControlName="elution" placeholder="Elution">
+                            </mat-form-field>
+                            <mat-checkbox *ngIf="showDnaseBox" formControlName="dnaseBox">Click if RNA samples were treated with DNase"</mat-checkbox>
+                            <mat-checkbox *ngIf="showRnaseBox" formControlName="rnaseBox">Click if DNA samples were treated with RNase"</mat-checkbox>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container>
+                    <div>
+                        <mat-radio-group (change)="onKeepChange($event)" formControlName="keepSample">
+                            <mat-radio-button value="1">Yes (leftover samples will be retained for 90 days)</mat-radio-button>
+                            <mat-radio-button value="2">No (leftover samples will be discarded)</mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="showSamplePrepContatainer">
+                    <mat-form-field class="formField" [floatLabel]="auto">
+                        <mat-label>Specify the nucleic acid extraction method.</mat-label>
+                        <input matInput formControlName="elution" placeholder="Elution">
+                    </mat-form-field>
+                </ng-container>
+                <mat-form-field class="formField">
+                    <textarea matInput placeholder="Enter a note for the Core facility" formControlName="coreNotes" matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="5"></textarea>
+                    <mat-error *ngIf="sampleSetupForm?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                </mat-form-field>
+            </ng-container>
+        </div>
+    </div>
+    <ng-template #qcSetup>
+    </ng-template>
+</form>

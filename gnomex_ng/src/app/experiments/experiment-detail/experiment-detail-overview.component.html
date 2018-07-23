@@ -1,11 +1,14 @@
 <div style="display:flex; flex-direction:column ; height:100%; width:100%;">
     <div style="display:flex; flex: 1;">
-        <mat-tab-group class="mat-tab-group-border">
+        <mat-tab-group class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Other Details">
                 <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.EXPERIMENT"> </annotation-tab>
             </mat-tab>
             <mat-tab label="Related Data" *ngIf="showRelatedDataTab">
                 <related-data-tab [relatedObjects]="relatedObjects" ></related-data-tab>
+            </mat-tab>
+            <mat-tab label="Description">
+                <description-tab [showEditor]="initDescriptionTab" ></description-tab>
             </mat-tab>
         </mat-tab-group>
     </div>
