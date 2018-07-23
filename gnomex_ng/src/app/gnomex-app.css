@@ -61,12 +61,17 @@ body > .container {
 }
 
 main {
-  padding-right: 0.3em;
-  padding-left: 0.3em;
   position: relative;
   height: 100%;
-  padding-bottom: 0.3em;
-  padding-top: 10em;
+  width: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.main-display-area {
+  padding: 0.3em;
+  overflow: auto;
 }
 
 .navbar {
@@ -157,6 +162,9 @@ div.mainnav {
   display: flex;
   flex-direction: column;
 }
+.flex-grow {
+  flex: 1;
+}
 .flex-wrap {
   flex-wrap: wrap;
 }
@@ -169,6 +177,12 @@ div.mainnav {
 img.icon {
   margin-right: 0.5em;
 }
+.ellipsis {
+  text-overflow: ellipsis;
+}
+
+button.mat-button.minimize      { min-width: 0; }
+button.mat-button.minimize span { min-width: 0; }
 
 /******************************/
 /**** Primary Nav / Header ****/

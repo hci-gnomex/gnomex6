@@ -5,28 +5,24 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
 import {AnalysisService} from "../../services/analysis.service"
 
 
-
 @Component({
     selector: 'analysis-panel',
     template: `        
-        <div style="height: 100%">
+        <div class="full-width full-height">
             <router-outlet name="analysisPanel"></router-outlet>
         </div>
-`
+    `
 })
 export class AnalysisPanelComponent implements OnInit, OnDestroy{
 
-    constructor(private analysisService:AnalysisService){
-    }
+    constructor(private analysisService:AnalysisService){ }
 
-    ngOnInit(){
+    ngOnInit() { }
 
-    }
     ngOnDestroy(){
         this.analysisService.analysisPanelParams = null;
         this.analysisService.resetAnalysisOverviewListSubject();
     }
-    save(){
 
-    }
+    save() { }
 }

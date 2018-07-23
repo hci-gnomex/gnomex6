@@ -1,67 +1,74 @@
-<div class="background">
-    <div class="flex-column-container">
-        <div style="flex-grow: .01;" class="br-exp-item br-exp-one">
-            <div style="margin-bottom: 0.3em;">
+<div class="full-width full-height major-border padded background">
+    <div class="full-width full-height flex-container-col foreground">
+        <div class="full-width small-font">
+            <div class="full-width">
                 <menu-header-data-tracks [selectedNode]="selectedItem"></menu-header-data-tracks>
             </div>
+            <div class="full-width vertical-spacer">
+            </div>
             <div>
-                <browse-filter [label]="'Data Track'" [iconSource]="'assets/datatrack.png'"
-                               [mode]="'dataTrackBrowse'"></browse-filter>
+                <browse-filter [label]="'Data Track'"
+                               [iconSource]="'assets/datatrack.png'"
+                               [mode]="'dataTrackBrowse'">
+                </browse-filter>
             </div>
         </div>
-        <div style="flex:1;"class="flex-row-container">
+        <div class="full-width vertical-spacer background">
+        </div>
+        <div class="flex-container-row flex-grow">
             <split>
                 <split-area size="20">
-                <div class="br-exp-item" style="height:100%">
-                    <div class="flex-column-container" style="height:100%;">
-                        <div class="br-exp-item br-exp-help-drag-drop">
-                            <div class="flex-row-container">
-                                <div class="br-exp-item-row-one" style="position: relative;top: .65em; left: .25em ">
-                                    {{datatracksCount}} data tracks
+                <div class="full-height full-width small-font border">
+                    <div class="full-width full-height flex-container-col foreground">
+                        <div class="full-width small-font">
+                            <div class="flex-container-row align-center">
+                                <div class="flex-grow major-left-right-padded no-word-wrap">
+                                    {{datatracksCount + " data track" + (datatracksCount != 1 ? "s" : "")}}
+                                </div>
+                                <div class="align-center no-word-wrap">
+                                    <mat-form-field class="short-width padded">
+                                        <input matInput [(ngModel)]="searchText" placeholder="Enter search here...">
+                                    </mat-form-field>
+                                    <button mat-button class="minimize" (click)="search()">
+                                        <img src="../../assets/magnifier.png">
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="br-exp-item br-exp-four">
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="searchText" placeholder="Enter search here...">
-                            </mat-form-field>
-                            <button mat-button (click)="search()"><img src="../../assets/magnifier.png"></button>
-                            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+                        <div class="full-width flex-grow no-overflow left-right-padded">
+                            <div class="full-width full-height border">
+                                <tree-root #datatracksTree (moveNode)="onMoveNode($event)"
+                                           [nodes]="items" [options]="options"
+                                           (activate)="treeOnSelect($event)"
+                                           (changeFilter)="treeChangeFilter($event)"
+                                           (updateData)="treeUpdateData($event)">
+                                    <ng-template #treeNodeTemplate let-node let-index="index">
+                                        <div class="full-width no-word-wrap">
+                                            <img src="{{node.data.icon}}" height="16" width="16">
+                                            <span>{{ node.data.label }}</span>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #loadingTemplate></ng-template>
+                                </tree-root>
+                            </div>
                         </div>
-                        <div class="br-exp-item br-exp-three">
-                            <tree-root #datatracksTree (moveNode)="onMoveNode($event)"
-                                       [nodes]="items" [options]="options"
-                                       (activate)="treeOnSelect($event)"
-                                       (changeFilter)="treeChangeFilter($event)"
-                                       (updateData)="treeUpdateData($event)"
-                            >
-
-                                <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <img src="{{node.data.icon}}" height="16" width="16">
-                                    <span>{{ node.data.label }}</span>
-                                </ng-template>
-                                <ng-template #loadingTemplate></ng-template>
-                            </tree-root>
-                        </div>
-
-                        <div class="br-exp-item br-exp-four">
-                            <div class="flex-row-container">
-                                <div class="br-exp-item-row-one" style="position: relative; top: 1em">
+                        <div class="full-width">
+                            <div class="flex-container-row">
+                                <div class="padded">
                                     <button mat-button (click)="expandClicked()">Expand</button>
                                 </div>
-                                <div class="br-exp-item-row-two" style="position: relative; top: 1em">
+                                <div class="padded flex-grow">
                                     <button mat-button (click)="collapseClicked()">Collapse</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div> <!-- end tree container -->
-                </split-area>
-
-                <split-area size="80">
-                <div  class="br-dt-item datatracks-panel">
-                    <datatracks-panel> </datatracks-panel>
                 </div>
+                </split-area>
+                <split-area size="80">
+                    <div  class="full-width full-height border padded">
+                        <datatracks-panel></datatracks-panel>
+                    </div>
                 </split-area>
             </split>
         </div>
