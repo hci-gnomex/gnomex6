@@ -25,6 +25,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
 import {DateParserComponent} from "../../util/parsers/date-parser.component";
 import {GnomexService} from "../../services/gnomex.service";
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'advanced-search-component',
@@ -292,6 +293,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
                 private advancedSearchService: AdvancedSearchService,
+                private router: Router,
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (data) {
             this.searchText = !!data.searchText ? data.searchText : '';
@@ -343,9 +345,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         this.searchResultsSubscription = this.advancedSearchService.getSearchResultObservable().subscribe((results) => {
             this.processSearchResults(results);
             this.selectedTabIndex = 1; // Change the tab to the Search Results
-            if (!!this.spinnerRef) {
-                this.spinnerRef.close();
-            }
+            this.dialogService.stopAllSpinnerDialogs();
         });
 
         this.visibilityDictionary = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.Visibility");
@@ -534,10 +534,6 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
         this.newSearchGridApi.setRowData(rowData);
         this.currentlyDisplayedRowData = rowData;
 
-        if (!!this.spinnerRef) {
-            this.spinnerRef.close();
-        }
-
         if (this.searchAfterLoad
             && (this.gotAllObjectSearchList
                 && this.gotExperimentSearchList
@@ -548,6 +544,8 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 && this.gotDictionaryMap)) {
             this.searchAfterLoad = false;
             setTimeout(() => { this.onClickSearchButton(); });
+        } else {
+            this.dialogService.stopAllSpinnerDialogs();
         }
     }
 
@@ -566,6 +564,17 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                     this.lastSearchDataAllObjects = [results[0].GlobalList.Global];
                 }
 
+                for (let element of this.lastSearchDataAllObjects) {
+                    // Experiments, Analyses and Data Tracks all use the same field, "number" to store the destination information.
+                    if (element.codeVisibility && (element.objectTypeDisplay && element.objectTypeDisplay !== 'Topic')) {
+                        element.destination = '' + element.number;
+                    } // Topics use a different field, or rather their "number" field is not populated at time of writing.
+                    else if (element.codeVisibility && (element.objectTypeDisplay && element.objectTypeDisplay === 'Topic')) {
+                        element.destination = "T" + element.id;
+                    }
+                    // Protocols require two pieces of information to route to, so they are handled separately at time of navigation.
+                }
+
                 if (this.resultType === this.ALL_OBJECTS && this.searchResultsGridApi) {
                     this.searchResultsGridApi.setRowData(this.lastSearchDataAllObjects);
                 }
@@ -581,6 +590,12 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                     this.lastSearchDataExperiments = results[0].RequestList;
                 } else {
                     this.lastSearchDataExperiments = [results[0].RequestList.Request];
+                }
+
+                for (let element of this.lastSearchDataExperiments) {
+                    if (element.idRequest && (element.label || element.displayName)) {
+                        element.destination = '' + element.requestNumber;
+                    }
                 }
 
                 if (this.resultType === this.EXPERIMENTS && this.searchResultsGridApi) {
@@ -601,6 +616,12 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 }
 
                 for (let analysisSearchResult of this.lastSearchDataAnalyses) {
+                    if (analysisSearchResult.idAnalysis
+                        && (analysisSearchResult.label
+                            || (analysisSearchResult.number && analysisSearchResult.name))) {
+                        analysisSearchResult.destination = '' + analysisSearchResult.number;
+                    }
+
                     let submittedBy: string = '';
                     let temp: string;
                     let addedFirstName: boolean = false;
@@ -658,6 +679,11 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 }
 
                 for (let analysisSearchResult of this.lastSearchDataDataTracks) {
+
+                    if (analysisSearchResult.idDataTrack && (analysisSearchResult.label || analysisSearchResult.name)) {
+                        analysisSearchResult.destination = '' + analysisSearchResult.fileName;
+                    }
+
                     let submittedBy: string = '';
                     let temp: string;
                     let addedFirstName: boolean = false;
@@ -697,6 +723,12 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                     this.lastSearchDataTopics = [results[0].TopicList.Topic];
                 }
 
+                for (let element of this.lastSearchDataTopics) {
+                    if (element.idTopic && (element.label || element.name)) {
+                        element.destination = "T" + element.idTopic;
+                    }
+                }
+
                 if (this.resultType === this.TOPICS && this.searchResultsGridApi) {
                     this.searchResultsGridApi.setRowData(this.lastSearchDataTopics);
                 }
@@ -705,7 +737,6 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             } else {
                 this.numberOfTopicResults = 0;
             }
-
 
             // Get "Experiment" Tree Results
             if (results[0].ProjectRequestList) {
@@ -746,7 +777,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 }
             }
 
-            // Get "Protocol" Tree Results - actually runs off the same information as the grid view.
+            // Get "Data Track" Tree Results - actually runs off the same information as the grid view.
             if (results[0].DataTrackFolderList) {
                 if (Array.isArray(results[0].DataTrackFolderList)) {
                     this.lastSearchTreeNodesDataTracks = results[0].DataTrackFolderList;
@@ -759,7 +790,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
                 }
             }
 
-            // Get "Protocol" Tree Results - actually runs off the same information as the grid view.
+            // Get "Topic" Tree Results - actually runs off the same information as the grid view.
             if (results[0].LabTopicList) {
                 if (Array.isArray(results[0].LabTopicList)) {
                     this.lastSearchTreeNodesTopics = results[0].LabTopicList;
@@ -1532,6 +1563,9 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             return;  // This is not a recognized node type. Stop.
         }
 
+        node.className  = '' + backEndData.className;
+        node.idProtocol = '' + backEndData.idProtocol;
+
         // If successful, get a new id for the node
         node.id = this.nodeIndex++;
 
@@ -1796,8 +1830,21 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
 
     treeOnSelect(event: any) {
-        if (event && event.node && event.node.data && event.node.data.destination) {
-            this.gnomexService.navByNumber(event.node.data.destination);
+        if (event && event.node && event.node.data) {
+            if (event.node.data.destination) {
+                this.gnomexService.navByNumber(event.node.data.destination);
+            } else if (event.node.data.idProtocol && event.node.data.className) {
+                setTimeout(() => {
+                    this.router.navigate([
+                        '/manage-protocols',
+                        {
+                            outlets: {
+                                'browsePanel': ['details', event.node.data.className,  event.node.data.idProtocol]
+                            }
+                        }
+                    ]);
+                });
+            }
         }
     }
 
@@ -1840,10 +1887,45 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     }
 
 
+    onRowDoubleClicked(event: any) {
+        if (event && event.data) {
+            if (event.data.destination) {
+                this.gnomexService.navByNumber(event.data.destination);
+            } else if (event.data.id && event.data.className) {
+                setTimeout(() => {
+                    this.router.navigate([
+                        '/manage-protocols',
+                        {
+                            outlets: {
+                                'browsePanel': ['details', event.data.className,  event.data.id]
+                            }
+                        }
+                    ]);
+                });
+            } else if (event.data.idProtocol && event.data.className) {
+                setTimeout(() => {
+                    this.router.navigate([
+                        '/manage-protocols',
+                        {
+                            outlets: {
+                                'browsePanel': ['details', event.data.className,  event.data.idProtocol]
+                            }
+                        }
+                    ]);
+                });
+            } else {
+                console.log('Error in Advanced Search while routing to search item.');
+            }
+        }
+    }
+
+
     onClickSearchButton(): void {
-        this.resultType = this.searchType;
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
-        this.advancedSearchService.search(this.searchType, this.searchText, this.currentlyDisplayedRowData, this.matchType);
+        setTimeout(() => {
+            this.resultType = this.searchType;
+            this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+            this.advancedSearchService.search(this.searchType, this.searchText, this.currentlyDisplayedRowData, this.matchType);
+        });
     }
     onClickClearButton(): void {
         // This should clear the search terms from the window, shown and unshown.
