@@ -13,6 +13,9 @@ export class BrowseOrderValidateService {
 
     constructor() {}
 
+    /* good for grid or controls that don't integrate well with reactive forms */
+    public propsNotOnForm:any = {};
+
     get dirtyNote(){
         return this._dirtyNote;
     }
@@ -47,6 +50,7 @@ export class BrowseOrderValidateService {
         this.dirtyNote = false;
         this.orderValidateSubject = new Subject();
         this._annotationsToSave = [];
+        this.propsNotOnForm = {};
 
     }
 

@@ -3,7 +3,7 @@ tomcatScriptPath="/usr/share/apache-tomcat-7.0.79/webapps/gnomex/scripts/"
 scriptsPath="/home/u0566434/Scripts/"
 pDataPath="/home/u0566434/parser_data/"
 fScriptsPath=$scriptsPath"foundation/" # where the scripts live
-localDataPath="/mnt/win/Results/foundTEST/"   #"/home/u0566434/FoundationData/"
+remoteDataPath="/mnt/win/Results/"   #"/home/u0566434/FoundationData/"
 foundationPath="/Repository/PersonData/2017/2R/Foundation/"
 
 regex="^(TRF[0-9]+)(\.|_).*"  #"^(TRF[0-9]+)_(\wNA)(.*)" # Match TRF and its type (DNA/RNA) and then the file extension
@@ -27,30 +27,35 @@ do
 done
 export CLASSPATH
 
-CLASSPATH="./gnomex1.jar:$CLASSPATH"
+CLASSPATH="./gnomex2.jar:$CLASSPATH"
 export CLASSPATH
 
 
-
+set -e
 
 echo hello out there from foundation
-:<<'END'
-ls $localDataPath*TRF* > "$pDataPath"tmpFileNameList.out
-# Filter file order of types  params: in, out, path, out, out
-java hci.gnomex.daemon.auto_import.FilterFile "$pDataPath"tmpFileNameList.out "$pDataPath"remoteChecksums.out "$pDataPath"localChecksums.out "$pDataPath"remoteFileList.out "$pDataPath"hci-creds.properties
-java hci.gnomex.daemon.auto_import.DiffParser "$pDataPath"localChecksums.out  "$pDataPath"remoteChecksums.out "$pDataPath"
 
+tree "$foundationPath" --noreport > "$pDataPath"localFoundationTree.out
+java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localFoundationTree.out "$pDataPath"localFoundationPath.out
+
+ls $remoteDataPath*TRF* > "$pDataPath"remoteFoundationPath.out
+java hci.gnomex.daemon.auto_import.DiffParser  "$pDataPath"localFoundationPath.out  "$pDataPath"remoteFoundationPath.out > "$pDataPath"uniqueFilesToMove.out
+
+
+
+# Filter file order of types  params: in, out, path, out, out
+
+java hci.gnomex.daemon.auto_import.FilterFile "$pDataPath"uniqueFilesToMove.out "$pDataPath"remoteChecksums.out "$pDataPath"localChecksums.out "$pDataPath"remoteFileList.out "$pDataPath"hci-creds.properties
+java hci.gnomex.daemon.auto_import.DiffParser "$pDataPath"localChecksums.out  "$pDataPath"remoteChecksums.out "$pDataPath"
 
 cat "$pDataPath"inclusion.out "$pDataPath"remoteFileList.out > "$pDataPath"remoteFPath.out
 
 cat "$pDataPath"remoteChecksums.out
 cat "$pDataPath"localChecksums.out
 
-rm "$pDataPath"tmpFileNameList.out
 
 rm "$pDataPath"*Checksums.out
 
-END
 
  #echo  `wc -l < "$pDataPath"download.log`
 
@@ -75,29 +80,15 @@ echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder > "$pDataPath"tem
 echo The temp str:
 cat "$pDataPath"tempStr.out
 
-#echo here is the list of files
-#value=$(<"$pDataPath"tempStr.out)
-#echo $value
-
-#sed "s/'SL#'/$idStr/g" "$scriptsPath"sLNumberMRNQuery.sql > "$pDataPath"modSlNumberMRNQuery.sql
 
 java  hci.gnomex.daemon.auto_import.Linker "$pDataPath"tempStr.out "$pDataPath"hci-creds.properties "$pDataPath"trfInfo.out foundation
-
 rm "$pDataPath"tempStr.out
 
-cd $tomcatScriptPath
 java hci.gnomex.daemon.auto_import.XMLParserMain -file "$pDataPath"trfInfo.out -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"tempRequest.xml -importMode foundation
-cd $scriptsPath
-:<<'END'
-
-
-java hci.gnomex.daemon.auto_import.FileMover -file "$pDataPath"remoteFPath.out  -root $foundationPath -downloadPath $localDataPath -flaggedFile "$pDataPath"flaggedIDs.out -mode foundation
+java hci.gnomex.daemon.auto_import.FileMover -file "$pDataPath"remoteFPath.out  -root $foundationPath -downloadPath $remoteDataPath -flaggedFile "$pDataPath"flaggedIDs.out -mode foundation
 
 #rm "$pDataPath"tempAnalysisList.out
 
-#else
-        #echo $downloaderStatus
-#fi
 
 
 echo ------------------------------------------------------------------------------------------------------------
@@ -105,5 +96,3 @@ echo ---------------------------------------------------------------------------
 
 #rm ../Data/matched.txt
 #rm catList.txt
-
-END

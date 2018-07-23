@@ -11,14 +11,14 @@ import {Form, FormGroup} from "@angular/forms";
 @Component({
     selector: 'tabs',
 
-    template: `        
-            <ul #container class="tabs-nav">
+    template: `
+        <ul #container class="tabs-nav">
                 <li class="tab-item"  [ngClass]="{  'disable-tab':!tab.enable, 'active-tab':tab.active, 'error':!tab.valid}"
                     *ngFor="let tab of tabs" (click)="selectTab(tab)" >
                     <a class="tab-link" >
                         {{tab.title}}</a>
                 </li>
-            </ul>
+        </ul>
             <!-- note the screens for the tabs will be inserted here dynamically -->
             <!-- the  ref '#container' tells the viewContainerRef where to place the screen  -->
   `,

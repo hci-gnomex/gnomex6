@@ -139,7 +139,6 @@ export class HeaderComponent implements OnInit{
             this.checkSecurity();
             this.gnomexService.isGuestState = this.createSecurityAdvisorService.isGuest;
             this.addQuickLinks();
-
         });
 
 
@@ -1810,6 +1809,7 @@ export class HeaderComponent implements OnInit{
 
         let obj = {
             displayName: displayName,
+            idCoreFacility: idCoreFacility,
             context: context,
             iconName: icon,
             children: children,
@@ -1909,7 +1909,7 @@ export class HeaderComponent implements OnInit{
      */
     canSubmitRequestForALab():boolean {
         let hasLab:boolean = false;
-        for (let lab of this.labList) {
+        for (let lab of this.gnomexService.labList) {
             if (lab.canSubmitRequests === 'Y') {
                 hasLab = true;
                 break;
@@ -1947,7 +1947,8 @@ export class HeaderComponent implements OnInit{
         for (let core of this.gnomexService.myCoreFacilities) {
             if (core.hasRequestCategories === 'Y') {
                 let label: string = template.displayName + " for " + core.facilityName;
-                let menuItem = this.createMenuItem(label, "", template.iconName, "", core.idCoreFacility,[]);
+                let route: string = "/newExperiment";
+                let menuItem = this.createMenuItem(label, "", template.iconName, route, core.idCoreFacility,[]);
                 children[coreCtr] = menuItem;
                 coreCtr++;
             }

@@ -14,6 +14,8 @@ import { TextAlignLeftMiddleRenderer } from "./text-align-left-middle.renderer";
 import { TextAlignRightMiddleRenderer } from "./text-align-right-middle.renderer";
 import { TextSelectXorMultiselectRenderer } from "./text-select-xor-multiselect.renderer";
 import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
+import {TwoButtonRenderer} from "./two-button.renderer";
+import {MultipleLineTextRenderer} from "./multiple-line-text.renderer";
 
 @NgModule({
     imports: [
@@ -28,12 +30,14 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 		IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
+        MultipleLineTextRenderer,
 		RemoveLinkButtonRenderer,
 		SelectRenderer,
 		SplitStringToMultipleLinesRenderer,
 		TextAlignLeftMiddleRenderer,
 		TextAlignRightMiddleRenderer,
         TextSelectXorMultiselectRenderer,
+		TwoButtonRenderer,
 		UploadViewRemoveRenderer
     ],
     exports: [
@@ -43,12 +47,14 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 		IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
+        MultipleLineTextRenderer,
 		RemoveLinkButtonRenderer,
 		SelectRenderer,
 		SplitStringToMultipleLinesRenderer,
 		TextAlignLeftMiddleRenderer,
 		TextAlignRightMiddleRenderer,
         TextSelectXorMultiselectRenderer,
+        TwoButtonRenderer,
 		UploadViewRemoveRenderer
     ]
 })

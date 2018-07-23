@@ -1,20 +1,23 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
-
-import {ExperimentsService} from "../experiments.service";
-import {Subscription} from "rxjs/Subscription";
-import {NgModel} from "@angular/forms"
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {URLSearchParams} from "@angular/http";
 
-import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
-import {jqxWindowComponent} from "../../../assets/jqwidgets-ts/angular_jqxwindow";
+import {Subscription} from "rxjs/Subscription";
 
-import {BrowseFilterComponent} from "../../util/browse-filter.component";
-import {DictionaryService} from "../../services/dictionary.service";
-import {EmailRelatedUsersPopupComponent} from "../../util/emailRelatedUsersPopup/email-related-users-popup.component"
-import {GnomexStyledGridComponent} from "../../util/gnomexStyledJqxGrid/gnomex-styled-grid.component"
-import {PropertyService} from "../../services/property.service";
-import {Alert} from "selenium-webdriver";
+import {EmailRelatedUsersPopupComponent} from "../../util/emailRelatedUsersPopup/email-related-users-popup.component";
+import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
+import {MultipleLineTextRenderer} from "../../util/grid-renderers/multiple-line-text.renderer";
+import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
+import {TwoButtonRenderer} from "../../util/grid-renderers/two-button.renderer";
+
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {DictionaryService} from "../../services/dictionary.service";
+import {ExperimentsService} from "../experiments.service";
+import {PropertyService} from "../../services/property.service";
+import {MatDialog, MatDialogConfig} from "@angular/material";
+
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
  *	the navigation bar.
@@ -27,33 +30,45 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 @Component({
 	selector: "ExperimentOrders",
 	templateUrl: "./experiment-orders.component.html",
-	styles: [`
-      div.t {
-          display: table;
-      }
+	styles: [`		
+		
+		.most-width { width: 80%; }
+		
+		.t  { display: table;      }  
+		.tr { display: table-row;  }  
+		.td { display: table-cell; }  
+		
+		.vertical-center { vertical-align: middle; }
 
-      div.tr {
-          display: table-row;
-          vertical-align: middle;
-      }
-
-      div.td {
-          display: table-cell;
-          vertical-align: middle;
-      }
-
-      div.background {
-          width: 100%;
-          height: 100%;
-          background-color: #EEEEEE;
-          padding: 0.3em;
-          border-radius: 0.3em;
-          border: 1px solid darkgrey;
-          position: relative;
-          display: flex;
-          flex-direction: column;
-      }
-
+        .right-align { text-align: right; }
+		
+        .small-font { font-size: small; }
+		
+		.background {  
+			background-color: #EEEEEE;  
+			padding: 0.3em;  
+			border-radius: 0.3em;  
+			border: 1px solid darkgrey;  
+			position: relative;  
+		}
+		
+		.flex-column-container {  
+			display: flex;  
+			flex-direction: column;  
+		}  
+		.flex-row-container {  
+			display: flex;  
+			flex-direction: row;  
+		}  
+		.flex-stretch {  
+			flex: 1;  
+		}
+		
+		.vertical-spacer {  
+			height:0.3em;  
+			width:0;  
+		}
+	  
       .title {
           text-align: left;
           font-size: medium;
@@ -69,8 +84,6 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
       }
 
       div.lower-panel {
-          height: 100%;
-          width: 100%;
           border: 1px solid darkgrey;
           background-color: white;
           padding: 0.3em;
@@ -81,108 +94,36 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
           display: block;
           width: 100%;
           margin-top: 0.3em;
-          padding: 0em 0.8em;
+          padding: 0 0.8em;
       }
 
       div.button-container {
-          padding: 0.2em 0em 0.2em 0.6em;
+          padding: 0.2em 0 0.2em 0.6em;
       }
 	`]
 })
 export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
-	@ViewChild('myGrid') myGrid: GnomexStyledGridComponent;
-	@ViewChild('statusComboBox') statusCombobox: jqxComboBoxComponent;
-	@ViewChild('errorPopup') errorPopup: jqxWindowComponent;
-	@ViewChild('warningPopup') warningPopup: jqxWindowComponent;
-	@ViewChild('confirmationPopup') confirmationPopup: jqxWindowComponent;
-	@ViewChild('windowReference') window: EmailRelatedUsersPopupComponent;
+    protected gridApi;
+    protected gridColumnApi;
 
-	private errorMessage: string = '';
-	private warningMessage: string = '';
-
-	private dictionary: any;
+    protected experiments: any[] = [];
 
 	private experimentsSubscription: Subscription;
 	private statusChangeSubscription: Subscription;
+
+    private idCoreFacilityFilter: string;
 
 	private selectedRequestNumbers: string[];
 	private changeStatusResponsesRecieved: number;
 
 	private enableChanges: boolean = false;
 
+    private changeStatus: string;
 
-	private actionCellsRenderer = (row: number, column: any, value: any): any => {
-		return `<div style="display:inline-block; width: 80%; padding-left: 10%; padding-right:10%; text-align: center;">
-							<div style="display:inline-block; width: 35%; text-align: center;">
-								<a>View</a>
-							</div>
-							<div style="display:inline-block; width: 35%; padding-left:10%; text-align: center;">
-								<a>Edit</a>
-							</div>
-						</div>`;
-	};
+    private requestCategories: any[] = [];
 
-	private experimentNumberCellsRenderer = (row: number, column: any, value: any): any => {
-		let imgSource = this.source.localdata[row].icon;
-		return `<div style="display: block; text-align: left; padding: 0.3rem 0.5rem;">
-							<img src="` + imgSource +`" alt=""/>` + value +
-					 `</div>`;
-	};
-
-	private dateCellsRenderer = (row: number, column: any, value: any): any => {
-		let tokens:string[] = ('' + value).split(' ');
-		let error:boolean = false;
-
-		error = error || tokens.length != 9;
-
-		if(error) {
-			return "";
-		} else {
-			let month: string;
-			let day: string;
-			let year: string;
-
-			let time: string;
-
-			switch(tokens[1]) {
-				case 'Jan' : month = '01'; break;
-				case 'Feb' : month = '02'; break;
-				case 'Mar' : month = '03'; break;
-				case 'Apr' : month = '04'; break;
-				case 'May' : month = '05'; break;
-				case 'Jun' : month = '06'; break;
-				case 'Jul' : month = '07'; break;
-				case 'Aug' : month = '08'; break;
-				case 'Sep' : month = '09'; break;
-				case 'Oct' : month = '10'; break;
-				case 'Nov' : month = '11'; break;
-				case 'Dec' : month = '12'; break;
-				default : error = true;
-			}
-
-			day = tokens[2];
-			year = tokens[3];
-			time = tokens[4];
-
-			if (error) {
-				return "";
-			} else {
-				return `<div style="display: block; text-align: right; padding: 0.3rem 0.5rem;">` +
-									month + '-' + day + '-' + year + ' ' + time +
-							 `</div>`;
-
-			}
-		}
-	};
-
-	private textCellsRenderer = (row: number, column: any, value: any): any => {
-		return `<div style="display: block; text-align: left; padding: 0.3rem 0.5rem;">` + value + `</div>`;
-	};
-
-	private numberCellsRenderer = (row: number, column: any, value: any): any => {
-		return `<div style="display: block; text-align: right; padding: 0.3rem 0.5rem;">` + value + `</div>`;
-	};
+    public context: any = this;
 
 	private dropdownChoices: any[] = [
 		{value: "", label: ""},
@@ -193,54 +134,160 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		{value: "SUBMITTED", label: "SUBMITTED"}
 	];
 
-	private columns: any[] = [
-		{text: "# ", 							datafield: "requestNumber", 	width: "4%",	cellsrenderer: this.experimentNumberCellsRenderer},
-		{text: "Name", 						datafield: "name", 						width: "6%", 	cellsrenderer: this.textCellsRenderer},
-		{text: "Action", 																				width: "5%", 	cellsrenderer: this.actionCellsRenderer},
-		{text: "Samples",					datafield: "numberOfSamples", width: "4%", 	cellsrenderer: this.numberCellsRenderer},
-		{text: "Status", 					datafield: "requestStatus", 	width: "4%", 	cellsrenderer: this.textCellsRenderer},
-		{text: "Type", 																					width: "7%", 	cellsrenderer: this.textCellsRenderer},
-		{text: "Submitted on", 		datafield: "createDate", 			width: "7%", 	cellsrenderer: this.dateCellsRenderer},
-		{text: "Container", 			datafield: "container", 			width: "4%", 	cellsrenderer: this.textCellsRenderer},
-		{text: "Submitter", 			datafield: "ownerName", 			width: "6%", 	cellsrenderer: this.textCellsRenderer},
-		{text: "Lab", 						datafield: "labName", 				width: "8%",	cellsrenderer: this.textCellsRenderer},
-		{text: "Notes for core", 	datafield: "corePrepInstructions", 					cellsrenderer: this.textCellsRenderer}
-	];
+	get columnDefinitions(): any[] {
+	    let columnDefinitions: any[] = [];
 
-	private source = {
-		datatype: "json",
-		localdata: [],
-		datafields: [
-			{name: "name", type: "string"},
-			{name: "icon", type: "string"},
-			{name: "requestNumber", type: "string"},
-			{name: "requestStatus", type: "string"},
-			{name: "codeRequestCategory", type: "string"},
-			{name: "container", type: "string"},
-			{name: "ownerName", type: "string"},
-			{name: "labName", type: "string"},
-			{name: "createDate", type: "date"},
-			{name: "numberOfSamples", type: "string"},
-			{name: "corePrepInstructions", type: "string"}
-		]
-	};
+        columnDefinitions.push({
+            checkboxSelection: true,
+            headerCheckboxSelection: true
+        });
+        columnDefinitions.push({
+            headerName: "#",
+            editable: false,
+            width: 250,
+            cellRendererFramework: IconTextRendererComponent,
+            field: "requestNumber"
+        });
+        columnDefinitions.push({
+            headerName: "Name",
+            editable: false,
+            width: 600,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "name"
+        });
+        columnDefinitions.push({
+            headerName: "Action",
+            editable: false,
+            width: 300,
+            cellRendererFramework: TwoButtonRenderer,
+            button1Label: 'View',
+            button2Label: 'Edit',
+            onClickButton1: 'onClickView',
+            onClickButton2: 'onClickEdit',
+            field: ""
+        });
+        columnDefinitions.push({
+            headerName: "Samples",
+            editable: false,
+            width: 200,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            field: "numberOfSamples"
+        });
+        columnDefinitions.push({
+            headerName: "Status",
+            editable: false,
+            width: 200,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "requestStatus"
+        });
+        columnDefinitions.push({
+            headerName: "Type",
+            editable: false,
+            width: 300,
+            cellRendererFramework: SelectRenderer,
+            selectOptions: this.requestCategories,
+            selectOptionsValueField: 'value',
+            selectOptionsDisplayField: 'display',
+            field: "codeRequestCategory"
+        });
+        columnDefinitions.push({
+            headerName: "Submitted on",
+            editable: false,
+            width: 400,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            field: "createDate"
+        });
+        columnDefinitions.push({
+            headerName: "Container",
+            editable: false,
+            width: 200,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "container"
+        });
+        columnDefinitions.push({
+            headerName: "Submitter",
+            editable: false,
+            width: 400,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "ownerName"
+        });
+        columnDefinitions.push({
+            headerName: "Lab",
+            editable: false,
+            width: 300,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "labName"
+        });
 
+        if (this.idCoreFacilityFilter && this.idCoreFacilityFilter !== '') {
+            columnDefinitions.push({
 
-	constructor (private experimentsService: ExperimentsService,
-							 private createSecurityAdvisorService: CreateSecurityAdvisorService,
-							 private dictionaryService: DictionaryService,
-							 private propertyService: PropertyService) {
+                headerName: "Notes for core",
+                editable: false,
+                width: 2400,
+                cellRendererFramework: MultipleLineTextRenderer,
+                field: "corePrepInstructions_processed"
+            });
+
+            this.debug = this.propertyService.getExactProperty(PropertyService.SHOW_ADMIN_NOTES_ON_REQUEST, this.idCoreFacilityFilter);
+
+            if (this.propertyService.getExactProperty(PropertyService.SHOW_ADMIN_NOTES_ON_REQUEST, this.idCoreFacilityFilter)
+                && this.propertyService.getExactProperty(PropertyService.SHOW_ADMIN_NOTES_ON_REQUEST, this.idCoreFacilityFilter).propertyValue
+                && this.propertyService.getExactProperty(PropertyService.SHOW_ADMIN_NOTES_ON_REQUEST, this.idCoreFacilityFilter).propertyValue === 'Y') {
+                columnDefinitions.push({
+                    headerName: "Notes for Admin",
+                    editable: false,
+                    width: 600,
+                    cellRendererFramework: MultipleLineTextRenderer,
+                    field: "adminNotes"
+                });
+            }
+        }
+
+        return columnDefinitions;
+	}
+
+	debug: string;
+
+	constructor (private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                 private dialog: MatDialog,
+                 private dialogService: DialogsService,
+                 private dictionaryService: DictionaryService,
+				 private experimentsService: ExperimentsService,
+				 private propertyService: PropertyService) {
 	}
 
 	ngOnInit(): void {
-		this.myGrid.setColumns(this.columns);
-		this.myGrid.setDataAdapterSource(this.source);
+		this.context = this;
 
 		this.experimentsSubscription = this.experimentsService.getExperimentsObservable().subscribe((response) => {
-			this.updateGridData(response);
+			this.experiments = response;
+
+			if (this.experiments && !Array.isArray(this.experiments)) {
+                if (response.requestCount && response.requestCount === '0') {
+                    this.experiments = [];
+                } else {
+                    this.experiments = [this.experiments];
+                }
+			}
+
+			this.idCoreFacilityFilter = this.experimentsService.getPreviousURLParamsCoreFacilityFilter();
+
+			if (this.experiments && this.experiments.length > 0) {
+                for (let experiment of this.experiments) {
+                    experiment.corePrepInstructions_processed = [];
+
+                    if (experiment.corePrepInstructions) {
+                        experiment.corePrepInstructions_processed = experiment.corePrepInstructions.split('\n');
+                    }
+                }
+            }
+
+			this.assignGridContents();
+			this.dialogService.stopAllSpinnerDialogs();
 		});
 
-		this.dictionary = this.dictionaryService.getDictionary(DictionaryService.REQUEST_CATEGORY);
+		this.requestCategories = this.dictionaryService.getEntries(DictionaryService.REQUEST_CATEGORY);
 
 		// When we get a response from the backend that the status of an experiment has changed
 		this.statusChangeSubscription = this.experimentsService.getChangeExperimentStatusObservable().subscribe((response) => {
@@ -264,7 +311,14 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		let params: URLSearchParams = new URLSearchParams();
 		params.append("status", "SUBMITTED");
 
-		this.experimentsService.getExperiments_fromBackend(params);
+
+        setTimeout(() => {
+			this.dialogService.startDefaultSpinnerDialog();
+
+            setTimeout(() => {
+                this.experimentsService.getExperiments_fromBackend(params);
+            });
+		});
 	}
 
 	ngOnDestroy(): void {
@@ -274,37 +328,37 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		this.statusChangeSubscription.unsubscribe();
 	}
 
+    onClickView(rowId: any): void {
+        console.log("View button clicked on " + rowId);
+    }
+
+    onClickEdit(rowId: any): void {
+        console.log("Edit button clicked on " + rowId);
+    }
+
 	goButtonClicked(): void {
-
-		if (!this.enableChanges) {
-			return;
-		}
-
 		// The "go" button should be disabled in this case, but if we get a click without a valid status,
 		// stop.
-		if (this.statusCombobox.getSelectedItem().value === "") {
+		if (!this.enableChanges || this.changeStatus === "") {
 			return;
 		}
 
-		// grab all the selected rows, and the new status
-		let gridSelectedIndexes: Array<Number> = this.myGrid.getselectedrowindexes();
-		let statusSelectedIndex: number = this.statusCombobox.getSelectedIndex();
+		if (this.gridApi && this.gridApi.getSelectedRows() && Array.isArray(this.gridApi.getSelectedRows())) {
+		    this.dialogService.startDefaultSpinnerDialog();
 
-		// note that we have no responses from the backend yet
-		this.changeStatusResponsesRecieved = 0;
+		    setTimeout(() => {
+                this.changeStatusResponsesRecieved = 0;
+                this.selectedRequestNumbers = [];
 
-		// get the actual experiment identifiers from the grid
-		this.selectedRequestNumbers = [];
+                for (let selectedRow of this.gridApi.getSelectedRows()) {
+                    let idRequest = ('' + selectedRow.requestNumber).trim();
+                    let cleanedIdRequest: string = idRequest.slice(0, idRequest.indexOf("R") >= 0 ? idRequest.indexOf("R") : idRequest.length);
 
-		for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
-			let idRequest: string = "" + this.myGrid.getcell(gridSelectedIndexes[i].valueOf(), "requestNumber").value;
-			let cleanedIdRequest: string = idRequest.slice(0, idRequest.indexOf("R") >= 0 ? idRequest.indexOf("R") : idRequest.length);
-			this.selectedRequestNumbers.push(cleanedIdRequest);
-
-			// send a change experiment status request to the backend for each of the selected experiments
-			// Note : See "statusChangeSubscription" in ngOnInit for processing these requests.
-			this.experimentsService.changeExperimentStatus(cleanedIdRequest, this.statusCombobox.getSelectedItem().value)
-		}
+                    this.selectedRequestNumbers.push(cleanedIdRequest);
+                    this.experimentsService.changeExperimentStatus(cleanedIdRequest, this.changeStatus);
+                }
+            });
+        }
 	}
 
 	deleteButtonClicked(): void {
@@ -313,63 +367,57 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 			return;
 		}
 
-		let gridSelectedIndexes: Array<Number> = this.myGrid.getselectedrowindexes();
+        let experimentHasBeenRun: boolean = false;
 
-		let experimentHasBeenRun: boolean = false;
+		if (this.gridApi && Array.isArray(this.gridApi.getSelectedRows())) {
+            for (let selectedRow of this.gridApi.getSelectedRows()) {
+                if (('' + selectedRow.requestStatus).toLowerCase() != 'new'
+                    && ('' + selectedRow.requestStatus).toLowerCase() != 'submitted') {
+                    experimentHasBeenRun = true;
+                    break;
+                }
+            }
 
-		for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
-			let j:number = gridSelectedIndexes[i].valueOf();
+            if (experimentHasBeenRun) {
+                console.log("One or more of the selected orders has already been added to an instrument run.\"\n" +
+                    "\t\t\t+ \" The order(s) cannot be deleted.");
 
-			if (this.source.localdata[j].requestStatus != 'new' && this.source.localdata[j].requestStatus != 'submitted') {
-				experimentHasBeenRun = true;
-				break;
-			}
-		}
+                let errorMessage = "One or more of the selected orders has already been added to an " +
+                    "instrument run. The order(s) cannot be deleted.";
 
-		if (experimentHasBeenRun) {
-			console.log("One or more of the selected orders has already been added to an instrument run.\"\n" +
-					"\t\t\t+ \" The order(s) cannot be deleted.");
+                this.dialogService.alert(errorMessage);
+            } else {
+                let warningMessage = 'Are you sure you want to delete these orders?';
+                let usedProducts: boolean = false;
 
-			this.errorMessage = "One or more of the selected orders has already been added to an " +
-					"instrument run. The order(s) cannot be deleted.";
+                for (let selectedRow of this.gridApi.getSelectedRows()) {
+                    // Most of the time, requests are not given the below property, so the if is skipped.
+                    let statusToUseProducts: string = this.propertyService.getProperty('status_to_use_products', selectedRow.idCoreFacility, selectedRow.codeRequestCategory);
 
-			this.errorPopup.open();
-		} else {
-			this.warningMessage = 'Are you sure you want to delete these orders?';
-			let usedProducts: boolean = false;
+                    if (statusToUseProducts != undefined
+                        && statusToUseProducts != null
+                        && statusToUseProducts != ''
+                        && selectedRow.codeRequestStatus != undefined
+                        && selectedRow.codeRequestStatus != null
+                        && selectedRow.codeRequestStatus != '') {
+                        if (this.compareStatuses(selectedRow.codeRequestStatus, statusToUseProducts) >= 0) {
+                            usedProducts = true;
+                            break;
+                        }
+                    }
+                }
 
-			for (let i: number = 0; i < gridSelectedIndexes.length; i++) {
-				let j: number = gridSelectedIndexes[i].valueOf();
+                if (usedProducts) {
+                    warningMessage += "\n\n" +
+                        "WARNING: One or more of the selected orders may have used products. " +
+                        "If the products were not actually consumed, please revert the status " +
+                        "of the order to an earlier status or manually return the products to " +
+                        "the lab before deleting.\n\n";
+                }
 
-				let request = this.source.localdata[j];
-
-				// Most of the time, requests are not given the below property, so the if is skipped.
-
-				var statusToUseProducts: string = this.propertyService.getProperty('status_to_use_products', request.idCoreFacility, request.codeRequestCategory);
-
-				if (statusToUseProducts != undefined
-						&& statusToUseProducts != null
-						&& statusToUseProducts != ''
-						&& request.codeRequestStatus != undefined
-						&& request.codeRequestStatus != null
-						&& request.codeRequestStatus != '') {
-					if (this.compareStatuses(request.codeRequestStatus, statusToUseProducts) >= 0) {
-						usedProducts = true;
-						break;
-					}
-				}
-			}
-
-			if (usedProducts) {
-				this.warningMessage += "\n\n" +
-						"WARNING: One or more of the selected orders may have used products. " +
-						"If the products were not actually consumed, please revert the status " +
-						"of the order to an earlier status or manually return the products to " +
-						"the lab before deleting.\n\n";
-			}
-
-			this.confirmationPopup.open();
-		}
+                this.dialogService.yesNoDialog(warningMessage, this, 'onConfirmDelete');
+            }
+        }
 	}
 
 	private compareStatuses (status1: string, status2: string) {
@@ -404,61 +452,62 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 	}
 
 	private onConfirmDelete(): void {
-		let selectedIndices: Number[] = this.myGrid.getselectedrowindexes();
-		let selectedOrders: any[] = [];
+	    let formattingRemovedSelectedRows: any[] = [];
 
-		for (let i: number = 0; i < selectedIndices.length; i++) {
-			let j: number = selectedIndices[i].valueOf();
+        for (let selectedRow of this.gridApi.getSelectedRows()) {
+            formattingRemovedSelectedRows.push(selectedRow);
+        }
+        for (let selectedRow of formattingRemovedSelectedRows) {
+            selectedRow.corePrepInstructions_processed = '';  // This is done to fix the translation back to XML.
+        }
 
-			let Request = this.source.localdata[j];
-			selectedOrders.push(Request);
-		}
+	    let stringified: string = JSON.stringify(formattingRemovedSelectedRows);
+        let parameters: URLSearchParams = new URLSearchParams();
+        parameters.set('requestsToDeleteXMLString', stringified);
 
-		let stringified: string = JSON.stringify(selectedOrders);
-
-		let parameters: URLSearchParams = new URLSearchParams();
-
-		parameters.set('requestsToDeleteXMLString', stringified);
-
-		this.experimentsService.deleteExperiment(parameters).subscribe((response) => {
-			this.experimentsService.repeatGetExperiments_fromBackend();
-
-			this.confirmationPopup.close();
-		});
-	}
-
-	private onCancelDelete(): void {
-		this.confirmationPopup.close();
-	}
-
-	errorPopupOkClicked(): void {
-		this.errorPopup.close();
+        this.experimentsService.deleteExperiment(parameters).subscribe((response) => {
+        	this.experimentsService.repeatGetExperiments_fromBackend();
+        });
 	}
 
 	emailButtonClicked(): void {
-		console.log("You clicked \"Email\"!");
-		let selectedIndices: Number[] = this.myGrid.getselectedrowindexes();
-		let idRequests: number[] = [];
+	    if (this.gridApi && this.gridApi.getSelectedRows()) {
+            let idRequests: number[] = [];
 
-		if(selectedIndices.length > 0 && selectedIndices[0] != null) {
+            for(let selectedRow of this.gridApi.getSelectedRows()) {
+                let requestNumber = ('' + selectedRow.requestNumber);
+                idRequests.push(Number.parseInt(requestNumber.slice(0, requestNumber.length - 1)));
+            }
 
-			for(let selectedIndex in selectedIndices) {
-				let requestNumber = this.source.localdata[selectedIndex].requestNumber;
-				idRequests.push(Number.parseInt(requestNumber.slice(0, requestNumber.length - 1)));
-			}
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.panelClass = 'no-padding-dialog';
+            configuration.width  = '40%';
+            configuration.data   = { idRequests: idRequests };
 
-			this.window.setIdRequests(idRequests);
-			// this.window.open();
-			this.window.window.open();
+            this.dialog.open(EmailRelatedUsersPopupComponent, configuration);
+        }
+	}
+
+    assignGridContents(): void {
+		if (this.gridApi) {
+			this.gridApi.setColumnDefs(this.columnDefinitions);
+            this.gridApi.setRowData(this.experiments);
+
+            this.gridApi.sizeColumnsToFit();
 		}
 	}
 
-	updateGridData(data: Array<any>) {
-		// rebuild the grid's data
-		this.source.localdata = Array.isArray(data) ? data : [data];
-		// send the grid data to the grid to trigger screen refresh
-		this.myGrid.setDataAdapterSource(this.source);
-		// clear all selected items.
-		this.myGrid.selectedrowindexes([]);
-	}
+    onGridSizeChanged(event: any): void {
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
+    }
+
+    onGridReady(event: any): void {
+        this.gridApi = event.api;
+        this.gridColumnApi = event.columnApi;
+
+        this.assignGridContents();
+        this.onGridSizeChanged(event)
+    }
 }

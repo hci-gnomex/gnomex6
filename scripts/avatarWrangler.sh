@@ -26,13 +26,13 @@ do
     CLASSPATH="$CLASSPATH:$JAR"
 done
 
-CLASSPATH="./gnomex1.jar:$CLASSPATH"
+CLASSPATH="./gnomex2.jar:$CLASSPATH"
 export CLASSPATH
 
 #java -Xmx6000M hci.gnomex.daemon.LinkData $*
 #java hci.gnomex.daemon.auto_import.XMLParserMain $*
 
-
+set -e
 
 flaggedIDParam=${1:-normal}
 idColumn=${2:-1}
@@ -60,7 +60,7 @@ if [ "$flaggedIDParam" = "normal"  ]; then
         dx cd /
 
         tree "$avatarLocalDataPath" --noreport > "$pDataPath"localTree.out
-        dx tree . > "$pDataPath"remoteTree.out
+        dx tree ./ > "$pDataPath"remoteTree.out
 
         java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"remoteTree.out "$pDataPath"remotePath.out
         java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localTree.out  "$pDataPath"localPath.out
@@ -71,7 +71,8 @@ if [ "$flaggedIDParam" = "normal"  ]; then
 
         echo I am about to download files
 
-        #downloaderStatus=$(java hci.gnomex.daemon.auto_import.DownloadMain "$pDataPath" "$downloadPath") #outputs download.log  reads in uniqueFilesToDownload.out
+        #java hci.gnomex.daemon.auto_import.DownloadMain "$pDataPath" "$downloadPath" #outputs download.log  reads in uniqueFilesToDownload.out
+
         # the line above executes
         downloadCode=$? # Saves the exit status of the last script
 
@@ -138,7 +139,7 @@ if [ $downloadCode -eq 0 ]; then
 
         # Note avatarImporter outputs two implicit files
         cd $tomcatScriptPath
-        java hci.gnomex.daemon.auto_import.XMLParserMain -file $verifiedSlInfo -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"tempRequest.xml -importMode avatar
+        java hci.gnomex.daemon.auto_import.XMLParserMain -file $verifiedSlInfo -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"                      tempRequest.xml -importMode avatar
 
 
         # checking last script ran(XMLParserMain) has an exit status of 0
@@ -170,7 +171,4 @@ fi
 
 echo ------------------------------------------------------------------------------------------------------------
 
-:<<'END'
-
-END
 #bash "$scriptsPath"foundation/automateFoundation.sh $scriptsPath $pDataPath $foundationLocalDataPath

@@ -12,6 +12,7 @@ import {AnalysisService} from "../services/analysis.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {DataTrackService} from "../services/data-track.service";
 import {BillingService} from "../services/billing.service";
+import {DialogsService} from "./popup/dialogs.service";
 
 @Component({
     selector: 'browse-filter',
@@ -124,7 +125,8 @@ export class BrowseFilterComponent implements OnInit {
     constructor(private labListService: LabListService, private getLabService: GetLabService,
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
-                private dictionaryService: DictionaryService, private billingService: BillingService) {
+                private dictionaryService: DictionaryService, private billingService: BillingService,
+                private dialogService: DialogsService) {
         this.showMore = false;
         this.resetFields();
     }
@@ -736,6 +738,8 @@ export class BrowseFilterComponent implements OnInit {
             this.experimentsService.browsePanelParams["refreshParams"] = true;
             this.experimentsService.getProjectRequestList_fromBackend(params);
         } else if (this.mode === this.ORDER_BROWSE) {
+            this.dialogService.startDefaultSpinnerDialog();
+
             let params: URLSearchParams = this.getOrderBrowseParameters();
             this.experimentsService.getExperiments_fromBackend(params);
         } else if (this.mode === this.ANALYSIS_BROWSE) {

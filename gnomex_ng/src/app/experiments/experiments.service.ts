@@ -3,7 +3,8 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject} from "rxjs/Subject";
 import {Observable} from "rxjs/Observable";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {HttpHeaders, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -43,7 +44,9 @@ export class ExperimentsService {
     public dirty:boolean = false;
 
 
-    constructor(private _http: Http, @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
+    constructor(private _http: Http,
+                private httpClient: HttpClient,
+                @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
     getExperiments() {
         //return this._http.get("/gnomex/GetProjectRequestList.gx?idLab=1500&showCategory='N'", {withCredentials: true}).map((response: Response) => {
@@ -68,12 +71,9 @@ export class ExperimentsService {
 			withCredentials: true,
 			search: this.previousURLParams
 		}).subscribe((response: Response) => {
-			console.log("GetRequestList called");
-
 			if (response.status === 200) {
 				this.projectRequestList = response.json().Lab;
 				this.emitProjectRequestList();
-				//return response.json().Request;
 			} else {
 				throw new Error("Error");
 			}
@@ -86,12 +86,9 @@ export class ExperimentsService {
         this.previousURLParams = parameters;
 
         this._http.get("/gnomex/GetRequestList.gx", {withCredentials: true, search: parameters}).subscribe((response: Response) => {
-            // console.log("GetRequestList called");
-
             if (response.status === 200) {
                 this.experimentOrders = response.json().Request;
                 this.emitExperimentOrders();
-                //return response.json().Request;
             } else {
                 throw new Error("Error");
             }
@@ -101,6 +98,10 @@ export class ExperimentsService {
     repeatGetExperiments_fromBackend(): void {
         this.haveLoadedExperimentOrders = false;
         this.getExperiments_fromBackend(this.previousURLParams);
+    }
+
+    getPreviousURLParamsCoreFacilityFilter(): string {
+        return this.previousURLParams.get('idCoreFacility');
     }
 
 	getChangeExperimentStatusObservable(): Observable<any> {
@@ -154,22 +155,19 @@ export class ExperimentsService {
             withCredentials: true,
             search: params
         }).subscribe((response: Response) => {
-            console.log("GetRequestList called");
-
             if (response.status === 200) {
                 this.projectRequestList = response.json().Lab;
                 this.emitProjectRequestList();
-                //return response.json().Request;
             } else {
                 throw new Error("Error");
             }
         });
-        //  }
     }
 
     emitExperiment(exp:any):void{
         this.experimentSubject.next(exp);
     }
+
     getExperimentObservable():Observable<any>{
         return this.experimentSubject.asObservable();
     }
@@ -182,6 +180,11 @@ export class ExperimentsService {
                 throw new Error("Error");
             }
         });
+    }
+
+    public getNewRequest(): Observable<any> {
+        let params: HttpParams = new HttpParams().set("idRequest", '0');
+        return this.httpClient.get("/gnomex/GetRequest.gx", {params: params});
     }
 
     getLab(params: URLSearchParams): Observable<any> {
