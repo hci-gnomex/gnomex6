@@ -8,7 +8,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
 import {MatCheckboxChange} from "@angular/material";
-import {CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent, SelectionChangedEvent} from "ag-grid";
+import {CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent} from "ag-grid";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -112,6 +112,7 @@ export class NavBillingComponent implements OnInit {
     private billingPeriods: any[] = [];
     private statuses: any[] = [];
     private statusListShort: any[] = [];
+    public changeStatusValue: string = '';
 
     constructor(private billingService: BillingService,
                 private dialogsService: DialogsService,
@@ -185,13 +186,13 @@ export class NavBillingComponent implements OnInit {
     public onBillingItemGridChange(event: CellValueChangedEvent): void {
         event.data.isDirty = 'Y';
         if (event.data.idBillingItem) {
-            let parent: any = this.findRequestParent(event.data);
+            let parent: any = this.findRequestParent(event.data, true);
             parent.isDirty = 'Y';
         }
         this.showDirtyNote = true;
     }
 
-    public onBillingItemGridSelection(event: SelectionChangedEvent): void {
+    public onBillingItemGridSelection(): void {
         this.selectedBillingItems = this.billingItemGridApi.getSelectedRows();
     }
 
@@ -628,7 +629,6 @@ export class NavBillingComponent implements OnInit {
 
         let isExternalApproved: boolean = false;
         let isEmptyPriceOrQty: boolean = false;
-        let isNegativeQtyAndPrice: boolean = false;
 
         for (let r of this.billingItemList) {
             if (r.isDirty === 'Y') {
@@ -715,6 +715,62 @@ export class NavBillingComponent implements OnInit {
                 this.dialogsService.confirm("An error occurred while saving billing items" + message, null);
             }
         });
+    }
+
+    private updateBillingItemsWithNewValue(field: string, newValue: string): void {
+        if (this.selectedBillingItems.length > 0) {
+            for (let item of this.selectedBillingItems) {
+                if (item.idBillingItem) {
+                    item[field] = newValue;
+                    item.isDirty = 'Y';
+                    let parent: any = this.findRequestParent(item, true);
+                    parent.isDirty = 'Y';
+                }
+            }
+        } else {
+            for (let r of this.billingItemGridData) {
+                for (let bi of r.BillingItem) {
+                    bi[field] = newValue;
+                    bi.isDirty = 'Y';
+                }
+                r.isDirty = 'Y';
+            }
+        }
+        this.showDirtyNote = true;
+        this.billingItemGridApi.refreshCells();
+    }
+
+    public onChangeStatus(): void {
+        if (this.changeStatusValue) {
+            this.updateBillingItemsWithNewValue("codeBillingStatus", this.changeStatusValue);
+            setTimeout(() => {
+                this.changeStatusValue = '';
+            });
+        }
+    }
+
+    public onMoveToNextPeriod(): void {
+        if (this.lastFilterEvent.idBillingPeriod) {
+            let months: string[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            let currentPeriodDisplay: string = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD).filter((period: any) => {
+                return period.idBillingPeriod === this.lastFilterEvent.idBillingPeriod;
+            })[0].display;
+            let selYear: number = parseInt(currentPeriodDisplay.substring(currentPeriodDisplay.length - 4));
+            let selMonth: number = months.indexOf(currentPeriodDisplay.substring(0, 3));
+
+            let nextMonth: number = (selMonth + 1) % 12;
+            if (nextMonth === 0) {
+                selYear++;
+            }
+            let nextPeriodDisplay: string = months[nextMonth] + " " + selYear;
+            let nextPeriodList: any[] = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD).filter((period: any) => {
+                return period.display === nextPeriodDisplay;
+            });
+            if (nextPeriodList.length > 0) {
+                this.updateBillingItemsWithNewValue("idBillingPeriod", nextPeriodList[0].idBillingPeriod);
+            }
+        }
     }
 
 }
