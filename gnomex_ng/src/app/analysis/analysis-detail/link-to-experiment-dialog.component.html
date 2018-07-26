@@ -1,0 +1,59 @@
+
+<div class="padded-outer" mat-dialog-title>
+    <div class="dialog-header-colors padded-inner">
+        Link to Experiment
+    </div>
+</div>
+<mat-dialog-content style="padding:0;margin:0;">
+    <div class="padded-inner">
+        <div class="flex-container-row" >
+            <mat-form-field style="flex:1;">
+                <input matInput [formControl]="numberControl"  type="text" placeholder="Filter by experiment number" />
+            </mat-form-field>
+
+
+            <mat-form-field style="flex:1; margin-left: 1em ">
+                <mat-select   placeholder="Filter by Lab" [formControl]="labControl">
+                    <mat-option>   </mat-option>
+                    <mat-option *ngFor="let lab of labList" [value]="lab.idLab">
+                        {{ lab.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+
+        <div style="height:25em; width:55em; margin-top:0.5em;">
+            <ag-grid-angular style="width: 100%; height: 100%;" class="ag-fresh"
+                             [rowData]="rowData"
+                             [columnDefs]="columnDefs"
+                             [rowSelection]="'single'"
+                             (gridSizeChanged)="gridSizeChanged($event)"
+                             (rowSelected)="experimentRowSelected($event)"
+                             [enableSorting]="true"
+                             [enableColResize]="true"
+                             [rowDeselection]="true"
+                             (gridReady)="onGridReady($event)">
+            </ag-grid-angular>
+
+        </div>
+
+    </div>
+
+
+
+
+</mat-dialog-content>
+<mat-dialog-actions class="padded-outer" align="end">
+    <div class="padded-inner">
+        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="20"></mat-spinner>
+        <button mat-button [disabled]="this.selectedAnalysisToLink.length < 1" (click)="linkAnalysis()">
+            <img class="icon" [src]="constService.ICON_LINK">Link
+        </button>
+        <button mat-button  mat-dialog-close tabindex="-1"> Cancel </button>
+
+    </div>
+
+
+
+</mat-dialog-actions>

@@ -4,7 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 import {
     AnalysisDetailOverviewComponent,
-    AnalysisExperimentTabComponent
+    AnalysisExperimentTabComponent,
+    LinkToExperimentDialogComponent
 } from './index'
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {AgGridModule} from "ag-grid-angular";
@@ -31,10 +32,11 @@ import {TreeModule} from "angular-tree-component";
 
     declarations: [
         AnalysisDetailOverviewComponent,
-        AnalysisExperimentTabComponent
+        AnalysisExperimentTabComponent,
+        LinkToExperimentDialogComponent
     ],
     providers: [],
-    entryComponents: [],
+    entryComponents: [LinkToExperimentDialogComponent],
     exports: []
 })
 export class AnalysisDetailModule { }

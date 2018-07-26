@@ -1,4 +1,18 @@
 <div style="display:flex; flex-direction:column ; height:100%; width:100%;">
+    <div style="display:flex; font-size:small; " >
+        <label>
+            <img class="icon" [src]="analysisTreeNode?.icon">
+            Analysis {{analysisTreeNode?.number}}
+        </label>
+        <button *ngIf="showLinkToExp"
+                mat-button
+                color="link"
+                (click)="makeLinkToExperiment()">
+            <img class="icon" [src]="constService.ICON_LINK">
+            Link to Experiment
+        </button>
+    </div>
+
     <div style="display:flex; flex: 9">
         <mat-tab-group class="mat-tab-group-border"  (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Annotations">
