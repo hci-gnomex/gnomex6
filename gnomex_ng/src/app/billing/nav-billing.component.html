@@ -44,11 +44,11 @@
             <div class="flex-container-row align-center flex-one justify-space-between">
                 <label>{{this.invoiceLabel}}</label>
                 <div class="flex-container-row">
-                    <button mat-button>Move to next billing period</button>
+                    <button mat-button matTooltip="This will move all the selected items to the next billing period. If no items are selected, all of the displayed items will be updated" (click)="this.onMoveToNextPeriod()">Move to next billing period</button>
                     <mat-form-field matTooltip="This will update the status for all the selected items. If no items are selected, all of the displayed items' statuses will update">
-                        <mat-select placeholder="Change Status">
+                        <mat-select [(ngModel)]="this.changeStatusValue" placeholder="Change Status" (change)="this.onChangeStatus()">
                             <mat-option>None</mat-option>
-                            <mat-option *ngFor="let status of this.statusListShort" [value]="status">{{status.display}}</mat-option>
+                            <mat-option *ngFor="let status of this.statusListShort" [value]="status.codeBillingStatus">{{status.display}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </div>
@@ -58,7 +58,7 @@
                                  (gridReady)="this.onBillingItemGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  (cellValueChanged)="this.onBillingItemGridChange($event)"
-                                 (selectionChanged)="this.onBillingItemGridSelection($event)"
+                                 (selectionChanged)="this.onBillingItemGridSelection()"
                                  [getNodeChildDetails]="this.getBillingItemNodeChildDetails"
                                  [rowSelection]="'multiple'"
                                  [singleClickEdit]="true"
