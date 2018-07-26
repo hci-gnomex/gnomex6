@@ -302,9 +302,12 @@
                             <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveUser()"><img src="../../assets/save.png">Save</button>
                         </div>
                     </div>
-                    <div *ngIf="isGroupsTab && selectedGroup" style="height: 100%">
+                    <div *ngIf="isGroupsTab && selectedGroup" class="full-height full-width flex-container-col">
                         <!--groups tab group-->
-                        <mat-tab-group id="groupTabGroup" style="height: 90%" [selectedIndex]="selectedGroupTab" (selectedTabChange)="onGroupsTabChange($event)">
+                        <mat-tab-group id="groupTabGroup"
+                                       class="full-width flex-grow"
+                                       [selectedIndex]="selectedGroupTab"
+                                       (selectedTabChange)="onGroupsTabChange($event)">
                             <mat-tab groupTab label="Group"  style="height:100%;">
                                 <div *ngIf="isGroupSubTab && selectedGroup" #groupsDetail class="flex-column-container ug-background" style="width: 100%">
                                     <div class="flex-column-container">
@@ -385,7 +388,7 @@
                                     <membership-tab [memberGroup]="selectedGroup" [users]="rowData" #membershipTab ></membership-tab>
                                 </div>
                             </mat-tab>
-                            <mat-tab #groupTab label="Billing Accounts"  style="height:100%;">
+                            <mat-tab #groupTab label="Billing Accounts" class="full-height full-width">
                                 <billing-account-tab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
                             </mat-tab>
                             <mat-tab label="Invoices"  style="height:100%;">
@@ -394,8 +397,10 @@
                                 </div>
                             </mat-tab>
                         </mat-tab-group>
-                        <div *ngIf="isGroupsTab" class="flex-container users-groups-row-one" style="flex-grow:.1">
-                            <button mat-button (click)="verify('lab')"><img src="../../assets/email_go.png">Send email to verify users</button>
+                        <div *ngIf="isGroupsTab" class="full-width flex-container-row align-center padded">
+                            <div class="flex-grow">
+                                <button mat-button (click)="verify('lab')"><img src="../../assets/email_go.png">Send email to verify users</button>
+                            </div>
                             <span *ngIf="groupFormDirty" style="background:#feec89; padding: 1em 1em 1em 1em;">
                                 Your changes have not been saved
                             </span>

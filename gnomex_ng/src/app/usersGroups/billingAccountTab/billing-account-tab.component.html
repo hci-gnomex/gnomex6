@@ -1,9 +1,8 @@
-<div class="full-width full-height" style="padding: 1em;">
-
-	<div class="flex-base full-width full-height">
-		<div class="flex-header full-width">
+<div class="full-width full-height padded-not-bottom">
+	<div class="flex-container-col full-width full-height">
+		<div class="full-width">
 			<div class="full-width">
-				<mat-form-field style="width: 20em;">
+				<mat-form-field class="medium-width">
 					<mat-select
 							placeholder="Select Core Facility"
 							[(value)]="selectedCoreFacility"
@@ -17,7 +16,7 @@
 				<button mat-raised-button *ngIf="!showAddAccountBox" (click)="onAddAccount1Clicked()">Add account</button>
 				<button mat-raised-button (click)="onCopyAccountsClicked()">Copy Accounts From Other Cores</button>
 			</div>
-			<div *ngIf="showAddAccountBox" class="full-width" style="font-size: x-small;">
+			<div *ngIf="showAddAccountBox" class="full-width small-font">
 				<div class="border">
 					<div class="t full-width">
 						<div class="tr">
@@ -60,12 +59,13 @@
 				</div>
 			</div>
 		</div>
-		<div class="flex-stretch full-width">
-			<div class="block full-width full-height">
-				<div class="full-width" style="height:40%; padding-bottom: 0.5em;">
+		<div class="vertical-spacer full-width">
+		</div>
+		<div class="flex-grow full-width">
+			<div class="flex-container-col full-width full-height">
+				<div class="full-width flex-grow small-font">
 					<ag-grid-angular
-							style="font-size:x-small; width:100%; height:100%;"
-							class="ag-fresh"
+							class="ag-fresh small-font full-width full-height"
 							[context]="context"
 							[singleClickEdit]="true"
 							[enableSorting]="true"
@@ -74,26 +74,26 @@
 							(gridReady)="onChartfieldGridReady($event)">
 					</ag-grid-angular>
 				</div>
-				<div class="full-width" style="font-size:smaller; height:30%; padding-bottom: 0.5em;">
+				<div class="vertical-spacer full-width">
+				</div>
+				<div class="full-width flex-grow small-font">
 					<ag-grid-angular
-							style="font-size:x-small; width:100%; height:100%;"
-							class="ag-fresh"
+							class="ag-fresh small-font full-width full-height"
 							[context]="context"
 							[singleClickEdit]="true"
-							[columnDefs]="poColumnDefs"
 							[enableSorting]="true"
 							[enableColResize]="true"
 							(gridSizeChanged)="onPoGridSizeChanged()"
 							(gridReady)="onPoGridReady($event)">
 					</ag-grid-angular>
 				</div>
-				<div class="full-width" style="font-size:smaller; height:30%; padding-bottom: 0.5em;">
+				<div class="vertical-spacer full-width">
+				</div>
+				<div class="full-width flex-grow small-font">
 					<ag-grid-angular
-							style="font-size:x-small; width:100%; height:100%;"
-							class="ag-fresh"
+							class="ag-fresh small-font full-width full-height"
 							[context]="context"
 							[singleClickEdit]="true"
-							[columnDefs]="creditCardColumnDefs"
 							[enableSorting]="true"
 							[enableColResize]="true"
 							(gridSizeChanged)="onCreditCardGridSizeChanged()"
@@ -101,9 +101,6 @@
 					</ag-grid-angular>
 				</div>
 			</div>
-		</div>
-		<div class="flex-footer full-width">
-			<button mat-raised-button (click)="onClickDebug()">Debug!</button>
 		</div>
 	</div>
 </div>
