@@ -404,12 +404,6 @@ export class AnalysisExperimentTabComponent implements OnInit{
     sampleColDefs =
         [
             {
-                headerName: "#",
-                editable: false,
-                field: "requestNumber",
-                width: 100
-            },
-            {
                 headerName: "ID",
                 field: "number",
                 editable: false,

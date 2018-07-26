@@ -7,8 +7,12 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {OrderType} from "../../util/annotation-tab.component";
 import {Subscription} from "rxjs/Subscription";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
-import {MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatDialogRef, MatTabChangeEvent} from "@angular/material";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
+import {ConstantsService} from "../../services/constants.service";
+import {ImportSegmentsDialog} from "../../datatracks/datatracks-overview/genome-build/import-segments-dialog";
+import {LinkToExperimentDialogComponent} from "./index";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -30,14 +34,27 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
     private relatedObjects:IRelatedObject = {};
     private showRelatedDataTab:boolean =false;
     private showExpAnalysisTab: boolean =false ;
+    private showLinkToExp:boolean = false;
+
+    public analysisTreeNode:any;
+    private analysisTreeNodeSubscription: Subscription;
+    private linkExpDialogRef: MatDialogRef<LinkToExperimentDialogComponent>;
 
 
     constructor(private analysisService: AnalysisService,
                 private route:ActivatedRoute,
+                private dialog: MatDialog,
+                private secAdvisor: CreateSecurityAdvisorService,
+                public constService: ConstantsService,
                 public orderValidateService: BrowseOrderValidateService) {
     }
 
     ngOnInit():void{
+        this.analysisTreeNodeSubscription = this.analysisService.getAnalysisOverviewListSubject().subscribe(node =>{
+            this.analysisTreeNode = node;
+
+
+        });
 
         this.route.data.forEach(data => {
             this.orderValidateService.dirtyNote = false;
@@ -47,6 +64,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
             if(this.analysis){
                 let annots = this.analysis.AnalysisProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);
+                this.showLinkToExp = !this.secAdvisor.isGuest && this.analysis.canRead === 'Y';
 
                 if(annots){
                     this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
@@ -60,7 +78,6 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
                     this.annotations = [];
                 }
             }
-
 
         });
     }
@@ -102,12 +119,27 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
        this.showExpAnalysisTab = event.tab.textLabel === "Experiment"
     }
 
+    makeLinkToExperiment(){
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            idAnalysis : this.analysis ? this.analysis.idAnalysis : '',
+            idLab: this.analysis ? this.analysis.idLab : ''
+        };
+
+
+        this.linkExpDialogRef = this.dialog.open(LinkToExperimentDialogComponent, config );
+
+
+
+    }
 
     save(){
 
     }
 
     ngOnDestroy(){
+        this.analysisTreeNodeSubscription.unsubscribe();
     }
 
 
