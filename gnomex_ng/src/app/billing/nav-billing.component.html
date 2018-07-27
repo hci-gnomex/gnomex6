@@ -68,7 +68,7 @@
             </div>
             <div class="flex-container-row align-center flex-one justify-space-between">
                 <div>
-                    <button mat-button [disabled]="this.disableSplitButton" color="accent"><img src="../../assets/account_split.png" class="icon">Reassign/Split</button>
+                    <button mat-button [disabled]="this.disableSplitButton" color="accent" (click)="this.openSplitWindow()"><img src="../../assets/account_split.png" class="icon">Reassign/Split</button>
                     <button mat-button [disabled]="this.selectedBillingItems.length < 1" color="warn" (click)="this.removeBillingItems()"><img src="../../assets/delete.png" class="icon">Remove</button>
                     <span *ngIf="this.showDirtyNote" class="dirtyNote">Changes Have Not Been Saved</span>
                 </div>
