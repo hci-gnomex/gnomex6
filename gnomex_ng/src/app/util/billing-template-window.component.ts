@@ -230,7 +230,7 @@ export class BillingTemplateWindowComponent implements OnInit {
     private save(): void {
         let billingTemplate: BillingTemplate = {
             idBillingTemplate: this.idBillingTemplate,
-            usingPercentSplit: "Y",
+            usingPercentSplit: "true",
             items: this.currentAccountsList,
             targetClassName: this.targetClassName,
             targetClassIdentifier: this.targetClassIdentifier
