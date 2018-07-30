@@ -11,7 +11,7 @@ import {
 } from "@angular/forms";
 import {GnomexService} from "../services/gnomex.service";
 import {NewUserDialogComponent} from "./new-user-dialog.component";
-import {ErrorStateMatcher, MatDialog, MatDialogRef} from "@angular/material";
+import {ErrorStateMatcher, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {PasswordUtilService} from "../services/password-util.service";
 import {MatSnackBar} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
@@ -162,6 +162,9 @@ import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
             padding: 3px;
             margin: 3px;
         }
+        
+        
+        .padded { padding: 0.3em; }
 
     `]
 
@@ -655,15 +658,15 @@ export class UsersGroupsTablistComponent implements OnInit{
         this.idLab = selectedRows[0].idLab;
         this.myCoreFacilities = [];
         params.set("idLab", this.idLab);
+
         this.getLabService.getLab(params).subscribe((response: any) => {
             this.selectedGroup = response.Lab;
             this.myCoreFacilities = this.buildGroupCoreControls();
             this.setLabPricing(this.selectedGroup);
             this.setGroupValues();
             this.changeRef.detectChanges();
+        });
 
-
-        })
         this.groupForm.markAsPristine();
         this.touchGroupFields();
     }
@@ -855,10 +858,11 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     newUser() {
-        this.createUserDialogRef = this.dialog.open(NewUserDialogComponent, {
-            height: '20em',
-            width: '24em',
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.height = '20em';
+        configuration.width  = '24em';
+
+        this.createUserDialogRef = this.dialog.open(NewUserDialogComponent, configuration);
         this.createUserDialogRef.afterClosed()
             .subscribe(result => {
                 if (this.createUserDialogRef.componentInstance.rebuildUsers) {
@@ -869,15 +873,16 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     deleteUser() {
-        this.deleteUserDialogRef = this.dialog.open(DeleteUserDialogComponent, {
-            height: '11em',
-            width: '24em',
-            data: {
-                idAppUser: this.idAppUser,
-                userName: this.selectedUser.displayName
-            }
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.height = '11em';
+        configuration.width  = '24em';
 
-        });
+        configuration.data = {
+            idAppUser: this.idAppUser,
+            userName: this.selectedUser.displayName
+        };
+
+        this.deleteUserDialogRef = this.dialog.open(DeleteUserDialogComponent, configuration);
         this.deleteUserDialogRef.afterClosed()
             .subscribe(result => {
                 if (this.deleteUserDialogRef.componentInstance.rebuildUsers) {
@@ -1198,10 +1203,11 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     newGroup() {
-        this.createGroupDialogRef = this.dialog.open(NewGroupDialogComponent, {
-            height: '35em',
-            width: '20em',
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.height = '35em';
+        configuration.width  = '20em';
+
+        this.createGroupDialogRef = this.dialog.open(NewGroupDialogComponent, configuration);
         this.createGroupDialogRef.afterClosed()
             .subscribe(result => {
                 if (this.createGroupDialogRef.componentInstance.rebuildGroups) {
@@ -1212,15 +1218,16 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     deleteGroup() {
-        this.deleteGroupDialogRef = this.dialog.open(DeleteGroupDialogComponent, {
-            height: '10em',
-            width: '20em',
-            data: {
-                idLab: this.idLab,
-                labName: this.selectedGroup.name
-            }
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.height = '10em';
+        configuration.width  = '20em';
 
-        });
+        configuration.data = {
+            idLab: this.idLab,
+            labName: this.selectedGroup.name
+        };
+
+        this.deleteGroupDialogRef = this.dialog.open(DeleteGroupDialogComponent, configuration);
         this.deleteGroupDialogRef.afterClosed()
             .subscribe(result => {
                 if (this.deleteGroupDialogRef.componentInstance.rebuildGroups) {
@@ -1232,15 +1239,17 @@ export class UsersGroupsTablistComponent implements OnInit{
 
     verify(mode: string) {
         let theLabId = (mode === 'lab' ? this.idLab : "");
-        this.verifyUsersDialogRef = this.dialog.open(VerifyUsersDialogComponent, {
-            height: '16em',
-            width: '20em',
-            data: {
-                idLab: theLabId,
-                labName: this.selectedGroup.name
-            }
 
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.height = '16em';
+        configuration.width  = '20em';
+
+        configuration.data = {
+            idLab: theLabId,
+            labName: this.selectedGroup.name
+        };
+
+        this.verifyUsersDialogRef = this.dialog.open(VerifyUsersDialogComponent, configuration);
         this.verifyUsersDialogRef.afterClosed()
             .subscribe(result => {
             })

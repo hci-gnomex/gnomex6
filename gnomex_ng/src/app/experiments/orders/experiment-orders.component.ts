@@ -100,6 +100,8 @@ import {MatDialog, MatDialogConfig} from "@angular/material";
       div.button-container {
           padding: 0.2em 0 0.2em 0.6em;
       }
+      
+        .small-font { font-size:x-small; }
 	`]
 })
 export class ExperimentOrdersComponent implements OnInit, OnDestroy {

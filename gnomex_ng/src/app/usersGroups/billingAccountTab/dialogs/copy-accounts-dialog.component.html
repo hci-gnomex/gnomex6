@@ -1,0 +1,67 @@
+<div mat-dialog-title class="no-margin no-padding header-colors">
+    <div class="full-width flex-container-row align-center padded">
+        <div>
+            <img src="../../../../assets/work_auth_form.png" alt="">
+        </div>
+        <div class="flex-grow padded-left">
+            {{!!selectedCoreFacility ? 'Copy Billing Account to ' + selectedCoreFacility.display : 'Copy Billing Account'}}
+        </div>
+    </div>
+</div>
+<div mat-dialog-content class="no-margin no-padding fixed-height background">
+    <div class="full-width full-height padded">
+        <div class="flex-container-col full-width full-height">
+            <div class="full-width flex-grow small-font">
+                <ag-grid-angular
+                        class="ag-fresh small-font full-width full-height"
+                        [context]="context"
+                        [singleClickEdit]="true"
+                        [rowSelection]="'multiple'"
+                        [suppressRowClickSelection]="true"
+                        [enableSorting]="true"
+                        [enableColResize]="true"
+                        (gridSizeChanged)="onGridSizeChanged($event)"
+                        (gridReady)="onChartfieldGridReady($event)">
+                </ag-grid-angular>
+            </div>
+            <div class="vertical-spacer full-width">
+            </div>
+            <div class="full-width flex-grow small-font">
+                <ag-grid-angular
+                        class="ag-fresh small-font full-width full-height"
+                        [context]="context"
+                        [singleClickEdit]="true"
+                        [rowSelection]="'multiple'"
+                        [suppressRowClickSelection]="true"
+                        [enableSorting]="true"
+                        [enableColResize]="true"
+                        (gridSizeChanged)="onGridSizeChanged($event)"
+                        (gridReady)="onPoGridReady($event)">
+                </ag-grid-angular>
+            </div>
+            <div class="vertical-spacer full-width">
+            </div>
+            <div class="full-width flex-grow small-font">
+                <ag-grid-angular
+                        class="ag-fresh small-font full-width full-height"
+                        [context]="context"
+                        [singleClickEdit]="true"
+                        [rowSelection]="'multiple'"
+                        [suppressRowClickSelection]="true"
+                        [enableSorting]="true"
+                        [enableColResize]="true"
+                        (gridSizeChanged)="onGridSizeChanged($event)"
+                        (gridReady)="onCreditCardGridReady($event)">
+                </ag-grid-angular>
+            </div>
+        </div>
+    </div>
+</div>
+<div mat-dialog-actions class="no-margin no-padding background">
+    <div class="full-width right-align right-bottom-left-padded">
+        <button mat-button (click)="onClickSaveButton()">
+            <img src="../../../../assets/pricesheet_add.png" alt="">
+            Add to working document
+        </button>
+    </div>
+</div>
