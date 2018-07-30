@@ -7,7 +7,7 @@ import {BillingService} from "../services/billing.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
-import {MatCheckboxChange} from "@angular/material";
+import {MatCheckboxChange, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent} from "ag-grid";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
@@ -16,6 +16,10 @@ import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateParserComponent} from "../util/parsers/date-parser.component";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
+import {
+    BillingTemplate, BillingTemplateWindowComponent,
+    BillingTemplateWindowParams
+} from "../util/billing-template-window.component";
 
 @Component({
     selector: 'nav-billing',
@@ -118,7 +122,8 @@ export class NavBillingComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private constantsService: ConstantsService,
                 private propertyService: PropertyService,
-                private dictionaryService: DictionaryService) {
+                private dictionaryService: DictionaryService,
+                private dialog: MatDialog) {
         this.billingPeriods = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD);
         this.statuses = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_STATUS).filter((stat: any) => {
             return stat.value === this.STATUS_PENDING || stat.value === this.STATUS_COMPLETED || stat.value === this.STATUS_APPROVED;
@@ -267,6 +272,8 @@ export class NavBillingComponent implements OnInit {
         this.selectedBillingItems = [];
         this.billingItemsToDelete = [];
 
+        this.disableSplitButton = true;
+
         this.billingItemGridLabel = '';
         this.billingItemList = [];
         this.billingItemGridData = [];
@@ -322,6 +329,8 @@ export class NavBillingComponent implements OnInit {
         this.billingItemGridLabel = '';
         this.billingItemGridData = [];
         this.selectedBillingItems = [];
+
+        this.disableSplitButton = true;
 
         this.billingItemsTreeSelectedNode = null;
         this.billingItemsTreeNodes = [];
@@ -445,6 +454,8 @@ export class NavBillingComponent implements OnInit {
             node.expand();
         }
 
+        this.disableSplitButton = true;
+
         let billingItems: any[] = [];
         let requestNumbers: Set<string> = new Set<string>();
         if (node.data.name === 'Status' && node.data.status === this.STATUS_PENDING) {
@@ -467,6 +478,7 @@ export class NavBillingComponent implements OnInit {
             }
         } else if (node.data.name === 'Request') {
             this.addRequestBillingItems(node.data.requestNumber, billingItems);
+            this.disableSplitButton = false;
         }
 
         let totalPrice: number = 0;
@@ -506,7 +518,7 @@ export class NavBillingComponent implements OnInit {
             return request.requestNumber === requestNumber;
         });
         for (let r of requestNodes) {
-            if (this.hideEmptyRequests && !r.BillingItem) {
+            if (this.hideEmptyRequests && r.BillingItem.length < 1) {
                 continue;
             }
             billingItems.push(r);
@@ -770,6 +782,69 @@ export class NavBillingComponent implements OnInit {
             if (nextPeriodList.length > 0) {
                 this.updateBillingItemsWithNewValue("idBillingPeriod", nextPeriodList[0].idBillingPeriod);
             }
+        }
+    }
+
+    public openSplitWindow(): void {
+        if (this.billingItemGridData.length > 0) {
+            let id: string = "";
+            let className: string = "";
+
+            let request: any = this.billingItemGridData[0];
+
+            if (request.status === "NEW") {
+                this.dialogsService.confirm("Please save the billing items before reassigning / splitting", null);
+                return;
+            }
+            if (this.showDirtyNote) {
+                this.dialogsService.confirm("Please save changes before reassigning / splitting", null);
+                return;
+            }
+
+            if (request.idProductOrder) {
+                id = request.idProductOrder;
+                className = "ProductOrder";
+            } else if (request.idRequest) {
+                id = request.idRequest;
+                className = "Request";
+            } else {
+                this.dialogsService.confirm("Billing can be reassigned / split only for Requests and Product Orders", null);
+                return;
+            }
+
+            this.billingService.getBillingTemplate(id, className).subscribe((template: BillingTemplate) => {
+                if (template) {
+                    let params: BillingTemplateWindowParams = new BillingTemplateWindowParams();
+                    params.idCoreFacility = this.lastFilterEvent.idCoreFacility;
+                    params.billingTemplate = template;
+
+                    let config: MatDialogConfig = new MatDialogConfig();
+                    config.data = {
+                        params: params
+                    };
+
+                    let dialogRef: MatDialogRef<BillingTemplateWindowComponent> = this.dialog.open(BillingTemplateWindowComponent, config);
+                    dialogRef.afterClosed().subscribe((result: any) => {
+                        if (result) {
+                            this.billingService.saveBillingTemplate(result).subscribe((result: any) => {
+                                if (result && result.result === "SUCCESS") {
+                                    if (this.lastFilterEvent) {
+                                        this.onFilterChange(this.lastFilterEvent);
+                                    }
+                                } else {
+                                    let message: string = "";
+                                    if (result && result.message) {
+                                        message = ": " + result.message;
+                                    }
+                                    this.dialogsService.confirm("An error occurred while saving the billing template" + message, null);
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    this.dialogsService.confirm("There was an error retrieving the billing template", null);
+                }
+            });
         }
     }
 
