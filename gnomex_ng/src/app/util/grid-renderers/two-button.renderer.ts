@@ -5,27 +5,23 @@ import {ICellRendererAngularComp} from "ag-grid-angular";
     selector: 'two-button',
     template: `
         <div class="full-width full-height">
-            <div class="t full-width full-height">
-                <div class="tr">
-                    <div class="td vertical-center button-container" (click)="invokeParentMethod1()">
-                        <button class="link-button"><div class="message inline-block">{{button1Name}}</div></button>
-                    </div>
-                    <div class="td vertical-center button-container" (click)="invokeParentMethod2()">
-                        <button class="link-button"><div class="message inline-block">{{button2Name}}</div></button>
-                    </div>
+            <div class="full-width full-height flex-container-row align-center">
+                <div class="half-width horizontal-center" (click)="invokeParentMethod1()">
+                    <button class="link-button"><div class="message inline-block">{{button1Name}}</div></button>
+                </div>
+                <div class="flex-grow horizontal-center" (click)="invokeParentMethod2()">
+                    <button class="link-button"><div class="message inline-block">{{button2Name}}</div></button>
                 </div>
             </div>
         </div>
     `,
     styles: [`
 
-        .t  { display: table; }
-        .tr { display: table-row; }
-        .td { display: table-cell; }
-
+        .half-width { width: 50%; }
+        
         .inline-block { display: inline-block; }
 
-        .vertical-center { vertical-align: middle; }
+        .horizontal-center { text-align: center;     }
         
         button.link-button {
             background: none;
@@ -39,13 +35,8 @@ import {ICellRendererAngularComp} from "ag-grid-angular";
         button.link-button:focus {
             outline: none;
         }
-
-        .button-container {
-            padding-left: 0.3rem;
-        }
         
         .message {
-            padding-left: 0.5rem;
             text-decoration: underline;
             color: blue;
         }

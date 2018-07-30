@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {URLSearchParams} from "@angular/http";
 
 import {Subscription} from "rxjs/Subscription";
@@ -100,11 +100,17 @@ import {MatDialog, MatDialogConfig} from "@angular/material";
       div.button-container {
           padding: 0.2em 0 0.2em 0.6em;
       }
-      
+        
+        .no-height  { height: 0; }
+        .single-em  { width: 1em;}
+
         .small-font { font-size:x-small; }
+        
 	`]
 })
-export class ExperimentOrdersComponent implements OnInit, OnDestroy {
+export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestroy {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
     protected gridApi;
     protected gridColumnApi;
@@ -117,7 +123,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
     private idCoreFacilityFilter: string;
 
 	private selectedRequestNumbers: string[];
-	private changeStatusResponsesRecieved: number;
+	private changeStatusResponsesReceived: number;
 
 	private enableChanges: boolean = false;
 
@@ -126,6 +132,8 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
     private requestCategories: any[] = [];
 
     public context: any = this;
+
+    private emToPxConversionRate: number = 1;
 
 	private dropdownChoices: any[] = [
 		{value: "", label: ""},
@@ -141,12 +149,19 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 
         columnDefinitions.push({
             checkboxSelection: true,
-            headerCheckboxSelection: true
+            headerCheckboxSelection: true,
+            width:    17,
+            maxWidth: 17,
+            minWidth: 17,
+            suppressSizeToFit: true
         });
         columnDefinitions.push({
             headerName: "#",
             editable: false,
-            width: 250,
+            width:     7 * this.emToPxConversionRate,
+            minWidth:  7 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             cellRendererFramework: IconTextRendererComponent,
             field: "requestNumber"
         });
@@ -155,12 +170,18 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
             editable: false,
             width: 600,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
+            tooltip: ((value: any, valueFormatted: any, data: any, node: any, colDef: any, rowIndex: any, api: any) => {
+                return 'Hello World';
+            }),
             field: "name"
         });
         columnDefinitions.push({
             headerName: "Action",
             editable: false,
-            width: 300,
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 9 * this.emToPxConversionRate,
+            maxWidth: 9 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             cellRendererFramework: TwoButtonRenderer,
             button1Label: 'View',
             button2Label: 'Edit',
@@ -171,15 +192,27 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
         columnDefinitions.push({
             headerName: "Samples",
             editable: false,
-            width: 200,
+            width:    6 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
+            maxWidth: 6 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
+            tooltip: ((value: any, valueFormatted: any, data: any, node: any, colDef: any, rowIndex: any, api: any) => {
+                return 'Hello World';
+            }),
             cellRendererFramework: TextAlignRightMiddleRenderer,
             field: "numberOfSamples"
         });
         columnDefinitions.push({
             headerName: "Status",
             editable: false,
-            width: 200,
+            width:    8 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            maxWidth: 8 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
+            tooltip: ((value: any, valueFormatted: any, data: any, node: any, colDef: any, rowIndex: any, api: any) => {
+                return 'Hello World';
+            }),
             field: "requestStatus"
         });
         columnDefinitions.push({
@@ -195,14 +228,20 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
         columnDefinitions.push({
             headerName: "Submitted on",
             editable: false,
-            width: 400,
+            width:    12 * this.emToPxConversionRate,
+            minWidth: 12 * this.emToPxConversionRate,
+            maxWidth: 12 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             field: "createDate"
         });
         columnDefinitions.push({
             headerName: "Container",
             editable: false,
-            width: 200,
+            width:    8 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            maxWidth: 8 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "container"
         });
@@ -296,10 +335,10 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 			for (let i: number = 0; i < this.selectedRequestNumbers.length; i++) {
 				if (this.selectedRequestNumbers[i] === response.idRequest) {
 					// count the changes made
-					this.changeStatusResponsesRecieved++;
+					this.changeStatusResponsesReceived++;
 
 					// when the changes are all made, reload the grid data
-					if (this.changeStatusResponsesRecieved === this.selectedRequestNumbers.length) {
+					if (this.changeStatusResponsesReceived === this.selectedRequestNumbers.length) {
 						this.experimentsService.repeatGetExperiments_fromBackend();
 					}
 
@@ -322,6 +361,12 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
             });
 		});
 	}
+
+	ngAfterViewInit(): void {
+	    if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+    }
 
 	ngOnDestroy(): void {
 		// When the component dies, avoid memory leaks and stop listening to the service
@@ -349,7 +394,7 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
 		    this.dialogService.startDefaultSpinnerDialog();
 
 		    setTimeout(() => {
-                this.changeStatusResponsesRecieved = 0;
+                this.changeStatusResponsesReceived = 0;
                 this.selectedRequestNumbers = [];
 
                 for (let selectedRow of this.gridApi.getSelectedRows()) {
@@ -503,11 +548,18 @@ export class ExperimentOrdersComponent implements OnInit, OnDestroy {
         if (event && event.api) {
             event.api.sizeColumnsToFit();
         }
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
     }
 
     onGridReady(event: any): void {
         this.gridApi = event.api;
         this.gridColumnApi = event.columnApi;
+
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
 
         this.assignGridContents();
         this.onGridSizeChanged(event)
