@@ -87,6 +87,10 @@ mat-form-field.dialogFormField {
   margin: 0.4rem 0rem;
 }
 
+mat-tooltip-component {
+  white-space: pre-line;
+}
+
 div.dialogDiv {
   width: 100%;
   margin: 0.4rem 0rem;

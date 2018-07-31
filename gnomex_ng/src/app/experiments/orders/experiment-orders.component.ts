@@ -17,6 +17,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {ExperimentsService} from "../experiments.service";
 import {PropertyService} from "../../services/property.service";
 import {MatDialog, MatDialogConfig} from "@angular/material";
+import {Validators} from "@angular/forms";
 
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
@@ -170,9 +171,15 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             editable: false,
             width: 600,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            tooltip: ((value: any, valueFormatted: any, data: any, node: any, colDef: any, rowIndex: any, api: any) => {
-                return 'Hello World';
-            }),
+            setErrors: (value: any,
+                        data: any,
+                        node: any,
+                        colDef: any,
+                        rowIndex: any,
+                        gridApi: any) => {
+                return (value && value === 'TEST') ? 'Invalid name' : '';
+            },
+            validators: [ Validators.minLength(10) ],
             field: "name"
         });
         columnDefinitions.push({
@@ -196,9 +203,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             minWidth: 6 * this.emToPxConversionRate,
             maxWidth: 6 * this.emToPxConversionRate,
             suppressSizeToFit: true,
-            tooltip: ((value: any, valueFormatted: any, data: any, node: any, colDef: any, rowIndex: any, api: any) => {
-                return 'Hello World';
-            }),
             cellRendererFramework: TextAlignRightMiddleRenderer,
             field: "numberOfSamples"
         });
@@ -210,9 +214,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             maxWidth: 8 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            tooltip: ((value: any, valueFormatted: any, data: any, node: any, colDef: any, rowIndex: any, api: any) => {
-                return 'Hello World';
-            }),
             field: "requestStatus"
         });
         columnDefinitions.push({
