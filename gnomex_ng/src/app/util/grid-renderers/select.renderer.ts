@@ -1,9 +1,13 @@
 import {Component} from "@angular/core";
 import { ICellRendererAngularComp } from "ag-grid-angular";
+import {CellRendererValidation} from "./cell-renderer-validation";
 
 @Component({
 	template: `
-		<div class="full-width full-height">
+		<div [matTooltip]="this.errorMessage"
+             [matTooltipShowDelay]="300"
+             [matTooltipHideDelay]="300"
+             class="full-width full-height  {{this.errorMessage && this.errorMessage !== '' ? 'error' : ''}}">
 			<div class="t full-width full-height fix-table">
 				<div class="tr">
 					<div class="td cell-text-container ellipsis">
@@ -14,27 +18,31 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 		</div>
 	`,
 	styles: [`
-			.t  { display: table;      }
-			.tr { display: table-row;  }
-			.td { display: table-cell; }
-			
-			.cell-text-container { 
-					vertical-align: middle;
-					padding-left: 0.3rem;
-			}
-			
-			.full-width  { width:  100%; } 
-			.full-height { height: 100%; }
+		.t  { display: table;      }
+		.tr { display: table-row;  }
+		.td { display: table-cell; }
+		
+		.cell-text-container { 
+			vertical-align: middle;
+			padding-left: 0.3rem;
+		}
+		
+		.full-width  { width:  100%; } 
+		.full-height { height: 100%; }
 
-            .fix-table { table-layout:fixed; }
+		.fix-table { table-layout:fixed; }
 
-            .ellipsis {
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+		.ellipsis {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.error {
+			background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
+			border: solid red 2px;
+		}
 	`]
-}) export class SelectRenderer implements ICellRendererAngularComp {
-	private params: any;
+}) export class SelectRenderer extends CellRendererValidation implements ICellRendererAngularComp {
 	value: string;
 	display: string;
 	options: any;
@@ -44,8 +52,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 	defaultDisplayValue: string;
 	defaultOption: any;
 
-	agInit(params: any): void {
-		this.params = params;
+	agInit2(params: any): void {
 		this.options = [];
 		this.value = "";
 		this.optionsValueField = "";

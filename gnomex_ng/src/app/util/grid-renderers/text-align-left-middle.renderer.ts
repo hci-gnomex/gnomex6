@@ -48,45 +48,6 @@ export class TextAlignLeftMiddleRenderer extends CellRendererValidation {
 
 	agInit2(params: any): void {
 		this.value = (this.params && this.params.value) ? this.params.value : "";
-
-        // if (this.params
-        //     && this.params.column
-        //     && this.params.column.colDef
-        //     && this.params.data) {
-        //
-        //     if (this.params.column.colDef.setErrors) {
-        //
-        //         this.errorMessage = this.params.column.colDef.setErrors(
-        //             this.params.value,
-        //             this.params.valueFormatted,
-        //             this.params.data,
-        //             this.params.node,
-        //             this.params.column.colDef,
-        //             this.params.rowIndex,
-        //             this.params.node.gridApi);
-        //
-        //         if (this.params.data.isValid_internalRow === undefined) {
-        //             this.params.data.isValid_internalRow = !this.errorMessage;
-			// 	} else {
-        //             this.params.data.isValid_internalRow = this.params.data.isValid_internalRow && !this.errorMessage;
-			// 	}
-        //
-        //         if (this.params.node.gridApi.getModel().allRowsValid === undefined) {
-        //             this.params.node.gridApi.getModel().allRowsValid =
-			// 			this.params.data.isValid_internalRow;
-        //         } else {
-        //             this.params.node.gridApi.getModel().allRowsValid =
-			// 			this.params.node.gridApi.getModel().allRowsValid
-			// 			&& this.params.data.isValid_internalRow;
-        //         }
-        //
-        //         if (this.params.node.gridApi.allRowsValid === undefined) {
-        //             this.params.node.gridApi.allRowsValid = this.params.data.isValid_internalRow;
-        //         } else {
-        //             this.params.node.gridApi.allRowsValid = this.params.node.gridApi.allRowsValid && this.params.data.isValid_internalRow;
-        //         }
-        //     }
-        // }
 	}
 
 	refresh(params: any): boolean {

@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { ICellRendererAngularComp } from "ag-grid-angular";
+import {CellRendererValidation} from "./cell-renderer-validation";
 
 @Component({
 	template: `
@@ -37,36 +38,12 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 		
 	`]
 })
-export class TextAlignRightMiddleRenderer implements ICellRendererAngularComp {
-	params: any;
+export class TextAlignRightMiddleRenderer extends CellRendererValidation {
     value: string;
     context: any;
 
-    errorMessage: string = '';
-
-	agInit(params: any): void {
-		this.params = params;
-
+	agInit2(params: any): void {
 		this.value = (this.params && this.params.value) ? this.params.value : "";
-
-		if (this.params
-			&& this.params.column
-			&& this.params.column.colDef
-			&& this.params.data) {
-
-			if (this.params.column.colDef.setErrors) {
-
-                this.errorMessage = this.params.column.colDef.setErrors(
-                    this.params.value,
-                    this.params.valueFormatted,
-                    this.params.data,
-                    this.params.node,
-                    this.params.column.colDef,
-                    this.params.rowIndex,
-                    this.params.node.gridApi);
-
-			}
-		}
 	}
 
 	refresh(params: any): boolean {
