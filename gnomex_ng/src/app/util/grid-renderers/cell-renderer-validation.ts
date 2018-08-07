@@ -73,9 +73,7 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
             && this.params.node.formGroup.controls
             && this.params.column
             && this.params.column.colDef
-            && this.params.column.colDef.field
-            // && this.params.node[this.params.column.colDef.field + "_errorMessage"]
-        ) {
+            && this.params.column.colDef.field) {
 
             // In case of editing and re-creating renderers.
             this.errorMessage = CellRendererValidation.updateErrorMessage(
@@ -86,22 +84,6 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
 
             this.errorMessage = this.params.node[this.params.column.colDef.field + "_errorMessage"];
         }
-        // else if(this.params
-        //     && this.params.node
-        //     && this.params.node.formGroup === undefined
-        //     && this.params.column
-        //     && this.params.column.colDef
-        //     && this.params.column.colDef.field
-        //     && !this.params.node[this.params.column.colDef.field + "_errorMessage"]) {
-        //
-        //     if (this.params
-        //         && this.params.column
-        //         && this.params.column.colDef
-        //         && this.params.node
-        //         && this.params.node.formGroup) {
-        //         this.errorMessage = CellRendererValidation.updateErrorMessage(this.params.node.formGroup, this.params.node, this.params.column.colDef);
-        //     }
-        // }
 
         this.agInit2(params);
     }
