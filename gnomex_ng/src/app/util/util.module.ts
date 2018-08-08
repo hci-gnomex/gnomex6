@@ -32,6 +32,7 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {UrlAnnotationComponent} from "./url-annotation.component";
 import {BillingPeriodSelectorComponent} from "./billing-period-selector.component";
 import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-popup.component";
+import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
 
 @NgModule({
     imports: [
@@ -71,6 +72,7 @@ import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-pop
         UrlAnnotationComponent,
         BillingPeriodSelectorComponent,
         BillingPeriodSelectorPopupComponent,
+        VisibilityDetailTabComponent
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -107,6 +109,7 @@ import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-pop
         AnnotationTabComponent,
         UrlAnnotationComponent,
         BillingPeriodSelectorComponent,
+        VisibilityDetailTabComponent
     ]
 })
 export class UtilModule {

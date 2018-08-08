@@ -14,7 +14,7 @@ import {URLSearchParams} from "@angular/http"
 
 
 @Component({
-    selector: "visibility-tab",
+    selector: "visibility-browse-tab",
     template: `
         
         <div style="width:100%; height:100%; display:flex; flex-direction: column ">
