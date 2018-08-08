@@ -84,7 +84,7 @@ export class ConstantsService {
     public readonly ICON_GREEN_BULLET:string = "assets/bullet_green.png";
     public readonly ICON_FOLDER:string = "assets/folder.png";
     public readonly ICON_FLASK:string = "assets/flask.png";
-
+    public readonly ICON_ADD:string = "assets/add.png";
     public readonly ICON_DELETE:string = "assets/delete.png";
     public readonly ICON_FOLDER_DELETE:string= "assets/folder_delete.png";
 
