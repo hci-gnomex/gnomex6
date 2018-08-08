@@ -7,6 +7,9 @@
             <mat-tab label="Related Data" *ngIf="showRelatedDataTab">
                 <related-data-tab [relatedObjects]="relatedObjects" ></related-data-tab>
             </mat-tab>
+            <mat-tab label="Visibility" >
+                 <visibility-detail-tab> </visibility-detail-tab>
+            </mat-tab>
             <mat-tab label="Description">
                 <description-tab [showEditor]="initDescriptionTab" ></description-tab>
             </mat-tab>

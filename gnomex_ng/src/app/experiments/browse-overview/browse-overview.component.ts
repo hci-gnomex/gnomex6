@@ -40,7 +40,7 @@ import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
                         <progress-tab></progress-tab>
                     </mat-tab>
                     <mat-tab class="full-height" label="Visibility">
-                        <visibility-tab (saveSuccess)="saveVis()"></visibility-tab>
+                        <visibility-browse-tab (saveSuccess)="saveVis()"></visibility-browse-tab>
                     </mat-tab>
                     <mat-tab *ngIf="this.project" class="full-height" label="Project">
                         <project-tab (saveSuccess)="saveProject()"></project-tab>

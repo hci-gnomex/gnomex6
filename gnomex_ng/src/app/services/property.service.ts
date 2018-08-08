@@ -15,6 +15,7 @@ export class PropertyService {
     public static readonly PROPERTY_NO_PUBLIC_VISIBILITY:string = "no_public_visibility";
     public static readonly PROPERTY_PRODUCT_SHEET_NAME: string = 'product_sheet_name';
     public static readonly SHOW_ADMIN_NOTES_ON_REQUEST: string = 'show_admin_notes_on_request';
+    public static readonly PROPERTY_DATASET_PRIVACY_EXPIRATION:string = "dataset_privacy_expiration";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
@@ -129,13 +130,22 @@ export class PropertyService {
         return this.http.post("/gnomex/DeleteProperty.gx", params.toString(), {headers: headers});
     }
 
-    public isPublicVisbility():boolean{
+    public isPublicVisbility(): boolean{
         let visProp = this.getProperty(PropertyService.PROPERTY_NO_PUBLIC_VISIBILITY);
          if(visProp){
             return !(visProp.propertyValue === 'Y');
          }else{
              return true;
          }
+    }
+    public get isPrivacyExpirationSupported(): boolean{
+        let privacyExpProp = this.getProperty(PropertyService.PROPERTY_DATASET_PRIVACY_EXPIRATION);
+        if(privacyExpProp){
+            let pv:number = +privacyExpProp.propertyValue;
+            return ( pv > 0 );
+        }else{
+            return false;
+        }
     }
 
 }
