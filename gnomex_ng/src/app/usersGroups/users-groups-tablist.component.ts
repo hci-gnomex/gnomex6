@@ -11,7 +11,10 @@ import {
 } from "@angular/forms";
 import {GnomexService} from "../services/gnomex.service";
 import {NewUserDialogComponent} from "./new-user-dialog.component";
-import {ErrorStateMatcher, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {
+    ErrorStateMatcher, MatDialog, MatDialogConfig, MatDialogRef,
+    MatSnackBarConfig
+} from "@angular/material";
 import {PasswordUtilService} from "../services/password-util.service";
 import {MatSnackBar} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
@@ -31,122 +34,11 @@ import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
     selector: 'users-groups-tablist',
     templateUrl: './users-groups-tablist.component.html',
     styles: [`
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 100%;
-        }
-
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .users-groups-row-one {
-            display: flex;
-            flex-grow: 1;
-        }
-
-        .users-groups-row-one-shrink {
-            display: flex;
-            flex-grow: 1;
-            flex-shrink: 1;
-            min-width: 0;
-        }
-
-        .users-groups-type-row {
-            display: flex;
-            flex-grow: .2;
-        }
-
-        .users-groups-unid-row {
-            display: flex;
-            flex-grow: .1;
-        }
-
-        .users-groups-item-row-two {
-            flex-grow: 1;
-            position: relative;
-        }
-
-        .users-groups-item {
-            width: 100%;
-            flex: 1 1 auto;
-            font-size: small;
-        }
-
-        .users-groups-one {
-            width: 100%;
-            flex-grow: .1;
-
-        }
-
-        .users-groups-help-drag-drop {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .users-groups-three {
-            width: 100%;
-            height: 5px;
-            flex-grow: 3;
-        }
-
-        .users-groups-four {
-            width: 100%;
-            flex-grow: .10;
-        }
-
+        
         /deep/ .mat-tab-body-wrapper {
             flex-grow: 1 !important;
         }
         
-        div.background {
-            width: 100%;
-            height: 100%;
-            background-color: #EEEEEE;
-            padding: 0.3em;
-            border-radius: 0.3em;
-            border: 1px solid darkgrey;
-            display: flex;
-            flex-direction: column;
-        }
-        .ug-background {
-            background-color: #EEEEEE;
-            padding: 0.3em;
-            border-radius: 0.3em;
-            border: 1px solid darkgrey;
-        }
-        .ug-white-background {
-            padding: 0.3em;
-            border-radius: 0.3em;
-            border: 1px solid darkgrey;
-        }
-        .permission-radio-group {
-            display: inline-flex;
-            flex-direction: column;
-        }
-        .ug-label {
-            width: 8rem;
-            height: 2.6em;
-            vertical-align: middle;
-            font-style: italic;
-            color: #1601db;
-        }
-        .flex-container{
-
-            display: flex;
-            justify-content: space-between;
-            margin-left: auto;
-            margin-top: 1em;
-            padding-left: 1em;
-        }
-        div.form {
-            display: flex;
-            flex-direction: column;
-            padding: 0 1%;
-        }
         div.formRow {
             display: flex;
             flex-direction: row;
@@ -155,6 +47,7 @@ import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
         }
         mat-form-field.formField {
             width: 30%;
+            min-width: 15em;
             margin: 0 0.5%;
         }
         ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
@@ -162,26 +55,82 @@ import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
             padding: 3px;
             margin: 3px;
         }
+
+
         
+        label {
+            font-style: italic;
+            color: #1601db;
+        }
+        
+        .height-auto { height: auto; }
+        
+        .reserve-height {
+            height:     fit-content;
+            min-height: fit-content; 
+        }
+        
+        .small-width { width: 12em; }
+
+        .horizontal-spacer { 
+            height: 100%;
+            width: 0.3em;
+        }
+        
+        .foreground { background-color: white;   }
+        .background { background-color: #EEEEEE; }
+
+        .border-padding {
+            padding:       0.3em;
+            border-radius: 0.3em;
+            border: 1px solid darkgrey;
+        }
+        
+        .right-align { text-align: right; }
+        
+        .small-font { font-size: small; }
+        
+        .margin-left { margin-left: 0.3em; }
+        
+        .large-margin-left  { margin-left:  2em; }
+        .large-margin-right { margin-right: 2em; }
         
         .padded { padding: 0.3em; }
+        
+        .padded-right  { padding-right:  0.3em; }
+        .padded-bottom { padding-bottom: 0.3em; }
+        
+        .padded-left-right {
+            padding-left:   0.3em;
+            padding-right:  0.3em;
+        }
+        
+        .padded-left-right-bottom {
+            padding-left:   0.3em;
+            padding-right:  0.3em;
+            padding-bottom: 0.3em;
+        }
+        
+        .large-padding-right { padding-right: 2em; }
 
     `]
-
 })
-
 export class UsersGroupsTablistComponent implements OnInit{
+
     @ViewChild("billingAdminTab") billingAdminTab: BillingAdminTabComponent;
     @ViewChild("membershipTab") membershipTab: MembershipTabComponent;
-    public readonly USER_TYPE_UNIVERSITY: string = "uu";
-    public readonly USER_TYPE_EXTERNAL: string = "ex";
+
     private readonly DUMMY_UNID: string = "u0000000";
     private readonly DUMMY_USERNAME: string = "_";
     private readonly DUMMY_PASSWORD: string = "aaAA11$$";
     private readonly PASSWORD_MASKED: string = "XXXX";
-    public  readonly EXACADEMIC = "EXACADEMIC";
-    public  readonly EXCOMM = "EXCOMM";
-    public  readonly INTERNAL = "INTERNAL";
+
+    public readonly USER_TYPE_UNIVERSITY: string = "uu";
+    public readonly USER_TYPE_EXTERNAL: string = "ex";
+    public readonly EXACADEMIC = "EXACADEMIC";
+    public readonly EXCOMM = "EXCOMM";
+    public readonly INTERNAL = "INTERNAL";
+
     private columnDefs;
     private labColumnDefs;
     private collColumnDefs;
@@ -280,13 +229,16 @@ export class UsersGroupsTablistComponent implements OnInit{
                 headerName: "",
                 editable: false,
                 field: "name",
+                width: 200
             },
             {
                 headerName: "",
                 editable: false,
                 cellRenderer: this.pricingCellRenderer,
                 field: "pricing",
-                width: 20
+                width: 20,
+                maxWidth:20,
+                minWidth:20
             }
         ];
         this.labColumnDefs = [
@@ -456,10 +408,10 @@ export class UsersGroupsTablistComponent implements OnInit{
 
     }
 
-    public onGridSizeChanged(): void {
-        setTimeout(() => {
-            this.gridOptions.api.sizeColumnsToFit();
-        });
+    public onGridSizeChanged(event: any): void {
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
     }
 
     public onManGridSizeChanged(): void {
@@ -914,7 +866,6 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
     onGroupsGridReady(params) {
         this.groupsGridOptions.api.sizeColumnsToFit();
-
     }
 
     setCoreFacilities(): number {
@@ -1009,9 +960,11 @@ export class UsersGroupsTablistComponent implements OnInit{
                 if (responseJSON.result && responseJSON.result === "SUCCESS") {
                     this.userForm.markAsPristine();
                     this.touchUserFields();
-                    this.snackBar.open("Changes Saved", "User", {
-                        duration: 3000
-                    });
+
+                    let config: MatSnackBarConfig = new MatSnackBarConfig();
+                    config.duration = 3000;
+
+                    this.snackBar.open("Changes Saved", "User", config);
                     this.buildUsers();
                 }
             }
@@ -1049,6 +1002,10 @@ export class UsersGroupsTablistComponent implements OnInit{
                 this.save();
             }
         }
+    }
+
+    saveLab(): void {
+        console.log('Save this lab!');
     }
 
     isMemberOfLab(): boolean {
@@ -1137,9 +1094,11 @@ export class UsersGroupsTablistComponent implements OnInit{
                 if (responseJSON.result && responseJSON.result === "SUCCESS") {
                     this.groupForm.markAsPristine();
                     this.touchGroupFields();
-                    this.snackBar.open("Changes Saved", "Lab", {
-                        duration: 2000
-                    });
+
+                    let config: MatSnackBarConfig = new MatSnackBarConfig();
+                    config.duration = 2000;
+
+                    this.snackBar.open("Changes Saved", "Lab", config);
                     this.buildLabList();
                 }
             }
