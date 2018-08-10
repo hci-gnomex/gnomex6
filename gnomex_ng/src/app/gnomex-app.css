@@ -91,6 +91,10 @@ mat-form-field.short-input{
 }
 
 
+mat-tooltip-component {
+  white-space: pre-line;
+}
+
 div.dialogDiv {
   width: 100%;
   margin: 0.4rem 0rem;
