@@ -13,7 +13,7 @@
 						</mat-option>
 					</mat-select>
 				</mat-form-field>
-				<button mat-raised-button *ngIf="!showAddAccountBox" (click)="onAddAccount1Clicked()">Add account</button>
+				<button mat-raised-button *ngIf="!showAddAccountBox" (click)="onAddAccountBeginClicked()">Add account</button>
 				<button mat-raised-button (click)="onCopyAccountsClicked()">Copy Accounts From Other Cores</button>
 			</div>
 			<div *ngIf="showAddAccountBox" class="full-width small-font">
@@ -48,7 +48,7 @@
 									</mat-radio-group>
 								</div>
 								<div class="inline-block" style="width: 34%; text-align: right;">
-									<button mat-raised-button>Add account</button>
+									<button mat-raised-button (click)="onAddAccountConfirmClicked()">Add account</button>
 								</div>
 							</div>
 							<div class="td" style="text-align: center;">
@@ -62,6 +62,7 @@
 		<div class="vertical-spacer full-width">
 		</div>
 		<div class="flex-grow full-width">
+			<div #oneEmWidth class="no-height single-em"></div>
 			<div class="flex-container-col full-width full-height">
 				<div class="full-width flex-grow small-font">
 					<ag-grid-angular
@@ -70,7 +71,8 @@
 							[singleClickEdit]="true"
 							[enableSorting]="true"
 							[enableColResize]="true"
-							(gridSizeChanged)="onChartfieldGridSizeChanged()"
+							(cellValueChanged)="translateChangesOntoAccountRecords($event)"
+							(gridSizeChanged)="onGridSizeChanged($event)"
 							(gridReady)="onChartfieldGridReady($event)">
 					</ag-grid-angular>
 				</div>
@@ -83,7 +85,7 @@
 							[singleClickEdit]="true"
 							[enableSorting]="true"
 							[enableColResize]="true"
-							(gridSizeChanged)="onPoGridSizeChanged()"
+							(gridSizeChanged)="onGridSizeChanged($event)"
 							(gridReady)="onPoGridReady($event)">
 					</ag-grid-angular>
 				</div>
@@ -96,7 +98,7 @@
 							[singleClickEdit]="true"
 							[enableSorting]="true"
 							[enableColResize]="true"
-							(gridSizeChanged)="onCreditCardGridSizeChanged()"
+							(gridSizeChanged)="onGridSizeChanged($event)"
 							(gridReady)="onCreditCardGridReady($event)">
 					</ag-grid-angular>
 				</div>

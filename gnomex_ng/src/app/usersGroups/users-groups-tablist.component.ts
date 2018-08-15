@@ -695,9 +695,21 @@ export class UsersGroupsTablistComponent implements OnInit{
         if (event.tab.textLabel === "Groups") {
             this.isUserTab = false;
             this.isGroupsTab = true;
+
+            setTimeout(() => {
+                if (this.groupsGridOptions && this.groupsGridOptions.api) {
+                    this.groupsGridOptions.api.sizeColumnsToFit();
+                }
+            });
         } else {
             this.isUserTab = true;
             this.isGroupsTab = false;
+
+            setTimeout(() => {
+                if (this.gridOptions && this.gridOptions.api) {
+                    this.gridOptions.api.sizeColumnsToFit();
+                }
+            });
         }
     }
 

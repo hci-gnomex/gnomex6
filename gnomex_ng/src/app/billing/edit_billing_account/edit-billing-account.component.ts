@@ -50,104 +50,102 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 @Component({
 	selector: "edit-billing-account-window",
 	templateUrl: "./edit-billing-account.component.html",
-	styles: [`
-      .mat-dialog-title {
-          margin: 0;
-          padding: 0;
-      }
-      .mat-dialog-content {
-          margin: 0;
-          padding: 0;
-      }
-      .mat-dialog-actions {
-          margin: 0;
-          padding: 0;
-      }
-
-      div.t  { display: table; }
-      div.tr { display: table-row; }
-      div.td { display: table-cell; }
+	styles: [`		
+		.mat-dialog-title {  
+			margin: 0;  
+			padding: 0;  
+		}  
+		.mat-dialog-content {  
+			margin: 0;  
+			padding: 0;  
+		}  
+		.mat-dialog-actions {  
+			margin: 0;  
+			padding: 0;  
+		}
+		
+		div.t  { display: table; }  
+		div.tr { display: table-row; }  
+		div.td { display: table-cell; }
+		
+		p { margin: 1em 0.5em; }
+		
+		.full-height { height: 100%; }  
+		.full-width  { width: 100%;  }
+		
+		.center { text-align: center; }
+		
+		.font-small { font-size: small; }
+		
+		.cell-label {  
+			width: 8rem;  
+			height: 2.6em;  
+			vertical-align: middle;  
+			font-style: italic;  
+			font-size: x-small;  
+			color: #1601db;  
+		}
+		
+		.radio-button {  
+			margin: 0 4em 0 0;  
+			padding: 0;  
+		}
+		
+		.background {  
+			display: block;  
+			position: relative;  
+			background-color: white;  
+			border: #d2d2d2 solid 1px;
 			
-	  p { 
-		  margin: 1em 0.5em;
-	  }
-			
-	  .full-height { height: 100%; }
-	  .full-width  { width: 100%;  }
-			
-	  .center { text-align: center; }
-	  
-	  .font-small { font-size: small; }
-	  
-	  .cell-label {
-          width: 8rem;
-          height: 2.6em;
-		  vertical-align: middle;
-		  font-style: italic;
-		  font-size: x-small;
-		  color: #1601db;
-	  }
-
-      .radio-button {
-          margin: 0 4em 0 0;
-          padding: 0;
-      }
-
-      .background {
-          display: block;
-          position: relative;
-          background-color: white;
-          border: #d2d2d2 solid 1px;
-          
-		  width: calc(100% - 8px); 
-		  margin: 3px 4px;
-      }
-      .background-sideless {
-          display: block;
-          position: relative;
-          background-color: white;
-          border-color: #d2d2d2;
-		  border-style: solid;
-		  border-top-width: 1px;
-		  border-bottom-width: 1px;
-          border-left-width: 0;
-          border-right-width: 0;
-      }
-	  
-	  .padded {
-          position:relative; 
-		  width:calc(100% - 1.6em); 
-		  margin:0.4em 0.8em;
-	  }
-			
-	  .inline-block { display: inline-block; }
-      .top-vertical-align    { vertical-align: top; }
-      .center-vertical-align { vertical-align: middle; }
-	  
-      .row-spacer {
-		  height: 0.7em;
-	  }
-			
-	  .checkbox-container {
-		  display: inline-block;
-		  vertical-align: middle;
-		  width: fit-content;
-	  }
-			
-	  .horizontal-break {
-		  display: inline-block;
-		  vertical-align: middle;
-		  height: 3em;
-		  width: 1px;
-		  background-color: #c4cccc;
-		  margin: 0.5em 0.5em 0.5em 0.5em;
-	  }
-	  
-	  .mat-dialog-content {
-          background-color: #eeeeeb; 
-		  overflow: auto; 
-		  font-size: small;
-	  }
+			width: calc(100% - 8px);  
+			margin: 3px 4px;  
+		}  
+		.background-sideless {  
+			display: block;  
+			position: relative;  
+			background-color: white;  
+			border-color: #d2d2d2;  
+			border-style: solid;  
+			border-top-width: 1px;  
+			border-bottom-width: 1px;  
+			border-left-width: 0;  
+			border-right-width: 0;  
+		}
+		
+		.padded {  
+			position:relative;  
+			width:calc(100% - 1.6em);  
+			margin:0.4em 0.8em;  
+		}
+		
+		.inline-block { display: inline-block; }  
+		.top-vertical-align    { vertical-align: top; }  
+		.center-vertical-align { vertical-align: middle; }
+		
+		.row-spacer {  
+			height: 0.7em;  
+		}
+		
+		.checkbox-container {  
+			display: inline-block;  
+			vertical-align: middle;  
+			width: fit-content;  
+		}
+		
+		.horizontal-break {  
+			display: inline-block;  
+			vertical-align: middle;  
+			height: 3em;  
+			width: 1px;  
+			background-color: #c4cccc;  
+			margin: 0.5em 0.5em 0.5em 0.5em;  
+		}
+		
+		.mat-dialog-content {  
+			background-color: #eeeeeb;  
+			overflow: auto;  
+			font-size: small;  
+		}
 	  
 		.long-input    { width: 100%; }
 		.medium-input  { width: 18em; }
@@ -179,7 +177,7 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 		
 		.date-horizontal-spacer {
             width:7em;
-		}
+		}  
 	`]
 })
 export class EditBillingAccountComponent implements OnInit, OnDestroy {
@@ -192,24 +190,18 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 	usesCustomChartfields: string = '';
 
-	accountName_Chartfield: string = '';
+    accountName: string = '';
 	accountNameFormControl_Chartfield = new FormControl('', []);
 	accountNameStateMatcher_Chartfield = new EditBillingAccountStateMatcher();
-
-	accountName_po: string = '';
 	accountNameFormControl_po = new FormControl('', []);
 	accountNameStateMatcher_po = new EditBillingAccountStateMatcher();
-
-	accountName_creditCard: string = '';
 	accountNameFormControl_creditCard = new FormControl('', []);
 	accountNameStateMatcher_creditCard = new EditBillingAccountStateMatcher();
 
-	shortAccountName_Chartfield: string = '';
-	shortNameFormControl_Chartfield = new FormControl('', []);
-	shortNameStateMatcher_Chartfield = new EditBillingAccountStateMatcher();
-	requireShortAcct: boolean = false;
-
-	shortAccountName_po: string = '';
+	shortAccountName: string = '';
+    requireShortAcct: boolean = false;
+    shortNameFormControl_Chartfield = new FormControl('', []);
+    shortNameStateMatcher_Chartfield = new EditBillingAccountStateMatcher();
 	shortNameFormControl_po = new FormControl('', []);
 	shortNameStateMatcher_po = new EditBillingAccountStateMatcher();
 
@@ -239,17 +231,11 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 	accountNumberAU_Chartfield: string = '1';
 
-    startDate_chartfield: string = '';
-	startDate_po: string = '';
-	startDate_creditcard: string = '';
+    startDate: string = '';
+    requireStartDate: boolean = true;
 
-	requireStartDate: boolean = true;
-
-    effectiveUntilDate_chartfield: string;
-	expirationDate_po: string;
-	expirationDate_creditcard: string;
-
-	requireExpirationDate: boolean = true;
+    effectiveUntilDate: string;
+    requireExpirationDate: boolean = true;
 
     totalDollarAmount: string = '';
     totalDollarAmountFormControl = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
@@ -617,17 +603,17 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
             let startDateOther: string = '';
             let expirationDateOther: string = '';
 
-            if (this.startDate_chartfield && this.startDate_chartfield !== '') {
-                startDateOther = valueToDisplayParser.parseDateString(this.startDate_chartfield);
+            if (this.startDate && this.startDate !== '') {
+                startDateOther = valueToDisplayParser.parseDateString(this.startDate);
 			}
-            if (this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield !== '') {
-                expirationDateOther = valueToDisplayParser.parseDateString(this.effectiveUntilDate_chartfield);
+            if (this.effectiveUntilDate && this.effectiveUntilDate !== '') {
+                expirationDateOther = valueToDisplayParser.parseDateString(this.effectiveUntilDate);
             }
 
 			this._rowData.idLab                    = idLab;
             this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
-            this._rowData.accountName              = this.accountName_Chartfield;
-            this._rowData.shortAcct                = this.shortAccountName_Chartfield;
+            this._rowData.accountName              = this.accountName;
+            this._rowData.shortAcct                = this.shortAccountName;
             this._rowData.accountNumberBus         = this.accountNumberBus_Chartfield;
             this._rowData.accountNumberOrg         = this.accountNumberOrg_Chartfield;
             this._rowData.accountNumberFund        = this.accountNumberFund_Chartfield;
@@ -641,9 +627,9 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
             this._rowData.custom3                  = custom3;
             this._rowData.acctUsers                = this.approvedUsersValue;
             this._rowData.submitterEmail           = this.submitterEmail;
-            this._rowData.startDate                = this.startDate_chartfield;
+            this._rowData.startDate                = this.startDate;
             this._rowData.startDateOther           = startDateOther;
-            this._rowData.expirationDate           = this.effectiveUntilDate_chartfield;
+            this._rowData.expirationDate           = this.effectiveUntilDate;
             this._rowData.expirationDateOther      = expirationDateOther;
             this._rowData.totalDollarAmount        = this.totalDollarAmount;
             this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
@@ -723,13 +709,13 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		}
 
         if (this.requireStartDate
-			&& ((!(this.startDate_chartfield && this.startDate_chartfield != ''))
+			&& ((!(this.startDate && this.startDate != ''))
 			&& (this.usesCustomChartfields !== 'Y' || this.includeInCustomField_startDate))) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
 		if (this.requireExpirationDate &&
-			((!(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield != ''))
+			((!(this.effectiveUntilDate && this.effectiveUntilDate != ''))
 				&& ((this.usesCustomChartfields !== 'Y' ||   this.includeInCustomField_startDate)  && this.includeInCustomField_expirationDate)
 				&& ((this.usesCustomChartfields  == 'Y' && (!this.includeInCustomField_startDate)) && this.includeInCustomField_expirationDate))) {
 			errorFound = errorFound || true;
@@ -759,8 +745,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 		let idFundingAgency: string = "";
 
-		let startDate: string = (this.startDate_po ? this.startDate_po : '');
-		let expirationDate: string = (this.expirationDate_po ? this.expirationDate_po : '');
+		let startDate: string = (this.startDate ? this.startDate : '');
+		let expirationDate: string = (this.effectiveUntilDate ? this.effectiveUntilDate : '');
 
 		let activeAccount: string = "";
 
@@ -818,8 +804,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
             this._rowData.idLab                    = idLab;
             this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
-            this._rowData.accountName              = this.accountName_po;
-            this._rowData.shortAcct                = this.shortAccountName_po;
+            this._rowData.accountName              = this.accountName;
+            this._rowData.shortAcct                = this.shortAccountName;
             this._rowData.idFundingAgency          = idFundingAgency;
             this._rowData.custom1                  = custom1;
             this._rowData.custom2                  = custom2;
@@ -865,11 +851,11 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			this.errorMessage += '- Error with short account name\n';
 		}
 
-		if (this.requireStartDate && !(this.startDate_po && this.startDate_po != '')) {
+		if (this.requireStartDate && !(this.startDate && this.startDate != '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if (this.requireExpirationDate && !(this.expirationDate_po && this.expirationDate_po != '')) {
+		if (this.requireExpirationDate && !(this.effectiveUntilDate && this.effectiveUntilDate != '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
@@ -899,8 +885,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 		let idFundingAgency: string = "";
 
-		let startDate: string = !!this.startDate_creditcard ? this.startDate_creditcard : '';
-		let expirationDate: string = !!this.expirationDate_creditcard ? this.expirationDate_creditcard : '';
+		let startDate: string = !!this.startDate ? this.startDate : '';
+		let expirationDate: string = !!this.effectiveUntilDate ? this.effectiveUntilDate : '';
 
 		let idCreditCardCompany: string = '' + this.selectedCreditCardCompany;
 
@@ -963,7 +949,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
             this._rowData.idLab                    = idLab;
             this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
-            this._rowData.accountName              = this.accountName_creditCard;
+            this._rowData.accountName              = this.accountName;
             this._rowData.shortAcct                = shortAcct;
             this._rowData.idFundingAgency          = idFundingAgency;
             this._rowData.custom1                  = custom1;
@@ -1008,11 +994,11 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			this.errorMessage += '- Please provide a name for your account\n';
 		}
 
-		if (this.requireStartDate && !(this.startDate_creditcard && this.startDate_creditcard != '')) {
+		if (this.requireStartDate && !(this.startDate && this.startDate != '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if (this.requireExpirationDate && !(this.expirationDate_creditcard && this.expirationDate_creditcard != '')) {
+		if (this.requireExpirationDate && !(this.effectiveUntilDate && this.effectiveUntilDate != '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
@@ -1166,6 +1152,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
         this._approvedUsersDisplay = '';
 
         if (!this._approvedUsersValue) {
+            this._approvedUsersValue = '';
         	return;
 		}
 
@@ -1270,8 +1257,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
             }
         }
 
-        this.accountName_Chartfield           = this._rowData.accountName;
-        this.shortAccountName_Chartfield      = this._rowData.shortAcct;
+        this.accountName                      = this._rowData.accountName;
+        this.shortAccountName                 = this._rowData.shortAcct;
 
         this.accountNumberBus_Chartfield      = this._rowData.accountNumberBus;
         this.accountNumberOrg_Chartfield      = this._rowData.accountNumberOrg;
@@ -1299,8 +1286,8 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
             this.accountNumberAccount_Chartfield = this._rowData.accountNumberAccount;
         }
 
-		this.startDate_chartfield = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
-        this.effectiveUntilDate_chartfield = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
+		this.startDate = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
+        this.effectiveUntilDate = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
 
         this.approvedUsersValue = this._rowData.approvedUsers;
 
@@ -1320,12 +1307,12 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
         this.loadLabAndCoreFacilityFromRowData();
 
-        this.accountName_po = this._rowData.accountName;
-        this.shortAccountName_po = this._rowData.shortAcct;
+        this.accountName = this._rowData.accountName;
+        this.shortAccountName = this._rowData.shortAcct;
         this.selectedFundingAgency_po = this._rowData.idFundingAgency;
         this.submitterEmail = this._rowData.submitterEmail;
-        this.startDate_po = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
-        this.expirationDate_po = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
+        this.startDate = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
+        this.effectiveUntilDate = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
         this.totalDollarAmount = this._rowData.totalDollarAmountDisplay;
         this.activeCheckBox = (this._rowData.activeAccount && this._rowData.activeAccount.toLowerCase() === 'y');
 
@@ -1347,10 +1334,10 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
         this.loadLabAndCoreFacilityFromRowData();
 
-        this.accountName_creditCard = this._rowData.accountName;
+        this.accountName = this._rowData.accountName;
         this.selectedFundingAgency_creditCard = this._rowData.idFundingAgency;
-        this.startDate_creditcard = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
-        this.expirationDate_creditcard = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
+        this.startDate = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
+        this.effectiveUntilDate = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
         this.zipCodeInput_creditCard = this._rowData.zipCode;
         this.selectedCreditCardCompany = this._rowData.idCreditCardCompany;
 

@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {ErrorStateMatcher, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 
 import {DictionaryService} from "../../services/dictionary.service";
@@ -29,6 +29,7 @@ import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/form
 import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-users-selector.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {CopyAccountsDialogComponent} from "./dialogs/copy-accounts-dialog.component";
+import {UniqueIdGeneratorService} from "../../services/unique-id-generator.service";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -69,10 +70,15 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
         .vertical-spacer { height: 0.3em; }
         
         .small-font { font-size: x-small; }
+
+        .no-height { height: 0;   }
+        .single-em { width:  1em; }
         
 	`]
 })
-export class BillingAccountTabComponent implements OnInit, OnDestroy {
+export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDestroy {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
 	readonly CHARTFIELD:  string = 'CHARTFIELD';
 	readonly PO:          string = 'PO';
@@ -120,6 +126,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     requireExpirationDate : boolean = false;
     requireDollarAmount   : boolean = false;
 
+    private emToPxConversionRate: number = 1;
+
     // In GNomEx, it is possible to customize how the chartfield billing accounts appear.
     // This requires the "usesCustomChartfields" property to be 'Y'.
     // If it is 'Y', then startDate, endDate and all the account number fields are automatically
@@ -151,7 +159,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 private dialogsService: DialogsService,
                 private propertyService: PropertyService,
                 private accountFieldsConfigurationService: AccountFieldsConfigurationService,
-                private dialog: MatDialog) {
+                private dialog: MatDialog,
+                private idGenerator: UniqueIdGeneratorService) {
 		this.context = { componentParent: this };
 	}
 
@@ -205,9 +214,19 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
         }
     }
 
+    ngAfterViewInit(): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+    }
+
     ngOnDestroy(): void {
-        this.internalAccountsFieldsConfigurationSubscription.unsubscribe();
-        this.otherAccountsFieldsConfigurationSubscription.unsubscribe();
+        if (this.internalAccountsFieldsConfigurationSubscription) {
+            this.internalAccountsFieldsConfigurationSubscription.unsubscribe();
+        }
+        if (this.otherAccountsFieldsConfigurationSubscription) {
+            this.otherAccountsFieldsConfigurationSubscription.unsubscribe();
+        }
     }
 
 	// All the data on this component needs to be updated when the selected lab is changed (auto-detected
@@ -216,7 +235,11 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		this.selectedCoreFacility = this.getDefaultCoreFacility();
 		this.labActiveSubmitters = this.getActiveSubmitters();
 
-		this.assignChartfieldGridContents(this.selectedCoreFacility);
+		if (this.chartfieldGridApi) {
+            this.chartfieldGridApi.formGroup = null;
+        }
+
+        this.assignChartfieldGridContents(this.selectedCoreFacility);
 		this.assignPoGridContents(this.selectedCoreFacility);
 		this.assignCreditCardGridContents(this.selectedCoreFacility);
 
@@ -432,10 +455,32 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     private getChartfieldColumnDefs(shownGridData: any[]): any[] {
         let columnDefinitions = [];
 
+        let anyAccountsNeedApproval: boolean = false;
+        for (let row of shownGridData) {
+            if (row.isApproved && row.isApproved.toLowerCase() === 'n') {
+                anyAccountsNeedApproval = true;
+                break;
+            }
+        }
+
+        if (anyAccountsNeedApproval) {
+            columnDefinitions.push({
+                headerName: "",
+                editable: false,
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                cellRendererFramework: ApproveButtonRenderer,
+                onClick: "onApproveButtonClicked_chartfield",
+                field: "isApproved"
+            });
+        }
         columnDefinitions.push({
             headerName: "Account name",
             editable: false,
-            width: 300,
+            width: 200,
+            minWidth: 10 * this.emToPxConversionRate,
+            maxWidth: 15 * this.emToPxConversionRate,
             cellRendererFramework: IconLinkButtonRenderer,
             icon: "../../../assets/pricesheet.png",
             onClick: "openChartfieldEditor",
@@ -447,7 +492,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 columnDefinitions.push({
                     headerName: "Starts",
                     editable: true,
-                    width: 100,
+                    width:    4 * this.emToPxConversionRate,
+                    maxWidth: 4 * this.emToPxConversionRate,
+                    minWidth: 4 * this.emToPxConversionRate,
                     cellRendererFramework: DateRenderer,
                     cellEditorFramework: DateEditor,
                     dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -458,7 +505,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 columnDefinitions.push({
                     headerName: "Expires",
                     editable: true,
-                    width: 100,
+                    width:    4 * this.emToPxConversionRate,
+                    maxWidth: 4 * this.emToPxConversionRate,
+                    minWidth: 4 * this.emToPxConversionRate,
                     cellRendererFramework: DateRenderer,
                     cellEditorFramework: DateEditor,
                     dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -484,6 +533,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                             headerName: item.displayName,
                             editable: true,
                             width: 100,
+                            minWidth: (item.displayName ? (('' + item.displayName).length / 2.6) : 3) * this.emToPxConversionRate,
                             cellRendererFramework: TextAlignLeftMiddleRenderer,
                             field: fieldName
                         });
@@ -495,7 +545,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 columnDefinitions.push({
                     headerName: "Funding Agency",
                     editable: true,
-                    width: 200,
+                    width:    10 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    minWidth: 10 * this.emToPxConversionRate,
                     field: "idFundingAgency",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
@@ -508,7 +560,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             columnDefinitions.push({
                 headerName: "Starts",
                 editable: true,
-                width: 100,
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: DateRenderer,
                 cellEditorFramework: DateEditor,
                 dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -517,58 +571,136 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             columnDefinitions.push({
                 headerName: "Expires",
                 editable: true,
-                width: 100,
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: DateRenderer,
                 cellEditorFramework: DateEditor,
                 dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
                 field: "expirationDate"
             });
+        //        setErrors: (value: any,
+        //                    data: any,
+        //                    node: any,
+        //                    colDef: any,
+        //                    rowIndex: any,
+        //                    gridApi: any) => {
+        //            return (value && value === 'TEST') ? 'Invalid name' : '';
+        //        },
+        //        validators: [ Validators.minLength(10) ],
+        //        errorMessageHeader: 'TestingTestingTesting',
+        //        errorNameErrorMessageMap: [
+        //            { errorName: 'minlength', errorMessage: 'Name is too short' }
+        //        ],
             columnDefinitions.push({
                 headerName: "Bus",
                 editable: true,
-                width: 40,
+                width:    1.5 * this.emToPxConversionRate,
+                maxWidth: 1.5 * this.emToPxConversionRate,
+                minWidth: 1.5 * this.emToPxConversionRate,
+                validators: [
+                    Validators.pattern(/^\d{2}$/)
+                ],
+                errorMessageHeader: 'Warning :',
+                errorNameErrorMessageMap: [
+                    { errorName: 'pattern', errorMessage: 'Bus should be two digits' }
+                ],
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "accountNumberBus"
             });
             columnDefinitions.push({
                 headerName: "Org",
                 editable: true,
-                width: 60,
+                width:    3 * this.emToPxConversionRate,
+                maxWidth: 3 * this.emToPxConversionRate,
+                minWidth: 3 * this.emToPxConversionRate,
+                validators: [
+                    Validators.pattern(/^\d{5}$/)
+                ],
+                errorMessageHeader: 'Warning :',
+                errorNameErrorMessageMap: [
+                    { errorName: 'pattern', errorMessage: 'Org should be five digits' }
+                ],
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "accountNumberOrg"
             });
             columnDefinitions.push({
                 headerName: "Fund",
                 editable: true,
-                width: 50,
+                width:    3 * this.emToPxConversionRate,
+                maxWidth: 3 * this.emToPxConversionRate,
+                minWidth: 3 * this.emToPxConversionRate,
+                validators: [
+                    Validators.pattern(/^\d{4}$/)
+                ],
+                errorMessageHeader: 'Warning :',
+                errorNameErrorMessageMap: [
+                    { errorName: 'pattern', errorMessage: 'Fund should be four digits' }
+                ],
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "accountNumberFund"
             });
             columnDefinitions.push({
                 headerName: "Activity",
                 editable: true,
-                width: 70,
+                width:    3 * this.emToPxConversionRate,
+                maxWidth: 3 * this.emToPxConversionRate,
+                minWidth: 3 * this.emToPxConversionRate,
+                validators: [
+                    Validators.pattern(/^\d{5}$/)
+                ],
+                errorMessageHeader: 'Warning :',
+                errorNameErrorMessageMap: [
+                    { errorName: 'pattern', errorMessage: 'Activity should be five digits' }
+                ],
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "accountNumberActivity"
             });
             columnDefinitions.push({
                 headerName: "Project",
                 editable: true,
-                width: 90,
+                width:    4.5 * this.emToPxConversionRate,
+                maxWidth: 4.5 * this.emToPxConversionRate,
+                minWidth: 4.5 * this.emToPxConversionRate,
+                validators: [
+                    Validators.pattern(/^\d{8}$/)
+                ],
+                errorMessageHeader: 'Warning :',
+                errorNameErrorMessageMap: [
+                    { errorName: 'pattern', errorMessage: 'Project should be eight digits' }
+                ],
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "accountNumberProject"
             });
             columnDefinitions.push({
                 headerName: "Acct",
                 editable: true,
-                width: 50,
+                width:    3 * this.emToPxConversionRate,
+                maxWidth: 3 * this.emToPxConversionRate,
+                minWidth: 3 * this.emToPxConversionRate,
+                validators: [
+                    Validators.pattern(/^\d{5}$/)
+                ],
+                errorMessageHeader: 'Warning :',
+                errorNameErrorMessageMap: [
+                    { errorName: 'pattern', errorMessage: 'Acct should be five digits' }
+                ],
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "accountNumberAccount"
             });
             columnDefinitions.push({
                 headerName: "AU",
                 editable: true,
-                width: 35,
+                width:    1.5 * this.emToPxConversionRate,
+                maxWidth: 1.5 * this.emToPxConversionRate,
+                minWidth: 1.5 * this.emToPxConversionRate,
+                validators: [
+                    Validators.pattern(/^\d{1}$/)
+                ],
+                errorMessageHeader: 'Warning :',
+                errorNameErrorMessageMap: [
+                    { errorName: 'pattern', errorMessage: 'Bus should be one digit' }
+                ],
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "accountNumberAu"
             });
@@ -577,7 +709,16 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
         columnDefinitions.push({
             headerName: "Submitter email",
             editable: true,
-            width: 200,
+            width:    10 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate,
+            validators: [
+                Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/)
+            ],
+            errorMessageHeader: 'Warning :',
+            errorNameErrorMessageMap: [
+                { errorName: 'pattern', errorMessage: 'Please enter a valid email address.' }
+            ],
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "submitterEmail"
         });
@@ -587,7 +728,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 columnDefinitions.push({
                     headerName: "Total $ Amt",
                     editable: true,
-                    width: 80,
+                    width:    4 * this.emToPxConversionRate,
+                    maxWidth: 4 * this.emToPxConversionRate,
+                    minWidth: 4 * this.emToPxConversionRate,
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     field: "totalDollarAmount"
                 });
@@ -596,7 +739,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 columnDefinitions.push({
                     headerName: "Short acct",
                     editable: true,
-                    width: 100,
+                    width:    4 * this.emToPxConversionRate,
+                    maxWidth: 4 * this.emToPxConversionRate,
+                    minWidth: 4 * this.emToPxConversionRate,
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     field: "shortAcct"
                 });
@@ -607,6 +752,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             headerName: "Users",
             editable: false,
             width: 200,
+            maxWidth: 12 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
             field: "acctUsers",
             rendererOptions: this.labActiveSubmitters,
             rendererOptionDisplayField: "display",
@@ -617,14 +764,19 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
         columnDefinitions.push({
             headerName: "Active",
             editable: false,
-            width: 50,
+            checkboxEditable: true,
+            width:    2.5 * this.emToPxConversionRate,
+            maxWidth: 2.5 * this.emToPxConversionRate,
+            minWidth: 2.5 * this.emToPxConversionRate,
             cellRendererFramework: CheckboxRenderer,
             field: "activeAccount"
         });
         columnDefinitions.push({
             headerName: "$ Billed",
             editable: false,
-            width: 100,
+            width:    5 * this.emToPxConversionRate,
+            maxWidth: 5 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             field: "totalChargesToDateDisplay"
         });
@@ -641,7 +793,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             columnDefinitions.push({
                 headerName: "",
                 editable: false,
-                width: 100,
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: RemoveLinkButtonRenderer
             });
         }
@@ -664,7 +818,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 			columnDefinitions.push({
 				headerName: "",
 				editable: false,
-				width: 100,
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
 				cellRendererFramework: ApproveButtonRenderer,
 				onClick: "onApproveButtonClicked_po",
 				field: "isApproved"
@@ -675,6 +831,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 			headerName: "PO",
 			editable: false,
 			width: 200,
+            minWidth: 10 * this.emToPxConversionRate,
+            maxWidth: 15 * this.emToPxConversionRate,
 			cellRendererFramework: IconLinkButtonRenderer,
 			icon: "../../../assets/email_open.png",
 			onClick: "openPoEditor",
@@ -683,7 +841,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		columnDefinitions.push({
 			headerName: "Starts",
 			editable:  true,
-			width: 100,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
 			dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -692,7 +852,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		columnDefinitions.push({
 			headerName: "Expires",
 			editable:  true,
-			width: 100,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
 			dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -702,13 +864,17 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 			headerName: "Purchase Order Form",
 			editable:  false,
 			cellRendererFramework: UploadViewRemoveRenderer,
-			width: 200,
+            width:    12 * this.emToPxConversionRate,
+            maxWidth: 12 * this.emToPxConversionRate,
+            minWidth: 12 * this.emToPxConversionRate,
 			field: "purchaseOrderForm"
 		});
 		columnDefinitions.push({
 			headerName: "Users",
 			editable: false,
-			width: 100,
+            width: 200,
+            maxWidth: 12 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
 			field: "acctUsers",
 			rendererOptions: this.labActiveSubmitters,
 			rendererOptionDisplayField: "display",
@@ -719,14 +885,19 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		columnDefinitions.push({
 			headerName: "Active",
 			editable: false,
-			width:  50,
-			field: "activeAccount",
+            checkboxEditable: true,
+            width:    2.5 * this.emToPxConversionRate,
+            maxWidth: 2.5 * this.emToPxConversionRate,
+            minWidth: 2.5 * this.emToPxConversionRate,
+            field: "activeAccount",
 			cellRendererFramework: CheckboxRenderer
 		});
 		columnDefinitions.push({
 			headerName: "$ Billed",
 			editable: false,
-			width: 100,
+            width:    5 * this.emToPxConversionRate,
+            maxWidth: 5 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate,
 			field: "totalChargesToDateDisplay",
 			cellRendererFramework: TextAlignRightMiddleRenderer
 		});
@@ -743,7 +914,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             columnDefinitions.push({
                 headerName: "",
                 editable: false,
-                width: 100,
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: RemoveLinkButtonRenderer
             });
         }
@@ -766,7 +939,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 			columnDefinitions.push({
 				headerName: "",
 				editable: false,
-				width: 100,
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
 				cellRendererFramework: ApproveButtonRenderer,
 				onClick: "onApproveButtonClicked_creditCard",
 				field: "isApproved"
@@ -776,7 +951,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		columnDefinitions.push({
 			headerName: "Credit Card Last 4 digits",
 			editable: false,
-			width: 200,
+            width: 200,
+            minWidth: 10 * this.emToPxConversionRate,
+            maxWidth: 15 * this.emToPxConversionRate,
 			cellRendererFramework: IconLinkButtonRenderer,
 			icon: "../../../assets/creditcards.png",
 			onClick: "openCreditCardEditor",
@@ -785,7 +962,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		columnDefinitions.push({
 			headerName: "Expires",
 			editable:  true,
-			width: 100,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
 			dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -794,7 +973,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		columnDefinitions.push({
 			headerName: "Credit Card Company",
 			editable:  true,
-			width: 200,
+            width:    8 * this.emToPxConversionRate,
+            maxWidth: 8 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
 			field: "idCreditCardCompany",
 			cellRendererFramework: SelectRenderer,
 			cellEditorFramework: SelectEditor,
@@ -805,13 +986,17 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		columnDefinitions.push({
 			headerName: "Zip",
 			editable:  true,
-			width: 200,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
 			field: "zipCode"
 		});
 		columnDefinitions.push({
 			headerName: "Users",
 			editable: false,
-			width: 100,
+            width: 200,
+            maxWidth: 12 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
 			field: "acctUsers",
 			rendererOptions: this.labActiveSubmitters,
 			rendererOptionDisplayField: "display",
@@ -822,14 +1007,19 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		columnDefinitions.push({
 			headerName: "Active",
 			editable: false,
-			width:  50,
+            checkboxEditable: true,
+            width:    2.5 * this.emToPxConversionRate,
+            maxWidth: 2.5 * this.emToPxConversionRate,
+            minWidth: 2.5 * this.emToPxConversionRate,
 			field: "activeAccount",
 			cellRendererFramework: CheckboxRenderer
 		});
 		columnDefinitions.push({
 			headerName: "$ Billed",
 			editable: false,
-			width: 100,
+            width:    5 * this.emToPxConversionRate,
+            maxWidth: 5 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate,
 			field: "totalChargesToDateDisplay",
 			cellRendererFramework: TextAlignRightMiddleRenderer
 		});
@@ -846,7 +1036,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             columnDefinitions.push({
                 headerName: "",
                 editable: false,
-                width: 100,
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: RemoveLinkButtonRenderer
             });
         }
@@ -867,7 +1059,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		this.chartfieldGridColumnApi = event.columnApi;
 
 		this.assignChartfieldGridContents(this.selectedCoreFacility);
-		this.onChartfieldGridSizeChanged();
+		this.onGridSizeChanged(event);
 
         this.chartfieldGridApi.hideOverlay();
 	}
@@ -877,7 +1069,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 		// set the data
 		this.assignPoGridContents(this.selectedCoreFacility);
-		this.onPoGridSizeChanged();
+		this.onGridSizeChanged(event);
         this.poGridApi.hideOverlay();
 	}
 	onCreditCardGridReady(event: any): void {
@@ -886,7 +1078,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 		// set the data
 		this.assignCreditCardGridContents(this.selectedCoreFacility);
-        this.onCreditCardGridSizeChanged();
+        this.onGridSizeChanged(event);
         this.creditCardGridApi.hideOverlay();
 	}
 
@@ -898,17 +1090,18 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 			let shownGridData;
 			let idSelectedCore: string;
 
-			if (this._labInfo && this._labInfo && selectedCore) {
+			if (this._labInfo && selectedCore) {
+                idSelectedCore = selectedCore.value;
 
-				shownGridData = _.cloneDeep(this._labInfo.internalBillingAccounts);
-				idSelectedCore = selectedCore.value;
+                if (!this._labInfo.internalBillingAccounts) {
+                    this._labInfo.internalBillingAccounts = [];
+                } else if (!Array.isArray(this._labInfo.internalBillingAccounts)) {
+                    this._labInfo.internalBillingAccounts = [ this._labInfo.internalBillingAccounts.BillingAccount ];
+                }
 
-				if (!shownGridData) {
-					shownGridData = [];
-				} else if (!Array.isArray(shownGridData)) {
-					shownGridData = [ shownGridData.BillingAccount ];
-				}
+                this.attachUniqueIdsIfNeeded(this._labInfo.internalBillingAccounts);
 
+                shownGridData = this._labInfo.internalBillingAccounts;
 				shownGridData = shownGridData.filter((a, b) => {
 					return (selectedCore) ? a.idCoreFacility === idSelectedCore : false;
 				});
@@ -929,17 +1122,18 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 			let shownGridData;
 			let idSelectedCore: string;
 
-			if (this._labInfo && this._labInfo && selectedCore) {
-
-				shownGridData = _.cloneDeep(this._labInfo.pOBillingAccounts);
+			if (this._labInfo && selectedCore) {
 				idSelectedCore = selectedCore.value;
 
-				if (!shownGridData) {
-					shownGridData = [];
-				} else if (!Array.isArray(shownGridData)) {
-					shownGridData = [ shownGridData.BillingAccount ];
+				if (!this._labInfo.pOBillingAccounts) {
+                    this._labInfo.pOBillingAccounts = [];
+				} else if (!Array.isArray(this._labInfo.pOBillingAccounts)) {
+                    this._labInfo.pOBillingAccounts = [ this._labInfo.pOBillingAccounts.BillingAccount ];
 				}
 
+                this.attachUniqueIdsIfNeeded(this._labInfo.pOBillingAccounts);
+
+                shownGridData = this._labInfo.pOBillingAccounts;
 				shownGridData = shownGridData.filter((a, b) => {
 					return (selectedCore) ? a.idCoreFacility === idSelectedCore : false;
 				});
@@ -960,17 +1154,18 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 			let shownGridData;
 			let idSelectedCore: string;
 
-			if (this._labInfo && this._labInfo && selectedCore) {
-
-				shownGridData = _.cloneDeep(this._labInfo.creditCardBillingAccounts);
+			if (this._labInfo && selectedCore) {
 				idSelectedCore = selectedCore.value;
 
-				if (!shownGridData) {
-					shownGridData = [];
-				} else if (!Array.isArray(shownGridData)) {
-					shownGridData = [ shownGridData.BillingAccount ];
+				if (!this._labInfo.creditCardBillingAccounts) {
+                    this._labInfo.creditCardBillingAccounts = [];
+				} else if (!Array.isArray(this._labInfo.creditCardBillingAccounts)) {
+                    this._labInfo.creditCardBillingAccounts = [ this._labInfo.creditCardBillingAccounts.BillingAccount ];
 				}
 
+                this.attachUniqueIdsIfNeeded(this._labInfo.creditCardBillingAccounts);
+
+                shownGridData = this._labInfo.creditCardBillingAccounts;
 				shownGridData = shownGridData.filter((a, b) => {
 					return (selectedCore) ? a.idCoreFacility === idSelectedCore : false;
 				});
@@ -985,17 +1180,34 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 	}
 
 
-	onApproveButtonClicked_chartfield(rowIndex: string) {
-		// this.chartfieldGridApi.getrowdatabyid(rowIndex).isApproved = 'Y';
-		console.log("Approved clicked!");
+	onApproveButtonClicked_chartfield(node: any) {
+        if (node && node.data) {
+            node.data.isApproved = 'Y';
+        }
+
+        this.translateChangesOntoAccountRecords(node);
+
+        this.assignChartfieldGridContents(this.selectedCoreFacility);
 	}
 
-	onApproveButtonClicked_po(rowIndex: string) {
-		console.log("Approved clicked!");
+	onApproveButtonClicked_po(node: any) {
+        if (node && node.data) {
+            node.data.isApproved = 'Y';
+        }
+
+        this.translateChangesOntoAccountRecords(node);
+
+        this.assignPoGridContents(this.selectedCoreFacility);
 	}
 
-	onApproveButtonClicked_creditCard(rowIndex: string) {
-		console.log("Approved clicked!");
+	onApproveButtonClicked_creditCard(node: any) {
+        if (node && node.data) {
+            node.data.isApproved = 'Y';
+        }
+
+        this.translateChangesOntoAccountRecords(node);
+
+        this.assignCreditCardGridContents(this.selectedCoreFacility);
 	}
 
 
@@ -1017,8 +1229,12 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             if (!result) {
                 return;
             }
-            this.chartfieldGridApi.getRowNode(this.chartfieldRowNode_LastSelected).setData(result);
+
+            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+
             this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
+
+            this.translateChangesOntoAccountRecords(rowNode);
         });
     }
 
@@ -1040,8 +1256,11 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             if (!result) {
                 return;
             }
-            this.poGridApi.getRowNode(this.poRowNode_LastSelected).setData(result);
+            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+
             this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
+
+            this.translateChangesOntoAccountRecords(rowNode);
         });
     }
 
@@ -1063,9 +1282,62 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             if (!result) {
                 return;
             }
-            this.creditCardGridApi.getRowNode(this.creditCardRowNode_LastSelected).setData(result);
+            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+
             this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
+
+            this.translateChangesOntoAccountRecords(rowNode);
         });
+    }
+
+    private updateAccount(originalGridApi: any, lastSelectedId: any, account: any): void {
+        if (!originalGridApi || !lastSelectedId || !account
+            || !(originalGridApi.getRowNode(lastSelectedId))
+            || account.isPO === undefined
+            || account.isCreditCard === undefined) {
+            return;
+        }
+
+        if (account._uniqueId === undefined) {
+            account._uniqueId = this.idGenerator.generateNextId();
+        }
+
+        if (originalGridApi === this.chartfieldGridApi) {
+            this._labInfo.internalBillingAccounts = this._labInfo.internalBillingAccounts.filter((a, b) => {
+                return a._uniqueId !== account._uniqueId;
+            });
+        } else if (originalGridApi === this.poGridApi) {
+            this._labInfo.pOBillingAccounts = this._labInfo.pOBillingAccounts.filter((a, b) => {
+                return a._uniqueId !== account._uniqueId;
+            });
+        } else if (originalGridApi === this.creditCardGridApi) {
+            this._labInfo.creditCardBillingAccounts = this._labInfo.creditCardBillingAccounts.filter((a, b) => {
+                return a._uniqueId !== account._uniqueId;
+            });
+        } else {
+            return;
+        }
+
+        // let deleteTransaction = { remove: [originalGridApi.getRowNode(lastSelectedId).data] };
+        // originalGridApi.updateRowData(deleteTransaction);
+
+        if (account.isPO !== 'Y' && account.isCreditCard !== 'Y') {
+            if (this._labInfo && this._labInfo.internalBillingAccounts) {
+                this._labInfo.internalBillingAccounts.push(account);
+            }
+        } else if (account.isPO === 'Y') {
+            if (this._labInfo && this._labInfo.pOBillingAccounts) {
+                this._labInfo.pOBillingAccounts.push(account);
+            }
+        } else {
+            if (this._labInfo && this._labInfo.creditCardBillingAccounts) {
+                this._labInfo.creditCardBillingAccounts.push(account);
+            }
+        }
+
+        this.assignChartfieldGridContents(this.selectedCoreFacility);
+        this.assignPoGridContents(this.selectedCoreFacility);
+        this.assignCreditCardGridContents(this.selectedCoreFacility);
     }
 
 
@@ -1089,10 +1361,10 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef
-						&& dialogRef.componentInstance
-						&& this.chartfieldGridApi
-						&& this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
-						&& this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+                    && dialogRef.componentInstance
+                    && this.chartfieldGridApi
+                    && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
+                    && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
 					this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
 					this.chartfieldGridApi.refreshCells();
 				}
@@ -1120,10 +1392,10 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef
-						&& dialogRef.componentInstance
-						&& this.poGridApi
-						&& this.poGridApi.getDisplayedRowAtIndex(rowIndex)
-						&& this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+                    && dialogRef.componentInstance
+                    && this.poGridApi
+                    && this.poGridApi.getDisplayedRowAtIndex(rowIndex)
+                    && this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
 					this.poGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
 					this.poGridApi.refreshCells();
 				}
@@ -1151,10 +1423,10 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 			dialogRef.afterClosed().subscribe((result) => {
 				if (dialogRef
-						&& dialogRef.componentInstance
-						&& this.creditCardGridApi
-						&& this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex)
-						&& this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+                    && dialogRef.componentInstance
+                    && this.creditCardGridApi
+                    && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex)
+                    && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
 					this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
 					this.creditCardGridApi.refreshCells();
 				}
@@ -1166,27 +1438,59 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		console.log("Should remove index: " + rowIndex);
 	}
 
+	onGridSizeChanged(event: any): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
 
-	onChartfieldGridSizeChanged(): void {
-		if (this.chartfieldGridApi) {
-			this.chartfieldGridApi.sizeColumnsToFit();
-		}
-	}
-	onPoGridSizeChanged(): void {
-		if (this.poGridApi) {
-			this.poGridApi.sizeColumnsToFit();
-		}
-	}
-	onCreditCardGridSizeChanged(): void {
-		if (this.creditCardGridApi) {
-			this.creditCardGridApi.sizeColumnsToFit();
+		if (event && event.api) {
+            event.api.sizeColumnsToFit();
 		}
 	}
 
-
-	onAddAccount1Clicked(): void {
+	onAddAccountBeginClicked(): void {
 		this.showAddAccountBox = true;
 	}
+
+    onAddAccountConfirmClicked(): void {
+        if (!this.newAccountName
+            || !this.accountType
+            || !this._labInfo
+            || !this.selectedCoreFacility
+            || !this.selectedCoreFacility.value) {
+            return;
+        }
+
+        if (!this._labInfo.internalBillingAccounts) {
+            this._labInfo.internalBillingAccounts = [];
+        }
+
+        let newAccount: any = {
+            accountName: ('' + this.newAccountName),
+            idCoreFacility: this.selectedCoreFacility.value,
+            isApproved: 'N',
+            acctUsers: ''
+        };
+
+        if (this.accountType === this.CHARTFIELD) {
+            newAccount.isPO         = 'N';
+            newAccount.isCreditCard = 'N';
+            this._labInfo.internalBillingAccounts.push(newAccount);
+            this.assignChartfieldGridContents(this.selectedCoreFacility);
+        } else if (this.accountType === this.PO) {
+            newAccount.isPO         = 'Y';
+            newAccount.isCreditCard = 'N';
+            this._labInfo.pOBillingAccounts.push(newAccount);
+            this.assignPoGridContents(this.selectedCoreFacility);
+        } else if (this.accountType === this.CREDIT_CARD) {
+            newAccount.isPO         = 'N';
+            newAccount.isCreditCard = 'Y';
+            this._labInfo.creditCardBillingAccounts.push(newAccount);
+            this.assignCreditCardGridContents(this.selectedCoreFacility);
+        } else {
+            // Do nothing
+        }
+    }
 
     onCopyAccountsClicked(): void {
         let config: MatDialogConfig = new MatDialogConfig();
@@ -1224,7 +1528,82 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
         });
     }
 
+    private attachUniqueIdsIfNeeded(array: any[]): void {
+	    if (!array || !Array.isArray(array)) {
+	        return;
+        }
+
+        for (let element of array) {
+	        if (element._uniqueId === undefined) {
+                element._uniqueId = this.idGenerator.generateNextId();
+            }
+        }
+    }
+
     onHideClicked(): void {
         this.showAddAccountBox = false;
+    }
+
+    /**
+     * This function is needed because the format we need to use to save includes all the different
+     * accounts, whereas the grid is not guaranteed to do so.
+     *
+     * That is, it is the _labInfo's information that will be saved, not the copy in the grid. Therefore,
+     * we need to transcribe changes into the full record.
+     * @param eventOrDataHaver
+     */
+    private translateChangesOntoAccountRecords(eventOrDataHaver: any): void {
+        if (!eventOrDataHaver || !eventOrDataHaver.data || !this._labInfo) {
+            return;
+        }
+
+        // There should never be more than one row with the same _uniqueId, (depending on how
+        // the copy account function is implemented) but this should be able to handle the changes either way.
+
+	    let chartfieldRowsToChange: any[] = [];
+        let poRowsToChange: any[] = [];
+        let creditCardRowsToChange: any[] = [];
+
+        for (let billingAccount of this._labInfo.internalBillingAccounts) {
+            if (billingAccount._uniqueId === eventOrDataHaver.data._uniqueId) {
+                chartfieldRowsToChange.push(billingAccount);
+            }
+        }
+        for (let billingAccount of this._labInfo.pOBillingAccounts) {
+            if (billingAccount._uniqueId === eventOrDataHaver.data._uniqueId) {
+                poRowsToChange.push(billingAccount);
+            }
+        }
+        for (let billingAccount of this._labInfo.creditCardBillingAccounts) {
+            if (billingAccount._uniqueId === eventOrDataHaver.data._uniqueId) {
+                creditCardRowsToChange.push(billingAccount);
+            }
+        }
+
+        for (let newRow of chartfieldRowsToChange) {
+            for (let rowToReplace of this._labInfo.internalBillingAccounts) {
+                if (rowToReplace._uniqueId === newRow._uniqueId) {
+                    rowToReplace = newRow;
+                }
+            }
+        }
+        for (let newRow of poRowsToChange) {
+            for (let rowToReplace of this._labInfo.pOBillingAccounts) {
+                if (rowToReplace._uniqueId === newRow._uniqueId) {
+                    rowToReplace = newRow;
+                }
+            }
+        }
+        for (let newRow of creditCardRowsToChange) {
+            for (let rowToReplace of this._labInfo.creditCardBillingAccounts) {
+                if (rowToReplace._uniqueId === newRow._uniqueId) {
+                    rowToReplace = newRow;
+                }
+            }
+        }
+    }
+
+    testFunction(): void {
+	    console.log('Changed detected');
     }
 }

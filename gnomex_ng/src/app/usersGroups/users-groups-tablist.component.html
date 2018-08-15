@@ -1,7 +1,7 @@
 <div class="full-width full-height background border-padding">
     <div class="full-width full-height foreground">
         <split (dragEnd)="onSplitDragEnd($event)">
-            <split-area size="30">
+            <split-area size="20">
                 <mat-tab-group class="full-height" [selectedIndex]="selectedTab" (selectedTabChange)="onTabChange($event)">
                     <mat-tab *ngIf="rowData.length > 0" #userTab label="Users" class="full-height">
                         <div class="full-height full-width flex-container-col foreground small-font">
@@ -43,7 +43,7 @@
                         </div>
                     </mat-tab>
                     <mat-tab #groupTab label="Groups" class="full-height">
-                        <div class="full-height full-width foreground flex-container-col">
+                        <div class="full-height full-width foreground flex-container-col small-font">
                             <div class="full-width padded">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="searchText" (input)="searchGroups($event)" placeholder="Enter search here...">
@@ -119,7 +119,7 @@
                     </mat-tab>
                 </mat-tab-group>
             </split-area>
-            <split-area size="70">
+            <split-area size="80">
                 <div *ngIf="isUserTab && selectedUser" #userDetail class="full-height full-width flex-container-col background border-padding small-font">
                     <div class="full-width flex-grow">
                         <split direction="vertical">

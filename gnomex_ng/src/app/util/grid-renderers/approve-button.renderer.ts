@@ -88,9 +88,12 @@ export class ApproveButtonRenderer implements ICellRendererAngularComp {
 
 	invokeParentMethod(): void {
 		if (this.onClick && this.params && this.params.context && this.params.context.componentParent) {
-			this.params.context.componentParent[this.onClick](this.params.node.rowIndex);
+            if (this.params.node && this.params.node.formGroup) {
+                this.params.node.formGroup.markAsDirty();
+			}
+
+			this.params.context.componentParent[this.onClick](this.params.node);
 			this.params.value = 'Y';
-			// this.onClick(this.params.node.rowIndex);
 		}
 	}
 }

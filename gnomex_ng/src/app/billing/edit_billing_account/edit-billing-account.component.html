@@ -75,7 +75,7 @@
 							<input
 									matInput
 									placeholder="Account Name"
-									[(ngModel)]="accountName_Chartfield"
+									[(ngModel)]="accountName"
 									[formControl]="accountNameFormControl_Chartfield"
 									[errorStateMatcher]="accountNameStateMatcher_Chartfield"
 									required>
@@ -91,7 +91,7 @@
 							<input
 									matInput
 									placeholder="Short Account Name"
-									[(ngModel)]="shortAccountName_Chartfield"
+									[(ngModel)]="shortAccountName"
 									[formControl]="shortNameFormControl_Chartfield"
 									[errorStateMatcher]="shortNameStateMatcher_Chartfield"
 									required="{{ requireShortAcct }}">
@@ -435,7 +435,7 @@
 					<div class="td">
 						<div class="date-picker-wrapper font-small">
 							<date-picker
-									[(ngModel)]="startDate_chartfield"
+									[(ngModel)]="startDate"
 									[placeholder]="'Choose a date'"
 									[required]="requireStartDate">
 							</date-picker>
@@ -447,7 +447,7 @@
 						</div>
 						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" class="date-picker-wrapper font-small">
 							<date-picker
-									[(ngModel)]="effectiveUntilDate_chartfield"
+									[(ngModel)]="effectiveUntilDate"
 									[placeholder]="'Choose a date'"
 									[required]="requireExpirationDate">
 							</date-picker>
@@ -460,7 +460,7 @@
 					</div>
 					<div class="td">
 						<date-picker
-								[(ngModel)]="effectiveUntilDate_chartfield"
+								[(ngModel)]="effectiveUntilDate"
 								[placeholder]="'Choose a date'"
 								[required]="requireExpirationDate">
 						</date-picker>
@@ -479,7 +479,7 @@
 							<input
 									matInput
 									placeholder="Account Name"
-									[(ngModel)]="accountName_po"
+									[(ngModel)]="accountName"
 									[formControl]="accountNameFormControl_po"
 									[errorStateMatcher]="accountNameStateMatcher_po"
 									required>
@@ -495,7 +495,7 @@
 							<input
 									matInput
 									placeholder="Short Account Name"
-									[(ngModel)]="shortAccountName_po"
+									[(ngModel)]="shortAccountName"
 									[formControl]="shortNameFormControl_po"
 									[errorStateMatcher]="shortNameStateMatcher_po"
 									required="{{ requireShortAcct }}">
@@ -524,7 +524,7 @@
 					<div class="td">
 						<div class="date-picker-wrapper font-small">
 							<date-picker
-									[(ngModel)]="startDate_po"
+									[(ngModel)]="startDate"
 									[placeholder]="'Choose a date'"
 									[required]="requireStartDate">
 							</date-picker>
@@ -536,7 +536,7 @@
 						</div>
 						<div class="date-picker-wrapper font-small">
 							<date-picker
-									[(ngModel)]="expirationDate_po"
+									[(ngModel)]="effectiveUntilDate"
 									[placeholder]="'Choose a date'"
 									[required]="requireExpirationDate">
 							</date-picker>
@@ -556,7 +556,7 @@
 							<input
 									matInput
 									placeholder="Last four digits of Credit Card Number"
-									[(ngModel)]="accountName_creditCard"
+									[(ngModel)]="accountName"
 									[formControl]="accountNameFormControl_creditCard"
 									[errorStateMatcher]="accountNameStateMatcher_creditCard"
 									required>
@@ -585,7 +585,7 @@
 					<div class="td">
 						<div class="date-picker-wrapper font-small">
 							<date-picker
-									[(ngModel)]="startDate_creditcard"
+									[(ngModel)]="startDate"
 									[placeholder]="'Choose a date'"
 									[required]="requireStartDate">
 							</date-picker>
@@ -597,7 +597,7 @@
 						</div>
 						<div class="date-picker-wrapper font-small">
 							<date-picker
-									[(ngModel)]="expirationDate_creditcard"
+									[(ngModel)]="effectiveUntilDate"
 									[placeholder]="'Choose a date'"
 									[required]="requireExpirationDate">
 							</date-picker>
