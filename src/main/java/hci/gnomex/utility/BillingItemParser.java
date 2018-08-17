@@ -31,7 +31,10 @@ public class BillingItemParser extends DetailObject implements Serializable {
         JsonArray saveList = this.obj.getJsonArray("saveList");
         for (int i = 0; i < saveList.size(); i++) {
             JsonObject node = saveList.getJsonObject(i);
-            String idBillingItemString = node.getString("idBillingItem");
+            String idBillingItemString = null;
+            if (node.get("idBillingItem") != null) {
+                idBillingItemString = node.getString("idBillingItem");
+            }
 
             BillingItem billingItem;
             MasterBillingItem masterBillingItem;
@@ -116,8 +119,8 @@ public class BillingItemParser extends DetailObject implements Serializable {
             billingItem.setIdLab(!node.getString("idLab").equals("") ? new Integer(node.getString("idLab")) : null);
             masterBillingItem.setQty(!node.getString("qty").equals("") ? new Integer(node.getString("qty")) : null);
             billingItem.setQty(!node.getString("qty").equals("") ? new Integer(node.getString("qty")) : null);
-            masterBillingItem.setIdCoreFacility(!node.getString("idCoreFacility").equals("") ? new Integer(node.getString("idCoreFacility")) : null);
-            billingItem.setIdCoreFacility(!node.getString("idCoreFacility").equals("") ? new Integer(node.getString("idCoreFacility")) : null);
+            masterBillingItem.setIdCoreFacility(node.get("idCoreFacility") != null && !node.getString("idCoreFacility").equals("") ? new Integer(node.getString("idCoreFacility")) : null);
+            billingItem.setIdCoreFacility(node.get("idCoreFacility") != null && !node.getString("idCoreFacility").equals("") ? new Integer(node.getString("idCoreFacility")) : null);
 
             if (node.get("completeDate") != null && !node.getString("completeDate").equals("")) {
                 billingItem.setCompleteDate(this.parseDate(node.getString("completeDate")));
@@ -171,7 +174,7 @@ public class BillingItemParser extends DetailObject implements Serializable {
             billingItem.setCodeBillingStatus(codeBillingStatus);
 
             // Set the billing status
-            String currentCodeBillingStatus = node.getString("currentCodeBillingStatus");
+            String currentCodeBillingStatus = node.get("currentCodeBillingStatus") != null ? node.getString("currentCodeBillingStatus") : "";
             billingItem.setCurrentCodeBillingStatus(currentCodeBillingStatus);
 
             billingItems.add(billingItem);

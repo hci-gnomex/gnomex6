@@ -9,6 +9,7 @@
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import '~ag-grid/dist/styles/ag-grid.css';
 @import '~ag-grid/dist/styles/theme-fresh.css';
+@import '~ag-grid/dist/styles/ag-theme-balham.css';
 html {
   position: relative;
   height: 100%;

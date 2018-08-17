@@ -31,7 +31,35 @@
                     </div>
                 </mat-tab>
                 <mat-tab label="Prices">
-                    Prices Placeholder
+                    <div>
+                        <button *ngFor="let sheet of this.priceTreeGridData" mat-button class="minimize font-small price-sheet-link" (click)="this.jumpToPriceSheet(sheet.idPriceSheet)">{{sheet.display}}</button>
+                    </div>
+                    <div class="flex-container-row align-center justify-space-between">
+                        <label class="font-small padding-left no-margin" matTooltip="Drag-and-drop price category to reorder or attach to another price sheet" [matTooltipPosition]="'right'"><img class="icon" src="../../assets/information.png">Drag-and-drop hint</label>
+                        <button mat-button matTooltip="Create a new billing item with the selected price for the selected experiment" [matTooltipPosition]="'right'" [disabled]="this.disableAddBillingItemButton" (click)="this.addNewBillingItem()" class="font-small"><img src="../../assets/add.png" class="icon">Create new billing item</button>
+                    </div>
+                    <div class="height-seventy-five">
+                        <ag-grid-angular class="ag-theme-balham full-height full-width font-small"
+                                         (gridReady)="this.onPriceTreeGridReady($event)"
+                                         (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                         (rowClicked)="this.onPriceTreeGridSelection($event)"
+                                         (rowDragEnd)="this.onPriceTreeGridDragEnd($event)"
+                                         [getNodeChildDetails]="this.getPriceNodeChildDetails"
+                                         [enableColResize]="true"
+                                         [rowData]="this.priceTreeGridData">
+                        </ag-grid-angular>
+                    </div>
+                    <div class="flex-container-row">
+                        <mat-checkbox [(ngModel)]="this.showPricesCheckbox" (change)="this.refreshPricingGrid()" class="padding-left font-small">Show prices</mat-checkbox>
+                        <mat-checkbox [(ngModel)]="this.showPriceCriteriaCheckbox" (change)="this.refreshPricingGrid()" class="padding-left font-small">Show price criteria</mat-checkbox>
+                        <mat-checkbox [(ngModel)]="this.showInactivePricesCheckbox" (change)="this.refreshPricingGrid()" class="padding-left font-small">Show inactive prices</mat-checkbox>
+                    </div>
+                    <div class="flex-container-row">
+                        <button mat-button (click)="this.openNewSheetWindow()" class="font-small"><img src="../../assets/pricesheet_add.png" class="icon">New sheet</button>
+                        <button mat-button (click)="this.openNewCategoryWindow()" class="font-small"><img src="../../assets/folder_money_add.png" class="icon">New category</button>
+                        <button mat-button (click)="this.openNewPriceWindow()" class="font-small"><img src="../../assets/money_add.png" class="icon">New price</button>
+                        <button mat-button [disabled]="!this.selectedPriceTreeGridItem" (click)="this.removeFromPriceTree()" class="font-small"><img src="../../assets/delete.png" class="icon">Remove</button>
+                    </div>
                 </mat-tab>
             </mat-tab-group>
         </div>
@@ -54,11 +82,12 @@
                 </div>
             </div>
             <div class="flex-ten">
-                <ag-grid-angular class="ag-fresh full-height full-width"
+                <ag-grid-angular class="ag-theme-balham full-height full-width font-small"
                                  (gridReady)="this.onBillingItemGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  (cellValueChanged)="this.onBillingItemGridChange($event)"
                                  (selectionChanged)="this.onBillingItemGridSelection()"
+                                 (rowClicked)="this.onBillingItemGridRowSelection($event)"
                                  [getNodeChildDetails]="this.getBillingItemNodeChildDetails"
                                  [rowSelection]="'multiple'"
                                  [singleClickEdit]="true"
