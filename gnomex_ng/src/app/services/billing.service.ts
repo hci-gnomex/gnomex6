@@ -117,4 +117,35 @@ export class BillingService {
         return this.httpClient.get("/gnomex/SaveBillingTemplate.gx", {params: params});
     }
 
+    public getPricingList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetPricingList.gx", {params: params});
+    }
+
+    public deletePriceSheet(idPriceSheet: string): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        let params: HttpParams = new HttpParams()
+            .set("idPriceSheet", idPriceSheet);
+        return this.httpClient.post("/gnomex/DeletePriceSheet.gx", null, {params: params});
+    }
+
+    public deletePriceCategory(idPriceCategory: string, idPriceSheet: string): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        let params: HttpParams = new HttpParams()
+            .set("idPriceCategory", idPriceCategory)
+            .set("idPriceSheet", idPriceSheet);
+        return this.httpClient.post("/gnomex/DeletePriceCategory.gx", null, {params: params});
+    }
+
+    public deletePrice(idPrice: string): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        let params: HttpParams = new HttpParams()
+            .set("idPrice", idPrice);
+        return this.httpClient.post("/gnomex/DeletePrice.gx", null, {params: params});
+    }
+
+    public movePriceCategory(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/MovePriceCategory.gx", null, {params: params});
+    }
+
 }
