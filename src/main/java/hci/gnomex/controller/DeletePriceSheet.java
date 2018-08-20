@@ -11,100 +11,80 @@ import hci.gnomex.utility.HibernateSession;
 import java.io.Serializable;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.apache.log4j.Logger;
 
-
-
 public class DeletePriceSheet extends GNomExCommand implements Serializable {
 
+    // the static field for logging in Log4J
+    private static Logger LOG = Logger.getLogger(DeletePriceSheet.class);
 
+    private Integer idPriceSheet = null;
 
-  // the static field for logging in Log4J
-  private static Logger LOG = Logger.getLogger(DeletePriceSheet.class);
+    public void validate() {
+    }
 
+    public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
-  private Integer      idPriceSheet = null;
-
-
-
-
-  public void validate() {
-  }
-
-  public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
-
-   if (request.getParameter("idPriceSheet") != null && !request.getParameter("idPriceSheet").equals("")) {
-     idPriceSheet = new Integer(request.getParameter("idPriceSheet"));
-   } else {
-     this.addInvalidField("idPriceSheet", "idPriceSheet is required.");
-   }
-
-  }
-
-  public Command execute() throws RollBackCommandException {
-    try {
-
-      Session sess = HibernateSession.currentSession(this.getUsername());
-
-      PriceSheet priceSheet = (PriceSheet)sess.load(PriceSheet.class, idPriceSheet);
-
-      if (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_MANAGE_BILLING)) {
-
-        //
-        // Only allow price sheet to be deleted if there are no
-        // price categories attached.
-        //
-        Hibernate.initialize(priceSheet.getPriceCategories());
-        if (priceSheet.getPriceCategories().size() > 0) {
-          this.addInvalidField("Non-empty categories", "Please remove all price categories from price sheet first.");
-        }
-
-        if (this.isValid()) {
-          // First, empty out the request categories
-          priceSheet.setRequestCategories(new TreeSet());
-          sess.flush();
-
-          //
-          // Delete PriceSheet
-          //
-          sess.delete(priceSheet);
-
-          sess.flush();
-
-
-
-          this.xmlResult = "<SUCCESS/>";
-          setResponsePage(this.SUCCESS_JSP);
-
+        if (request.getParameter("idPriceSheet") != null && !request.getParameter("idPriceSheet").equals("")) {
+            idPriceSheet = new Integer(request.getParameter("idPriceSheet"));
         } else {
-          this.setResponsePage(this.ERROR_JSP);
+            this.addInvalidField("idPriceSheet", "idPriceSheet is required.");
         }
-
-
-
-
-      } else {
-        this.addInvalidField("Insufficient permissions", "Insufficient permissions to delete priceSheet sheet.");
-        this.setResponsePage(this.ERROR_JSP);
-      }
-    }catch (Exception e){
-      this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in DeletePriceSheet ", e);
-
-      throw new RollBackCommandException(e.getMessage());
 
     }
 
-    return this;
-  }
+    public Command execute() throws RollBackCommandException {
+        try {
 
+            Session sess = HibernateSession.currentSession(this.getUsername());
 
+            PriceSheet priceSheet = sess.load(PriceSheet.class, idPriceSheet);
 
+            if (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_MANAGE_BILLING)) {
 
+                //
+                // Only allow price sheet to be deleted if there are no
+                // price categories attached.
+                //
+                Hibernate.initialize(priceSheet.getPriceCategories());
+                if (priceSheet.getPriceCategories().size() > 0) {
+                    this.addInvalidField("Non-empty categories", "Please remove all price categories from price sheet first.");
+                }
 
+                if (this.isValid()) {
+                    // First, empty out the request categories
+                    priceSheet.setRequestCategories(new TreeSet());
+                    sess.flush();
+
+                    //
+                    // Delete PriceSheet
+                    //
+                    sess.delete(priceSheet);
+
+                    sess.flush();
+
+                    this.xmlResult = "<SUCCESS/>";
+                    setResponsePage(this.SUCCESS_JSP);
+
+                } else {
+                    this.setResponsePage(this.ERROR_JSP);
+                }
+
+            } else {
+                this.addInvalidField("Insufficient permissions", "Insufficient permissions to delete priceSheet sheet.");
+                this.setResponsePage(this.ERROR_JSP);
+            }
+        } catch (Exception e) {
+            this.errorDetails = Util.GNLOG(LOG, "An exception has occurred in DeletePriceSheet ", e);
+
+            throw new RollBackCommandException(e.getMessage());
+        }
+
+        return this;
+    }
 
 }

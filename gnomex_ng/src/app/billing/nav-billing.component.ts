@@ -8,7 +8,10 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
 import {MatCheckboxChange, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
-import {CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent} from "ag-grid";
+import {
+    CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent, RowClickedEvent, RowDragEvent,
+    RowNode
+} from "ag-grid";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -20,6 +23,7 @@ import {
     BillingTemplate, BillingTemplateWindowComponent,
     BillingTemplateWindowParams
 } from "../util/billing-template-window.component";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     selector: 'nav-billing',
@@ -31,8 +35,14 @@ import {
         .padding {
             padding: 0.5em;
         }
+        .padding-left {
+            padding-left: 1em;
+        }
         .height-eighty {
             height: 80%;
+        }
+        .height-seventy-five {
+            height: 75%;
         }
         .flex-one {
             flex: 1;
@@ -61,6 +71,20 @@ import {
             background: yellow;
             padding: 0.5rem;
             margin-left: 1rem;
+        }
+        .font-small {
+            font-size: 0.7em;
+        }
+        button.price-sheet-link {
+            margin: 0 1em;
+            padding: 0;
+            text-decoration: underline;
+        }
+        .no-margin {
+            margin: 0;
+        }
+        .no-padding {
+            padding: 0;
         }
     `]
 })
@@ -106,7 +130,8 @@ export class NavBillingComponent implements OnInit {
     public billingItemGridApi: GridApi;
 
     public showDirtyNote: boolean = false;
-    public selectedBillingItems: any[] = [];
+    public selectedBillingItems: RowNode[] = [];
+    public selectedBillingRequest: any = null;
     public disableSplitButton: boolean = true;
     public billingItemsToDelete: any[] = [];
 
@@ -117,6 +142,16 @@ export class NavBillingComponent implements OnInit {
     private statuses: any[] = [];
     private statusListShort: any[] = [];
     public changeStatusValue: string = '';
+
+    public priceTreeGridData: any[] = [];
+    public priceTreeGridColDefs: any[];
+    public priceTreeGridApi: GridApi;
+    public getPriceNodeChildDetails;
+    public selectedPriceTreeGridItem: RowNode;
+    public showPricesCheckbox: boolean = true;
+    public showPriceCriteriaCheckbox: boolean = false;
+    public showInactivePricesCheckbox: boolean = false;
+    public disableAddBillingItemButton: boolean = true;
 
     constructor(private billingService: BillingService,
                 private dialogsService: DialogsService,
@@ -133,25 +168,25 @@ export class NavBillingComponent implements OnInit {
         });
 
         this.billingItemGridColumnDefs = [
-            {headerName: "#", field: "requestNumber", tooltipField: "requestNumber", width: 100, cellRenderer: "agGroupCellRenderer"},
-            {headerName: "Icon", width: 100, cellRendererFramework: IconTextRendererComponent},
-            {headerName: "Group", field: "labName", tooltipField: "labName", width: 100},
-            {headerName: "Client", field: "submitter", tooltipField: "submitter", width: 100},
-            {headerName: "Acct", field: "billingAccountName", tooltipField: "billingAccountName", width: 100},
-            {headerName: "Period", editable: true, field: "idBillingPeriod", width: 100, cellRendererFramework: SelectRenderer,
+            {headerName: "#", headerTooltip:"#", field: "requestNumber", tooltipField: "requestNumber", width: 100, cellRenderer: "agGroupCellRenderer"},
+            {headerName: "", width: 40, maxWidth: 40, minWidth: 40, cellRendererFramework: IconTextRendererComponent},
+            {headerName: "Group", headerTooltip:"Group", field: "labName", tooltipField: "labName", width: 100},
+            {headerName: "Client", headerTooltip:"Client", field: "submitter", tooltipField: "submitter", width: 100},
+            {headerName: "Acct", headerTooltip:"Acct", field: "billingAccountName", tooltipField: "billingAccountName", width: 100},
+            {headerName: "Period", headerTooltip:"Period", editable: true, field: "idBillingPeriod", width: 100, cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor, selectOptions: this.billingPeriods, selectOptionsDisplayField: "display",
                 selectOptionsValueField: "idBillingPeriod"},
-            {headerName: "%", field: "percentageDisplay", tooltipField: "percentageDisplay", width: 100},
-            {headerName: "Type", field: "codeBillingChargeKind", tooltipField: "codeBillingChargeKind", width: 100},
-            {headerName: "Price Category", field: "category", tooltipField: "category", width: 100},
-            {headerName: "Description", editable: true, field: "description", tooltipField: "description", width: 100},
-            {headerName: "Complete Date", editable: true, field: "completeDate", width: 100, cellRendererFramework: DateRenderer,
+            {headerName: "%", headerTooltip:"%", field: "percentageDisplay", tooltipField: "percentageDisplay", width: 100},
+            {headerName: "Type", headerTooltip:"Type", field: "codeBillingChargeKind", tooltipField: "codeBillingChargeKind", width: 100},
+            {headerName: "Price Category", headerTooltip:"Price Category", field: "category", tooltipField: "category", width: 100},
+            {headerName: "Description", headerTooltip:"Description", editable: true, field: "description", tooltipField: "description", width: 100},
+            {headerName: "Complete Date", headerTooltip:"Complete Date", editable: true, field: "completeDate", width: 100, cellRendererFramework: DateRenderer,
                 cellEditorFramework: DateEditor, dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY")},
-            {headerName: "Notes", editable: true, field: "notes", tooltipField: "notes", width: 100},
-            {headerName: "Unit price", editable: true, field: "unitPrice", tooltipField: "unitPrice", width: 100},
-            {headerName: "Qty", editable: true, field: "qty", tooltipField: "qty", width: 100},
-            {headerName: "Total price", field: "invoicePrice", tooltipField: "invoicePrice", width: 100},
-            {headerName: "Status", editable: true, field: "codeBillingStatus", width: 100, cellRendererFramework: SelectRenderer,
+            {headerName: "Notes", headerTooltip:"Notes", editable: true, field: "notes", tooltipField: "notes", width: 100},
+            {headerName: "Unit price", headerTooltip:"Unit Price", editable: true, field: "unitPrice", tooltipField: "unitPrice", width: 100},
+            {headerName: "Qty", headerTooltip:"Qty", editable: true, field: "qty", tooltipField: "qty", width: 100},
+            {headerName: "Total price", headerTooltip:"Total price", field: "invoicePrice", tooltipField: "invoicePrice", width: 100},
+            {headerName: "Status", headerTooltip:"Status", editable: true, field: "codeBillingStatus", width: 100, cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor, selectOptions: this.statuses, selectOptionsDisplayField: "display",
                 selectOptionsValueField: "codeBillingStatus"},
         ];
@@ -169,6 +204,40 @@ export class NavBillingComponent implements OnInit {
         };
         this.billingItemGridRowClassRules = {
             "otherBillingItem": "data.other === 'Y'"
+        };
+
+        this.priceTreeGridColDefs = [
+            {headerName: "", field: "display", tooltipField: "display", width: 100, cellRenderer: "agGroupCellRenderer", rowDrag: true},
+            {headerName: "", width: 40, maxWidth: 40, cellRendererFramework: IconTextRendererComponent},
+            {headerName: "Price", headerTooltip: "Price", field: "unitPriceCurrency", tooltipField: "unitPriceCurrency", type: "numericColumn", width: 70, maxWidth: 70},
+            {headerName: "Academic", headerTooltip: "Academic", field: "unitPriceExternalAcademicCurrency", tooltipField: "unitPriceExternalAcademicCurrency", type: "numericColumn", width: 70, maxWidth: 70},
+            {headerName: "Commercial", headerTooltip: "Commercial", field: "unitPriceExternalCommercialCurrency", tooltipField: "unitPriceExternalCommercialCurrency", type: "numericColumn", width: 70, maxWidth: 70},
+        ];
+        this.getPriceNodeChildDetails = function getBillingItemNodeChildDetails(rowItem) {
+            if (rowItem.idPriceSheet) {
+                return {
+                    group: true,
+                    expanded: true,
+                    children: rowItem.PriceCategory,
+                    key: rowItem.display
+                };
+            } else if (rowItem.idPriceCategory && !rowItem.idPrice) {
+                return {
+                    group: true,
+                    expanded: false,
+                    children: rowItem.Price,
+                    key: rowItem.display
+                };
+            } else if (rowItem.idPrice && !rowItem.idPriceCriteria && rowItem.PriceCriteria) {
+                return {
+                    group: true,
+                    expanded: false,
+                    children: rowItem.PriceCriteria,
+                    key: rowItem.display
+                };
+            } else {
+                return null;
+            }
         };
     }
 
@@ -191,14 +260,36 @@ export class NavBillingComponent implements OnInit {
     public onBillingItemGridChange(event: CellValueChangedEvent): void {
         event.data.isDirty = 'Y';
         if (event.data.idBillingItem) {
-            let parent: any = this.findRequestParent(event.data, true);
+            let parent: any = event.node.parent.data;
             parent.isDirty = 'Y';
         }
         this.showDirtyNote = true;
     }
 
     public onBillingItemGridSelection(): void {
-        this.selectedBillingItems = this.billingItemGridApi.getSelectedRows();
+        let selectedRows: RowNode[] = this.billingItemGridApi.getSelectedNodes();
+        if (selectedRows.length === 1 && selectedRows[0].data.requestNumber) {
+            return; // Already handled in row clicked function below
+        }
+        this.selectedBillingItems = selectedRows.filter((item: RowNode) => {
+            return !item.data.requestNumber;
+        });
+        this.selectedBillingRequest = null;
+    }
+
+    public onBillingItemGridRowSelection(event: RowClickedEvent): void {
+        if (event.node.data.requestNumber) {
+            event.node.setSelected(true, true);
+            this.selectedBillingItems = event.node.childrenAfterGroup;
+            this.selectedBillingRequest = event.node.data;
+            this.disableSplitButton = false;
+            if (this.selectedPriceTreeGridItem && this.selectedPriceTreeGridItem.data.idPrice && !this.selectedPriceTreeGridItem.data.idPriceCriteria) {
+                this.disableAddBillingItemButton = false;
+            }
+        } else {
+            this.disableSplitButton = true;
+            this.disableAddBillingItemButton = true;
+        }
     }
 
     public onFilterChange(event: BillingFilterEvent): void {
@@ -265,14 +356,19 @@ export class NavBillingComponent implements OnInit {
                 this.invoiceMap[invoice.idInvoice] = invoice;
             }
         });
+
+        // Price tree grid
+        this.refreshPricingGrid();
     }
 
     public refreshBillingItemList(event: BillingFilterEvent, reselectIfPossible?: boolean): void {
         this.showDirtyNote = false;
         this.selectedBillingItems = [];
+        this.selectedBillingRequest = null;
         this.billingItemsToDelete = [];
 
         this.disableSplitButton = true;
+        this.disableAddBillingItemButton = true;
 
         this.billingItemGridLabel = '';
         this.billingItemList = [];
@@ -329,8 +425,10 @@ export class NavBillingComponent implements OnInit {
         this.billingItemGridLabel = '';
         this.billingItemGridData = [];
         this.selectedBillingItems = [];
+        this.selectedBillingRequest = null;
 
         this.disableSplitButton = true;
+        this.disableAddBillingItemButton = true;
 
         this.billingItemsTreeSelectedNode = null;
         this.billingItemsTreeNodes = [];
@@ -455,6 +553,7 @@ export class NavBillingComponent implements OnInit {
         }
 
         this.disableSplitButton = true;
+        this.disableAddBillingItemButton = true;
 
         let billingItems: any[] = [];
         let requestNumbers: Set<string> = new Set<string>();
@@ -478,7 +577,6 @@ export class NavBillingComponent implements OnInit {
             }
         } else if (node.data.name === 'Request') {
             this.addRequestBillingItems(node.data.requestNumber, billingItems);
-            this.disableSplitButton = false;
         }
 
         let totalPrice: number = 0;
@@ -503,6 +601,7 @@ export class NavBillingComponent implements OnInit {
         }
 
         this.selectedBillingItems = [];
+        this.selectedBillingRequest = null;
         this.billingItemGridData = billingItems;
     }
 
@@ -602,38 +701,18 @@ export class NavBillingComponent implements OnInit {
     public removeBillingItems(): void {
         if (this.selectedBillingItems.length > 0) {
             for (let item of this.selectedBillingItems) {
-                if (item.idBillingItem) {
-                    item.remove = 'Y';
-                    this.billingItemsToDelete.push(item);
-                    let r: any = this.findRequestParent(item, true);
+                if (item.data.idBillingItem) {
+                    item.data.remove = 'Y';
+                    this.billingItemsToDelete.push(item.data);
+                    let r: any = item.parent.data;
                     let billingItems: any[] = r.BillingItem;
-                    billingItems.splice(billingItems.indexOf(item), 1);
+                    billingItems.splice(billingItems.indexOf(item.data), 1);
                     r.isDirty = 'Y';
                 }
             }
             this.showDirtyNote = true;
             this.selectTreeNode(this.billingItemsTreeSelectedNode);
         }
-    }
-
-    private findRequestParent(billingItem: any, restrictToCurrentData: boolean = false): any {
-        let requests: any[] = restrictToCurrentData ? this.billingItemGridData : this.billingItemList;
-        let key: string;
-        if (billingItem.idRequest) {
-            key = "idRequest";
-        } else if (billingItem.idProductOrder) {
-            key = "idProductOrder";
-        } else if (billingItem.idDiskUsageMonth) {
-            key = "idDiskUsageMonth";
-        }
-        if (key) {
-            for (let r of requests) {
-                if (r[key] === billingItem[key] && r.idBillingAccount === billingItem.idBillingAccount) {
-                    return r;
-                }
-            }
-        }
-        return null;
     }
 
     public validateAndSave(): void {
@@ -732,10 +811,10 @@ export class NavBillingComponent implements OnInit {
     private updateBillingItemsWithNewValue(field: string, newValue: string): void {
         if (this.selectedBillingItems.length > 0) {
             for (let item of this.selectedBillingItems) {
-                if (item.idBillingItem) {
-                    item[field] = newValue;
-                    item.isDirty = 'Y';
-                    let parent: any = this.findRequestParent(item, true);
+                if (item.data.idBillingItem) {
+                    item.data[field] = newValue;
+                    item.data.isDirty = 'Y';
+                    let parent: any = item.parent.data;
                     parent.isDirty = 'Y';
                 }
             }
@@ -786,11 +865,11 @@ export class NavBillingComponent implements OnInit {
     }
 
     public openSplitWindow(): void {
-        if (this.billingItemGridData.length > 0) {
+        if (this.selectedBillingRequest) {
             let id: string = "";
             let className: string = "";
 
-            let request: any = this.billingItemGridData[0];
+            let request: any = this.selectedBillingRequest;
 
             if (request.status === "NEW") {
                 this.dialogsService.confirm("Please save the billing items before reassigning / splitting", null);
@@ -845,6 +924,247 @@ export class NavBillingComponent implements OnInit {
                     this.dialogsService.confirm("There was an error retrieving the billing template", null);
                 }
             });
+        }
+    }
+
+    private refreshPricingGrid(): void {
+        this.priceTreeGridData = [];
+        this.selectedPriceTreeGridItem = null;
+
+        let params: HttpParams = new HttpParams()
+            .set("showPrices", this.showPricesCheckbox ? "Y" : "N")
+            .set("showPriceCriteria", this.showPriceCriteriaCheckbox ? "Y" : "N")
+            .set("showInactive", this.showInactivePricesCheckbox ? "Y" : "N")
+            .set("idCoreFacility", this.lastFilterEvent && this.lastFilterEvent.idCoreFacility ? this.lastFilterEvent.idCoreFacility : "");
+
+        this.billingService.getPricingList(params).subscribe((result: any) => {
+            if (result) {
+                if (result.result && result.result !== "SUCCESS") {
+                    let message: string = "";
+                    if (result.message) {
+                        message = ": " + result.message;
+                    }
+                    this.dialogsService.confirm("An error occurred while retrieving the price list" + message, null);
+                    return;
+                } else {
+                    let priceSheets: any[] = Array.isArray(result) ? result : [result.PriceSheet];
+                    for (let sheet of priceSheets) {
+                        sheet.icon = "assets/pricesheet.png";
+                        if (sheet.PriceCategory) {
+                            sheet.PriceCategory = Array.isArray(sheet.PriceCategory) ? sheet.PriceCategory : [sheet.PriceCategory];
+                        } else {
+                            sheet.PriceCategory = [];
+                        }
+
+                        for (let cat of sheet.PriceCategory) {
+                            cat.icon = "assets/folder_money.png";
+                            if (cat.Price) {
+                                cat.Price = Array.isArray(cat.Price) ? cat.Price : [cat.Price];
+                            } else {
+                                cat.Price = [];
+                            }
+
+                            for (let p of cat.Price) {
+                                p.icon = p.isActive === 'Y' ? "assets/money.png" : "assets/money_disable.png";
+                                if (this.showPriceCriteriaCheckbox) {
+                                    if (p.PriceCriteria) {
+                                        p.PriceCriteria = Array.isArray(p.PriceCriteria) ? p.PriceCriteria : [p.PriceCriteria];
+                                    } else {
+                                        p.PriceCriteria = [];
+                                    }
+
+                                    for (let criteria of p.PriceCriteria) {
+                                        criteria.icon = "assets/attach.png";
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    this.priceTreeGridData = priceSheets;
+                }
+            }
+        });
+    }
+
+    public onPriceTreeGridReady(event: GridReadyEvent): void {
+        event.api.setColumnDefs(this.priceTreeGridColDefs);
+        event.api.sizeColumnsToFit();
+        this.priceTreeGridApi = event.api;
+    }
+
+    public onPriceTreeGridSelection(event: RowClickedEvent): void {
+        // TODO on double click open window
+        event.node.setSelected(true, true);
+        if (!event.data.idPriceCriteria) {
+            this.selectedPriceTreeGridItem = event.node;
+        } else {
+            this.selectedPriceTreeGridItem = null;
+        }
+
+        if (event.data.idPrice && !event.data.idPriceCriteria && this.selectedBillingRequest) {
+            this.disableAddBillingItemButton = false;
+        } else {
+            this.disableAddBillingItemButton = true;
+        }
+    }
+
+    public onPriceTreeGridDragEnd(event: RowDragEvent): void {
+        let dragItemNode: RowNode = event.node;
+        if (dragItemNode.data.idPriceCategory && !dragItemNode.data.idPrice) {
+            let dropItemNode: RowNode = event.overNode;
+            let dropPriceCategory: any = null;
+            let dropPriceSheet: any = null;
+            let dropPosition: string = "after";
+
+            if (!dropItemNode) {
+                return;
+            }
+
+            if (dropItemNode.data.idPriceSheet) {
+                dropPriceSheet = dropItemNode.data;
+                if ((dropPriceSheet.PriceCategory as any[]).length > 0) {
+                    dropPriceCategory = (dropPriceSheet.PriceCategory as any[])[0];
+                    dropPosition = "before";
+                }
+            } else if (dropItemNode.data.idPriceCategory && !dropItemNode.data.idPrice) {
+                dropPriceSheet = dropItemNode.parent.data;
+                dropPriceCategory = dropItemNode.data;
+            } else if (dropItemNode.data.idPrice && !dropItemNode.data.idPriceCriteria) {
+                dropPriceSheet = dropItemNode.parent.parent.data;
+                dropPriceCategory = dropItemNode.parent.data;
+            } else {
+                return;
+            }
+
+            if (dropPriceCategory && dropPriceCategory.idPriceCategory === dragItemNode.data.idPriceCategory) {
+                return;
+            }
+
+            let params: HttpParams = new HttpParams()
+                .set("idPriceCategorySource", dragItemNode.data.idPriceCategory)
+                .set("idPriceSheetTarget", dropPriceSheet.idPriceSheet)
+                .set("idPriceCategoryPosition", dropPriceCategory ? dropPriceCategory.idPriceCategory : "")
+                .set("dropPosition", dropPosition);
+            this.billingService.movePriceCategory(params).subscribe((result: any) => {
+                if (result) {
+                    if (result.result && result.result === "SUCCESS") {
+                        this.refreshPricingGrid();
+                        if (result.message) {
+                            this.dialogsService.confirm(result.message, null);
+                        }
+                    } else {
+                        let message: string = "";
+                        if (result.message) {
+                            message = ": " + result.message;
+                        }
+                        this.dialogsService.confirm("An error occurred while moving price category" + message, null);
+                    }
+                }
+            });
+        } else {
+            this.dialogsService.confirm("Drag-and-drop only allowed for price categories", null);
+        }
+    }
+
+    public openNewSheetWindow(): void {
+        // TODO
+    }
+
+    public openNewCategoryWindow(): void {
+        // TODO
+    }
+
+    public openNewPriceWindow(): void {
+        // TODO
+    }
+
+    public removeFromPriceTree(): void {
+        if (this.selectedPriceTreeGridItem) {
+            let warningMessage: string;
+            if (this.selectedPriceTreeGridItem.data.idPriceCategory && !this.selectedPriceTreeGridItem.data.idPrice) {
+                warningMessage = "Are you sure you want to remove (unlink) category '" + this.selectedPriceTreeGridItem.data.display + "' from the price sheet?";
+            } else {
+                warningMessage = "Are you sure you want to remove '" + this.selectedPriceTreeGridItem.data.display + "'?";
+            }
+            this.dialogsService.confirm(warningMessage, " ").subscribe((result: boolean) => {
+                if (result) {
+                    let controllerCall: Observable<any>;
+                    if (this.selectedPriceTreeGridItem.data.idPriceSheet) {
+                        controllerCall = this.billingService.deletePriceSheet(this.selectedPriceTreeGridItem.data.idPriceSheet);
+                    } else if (this.selectedPriceTreeGridItem.data.idPriceCategory && !this.selectedPriceTreeGridItem.data.idPrice && this.selectedPriceTreeGridItem.parent && this.selectedPriceTreeGridItem.parent.data.idPriceSheet) {
+                        controllerCall = this.billingService.deletePriceCategory(this.selectedPriceTreeGridItem.data.idPriceCategory, this.selectedPriceTreeGridItem.parent.data.idPriceSheet);
+                    } else if (this.selectedPriceTreeGridItem.data.idPrice && !this.selectedPriceTreeGridItem.data.idPriceCriteria) {
+                        controllerCall = this.billingService.deletePrice(this.selectedPriceTreeGridItem.data.idPrice);
+                    }
+
+                    if (controllerCall) {
+                        controllerCall.subscribe((result: any) => {
+                            if (result && result.result && result.result === "SUCCESS") {
+                                this.refreshPricingGrid();
+                            } else {
+                                let message: string = "";
+                                if (result && result.message) {
+                                    message = ": " + result.message;
+                                }
+                                this.dialogsService.confirm("An error occurred while removing" + message, null);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    public jumpToPriceSheet(idPriceSheet: string): void {
+        this.priceTreeGridApi.forEachNode((node: RowNode) => {
+            if (node.data.idPriceSheet && node.data.idPriceSheet === idPriceSheet) {
+                node.setSelected(true, true);
+                this.priceTreeGridApi.ensureIndexVisible(node.rowIndex, 'top');
+                this.selectedPriceTreeGridItem = node;
+            }
+        });
+    }
+
+    public addNewBillingItem(): void {
+        if (this.selectedPriceTreeGridItem && this.selectedPriceTreeGridItem.data.idPrice && !this.selectedPriceTreeGridItem.data.idPriceCriteria && this.selectedBillingRequest) {
+            if (this.selectedBillingRequest.codeRequestCategory === "PRODUCTORDER") {
+                return;
+            }
+
+            let price: string = this.selectedPriceTreeGridItem.data.unitPrice;
+            if (this.selectedBillingRequest.isExternalPricing === 'Y') {
+                price = this.selectedPriceTreeGridItem.data.unitPriceExternalAcademic;
+            }
+            if (this.selectedBillingRequest.isExternalPricingCommercial === 'Y') {
+                price = this.selectedPriceTreeGridItem.data.unitPriceExternalCommercial;
+            }
+            let newBillingItem: any = {
+                codeBillingChargeKind: this.selectedPriceTreeGridItem.data.codeBillingChargeKind,
+                category: this.selectedPriceTreeGridItem.data.category,
+                description: this.selectedPriceTreeGridItem.data.name,
+                unitPrice: price,
+                codeBillingStatus: 'PENDING',
+                idBillingPeriod: this.lastFilterEvent.idBillingPeriod ? this.lastFilterEvent.idBillingPeriod : '',
+                idPriceCategory: this.selectedPriceTreeGridItem.parent.data.idPriceCategory,
+                idPrice: this.selectedPriceTreeGridItem.data.idPrice,
+                idRequest: this.selectedBillingRequest.idRequest,
+                idBillingAccount: this.selectedBillingRequest.idBillingAccount,
+                idLab: this.selectedBillingRequest.idLab,
+                percentagePrice: '1',
+                percentageDisplay: '100.0%',
+                splitType: '%',
+                notes: '',
+                qty: '',
+                idCoreFacility: this.selectedBillingRequest.idCoreFacility,
+                isDirty: 'Y',
+                icon: "assets/money.png"
+            };
+            this.selectedBillingRequest.isDirty = 'Y';
+            (this.selectedBillingRequest.BillingItem as any[]).push(newBillingItem);
+
+            this.showDirtyNote = true;
+            this.selectTreeNode(this.billingItemsTreeSelectedNode);
         }
     }
 
