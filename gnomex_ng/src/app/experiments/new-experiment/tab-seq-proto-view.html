@@ -1,8 +1,8 @@
-<form [formGroup]="form" class="flexbox-column">
+<form [formGroup]="form" class="flex-container-col full-height full-width">
     <div>
-        <div class="flex-column-container">
+        <div class="flex-container-col">
             <ng-container>
-                <div class="flex-row-container">
+                <div class="flex-container-row">
                     <div style="margin-right: 10em">
                         Select a Sequencing Protocol
                     </div>
@@ -13,8 +13,11 @@
                             <mat-radio-group placeholder="Select a Sequencing Protocol" class="cat-type-radio-group" (change)="onProtoChange($event)" formControlName="selectedProto">
                                 <div *ngFor="let proto of filteredNumberSequencingCyclesAllowedList">
                                     <mat-radio-button [value]="proto">
-                                        <span class="inline-span">
+                                        <span class="inline-block">
                                             {{proto.display}}
+                                        </span>
+                                        <span style="margin-left: 20em">
+                                            {{proto.price}}
                                         </span>
                                     </mat-radio-button>
                                 </div>

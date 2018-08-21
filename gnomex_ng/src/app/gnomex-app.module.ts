@@ -15,7 +15,7 @@ import {ExperimentsModule} from "./experiments/experiments.module";
 import {ConfigurationModule} from "./configuration/configuration.module";
 import {NewBillingAccountModule} from "./billing/new_billing_account/new-billing-account.module";
 import {ProgressService} from "./home/progress.service";
-import {RouterModule} from "@angular/router";
+import {RouteReuseStrategy, RouterModule} from "@angular/router";
 import {TestPageModule} from "./testing/test-page.module";
 import {FormsModule} from "@angular/forms";
 import {
@@ -48,6 +48,7 @@ import {WorkflowModule} from "./workflow/workflow.module";
 import {AboutModule} from "./about/about.module";
 import {ProductsModule} from "./products/products.module";
 import {BillingModule} from "./billing/billing.module";
+import {CustomRouteReuseStrategy} from "./custom-route-reuse-strategy";
 
 
 
@@ -103,6 +104,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: AUTHENTICATION_ROUTE, useValue: "/authenticate"},
         {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
         {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 240},
+        {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
         {provide: Window, useValue: window},
         UserService,
         AuthenticationService,

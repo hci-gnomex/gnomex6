@@ -99,6 +99,9 @@ export class ConstantsService {
             "assets/DNA_test_tube.png" ,"assets/data-accept.png" ,"assets/nano.png" ,"assets/flask.png"];
 
 
+    public readonly ICON_INFORMATION:string= "assets/information.png";
+    public readonly ICON_UPLOAD:string= "assets/upload.png";
+
 
 
     public getTreeIcon(item:any,name:string) {

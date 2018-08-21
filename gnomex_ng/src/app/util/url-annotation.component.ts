@@ -94,17 +94,14 @@ export class UrlAnnotationComponent implements OnInit, OnDestroy, ControlValueAc
            // this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
 
            this.annot = obj;
-           let pev =  obj.PropertyEntryValue;
+           let pev = obj.PropertyEntryValue;
            this.urlAnnotations = Array.isArray(pev) ? <IPropertyEntryValue[]>pev : <IPropertyEntryValue[]>[pev];
            // writing PropertyEntryValue Array to Annot again because if only one item return it will be just an object
            // then I add that to an array thus breaking the connection between annot and its property 'PropertyEntryValue'
            this.annot.PropertyEntryValue = this.urlAnnotations;
 
-           for(let annot of this.urlAnnotations){
+           for (let annot of this.urlAnnotations) {
                annot.edit = false;
-           }
-           if(this.urlAnnotations.length > 0){
-               this.urlAnnotations.splice(-1,1); // striping last row since it's the add link
            }
        }else{
            this.urlAnnotations =[];

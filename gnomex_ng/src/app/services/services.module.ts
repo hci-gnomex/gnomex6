@@ -45,6 +45,7 @@ import {ProductsService} from "./products.service";
 import {NewExperimentService} from "./new-experiment.service";
 import {ProtocolService} from "./protocol.service";
 import {BrowseOrderValidateService} from "./browse-order-validate.service";
+import {SamplesService} from "./samples.service";
 import {ExperimentPlatformService} from "./experiment-platform.service";
 
 
@@ -103,6 +104,7 @@ import {ExperimentPlatformService} from "./experiment-platform.service";
         NewExperimentService,
         ProtocolService,
         BrowseOrderValidateService,
+        SamplesService,
         ExperimentPlatformService
     ]})
 export class ServicesModule {

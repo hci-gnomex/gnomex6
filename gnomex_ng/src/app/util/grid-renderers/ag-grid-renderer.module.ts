@@ -18,6 +18,8 @@ import { TextAlignRightMiddleRenderer } from "./text-align-right-middle.renderer
 import { TextSelectXorMultiselectRenderer } from "./text-select-xor-multiselect.renderer";
 import { TwoButtonRenderer } from "./two-button.renderer";
 import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
+import {MultiSelectRenderer} from "./multi-select.renderer";
+import {UrlAnnotRenderer} from "./url-annot-renderer";
 
 @NgModule({
     imports: [
@@ -41,7 +43,9 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 		TextAlignRightMiddleRenderer,
         TextSelectXorMultiselectRenderer,
 		TwoButtonRenderer,
-		UploadViewRemoveRenderer
+		UploadViewRemoveRenderer,
+		MultiSelectRenderer,
+		UrlAnnotRenderer
     ],
     exports: [
 		ApproveButtonRenderer,
@@ -58,7 +62,9 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 		TextAlignRightMiddleRenderer,
         TextSelectXorMultiselectRenderer,
         TwoButtonRenderer,
-		UploadViewRemoveRenderer
+		UploadViewRemoveRenderer,
+        MultiSelectRenderer,
+        UrlAnnotRenderer
     ]
 })
 export class AgGridRendererModule { }

@@ -6,6 +6,15 @@ import {Observable} from "rxjs/Observable";
 import 'rxjs/add/operator/map';
 import {CookieUtilService} from "./cookie-util.service";
 
+export enum annotType
+{
+    CHECK = "CHECK",
+    URL = "URL",
+    OPTION = "OPTION",
+    MOPTION = "MOPTION",
+    TEXT = "TEXT"
+}
+
 @Injectable()
 export class PropertyService {
 

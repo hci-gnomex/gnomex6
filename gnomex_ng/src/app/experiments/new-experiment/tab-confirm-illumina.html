@@ -1,0 +1,18 @@
+<form [formGroup]="form" class="flex-container-col">
+    <textarea class="confirm-instructions" rows="7" cols="50">
+1.  Please confirm the information below. Click the
+     Back button or a tab to modify the request.
+2.  Agree to estimated charges by clicking the
+     "I authorize" checkbox.
+3.  Approve the work request by clicking the
+     Submit button.
+    </textarea>
+    <mat-label style="font-weight: bold">Experiment Details</mat-label>
+    <mat-label>{{submitterName}}</mat-label>
+    <mat-label>{{labName}}</mat-label>
+    <mat-label>{{billingAccountName}}({{billingAccountNumber}})</mat-label>
+    <mat-label>{{newExperimentService.requestCategory.requestCategoryName}}</mat-label>
+    <mat-label>{{newExperimentService.applicationName}}</mat-label>
+    <mat-label>{{protoName}}</mat-label>
+    <mat-label *ngIf="clientDidPrepare">Library Prepared By Client</mat-label>
+</form>

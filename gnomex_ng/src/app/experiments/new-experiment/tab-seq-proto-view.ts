@@ -4,19 +4,12 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {BillingService} from "../../services/billing.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: "tabSeqProtoView",
     templateUrl: "./tab-seq-proto-view.html",
     styles: [`
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-        }
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
         .radio-group-container {
             display: inline-flex;
             flex-direction: row;
@@ -27,11 +20,7 @@ import {BillingService} from "../../services/billing.service";
         .type-radio-button {
             margin: 0 0.5%;
         }
-        .app-price-radio-group {
-            display: inline-flex;
-            flex-direction: column;
-        }
-        .inline-span {
+        .inline-block {
             width: 20em;
             display: inline-block;
         }
@@ -44,6 +33,7 @@ export class TabSeqProtoView implements OnInit {
     private filteredNumberSequencingCyclesAllowedList: any[] = [];
     private form: FormGroup;
     private runTypeLabel: string;
+    private priceMap: Map<string, string> = new Map<string, string>();
 
     constructor(private dictionaryService: DictionaryService,
                 private newExperimentService: NewExperimentService,
@@ -57,14 +47,31 @@ export class TabSeqProtoView implements OnInit {
         this.form = this.fb.group({
             selectedProto: ['', Validators.required],
         });
+        this.newExperimentService.hiSeqPricesChanged.subscribe((value) => {
+            if (value ) {
+                if (this.newExperimentService.hiSeqPricesChanged.value === true) {
+                    this.newExperimentService.hiSeqPricesChanged.next(false);
+                }
 
-        this.filteredNumberSequencingCyclesAllowedList = this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed')
-            .sort(this.newExperimentService.sortNumberSequencingCyclesAllowed);
-        this.filteredNumberSequencingCyclesAllowedList = this.newExperimentService.filterNumberSequencingCyclesAllowed(this.filteredNumberSequencingCyclesAllowedList, this.requestCategory);
-        this.runTypeLabel = this.gnomexService.getRequestCategoryProperty(this.requestCategory.idCoreFacility, this.requestCategory.codeRequestCategory, this.gnomexService.PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD);
+                this.filteredNumberSequencingCyclesAllowedList = this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed')
+                    .sort(this.newExperimentService.sortNumberSequencingCyclesAllowed);
+                this.filteredNumberSequencingCyclesAllowedList = this.newExperimentService.filterNumberSequencingCyclesAllowed(this.filteredNumberSequencingCyclesAllowedList, this.requestCategory);
+                this.runTypeLabel = this.gnomexService.getRequestCategoryProperty(this.requestCategory.idCoreFacility, this.requestCategory.codeRequestCategory, this.gnomexService.PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD);
+                for (let proto of this.filteredNumberSequencingCyclesAllowedList) {
+                    let price = this.newExperimentService.priceMap.get(proto.idNumberSequencingCyclesAllowed);
+                    proto.price = price;
+                }
+            }
+        });
     }
 
     onProtoChange(event) {
+        this.newExperimentService.selectedProto = this.form.get("selectedProto").value;
 
     }
+
+    onAppPriceChanged(event) {
+
+    }
+
 }

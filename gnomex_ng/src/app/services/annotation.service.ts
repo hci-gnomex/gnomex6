@@ -30,18 +30,22 @@ export class AnnotationService {
         }
 
         let filterByOrganism: boolean = false;
-        if (property.organisms.length > 0) {
+        if (property.organisms && property.organisms.length > 0) {
             filterByOrganism = true;
         }
 
         let filterByPlatformApplication: boolean = false;
         if (reqCategory != null) {
             if (!Array.isArray(property.platformApplications)) {
-                property.platformApplications = [property.platformApplications.PropertyPlatformApplication];
+                if (property.platformApplications) {
+                    property.platformApplications.PropertyPlatformApplication = [property.platformApplications.PropertyPlatformApplication];
+                } else {
+                    console.log("no propery.platformApplication");
+                }
             }
 
             if (( property.forRequest != null && property.forRequest == 'Y' ) ||
-                property.platformApplications.PropertyPlatformApplication.length > 0 ||
+                (property.platformApplications && property.platformApplications.PropertyPlatformApplication && property.platformApplications.PropertyPlatformApplication.length > 0) ||
                 reqCategory.type == 'ISCAN' || reqCategory.type == 'CAPSEQ' || reqCategory.type == 'FRAGANAL') {
                 filterByPlatformApplication = true;
             }
@@ -53,7 +57,7 @@ export class AnnotationService {
         } else {
             if (idOrganism != null) {
                 if (!Array.isArray(property.organisms)) {
-                    property.organisms = [property.organisms.Organism];
+                    property.organisms.Organisms = [property.organisms.Organism];
                 }
                 for (let org of property.organisms) {
                     if (idOrganism == org.idOrganism) {
@@ -70,6 +74,9 @@ export class AnnotationService {
             } else {
                 keep = false;
                 if (reqCategory != null) {
+                    if (!Array.isArray(property.platformApplications)) {
+                        property.platformApplications = property.platformApplications.PropertyPlatformApplication;
+                    }
                     for (let pa of property.platformApplications) {
                         if (reqCategory.codeRequestCategory === pa.codeRequestCategory) {
                             if(pa.codeApplication === "" || codeApplication === pa.codeApplication) {
@@ -90,5 +97,45 @@ export class AnnotationService {
 
         return keep;
     }
+
+    /*
+ * Sort annotations by sort order then name
+ */
+    public static sortProperties(obj1, obj2): number {
+        if (obj1 === null && obj2 === null) {
+            return 0;
+        } else if (obj1 === null) {
+            return 1;
+        } else if (obj2 === null) {
+            return -1;
+        } else {
+            let so1: Number = (obj1.sortOrder === '' || obj1.sortOrder === null) ? Number(999999) : new Number(obj1.sortOrder);
+            let so2: Number = (obj2.sortOrder === '' || obj2.sortOrder === null) ? Number(999999) : new Number(obj2.sortOrder);
+            let sc1: string = obj1.name;
+            let sc2: string = obj2.name;
+
+            if (so1 < so2) {
+                return -1;
+            } else if (so1 > so2) {
+                return 1;
+            } else {
+                if (sc1 === 'Other') {
+                    return 1;
+                } else if (sc2 === 'Other') {
+                    return  -1;
+                } else {
+                    if (sc1.toLowerCase() < sc2.toLowerCase()) {
+                        return -1;
+                    } else if (sc1.toLowerCase() > sc2.toLowerCase()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+
+        }
+    }
+
 
 }
