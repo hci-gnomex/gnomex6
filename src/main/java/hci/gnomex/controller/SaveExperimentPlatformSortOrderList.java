@@ -11,6 +11,10 @@ import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -26,22 +30,22 @@ public class SaveExperimentPlatformSortOrderList extends GNomExCommand implement
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger(SaveExperimentPlatformSortOrderList.class);
 
-  private Document categoriesDoc;
+  private JsonArray categoriesList;
   
   public void validate() {
-    for(Iterator i = this.categoriesDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-      Element node = (Element)i.next();
-      if (node.getAttributeValue("codeRequestCategory") == null || node.getAttributeValue("codeRequestCategory").toString().length() == 0) {
-        this.addInvalidField("codeRequestCategory", "each entry in requestCategoriesXMLString must have codeRequestCategory");
+    for(int i= 0; i < categoriesList.size(); i++) {
+      JsonObject node = categoriesList.getJsonObject(i);
+      if (node.get("codeRequestCategory") == null || node.getString("codeRequestCategory").toString().length() == 0) {
+        this.addInvalidField("codeRequestCategory", "each entry in requestCategoriesJSONString must have codeRequestCategory");
         break;
       }
-      String codeRequestCategory = node.getAttributeValue("codeRequestCategory");
-      if (node.getAttributeValue("sortOrder") == null || node.getAttributeValue("sortOrder").toString().length() == 0) {
-        this.addInvalidField("sortOrder", "entry in requestCategoriesXMLString for " + codeRequestCategory + " does not have sortOrder");
+      String codeRequestCategory = node.getString("codeRequestCategory");
+      if (node.get("sortOrder") == null || node.getString("sortOrder").toString().length() == 0) {
+        this.addInvalidField("sortOrder", "entry in requestCategoriesJSONString for " + codeRequestCategory + " does not have sortOrder");
         break;
       }
       try {
-        Integer sortOrder = Integer.parseInt(node.getAttributeValue("sortOrder"));
+        Integer sortOrder = Integer.parseInt(node.getString("sortOrder"));
       } catch(NumberFormatException ex) {
         this.addInvalidField("sortOrder", "Sort order for " + codeRequestCategory + " is not numberic.");
       }
@@ -50,18 +54,20 @@ public class SaveExperimentPlatformSortOrderList extends GNomExCommand implement
   
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
-    if (request.getParameter("requestCategoriesXMLString") != null && !request.getParameter("requestCategoriesXMLString").equals("")) {
-      String requestCategoriesXMLString = request.getParameter("requestCategoriesXMLString");
-      StringReader reader = new StringReader(requestCategoriesXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        categoriesDoc = sax.build(reader);     
-      } catch (JDOMException je ) {
-        this.addInvalidField( "requestCategoriesXMLString", "Invalid requestCategoriesXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestCategoriesXMLString", je);
+    if (request.getParameter("requestCategoriesJSONString") != null && !request.getParameter("requestCategoriesJSONString").equals("")) {
+      String requestCategoriesJSONString = request.getParameter("requestCategoriesJSONString");
+      if(Util.isParameterNonEmpty(requestCategoriesJSONString)){
+        try(JsonReader jsonReader = Json.createReader(new StringReader(requestCategoriesJSONString))) {
+          categoriesList = jsonReader.readArray();
+        } catch (Exception e ) {
+          this.addInvalidField( "requestCategoriesJSONString", "Invalid requestCategoriesJSONString");
+          this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestCategoriesJSONString", e);
+        }
+
       }
+
     } else {
-      this.addInvalidField("requestCategoriesXMLString", "requestCategoriesXMLString is required");
+      this.addInvalidField("requestCategoriesJSONString", "requestCategoriesJSONString is required");
     }
 
     validate();
@@ -79,10 +85,10 @@ public class SaveExperimentPlatformSortOrderList extends GNomExCommand implement
       Session sess = HibernateSession.currentSession(this.getUsername());
 
       Boolean modified = false;
-      for(Iterator i = this.categoriesDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-        Element node = (Element)i.next();
-        RequestCategory cat = (RequestCategory)sess.load(RequestCategory.class, node.getAttributeValue("codeRequestCategory"));
-        Integer sortOrder = Integer.parseInt(node.getAttributeValue("sortOrder"));
+      for(int i = 0; i < categoriesList.size(); i++) {
+        JsonObject node = categoriesList.getJsonObject(i);
+        RequestCategory cat = sess.load(RequestCategory.class, node.getString("codeRequestCategory"));
+        Integer sortOrder = Integer.parseInt(node.getString("sortOrder"));
         if (!sortOrder.equals(cat.getSortOrder())) {
           modified = true;
           cat.setSortOrder(sortOrder);
@@ -94,7 +100,7 @@ public class SaveExperimentPlatformSortOrderList extends GNomExCommand implement
         sess.flush();
       }
 
-      this.xmlResult = "<SUCCESS />";
+      this.xmlResult = "<SUCCESS/>";
 
     }catch (Exception e){
       this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in SaveExperimentPlatformSortOrderList ", e);

@@ -8,7 +8,6 @@
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
-
             </div>
             <mat-form-field *ngSwitchCase="'TEXT'" class="annot-control" >
                 <input matInput placeholder="{{annot.name}}" [formControl]="this.form.controls[annot.name]">

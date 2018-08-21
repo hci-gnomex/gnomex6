@@ -10,7 +10,7 @@ import {DialogsService} from "../popup/dialogs.service";
                 <div class="tr">
                     <div class="td vertical-center button-container">
                         <input type="file" class="hidden" (change)="selectFile($event)" #fileInput>
-                        <button class="link-button" (click)="onClickUpload()">
+                        <button *ngIf="!disableEdit" class="link-button" (click)="onClickUpload()">
                             <img src="../../../assets/upload.png" alt=""/>
                             <div class="name inline-block">
                                 Upload
@@ -23,7 +23,7 @@ import {DialogsService} from "../popup/dialogs.service";
                                 View
                             </div>
                         </button>
-                        <button *ngIf="hasPoForm" class="link-button"
+                        <button *ngIf="hasPoForm && !disableEdit" class="link-button"
                                 (click)="onClickRemove()">
                             <img src="../../../assets/page_cross.gif" alt=""/>
                             <div class="name inline-block">
@@ -78,6 +78,7 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
     public params: any;
     public hasPoForm: boolean;
     public file: any;
+    public disableEdit: boolean = false;
 
     @ViewChild('fileInput') fileInput: ElementRef;
 
@@ -87,6 +88,10 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
     agInit(params: any): void {
         this.params = params;
         this.hasPoForm = false;
+
+        if (this.params && this.params.data) {
+            this.disableEdit = !!this.params.column.colDef.disableEdit;
+        }
 
         this.checkIfHasPoForm();
     }

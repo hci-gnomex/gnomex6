@@ -23,7 +23,7 @@ import {Subscription} from "rxjs/Subscription";
 import {ActivatedRoute, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
 import {DialogsService} from '../util/popup/dialogs.service';
 import {DeleteProjectComponent} from "./delete-project.component";
@@ -40,123 +40,48 @@ import {GnomexService} from "../services/gnomex.service";
     selector: "experiments",
     templateUrl: "./browse-experiments.component.html",
     styles: [`
-        .inlineComboBox {
-            display: inline-block;
-        }
-
-        .hintLink
-        {
-            fontSize: 9;
-            paddingLeft: 1;
-            paddingRight: 1;
-            paddingBottom: 1;
-            paddingTop: 1;
-        }
-
-        .sidebar {
-            width: 25%;
-            position: relative;
-            left: 0;
-            background-color: #ccc;
-            transition: all .25s;
-        }
-
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 100%;
-        }
-
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .br-exp-row-one {
-            flex-grow: 1;
-        }
-
-        .br-exp-item-row-two {
-            flex-grow: 1;
-        }
-
-        .br-exp-item {
-            flex: 1 1 auto;
-            font-size: small;
-        }
-
-        .br-exp-one {
-            width: 100%;
-            flex-grow: .25;
-
-        }
-
-        .br-exp-help-drag-drop {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .br-exp-three {
-            width: 100%;
-            height: 5px;
-            flex-grow: 2;
-        }
-
-        .br-exp-four {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .br-exp-five {
-            width: 100%;
-            flex-grow: .10;
-        }
-
-        .t {
-            display: table;
-            width: 100%;
-        }
-
-        .tr {
-            display: table-row;
-            width: 100%;
-        }
-
-        .td {
-            display: table-cell;
-        }
-
-        .jqx-tree {
-            height: 100%;
-        }
 
         .jqx-notification {
             margin-top: 30em;
             margin-left: 20em;
         }
+        
 
-        div.background {
-            width: 100%;
-            height: 100%;
-            background-color: #EEEEEE;
-            padding: 0.3em;
-            border-radius: 0.3em;
-            border: 1px solid darkgrey;
-            display: flex;
-            flex-direction: column;
-        }
-        .experiment-detail-panel {
-            height:98%;
-            width:100%;
-            border: #C8C8C8 solid thin;
-            padding: 1em;
-            
-        }
-        .exp-overview-item {
-            flex: 1 1 auto;
+        .t  { display: table;      }
+        .tr { display: table-row;  }
+        .td { display: table-cell; }
+
+        .half-width { width: 50%; }
+        
+        .vertical-center { vertical-align: middle; }
+        .horizontal-center { text-align: center; }
+
+        .vertical-spacer { height: 0.3em; }
+        
+        
+        .padding { padding: 0.3em; }
+
+        .left-right-padding {
+            padding-left:  0.3em;
+            padding-right: 0.3em;
         }
         
+        .major-left-right-padding { 
+            padding-left:  1em;
+            padding-right: 0.3em; 
+        }
+        
+        .foreground { background-color: white;   }
+        .background { background-color: #EEEEEE; }
+
+        .border { border: #C8C8C8 solid thin; }
+        .background-border {
+            border-radius: 0.3em;
+            border: 1px solid darkgrey;
+        }
+        
+        .no-overflow  { overflow:    hidden; }
+        .no-word-wrap { white-space: nowrap; }
     `]
 })
 
@@ -209,7 +134,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private showBillingCombo: boolean = false;
     private labList: any[] = [];
     private selectedExperiment: any;
-    public experimentCount: number;
+    public experimentCount: number = 0;
     private projectRequestListSubscription: Subscription;
     public disableNewProject: boolean = true;
     public disableDeleteProject: boolean = true;
@@ -218,7 +143,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
     public reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
     public deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
-    public showSpinner: boolean = false;
+    // public showSpinner: boolean = false;
     private viewLimit: number = 999999;
     private navProjectReqList:any;
     private navInitSubscription: Subscription;
@@ -231,24 +156,22 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         if (this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS) != null) {
             this.viewLimit = this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS).propertyValue;
         }
-
     }
 
-    ngAfterViewInit(){
-    }
+    ngAfterViewInit() { }
 
 
-    constructor(public experimentsService: ExperimentsService,private router:Router,
+    constructor(public experimentsService: ExperimentsService,
+                private changeDetectorRef: ChangeDetectorRef,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
-                private changeDetectorRef: ChangeDetectorRef,
                 private dictionaryService: DictionaryService,
+                private gnomexService: GnomexService,
                 private labListService: LabListService,
                 private propertyService: PropertyService,
-                private gnomexService: GnomexService,
-                private route:ActivatedRoute) {
-
+                private route:ActivatedRoute,
+                private router:Router) {
 
         this.items = [];
         this.dragEndItems = [];
@@ -256,29 +179,31 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.billingAccounts = [];
         this.labs = [];
 
-
-
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
             if (this.createProjectDialogRef) {
-                this.createProjectDialogRef.componentInstance.showSpinner = false;
+                this.dialogsService.stopAllSpinnerDialogs();
+                // this.createProjectDialogRef.componentInstance.showSpinner = false;
                 this.createProjectDialogRef.close();
                 this.createProjectDialogRef = null;
             }
             if (this.deleteProjectDialogRef) {
-                this.deleteProjectDialogRef.componentInstance.showSpinner = false;
+                this.dialogsService.stopAllSpinnerDialogs();
+                // this.deleteProjectDialogRef.componentInstance.showSpinner = false;
                 this.deleteProjectDialogRef.close();
                 this.deleteProjectDialogRef = null;
             }
 
             if (this.deleteExperimentDialogRef) {
-                this.deleteExperimentDialogRef.componentInstance.showSpinner = false;
+                this.dialogsService.stopAllSpinnerDialogs();
+                // this.deleteExperimentDialogRef.componentInstance.showSpinner = false;
                 this.deleteExperimentDialogRef.close();
                 this.deleteExperimentDialogRef = null;
             }
 
             if (this.reassignExperimentDialogRef) {
-                this.reassignExperimentDialogRef.componentInstance.showSpinner = false;
+                this.dialogsService.stopAllSpinnerDialogs();
+                // this.reassignExperimentDialogRef.componentInstance.showSpinner = false;
                 this.reassignExperimentDialogRef.close();
                 this.reassignExperimentDialogRef = null;
             }
@@ -325,7 +250,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         this.experimentsService.startSearchSubject.subscribe((value) =>{
             if (value) {
-                this.showSpinner = true;
+                this.dialogsService.startDefaultSpinnerDialog();
+                // this.showSpinner = true;
             }
         });
 
@@ -405,7 +331,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     treeUpdateData(event) {
         if (this.experimentsService.startSearchSubject.getValue() === true) {
-            this.showSpinner = false;
+
+            this.dialogsService.stopAllSpinnerDialogs();
+            // this.showSpinner = false;
             this.experimentsService.startSearchSubject.next(false);
             this.changeDetectorRef.detectChanges();
         }
@@ -445,24 +373,24 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     showReassignWindow() {
-        this.reassignExperimentDialogRef= this.dialog.open(ReassignExperimentComponent, {
-            data: {
-                currentItemId: this.currentItem.id,
-                idProject: this.targetItem.id,
-                labMembers: this.labMembers,
-                billingAccounts: this.billingAccounts,
-                currentItem: this.currentItem,
-                targetItem: this.targetItem,
-                showBillingCombo: this.showBillingCombo
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = {
+            currentItemId:      this.currentItem.id,
+            idProject:          this.targetItem.id,
+            labMembers:         this.labMembers,
+            billingAccounts:    this.billingAccounts,
+            currentItem:        this.currentItem,
+            targetItem:         this.targetItem,
+            showBillingCombo:   this.showBillingCombo
+        };
 
+        this.reassignExperimentDialogRef = this.dialog.open(ReassignExperimentComponent, configuration);
+
+        this.reassignExperimentDialogRef.afterClosed().subscribe(result => {
+            if (this.reassignExperimentDialogRef && this.reassignExperimentDialogRef.componentInstance.noButton) {
+                this.resetTree();
             }
-        });
-        this.reassignExperimentDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.reassignExperimentDialogRef && this.reassignExperimentDialogRef.componentInstance.noButton) {
-                    this.resetTree();
-                }
-            })
+        })
     }
 
 
@@ -572,13 +500,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 useThisLabList = this.labs;
             }
 
-            this.createProjectDialogRef= this.dialog.open(CreateProjectComponent, {
-                data: {
-                    labList: useThisLabList,
-                    items: this.items,
-                    selectedLabItem: this.selectedItem
-                }
-            });
+            let configuration: MatDialogConfig = new MatDialogConfig();
+
+            configuration.data = {
+                labList:            useThisLabList,
+                items:              this.items,
+                selectedLabItem:    this.selectedItem
+            };
+
+            this.createProjectDialogRef= this.dialog.open(CreateProjectComponent, configuration);
         }
     }
 
@@ -587,22 +517,17 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     deleteProjectClicked(event: any) {
-        //this.deleteProjectWindow.open();
-        this.deleteProjectDialogRef = this.dialog.open(DeleteProjectComponent, {
-            data: {
-                selectedItem: this.selectedItem,
-            }
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = { selectedItem: this.selectedItem };
+
+        this.deleteProjectDialogRef = this.dialog.open(DeleteProjectComponent, configuration);
     }
 
     deleteExperimentClicked() {
-        this.deleteExperimentDialogRef = this.dialog.open(DeleteExperimentComponent, {
-            data: {
-                selectedExperiment: this.selectedExperiment
-            }
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = { selectedExperiment: this.selectedExperiment };
 
-
+        this.deleteExperimentDialogRef = this.dialog.open(DeleteExperimentComponent, configuration);
     }
     /**
      * A node is selected in the tree.
@@ -676,8 +601,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     };
 
     dragDropHintClicked(event: any) {
-        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, {
-        });
+        let configuration: MatDialogConfig = new MatDialogConfig();
+
+        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, configuration);
     }
 
     /**

@@ -13,36 +13,32 @@ import {Subscription} from "rxjs/Subscription";
 @Component({
     selector: "progress-tab",
     template: `
-        <div style="display:flex; flex-direction: column; height:100%; width:100%;">
-            <div style="display:flex; width:100%;">
-                <div style="flex:1;" class="radioLikeLink" *ngFor="let opt of progressOptions; let i=index">
-                    <input id="{{opt.id}}" type="radio" name="progressRadio" [(ngModel)]="selectedOpt"  [id]="opt.id" [value]="opt.label" (change)="selectSubFilter()">
-                    <label for="{{opt.id}}">{{opt.label}}</label>
-                    <div *ngIf="!isEnd(i)" class="divider"></div>
-
+        <div class="full-width full-height">
+            <div class="full-width full-height flex-container-col">
+                <div class="full-width">
+                    <div class="full-width flex-container-row">
+                        <div class="flex-grow radioLikeLink" *ngFor="let opt of progressOptions; let i=index">
+                            <input id="{{opt.id}}" type="radio" name="progressRadio" [(ngModel)]="selectedOpt"  [id]="opt.id" [value]="opt.label" (change)="selectSubFilter()">
+                            <label for="{{opt.id}}">{{opt.label}}</label>
+                            <div *ngIf="!isEnd(i)" class="divider"></div>
+                        </div>
+                    </div>
                 </div>
-                
+                <div class="full-width flex-grow">
+                    <div #treeGridContainer style="display:flex; flex-direction:column; flex:10; width:100%;">
+                        <jqxTreeGrid [width]="'calc(100% - 2px)'" 
+                                     [source]="dataAdapter" 
+                                     [pageable]="true" 
+                                     [sortable]="true" 
+                                     [columns]="columns" 
+                                     [columnsResize]="true" 
+                                     #TreeGrid
+                        >
+                        </jqxTreeGrid>
+                    </div>
+                </div>
             </div>
-            
-            
-            
-            <div #treeGridContainer style="display:flex; flex-direction:column; flex:10; width:100%;">
-                <jqxTreeGrid
-                        
-                        [width]="'calc(100% - 2px)'"
-                        [source]="dataAdapter"
-                        [pageable]="true"
-                        [sortable]="true"
-                        [columns]="columns"
-                        [columnsResize]="true"
-                        #TreeGrid
-                >
-                    <!-- [width]="'calc(100% - 2px)'"-->
-                </jqxTreeGrid>
-            </div>
-            
         </div>
-        
     `,
     styles:[`
 
@@ -50,7 +46,6 @@ import {Subscription} from "rxjs/Subscription";
         input[type="radio"] + label:hover {
             /* hide the inputs */
             text-decoration: underline;
-
         }
 
         input[type="radio"]:checked + label {
@@ -60,7 +55,6 @@ import {Subscription} from "rxjs/Subscription";
         input[type="radio"] {
             /* hide the inputs */
             opacity: 0;
-
         }
 
         span.radioLikeLink:hover {

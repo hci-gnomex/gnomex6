@@ -3,10 +3,14 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 import {PropertyService} from "../../services/property.service";
 
 import { DateParserComponent } from "../parsers/date-parser.component";
+import {CellRendererValidation} from "./cell-renderer-validation";
 
 @Component({
 	template: `
-		<div class="full-width full-height">
+		<div [matTooltip]="this.errorMessage"
+             [matTooltipShowDelay]="300"
+             [matTooltipHideDelay]="300"
+			 class="full-width full-height  {{this.errorMessage && this.errorMessage !== '' ? 'error' : ''}}">
 			<div class="t full-width full-height">
 				<div class="tr">
 					<div class="td vertical-center right-align padded cursor">
@@ -19,36 +23,39 @@ import { DateParserComponent } from "../parsers/date-parser.component";
 			</div>
 		</div>
 	`,
-	styles: [`
+	styles: [`		
+		
+		.full-width  { width:  100% }
+		.full-height { height: 100% }
 			
-			.full-width  { width:  100% }
-			.full-height { height: 100% }
+		.t  { display: table; }
+		.tr { display: table-row; }
+		.td { display: table-cell; }
+		
+		.vertical-center { vertical-align: middle;   }
+		.right-align     { text-align:     right;    }
+		.padded          { padding:        0 0.3rem; }
 			
-			.t  { display: table; }
-			.tr { display: table-row; }
-			.td { display: table-cell; }
-			
-			.vertical-center { vertical-align: middle;   }
-			.right-align     { text-align:     right;    }
-			.padded          { padding:        0 0.3rem; }
-			
-			.cursor { cursor: pointer; }
+		.cursor { cursor: pointer; }
+
+		.error {
+			background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
+			border: solid red 2px;
+		}
 	`]
 })
-export class DateRenderer implements ICellRendererAngularComp {
+export class DateRenderer extends CellRendererValidation{
 
 	public static readonly DEFAULT_RECEIVED_DATE_FORMAT: string = "yyyy-mm-dd";
 	public static readonly DEFAULT_DISPLAY_DATE_FORMAT: string = "mm/dd/yyyy";
 
-	params: any;
 	value: any;
     displayString: string;
 
 	// constructor(private propertyService: PropertyService) { }
 	// this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
 
-	agInit(params: any): void {
-		this.params = params;
+	agInit2(params: any): void {
 		this.value = this.params.value;
 		this.displayString = "";
 

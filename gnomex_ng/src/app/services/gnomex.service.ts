@@ -13,6 +13,7 @@ import {LaunchPropertiesService} from "./launch-properites.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Router} from "@angular/router";
 import {ProjectService} from "./project.service";
+import {AppUserListService} from "./app-user-list.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -71,6 +72,7 @@ export class GnomexService {
     public isInternalExperimentSubmission: boolean = true;
     public uploadSampleSheetURL: string = "";
     public labList: any[] = [];
+    public appUserList:any[] =[];
     public propertyList: any[] = [];
     public projectList: any[] = [];
     public submitRequestLabList: any[] = [];
@@ -102,17 +104,18 @@ export class GnomexService {
 
 
     constructor(
-              private dictionaryService: DictionaryService,
-              private propertyService: PropertyService,
-              private progressService: ProgressService,
-              private labListService: LabListService,
-              private projectService: ProjectService,
-              private createSecurityAdvisorService: CreateSecurityAdvisorService,
-              private authenticationService:AuthenticationService,
-              private launchPropertiesService: LaunchPropertiesService,
-              //private http:Http
-              private http:HttpClient,
-              private router:Router) {
+        private dictionaryService: DictionaryService,
+        private propertyService: PropertyService,
+        private progressService: ProgressService,
+        private labListService: LabListService,
+        private projectService: ProjectService,
+        private createSecurityAdvisorService: CreateSecurityAdvisorService,
+        private authenticationService:AuthenticationService,
+        private launchPropertiesService: LaunchPropertiesService,
+        private appUserListService: AppUserListService,
+        //private http:Http
+        private http:HttpClient,
+        private router:Router) {
     }
 
     /* The header only uses this for displaying itself.
@@ -689,26 +692,28 @@ export class GnomexService {
                     });
                     this.dictionaryService.reload(() => {
                         this.progressService.displayLoader(30);
-                        this.labListService.getLabList().first().subscribe((response: any[]) => {
-                            this.progressService.displayLoader(45);
-                            this.labList = response;
-                            this.progressService.displayLoader(60);
-                            this.myCoreFacilities = this.dictionaryService.coreFacilities();
-                            this.progressService.displayLoader(75);
-                            this.onDictionariesLoaded().then((response) => {
-                                this.progressService.displayLoader(90);
-                                this.launchPropertiesService.getFAQ().first().subscribe((response: any) => {
-                                    if (response != null) {
-                                        if (!this.createSecurityAdvisorService.isArray(response)) {
-                                            this.faqList = [response.FAQ];
-                                        } else {
-                                            this.faqList = response;
+                        Observable.forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
+                            .first().subscribe((response: any[]) => {
+                                this.progressService.displayLoader(45);
+                                this.appUserList = response[0];
+                                this.labList = response[1];
+                                this.progressService.displayLoader(60);
+                                this.myCoreFacilities = this.dictionaryService.coreFacilities();
+                                this.progressService.displayLoader(75);
+                                this.onDictionariesLoaded().then((response) => {
+                                    this.progressService.displayLoader(90);
+                                    this.launchPropertiesService.getFAQ().first().subscribe((response: any) => {
+                                        if (response != null) {
+                                            if (!this.createSecurityAdvisorService.isArray(response)) {
+                                                this.faqList = [response.FAQ];
+                                            } else {
+                                                this.faqList = response;
+                                            }
                                         }
-                                    }
-                                    this.emitIsAppInitCompelete(true);
-                                    this.progressService.displayLoader(100);
-                                    this._isLoggedIn = true;
-                                });
+                                        this.emitIsAppInitCompelete(true);
+                                        this.progressService.displayLoader(100);
+                                        this._isLoggedIn = true;
+                                    });
 
 
 
@@ -734,9 +739,11 @@ export class GnomexService {
             this.progressService.displayLoader(15);
             this.dictionaryService.reload(() => {
                 this.progressService.displayLoader(30);
-                this.labListService.getLabList().first().subscribe((response: any[]) => {
+                Observable.forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
+                    .first().subscribe((response: any[]) => {
                     this.progressService.displayLoader(45);
-                    this.labList = response;
+                    this.appUserList = response[0];
+                    this.labList = response[1];
                     this.progressService.displayLoader(60);
                     this.myCoreFacilities = this.dictionaryService.coreFacilities();
                     this.progressService.displayLoader(75);

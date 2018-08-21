@@ -15,53 +15,46 @@ import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
 
 
 @Component({
-    template: `
-            <div class="flexbox-column">
-                <div class="flex-container">
-                    <div >
-                        {{ this.experimentsService.experimentList.length + " Experiments"}}
-                    </div>
-                    <div >
-                        <label>Experiment #</label>
-                        <jqxComboBox  class="inlineComboBox"
-                                      [width]="170"
-                                      [height]="20"
-                                      [source]="orderedExperimentIds"
-                                      (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
-                        </jqxComboBox>
-                    </div>
+    template: `        
+        <div class="flexbox-column">
+            <div class="flex-container">
+                <div >
+                    {{ this.experimentsService.experimentList.length + " Experiments"}}
                 </div>
-                <div style="flex:10; width:100%">
-                    <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
-                        <mat-tab style="height:100%" label="Experiment">
-                            <experiment-browse-tab> </experiment-browse-tab>
-                        </mat-tab>
-                        <mat-tab style="height:100%" label="Progress">
-                            <progress-tab> </progress-tab>
-                        </mat-tab>
-                        <mat-tab style="height:100%" label="Visibility">
-                            <visibility-tab (saveSuccess)="saveVis()"> </visibility-tab>
-                        </mat-tab>
-                        <mat-tab *ngIf="this.project" style="height:100%;" label="Project">
-                            <project-tab (saveSuccess)="saveProject()"> </project-tab>
-                        </mat-tab>
-                    </mat-tab-group>
-                    
+                <div>
+                    <label>Experiment #</label>
+                    <jqxComboBox  class="inlineComboBox"
+                                  [width]="170"
+                                  [height]="20"
+                                  [source]="orderedExperimentIds"
+                                  (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
+                    </jqxComboBox>
                 </div>
-                <save-footer (saveClicked)="saveManager()"
-                             [dirty]="this.experimentsService.dirty"
-                             [showSpinner]="this.showSpinner"
-                             [disableSave]="this.experimentsService.invalid || this.noSave">
-                </save-footer>
-
-               
-
-                
             </div>
+            <div class="full-width full-height flex-grow-greater overflow">
+                <mat-tab-group class="mat-tab-group-border full-height full-width" (selectedTabChange)="tabChanged($event)">
+                    <mat-tab class="full-height" label="Experiment">
+                        <experiment-browse-tab></experiment-browse-tab>
+                    </mat-tab>
+                    <mat-tab class="full-height" label="Progress">
+                        <progress-tab></progress-tab>
+                    </mat-tab>
+                    <mat-tab class="full-height" label="Visibility">
+                        <visibility-browse-tab (saveSuccess)="saveVis()"></visibility-browse-tab>
+                    </mat-tab>
+                    <mat-tab *ngIf="this.project" class="full-height" label="Project">
+                        <project-tab (saveSuccess)="saveProject()"></project-tab>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+            <save-footer (saveClicked)="saveManager()"
+                         [dirty]="this.experimentsService.dirty"
+                         [showSpinner]="this.showSpinner"
+                         [disableSave]="this.experimentsService.invalid || this.noSave">
+            </save-footer>
+        </div>
 `,
     styles: [`
-       
-        
         
         .flex-container{
             display: flex;
@@ -80,6 +73,10 @@ import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
         .mat-tab-group-border{
             border: 1px solid #e8e8e8;
         }
+      
+        .overflow { overflow: auto; }
+        
+        .flex-grow-greater { flex: 10; }
         
     `]
 })

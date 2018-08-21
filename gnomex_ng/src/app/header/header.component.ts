@@ -1,7 +1,10 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {Component, OnInit, ViewEncapsulation} from "@angular/core";
+import {
+    AfterViewChecked, Component, ElementRef, HostListener, OnInit, ViewChild,
+    ViewEncapsulation
+} from "@angular/core";
 import {ProgressService} from "../home/progress.service";
 import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {Observable} from "rxjs/Observable";
@@ -18,7 +21,7 @@ import * as _ from "lodash";
 import {HttpParams} from "@angular/common/http";
 import {TopicService} from "../services/topic.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatToolbar} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 
 @Component({
@@ -77,11 +80,20 @@ import {AdvancedSearchComponent} from "./advanced_search/advanced-search.compone
         .mat-menu-panel.no-max-width {
             max-width: none;
         }
+
+        .inline-block { display: inline-block; }
+        
+        .horizontal-padding { padding: 0 0.4em; }
+        
+        .horizontal-center { text-align: center; }
     `],
     encapsulation: ViewEncapsulation.None
 })
 
-export class HeaderComponent implements OnInit{
+export class HeaderComponent implements OnInit, AfterViewChecked{
+
+    @ViewChild('headerRef') headerRef: MatToolbar;
+    @ViewChild('spacerRef') spacerRef: ElementRef;
 
     isLoggedIn: Observable<boolean>;
     options: FormGroup;
@@ -127,12 +139,13 @@ export class HeaderComponent implements OnInit{
     public linkNavItems: any[] = [];
     private authSubscription: Subscription;
 
+    private headerHeight: number = 0;
+
     /**
      * Initialize
      */
     ngOnInit() {
         console.log("Initializing app dependencies ");
-
 
         this.gnomexService.isAppInitCompleteObservable().subscribe(complete => {
             this.buildNavItems();
@@ -141,8 +154,34 @@ export class HeaderComponent implements OnInit{
             this.addQuickLinks();
         });
 
-
         // Links, Help, Report Problem and Account
+    }
+
+    ngAfterViewChecked() {
+        this.resizeHeaderSpacing();
+    }
+
+    @HostListener('window:resize')
+    onResize() {
+        this.resizeHeaderSpacing();
+    }
+
+    private resizeHeaderSpacing(): void {
+        if (this.spacerRef
+            && this.spacerRef.nativeElement
+            && this.spacerRef.nativeElement.style
+            && this.headerRef
+            && this.headerRef._elementRef
+            && this.headerRef._elementRef.nativeElement
+            && this.headerRef._elementRef.nativeElement.offsetHeight
+            && this.headerRef._elementRef.nativeElement.offsetHeight > 0
+            && this.headerRef._elementRef.nativeElement.offsetHeight != this.headerHeight) {
+
+            this.headerHeight = this.headerRef._elementRef.nativeElement.offsetHeight;
+
+            this.spacerRef.nativeElement.style.height = 'initial';
+            this.spacerRef.nativeElement.style.height = '' + Math.ceil(this.headerHeight) + 'px';
+        }
     }
 
     public buildNavItems() {
@@ -981,7 +1020,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Experiment Platform',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -1288,7 +1327,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Experiment Platform',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Billing Account Fields',
@@ -1577,7 +1616,7 @@ export class HeaderComponent implements OnInit{
                     {
                         displayName: 'Configure Experiment Platform',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',

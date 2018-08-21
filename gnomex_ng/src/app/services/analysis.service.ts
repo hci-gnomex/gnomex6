@@ -242,6 +242,15 @@ export class AnalysisService {
     getExperimentPickList(params:HttpParams):Observable<any>{
         return this.httpClient.get("/gnomex/GetExperimentPickList.gx",{params: params});
     }
+    //for link to experiment
+    getRequestList(params:HttpParams):Observable<any>{
+        return this.httpClient.get("/gnomex/GetRequestList.gx",{params:params});
+    }
+    linkExpToAnalysis(params:HttpParams):Observable<any>{
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/LinkExpToAnalysis.gx",null,{params:params});
+    }
+
 
 
 

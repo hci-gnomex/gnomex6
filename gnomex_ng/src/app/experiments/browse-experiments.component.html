@@ -1,76 +1,93 @@
-<div class="background">
-    <div class="flex-column-container">
-        <div style="flex-grow: .01;" class="br-exp-item br-exp-one">
-            <div style="margin-bottom: 0.3em;">
-                <browse-filter [label]="'Experiments'" [iconSource]="'assets/flask.png'"
-                               [mode]="'experimentBrowse'"></browse-filter>
-            </div>
+<div class="background background-border full-width full-height flex-container-col padding">
+    <div class="full-height flex-container-col foreground">
+        <div class="full-width">
+            <browse-filter [label]="'Experiments'"
+                           [iconSource]="'assets/flask.png'"
+                           [mode]="'experimentBrowse'">
+            </browse-filter>
         </div>
-
-       <div style="flex:1;"class="flex-row-container">
-           <split>
-               <split-area size="20">
-                   <div class="br-exp-item" style="height:100%"> <!-- start tree container -->
-                    <div class="flex-column-container" style="height:100%;">
-                        <div class="br-exp-item br-exp-help-drag-drop">
-                            <div class="flex-row-container">
-                                <div class="br-exp-item-row-one" style="position: relative;top: .65em; left: .25em ">
-                                    {{experimentCount}} experiments
+        <div class="full-width background vertical-spacer"></div>
+        <div class="flex-container-row flex-grow">
+            <split>
+                <split-area size="20">
+                    <div class="full-height flex-grow border"> <!-- start tree container -->
+                        <div class="full-height flex-container-col foreground">
+                            <div class="full-width padding">
+                                <div class="flex-container-row align-center">
+                                    <div class="full-height flex-grow major-left-right-padding no-word-wrap">
+                                        {{experimentCount}} experiments
+                                    </div>
+                                    <div class="full-height">
+                                        <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()">
+                                            <img src="../../assets/information.png" alt="" class="padding">
+                                            Drag-and-drop hint
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="br-exp-item-row-two">
-                                    <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"><img src="../../assets/information.png">Drag-and-drop hint</button>
+                            </div>
+                            <div class="full-width flex-grow left-right-padding no-overflow">
+                                <div class="full-width full-height border">
+                                    <tree-root #tree
+                                               (moveNode)="onMoveNode($event)"
+                                               (updateData)="treeUpdateData($event)"
+                                               (activate)="treeOnSelect($event)"
+                                               [nodes]="items"
+                                               [options]="options">
+                                        <ng-template #treeNodeTemplate let-node let-index="index">
+                                            <div class="full-width no-word-wrap">
+                                                <img src="{{node.data.icon}}" height="16" width="16">
+                                                <span>{{ node.data.label }}</span>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #loadingTemplate></ng-template>
+                                    </tree-root>
+                                </div>
+                            </div>
+                            <div class="full-width padding">
+                                <div class="flex-container-row full-width">
+                                    <div class="flex-grow">
+                                        <jqxToggleButton #toggleButton [template]="'link'" (onClick)="expandCollapseClicked()">
+                                            Expand Projects
+                                        </jqxToggleButton>
+                                    </div>
+                                </div>
+                                <div class="t">
+                                    <div class="tr">
+                                        <div class="td">
+                                            <button mat-button [disabled]="disableNewProject" (click)="newProjectClicked()">
+                                                <img src="../../assets/folder_add.png" alt="">
+                                                New Project
+                                            </button>
+                                        </div>
+                                        <div class="td">
+                                            <button mat-button [disabled]="disableDeleteProject" (click)="deleteProjectClicked()">
+                                                <img src="../../assets/folder_delete.png">
+                                                Delete Project
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="tr">
+                                        <div class="td">
+                                            <button mat-button [disabled]="disableDeleteExperiment" (click)="deleteExperimentClicked()">
+                                                <img src="../../assets/delete.png" alt="">
+                                                Delete Experiment
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-                        <div class="br-exp-item br-exp-three">
-                            <tree-root #tree (moveNode)="onMoveNode($event)"
-                                       (updateData)="treeUpdateData($event)"
-                                       (activate)="treeOnSelect($event)"
-                                       [nodes]="items" [options]="options">
-                                <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <img src="{{node.data.icon}}" height="16" width="16">
-                                    <span>{{ node.data.label }}</span>
-                                </ng-template>
-                                <ng-template #loadingTemplate></ng-template>
-                            </tree-root>
-                        </div>
-                        <div class="br-exp-item br-exp-four">
-                            <div class="flex-row-container">
-
-                                <div class="br-exp-item-row-one" style="position: relative; top: 1em">
-                                    <button mat-button [disabled]="disableNewProject" (click)="newProjectClicked()"><img src="../../assets/folder_add.png">New Project</button>
-                                </div>
-                                <div class="br-exp-item-row-two" style="position: relative; top: 1em">
-                                    <button mat-button [disabled]="disableDeleteProject" (click)="deleteProjectClicked()"><img src="../../assets/folder_delete.png">Delete Project</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="br-exp-item br-exp-five">
-                            <div class="flex-row-container">
-                                <div class="br-exp-item-row-one" style="position: relative; top: 1em">
-                                    <jqxToggleButton #toggleButton [template]="'link'" (onClick)="expandCollapseClicked()">Expand
-                                        Projects
-                                    </jqxToggleButton>
-                                </div>
-                                <div class="br-exp-item-row-two" style="position: relative; top: 1em">
-                                    <button mat-button [disabled]="disableDeleteExperiment" (click)="deleteExperimentClicked()"><img src="../../assets/delete.png">Delete Experiment</button>
-                                </div>
-                            </div>
-                        </div>
+                    </div> <!-- end tree container -->
+                </split-area>
+                <split-area size="80">
+                    <div  class="full-width full-height border padding">
+                        <browse-panel></browse-panel>
                     </div>
-                </div> <!-- end tree container -->
-               </split-area>
-               <split-area size="80">
-                   <div  class="exp-overview-item experiment-detail-panel">
-                       <browse-panel></browse-panel>
-                   </div>
-               </split-area>
-           </split>
-       </div>
+                </split-area>
+            </split>
+        </div>
     </div>
 </div>
-
 <div>
     <jqxWindow #responseMsgWindow
                [width]="250"
@@ -80,22 +97,21 @@
                [autoOpen]="false"
                [cancelButton]="'.cancel'" [okButton]="'.ok'" [resizable]="false"
     >
-
         <div style="width: 100%; background-color: #4cae4c">
             <div>
                 <img width="14" height="14" src="../../assets/jqwidgets/images/help.png" alt=""/>
                 Delete Project
             </div>
         </div>
-        <div class="background">
-            <div class="t">
-                <div class="tr">
+        <div class="background background-border full-width full-height flex-container-col padding">
+            <div class="t full-width">
+                <div class="tr full-width">
                     <div class="td">
-                        <div class="t">
-                            <div class="tr" style="vertical-align: middle">
-                                <div class="td" style="width: 100%">
-                                    <div style="width: 100%">
-                                        <div *ngIf="responseMsg" class="tr" style="text-align: center">
+                        <div class="t full-width">
+                            <div class="tr full-width vertical-center">
+                                <div class="td full-width">
+                                    <div class="full-width">
+                                        <div *ngIf="responseMsg" class="tr full-width horizontal-center">
                                             {{responseMsg}}
                                             Delete project
                                         </div>
@@ -105,18 +121,16 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="tr">
+                <div class="tr full-width">
                     <div class="td">
                         <div style="font-size:small">
-                            <div class="t">
-                                <div class="tr" style="vertical-align: middle">
+                            <div class="t full-width">
+                                <div class="tr full-width" style="vertical-align: middle">
                                     <div class="td">
                                         <jqxButton #noButtonDeleteProject class="No"
                                                    style="display: inline-block"
                                                    [width]="80"
                                                    (onClick)="responseMsgNoButtonClicked()"
-
                                         >
                                             No
                                         </jqxButton>
@@ -131,65 +145,93 @@
     </jqxWindow>
 </div>
 <jqxNotification #msgSelectOwner
-                 [width]="450" [position]="'top-left'" [opacity]="0.9" [autoOpen]="false" [template]="'info'"
-                 [autoClose]="false" [closeOnClick]="true" (onClick)="resetReassign($event)"
->
+                 [width]="450"
+                 [position]="'top-left'"
+                 [opacity]="0.9"
+                 [template]="'info'"
+                 [autoOpen]="false"
+                 [autoClose]="false"
+                 [closeOnClick]="true"
+                 (onClick)="resetReassign($event)">
     <div>
         Please select the experiment owner.
     </div>
 </jqxNotification>
-
 <jqxNotification #msgSelectBilling
-                 [width]="450" [position]="'top-left'" [opacity]="0.9" [autoOpen]="false" [template]="'info'"
-                 [autoClose]="false" [closeOnClick]="true" (onClick)="resetReassign($event)"
->
+                 [width]="450"
+                 [position]="'top-left'"
+                 [opacity]="0.9"
+                 [template]="'info'"
+                 [autoOpen]="false"
+                 [autoClose]="false"
+                 [closeOnClick]="true"
+                 (onClick)="resetReassign($event)">
     <div>
         Please select the experiment billing account.
     </div>
 </jqxNotification>
-
 <jqxNotification #msgEnterProjectName
-                 [width]="450" [position]="'top-left'" [opacity]="0.9" [autoOpen]="false" [template]="'info'"
-                 [autoClose]="false" [closeOnClick]="true" (onClick)="resetReassign($event)"
->
+                 [width]="450"
+                 [position]="'top-left'"
+                 [opacity]="0.9"
+                 [template]="'info'"
+                 [autoOpen]="false"
+                 [autoClose]="false"
+                 [closeOnClick]="true"
+                 (onClick)="resetReassign($event)">
     <div>
         Please enter a project name.
     </div>
 </jqxNotification>
-
 <jqxNotification #msgEnterLab
-                 [width]="450" [position]="'top-left'" [opacity]="0.9" [autoOpen]="false" [template]="'info'"
-                 [autoClose]="false" [closeOnClick]="true" (onClick)="clickNoProject($event)"
->
+                 [width]="450"
+                 [position]="'top-left'"
+                 [opacity]="0.9"
+                 [template]="'info'"
+                 [autoOpen]="false"
+                 [autoClose]="false"
+                 [closeOnClick]="true"
+                 (onClick)="clickNoProject($event)">
     <div>
         Please select a lab.
     </div>
 </jqxNotification>
-
 <jqxNotification #msgLoading
-                 [width]="450" [position]="'top-left'" [opacity]="0.9" [autoOpen]="false" [template]="'info'"
-                 [autoClose]="true" [closeOnClick]="true"
->
+                 [width]="450"
+                 [position]="'top-left'"
+                 [opacity]="0.9"
+                 [template]="'info'"
+                 [autoOpen]="false"
+                 [autoClose]="true"
+                 [closeOnClick]="true">
     <div>
         Loading...
     </div>
 </jqxNotification>
-
 <jqxNotification #msgDragDropHint
-                 [width]="'80%'" [position]="'top-left'" [opacity]="0.9" [autoOpen]="false" [template]="'info'"
-                 [autoClose]="false" [closeOnClick]="true"
->
+                 [width]="'80%'"
+                 [position]="'top-left'"
+                 [opacity]="0.9"
+                 [template]="'info'"
+                 [autoOpen]="false"
+                 [autoClose]="false"
+                 [closeOnClick]="true">
     <div>
         Drag-and-drop experiment to move to another project.
     </div>
 </jqxNotification>
 <jqxNotification #msgNoAuthUsersForLab
-                 [width]="'80%'" [height]="50" [position]="'top-left'" [opacity]="0.9" [autoOpen]="false"
-                 [template]="'warning'" [autoClose]="false" [closeOnClick]="true" (onClick)="clickNoOwners($event)"
->
+                 [width]="'80%'"
+                 [height]="50"
+                 [position]="'top-left'"
+                 [opacity]="0.9"
+                 [template]="'warning'"
+                 [autoOpen]="false"
+                 [autoClose]="false"
+                 [closeOnClick]="true"
+                 (onClick)="clickNoOwners($event)">
     <div>
         Sorry, in order to reassign this experiment you must change its owner to a member of the new lab group. However,
         you do not have permission to access the member list for this lab. Please contact an administrator.
     </div>
 </jqxNotification>
-

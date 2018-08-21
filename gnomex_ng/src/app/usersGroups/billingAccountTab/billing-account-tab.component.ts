@@ -28,6 +28,7 @@ import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/form
 
 import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-users-selector.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {CopyAccountsDialogComponent} from "./dialogs/copy-accounts-dialog.component";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -39,34 +40,36 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 	selector: "billing-account-tab",
 	templateUrl: "./billing-account-tab.component.html",
 	styles: [`
-      .flex-base {
-		  display: flex;
-		  flex-direction: column;
-	  }
-	  .flex-header { }
-	  .flex-stretch {
-		  display: flex;
-		  flex: 1;
-	  }
-	  .flex-footer { }
-			
-	  .border {
-		  width: 50%;
-		  margin-bottom: 0.8em;
-		  padding: 0.5em;
-		  border: 1px solid lightgrey;
-		  border-radius: 3px;
-	  }
-			
-	  .t  { display: table;      }
-	  .tr { display: table-row;  }
-	  .td { display: table-cell; }  
-	  
-	  .block        { display: block;        }
-	  .inline-block { display: inline-block; }
-			
-	  .full-width  { width: 100%;  }
-	  .full-height { height: 100%; }
+        
+        .border {  
+            width: 50%;  
+            margin-bottom: 0.8em;  
+            padding: 0.5em;  
+            border: 1px solid lightgrey;  
+            border-radius: 3px;  
+        }
+        
+        .t  { display: table;      }  
+        .tr { display: table-row;  }  
+        .td { display: table-cell; }
+        
+        .block        { display: block;        }  
+        .inline-block { display: inline-block; }
+        
+        
+        .padded { padding: 0.3em; }
+        
+        .padded-not-bottom { 
+            padding-top:   0.3em;
+            padding-left:  0.3em;
+            padding-right: 0.3em; 
+        }
+
+        .medium-width    { width:  20em;  }
+        .vertical-spacer { height: 0.3em; }
+        
+        .small-font { font-size: x-small; }
+        
 	`]
 })
 export class BillingAccountTabComponent implements OnInit, OnDestroy {
@@ -288,8 +291,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				}
 			}
 		}
-		if (this._labInfo.poBillingAccounts) {
-			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.poBillingAccounts);
+		if (this._labInfo.pOBillingAccounts) {
+			let tempArray = this.getApprovedUsersFromBillingAccount(this._labInfo.pOBillingAccounts);
 
 			for (let user of tempArray) {
 				if (user.value && user.value !== '' && user.display && user.display !== '') {
@@ -1186,25 +1189,42 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 	}
 
     onCopyAccountsClicked(): void {
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width  = '60em';
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            labInfo: this._labInfo,
+            creditCardCompanies: this.creditCardCompanies,
+            selectedCoreFacility: this.selectedCoreFacility,
+            coreFacilities: this.coreFacilities
+        };
 
+        let dialogRef = this.dialog.open(CopyAccountsDialogComponent, config);
+        dialogRef.afterClosed().subscribe((data) => {
+            if (!data || !data.saveButtonClicked) {
+                return;
+            }
+
+            for (let account of data.chartfieldAccountRowsToCopy) {
+                this._labInfo.internalBillingAccounts.push(account);
+                this._labInfo.billingAccounts.push(account);
+            }
+            for (let account of data.poAccountRowsToCopy) {
+                this._labInfo.pOBillingAccounts.push(account);
+                this._labInfo.billingAccounts.push(account);
+            }
+            for (let account of data.creditCardAccountRowsToCopy) {
+                this._labInfo.creditCardBillingAccounts.push(account);
+                this._labInfo.billingAccounts.push(account);
+            }
+
+            this.assignChartfieldGridContents(this.selectedCoreFacility);
+            this.assignPoGridContents(this.selectedCoreFacility);
+            this.assignCreditCardGridContents(this.selectedCoreFacility);
+        });
     }
 
     onHideClicked(): void {
         this.showAddAccountBox = false;
-    }
-
-
-    testingFunction(message: string): void {
-        console.log("testing function reached with message: \n" + message);
-    }
-
-    onClickDebug(): void {
-        console.log("_labInfo : " + this._labInfo);
-        // this.chartfieldGridApi.sizeColumnsToFit();
-
-        this.assignChartfieldGridContents(this.selectedCoreFacility);
-        this.assignPoGridContents(this.selectedCoreFacility);
-        this.assignCreditCardGridContents(this.selectedCoreFacility);
-
     }
 }
