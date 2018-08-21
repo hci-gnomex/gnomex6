@@ -57,11 +57,14 @@ export class SaveFooterComponent implements OnInit,OnDestroy {
 
 
     @Input() set showSpinner(showSpinner: boolean) {
-        if (showSpinner) {
-            this.dialogsService.startDefaultSpinnerDialog();
-        } else {
-            this.dialogsService.stopAllSpinnerDialogs();
-        }
+        setTimeout( ()=>{
+            if (showSpinner) {
+                this.dialogsService.startDefaultSpinnerDialog();
+            } else {
+                this.dialogsService.stopAllSpinnerDialogs();
+            }
+        });
+
     }
 
     @Input() disableSave = false;

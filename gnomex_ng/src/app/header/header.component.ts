@@ -1020,7 +1020,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     {
                         displayName: 'Configure Experiment Platform',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
@@ -1327,7 +1327,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     {
                         displayName: 'Configure Experiment Platform',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Billing Account Fields',
@@ -1616,7 +1616,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     {
                         displayName: 'Configure Experiment Platform',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',

@@ -189,6 +189,18 @@ img.icon {
 .ellipsis {
   text-overflow: ellipsis;
 }
+.warningLabelMinor
+{
+  color: #17871C;
+  fontWeight: normal;
+}
+.warningLabelSevere
+{
+  color: #EE2525;
+  fontWeight: bold;
+  fontSize: 10;
+}
+
 
 button.mat-button.minimize      { min-width: 0; }
 button.mat-button.minimize span { min-width: 0; }
