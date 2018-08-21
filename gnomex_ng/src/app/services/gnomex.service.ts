@@ -40,12 +40,19 @@ export class GnomexService {
     public iconDataTrackMember = "assets/datatrack_member.png";
     public iconDataTrackOwner = "assets/datatrack_owner.png";
     public iconDataTrackPublic = "assets/datatrack_world.png";
-    public PROPERTY_SHOW_SAMPLE_CONC_PM: string = "show_sample_conc_pm";
-    public PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT: string = "request_work_auth_link_text";
-    public PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT: string = "access_auth_account_link_text";
-    public PROPERTY_WORKAUTH_INSTRUCTIONS: string = "workauth_instructions";
-    public PROPERTY_AUTH_ACCOUNTS_DESCRIPTION: string = "auth_accounts_description";
-    public PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD: string = "hiseq_run_type_label_standard";
+    public readonly PROPERTY_SHOW_SAMPLE_CONC_PM: string = "show_sample_conc_pm";
+    public readonly PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT: string = "request_work_auth_link_text";
+    public readonly PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT: string = "access_auth_account_link_text";
+    public readonly PROPERTY_WORKAUTH_INSTRUCTIONS: string = "workauth_instructions";
+    public readonly PROPERTY_AUTH_ACCOUNTS_DESCRIPTION: string = "auth_accounts_description";
+    public readonly PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD: string = "hiseq_run_type_label_standard";
+    public readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string = "analysis_assistance_group";
+    public readonly PROPERTY_CONTACT_EMAIL_BIOINFORMATICS: string = "contact_email_bioinformatics";
+    public readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
+    public readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string = "request_bio_analysis_note";
+    public readonly PROPERTY_HIDE_SAMPLETYPE_ON_EXTERNAL_EXPERIMENT: string = "hide_sampletype_on_external_experiment";
+
+
 
     public properties: Map<string, string> = new Map<string, string>();
     private requestCategoryTypeMap: Map<string, string> = new Map<string, string>();
@@ -145,10 +152,10 @@ export class GnomexService {
         if (this.properties != null) {
             let qualName: string = idCoreFacility + "\t" + name;
             result = this.properties[qualName];
-            if (result === null || result === "") {
+            if (!result) {
                 result = this.properties[name];
             }
-            if (result == null) {
+            if (!result) {
                 result = "";
             }
         }
@@ -223,6 +230,11 @@ export class GnomexService {
         });
     }
 
+    rebuildPropertyList() {
+        this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
+            this.propertyList = response;
+        });
+    }
     /**
      See if this person has any request categories that allow external uploads
      if not then don't show the upload external experiment menu item.

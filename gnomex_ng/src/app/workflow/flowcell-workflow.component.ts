@@ -110,7 +110,7 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
         }
 
         this.workflowService.getFlowCellList(params).subscribe((response: any) => {
-            if (response.result !== "INVALID") {
+            if (response && response.result !== "INVALID") {
                 this.workItemList = response;
                 if (!this.securityAdvisor.isArray(response)) {
                     this.workItemList = [response.WorkItem];

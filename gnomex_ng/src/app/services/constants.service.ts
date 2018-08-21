@@ -88,6 +88,9 @@ export class ConstantsService {
     public readonly ICON_DELETE:string = "assets/delete.png";
     public readonly ICON_FOLDER_DELETE:string= "assets/folder_delete.png";
 
+    public readonly ICON_INFORMATION:string= "assets/information.png";
+    public readonly ICON_UPLOAD:string= "assets/upload.png";
+
 
 
     public getTreeIcon(item:any,name:string) {

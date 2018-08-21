@@ -70,41 +70,42 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
             this.form =  new FormGroup({});
         }
 
-        this._annotations.forEach(annot => {
-            this.form.addControl(annot.name, new FormControl());
+        if (this._annotations) {
+            this._annotations.forEach(annot => {
+                this.form.addControl(annot.name, new FormControl());
 
-            if(annot.codePropertyType === this.TEXT){
-                this.form.controls[annot.name].setValue(annot.value);
-            }else if(annot.codePropertyType === this.CHECK){
-                this.form.controls[annot.name].setValue(annot.value === 'Y');
-            }else if(annot.codePropertyType === this.MOPTION){
-                let selectedOpts: IAnnotationOption[] = [];
-                for (let opt  of annot.PropertyOption){
-                     if (opt.selected ==='Y'){
-                         selectedOpts.push(opt);
-                     }
+                if (annot.codePropertyType === this.TEXT) {
+                    this.form.controls[annot.name].setValue(annot.value);
+                } else if (annot.codePropertyType === this.CHECK) {
+                    this.form.controls[annot.name].setValue(annot.value === 'Y');
+                } else if (annot.codePropertyType === this.MOPTION) {
+                    let selectedOpts: IAnnotationOption[] = [];
+                    for (let opt  of annot.PropertyOption) {
+                        if (opt.selected === 'Y') {
+                            selectedOpts.push(opt);
+                        }
+                    }
+                    this.form.controls[annot.name].setValue(selectedOpts);
+                } else if (annot.codePropertyType === this.OPTION) {
+                    this.form.controls[annot.name].setValue(annot.value ? annot.value : '');
+
+
+                } else if (annot.codePropertyType === this.URL) {
+                    this.form.controls[annot.name].setValue(annot);
                 }
-                this.form.controls[annot.name].setValue(selectedOpts);
-            }else if(annot.codePropertyType === this.OPTION){
-                this.form.controls[annot.name].setValue(annot.value ? annot.value : '');
 
-
-
-            } else if(annot.codePropertyType === this.URL){
-                this.form.controls[annot.name].setValue(annot);
-            }
-
-            if(annot.isRequired === 'Y'){
-                if(annot.codePropertyType === this.TEXT){
-                    this.form.controls[annot.name].setValidators([Validators.required]);
-                }else if(annot.codePropertyType === this.CHECK){
-                    this.form.controls[annot.name].setValidators([Validators.requiredTrue]);
-                }else if(annot.codePropertyType === this.MOPTION || annot.codePropertyType === this.OPTION ){
-                    this.form.controls[annot.name].setValidators(selectRequired());
+                if (annot.isRequired === 'Y') {
+                    if (annot.codePropertyType === this.TEXT) {
+                        this.form.controls[annot.name].setValidators([Validators.required]);
+                    } else if (annot.codePropertyType === this.CHECK) {
+                        this.form.controls[annot.name].setValidators([Validators.requiredTrue]);
+                    } else if (annot.codePropertyType === this.MOPTION || annot.codePropertyType === this.OPTION) {
+                        this.form.controls[annot.name].setValidators(selectRequired());
+                    }
                 }
-            }
 
-        });
+            });
+        }
         this.form.markAsPristine();
 
 
