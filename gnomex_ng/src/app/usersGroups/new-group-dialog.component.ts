@@ -61,8 +61,8 @@ export class NewGroupDialogComponent implements OnInit{
     public save(): void {
         this.showSpinner = true;
         let params: URLSearchParams = new URLSearchParams();
-        params.set("accountsXMLString", "");
-        params.set("collaboratorsXMLString", "");
+        params.set("accountsJSONString", "");
+        params.set("collaboratorsJSONString", "");
         params.set("contactPhone", this.addGroupFG.controls['phone'].value);
         params.set("contactEmail", this.emailFC.value);
         params.set("idLab", '0');
@@ -78,11 +78,11 @@ export class NewGroupDialogComponent implements OnInit{
             params.set("isExternalPricing", "Y");
             params.set("isExternalPricingCommercial", "Y");
         }
-        params.set("institutionsXMLString", "");
+        params.set("institutionsJSONString", "");
         params.set("firstName", this.addGroupFG.controls['firstName'].value);
         params.set("lastName", this.addGroupFG.controls['lastName'].value);
-        params.set("managersXMLString", "");
-        params.set("membersXMLString", "");
+        params.set("managersJSONString", "");
+        params.set("membersJSONString", "");
 
         this.labListService.saveLab(params).subscribe((response: Response) => {
             if (response.status === 200) {

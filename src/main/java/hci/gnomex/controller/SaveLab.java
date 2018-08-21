@@ -32,10 +32,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -52,24 +53,29 @@ public class SaveLab extends GNomExCommand implements Serializable {
 	// the static field for logging in Log4J
 	private static Logger LOG = Logger.getLogger(SaveLab.class);
 
-	private String               institutionsXMLString;
-	private Document             institutionsDoc;
+	private String               institutionsJSONString;
+//	private Document             institutionsDoc;
+	private JsonArray            labInstitutionJson;
 	private LabInstitutionParser labInstitutionParser;
 
-	private String          membersXMLString;
-	private Document        membersDoc;
+	private String          membersJSONString;
+//	private Document        membersDoc;
+	private JsonArray       membersJson;
 	private LabMemberParser labMemberParser;
 
-	private String          collaboratorsXMLString;
-	private Document        collaboratorsDoc;
+	private String          collaboratorsJSONString;
+//	private Document        collaboratorsDoc;
+	private JsonArray       collaboratorsJson;
 	private LabMemberParser collaboratorParser;
 
-	private String          managersXMLString;
-	private Document        managersDoc;
+	private String          managersJSONString;
+//	private Document        managersDoc;
+	private JsonArray       managersJson;
 	private LabMemberParser managerParser;
 
-	private String               accountsXMLString;
-	private Document             accountsDoc;
+	private String               accountsJSONString;
+//	private Document             accountsDoc;
+	private JsonArray            accountsJson;
 	private BillingAccountParser accountParser;
 
 	private LabCoreFacilityParser coreFacilityParser;
@@ -89,7 +95,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 		labScreen = new Lab();
 		HashMap errors = this.loadDetailObject(request, labScreen);
 		this.addInvalidFields(errors);
-		if (labScreen.getIdLab() == null || labScreen.getIdLab().intValue() == 0) {
+		if (labScreen.getIdLab() == null || labScreen.getIdLab() == 0) {
 			isNewLab = true;
 		}
 
@@ -100,97 +106,103 @@ public class SaveLab extends GNomExCommand implements Serializable {
 			}
 		}
 
-		if (request.getParameter("institutionsXMLString") != null
-				&& !request.getParameter("institutionsXMLString").equals("")) {
-			institutionsXMLString = request.getParameter("institutionsXMLString");
+		if (request.getParameter("institutionsJSONString") != null
+				&& !request.getParameter("institutionsJSONString").equals("")) {
+			institutionsJSONString = request.getParameter("institutionsJSONString");
 
-
-			reader = new StringReader(institutionsXMLString);
-			try {
-				SAXBuilder sax = new SAXBuilder();
-				institutionsDoc = sax.build(reader);
-				labInstitutionParser = new LabInstitutionParser(institutionsDoc);
-			}
-			catch (JDOMException je) {
-				this.addInvalidField("institutionsXMLString", "Invalid institutionsXMLString");
-				this.errorDetails = Util.GNLOG(LOG, "Cannot parse institutionsXMLString", je);
-			}
-		}
-		if (request.getParameter("membersXMLString") != null && !request.getParameter("membersXMLString").equals("")) {
-			membersXMLString = request.getParameter("membersXMLString");
-
-
-			reader = new StringReader(membersXMLString);
-			try {
-				SAXBuilder sax = new SAXBuilder();
-				membersDoc = sax.build(reader);
-				labMemberParser = new LabMemberParser(membersDoc);
-			}
-			catch (JDOMException je) {
-				this.addInvalidField("membersXMLString", "Invalid membersXMLString");
-				this.errorDetails = Util.GNLOG(LOG, "Cannot parse membersXMLString", je);
+			if (Util.isParameterNonEmpty(institutionsJSONString)) {
+				try {
+					JsonReader jsonReader = Json.createReader(new StringReader(institutionsJSONString));
+					labInstitutionJson = jsonReader.readArray();
+					labInstitutionParser = new LabInstitutionParser(labInstitutionJson);
+				}
+				catch (Exception e) {
+					this.addInvalidField("institutionsJSONString", "Invalid institutionsJSONString");
+					this.errorDetails = Util.GNLOG(LOG, "Cannot parse institutionsJSONString", e);
+				}
 			}
 		}
-		if (request.getParameter("collaboratorsXMLString") != null
-				&& !request.getParameter("collaboratorsXMLString").equals("")) {
-			collaboratorsXMLString = request.getParameter("collaboratorsXMLString");
 
-			reader = new StringReader(collaboratorsXMLString);
-			try {
-				SAXBuilder sax = new SAXBuilder();
-				collaboratorsDoc = sax.build(reader);
-				collaboratorParser = new LabMemberParser(collaboratorsDoc);
-			}
-			catch (JDOMException je) {
-				this.addInvalidField("collaboratorsXMLString", "Invalid collaboratorsXMLString");
-				this.errorDetails = Util.GNLOG(LOG, "Cannot parse collaboratorsXMLString", je);
-			}
-		}
-		if (request.getParameter("managersXMLString") != null && !request.getParameter("managersXMLString").equals("")) {
-			managersXMLString = request.getParameter("managersXMLString");
+		if (request.getParameter("membersJSONString") != null
+				&& !request.getParameter("membersJSONString").equals("")) {
+			membersJSONString = request.getParameter("membersJSONString");
 
-			reader = new StringReader(managersXMLString);
-			try {
-				SAXBuilder sax = new SAXBuilder();
-				managersDoc = sax.build(reader);
-				managerParser = new LabMemberParser(managersDoc);
-			}
-			catch (JDOMException je) {
-				this.addInvalidField("managersXMLString", "Invalid managersXMLString");
-				this.errorDetails = Util.GNLOG(LOG, "Cannot parse managersXMLString", je);
+			if (Util.isParameterNonEmpty(membersJSONString)) {
+				try {
+					JsonReader jsonReader = Json.createReader(new StringReader(membersJSONString));
+					membersJson = jsonReader.readArray();
+					labMemberParser = new LabMemberParser(membersJson);
+				}
+				catch (Exception e) {
+					this.addInvalidField("membersJSONString", "Invalid membersJSONString");
+					this.errorDetails = Util.GNLOG(LOG, "Cannot parse membersJSONString", e);
+				}
 			}
 		}
-		if (request.getParameter("accountsXMLString") != null && !request.getParameter("accountsXMLString").equals("")) {
-			accountsXMLString = request.getParameter("accountsXMLString");
 
+		if (request.getParameter("collaboratorsJSONString") != null
+				&& !request.getParameter("collaboratorsJSONString").equals("")) {
+			collaboratorsJSONString = request.getParameter("collaboratorsJSONString");
 
-			reader = new StringReader(accountsXMLString);
-			try {
-				SAXBuilder sax = new SAXBuilder();
-				accountsDoc = sax.build(reader);
-				accountParser = new BillingAccountParser(accountsDoc);
-
-			}
-			catch (JDOMException je) {
-				this.addInvalidField("accountsXMLString", "Invalid accountsXMLString");
-				this.errorDetails = Util.GNLOG(LOG, "Cannot parse accountsXMLString", je);
+			if (Util.isParameterNonEmpty(collaboratorsJSONString)) {
+				try {
+					JsonReader jsonReader = Json.createReader(new StringReader(collaboratorsJSONString));
+					collaboratorsJson = jsonReader.readArray();
+					collaboratorParser = new LabMemberParser(collaboratorsJson);
+				}
+				catch (Exception e) {
+					this.addInvalidField("collaboratorsJSONString", "Invalid collaboratorsJSONString");
+					this.errorDetails = Util.GNLOG(LOG, "Cannot parse collaboratorsJSONString", e);
+				}
 			}
 		}
-		String coreFacilitiesXMLString = "";
-		if (request.getParameter("coreFacilitiesXMLString") != null
-				&& !request.getParameter("coreFacilitiesXMLString").equals("")) {
-			coreFacilitiesXMLString = request.getParameter("coreFacilitiesXMLString");
 
-			reader = new StringReader(coreFacilitiesXMLString);
-			try {
-				SAXBuilder sax               = new SAXBuilder();
-				Document   coreFacilitiesDoc = sax.build(reader);
-				coreFacilityParser = new LabCoreFacilityParser(coreFacilitiesDoc);
+		if (request.getParameter("managersJSONString") != null && !request.getParameter("managersJSONString").equals("")) {
+			managersJSONString = request.getParameter("managersJSONString");
 
+			if (Util.isParameterNonEmpty(managersJSONString)) {
+				try {
+					JsonReader jsonReader = Json.createReader(new StringReader(managersJSONString));
+					managersJson = jsonReader.readArray();
+					managerParser = new LabMemberParser(managersJson);
+				}
+				catch (Exception e) {
+					this.addInvalidField("managersJSONString", "Invalid managersJSONString");
+					this.errorDetails = Util.GNLOG(LOG, "Cannot parse managersJSONString", e);
+				}
 			}
-			catch (JDOMException je) {
-				this.addInvalidField("coreFacilitiesXMLString", "Invalid coreFacilitiesXMLString");
-				this.errorDetails = Util.GNLOG(LOG, "Cannot parse coreFacilitiesXMLString", je);
+		}
+
+		if (request.getParameter("accountsJSONString") != null && !request.getParameter("accountsJSONString").equals("")) {
+			accountsJSONString = request.getParameter("accountsJSONString");
+
+			if (Util.isParameterNonEmpty(accountsJSONString)) {
+				try {
+					JsonReader jsonReader = Json.createReader(new StringReader(accountsJSONString));
+					accountsJson = jsonReader.readArray();
+					accountParser = new BillingAccountParser(accountsJson);
+				}
+				catch (Exception e) {
+					this.addInvalidField("accountsJSONString", "Invalid accountsJSONString");
+					this.errorDetails = Util.GNLOG(LOG, "Cannot parse accountsJSONString", e);
+				}
+			}
+		}
+
+		if (request.getParameter("coreFacilitiesJSONString") != null
+				&& !request.getParameter("coreFacilitiesJSONString").equals("")) {
+			String coreFacilitiesJSONString = request.getParameter("coreFacilitiesJSONString");
+
+			if (Util.isParameterNonEmpty(coreFacilitiesJSONString)) {
+				try {
+					JsonReader jsonReader = Json.createReader(new StringReader(coreFacilitiesJSONString));
+					JsonArray coreFacilitiesJson = jsonReader.readArray();
+					coreFacilityParser = new LabCoreFacilityParser(coreFacilitiesJson);
+				}
+				catch (Exception e) {
+					this.addInvalidField("coreFacilitiesJSONString", "Invalid coreFacilitiesJSONString");
+					this.errorDetails = Util.GNLOG(LOG, "Cannot parse coreFacilitiesJSONString", e);
+				}
 			}
 		}
 
@@ -202,7 +214,6 @@ public class SaveLab extends GNomExCommand implements Serializable {
 		}
 
 		serverName = request.getServerName();
-
 	}
 
 	public Command execute() throws RollBackCommandException {
@@ -327,8 +338,12 @@ public class SaveLab extends GNomExCommand implements Serializable {
 						billingAccountsToSave.add(ba);
 
 						// If the billing account isPO then change billing status of all billingItems in the account
-						List billingItems = sess.createQuery(
-								"select bi from BillingItem bi where idBillingAccount = " + ba.getIdBillingAccount()).list();
+						List billingItems = sess.createQuery(""
+								+ " SELECT bi "
+								+ "   FROM BillingItem bi "
+								+ "  WHERE idBillingAccount = " + ba.getIdBillingAccount()
+						).list();
+
 						if (ba.getIsPO().equals("Y")) {
 							for (Iterator bIterator = billingItems.iterator(); bIterator.hasNext(); ) {
 								BillingItem bi = (BillingItem) bIterator.next();
@@ -417,9 +432,9 @@ public class SaveLab extends GNomExCommand implements Serializable {
 						// Save lab institutions
 						//
 						TreeSet institutions = new TreeSet(new InstitutionComparator());
-						for (Iterator i = labInstitutionParser.getInstititionMap().keySet().iterator(); i.hasNext(); ) {
+						for (Iterator i = labInstitutionParser.getInstitutionMap().keySet().iterator(); i.hasNext(); ) {
 							Integer     idInstitution = (Integer) i.next();
-							Institution institution   = (Institution) labInstitutionParser.getInstititionMap().get(idInstitution);
+							Institution institution   = (Institution) labInstitutionParser.getInstitutionMap().get(idInstitution);
 							institutions.add(institution);
 						}
 						lab.setInstitutions(institutions);
@@ -525,12 +540,18 @@ public class SaveLab extends GNomExCommand implements Serializable {
 					if (labAssociatedIds.size() == 0) {
 						labAssociatedIds.add(-1);
 					}
-					String deleteProjectString = "select p from Project p " + "where p.idLab is not null "
-							+ "and p.idAppUser not in (:ids) "
-							+ "and p.idProject not in (select d.idProject from ExperimentDesignEntry d) "
-							+ "and p.idProject not in (select f.idProject from ExperimentFactorEntry f) "
-							+ "and p.idProject not in (select q.idProject from QualityControlStepEntry q) "
-							+ "and p.idProject not in (select r.idProject from Request r) " + "and p.idLab=:idLab ";
+
+					String deleteProjectString = ""
+							+ " SELECT p "
+							+ "   FROM Project p "
+							+ "  WHERE p.idLab IS NOT NULL "
+							+ "    AND p.idAppUser NOT IN (:ids) "
+							+ "    AND p.idProject NOT IN (SELECT d.idProject FROM ExperimentDesignEntry d) "
+							+ "    AND p.idProject NOT IN (SELECT f.idProject FROM ExperimentFactorEntry f) "
+							+ "    AND p.idProject NOT IN (SELECT q.idProject FROM QualityControlStepEntry q) "
+							+ "    AND p.idProject NOT IN (SELECT r.idProject FROM Request r) "
+							+ "    AND p.idLab=:idLab ";
+
 					Query query = sess.createQuery(deleteProjectString);
 					query.setParameterList("ids", labAssociatedIds);
 					query.setParameter("idLab", lab.getIdLab());

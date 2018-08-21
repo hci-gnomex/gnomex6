@@ -612,6 +612,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 			this._rowData.idLab                    = idLab;
             this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+            this._rowData.coreFacilitiesJSONString = coreFacilitiesXMLString;
             this._rowData.accountName              = this.accountName;
             this._rowData.shortAcct                = this.shortAccountName;
             this._rowData.accountNumberBus         = this.accountNumberBus_Chartfield;
@@ -804,6 +805,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
             this._rowData.idLab                    = idLab;
             this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+            this._rowData.coreFacilitiesJSONString = coreFacilitiesXMLString;
             this._rowData.accountName              = this.accountName;
             this._rowData.shortAcct                = this.shortAccountName;
             this._rowData.idFundingAgency          = idFundingAgency;
@@ -949,6 +951,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
             this._rowData.idLab                    = idLab;
             this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+            this._rowData.coreFacilitiesJSONString  = coreFacilitiesXMLString;
             this._rowData.accountName              = this.accountName;
             this._rowData.shortAcct                = shortAcct;
             this._rowData.idFundingAgency          = idFundingAgency;

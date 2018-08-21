@@ -1165,7 +1165,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
         let params: URLSearchParams = new URLSearchParams();
         let cores: any[] = [];
 
-        let accountsXMLString: string;
+        let accountsJSONString: string;
 
         let chartfieldAccounts: any[] = [];
         let poAccounts:         any[] = [];
@@ -1205,7 +1205,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
         }
 
         let stringifiedAccounts: string = JSON.stringify(billingAccounts);
-        params.set("accountsXMLString", stringifiedAccounts);
+        params.set("accountsJSONString", stringifiedAccounts);
 
 
         if (this.groupForm) {
@@ -1246,9 +1246,10 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
                 }
             }
             let stringifiedSF = JSON.stringify(cores);
-            params.set("coreFacilitiesXMLString", stringifiedSF);
+            params.set("coreFacilitiesJSONString", stringifiedSF);
             params.set("excludeUsage", this.selectedGroup.excludeUsage);
             params.set("lab", this.selectedGroup.lab);
+            params.set("idLab", this.selectedGroup.idLab);
             params.set("version", this.selectedGroup.version);
         }
         if (this.billingAdminTab) {
@@ -1262,13 +1263,16 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
         if (this.membershipTab) {
             // let stringifiedMembers = JSON.stringify(this.addAppUser(this.membershipTab.membersDataSource.data));
             let stringifiedMembers = JSON.stringify(this.membershipTab.membersDataSource.data);
-            params.set("membersXMLString", stringifiedMembers);
+            params.set("membersJSONString", stringifiedMembers);
             let stringifiedColls = JSON.stringify(this.addAppUser(this.membershipTab.collaboratorsDataSource.data));
-            params.set("collaboratorsXMLString", stringifiedColls);
+            params.set("collaboratorsJSONString", stringifiedColls);
             let stringifiedManagers = JSON.stringify(this.addAppUser(this.membershipTab.managersDataSource.data));
-            params.set("managersXMLString", stringifiedManagers);
+            params.set("managersJSONString", stringifiedManagers);
 
         }
+
+        params.set("noJSONToXMLConversionNeeded", "Y");
+
         this.labListService.saveLab(params).subscribe((response: Response) => {
             if (response.status === 200) {
                 let responseJSON: any = response.json();
