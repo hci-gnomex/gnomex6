@@ -44,12 +44,12 @@ public class JsonTokenizer {
         char nextChar = this.dataBuffer.data[this.dataPosition];
 
         switch(nextChar) {
-            case '{' :  { /*this.tokenLength = 1;*/ this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_CURLY_BRACKET_LEFT; } break;
-            case '}' :  { /*this.tokenLength = 1;*/ this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_CURLY_BRACKET_RIGHT; } break;
-            case '[' :  { /*this.tokenLength = 1;*/ this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_SQUARE_BRACKET_LEFT ; } break;
-            case ']' :  { /*this.tokenLength = 1;*/ this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_SQUARE_BRACKET_RIGHT; } break;
-            case ',' :  { /*this.tokenLength = 1;*/ this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_COMMA; } break;
-            case ':' :  { /*this.tokenLength = 1;*/ this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_COLON; } break;
+            case '{' :  { this.tokenLength = 1; this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_CURLY_BRACKET_LEFT; } break;
+            case '}' :  { this.tokenLength = 1; this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_CURLY_BRACKET_RIGHT; } break;
+            case '[' :  { this.tokenLength = 1; this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_SQUARE_BRACKET_LEFT ; } break;
+            case ']' :  { this.tokenLength = 1; this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_SQUARE_BRACKET_RIGHT; } break;
+            case ',' :  { this.tokenLength = 1; this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_COMMA; } break;
+            case ':' :  { this.tokenLength = 1; this.tokenBuffer.type[this.tokenIndex] = TokenTypes.JSON_COLON; } break;
 
             case '"' :  { parseStringToken(); } break;
             case '0' :  ;

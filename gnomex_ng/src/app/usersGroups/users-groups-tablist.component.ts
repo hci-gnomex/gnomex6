@@ -1,31 +1,28 @@
-import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {AppUserListService} from "../services/app-user-list.service";
+import {AfterViewChecked, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {URLSearchParams} from "@angular/http";
+import {MatDialog, MatDialogConfig, MatDialogRef, MatSnackBar, MatSnackBarConfig} from "@angular/material";
+
+import {GridOptions} from "ag-grid/main";
+
 import {Subscription} from "rxjs/Subscription";
-import {GridOptions, RowDataChangedEvent} from "ag-grid/main";
-import { URLSearchParams } from "@angular/http";
-import {LabListService} from "../services/lab-list.service";
-import {
-    AbstractControl, FormBuilder, FormControl, FormGroup,
-    Validators
-} from "@angular/forms";
-import {GnomexService} from "../services/gnomex.service";
-import {NewUserDialogComponent} from "./new-user-dialog.component";
-import {
-    ErrorStateMatcher, MatDialog, MatDialogConfig, MatDialogRef,
-    MatSnackBarConfig
-} from "@angular/material";
-import {PasswordUtilService} from "../services/password-util.service";
-import {MatSnackBar} from "@angular/material";
-import {DialogsService} from "../util/popup/dialogs.service";
-import {DeleteUserDialogComponent} from "./delete-user-dialog.component";
-import {GetLabService} from "../services/get-lab.service";
-import {DictionaryService} from "../services/dictionary.service";
-import {NewGroupDialogComponent} from "./new-group-dialog.component";
-import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
-import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
+
 import {BillingAdminTabComponent} from "./billingAdminTab/billing-admin-tab.component";
+import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";
+import {DeleteUserDialogComponent} from "./delete-user-dialog.component";
 import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
+import {NewGroupDialogComponent} from "./new-group-dialog.component";
+import {NewUserDialogComponent} from "./new-user-dialog.component";
+import {VerifyUsersDialogComponent} from "./verify-users-dialog.component";
+
+import {AppUserListService} from "../services/app-user-list.service";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {DictionaryService} from "../services/dictionary.service";
+import {GetLabService} from "../services/get-lab.service";
+import {LabListService} from "../services/lab-list.service";
+import {PasswordUtilService} from "../services/password-util.service";
+import {BillingAccountTabComponent} from "./billingAccountTab/billing-account-tab.component";
 
 /**
  * @title Basic tabs
@@ -115,8 +112,9 @@ import {MembershipTabComponent} from "./membershipTab/membership-tab.component";
 
     `]
 })
-export class UsersGroupsTablistComponent implements OnInit{
+export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
+    @ViewChild("billingAccountTab") billingAccountTab: BillingAccountTabComponent;
     @ViewChild("billingAdminTab") billingAdminTab: BillingAdminTabComponent;
     @ViewChild("membershipTab") membershipTab: MembershipTabComponent;
 
@@ -150,8 +148,8 @@ export class UsersGroupsTablistComponent implements OnInit{
     private appUser: any;
     private idCoreFacility: string;
     private groupsData: any[] = [];
-    private labs: any[] = [];
-    private institutions: any[] = [];
+    public labs: any[] = [];
+    public institutions: any[] = [];
     public collaboratingLabs: any[] = [];
     public managingLabs: any[] = [];
     public myManagingLabs: any[] = [];
@@ -199,6 +197,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     public groupFormValid: boolean = false;
     private userLabel: string;
     private groupLabel: string;
+
     constructor(public secAdvisor: CreateSecurityAdvisorService,
                 public passwordUtilService: PasswordUtilService,
                 private appUserListService: AppUserListService,
@@ -303,7 +302,7 @@ export class UsersGroupsTablistComponent implements OnInit{
                     lab.pricing = 'com';
                     lab.icon = "../../assets/building.png";
                 } else {
-                    lab.pricing = "int;"
+                    lab.pricing = "int";
                     lab.icon = "../../assets/empty.png";
                 }
             }
@@ -314,7 +313,7 @@ export class UsersGroupsTablistComponent implements OnInit{
         this.rowData = [];
         if (this.secAdvisor.isAdmin || this.secAdvisor.isSuperAdmin || this.secAdvisor.isBillingAdmin) {
             this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any[]) => {
-                this.userLabel = response.length + " users"
+                this.userLabel = response.length + " users";
                 this.createUserForm();
                 this.userForm.markAsPristine();
                 this.touchUserFields();
@@ -326,7 +325,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     public buildGroups(params: URLSearchParams) {
         this.labListService.getLabListWithParams(params).subscribe((response: any[]) => {
             this.groupsData = response;
-            this.groupLabel = response.length + " groups"
+            this.groupLabel = response.length + " groups";
             this.setPricing();
         });
 
@@ -370,7 +369,7 @@ export class UsersGroupsTablistComponent implements OnInit{
                 this.isGroupsTab = true;
                 this.isUserTab = false;
             }
-            this.groupLabel = this.groupsData.length + " lab groups"
+            this.groupLabel = this.groupsData.length + " lab groups";
             this.createGroupForm();
             this.setPricing();
         });
@@ -552,8 +551,8 @@ export class UsersGroupsTablistComponent implements OnInit{
      *
      */
     onSelectionChanged() {
-        var params: URLSearchParams = new URLSearchParams();
-        var selectedRows = this.gridOptions.api.getSelectedRows();
+        let params: URLSearchParams = new URLSearchParams();
+        let selectedRows = this.gridOptions.api.getSelectedRows();
         this.idAppUser = selectedRows[0].idAppUser;
         params.set("idAppUser", this.idAppUser);
         this.getAppUserListSubscription = this.appUserListService.getAppUser(params).subscribe((response: any) => {
@@ -605,8 +604,8 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     onGroupsSelectionChanged() {
-        var params: URLSearchParams = new URLSearchParams();
-        var selectedRows = this.groupsGridOptions.api.getSelectedRows();
+        let params: URLSearchParams = new URLSearchParams();
+        let selectedRows = this.groupsGridOptions.api.getSelectedRows();
         this.idLab = selectedRows[0].idLab;
         this.myCoreFacilities = [];
         params.set("idLab", this.idLab);
@@ -990,7 +989,6 @@ export class UsersGroupsTablistComponent implements OnInit{
         if (this.codeUserPermissionKind === 'ADMIN' && coresIManage === 0) {
             this.dialogsService.confirm("The user is marked as an admin; Please specify the core facilities the user can manage.", null);
         } else {
-            let answer: string;
             if (this.isActiveChanged && this.isActiveFC.value == false) {
                 if ( this.isMemberOfLab()) {
                     let activeMessage = this.buildLabsMessage();
@@ -1017,29 +1015,199 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     saveLab(): void {
+
+        let warningMessages: string[] = [];
+
+        if (!this.selectedGroup) {
+            return;
+        }
+
+        if (this.billingAccountTab && this.billingAccountTab.tabFormGroup && this.billingAccountTab.tabFormGroup.invalid) {
+            warningMessages.push("Billing account errors detected!");
+        }
+
+        let chartfieldAccounts: any[] = [];
+        let poAccounts:         any[] = [];
+        let creditCardAccounts: any[] = [];
+
+        if (this.selectedGroup) {
+            if (this.selectedGroup.internalBillingAccounts) {
+                chartfieldAccounts = Array.isArray(this.selectedGroup.internalBillingAccounts)   ? this.selectedGroup.internalBillingAccounts   : [this.selectedGroup.internalBillingAccounts.BillingAccount];
+            }
+            if (this.selectedGroup.pOBillingAccounts) {
+                poAccounts         = Array.isArray(this.selectedGroup.pOBillingAccounts)         ? this.selectedGroup.pOBillingAccounts         : [this.selectedGroup.pOBillingAccounts.BillingAccount];
+            }
+            if (this.selectedGroup.creditCardBillingAccounts) {
+                creditCardAccounts = Array.isArray(this.selectedGroup.creditCardBillingAccounts) ? this.selectedGroup.creditCardBillingAccounts : [this.selectedGroup.creditCardBillingAccounts.BillingAccount];
+            }
+        }
+
+        for (let account of chartfieldAccounts) {
+            if (!this.arePoFieldsBlank(account)) {
+                warningMessages.push('Will clear PO account fields from new chartfield account "' + account.accountName + '"');
+            } if (!this.areCreditCardFieldsBlank(account)) {
+                warningMessages.push('Will clear credit card account fields from new chartfield account "' + account.accountName + '"');
+            }
+        }
+        for (let account of poAccounts) {
+            if (!this.areChartfieldFieldsBlank(account)) {
+                warningMessages.push('Will clear chartfield account fields from new PO account "' + account.accountName + '"');
+            } if (!this.areCreditCardFieldsBlank(account)) {
+                warningMessages.push('Will clear credit card account fields from new PO account "' + account.accountName + '"');
+            }
+        }
+        for (let account of creditCardAccounts) {
+            if (!this.arePoFieldsBlank(account)) {
+                warningMessages.push('Will clear PO account fields from new credit card account "' + account.accountName + '"');
+            } if (!this.areChartfieldFieldsBlank(account)) {
+                warningMessages.push('Will clear chartfield account fields from new credit card account "' + account.accountName + '"');
+            }
+        }
+
+        if (warningMessages.length > 0) {
+            warningMessages.push(' ');
+            warningMessages.push('Continue with save anyway?');
+
+            this.dialogsService.yesNoDialog(warningMessages, this, "saveGroup");
+        } else {
+            this.saveGroup();
+        }
+    }
+
+    testFunction(): void {
         console.log('Save this lab!');
     }
 
+    areChartfieldFieldsBlank(billingAccount: any): boolean {
+        return !!billingAccount
+            && !billingAccount.accountNumberBus
+            && !billingAccount.accountNumberOrg
+            && !billingAccount.accountNumberFund
+            && !billingAccount.accountNumberActivity
+            && !billingAccount.accountNumberProject
+            && !billingAccount.accountNumberAccount
+            && !billingAccount.accountNumberAu
+            && !billingAccount.accountNumberYear
+            && !billingAccount.custom1
+            && !billingAccount.custom2
+            && !billingAccount.custom3;
+    }
+    arePoFieldsBlank(billingAccount: any): boolean {
+        return true;
+    }
+    areCreditCardFieldsBlank(billingAccount: any): boolean {
+        return true;
+    }
+
+    clearChartfieldFields(billingAccount: any): void {
+        if (!billingAccount) {
+            return;
+        }
+
+        billingAccount.accountNumberBus      = '';
+        billingAccount.accountNumberOrg      = '';
+        billingAccount.accountNumberFund     = '';
+        billingAccount.accountNumberActivity = '';
+        billingAccount.accountNumberProject  = '';
+        billingAccount.accountNumberAccount  = '';
+        billingAccount.accountNumberAu       = '';
+        billingAccount.accountNumberYear     = '';
+        billingAccount.custom1               = '';
+        billingAccount.custom2               = '';
+        billingAccount.custom3               = '';
+    }
+    clearPoFields(billingAccount: any): void {
+        if (!billingAccount) {
+            return;
+        }
+
+        // billingAccount.accountNumberBus      = '';
+        // billingAccount.accountNumberOrg      = '';
+        // billingAccount.accountNumberFund     = '';
+        // billingAccount.accountNumberActivity = '';
+        // billingAccount.accountNumberProject  = '';
+        // billingAccount.accountNumberAccount  = '';
+        // billingAccount.accountNumberAu       = '';
+        // billingAccount.accountNumberYear     = '';
+        // billingAccount.custom1               = '';
+        // billingAccount.custom2               = '';
+        // billingAccount.custom3               = '';
+    }
+    clearCreditCardFields(billingAccount: any): void {
+        if (!billingAccount) {
+            return;
+        }
+
+        // billingAccount.accountNumberBus      = '';
+        // billingAccount.accountNumberOrg      = '';
+        // billingAccount.accountNumberFund     = '';
+        // billingAccount.accountNumberActivity = '';
+        // billingAccount.accountNumberProject  = '';
+        // billingAccount.accountNumberAccount  = '';
+        // billingAccount.accountNumberAu       = '';
+        // billingAccount.accountNumberYear     = '';
+        // billingAccount.custom1               = '';
+        // billingAccount.custom2               = '';
+        // billingAccount.custom3               = '';
+    }
+
     isMemberOfLab(): boolean {
-       if (this.collaboratingLabs.length > 0 ||
+        if (this.collaboratingLabs.length > 0 ||
             this.managingLabs.length > 0 ||
             this.labs.length > 0) {
-           return true;
-       } else {
-           return false;
-       }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     saveGroup() {
         let params: URLSearchParams = new URLSearchParams();
         let cores: any[] = [];
-        // For now put the selectedGroup accounts in the savelab. Later get them off the billingAccountsForm
+
         let accountsXMLString: string;
-        if (!this.secAdvisor.isArray(this.selectedGroup.billingAccounts)) {
-            this.selectedGroup.billingAccounts = [this.selectedGroup.billingAccounts.BillingAccount]
+
+        let chartfieldAccounts: any[] = [];
+        let poAccounts:         any[] = [];
+        let creditCardAccounts: any[] = [];
+
+        if (this.selectedGroup) {
+            if (this.selectedGroup.internalBillingAccounts) {
+                chartfieldAccounts = Array.isArray(this.selectedGroup.internalBillingAccounts)   ? this.selectedGroup.internalBillingAccounts   : [this.selectedGroup.internalBillingAccounts.BillingAccount];
+            }
+            if (this.selectedGroup.pOBillingAccounts) {
+                poAccounts         = Array.isArray(this.selectedGroup.pOBillingAccounts)         ? this.selectedGroup.pOBillingAccounts         : [this.selectedGroup.pOBillingAccounts.BillingAccount];
+            }
+            if (this.selectedGroup.creditCardBillingAccounts) {
+                creditCardAccounts = Array.isArray(this.selectedGroup.creditCardBillingAccounts) ? this.selectedGroup.creditCardBillingAccounts : [this.selectedGroup.creditCardBillingAccounts.BillingAccount];
+            }
         }
-        let stringifiedAccounts: string = JSON.stringify(this.selectedGroup.billingAccounts.slice(0,1));
+
+        let billingAccounts: any[] = [];
+
+        for (let account of chartfieldAccounts) {
+            this.clearPoFields(account);
+            this.clearCreditCardFields(account);
+
+            billingAccounts.push(account);
+        }
+        for (let account of poAccounts) {
+            this.clearChartfieldFields(account);
+            this.clearCreditCardFields(account);
+
+            billingAccounts.push(account);
+        }
+        for (let account of creditCardAccounts) {
+            this.clearChartfieldFields(account);
+            this.clearPoFields(account);
+
+            billingAccounts.push(account);
+        }
+
+        let stringifiedAccounts: string = JSON.stringify(billingAccounts);
         params.set("accountsXMLString", stringifiedAccounts);
+
+
         if (this.groupForm) {
             for (let field in this.groupForm.controls) {
                 const control = this.groupForm.get(field);
@@ -1056,7 +1224,7 @@ export class UsersGroupsTablistComponent implements OnInit{
                                 params.set("isExternalPricingCommercial", 'Y');
                                 break;
                             }
-                            case this.EXACADEMIC: {
+                            case this.INTERNAL: {
                                 params.set("isExternalPricing", 'N');
                                 params.set("isExternalPricingCommercial", 'N');
                                 break;
@@ -1092,7 +1260,8 @@ export class UsersGroupsTablistComponent implements OnInit{
             }
         }
         if (this.membershipTab) {
-            let stringifiedMembers = JSON.stringify(this.addAppUser(this.membershipTab.membersDataSource.data));
+            // let stringifiedMembers = JSON.stringify(this.addAppUser(this.membershipTab.membersDataSource.data));
+            let stringifiedMembers = JSON.stringify(this.membershipTab.membersDataSource.data);
             params.set("membersXMLString", stringifiedMembers);
             let stringifiedColls = JSON.stringify(this.addAppUser(this.membershipTab.collaboratorsDataSource.data));
             params.set("collaboratorsXMLString", stringifiedColls);
@@ -1131,7 +1300,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     searchCoreFacility(event) {
-        var params: URLSearchParams = new URLSearchParams();
+        let params: URLSearchParams = new URLSearchParams();
         params.set("idCoreFacility", event.value);
         params.set("idInstitution", "");
         params.set("isExternal", "");
@@ -1142,7 +1311,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     onExternalGroupChange(event) {
-        var params: URLSearchParams = new URLSearchParams();
+        let params: URLSearchParams = new URLSearchParams();
         params.set("idCoreFacility", "");
         params.set("idInstitution", "");
         if (event.checked) {
@@ -1163,7 +1332,7 @@ export class UsersGroupsTablistComponent implements OnInit{
     }
 
     searchInstitution(event) {
-        var params: URLSearchParams = new URLSearchParams();
+        let params: URLSearchParams = new URLSearchParams();
         params.set("idCoreFacility", "");
         params.set("idInstitution", event.value);
         params.set("isExternal", "");

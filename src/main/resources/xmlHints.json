@@ -150,8 +150,32 @@
     },
     {
       "command": "SaveLab",
+      "parameter": "collaboratorsXMLString",
+      "nodeheader": "collaborators",
+      "nodeprefix": "AppUser",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
+      "parameter": "managersXMLString",
+      "nodeheader": "managers",
+      "nodeprefix": "AppUser",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
       "parameter": "membersXMLString",
-      "nodeheader": "appUsers",
+      "nodeheader": "members",
       "nodeprefix": "AppUser",
       "elementhints": [
         {

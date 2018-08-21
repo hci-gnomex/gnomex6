@@ -24,7 +24,7 @@ import * as _ from "lodash";
 import {DateParserComponent} from "../../util/parsers/date-parser.component";
 import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
 import {Subscription} from "rxjs/Subscription";
-import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
+import {FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
 import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-users-selector.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
@@ -85,6 +85,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 	readonly CREDIT_CARD: string = 'CREDIT_CARD';
 
 	private _labInfo: any;
+
+	public tabFormGroup: FormGroup = new FormGroup({});
 
 	context;
 
@@ -238,6 +240,12 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		if (this.chartfieldGridApi) {
             this.chartfieldGridApi.formGroup = null;
         }
+        if (this.chartfieldGridApi) {
+            this.poGridApi.formGroup = null;
+        }
+        if (this.chartfieldGridApi) {
+            this.creditCardGridApi.formGroup = null;
+        }
 
         this.assignChartfieldGridContents(this.selectedCoreFacility);
 		this.assignPoGridContents(this.selectedCoreFacility);
@@ -247,6 +255,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		this.creditCardCompanies = this.dictionaryService.getEntries(DictionaryService.CREDIT_CARD_COMPANY);
         this.fundingAgencies = this.dictionaryService.getEntries(DictionaryService.FUNDING_AGENCY);
 		//this.userList = this.dictionaryService.getEntries(DictionaryService.USE)
+
+        this.tabFormGroup.removeControl("chartfieldGridFormControl");
+        this.tabFormGroup.removeControl("poGridFormControl");
+        this.tabFormGroup.removeControl("creditCardGridFormControl");
 	}
 
 
@@ -1112,6 +1124,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			this.chartfieldGridApi.setRowData(shownGridData);
 			this.chartfieldGridApi.setColumnDefs(this.getChartfieldColumnDefs(shownGridData));
 			this.chartfieldGridApi.sizeColumnsToFit();
+
+			if (this.tabFormGroup && this.chartfieldGridApi && this.chartfieldGridApi.formGroup) {
+                this.tabFormGroup.addControl("chartfieldGridFormControl", this.chartfieldGridApi.formGroup);
+            }
 		}
 	}
 
@@ -1144,6 +1160,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			this.poGridApi.setRowData(shownGridData);
 			this.poGridApi.setColumnDefs(this.getPoColumnDefs(shownGridData));
 			this.poGridApi.sizeColumnsToFit();
+
+            if (this.tabFormGroup && this.poGridApi && this.poGridApi.formGroup) {
+                this.tabFormGroup.addControl("poGridFormControl", this.poGridApi.formGroup);
+            }
 		}
 	}
 
@@ -1176,6 +1196,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			this.creditCardGridApi.setColumnDefs(this.getCreditCardColumnDefs(shownGridData));
 			this.creditCardGridApi.setRowData(shownGridData);
 			this.creditCardGridApi.sizeColumnsToFit();
+
+            if (this.tabFormGroup && this.creditCardGridApi && this.creditCardGridApi.formGroup) {
+                this.tabFormGroup.addControl("creditCardGridFormControl", this.creditCardGridApi.formGroup);
+            }
 		}
 	}
 

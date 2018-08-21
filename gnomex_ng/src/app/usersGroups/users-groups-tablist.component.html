@@ -380,7 +380,7 @@
                             </div>
                         </mat-tab>
                         <mat-tab #groupTab label="Billing Accounts" class="full-height full-width">
-                            <billing-account-tab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
+                            <billing-account-tab #billingAccountTab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
                         </mat-tab>
                         <mat-tab label="Invoices" class="full-height">
                             <div *ngIf="selectedGroup">
@@ -406,7 +406,7 @@
                         </div>
                         <div class="horizontal-spacer">
                         </div>
-                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveLab()">
+                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.groupForm.valid" (click)="saveLab()">
                             <img src="../../assets/save.png">
                             Save
                         </button>

@@ -16,6 +16,7 @@ export class PropertyService {
     public static readonly PROPERTY_PRODUCT_SHEET_NAME: string = 'product_sheet_name';
     public static readonly SHOW_ADMIN_NOTES_ON_REQUEST: string = 'show_admin_notes_on_request';
     public static readonly PROPERTY_DATASET_PRIVACY_EXPIRATION:string = "dataset_privacy_expiration";
+    public static readonly PROPERTY_HIDE_EXCLUDE_USAGE_FLAG:string = "hide_exclude_usage_flag";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
