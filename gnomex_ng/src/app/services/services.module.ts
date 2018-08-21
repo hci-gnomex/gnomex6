@@ -45,6 +45,7 @@ import {ProductsService} from "./products.service";
 import {NewExperimentService} from "./new-experiment.service";
 import {ProtocolService} from "./protocol.service";
 import {BrowseOrderValidateService} from "./browse-order-validate.service";
+import {ExperimentPlatformService} from "./experiment-platform.service";
 
 
 @NgModule({
@@ -101,7 +102,8 @@ import {BrowseOrderValidateService} from "./browse-order-validate.service";
         ProductsService,
         NewExperimentService,
         ProtocolService,
-        BrowseOrderValidateService
+        BrowseOrderValidateService,
+        ExperimentPlatformService
     ]})
 export class ServicesModule {
 }

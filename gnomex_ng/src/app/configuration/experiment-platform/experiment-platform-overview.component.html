@@ -1,0 +1,41 @@
+<div style="display:flex; flex-direction: column; height:100%; width:100%;">
+    <div *ngIf="secAdvisor.isSuperAdmin" style="margin-bottom: 0.5em">
+        <button mat-button color="primary" type="button" (click)="addCore($event)">
+            <img [src]="constService.PAGE_ADD">Add Core Facility
+        </button>
+    </div>
+    <div style="display:flex;height:100%; width:100%;">
+        <split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
+            <split-area size="20">
+                <div style="height:100%;width:100%;">
+                    <ag-grid-angular style="width: 100%; height: 90%;" class="ag-fresh"
+                                     [gridOptions]="gridOpt"
+                                     [rowData]="rowData"
+                                     [columnDefs]="columnDefs"
+                                     [rowSelection]="rowSelection"
+                                     (gridReady)="onGridReady($event)"
+                                     (rowSelected)="selectedRow($event)"
+                                     [enableSorting]="true"
+                                     [enableColResize]="true" >
+                    </ag-grid-angular>
+
+                </div>
+            </split-area>
+
+            <split-area size="80">
+
+                <div style="padding-left:2em;">
+                    <mat-tab-group class="full-height full-width border">
+                        <mat-tab [label]="tab.name" *ngFor="let tab of experimentPlatformTabs ">
+                            <div  *ngComponentOutlet="tab.component" > </div>
+                        </mat-tab>
+
+                    </mat-tab-group>
+                </div>
+
+            </split-area>
+        </split>
+
+    </div>
+
+</div>

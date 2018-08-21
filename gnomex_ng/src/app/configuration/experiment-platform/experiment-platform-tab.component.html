@@ -1,0 +1,213 @@
+
+<form [formGroup]="expPlatformGroup" style=" height:100%;width:100%; display:flex; flex-direction:column; font-size: small;">
+    <div class="flex-container-row">
+        <mat-form-field  class="medium-form-input">
+            <input matInput placeholder="Name" formControlName="name">
+            <mat-error *ngIf="this.expPlatformGroup?.controls['name']?.hasError('required')">
+                This field is required
+            </mat-error>
+        </mat-form-field>
+        <div class="padded-checkbox">
+            <label style="margin-right: 1em;"  > Active  </label>
+            <mat-checkbox  formControlName="active" > </mat-checkbox>
+        </div>
+
+    </div>
+
+
+    <div class="flex-container-row">
+        <mat-form-field class="medium-form-input">
+            <mat-select [compareWith]="compareByID" placeholder="Type" formControlName="type" (selectionChange)="onTypeChanged($event)">
+                <mat-option
+                        *ngFor="let opt of typeList"
+                        [value]="opt" >{{opt.display}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div class="padded-checkbox" >
+            <label style="margin-right: 1em;" > Associated With Analysis  </label>
+            <mat-checkbox  formControlName="associateAnalysis" > </mat-checkbox>
+        </div>
+        <div class="padded-checkbox">
+            <label style="margin-right: 1em;"  > Require Name & Description  </label>
+            <mat-checkbox  formControlName="requireNameDescipt" > </mat-checkbox>
+        </div>
+
+    </div>
+    <div class="flex-container-row" >
+        <mat-form-field  class="short-input margin-right-field">
+            <input matInput placeholder="Code" formControlName="code">
+            <!--<mat-error *ngIf="this.expPlatformGroup?.controls['code']?.hasError('required')">
+                This field is required
+            </mat-error>-->
+        </mat-form-field>
+
+        <mat-form-field class="short-input">
+
+            <img style="width:16px;" [src]="expPlatformGroup.get('icon').value" >
+            <mat-select style="width:calc(100% - 16px)" placeholder="Icon" formControlName="icon">
+                <mat-option
+                        *ngFor="let icon of iconList"
+                        [value]="icon" > <img [src]="icon">
+                </mat-option>
+            </mat-select>
+
+        </mat-form-field>
+
+    </div>
+
+    <mat-form-field class="medium-form-input">
+        <mat-select placeholder="Core Facility" formControlName="coreFacility" (selectionChange)="onCoreChanged($event)">
+            <mat-option *ngFor="let core of coreFacilityList" [value]="core.idCoreFacility" > {{core.display}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field *ngIf="showNote">
+        <textarea matInput placeholder="Notes" formControlName="notes" matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="2"></textarea>
+    </mat-form-field>
+
+    <mat-form-field class="medium-form-input" *ngIf="showVendor">
+        <mat-select placeholder="Vendor" formControlName="vendor" >
+            <mat-option *ngFor="let vendor of vendorList" [value]="vendor.idVendor" > {{vendor.display}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <div class="flex-container-row">
+        <label class="gx-label" style="margin-right: 2em;" > Available for </label>
+        <div class="flex-container-col">
+            <div>
+                <mat-checkbox  formControlName="isInternal" > </mat-checkbox>
+                <label class="gx-label" style="margin-left: 0.5em;"  > Internal Experiment Orders  </label>
+            </div>
+            <div>
+                <mat-checkbox  formControlName="isExternal" > </mat-checkbox>
+                <label class="gx-label"  style="margin-left: 0.5em;"  > Upload of Experiment Data Generated at a Third Party Facility  </label>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="flex-container-row">
+        <mat-form-field  class="short-input margin-right-field">
+            <input matInput placeholder="Sort Order" formControlName="sortOrder">
+            <mat-error *ngIf="this.expPlatformGroup?.controls['sortOrder']?.hasError('numberRange')">
+                {{this.expPlatformGroup.get('sortOrder').errors.numberRange }}
+            </mat-error>
+        </mat-form-field>
+        <button mat-button color="primary" (click)="editSortOrder()" class="margin-right-field"  > Edit Sort Order </button>
+
+        <mat-form-field *ngIf="showChannels" class="short-input margin-right-field">
+            <input type="number" min="1" [max]="channelMax" matInput [placeholder]="channelLabel" formControlName="numberOfChannels">
+        </mat-form-field>
+    </div>
+    <div class="flex-container-row">
+        <mat-form-field class="short-input margin-right-field">
+            <input matInput placeholder="Sample Batch Size" formControlName="sampleBatchSize">
+            <mat-error  *ngIf="this.expPlatformGroup?.controls['sampleBatchSize']?.hasError('numberRange')">
+                {{this.expPlatformGroup.get('sampleBatchSize').errors.numberRange }}
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field style="width:calc(99% - 12em )" *ngIf="this.expPlatformGroup?.controls['sampleBatchSize'].value">
+            <input matInput placeholder="Sample batch warning message" formControlName="customWarningMessage">
+        </mat-form-field>
+
+    </div>
+    <mat-form-field class="medium-form-input"  *ngIf="showOrganism">
+        <mat-select placeholder="Default Organism" formControlName="organism" >
+            <mat-option *ngFor="let organism of organismList" [value]="organism.value" > {{organism.display}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+
+
+    <div class="flex-container-col">
+
+        <div class="flex-container-row">
+            <div class="partial-padded-checkbox"  style="flex:1" >
+                <mat-checkbox (change)="onUseProducts()" formControlName="useProduct" > </mat-checkbox>
+                <label class="gx-label" style="margin-left:0.5em;"  > Use Products  </label>
+            </div>
+            <mat-form-field class="margin-right-field" style="flex:4"  *ngIf="this.expPlatformGroup.get('useProduct')?.value;">
+                <mat-select placeholder="Product Type" formControlName="productType" >
+                    <mat-option *ngFor="let productType of productTypeList" [value]="productType.idProductType" > {{productType.display}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field style="flex:6" *ngIf="this.expPlatformGroup.get('useProduct')?.value;">
+                <input matInput placeholder="No Products Message" formControlName="noProductsMessage">
+            </mat-form-field>
+        </div>
+
+        <div class="flex-container-row"  *ngIf="this.expPlatformGroup.get('useProduct')?.value;">
+            <mat-form-field >
+                <mat-select placeholder="Select a Status" formControlName="productStatus" >
+                    <mat-option *ngFor="let productStatus of productStatusList" [value]="productStatus.codeRequestStatus" > {{productStatus.codeRequestStatus}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+
+        </div>
+    </div>
+    <div class="flex-container-row" >
+
+
+        <div class="partial-padded-checkbox" >
+            <mat-checkbox formControlName="saveAndSubmit" > </mat-checkbox>
+            <label class="gx-label" style="margin-left:0.5em;" > Allow saving of request before submission </label>
+        </div>
+        <div style="margin-left:auto"
+             [ngClass]="{'warningLabelSevere':!isMinorSecurity,'warningLabelMinor':  isMinorSecurity }">
+            <label> {{ securityLabel}} </label>
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!--#optRef-->
+    <!--(onSelectionChange)="selectOption(optRef)"-->
+
+
+
+    <!-- <div class="annot-control">
+        <label style="margin-right: 1em;"  >{{annot.name}}  </label>
+        <mat-checkbox  [formControl]="this.form.controls[annot.name]" >
+        </mat-checkbox>
+        <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
+            This field is required
+        </mat-error>
+    </div> -->
+
+
+    <!--<mat-form-field >
+        <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.form.controls[annot.name]">
+            <mat-option *ngFor="let opt of annot.PropertyOption"
+                        #mOptRef
+                        (onSelectionChange)="selectOption(mOptRef)"
+                        [value]="opt" > {{opt.name}}
+            </mat-option>
+        </mat-select>
+        <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('selectRequired')">
+            This field is required
+        </mat-error>
+    </mat-form-field>
+
+    <div *ngSwitchCase="'URL'" class="annot-control">
+        <url-annotation [formControl]="this.form.controls[annot.name]">  </url-annotation>
+    </div> -->
+
+
+</form>
