@@ -23,7 +23,7 @@ import {BillingService} from "../../services/billing.service";
             display: inline-flex;
             flex-direction: column;
         }
-        .inline-span {
+        .inline-block {
             width: 20em;
             display: inline-block;
         }
@@ -148,7 +148,6 @@ export class TabSeqSetupView implements OnInit {
             this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
             this.showAppPrice = true;
-
         });
         if (this.currState === "NanoStringState") {
             // Hide isPrepped
@@ -172,6 +171,8 @@ export class TabSeqSetupView implements OnInit {
             }
 
         }
+        this.newExperimentService.seqType = this.form.get("seqType").value;
+
     }
 
     selectApp(event) {
@@ -210,6 +211,9 @@ export class TabSeqSetupView implements OnInit {
         }
     }
 
+    onNumSamplesChanged(event) {
+
+    }
 
     private sortApplicationsAlphabetically(obj1, obj2): number{
         if (obj1 == null && obj2 == null) {

@@ -213,7 +213,7 @@ export class PipelineWorkflowComponent implements OnInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        params.api.setHeaderHeight(75);
+        params.api.setHeaderHeight(50);
         params.api.sizeColumnsToFit();
         this.initialize();
     }

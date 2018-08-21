@@ -6,19 +6,13 @@ import {NewExperimentService} from "../../services/new-experiment.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {MatOption, MatAutocomplete} from "@angular/material";
 import {Subscription} from "rxjs";
+import {AnnotationService} from "../../services/annotation.service";
+import {AnnotationTabComponent} from "../../util/annotation-tab.component";
 
 @Component({
     selector: "tabSampleSetupView",
     templateUrl: "./tab-sample-setup-view.html",
     styles: [`        
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-        }
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
         .row-one {
             display: flex;
             flex-grow: 1;
@@ -37,12 +31,6 @@ import {Subscription} from "rxjs";
         mat-form-field.formField {
             width: 30%;
             margin: 0 0.5em;
-        }
-        .flexbox-column{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            width:100%;
         }
         .flex-container{
             display: flex;
@@ -77,19 +65,18 @@ export class TabSampleSetupViewComponent implements OnInit {
     @ViewChild("autoOrg") orgAutocomplete: MatAutocomplete;
     private form: FormGroup;
     private sampleType: any;
-    private organisms: any[] = [];
-    public filteredSampleTypeListDna: any[] = [];
-    public filteredSampleTypeListRna: any[] = [];
+    private filteredSampleTypeListDna: any[] = [];
+    private filteredSampleTypeListRna: any[] = [];
     private previousOrganismMatOption: MatOption;
-    public sampleSetupContainer: boolean = true;
-    public showSampleNotes: boolean = false;
-    public showSamplePrepContatainer: boolean = true;
-    public showRnaseBox: boolean = false;
-    public showDnaseBox: boolean = false;
-    label: string = "setup";
+    private sampleSetupContainer: boolean = true;
+    private showSampleNotes: boolean = false;
+    private showSamplePrepContatainer: boolean = true;
+    private showRnaseBox: boolean = false;
+    private showDnaseBox: boolean = false;
 
     constructor(private dictionaryService: DictionaryService,
                 private newExperimentService: NewExperimentService,
+                private annotationService: AnnotationService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
                 private fb: FormBuilder) {
@@ -106,17 +93,18 @@ export class TabSampleSetupViewComponent implements OnInit {
             elution: ['', [Validators.required, Validators.maxLength(100)]],
             dnaseBox: [''],
             rnaseBox: [''],
-            keepSample: [''],
+            keepSample: ['', Validators.required],
             acid: [''],
             coreNotes: ['', [Validators.maxLength(5000)]],
         }, { validator: this.oneCategoryRequired});
-        this.organisms = this.gnomexService.activeOrganismList;
+        this.newExperimentService.organisms = this.gnomexService.activeOrganismList;
         this.newExperimentService.currentState.subscribe((value) =>{
             if (value) {
                 this.currState = value;
                 this.buildSampleTypes();
             }
         });
+        this.newExperimentService.sampleSetupView = this;
     }
 
     oneCategoryRequired(group : FormGroup) : {[s:string ]: boolean} {
@@ -136,6 +124,10 @@ export class TabSampleSetupViewComponent implements OnInit {
         if (this.filteredSampleTypeListRna.length === 0 && this.requestCategory) {
             this.filteredSampleTypeListRna = this.newExperimentService.filterSampleType("RNA", this.currState, this.requestCategory)
                 .sort(this.newExperimentService.sortSampleTypes);
+        }
+        if (this.newExperimentService.sampleTypes.length === 0) {
+            this.newExperimentService.sampleTypes = this.newExperimentService.sampleTypes.concat(this.filteredSampleTypeListDna);
+            this.newExperimentService.sampleTypes = this.newExperimentService.sampleTypes.concat(this.filteredSampleTypeListRna);
         }
     }
 
@@ -159,6 +151,7 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.setState("");
         this.showSampleNotes = this.form.get("selectedDna").value.notes ? true : false;;
         this.sampleType = this.form.get("selectedDna").value;
+        this.newExperimentService.sampleType = this.sampleType;
         this.pickSampleType();
     }
 
@@ -169,6 +162,8 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.setState("");
         this.showSampleNotes = this.form.get("selectedRna").value.notes ? true : false;
         this.sampleType = this.form.get("selectedRna").value;
+        this.newExperimentService.sampleTypes = this.filteredSampleTypeListRna;
+        this.newExperimentService.sampleType = this.sampleType;
         this.pickSampleType();
     }
 
@@ -254,16 +249,16 @@ export class TabSampleSetupViewComponent implements OnInit {
         let fOrgs: any[] = [];
         if (selectedOrganism) {
             if (selectedOrganism.idOrganism) {
-                fOrgs = this.organisms.filter(org =>
+                fOrgs = this.newExperimentService.organisms.filter(org =>
                     org.combinedName.toLowerCase().indexOf(selectedOrganism.combinedName.toLowerCase()) >= 0);
                 return fOrgs;
             } else {
-                fOrgs = this.organisms.filter(org =>
+                fOrgs = this.newExperimentService.organisms.filter(org =>
                     org.combinedName.toLowerCase().indexOf(selectedOrganism.toLowerCase()) >= 0);
                 return fOrgs;
             }
         } else {
-            return this.organisms;
+            return this.newExperimentService.organisms;
         }
     }
 
@@ -272,6 +267,19 @@ export class TabSampleSetupViewComponent implements OnInit {
             this.form.get("organism").setValue(event.source.value);
             this.newExperimentService.annotations = this.newExperimentService.filterAnnotations(event.source.value.idOrganism);
             this.indexEvent.emit('+');
+            this.newExperimentService.organism = this.form.get("organism").value;
+            this.newExperimentService.propertyEntriesForUser = this.newExperimentService.filterPropertiesByUser(this.newExperimentService.propertyEntries);
+            this.setAnnotations(this.newExperimentService.annotations);
+            this.newExperimentService.propertyEntriesForUser.sort(AnnotationService.sortProperties);
+            this.newExperimentService.propEntriesChanged.next(true);
+        }
+    }
+
+    setAnnotations(annotations: any) {
+        for (let component of this.newExperimentService.components) {
+            if (component instanceof AnnotationTabComponent) {
+                component.annotations = annotations;
+            }
         }
     }
 
@@ -283,4 +291,8 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     }
 
+    setNumSamples(event) {
+        this.newExperimentService.numSamples = this.form.get("numSamples").value;
+        this.newExperimentService.numSamplesChanged.next(true);
+    }
 }

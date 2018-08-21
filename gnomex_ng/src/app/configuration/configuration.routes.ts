@@ -7,12 +7,15 @@ import {ManageProtocolsComponent} from "./manage-protocols.component";
 import {EditProtocolComponent} from "./edit-protocol.component";
 import {OverviewProtocolComponent} from "./overview-protocol.component";
 import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.service";
+import {ExperimentPlatformOverviewComponent} from "./experiment-platform/experiment-platform-overview.component";
 
 const ROUTES: Routes = [
     { path: "browse-dictionary", component: BrowseDictionaryComponent },
     { path: "editDictionary", component: BrowseDictionaryComponent, outlet: 'modal' },
     { path: "configure-core-facility", component: ConfigCoreFacilityComponent},
     { path: "configure-annotations", component: ConfigureAnnotationsComponent },
+    { path: "configure-experiment-platform", component: ExperimentPlatformOverviewComponent },
+
     { path: "configure-annotations/:idCoreFacility", component: ConfigureAnnotationsComponent },
     { path: "configure-organisms", component: ConfigureOrganismsComponent },
 

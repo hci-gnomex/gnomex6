@@ -1,7 +1,9 @@
 import {Component, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
-import {OrderType} from "../../util/annotation-tab.component";
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
+import {MatDialog} from "@angular/material";
+import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 
 @Component({
     selector: "tabPropertiesView",
@@ -10,20 +12,17 @@ import {OrderType} from "../../util/annotation-tab.component";
     `]
 })
 
-export class TabPropertiesViewComponent implements OnInit {
-    private _state: string;
+export class TabPropertiesViewComponent extends AnnotationTabComponent implements OnInit {
 
     constructor(private dictionaryService: DictionaryService,
-                private newExperimentService: NewExperimentService) {
-
+                private newExperimentService: NewExperimentService,
+                dialog: MatDialog, orderValidateService: BrowseOrderValidateService
+    ) {
+        super(dialog, orderValidateService);
     }
 
     ngOnInit() {
-
     }
 
-    setState(state: string) {
-        this._state = state;
-    }
 
 }

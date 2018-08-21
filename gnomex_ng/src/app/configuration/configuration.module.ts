@@ -25,6 +25,7 @@ import {EditProtocolComponent} from "./edit-protocol.component";
 import {ManageProtocolsComponent} from "./manage-protocols.component";
 import {ConfigurationBrowsePanelComponent} from "./configuration-browse-panel.component";
 import {OverviewProtocolComponent} from "./overview-protocol.component";
+import {ExperimentPlatformModule} from "./experiment-platform/experiment-platform.module";
 
 
 
@@ -45,7 +46,8 @@ import {OverviewProtocolComponent} from "./overview-protocol.component";
         UtilModule,
         RichEditorModule,
         ReactiveFormsModule,
-        AngularSplitModule
+        AngularSplitModule,
+        ExperimentPlatformModule
     ],
     declarations: [
         BrowseDictionaryComponent,

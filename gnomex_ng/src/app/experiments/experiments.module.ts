@@ -67,6 +67,14 @@ import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {TwoButtonRenderer} from "../util/grid-renderers/two-button.renderer";
 import {MultipleLineTextRenderer} from "../util/grid-renderers/multiple-line-text.renderer";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
+import {TabAnnotationViewComponent} from "./new-experiment/tab-annotation-view.component";
+import {TabSamplesIlluminaComponent} from "./new-experiment/tab-samples-illumina.component";
+import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer";
+import {UrlAnnotRenderer} from "../util/grid-renderers/url-annot-renderer";
+import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
+import {RouterModule} from "@angular/router";
+import {TabBioinformaticsViewComponent} from "./new-experiment/tab-bioinformatics-view.component";
+import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina.component";
 
 /**
  * @author mbyrne
@@ -105,8 +113,7 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
         AngularSplitModule,
         DynamicModule,
         DynamicModule.withComponents([TabNotesViewComponent, AnnotationTabComponent, TabSampleSetupViewComponent, TabSeqSetupView,
-            TabSeqProtoView]),
-
+            TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent]),
         AgGridModule.withComponents([
             DateRenderer,
             IconTextRendererComponent,
@@ -115,9 +122,12 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
             SelectRenderer,
             TextAlignLeftMiddleRenderer,
             TextAlignRightMiddleRenderer,
-            TwoButtonRenderer
+            TwoButtonRenderer,
+            MultiSelectRenderer,
+            UrlAnnotRenderer,
+            CheckboxRenderer,
         ]),
-        ExperimentDetailModule
+        ExperimentDetailModule,
     ],
     declarations: [
                     BrowseExperimentsComponent,
@@ -139,12 +149,16 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
                     TabPropertiesViewComponent,
                     TabSeqSetupView,
                     TabSeqProtoView,
-                    NewExperimentComponent
+                    NewExperimentComponent,
+                    TabAnnotationViewComponent,
+                    TabSamplesIlluminaComponent,
+                    TabBioinformaticsViewComponent,
+                    TabConfirmIlluminaComponent
     ],
     entryComponents:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupView, NewExperimentComponent,
-        TabSeqProtoView],
+        TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent],
     exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupView, NewExperimentComponent,
-        TabSeqProtoView]
+        TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent]
 })
 export class ExperimentsModule {
 }

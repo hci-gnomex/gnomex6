@@ -75,6 +75,10 @@ export class BillingService {
         return this.httpClient.get("/gnomex/GetBillingInvoiceList.gx", {params: params});
     }
 
+    public getHiSeqRunTypePriceList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetHiSeqRunTypePriceList.gx", {params: params});
+    }
+
     public saveBillingItemList(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/SaveBillingItemList.gx", null, {params: params});

@@ -2,6 +2,10 @@ import {Injectable} from "@angular/core";
 
 @Injectable()
 export class ConstantsService {
+    public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_NOTES:string = "experiment_platform_hide_notes";
+    public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_VENDOR:string = "experiment_platform_hide_vendor";
+    public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_ORGANISM:string = "experiment_platform_hide_organism";
+
     public readonly ICON_CHECKED = "assets/tick.png";
     public readonly SEGMENGT_NEW = "assets/segment_new.png";
     public readonly SEGMENGT_REMOVE = "assets/segment_remove.png";
@@ -87,6 +91,16 @@ export class ConstantsService {
     public readonly ICON_ADD:string = "assets/add.png";
     public readonly ICON_DELETE:string = "assets/delete.png";
     public readonly ICON_FOLDER_DELETE:string= "assets/folder_delete.png";
+    public readonly EXP_ICON_LIST:string[]=
+        [ "assets/noIcon.png" ,"assets/DNA_diag.png" ,"assets/DNA_diag_lightening.png" ,"assets/microarray_chip.png" ,
+            "assets/microarray_small.png" ,"assets/microarray_small_single_color.png" ,"assets/chart_line.png" ,
+            "assets/dna-helix-icon.png" ,"assets/cherrypick.png" ,"assets/fraganal.png" ,"assets/mitseq.png" ,
+            "assets/DNA_diag_miseq.png" ,"assets/iscan.png" ,"assets/sequenom_clinical.png" ,"assets/sequenom_plate.png" ,
+            "assets/DNA_test_tube.png" ,"assets/data-accept.png" ,"assets/nano.png" ,"assets/flask.png"];
+
+
+    public readonly ICON_INFORMATION:string= "assets/information.png";
+    public readonly ICON_UPLOAD:string= "assets/upload.png";
 
 
 

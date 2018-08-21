@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 import { AgGridModule } from "ag-grid-angular";
 import { AngularMaterialModule } from "../../../modules/angular-material.module";
@@ -14,6 +14,11 @@ import { SeqlaneSelectEditor } from "./seqlane-select.editor";
 import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.editor";
 import { TextAlignLeftMiddleEditor } from "./text-align-left-middle.editor";
 import {TextAlignRightMiddleEditor} from "./text-align-right-middle.editor";
+import {MultiSelectEditor} from "./multi-select.editor";
+import {UrlAnnotEditor} from "./url-annot-editor";
+import {UrlAnnotDialogComponent} from "./popups/url-annot-dialog.component";
+import {UtilModule} from "../util.module";
+import {AgGridRendererModule} from "../grid-renderers";
 
 
 @NgModule({
@@ -21,10 +26,15 @@ import {TextAlignRightMiddleEditor} from "./text-align-right-middle.editor";
         AgGridModule.withComponents([
             DateEditor,
             SelectEditor,
+            MultiSelectEditor,
+            UrlAnnotEditor
         ]),
         AngularMaterialModule,
         CommonModule,
-        FormsModule
+        FormsModule,
+        ReactiveFormsModule,
+        UtilModule,
+        AgGridRendererModule
     ],
     declarations: [
         BarcodeSelectEditor,
@@ -35,10 +45,14 @@ import {TextAlignRightMiddleEditor} from "./text-align-right-middle.editor";
         SeqlaneSelectEditor,
         TextAlignLeftMiddleEditor,
         TextAlignRightMiddleEditor,
-        TextSelectXorMultiselectEditor
+        TextSelectXorMultiselectEditor,
+        MultiSelectEditor,
+        UrlAnnotEditor,
+        UrlAnnotDialogComponent
     ],
     entryComponents: [
         MultipleSelectDialogComponent,
+        UrlAnnotDialogComponent
     ],
     exports: [
         BarcodeSelectEditor,
@@ -48,7 +62,10 @@ import {TextAlignRightMiddleEditor} from "./text-align-right-middle.editor";
         SelectEditor,
         TextAlignLeftMiddleEditor,
         TextAlignRightMiddleEditor,
-        TextSelectXorMultiselectEditor
+        TextSelectXorMultiselectEditor,
+        MultiSelectEditor,
+        UrlAnnotEditor,
+        UrlAnnotDialogComponent
     ]
 })
 export class AgGridEditorModule { }
