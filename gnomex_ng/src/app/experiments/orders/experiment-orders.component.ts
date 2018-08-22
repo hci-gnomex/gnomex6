@@ -172,18 +172,18 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             width: 600,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             // errorMessageHeader: 'TestingTestingTesting',
-            setErrors: (value: any,
-                        data: any,
-                        node: any,
-                        colDef: any,
-                        rowIndex: any,
-                        gridApi: any) => {
-                return (value && value === 'TEST') ? 'Invalid name' : '';
-            },
-            validators: [ Validators.minLength(10) ],
-            errorNameErrorMessageMap: [
-                { errorName: 'minlength', errorMessage: 'Name is too short' }
-            ],
+            // setErrors: (value: any,
+            //             data: any,
+            //             node: any,
+            //             colDef: any,
+            //             rowIndex: any,
+            //             gridApi: any) => {
+            //     return (value && value === 'TEST') ? 'Invalid name' : '';
+            // },
+            // validators: [ Validators.minLength(10) ],
+            // errorNameErrorMessageMap: [
+            //     { errorName: 'minlength', errorMessage: 'Name is too short' }
+            // ],
             field: "name"
         });
         columnDefinitions.push({
