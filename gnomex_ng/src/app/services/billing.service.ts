@@ -152,4 +152,15 @@ export class BillingService {
         return this.httpClient.post("/gnomex/MovePriceCategory.gx", null, {params: params});
     }
 
+    public getPriceSheet(idPriceSheet: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idPriceSheet", idPriceSheet);
+        return this.httpClient.get("/gnomex/GetPriceSheet.gx", {params: params});
+    }
+
+    public savePriceSheet(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/SavePriceSheet.gx", null, {params: params});
+    }
+
 }

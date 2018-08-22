@@ -16,6 +16,7 @@ import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
+import {PriceSheetViewComponent} from "./price-sheet-view.component";
 
 @NgModule({
     imports: [
@@ -38,9 +39,12 @@ import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-render
     declarations: [
         BillingFilterComponent,
         NavBillingComponent,
+        PriceSheetViewComponent,
     ],
     exports: [],
-    entryComponents: [],
+    entryComponents: [
+        PriceSheetViewComponent,
+    ],
 })
 
 export class BillingModule {
