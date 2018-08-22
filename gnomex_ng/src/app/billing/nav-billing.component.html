@@ -43,6 +43,7 @@
                                          (gridReady)="this.onPriceTreeGridReady($event)"
                                          (gridSizeChanged)="this.onGridSizeChanged($event)"
                                          (rowClicked)="this.onPriceTreeGridSelection($event)"
+                                         (rowDoubleClicked)="this.onPriceTreeGridRowDoubleClick($event)"
                                          (rowDragEnd)="this.onPriceTreeGridDragEnd($event)"
                                          [getNodeChildDetails]="this.getPriceNodeChildDetails"
                                          [enableColResize]="true"

@@ -9,7 +9,8 @@ import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
 import {MatCheckboxChange, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {
-    CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent, RowClickedEvent, RowDragEvent,
+    CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent, RowClickedEvent, RowDoubleClickedEvent,
+    RowDragEvent,
     RowNode
 } from "ag-grid";
 import {DictionaryService} from "../services/dictionary.service";
@@ -24,6 +25,7 @@ import {
     BillingTemplateWindowParams
 } from "../util/billing-template-window.component";
 import {Observable} from "rxjs/Observable";
+import {PriceSheetViewComponent} from "./price-sheet-view.component";
 
 @Component({
     selector: 'nav-billing',
@@ -994,7 +996,6 @@ export class NavBillingComponent implements OnInit {
     }
 
     public onPriceTreeGridSelection(event: RowClickedEvent): void {
-        // TODO on double click open window
         event.node.setSelected(true, true);
         if (!event.data.idPriceCriteria) {
             this.selectedPriceTreeGridItem = event.node;
@@ -1006,6 +1007,23 @@ export class NavBillingComponent implements OnInit {
             this.disableAddBillingItemButton = false;
         } else {
             this.disableAddBillingItemButton = true;
+        }
+    }
+
+    public onPriceTreeGridRowDoubleClick(event: RowDoubleClickedEvent): void {
+        // TODO on double click open window
+        if (event.data.idPriceSheet) {
+            event.node.setExpanded(true);
+            let dialogConfig: MatDialogConfig = new MatDialogConfig();
+            dialogConfig.data = {
+                idPriceSheet: event.data.idPriceSheet
+            };
+            let dialogRef: MatDialogRef<PriceSheetViewComponent> = this.dialog.open(PriceSheetViewComponent, dialogConfig);
+            dialogRef.afterClosed().subscribe((result: any) => {
+                if (result) {
+                    this.refreshPricingGrid();
+                }
+            });
         }
     }
 
@@ -1068,7 +1086,12 @@ export class NavBillingComponent implements OnInit {
     }
 
     public openNewSheetWindow(): void {
-        // TODO
+        let dialogRef: MatDialogRef<PriceSheetViewComponent> = this.dialog.open(PriceSheetViewComponent);
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.refreshPricingGrid();
+            }
+        });
     }
 
     public openNewCategoryWindow(): void {
