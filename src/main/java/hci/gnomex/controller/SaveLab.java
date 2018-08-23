@@ -44,9 +44,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 public class SaveLab extends GNomExCommand implements Serializable {
 
@@ -54,27 +51,22 @@ public class SaveLab extends GNomExCommand implements Serializable {
 	private static Logger LOG = Logger.getLogger(SaveLab.class);
 
 	private String               institutionsJSONString;
-//	private Document             institutionsDoc;
 	private JsonArray            labInstitutionJson;
 	private LabInstitutionParser labInstitutionParser;
 
 	private String          membersJSONString;
-//	private Document        membersDoc;
 	private JsonArray       membersJson;
 	private LabMemberParser labMemberParser;
 
 	private String          collaboratorsJSONString;
-//	private Document        collaboratorsDoc;
 	private JsonArray       collaboratorsJson;
 	private LabMemberParser collaboratorParser;
 
 	private String          managersJSONString;
-//	private Document        managersDoc;
 	private JsonArray       managersJson;
 	private LabMemberParser managerParser;
 
 	private String               accountsJSONString;
-//	private Document             accountsDoc;
 	private JsonArray            accountsJson;
 	private BillingAccountParser accountParser;
 

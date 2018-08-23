@@ -808,7 +808,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 width:    4 * this.emToPxConversionRate,
                 maxWidth: 4 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                cellRendererFramework: RemoveLinkButtonRenderer
+                cellRendererFramework: RemoveLinkButtonRenderer,
+                onRemoveClicked: "removeChartfieldRow"
             });
         }
 
@@ -929,7 +930,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 width:    4 * this.emToPxConversionRate,
                 maxWidth: 4 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                cellRendererFramework: RemoveLinkButtonRenderer
+                cellRendererFramework: RemoveLinkButtonRenderer,
+                onRemoveClicked: "removePoRow"
             });
         }
 
@@ -1051,7 +1053,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 width:    4 * this.emToPxConversionRate,
                 maxWidth: 4 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                cellRendererFramework: RemoveLinkButtonRenderer
+                cellRendererFramework: RemoveLinkButtonRenderer,
+                onRemoveClicked: "removeCreditCardRow"
             });
         }
 
@@ -1458,9 +1461,45 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		}
 	}
 
-	removeChartfieldRow(rowIndex: string) {
-		console.log("Should remove index: " + rowIndex);
-	}
+    removeChartfieldRow (node: any) {
+	    if (node && node.data && node.data.idBillingAccount && this._labInfo.internalBillingAccounts) {
+	        if (!Array.isArray(this._labInfo.internalBillingAccounts)) {
+                this._labInfo.internalBillingAccounts = [this._labInfo.internalBillingAccounts];
+            }
+
+            this._labInfo.internalBillingAccounts = this._labInfo.internalBillingAccounts.filter((a, b) => {
+	            return a.idBillingAccount != node.data.idBillingAccount;
+            });
+
+            this.assignChartfieldGridContents(this.selectedCoreFacility);
+        }
+    }
+    removePoRow (node: any) {
+        if (node && node.data && node.data.idBillingAccount && this._labInfo.pOBillingAccounts) {
+            if (!Array.isArray(this._labInfo.pOBillingAccounts)) {
+                this._labInfo.pOBillingAccounts = [this._labInfo.pOBillingAccounts];
+            }
+
+            this._labInfo.pOBillingAccounts = this._labInfo.pOBillingAccounts.filter((a, b) => {
+                return a.idBillingAccount != node.data.idBillingAccount;
+            });
+
+            this.assignPoGridContents(this.selectedCoreFacility);
+        }
+    }
+    removeCreditCardRow (node: any) {
+        if (node && node.data && node.data.idBillingAccount && this._labInfo.creditCardBillingAccounts) {
+            if (!Array.isArray(this._labInfo.creditCardBillingAccounts)) {
+                this._labInfo.creditCardBillingAccounts = [this._labInfo.creditCardBillingAccounts];
+            }
+
+            this._labInfo.creditCardBillingAccounts = this._labInfo.creditCardBillingAccounts.filter((a, b) => {
+                return a.idBillingAccount != node.data.idBillingAccount;
+            });
+
+            this.assignCreditCardGridContents(this.selectedCoreFacility);
+        }
+    }
 
 	onGridSizeChanged(event: any): void {
         if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
@@ -1485,28 +1524,38 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             return;
         }
 
-        if (!this._labInfo.internalBillingAccounts) {
-            this._labInfo.internalBillingAccounts = [];
-        }
-
         let newAccount: any = {
             accountName: ('' + this.newAccountName),
+            idBillingAccount: ('BillingAccountNN' + ('' + this.newAccountName)),
+            idLab: ('' + this._labInfo.idLab),
             idCoreFacility: this.selectedCoreFacility.value,
             isApproved: 'N',
             acctUsers: ''
         };
 
         if (this.accountType === this.CHARTFIELD) {
+            if (!this._labInfo.internalBillingAccounts) {
+                this._labInfo.internalBillingAccounts = [];
+            }
+
             newAccount.isPO         = 'N';
             newAccount.isCreditCard = 'N';
             this._labInfo.internalBillingAccounts.push(newAccount);
             this.assignChartfieldGridContents(this.selectedCoreFacility);
         } else if (this.accountType === this.PO) {
+            if (!this._labInfo.pOBillingAccounts) {
+                this._labInfo.pOBillingAccounts = [];
+            }
+
             newAccount.isPO         = 'Y';
             newAccount.isCreditCard = 'N';
             this._labInfo.pOBillingAccounts.push(newAccount);
             this.assignPoGridContents(this.selectedCoreFacility);
         } else if (this.accountType === this.CREDIT_CARD) {
+            if (!this._labInfo.creditCardBillingAccounts) {
+                this._labInfo.creditCardBillingAccounts = [];
+            }
+
             newAccount.isPO         = 'N';
             newAccount.isCreditCard = 'Y';
             this._labInfo.creditCardBillingAccounts.push(newAccount);

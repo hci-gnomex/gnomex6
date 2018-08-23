@@ -48,6 +48,11 @@ public class LabMemberParser extends DetailObject implements Serializable {
     if (this.json != null) {
       for(int i = 0; i < this.json.size(); i++) {
         JsonObject member = this.json.getJsonObject(i);
+
+        if (member.get("idAppUser") == null && member.get("AppUser") != null) {
+          member = member.getJsonObject("AppUser");
+        }
+
         if (member.get("idAppUser") != null) {
           String idAppUserString = member.getString("idAppUser");
           AppUser appUser = session.get(AppUser.class, new Integer(idAppUserString));
@@ -58,6 +63,7 @@ public class LabMemberParser extends DetailObject implements Serializable {
             newMemberEmailList.put(appUser, appUser.getEmail());
           }
         }
+
       }
     }
   }

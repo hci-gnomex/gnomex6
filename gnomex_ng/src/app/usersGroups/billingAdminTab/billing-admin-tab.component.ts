@@ -176,7 +176,7 @@ export class BillingAdminTabComponent implements OnInit {
             return this.states.filter(state =>
                 state.value.toLowerCase().indexOf(name.toLowerCase()) === 0);
         } else {
-            return [];
+            return this.states;
         }
     }
     selectOption(event) {

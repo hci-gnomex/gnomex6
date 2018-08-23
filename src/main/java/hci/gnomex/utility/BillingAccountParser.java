@@ -261,88 +261,88 @@ public class BillingAccountParser extends DetailObject implements Serializable {
 
   protected void initializeBillingAccountJSON(Session sess, JsonObject billingAccountJson, BillingAccount billingAccount) throws Exception {
 
-    if (billingAccountJson.getString("accountName") != null && !billingAccountJson.getString("accountName").equals("")) {
+    if (billingAccountJson.get("accountName") != null && !billingAccountJson.getString("accountName").equals("")) {
       billingAccount.setAccountName(billingAccountJson.getString("accountName"));
     }
-    if (billingAccountJson.getString("accountNumberBus") != null) {
+    if (billingAccountJson.get("accountNumberBus") != null) {
       billingAccount.setAccountNumberBus(billingAccountJson.getString("accountNumberBus"));
     }
-    if (billingAccountJson.getString("accountNumberOrg") != null) {
+    if (billingAccountJson.get("accountNumberOrg") != null) {
       billingAccount.setAccountNumberOrg(billingAccountJson.getString("accountNumberOrg"));
     }
-    if (billingAccountJson.getString("accountNumberFund") != null) {
+    if (billingAccountJson.get("accountNumberFund") != null) {
       billingAccount.setAccountNumberFund(billingAccountJson.getString("accountNumberFund"));
     }
-    if (billingAccountJson.getString("accountNumberActivity") != null) {
+    if (billingAccountJson.get("accountNumberActivity") != null) {
       billingAccount.setAccountNumberActivity(billingAccountJson.getString("accountNumberActivity"));
     }
-    if (billingAccountJson.getString("accountNumberProject") != null) {
+    if (billingAccountJson.get("accountNumberProject") != null) {
       billingAccount.setAccountNumberProject(billingAccountJson.getString("accountNumberProject"));
     }
-    if (billingAccountJson.getString("accountNumberAccount") != null) {
+    if (billingAccountJson.get("accountNumberAccount") != null) {
       billingAccount.setAccountNumberAccount(billingAccountJson.getString("accountNumberAccount"));
     }
-    if (billingAccountJson.getString("accountNumberAu") != null) {
+    if (billingAccountJson.get("accountNumberAu") != null) {
       billingAccount.setAccountNumberAu(billingAccountJson.getString("accountNumberAu"));
     }
-    if (billingAccountJson.getString("custom1") != null) {
+    if (billingAccountJson.get("custom1") != null) {
       billingAccount.setCustom1(billingAccountJson.getString("custom1"));
     }
-    if (billingAccountJson.getString("custom2") != null) {
+    if (billingAccountJson.get("custom2") != null) {
       billingAccount.setCustom2(billingAccountJson.getString("custom2"));
     }
-    if (billingAccountJson.getString("custom3") != null) {
+    if (billingAccountJson.get("custom3") != null) {
       billingAccount.setCustom3(billingAccountJson.getString("custom3"));
     }
 
-    if (billingAccountJson.getString("startDate") != null && !billingAccountJson.getString("startDate").equals("")) {
+    if (billingAccountJson.get("startDate") != null && !billingAccountJson.getString("startDate").equals("")) {
       billingAccount.setStartDate(this.parseDate(billingAccountJson.getString("startDate")));
     } else {
       billingAccount.setStartDate(null);
     }
 
-    if (billingAccountJson.getString("expirationDate") != null && !billingAccountJson.getString("expirationDate").equals("")) {
+    if (billingAccountJson.get("expirationDate") != null && !billingAccountJson.getString("expirationDate").equals("")) {
       billingAccount.setExpirationDate(this.parseDate(billingAccountJson.getString("expirationDate")));
     } else {
       billingAccount.setExpirationDate(null);
     }
 
-    if (billingAccountJson.getString("idFundingAgency") != null && !billingAccountJson.getString("idFundingAgency").equals("")) {
+    if (billingAccountJson.get("idFundingAgency") != null && !billingAccountJson.getString("idFundingAgency").equals("")) {
       billingAccount.setIdFundingAgency(new Integer(billingAccountJson.getString("idFundingAgency")));
     } else {
       billingAccount.setIdFundingAgency(null);
     }
-    if (billingAccountJson.getString("isPO") != null && !billingAccountJson.getString("isPO").equals("")) {
+    if (billingAccountJson.get("isPO") != null && !billingAccountJson.getString("isPO").equals("")) {
       billingAccount.setIsPO(billingAccountJson.getString("isPO"));
     } else {
       billingAccount.setIsPO("N");
     }
 
-    if (billingAccountJson.getString("isCreditCard") != null && !billingAccountJson.getString("isCreditCard").equals("")) {
+    if (billingAccountJson.get("isCreditCard") != null && !billingAccountJson.getString("isCreditCard").equals("")) {
       billingAccount.setIsCreditCard(billingAccountJson.getString("isCreditCard"));
     } else {
       billingAccount.setIsCreditCard("N");
     }
 
-    if (billingAccountJson.getString("idCreditCardCompany") != null && !billingAccountJson.getString("idCreditCardCompany").equals("")) {
+    if (billingAccountJson.get("idCreditCardCompany") != null && !billingAccountJson.getString("idCreditCardCompany").equals("")) {
       billingAccount.setIdCreditCardCompany(Integer.valueOf(billingAccountJson.getString("idCreditCardCompany")));
     } else {
       billingAccount.setIdCreditCardCompany(null);
     }
 
-    if (billingAccountJson.getString("zipCode") != null && !billingAccountJson.getString("zipCode").equals("")) {
+    if (billingAccountJson.get("zipCode") != null && !billingAccountJson.getString("zipCode").equals("")) {
       billingAccount.setZipCode(billingAccountJson.getString("zipCode"));
     } else {
       billingAccount.setZipCode("");
     }
 
-    if (billingAccountJson.getString("activeAccount") != null && !billingAccountJson.getString("activeAccount").equals("")) {
+    if (billingAccountJson.get("activeAccount") != null && !billingAccountJson.getString("activeAccount").equals("")) {
       billingAccount.setActiveAccount(billingAccountJson.getString("activeAccount"));
     } else {
       billingAccount.setActiveAccount("Y");
     }
 
-    if (billingAccountJson.getString("totalDollarAmountDisplay") != null && !billingAccountJson.getString("totalDollarAmountDisplay").equals("")) {
+    if (billingAccountJson.get("totalDollarAmountDisplay") != null && !billingAccountJson.getString("totalDollarAmountDisplay").equals("")) {
       String totalDollarAmount = billingAccountJson.getString("totalDollarAmountDisplay");
       DecimalFormatSymbols dfs = new DecimalFormatSymbols();
       String regex = "[^0-9" + dfs.getDecimalSeparator() + "]";
@@ -352,19 +352,19 @@ public class BillingAccountParser extends DetailObject implements Serializable {
     }
 
 
-    if (billingAccountJson.getString("shortAcct") != null && !billingAccountJson.getString("shortAcct").equals("")) {
+    if (billingAccountJson.get("shortAcct") != null && !billingAccountJson.getString("shortAcct").equals("")) {
       billingAccount.setShortAcct(billingAccountJson.getString("shortAcct"));
     } else {
       billingAccount.setShortAcct(null);
     }
 
-    if (billingAccountJson.getString("idCoreFacility") != null && !billingAccountJson.getString("idCoreFacility").equals("")) {
+    if (billingAccountJson.get("idCoreFacility") != null && !billingAccountJson.getString("idCoreFacility").equals("")) {
       billingAccount.setIdCoreFacility(new Integer(billingAccountJson.getString("idCoreFacility")));
     } else {
       billingAccount.setIdCoreFacility(null);
     }
 
-    if (billingAccountJson.getString("isApproved") != null && !billingAccountJson.getString("isApproved").equals("")) {
+    if (billingAccountJson.get("isApproved") != null && !billingAccountJson.getString("isApproved").equals("")) {
       String isApproved = billingAccountJson.getString("isApproved");
 
       // If we have toggled from not approved to approved, set the approved date
@@ -378,7 +378,7 @@ public class BillingAccountParser extends DetailObject implements Serializable {
       }
       billingAccount.setIsApproved(isApproved);
 
-      if (billingAccountJson.getString("submitterEmail") != null) {
+      if (billingAccountJson.get("submitterEmail") != null) {
         billingAccount.setSubmitterEmail(billingAccountJson.getString("submitterEmail"));
       }
     } else {
@@ -392,8 +392,8 @@ public class BillingAccountParser extends DetailObject implements Serializable {
     HashMap<Integer, AppUser> addMap = new HashMap<Integer, AppUser>();
     HashMap<Integer, AppUser> removeMap = new HashMap<Integer, AppUser>();
 
-    String acctUsers = billingAccountJson.getString("acctUsers");
-    if (acctUsers != null && !acctUsers.equals("")) {
+    if (billingAccountJson.get("acctUsers") != null && !billingAccountJson.getString("acctUsers").equals("")) {
+      String acctUsers = billingAccountJson.getString("acctUsers");
       String[] tokens = acctUsers.split(",");
       for (int x = 0; x < tokens.length; x++) {
         String idAppUserString = tokens[x];
