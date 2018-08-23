@@ -3,47 +3,27 @@ package hci.gnomex.utility;
 import hci.framework.model.DetailObject;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-
+import javax.json.JsonArray;
 
 public class PriceSheetCategoryParser extends DetailObject implements Serializable {
-  
-  protected Document   doc;
-  protected Map        requestCategoryMap = new HashMap();
-  
-  public PriceSheetCategoryParser(Document doc) {
-    this.doc = doc;
- 
-  }
-  
-  public void parse(Session sess) throws Exception{
-    
-    Element root = this.doc.getRootElement();
-    
-    
-    for(Iterator i = root.getChildren("RequestCategory").iterator(); i.hasNext();) {
-      Element node = (Element)i.next();
-      
-      String codeRequestCategory = node.getAttributeValue("codeRequestCategory");
-      
-      requestCategoryMap.put(codeRequestCategory, codeRequestCategory);
+
+    private JsonArray array;
+    private Set<String> codeRequestCategories = new HashSet<>();
+
+    public PriceSheetCategoryParser(JsonArray arr) {
+        this.array = arr;
     }
-    
-   
-  }
-  
-  public Map getRequestCategoryMap() {
-    return requestCategoryMap;
-  }
 
+    public void parse() throws Exception {
+        for (int i = 0; i < this.array.size(); i++) {
+            this.codeRequestCategories.add(this.array.getJsonObject(i).getString("codeRequestCategory"));
+        }
+    }
 
-  
-
+    public Set<String> getCodeRequestCategories() {
+        return this.codeRequestCategories;
+    }
 
 }
