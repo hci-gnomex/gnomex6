@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewChild} from "@angular/core";
+import {FormBuilder, FormGroup} from "@angular/forms";
 //assets/page_add.png
 
 @Component({
@@ -10,9 +11,13 @@ import {Component, OnInit, ViewChild} from "@angular/core";
 })
 
 export class EpLibraryPrepTabComponent implements OnInit{
+    public formGroup:FormGroup;
+
+    constructor(private fb:FormBuilder){
+    }
 
     ngOnInit(){
-
+        this.formGroup = this.fb.group({});
     }
 
 

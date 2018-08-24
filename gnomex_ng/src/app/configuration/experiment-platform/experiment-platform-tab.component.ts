@@ -37,7 +37,7 @@ import {PropertyService} from "../../services/property.service";
 })
 
 export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
-    public expPlatformGroup: FormGroup;
+    public formGroup: FormGroup;
     private expPlatformSubscription: Subscription;
     private expPlatformNode:any;
     private name:string;
@@ -72,7 +72,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
     ngOnInit(){
 
         this.name = this.constructor.name;
-        this.expPlatformGroup = this.fb.group({
+        this.formGroup = this.fb.group({
             name:['',Validators.required ],
             type:'',
             active: false,
@@ -119,25 +119,25 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
                     .getRequestCategoryProperty(data.idCoreFacility,data.codeRequestCategory, PropertyService.PROPERTY_DESCRIPTION_NAME_MANDATORY_FOR_INTERNAL_EXPERIMENTS);
 
                 //this.state = this.expPlatformService.getState(data.value, this.name );
-                this.expPlatformGroup.get('name').setValue(data.requestCategory);
-                this.expPlatformGroup.get('type').setValue(data.type);
-                this.expPlatformGroup.get('active').setValue(data && data.isActive === 'Y');
-                this.expPlatformGroup.get('associateAnalysis').setValue(data && data.associatedWithAnalysis === 'Y');
-                this.expPlatformGroup.get('requireNameDescipt').setValue(requireNameStr && requireNameStr === 'Y');
-                this.expPlatformGroup.get('code').setValue(data.codeRequestCategory);
-                this.expPlatformGroup.get('icon').setValue(data.icon);
-                this.expPlatformGroup.get('coreFacility').setValue(data.idCoreFacility);
-                this.expPlatformGroup.get('notes').setValue(data.notes);
-                this.expPlatformGroup.get('isInternal').setValue(data && data.isInternal === 'Y');
-                this.expPlatformGroup.get('isExternal').setValue(data && data.isExternal === 'Y');
-                this.expPlatformGroup.get('sortOrder').setValue(data.sortOrder);
-                this.expPlatformGroup.get('numberOfChannels').setValue(data.numberOfChannels);
-                this.expPlatformGroup.get('sampleBatchSize').setValue(data.sampleBatchSize);
-                this.expPlatformGroup.get('customWarningMessage').setValue(sampleBatchWarningMessage);
-                this.expPlatformGroup.get('organism').setValue(data.idOrganism);
-                this.expPlatformGroup.get('useProduct').setValue(data.idProductType != '');
-                this.expPlatformGroup.get('productType').setValue(data.idProductType);
-                this.expPlatformGroup.get('noProductsMessage').setValue(data.noProductsMessage);
+                this.formGroup.get('name').setValue(data.requestCategory);
+                this.formGroup.get('type').setValue(data.type);
+                this.formGroup.get('active').setValue(data && data.isActive === 'Y');
+                this.formGroup.get('associateAnalysis').setValue(data && data.associatedWithAnalysis === 'Y');
+                this.formGroup.get('requireNameDescipt').setValue(requireNameStr && requireNameStr === 'Y');
+                this.formGroup.get('code').setValue(data.codeRequestCategory);
+                this.formGroup.get('icon').setValue(data.icon);
+                this.formGroup.get('coreFacility').setValue(data.idCoreFacility);
+                this.formGroup.get('notes').setValue(data.notes);
+                this.formGroup.get('isInternal').setValue(data && data.isInternal === 'Y');
+                this.formGroup.get('isExternal').setValue(data && data.isExternal === 'Y');
+                this.formGroup.get('sortOrder').setValue(data.sortOrder);
+                this.formGroup.get('numberOfChannels').setValue(data.numberOfChannels);
+                this.formGroup.get('sampleBatchSize').setValue(data.sampleBatchSize);
+                this.formGroup.get('customWarningMessage').setValue(sampleBatchWarningMessage);
+                this.formGroup.get('organism').setValue(data.idOrganism);
+                this.formGroup.get('useProduct').setValue(data.idProductType != '');
+                this.formGroup.get('productType').setValue(data.idProductType);
+                this.formGroup.get('noProductsMessage').setValue(data.noProductsMessage);
 
 
                 this.setSecurityLabel();
@@ -147,8 +147,8 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
                 this.updateProductStatus();
                 this.setSaveAndSubmit();
 
-                this.expPlatformGroup.markAsPristine();
-                this.expPlatformGroup.markAsUntouched();
+                this.formGroup.markAsPristine();
+                this.formGroup.markAsUntouched();
             });
 
 
@@ -159,12 +159,12 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
         this.showNote =  this.showFieldByProperty(this.constService.PROPERTY_EXPERIMENT_PLATFORM_HIDE_NOTES);
         this.showOrganism =  this.showFieldByProperty(this.constService.PROPERTY_EXPERIMENT_PLATFORM_HIDE_ORGANISM);
         this.showVendor = this.showFieldByProperty(this.constService.PROPERTY_EXPERIMENT_PLATFORM_HIDE_VENDOR);
-        this.showProductDetails = this.expPlatformGroup.get('useProduct').value;
+        this.showProductDetails = this.formGroup.get('useProduct').value;
     }
     showFieldByProperty(propertyName:string): boolean {
         let val:String = 'N';
-        if (this.expPlatformGroup.get("coreFacility").value) {
-            val = this.gnomexService.getCoreFacilityProperty(this.expPlatformGroup.get("coreFacility").value, propertyName);
+        if (this.formGroup.get("coreFacility").value) {
+            val = this.gnomexService.getCoreFacilityProperty(this.formGroup.get("coreFacility").value, propertyName);
         }
         if (val == 'Y') {
             return false;
@@ -174,7 +174,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
     }
     editSortOrder(){
-        if(this.expPlatformGroup.dirty){
+        if(this.formGroup.dirty){
             this.dialogService.alert("Please save changes before editing sort order across platforms.")
         }else{
             let configuration: MatDialogConfig = new MatDialogConfig();
@@ -216,7 +216,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
 
     setChannelLabel(){
-        let selectedType = this.expPlatformGroup.get("type").value;
+        let selectedType = this.formGroup.get("type").value;
         this.channelLabel = this.expPlatformService.isIllumina ? " Number of Lanes on Flowcell " : "Number of channels";
         if(this.expPlatformService.isIllumina){
             this.channelLabel = "Number of Lanes on Flowcell";
@@ -244,16 +244,16 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
     filterProjectTypeList(){
         let filterProductList:any[] = this.dictionaryService.getEntries(DictionaryService.PRODUCT_TYPE);
-        let idCoreFacility = this.expPlatformGroup.get("coreFacility").value;
+        let idCoreFacility = this.formGroup.get("coreFacility").value;
         filterProductList = filterProductList.filter(p => p.idCoreFacility === idCoreFacility);
         this.productTypeList = filterProductList;
     }
 
 
     onTypeChanged(event:any):void{
-        let selectedType:any = this.expPlatformGroup.get('type').value;
+        let selectedType:any = this.formGroup.get('type').value;
         if(selectedType){
-            this.expPlatformGroup.get('icon').setValue(selectedType.defaultIcon);
+            this.formGroup.get('icon').setValue(selectedType.defaultIcon);
             this.expPlatformService.selectedType = selectedType;
         }
 
@@ -262,7 +262,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
     }
     onUseProducts(){
-        if(this.expPlatformGroup.get("useProduct").value) {
+        if(this.formGroup.get("useProduct").value) {
             this.updateProductType();
             this.updateProductStatus();
         }
@@ -270,16 +270,16 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
     setSaveAndSubmit(){
         let isSaveAndSubmitStr = this.gnomexService
             .getRequestCategoryProperty(this.expPlatformNode.idCoreFacility,this.expPlatformNode.codeRequestCategory,PropertyService.PROPERTY_NEW_REQUEST_SAVE_BEFORE_SUBMIT);
-        this.expPlatformGroup.get('saveAndSubmit').setValue(isSaveAndSubmitStr && isSaveAndSubmitStr === 'Y');
+        this.formGroup.get('saveAndSubmit').setValue(isSaveAndSubmitStr && isSaveAndSubmitStr === 'Y');
     }
 
 
     updateProductType(){
 
-        let idCoreFacility = this.expPlatformGroup.get("coreFacility").value;
-        let codeReqCategory = this.expPlatformGroup.get("code").value;
+        let idCoreFacility = this.formGroup.get("coreFacility").value;
+        let codeReqCategory = this.formGroup.get("code").value;
         let noProductsMessage = this.gnomexService.getRequestCategoryProperty(idCoreFacility, codeReqCategory,PropertyService.PROPERTY_NO_PRODUCTS_MESSAGE);
-        this.expPlatformGroup.get("noProductsMessage").setValue(noProductsMessage);
+        this.formGroup.get("noProductsMessage").setValue(noProductsMessage);
 
 
     }
@@ -299,9 +299,9 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
         }
 
         if(found){
-            this.expPlatformGroup.get('productStatus').setValue(codeRequestStatus);
+            this.formGroup.get('productStatus').setValue(codeRequestStatus);
         }else{
-            this.expPlatformGroup.get('productStatus').setValue("SUBMITTED");
+            this.formGroup.get('productStatus').setValue("SUBMITTED");
         }
 
     }

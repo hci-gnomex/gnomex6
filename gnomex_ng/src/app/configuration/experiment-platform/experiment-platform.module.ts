@@ -17,8 +17,9 @@ import {ExperimentPlatformOverviewComponent} from "./experiment-platform-overvie
 import {ExperimentPlatformTabComponent} from "./experiment-platform-tab.component";
 import {EpSampleTypeTabComponent} from "./ep-sample-type-tab.component";
 import {SortOrderDialogComponent} from "./sort-order-dialog.component";
-import {EpPropertyTabComponent} from "./ep-property-tab.component";
 import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
+import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
+import { DynamicModule } from 'ng-dynamic-component';
 
 
 
@@ -36,25 +37,23 @@ import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
         UtilModule,
         RichEditorModule,
         ReactiveFormsModule,
-        AngularSplitModule
+        AngularSplitModule,
+        DynamicModule.withComponents([ExperimentPlatformTabComponent,
+            SortOrderDialogComponent,EpSampleTypeTabComponent,
+            EpLibraryPrepTabComponent,ConfigureAnnotationsComponent
+        ])
+
     ],
     declarations: [
         ExperimentPlatformOverviewComponent,
         ExperimentPlatformTabComponent,
         SortOrderDialogComponent,
         EpSampleTypeTabComponent,
-        EpPropertyTabComponent,
         EpLibraryPrepTabComponent
 
 
     ],
     entryComponents: [
-        ExperimentPlatformTabComponent,
-        SortOrderDialogComponent,
-        EpSampleTypeTabComponent,
-        EpPropertyTabComponent,
-        EpLibraryPrepTabComponent
-
     ],
     exports: [
     ]
