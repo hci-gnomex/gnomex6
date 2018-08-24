@@ -10,12 +10,17 @@ import {ExperimentPlatformTabComponent} from "../configuration/experiment-platfo
 import {EpSampleTypeTabComponent} from "../configuration/experiment-platform/ep-sample-type-tab.component";
 import {DictionaryService} from "./dictionary.service";
 import {Subject} from "rxjs";
+import {AbstractControl, FormGroup} from "@angular/forms";
 
 @Injectable()
 export class ExperimentPlatformService implements OnDestroy{
     private reqCategorySubject:BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private expPlatformTypeChange: Subject<any> = new Subject<any>();
     private expPlatformListSubject: Subject<any> = new Subject<any>();
+    private _expPlatformOverviewForm: FormGroup;
+    private propertyListSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+
+
 
     private _selectedType:any;
 
@@ -24,6 +29,11 @@ export class ExperimentPlatformService implements OnDestroy{
     constructor(private cookieUtilService: CookieUtilService,
                 private httpClient: HttpClient,
                 private dictionaryService:DictionaryService) {
+        this._expPlatformOverviewForm = new FormGroup({});
+    }
+
+    get expPlatformOverviewForm():FormGroup{
+        return this._expPlatformOverviewForm;
     }
 
 
@@ -33,6 +43,30 @@ export class ExperimentPlatformService implements OnDestroy{
         }
 
     }
+    initExpPlatformForm(formName:string, remove:boolean):void {
+        let tabForm = this._expPlatformOverviewForm.get(formName);
+        if(tabForm){
+            if(remove){
+                this._expPlatformOverviewForm.removeControl(formName);
+            }else{
+                tabForm.reset();
+            }
+        }
+    }
+
+
+    addExpPlatformFormMember(control: AbstractControl, name:string,afterControlAddedfn?:any):void{
+        this._expPlatformOverviewForm.addControl(name, control);
+        if(afterControlAddedfn){
+            afterControlAddedfn();
+        }
+    }
+    findExpPlatformFormMember(path:string):AbstractControl{
+        return this._expPlatformOverviewForm.get(path);
+    }
+
+
+
     public get selectedType():any {
         return this._selectedType;
     }
@@ -73,11 +107,11 @@ export class ExperimentPlatformService implements OnDestroy{
     getExperimentPlatformTabList():string[]{
         if(this.isIllumina || this.isNanoString || this.isSequenom){
             return ['ExperimentPlatformTabComponent',
-                    'EpSampleTypeTabComponent', "EpLibraryPrepTabComponent","EpPropertyTabComponent"]
+                'EpSampleTypeTabComponent', "EpLibraryPrepTabComponent","ConfigureAnnotationsComponent"]
         }else if(this.isQC){
-            return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent',"EpPropertyTabComponent"]
+            return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent',"ConfigureAnnotationsComponent"]
         }else{
-            return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent']
+            return ['ExperimentPlatformTabComponent', 'ConfigureAnnotationsComponent']
         }
     }
 
@@ -88,7 +122,7 @@ export class ExperimentPlatformService implements OnDestroy{
     getExperimentPlatformList_fromBackend(){
         return this.httpClient.get("/gnomex/GetExperimentPlatformList.gx")
             .subscribe(resp =>{
-                  this.emitExperimentPlatformList(resp);
+                this.emitExperimentPlatformList(resp);
             })
     }
 
@@ -117,6 +151,13 @@ export class ExperimentPlatformService implements OnDestroy{
     getExperimentPlatformTypeChangeObservable(): Observable<any>{
         return this.expPlatformTypeChange.asObservable();
     }
+    emitPropertyList(data:any):void{
+        this.propertyListSubject.next(data);
+    }
+    getPropertyListObservable():Observable<any>{
+        return this.propertyListSubject.asObservable();
+    }
+
 
 
 

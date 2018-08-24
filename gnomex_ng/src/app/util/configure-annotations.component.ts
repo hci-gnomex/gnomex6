@@ -8,6 +8,8 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {DialogsService} from "./popup/dialogs.service";
 import {MatSnackBar} from "@angular/material";
+import {ExperimentPlatformService} from "../services/experiment-platform.service";
+import 'rxjs/add/operator/distinctUntilChanged';
 
 @Component({
     selector: 'configure-annotations',
@@ -24,7 +26,7 @@ export class ConfigureAnnotationsComponent {
     public readonly TYPE_CHECKBOX: string = "CHECK";
     public readonly TYPE_OPTION: string = "OPTION";
     public readonly TYPE_MULTI_OPTION: string = "MOPTION";
-
+    public experimentPlatformMode:boolean = false;
     @Input() public orderType: string = "";
     public listOrganism: any[] = [];
     public idOrganism: string;
@@ -37,7 +39,8 @@ export class ConfigureAnnotationsComponent {
     public appliesToOrganism: any;
     public appliesToAnalysisType: any;
     public appliesToUser: any;
-    public codeRequestCategory: string;
+    public requestCategory: string;
+    private expPlatform:any;
     public listAnalysisType: any[] = [];
     public idAnalysisType: string;
     public allProps: any[] = [];
@@ -95,13 +98,16 @@ export class ConfigureAnnotationsComponent {
     public mageOntologyCodeFC: FormControl;
     public mageOntologyDefFC: FormControl;
 
+
+
     constructor(private dictionaryService: DictionaryService,
                 private propertyService: PropertyService,
                 private route: ActivatedRoute,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private constantsService: ConstantsService,
                 private dialogsService: DialogsService,
-                private snackBar: MatSnackBar,) {
+                private snackBar: MatSnackBar,
+                private expPlatformService:ExperimentPlatformService) {
         this.annotGridColumnDefs = [
             {headerName: "Annotation", field: "name", width: 100, valueFormatter: this.annotFormatter},
         ];
@@ -223,22 +229,27 @@ export class ConfigureAnnotationsComponent {
             if (!coreMatch) {
                 return false;
             }
-
             let criteriaMatch: boolean = false;
-            if (this.orderType === "") {
-                criteriaMatch = true;
-            } else if (this.orderType === this.SHOW_FOR_SAMPLES && prop.forSample === "Y") {
-                criteriaMatch = true;
-            } else if (this.orderType === this.SHOW_FOR_ANALYSIS && prop.forAnalysis === "Y") {
-                criteriaMatch = true;
-            } else if (this.orderType === this.SHOW_FOR_DATA_TRACKS && prop.forDataTrack === "Y") {
-                criteriaMatch = true;
-            } else if (this.orderType === this.SHOW_FOR_EXPERIMENTS && prop.forRequest === "Y") {
-                criteriaMatch = true;
+            if(!this.experimentPlatformMode){
+                if (this.orderType === "") {
+                    criteriaMatch = true;
+                } else if (this.orderType === this.SHOW_FOR_SAMPLES && prop.forSample === "Y") {
+                    criteriaMatch = true;
+                } else if (this.orderType === this.SHOW_FOR_ANALYSIS && prop.forAnalysis === "Y") {
+                    criteriaMatch = true;
+                } else if (this.orderType === this.SHOW_FOR_DATA_TRACKS && prop.forDataTrack === "Y") {
+                    criteriaMatch = true;
+                } else if (this.orderType === this.SHOW_FOR_EXPERIMENTS && prop.forRequest === "Y") {
+                    criteriaMatch = true;
+                }
+
+            }else{
+                criteriaMatch = this.orderType === this.SHOW_FOR_EXPERIMENTS && prop.forRequest === "Y";
             }
             if (!criteriaMatch) {
                 return false;
             }
+
 
             if (this.idOrganism && this.idOrganism != "" && !ConfigureAnnotationsComponent.hasMatchInList(this.idOrganism, prop.appliesToOrganism)) {
                 return false;
@@ -246,7 +257,7 @@ export class ConfigureAnnotationsComponent {
             if (this.idAnalysisType && this.idAnalysisType != "" && !ConfigureAnnotationsComponent.hasMatchInList(this.idAnalysisType, prop.appliesToAnalysisType)) {
                 return false;
             }
-            if (this.codeRequestCategory && this.codeRequestCategory != "" && !ConfigureAnnotationsComponent.hasMatchInList(this.codeRequestCategory, prop.appliesToRequestCategory)) {
+            if (this.requestCategory && this.requestCategory != "" && !ConfigureAnnotationsComponent.hasMatchInList(this.requestCategory, prop.appliesToRequestCategory)) {
                 return false;
             }
 
@@ -453,6 +464,10 @@ export class ConfigureAnnotationsComponent {
         this.propertyTypeFC.setValue(prop ? prop.codePropertyType : "");
         this.mageOntologyCodeFC.setValue(prop ? prop.mageOntologyCode : "");
         this.mageOntologyDefFC.setValue(prop ? prop.mageOntologyDefinition : "");
+        if(this.experimentPlatformMode){
+            this.appliesToPlatform.setValue(this.expPlatform ? this.expPlatform: "");
+        }
+
     }
 
     public onAnnotGridReady(params: any): void {
@@ -466,7 +481,7 @@ export class ConfigureAnnotationsComponent {
 
     public onAnnotGridRowSelected(event: any): void {
         if (event.node.selected && event.data.idProperty) {
-            this.propertyService.getPropertyAnnotation(event.data.idProperty).subscribe((prop: any) => {
+            this.propertyService.getPropertyAnnotation(event.data.idProperty).first().subscribe((prop: any) => {
                 this.setProperty(prop.Property);
                 this.formGroup.markAsPristine();
             });
@@ -614,7 +629,7 @@ export class ConfigureAnnotationsComponent {
     public add(): void {
         let newProp: any = {};
         newProp.idProperty = "";
-        newProp.idCoreFacility = this.myCoreFacilities[0].idCoreFacility;
+        newProp.idCoreFacility = !this.experimentPlatformMode ? this.myCoreFacilities[0].idCoreFacility: this.idCoreFacility;
         newProp.canUpdate = "Y";
         newProp.canDelete = "Y";
         newProp.name = "";
@@ -720,7 +735,7 @@ export class ConfigureAnnotationsComponent {
     public refresh(): void {
         this.orderType = "";
         this.idOrganism = "";
-        this.codeRequestCategory = "";
+        this.requestCategory = "";
         this.idAnalysisType = "";
         this.selectedProperty = null;
         this.refreshPropertyList();
@@ -729,12 +744,46 @@ export class ConfigureAnnotationsComponent {
     private refreshPropertyList(): void {
         this.propertyService.getPropertyList(true).subscribe((response: any[]) => {
             this.allProps = response;
-            this.updateDisplayedProperties();
+            this.expPlatformService.emitPropertyList(this.allProps);
+            if(!this.experimentPlatformMode){ // need to control timing of when to call this method for experiment platform mode
+                this.updateDisplayedProperties();
+            }
+
         });
     }
 
     public onCriteriaChange(): void {
         this.updateDisplayedProperties();
+    }
+
+    private compareCorefn(core1,core2){
+        return core1 && core2 && core1 === core2;
+    }
+
+    externallyResizeGrid(){
+        if(this.annotGridApi){
+            this.annotGridApi.sizeColumnsToFit();
+        }
+    }
+
+    public setupExpPlatformMode(expPlatform:any){
+        this.formGroup.reset();
+        let expPlatCoreFacilityFC = this.expPlatformService.findExpPlatformFormMember("ExperimentPlatformTabComponent.coreFacility");
+        this.expPlatform = expPlatform;
+        this.requestCategory = expPlatform.requestCategory;
+        this.idCoreFacility = expPlatCoreFacilityFC.value;
+        this.orderType = this.SHOW_FOR_EXPERIMENTS;
+
+        // need to know that getPropertyList has loaded. Also need experiment platform's core facility, platform, and orderType is set before updateDisplayedProperties is ran
+        this.expPlatformService.getPropertyListObservable().take(2).subscribe( data =>{
+            if(data){
+                this.updateDisplayedProperties();
+            }
+        });
+
+        this.coreFacilityFC.disable();
+
+
     }
 
 }

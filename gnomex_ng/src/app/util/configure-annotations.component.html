@@ -1,5 +1,5 @@
 <div class="wholeDocument">
-    <div class="fullRow">
+    <div *ngIf="!experimentPlatformMode" class="fullRow">
         <h5>Configure Annotations</h5>
     </div>
     <div class="fullRow">
@@ -9,8 +9,8 @@
         </div>
         <button mat-button (click)="this.refresh()"><img class="icon" src="../../assets/refresh.png">Refresh</button>
     </div>
-    <div class="fullRow">
-        <div class="embeddedRow">
+    <div class="fullRow" *ngIf="!experimentPlatformMode">
+        <div class="embeddedRow" >
             <label class="leadingLabel">Show Annotations For</label>
             <mat-radio-group [(ngModel)]="this.orderType" (change)="this.onCriteriaChange()">
                 <mat-radio-button [value]="SHOW_FOR_SAMPLES">Samples</mat-radio-button>
@@ -19,7 +19,7 @@
                 <mat-radio-button [value]="SHOW_FOR_EXPERIMENTS">Experiments</mat-radio-button>
             </mat-radio-group>
         </div>
-        <div class="embeddedRow">
+        <div class="embeddedRow" >
             <label class="leadingLabel">Applies To Specific</label>
             <mat-form-field class="embeddedField">
                 <mat-select placeholder="Organism" [(ngModel)]="idOrganism" (change)="this.onCriteriaChange()">
@@ -62,15 +62,15 @@
                         </mat-form-field>
                         <mat-checkbox [formControl]="this.activeFC">Active</mat-checkbox>
                     </div>
-                    <div class="tabRow">
+                    <div class="tabRow" *ngIf="!experimentPlatformMode">
                         <mat-form-field class="propFormField">
-                            <mat-select placeholder="Core Facility" [formControl]="this.coreFacilityFC">
+                            <mat-select [compareWith]="compareCorefn" placeholder="Core Facility" [formControl]="this.coreFacilityFC">
                                 <mat-option *ngFor="let core of myCoreFacilities" [value]="core.idCoreFacility">{{core.display}}</mat-option>
                             </mat-select>
                             <mat-error *ngIf="this.coreFacilityFC.hasError('required')">Required</mat-error>
                         </mat-form-field>
                     </div>
-                    <div class="tabRow">
+                    <div class="tabRow" *ngIf="!experimentPlatformMode">
                         <label style="margin-right: 4%;">Annotates</label>
                         <mat-checkbox style="margin-right: 2%;" [formControl]="this.forSampleFC">Sample</mat-checkbox>
                         <mat-checkbox style="margin-right: 2%;" [formControl]="this.forDataTrackFC">Data Track</mat-checkbox>
@@ -132,11 +132,11 @@
             </mat-tab>
             <mat-tab label="Applies To">
                 <div class="tabContent">
-                    <div class="appliesToGroup">
+                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode || this.listFilteredApplication.length > 0">
                         <label>Only show for these platforms/experiment types</label>
                         <div style="display: flex; flex-direction: row;">
-                            <mat-form-field class="appliesToField">
-                                <mat-select placeholder="Platform" [formControl]="this.appliesToPlatform">
+                            <mat-form-field class="appliesToField" *ngIf="!experimentPlatformMode">
+                                <mat-select  placeholder="Platform" [formControl]="this.appliesToPlatform">
                                     <mat-option>None</mat-option>
                                     <mat-option *ngFor="let plat of this.listFilteredExperimentPlatform" [value]="plat">{{plat.display}}</mat-option>
                                 </mat-select>
@@ -184,7 +184,7 @@
                                          [enableColResize]="true">
                         </ag-grid-angular>
                     </div>
-                    <div class="appliesToGroup">
+                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode">
                         <label>Only show for these analysis types</label>
                         <div style="display: flex; flex-direction: row;">
                             <mat-form-field class="appliesToField">
@@ -207,7 +207,7 @@
                                          [enableColResize]="true">
                         </ag-grid-angular>
                     </div>
-                    <div class="appliesToGroup">
+                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode">
                         <label>Only show for these users (only applies to non-required sample annotations)</label>
                         <div style="display: flex; flex-direction: row;">
                             <mat-form-field class="appliesToField">
@@ -232,7 +232,7 @@
                     </div>
                 </div>
             </mat-tab>
-            <mat-tab label="Mage Ontology">
+            <mat-tab label="Mage Ontology" *ngIf="!experimentPlatformMode" >
                 <div class="tabContent">
                     <mat-form-field class="propFormField">
                         <input matInput placeholder="Mage Ontology Code" [formControl]="this.mageOntologyCodeFC">
