@@ -1,7 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from "@angular/core";
-
-
-import {TreeComponent, ITreeOptions, TreeModel} from "angular-tree-component";
+import { Component, ComponentRef, OnDestroy, OnInit } from "@angular/core";
 import {GridOptions} from "ag-grid/main";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {ConfigurationService} from "../../services/configuration.service";
@@ -10,9 +7,10 @@ import {ExperimentPlatformService} from "../../services/experiment-platform.serv
 import {ExperimentPlatformTabComponent} from "./experiment-platform-tab.component";
 import {EpSampleTypeTabComponent} from "./ep-sample-type-tab.component";
 import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
-import {EpPropertyTabComponent} from "./ep-property-tab.component";
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
+import {MatTabChangeEvent} from "@angular/material";
 //assets/page_add.png
 
 @Component({
@@ -44,6 +42,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     private selectRowIndex:number = -1 ;
     public experimentPlatformTabs: any[] = [];
     public platformListSubscription: Subscription;
+    private tabComponentRefList:ComponentRef<any>[] = [];
 
 
 
@@ -57,11 +56,11 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     ];
 
-    public readonly tabComponentTemplate:any = {
-        'ExperimentPlatformTabComponent': {name: 'Experiment Platform', component: ExperimentPlatformTabComponent},
-        'EpSampleTypeTabComponent': {name: 'Sample Type', component: EpSampleTypeTabComponent },
-        'EpLibraryPrepTabComponent': {name:'LibraryPrep', component: EpLibraryPrepTabComponent},
-        'EpPropertyTabComponent': {name:'Property', component: EpPropertyTabComponent}
+    public tabComponentTemplate:any = {
+        'ExperimentPlatformTabComponent': {name: 'Experiment Platform', component: ExperimentPlatformTabComponent, inputs: {}},
+        'EpSampleTypeTabComponent': {name: 'Sample Type', component: EpSampleTypeTabComponent,inputs:{} },
+        'EpLibraryPrepTabComponent': {name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{}},
+        'ConfigureAnnotationsComponent': {name:'Property', component: ConfigureAnnotationsComponent, inputs:{experimentPlatformType:'GENERIC',experimentPlatformMode:true }}
 
     };
 
@@ -80,6 +79,8 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     ngOnInit():void{
         this.expPlatformService.getExperimentPlatformList_fromBackend(); // need
 
+
+
         this.platformListSubscription = this.expPlatformService.getExperimentPlatformListObservable()
             .subscribe(resp =>{
             if(resp){
@@ -95,8 +96,20 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             .subscribe((expPlatform) =>{
                 this.expPlatformService.setExperimentPlatformState(expPlatform);
                 this.propagateTabChange();
+                this.componentInit(expPlatform);
+
             });
 
+    }
+
+    componentCreated(event:ComponentRef<any>){
+        this.tabComponentRefList.push(event);
+        if(event.instance instanceof ConfigureAnnotationsComponent ){
+            let propertyTab:ConfigureAnnotationsComponent = event.instance;
+            propertyTab.experimentPlatformMode = true;
+        }
+
+        //this.expPlatformService.addExpPlatformFormMember()
     }
 
 
@@ -129,6 +142,9 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             this.expPlatformService.emitExperimentPlatform(exPlatform); // existing platform
             this.propagateTabChange();
 
+            this.componentInit(exPlatform);
+
+
             //this.experimentPlatformTabs =
         }
 
@@ -151,13 +167,54 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     }
 
-    propagateTabChange(){
-        let tabList:any[] =[];
-        this.expPlatformService.getExperimentPlatformTabList().forEach(tabStr =>{
+    propagateTabChange() { // programmatically reloading tabs
+        let tabList: any[] = [];
+        this.expPlatformService.getExperimentPlatformTabList().forEach(tabStr => {
             tabList.push(this.tabComponentTemplate[tabStr]);
         });
         this.experimentPlatformTabs = tabList;
     }
+
+    tabChanged(event:MatTabChangeEvent){ // user selected a new tab
+        if(event.tab.textLabel  === "Property"){
+            let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
+                this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
+            propertyTabRef.instance.externallyResizeGrid();
+        }
+
+
+    }
+
+    componentInit(expPlatform:any){
+        setTimeout(() =>{
+            let propertyTab:ComponentRef<ConfigureAnnotationsComponent> = null;
+            let tempTabComponentRefList:ComponentRef<any>[] = [];
+            for(let i = 0; i< this.tabComponentRefList.length; i++){
+                let pt = this.experimentPlatformTabs.find(platTab => this.tabComponentRefList[i].instance instanceof platTab.component)
+                if(pt){
+                    tempTabComponentRefList.push(this.tabComponentRefList[i]);
+                }else{
+                    this.expPlatformService.initExpPlatformForm(this.tabComponentRefList[i].instance.constructor.name, true);
+                }
+            }
+            this.tabComponentRefList = tempTabComponentRefList;
+
+            for(let compRef of this.tabComponentRefList){
+                let name = compRef.instance.constructor.name;
+                if(compRef.instance.formGroup && !this.expPlatformService.findExpPlatformFormMember(name)){
+                    this.expPlatformService.addExpPlatformFormMember(compRef.instance.formGroup,name);
+                }
+                if(compRef.instance instanceof ConfigureAnnotationsComponent ){
+                    propertyTab = compRef;
+                }
+            }
+            propertyTab.instance.setupExpPlatformMode(expPlatform);
+
+
+        });
+    }
+
+
 
     onSplitDragEnd(event:any){
         this.gridOpt.api.sizeColumnsToFit();
