@@ -25,6 +25,7 @@ export class PropertyService {
     public static readonly PROPERTY_PRODUCT_SHEET_NAME: string = 'product_sheet_name';
     public static readonly SHOW_ADMIN_NOTES_ON_REQUEST: string = 'show_admin_notes_on_request';
     public static readonly PROPERTY_DATASET_PRIVACY_EXPIRATION:string = "dataset_privacy_expiration";
+    public static readonly PROPERTY_HIDE_EXCLUDE_USAGE_FLAG:string = "hide_exclude_usage_flag";
     public static readonly PROPERTY_SAMPLE_BATCH_WARNING:string = "sample_batch_warning";
     public static readonly PROPERTY_NO_PRODUCTS_MESSAGE:string = "no_products_message";
     public static readonly PROPERTY_DESCRIPTION_NAME_MANDATORY_FOR_INTERNAL_EXPERIMENTS:string = "description_name_mandatory_for_internal_experiments";

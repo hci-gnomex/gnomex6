@@ -696,11 +696,11 @@ public class JSONtoXML {
                         System.out.println("[convertJSONtoXML: array end] arrayDepth: " + arrayDepth + " objectDepth: " + objectDepth + " nameStackptr: " + nameStackptr);
 
 //						// do we directly follow an array start?
-                    if (previousElement(ElementTypes.JSON_ARRAY_START, jsonNavigator)) {
-                        theXML += "/>\n";
-                        if (debugConvert) System.out.println("[convertJSONtoXML JSON_ARRAY_START JSON_ARRAY_END] WWWWWHHHHHYYYYY nodeStack! ADDING '>' %%%%%%%theXML:\n" + theXML);
-                        break;
-                    }
+//                    if (previousElement(ElementTypes.JSON_ARRAY_START, jsonNavigator)) {
+//                        theXML += "/>\n";
+//                        if (debugConvert) System.out.println("[convertJSONtoXML JSON_ARRAY_START JSON_ARRAY_END] WWWWWHHHHHYYYYY nodeStack! ADDING '>' %%%%%%%theXML:\n" + theXML);
+//                        break;
+//                    }
 
                     arrayDepth--;
                     if (debugConvert)
@@ -720,8 +720,9 @@ public class JSONtoXML {
                             nameStackptr--;
                         }
                     }
-                    if (debugConvert)
+                    if (debugConvert && nameStackptr >= 0) {
                         System.out.println("[convertJSONtoXML: array end] end of array end case statement new nameStackptr: " + nameStackptr + " " + nameStack[nameStackptr] + " nodeStack: " + nodeStack[nameStackptr] + " arrayDepth: " + arrayDepth + " objectDepth: " + objectDepth);
+                    }
                     break;
                 }
                 case ElementTypes.JSON_OBJECT_END: {

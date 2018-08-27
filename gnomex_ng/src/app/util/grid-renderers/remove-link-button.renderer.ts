@@ -49,9 +49,15 @@ export class RemoveLinkButtonRenderer implements ICellRendererAngularComp {
 	public params: any;
 	showRemoveButton: boolean;
 
+	private onRemoveClicked: string;
+
 	agInit(params: any): void {
 		this.params = params;
 		this.checkIfShowRemove();
+
+		if (this.params && this.params.column && this.params.column.colDef) {
+            this.onRemoveClicked = this.params.column.colDef.onRemoveClicked;
+		}
 	}
 
 	refresh(params: any): boolean {
@@ -71,8 +77,8 @@ export class RemoveLinkButtonRenderer implements ICellRendererAngularComp {
 	}
 
 	invokeParentMethod(): void {
-		if (this.params && this.params.context && this.params.context.componentParent) {
-			this.params.context.componentParent.removeChartfieldRow(this.params.node.rowIndex);
+		if (this.params && this.params.context && this.params.context.componentParent && this.onRemoveClicked) {
+			this.params.context.componentParent[this.onRemoveClicked](this.params.node);
 		}
 	}
 }

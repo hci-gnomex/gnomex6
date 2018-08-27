@@ -625,6 +625,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 			parameters.set('idLab', idLab);
 			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
+			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
 			parameters.set('accountName', this.accountName_Chartfield);
 			parameters.set('shortAcct', this.shortAccountName_Chartfield);
 			parameters.set('accountNumberBus', this.accountNumberBus_Chartfield);
@@ -885,6 +886,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 			parameters.set('idLab', idLab);
 			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
+			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
 			parameters.set('accountName', this.accountName_po);
 			parameters.set('shortAcct', this.shortAccountName_po);
 			parameters.set('idFundingAgency', idFundingAgency);
@@ -1045,6 +1047,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 			parameters.set('idLab', idLab);
 			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
+			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
 			parameters.set('accountName', this.accountName_creditCard);
 			parameters.set('shortAcct', shortAcct);
 			parameters.set('idFundingAgency', idFundingAgency);
