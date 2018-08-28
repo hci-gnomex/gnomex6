@@ -26,6 +26,7 @@ import {
 } from "../util/billing-template-window.component";
 import {Observable} from "rxjs/Observable";
 import {PriceSheetViewComponent} from "./price-sheet-view.component";
+import {PriceCategoryViewComponent} from "./price-category-view.component";
 
 @Component({
     selector: 'nav-billing',
@@ -1011,14 +1012,33 @@ export class NavBillingComponent implements OnInit {
     }
 
     public onPriceTreeGridRowDoubleClick(event: RowDoubleClickedEvent): void {
-        // TODO on double click open window
+        if (event.data.idPriceCriteria) {
+            return;
+        }
+
+        event.node.setExpanded(true);
+        let dialogConfig: MatDialogConfig = new MatDialogConfig();
+        let dialogRef: MatDialogRef<any>;
+
         if (event.data.idPriceSheet) {
-            event.node.setExpanded(true);
-            let dialogConfig: MatDialogConfig = new MatDialogConfig();
             dialogConfig.data = {
                 idPriceSheet: event.data.idPriceSheet
             };
-            let dialogRef: MatDialogRef<PriceSheetViewComponent> = this.dialog.open(PriceSheetViewComponent, dialogConfig);
+            dialogRef = this.dialog.open(PriceSheetViewComponent, dialogConfig);
+        } else if (event.data.idPriceCategory && !event.data.idPrice) {
+            dialogConfig.data = {
+                idPriceCategory: event.data.idPriceCategory,
+                idPriceSheet: event.node.parent.data.idPriceSheet
+            };
+            dialogRef = this.dialog.open(PriceCategoryViewComponent, dialogConfig);
+        } else if (event.data.idPrice) {
+            dialogConfig.data = {
+                idPrice: event.data.idPrice
+            };
+            // TODO
+        }
+
+        if (dialogRef) {
             dialogRef.afterClosed().subscribe((result: any) => {
                 if (result) {
                     this.refreshPricingGrid();
@@ -1095,7 +1115,32 @@ export class NavBillingComponent implements OnInit {
     }
 
     public openNewCategoryWindow(): void {
-        // TODO
+        if (!this.selectedPriceTreeGridItem) {
+            this.dialogsService.confirm("Please select a price sheet", null);
+            return;
+        }
+
+        let idPriceSheet: string;
+        if (this.selectedPriceTreeGridItem.data.idPriceSheet) {
+            idPriceSheet = this.selectedPriceTreeGridItem.data.idPriceSheet;
+        } else if (this.selectedPriceTreeGridItem.data.idPriceCategory && !this.selectedPriceTreeGridItem.data.idPrice) {
+            idPriceSheet = this.selectedPriceTreeGridItem.parent.data.idPriceSheet;
+        } else if (this.selectedPriceTreeGridItem.data.idPrice && !this.selectedPriceTreeGridItem.data.idPriceCriteria) {
+            idPriceSheet = this.selectedPriceTreeGridItem.parent.parent.data.idPriceSheet;
+        } else {
+            idPriceSheet = this.selectedPriceTreeGridItem.parent.parent.parent.data.idPriceSheet;
+        }
+
+        let dialogConfig: MatDialogConfig = new MatDialogConfig();
+        dialogConfig.data = {
+            idPriceSheet: idPriceSheet
+        };
+        let dialogRef: MatDialogRef<PriceCategoryViewComponent> = this.dialog.open(PriceCategoryViewComponent, dialogConfig);
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.refreshPricingGrid();
+            }
+        });
     }
 
     public openNewPriceWindow(): void {
