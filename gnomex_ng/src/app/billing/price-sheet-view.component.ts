@@ -59,6 +59,7 @@ export class PriceSheetViewComponent implements OnInit {
             this.billingService.getPriceSheet(this.data.idPriceSheet).subscribe((result: any) => {
                 if (result && result.PriceSheet) {
                     let priceSheet: any = result.PriceSheet;
+                    this.title += " " + priceSheet.name;
                     this.idPriceSheet = priceSheet.idPriceSheet;
                     this.form.controls['name'].setValue(priceSheet.name);
                     this.form.controls['active'].setValue(priceSheet.isActive === 'Y');
