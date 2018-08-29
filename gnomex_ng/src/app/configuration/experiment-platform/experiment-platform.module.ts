@@ -20,7 +20,7 @@ import {SortOrderDialogComponent} from "./sort-order-dialog.component";
 import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
 import { DynamicModule } from 'ng-dynamic-component';
-import {AgGridRendererModule} from "../../util/grid-renderers";
+import {AgGridRendererModule, IconTextRendererComponent} from "../../util/grid-renderers";
 import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
 import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
 import {DialogsModule} from "../../util/popup/dialogs.module";
@@ -44,7 +44,8 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
             SelectEditor,
             SelectRenderer,
             CheckboxRenderer,
-            IconLinkButtonRenderer
+            IconLinkButtonRenderer,
+            IconTextRendererComponent
         ]),
         UtilModule,
         RichEditorModule,
