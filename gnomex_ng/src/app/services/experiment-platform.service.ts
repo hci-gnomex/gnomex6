@@ -172,4 +172,9 @@ export class ExperimentPlatformService implements OnDestroy{
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/SaveExperimentPlatformSortOrderList.gx",null,{params:params});
     }
+
+    deleteExperimentPlatform(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/DeleteExperimentPlatform.gx",null,{params:params})
+    }
 }
