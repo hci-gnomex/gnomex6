@@ -20,6 +20,12 @@ import {SortOrderDialogComponent} from "./sort-order-dialog.component";
 import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
 import { DynamicModule } from 'ng-dynamic-component';
+import {AgGridRendererModule} from "../../util/grid-renderers";
+import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
+import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
+import {DialogsModule} from "../../util/popup/dialogs.module";
+import {SelectEditor} from "../../util/grid-editors/select.editor";
+import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 
 
 
@@ -33,27 +39,38 @@ import { DynamicModule } from 'ng-dynamic-component';
         CommonModule,
         FormsModule,
         ServicesModule,
-        AgGridModule.withComponents([]),
+        AgGridRendererModule,
+        AgGridModule.withComponents([
+            SelectEditor,
+            SelectRenderer,
+            CheckboxRenderer,
+            IconLinkButtonRenderer
+        ]),
         UtilModule,
         RichEditorModule,
         ReactiveFormsModule,
         AngularSplitModule,
         DynamicModule.withComponents([ExperimentPlatformTabComponent,
-            SortOrderDialogComponent,EpSampleTypeTabComponent,
-            EpLibraryPrepTabComponent,ConfigureAnnotationsComponent
+            EpSampleTypeTabComponent,
+            EpLibraryPrepTabComponent,ConfigureAnnotationsComponent,
         ])
 
     ],
     declarations: [
         ExperimentPlatformOverviewComponent,
         ExperimentPlatformTabComponent,
-        SortOrderDialogComponent,
         EpSampleTypeTabComponent,
-        EpLibraryPrepTabComponent
+        EpLibraryPrepTabComponent,
+        SampleTypeDetailDialogComponent,
+        SortOrderDialogComponent
+
 
 
     ],
     entryComponents: [
+        SampleTypeDetailDialogComponent,
+        SortOrderDialogComponent
+
     ],
     exports: [
     ]

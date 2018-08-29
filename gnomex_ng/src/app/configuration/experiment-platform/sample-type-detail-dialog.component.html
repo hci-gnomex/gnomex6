@@ -1,0 +1,31 @@
+
+<div mat-dialog-title class="padded-outer">
+    <div class="dialog-header-colors padded-inner">
+        {{rowData?.display}}
+    </div>
+</div>
+<div mat-dialog-content style="margin: 0; padding: 0;">
+
+    <div style="margin: 0.5em;">
+        <label class="gx-label" style="margin-bottom:0.5em;" for="experimentDescriptionId" > notes </label>
+        <jqxEditor
+                #editorReference
+                id="experimentDescriptionId"
+                width="100%"
+                [height]="300"
+                [editable]="true"
+                [tools]="tbarSettings"
+                [toolbarPosition]="'bottom'">
+
+        </jqxEditor>
+    </div>
+
+</div>
+<div class="padded-outer" mat-dialog-actions align="end">
+    <div class="padded-inner">
+        <button mat-button (click)="applyChanges()">
+            <img class="icon" [src]="constService.ICON_SAVE" > Apply
+        </button>
+        <button mat-button mat-dialog-close color="accent" > Cancel </button>
+    </div>
+</div>
