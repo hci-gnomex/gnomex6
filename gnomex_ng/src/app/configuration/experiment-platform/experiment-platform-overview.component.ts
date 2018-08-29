@@ -180,6 +180,10 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
                 this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
             propertyTabRef.instance.externallyResizeGrid();
+        }else if (event.tab.textLabel === "Sample Type"){
+            let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
+                this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
+            sampleTypeTabRef.instance.externallyResizeGrid();
         }
 
 
