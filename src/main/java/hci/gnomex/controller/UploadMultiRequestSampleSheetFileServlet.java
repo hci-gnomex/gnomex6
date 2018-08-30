@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -171,22 +173,39 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 			}
 		}
 
-		Document doc = new Document(new Element("FileNotWritten"));
+//		Document doc = new Document(new Element("FileNotWritten"));
+//		if (fileWasWritten) {
+//			MultiRequestSampleSheetFileParser parser = new MultiRequestSampleSheetFileParser(directoryName + fileName,
+//					secAdvisor);
+//			parser.parse(sess);
+//			doc = parser.toXMLDocument();
+//		}
+//
+//		PrintWriter responseOut = res.getWriter();
+//		res.setHeader("Cache-Control", "cache, must-revalidate, proxy-revalidate, s-maxage=0, max-age=0");
+//		res.setHeader("Pragma", "public");
+//		res.setDateHeader("Expires", 0);
+//		res.setContentType("application/xml");
+//
+//		XMLOutputter xmlOut = new XMLOutputter();
+//		responseOut.println(xmlOut.outputString(doc));
+
+		JsonObject result = Json.createObjectBuilder().add("FilleNotWritten", true).build();
+
 		if (fileWasWritten) {
 			MultiRequestSampleSheetFileParser parser = new MultiRequestSampleSheetFileParser(directoryName + fileName,
 					secAdvisor);
 			parser.parse(sess);
-			doc = parser.toXMLDocument();
+			result = parser.toJSONObject();
 		}
 
 		PrintWriter responseOut = res.getWriter();
 		res.setHeader("Cache-Control", "cache, must-revalidate, proxy-revalidate, s-maxage=0, max-age=0");
 		res.setHeader("Pragma", "public");
 		res.setDateHeader("Expires", 0);
-		res.setContentType("application/xml");
+		res.setContentType("application/json");
 
-		XMLOutputter xmlOut = new XMLOutputter();
-		responseOut.println(xmlOut.outputString(doc));
+		responseOut.println(result.toString());
 
 	} catch (ServletException e) {
 		unexpectedError(e, res);

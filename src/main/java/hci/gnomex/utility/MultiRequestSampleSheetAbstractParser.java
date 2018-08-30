@@ -25,6 +25,13 @@ import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.apache.log4j.Logger;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+
 public abstract class MultiRequestSampleSheetAbstractParser implements Serializable {
 
   // the static field for logging in Log4J
@@ -493,6 +500,121 @@ public abstract class MultiRequestSampleSheetAbstractParser implements Serializa
     // delete old value of annotation even if new value is blank.
     annotationsToDelete.put(info.getProperty().getIdProperty(), value);
     annotationsToDeleteMap.put(sample.getIdSampleString(), annotationsToDelete);
+  }
+
+  public JsonObject toJSONObject() {
+    JsonObjectBuilder builder = Json.createObjectBuilder();
+
+    if (!this.fatalError()) {
+      builder.add("Headers",  this.getHeadersJson());
+      builder.add("Rows",     this.getRowsJson());
+      builder.add("Requests", this.getRequestsJson());
+    }
+
+    builder.add("Errors", this.getErrorsJson());
+
+    return builder.build();
+  }
+
+  private JsonArray getHeadersJson() {
+    JsonArrayBuilder builder = Json.createArrayBuilder();
+
+    for(Integer columnOrdinal : columnMap.keySet()) {
+      ColumnInfo info = columnMap.get(columnOrdinal);
+
+      JsonObject header = Json.createObjectBuilder()
+                              .add("columnOrdinal", columnOrdinal.toString())
+                              .add("header", info.getHeaderName())
+                              .build();
+
+      builder.add(header);
+    }
+
+    return builder.build();
+  }
+
+  private JsonArray getRowsJson() {
+    JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+    for (Integer rowOrdinal = 1; rowOrdinal <= getNumRows(); rowOrdinal++) {
+      JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+
+      objectBuilder.add("rowOrdinal", rowOrdinal.toString());
+
+      for(Integer columnOrdinal = 0; columnOrdinal < columnMap.keySet().size(); columnOrdinal++) {
+        ColumnInfo info = columnMap.get(columnOrdinal);
+        String value = info.getValue(rowOrdinal);
+        if (value == null) {
+          value = "";
+        }
+        objectBuilder.add("n" + columnOrdinal.toString(), value);
+        if (columnOrdinal.equals(this.requestNumberOrdinal)) {
+          objectBuilder.add("requestNumber", value);
+        }
+        if (columnOrdinal.equals(this.sampleNumberOrdinal)) {
+          objectBuilder.add("sampleNumber", value);
+        }
+      }
+
+      arrayBuilder.add(objectBuilder.build());
+    }
+
+    return arrayBuilder.build();
+  }
+
+  private JsonArray getRequestsJson() {
+    JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+    for(String requestNumber : requestMap.keySet()) {
+      Request request = requestMap.get(requestNumber);
+      String reqValid = this.hasRequestError(requestNumber) ? "N" : "Y";
+
+      JsonObject object = Json.createObjectBuilder()
+                              .add("includeFlag", reqValid)
+                              .add("idRequest", request == null ? "" : request.getIdRequest().toString())
+                              .add("requestNumber", requestNumber)
+                              .add("codeRequestCategory", request == null ? "" : request.getCodeRequestCategory())
+                              .add("name", request == null ? "" : request.getName())
+                              .add("description", request == null ? "" :  request.getDescription())
+                              .add("codeApplication", request == null || request.getCodeApplication() == null ? "" : request.getCodeApplication())
+                              .add("numUnmodifiedSamples", this.numberSamplesUnchanged(request).toString())
+                              .add("numUpdatedSamples", this.numberSamplesUpdated(request).toString())
+                              .add("numCreatedSamples", this.numberSamplesCreated(request).toString())
+                              .add("numErrors", this.numberErrors(requestNumber).toString())
+                              .add("enableCheckBox", reqValid)
+                              .build();
+
+      arrayBuilder.add(object);
+    }
+
+    return arrayBuilder.build();
+  }
+
+  private JsonArray getErrorsJson() {
+    JsonArrayBuilder builder = Json.createArrayBuilder();
+
+    for(Error error : this.errors) {
+      String colName = "";
+      if (error.getColumnOrdinal() != null) {
+        ColumnInfo info = columnMap.get(error.getColumnOrdinal());
+        if (info != null) {
+          colName = info.getHeaderName();
+        }
+      }
+
+      JsonObject element = Json.createObjectBuilder()
+                               .add("rowOrdinal", error.getRowOrdinal() == null ? "" : error.getRowOrdinal().toString())
+                               .add("columnOrdinal", error.getColumnOrdinal() == null ? "" : error.getColumnOrdinal().toString())
+                               .add("status", error.getStatus())
+                               .add("message", error.getMessage())
+                               .add("requestNumber", error.getRequestNumber() == null ? "" : error.getRequestNumber())
+                               .add("sampleNumber", error.getSampleNumber() == null ? "" : error.getSampleNumber())
+                               .add("header", colName)
+                               .build();
+      builder.add(element);
+    }
+
+    return builder.build();
   }
 
   public Document toXMLDocument() {
