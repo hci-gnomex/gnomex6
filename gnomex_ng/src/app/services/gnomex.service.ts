@@ -710,14 +710,20 @@ export class GnomexService {
                                                 this.faqList = response;
                                             }
                                         }
-                                        this.emitIsAppInitCompelete(true);
-                                        this.progressService.displayLoader(100);
-                                        this._isLoggedIn = true;
+                                        this.progressService.displayLoader(95);
+
+                                        this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
+                                            this.progressService.displayLoader(100);
+                                            this.uploadSampleSheetURL = response.url;
+
+                                            this.emitIsAppInitCompelete(true);
+                                            this._isLoggedIn = true;
+                                        });
                                     });
 
 
 
-
+                                    //TODO implemented, delete this V
                                 // TODO will need this in future
                                 // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
                                 //      this.progressService.displayLoader(100);
@@ -749,9 +755,13 @@ export class GnomexService {
                     this.progressService.displayLoader(75);
                     this.onDictionariesLoaded().then((response) => {
                         this.progressService.displayLoader(90);
-                        this.emitIsAppInitCompelete(true);
-                        this.progressService.displayLoader(100);
-                        this._isLoggedIn = true;
+                        this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
+                            this.progressService.displayLoader(100);
+                            this.uploadSampleSheetURL = response.url;
+
+                            this.emitIsAppInitCompelete(true);
+                            this._isLoggedIn = true;
+                        });
 
                         // TODO will need this in future
                         // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {

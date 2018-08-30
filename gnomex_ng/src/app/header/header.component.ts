@@ -100,7 +100,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
 
 
     constructor(private authenticationService: AuthenticationService,
-				        private progressService: ProgressService,
+                private progressService: ProgressService,
                 private dictionaryService: DictionaryService,
                 private launchPropertiesService: LaunchPropertiesService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -426,9 +426,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     }
                 ]
             }
-
-
-        ]
+        ];
 
         // Manager menu
         this.managerNavItems = [
@@ -573,10 +571,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     }
                 ]
             }
-
-
-        ]
-
+        ];
         this.managerESNavItems = [
             {
                 displayName: 'Experiments',
@@ -683,7 +678,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     }
                 ]
             }
-        ]
+        ];
 
         // Admin menu
         this.adminNavItems = [
@@ -738,7 +733,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     {
                         displayName: 'Bulk Sample Sheet Import',
                         iconName: '../../assets/review.png',
-                        route: '/experiments-orders',
+                        route: [{outlets: {'modal': 'BulkSampleUpload'}}]
                     }
                 ]
             },
@@ -1562,7 +1557,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     {
                         displayName: 'Bulk Sample Sheet Import',
                         iconName: '../../assets/review.png',
-                        route: '/experiments-orders',
+                        route: [{outlets: {'modal': 'BulkSampleUpload'}}]
                     }
                 ]
             },
@@ -1663,7 +1658,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 ]
             }
 
-        ]
+        ];
 
         // User external menu
         this.userESNavItems = [
@@ -1758,8 +1753,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     }
                 ]
             }
-
-        ]
+        ];
         this.userNonSubmitterNavItems = [
             {
                 displayName: 'Experiments',
@@ -1785,7 +1779,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 iconName: '../../assets/topic_tag.png',
                 route: '/topics'
             }
-        ]
+        ];
 
     }
     /**

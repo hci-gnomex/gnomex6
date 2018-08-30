@@ -114,7 +114,10 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
             && this.params.data
             && this.params.node
             && this.params.node.gridApi
-            && this.params.node.gridApi.formGroup === undefined
+            && (this.params.node.gridApi.formGroup === undefined
+                || (this.params.node.gridApi.formGroup.controls
+                    && this.params.node.gridApi.formGroup.controls.length
+                ))
             && this.params.node.gridApi.getModel()) {
 
             this.params.node.gridApi.formGroup = new FormGroup({});

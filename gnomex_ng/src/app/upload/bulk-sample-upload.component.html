@@ -1,0 +1,14 @@
+<div mat-dialog-title class="full-width padded no-margin title">
+    <div class="full-width align-center flex-container-row">
+        <div>Upload Multi-Experiment Sample Sheet</div>
+    </div>
+</div>
+<div mat-dialog-content class="full-width padded no-margin">
+    <div style="height: 15em;">
+        <input type="file" class="hidden" (change)="onFileSelected($event)" #fileInput>
+        <button mat-button (click)="openFileChooser()">Upload</button>
+    </div>
+</div>
+<div mat-dialog-actions class="full-width padded no-margin">
+    Buttons
+</div>
