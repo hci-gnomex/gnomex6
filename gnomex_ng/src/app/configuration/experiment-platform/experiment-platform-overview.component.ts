@@ -13,6 +13,7 @@ import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.co
 import {MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {IconTextRendererComponent} from "../../util/grid-renderers";
+import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
 //assets/page_add.png
 
 @Component({
@@ -66,8 +67,8 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         'ExperimentPlatformTabComponent': {name: 'Experiment Platform', component: ExperimentPlatformTabComponent, inputs: {}},
         'EpSampleTypeTabComponent': {name: 'Sample Type', component: EpSampleTypeTabComponent,inputs:{} },
         'EpLibraryPrepTabComponent': {name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{}},
-        'ConfigureAnnotationsComponent': {name:'Property', component: ConfigureAnnotationsComponent, inputs:{experimentPlatformType:'GENERIC',experimentPlatformMode:true }}
-
+        'ConfigureAnnotationsComponent': {name:'Property', component: ConfigureAnnotationsComponent, inputs:{}},
+        'EpPipelineProtocolTabComponent': {name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent}
     };
 
 
@@ -87,18 +88,18 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
         this.platformListSubscription = this.expPlatformService.getExperimentPlatformListObservable()
             .subscribe(resp =>{
-            if(resp){
+                if(resp){
 
-                this.showSpinner = false;
-                this.rowData = (<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
-            }else if(resp && resp.message){
-                this.dialogService.alert(resp.message);
-            }else{
-                this.dialogService.alert("An error has occurred getting ExperimentPlatformList");
-            }
+                    this.showSpinner = false;
+                    this.rowData = (<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
+                }else if(resp && resp.message){
+                    this.dialogService.alert(resp.message);
+                }else{
+                    this.dialogService.alert("An error has occurred getting ExperimentPlatformList");
+                }
                 this.expPlatformService.expPlatformOverviewForm.markAsPristine();
                 this.expPlatformService.expPlatformOverviewForm.markAsUntouched();
-        });
+            });
 
         this.expPlatformService.getExperimentPlatformTypeChangeObservable()
             .subscribe((expPlatform) =>{
@@ -182,21 +183,21 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             this.dialogService.confirm("Remove Platform ",
                 "Are you sure you want to remove experiment platform " + expPlatform.display + "?")
                 .first().subscribe((result:boolean) => {
-                    if(result){
-                        this.showSpinner = true;
-                        let params:HttpParams = new HttpParams().set("codeRequestCategory", expPlatform.codeRequestCategory);
-                        console.log(params);
-                        this.expPlatformService.deleteExperimentPlatform(params).first()
-                            .subscribe(resp => {
-                                if(resp && resp.result === "SUCCESS"){
-                                    this.expPlatformService.getExperimentPlatformList_fromBackend();
-                                }else if(resp && resp.message){
-                                    this.dialogService.alert(resp.message);
-                                }
-                            });
+                if(result){
+                    this.showSpinner = true;
+                    let params:HttpParams = new HttpParams().set("codeRequestCategory", expPlatform.codeRequestCategory);
+                    console.log(params);
+                    this.expPlatformService.deleteExperimentPlatform(params).first()
+                        .subscribe(resp => {
+                            if(resp && resp.result === "SUCCESS"){
+                                this.expPlatformService.getExperimentPlatformList_fromBackend();
+                            }else if(resp && resp.message){
+                                this.dialogService.alert(resp.message);
+                            }
+                        });
 
-                    }
-                })
+                }
+            })
         }
 
 
