@@ -26,6 +26,7 @@ import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.compo
 import {DialogsModule} from "../../util/popup/dialogs.module";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
+import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
 
 
 
@@ -54,6 +55,7 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
         DynamicModule.withComponents([ExperimentPlatformTabComponent,
             EpSampleTypeTabComponent,
             EpLibraryPrepTabComponent,ConfigureAnnotationsComponent,
+            EpPipelineProtocolTabComponent
         ])
 
     ],
@@ -63,7 +65,8 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
         EpSampleTypeTabComponent,
         EpLibraryPrepTabComponent,
         SampleTypeDetailDialogComponent,
-        SortOrderDialogComponent
+        SortOrderDialogComponent,
+        EpPipelineProtocolTabComponent
 
 
 

@@ -39,7 +39,7 @@ export class ExperimentPlatformService implements OnDestroy{
 
     setExperimentPlatformState(reqCategory:any ):void{
         if(reqCategory){
-            this._selectedType = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY_TYPE, reqCategory.value)
+            this._selectedType = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY_TYPE, reqCategory.type);
         }
 
     }
@@ -106,8 +106,13 @@ export class ExperimentPlatformService implements OnDestroy{
 
     getExperimentPlatformTabList():string[]{
         if(this.isIllumina || this.isNanoString || this.isSequenom){
-            return ['ExperimentPlatformTabComponent',
-                'EpSampleTypeTabComponent', "EpLibraryPrepTabComponent","ConfigureAnnotationsComponent"]
+            return [
+                'ExperimentPlatformTabComponent',
+                'EpSampleTypeTabComponent',
+                "EpLibraryPrepTabComponent",
+                "EpPipelineProtocolTabComponent",
+                "ConfigureAnnotationsComponent"
+            ]
         }else if(this.isQC){
             return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent',"ConfigureAnnotationsComponent"]
         }else{

@@ -6,10 +6,8 @@ import {ExperimentPlatformService} from "../../services/experiment-platform.serv
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {GnomexService} from "../../services/gnomex.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
-import {LinkToExperimentDialogComponent} from "../../analysis/analysis-detail";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 //assets/page_add.png
