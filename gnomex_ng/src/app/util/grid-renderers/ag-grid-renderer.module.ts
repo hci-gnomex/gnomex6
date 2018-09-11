@@ -12,6 +12,7 @@ import { IconLinkButtonRenderer } from "./icon-link-button.renderer";
 import { MultipleLineTextRenderer } from "./multiple-line-text.renderer";
 import { RemoveLinkButtonRenderer } from "./remove-link-button.renderer";
 import { SelectRenderer } from "./select.renderer";
+import { ShowErrorsShowSamplesRenderer } from "./show-errors-show-samples.renderer";
 import { SplitStringToMultipleLinesRenderer } from "./split-string-to-multiple-lines.renderer";
 import { TextAlignLeftMiddleRenderer } from "./text-align-left-middle.renderer";
 import { TextAlignRightMiddleRenderer } from "./text-align-right-middle.renderer";
@@ -38,6 +39,7 @@ import {UrlAnnotRenderer} from "./url-annot-renderer";
         MultipleLineTextRenderer,
 		RemoveLinkButtonRenderer,
 		SelectRenderer,
+        ShowErrorsShowSamplesRenderer,
 		SplitStringToMultipleLinesRenderer,
 		TextAlignLeftMiddleRenderer,
 		TextAlignRightMiddleRenderer,
@@ -57,6 +59,7 @@ import {UrlAnnotRenderer} from "./url-annot-renderer";
         MultipleLineTextRenderer,
 		RemoveLinkButtonRenderer,
 		SelectRenderer,
+        ShowErrorsShowSamplesRenderer,
 		SplitStringToMultipleLinesRenderer,
 		TextAlignLeftMiddleRenderer,
 		TextAlignRightMiddleRenderer,

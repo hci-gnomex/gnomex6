@@ -6,6 +6,7 @@ import {AgGridModule} from "ag-grid-angular";
 
 import {AgGridRendererModule} from "../util/grid-renderers/ag-grid-renderer.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
+import {AngularSplitModule} from "angular-split";
 import {ServicesModule} from "../services/services.module";
 import {UtilModule} from "../util/util.module";
 import {WindowModule} from "../../modules/window.module";
@@ -22,6 +23,7 @@ import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-render
 import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
 import {MultipleLineTextRenderer} from "../util/grid-renderers/multiple-line-text.renderer";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
+import {ShowErrorsShowSamplesRenderer} from "../util/grid-renderers/show-errors-show-samples.renderer";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
 import {TwoButtonRenderer} from "../util/grid-renderers/two-button.renderer";
@@ -48,6 +50,7 @@ import {SampleUploadService} from "./sample-upload.service";
             IconRendererComponent,
             MultipleLineTextRenderer,
             SelectRenderer,
+            ShowErrorsShowSamplesRenderer,
             TextAlignLeftMiddleRenderer,
             TextAlignRightMiddleRenderer,
             TwoButtonRenderer,
@@ -55,6 +58,7 @@ import {SampleUploadService} from "./sample-upload.service";
             UrlAnnotRenderer,
             CheckboxRenderer,
         ]),
+        AngularSplitModule,
     ],
     declarations: [
         BulkSampleUploadComponent,

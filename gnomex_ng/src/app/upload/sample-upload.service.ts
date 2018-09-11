@@ -21,7 +21,7 @@ export class SampleUploadService {
     constructor(private http: Http, private cookieUtilService: CookieUtilService) { }
 
 
-    public uploadBulkSampleSheet(params: any): Observable<boolean> {
+    public uploadBulkSampleSheet(params: any): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
 
         this.http.get(SampleUploadService.getUploadSampleSheetURL_URL, {}).subscribe((response: any) => {
@@ -32,10 +32,10 @@ export class SampleUploadService {
 
                 this.http.post('/gnomex/UploadMultiRequestSampleSheetFileServlet.gx', params).subscribe((response: any) => {
                     if (response && response.status === 200) {
-                        this.bulkUploadSubject.next(true);
-                        // this.bulkUploadSubject.next(response.json());
+                        // this.bulkUploadSubject.next(true);
+                        this.bulkUploadSubject.next(response.json());
                     } else {
-                        this.bulkUploadSubject.next(false);
+                        this.bulkUploadSubject.next(null);
                     }
                 });
             }

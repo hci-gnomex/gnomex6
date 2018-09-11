@@ -69,18 +69,19 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
 
         if (this.params
             && this.params.node
-            && this.params.node.formGroup
-            && this.params.node.formGroup.controls
             && this.params.column
             && this.params.column.colDef
             && this.params.column.colDef.field) {
 
-            // In case of editing and re-creating renderers.
-            this.errorMessage = CellRendererValidation.updateErrorMessage(
-                this.params.node.formGroup.controls[this.params.column.colDef.field + "_formControl"],
-                this.params.node,
-                this.params.column.colDef
-            );
+            if (this.params.node.formGroup
+                && this.params.node.formGroup.controls) {
+                // In case of editing and re-creating renderers.
+                this.errorMessage = CellRendererValidation.updateErrorMessage(
+                    this.params.node.formGroup.controls[this.params.column.colDef.field + "_formControl"],
+                    this.params.node,
+                    this.params.column.colDef
+                );
+            }
 
             this.errorMessage = this.params.node[this.params.column.colDef.field + "_errorMessage"];
         }
@@ -114,16 +115,18 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
             && this.params.data
             && this.params.node
             && this.params.node.gridApi
-            && (this.params.node.gridApi.formGroup === undefined
-                || (this.params.node.gridApi.formGroup.controls
-                    && this.params.node.gridApi.formGroup.controls.length
-                ))
             && this.params.node.gridApi.getModel()) {
-
-            this.params.node.gridApi.formGroup = new FormGroup({});
 
             let allNodes = this.params.node.gridApi.getModel().rowsToDisplay;
             let columns: any[];
+
+            if (!this.params.node.gridApi.formGroup
+                || (this.params.node.gridApi.formGroup
+                    && this.params.node.gridApi.formGroup.controls
+                    && this.params.node.gridApi.formGroup.controls.length != allNodes.length
+                )) {
+                this.params.node.gridApi.formGroup = new FormGroup({});
+            }
 
             if (this.params && this.params.columnApi && this.params.columnApi.columnController) {
                 columns = this.params.columnApi.columnController.gridColumns;
@@ -131,7 +134,7 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
 
             for (let node of allNodes) {
 
-                if (node.formGroup === undefined) {
+                if (!node.formGroup) {
                     node.formGroup = new FormGroup({});
                 }
 
@@ -155,7 +158,9 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
                     }
                 }
 
-                this.params.node.gridApi.formGroup.addControl('RowGroup_' + node.rowIndex, node.formGroup);
+                if (!this.params.node.gridApi.formGroup.contains('RowGroup_' + node.rowIndex)) {
+                    this.params.node.gridApi.formGroup.addControl('RowGroup_' + node.rowIndex, node.formGroup);
+                }
             }
         }
     }
@@ -189,7 +194,7 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
 
         node[columnDefinition.field + "_errorMessage"] = '';
 
-        if (formControl.invalid || (customErrorMessage && customErrorMessage != '')) {
+        if (formControl.invalid || (customErrorMessage && customErrorMessage !== '')) {
             if (columnDefinition.errorMessageHeader) {
                 node[columnDefinition.field + "_errorMessage"] += '' + columnDefinition.errorMessageHeader + '\n';
             } else {

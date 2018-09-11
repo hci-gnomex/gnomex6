@@ -1,14 +1,172 @@
-<div mat-dialog-title class="full-width padded no-margin title">
-    <div class="full-width align-center flex-container-row">
-        <div>Upload Multi-Experiment Sample Sheet</div>
+<div class="full-height full-width flex-container-col">
+    <div mat-dialog-title class="full-width padded no-margin title">
+        <div class="full-width align-center flex-container-row">
+            <div>Upload Multi-Experiment Sample Sheet</div>
+        </div>
     </div>
-</div>
-<div mat-dialog-content class="full-width padded no-margin">
-    <div style="height: 15em;">
-        <input type="file" class="hidden" (change)="onFileSelected($event)" #fileInput>
-        <button mat-button (click)="openFileChooser()">Upload</button>
+    <div mat-dialog-content class="full-width flex-grow padded-top padded-left-right no-margin no-max-height background">
+        <div class="full-height full-width">
+            <div #oneEmWidth class="no-height single-em"></div>
+            <div *ngIf="!fileUploaded" class="full-height full-width flex-container-row align-center">
+                <div class="full-height flex-grow">
+                </div>
+                <div>
+                    <input type="file" class="hidden" (change)="onFileSelected($event)" #fileInput>
+                    <button mat-raised-button (click)="openFileChooser()">Upload</button>
+                </div>
+                <div class="full-height flex-grow">
+                </div>
+            </div>
+            <div *ngIf="fileUploaded" class="full-height full-width">
+                <div *ngIf="!showErrorsAndSamplesScreen" class="full-height full-width flex-container-col">
+                    <div class="full-width flex-container-row align-center">
+                        <div class="flex-grow">
+                            Experiments To Be Imported
+                        </div>
+                        <div *ngIf="errorRows_original?.length > 0" class="padded-left-right">
+                            <button mat-button (click)="showAllErrorsThenSamples()" class="small-font red-text underline">
+                                Show Errors/Warnings
+                            </button>
+                        </div>
+                        <div>
+                            <button mat-button (click)="showAllSamplesThenErrors()" class="small-font blue-text underline">
+                                Show Samples
+                            </button>
+                        </div>
+                    </div>
+                    <div class="full-width flex-grow padded-top">
+                        <ag-grid-angular
+                                class="ag-fresh small-font full-width full-height"
+                                [context]="context"
+                                [singleClickEdit]="true"
+                                [enableSorting]="true"
+                                [enableColResize]="true"
+                                [rowSelection]="'multiple'"
+                                [suppressRowClickSelection]="true"
+                                (gridSizeChanged)="onGridSizeChanged($event)"
+                                (gridReady)="onImportableGridReady($event)">
+                        </ag-grid-angular>
+                    </div>
+                </div>
+                <div *ngIf="showErrorsAndSamplesScreen" class="full-height full-width">
+                    <div *ngIf="showErrorsAboveSamples" class="full-height full-width flex-container-col">
+                        <split direction="vertical">
+                            <split-area [size]="70">
+                                <div class="full-width full-height flex-container-col">
+                                    <div class="full-width flex-container-row align-center">
+                                        <div class="flex-grow">
+                                            {{ selectedAll ? "All Errors and Warnings" : "Errors and Warnings for Experiment"}}
+                                        </div>
+                                        <div>
+                                            <button mat-raised-button (click)="onBackClicked()" class="small-font">
+                                                <img src="../../assets/arrow_left.png" alt="">
+                                                Back
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="full-width flex-grow padded-top">
+                                        <ag-grid-angular
+                                                class="ag-fresh small-font full-width full-height"
+                                                [context]="context"
+                                                [singleClickEdit]="true"
+                                                [enableSorting]="true"
+                                                [enableColResize]="true"
+                                                [rowSelection]="'single'"
+                                                (rowSelected)="selectAnError($event)"
+                                                (gridSizeChanged)="onGridSizeChanged($event)"
+                                                (gridReady)="onErrorsTopGridReady($event)">
+                                        </ag-grid-angular>
+                                    </div>
+                                </div>
+                            </split-area>
+                            <split-area [size]="30">
+                                <div class="full-width full-height flex-container-col">
+                                    <div class="full-width flex-container-row align-center">
+                                        <div class="flex-grow">
+                                            {{ selectedAll ? "All Samples" : "Samples for selected error"}}
+                                        </div>
+                                    </div>
+                                    <div class="full-width flex-grow padded-top">
+                                        <ag-grid-angular
+                                                class="ag-fresh small-font full-width full-height"
+                                                [context]="context"
+                                                [singleClickEdit]="true"
+                                                [enableSorting]="true"
+                                                [enableColResize]="true"
+                                                [rowSelection]="'single'"
+                                                (gridSizeChanged)="onGridSizeChanged($event)"
+                                                (gridReady)="onSamplesBottomGridReady($event)">
+                                        </ag-grid-angular>
+                                    </div>
+                                </div>
+                            </split-area>
+                        </split>
+                    </div>
+                    <div *ngIf="!showErrorsAboveSamples" class="full-height full-width flex-container-col">
+                        <split direction="vertical">
+                            <split-area [size]="70">
+                                <div class="full-width full-height flex-container-col">
+                                    <div class="full-width flex-container-row align-center">
+                                        <div class="flex-grow">
+                                            {{ selectedAll ? "All Samples" : "Samples for selected error"}}
+                                        </div>
+                                        <div>
+                                            <button mat-raised-button (click)="onBackClicked()" class="small-font">
+                                                <img src="../../assets/arrow_left.png" alt="">
+                                                Back
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="full-width flex-grow padded-top">
+                                        <ag-grid-angular
+                                                class="ag-fresh small-font full-width full-height"
+                                                [context]="context"
+                                                [singleClickEdit]="true"
+                                                [enableSorting]="true"
+                                                [enableColResize]="true"
+                                                [rowSelection]="'single'"
+                                                (rowSelected)="selectASample($event)"
+                                                (gridSizeChanged)="onGridSizeChanged($event)"
+                                                (gridReady)="onSamplesTopGridReady($event)">
+                                        </ag-grid-angular>
+                                    </div>
+                                </div>
+                            </split-area>
+                            <split-area [size]="30">
+                                <div class="full-width full-height flex-container-col">
+                                    <div class="full-width flex-container-row align-center">
+                                        <div class="flex-grow">
+                                            {{ selectedAll ? "All Errors and Warnings" : "Errors and Warnings for Experiment"}}
+                                        </div>
+                                    </div>
+                                    <div class="full-width flex-grow padded-top">
+                                        <ag-grid-angular
+                                                class="ag-fresh small-font full-width full-height"
+                                                [context]="context"
+                                                [singleClickEdit]="true"
+                                                [enableSorting]="true"
+                                                [enableColResize]="true"
+                                                [rowSelection]="'single'"
+                                                (gridSizeChanged)="onGridSizeChanged($event)"
+                                                (gridReady)="onErrorsBottomGridReady($event)">
+                                        </ag-grid-angular>
+                                    </div>
+                                </div>
+                            </split-area>
+                        </split>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<div mat-dialog-actions class="full-width padded no-margin">
-    Buttons
+    <div mat-dialog-actions class="flex-container-row full-width padded no-margin background">
+        <div class="full-height flex-grow">
+        </div>
+        <div class="padded-left-right">
+            <button mat-raised-button (click)="importSamplesButton()">Import Samples</button>
+        </div>
+        <div>
+            <button mat-raised-button (click)="closeButton()">Close</button>
+        </div>
+    </div>
 </div>

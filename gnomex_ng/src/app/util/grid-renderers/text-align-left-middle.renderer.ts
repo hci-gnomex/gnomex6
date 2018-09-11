@@ -7,6 +7,7 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 		<div [matTooltip]="this.errorMessage"
              [matTooltipShowDelay]="300"
              [matTooltipHideDelay]="300"
+			 (click)="onClick()"
 			 class="full-width full-height {{this.errorMessage && this.errorMessage !== '' ? 'error' : ''}}">
 			<div class="t full-width full-height fix-table">
 				<div class="tr">
@@ -43,8 +44,6 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 })
 export class TextAlignLeftMiddleRenderer extends CellRendererValidation {
     value: string;
-
-    errorMessage: string = '';
 
 	agInit2(params: any): void {
 		this.value = (this.params && this.params.value) ? this.params.value : "";
