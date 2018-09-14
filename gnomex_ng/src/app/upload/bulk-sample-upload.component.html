@@ -1,10 +1,10 @@
 <div class="full-height full-width flex-container-col">
     <div mat-dialog-title class="full-width padded no-margin title">
-        <div class="full-width align-center flex-container-row">
+        <div #topmostLeftmost (mousedown)="onMouseDownHeader($event)" class="full-width align-center flex-container-row {{ movingDialog ? 'grabbed' : 'grabbable' }}">
             <div>Upload Multi-Experiment Sample Sheet</div>
         </div>
     </div>
-    <div mat-dialog-content class="full-width flex-grow padded-top padded-left-right no-margin no-max-height background">
+    <div mat-dialog-content class="full-width flex-grow padded no-margin no-max-height background">
         <div class="full-height full-width">
             <div #oneEmWidth class="no-height single-em"></div>
             <div *ngIf="!fileUploaded" class="full-height full-width flex-container-row align-center">
@@ -159,7 +159,7 @@
             </div>
         </div>
     </div>
-    <div mat-dialog-actions class="flex-container-row full-width padded no-margin background">
+    <div mat-dialog-actions *ngIf="!showErrorsAndSamplesScreen" class="flex-container-row full-width padded-left-right-bottom no-margin background">
         <div class="full-height flex-grow">
         </div>
         <div class="padded-left-right">

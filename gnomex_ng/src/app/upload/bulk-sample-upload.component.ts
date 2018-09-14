@@ -1,5 +1,5 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {DialogPosition, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {Router} from "@angular/router";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {SampleUploadService} from "./sample-upload.service";
@@ -31,6 +31,8 @@ import {Subscription} from "rxjs/Subscription";
         config.width = '60em';
         config.height = '45em';
         config.panelClass = 'no-padding-dialog';
+        config.disableClose = true;
+        config.hasBackdrop = false;
 
         let dialogRef = this.dialog.open(BulkSampleUploadComponent, config);
 
@@ -76,6 +78,14 @@ import {Subscription} from "rxjs/Subscription";
             padding-right: 0.3em; 
         }
         
+        .padded-left-right-bottom {
+            padding: 0;
+            
+            padding-left:   0.3em;
+            padding-right:  0.3em;
+            padding-bottom: 0.3em;
+        }
+        
         .no-margin    { margin: 0; }
         .margin-right { margin-right: 0.3em; }
         
@@ -84,12 +94,33 @@ import {Subscription} from "rxjs/Subscription";
             color: white;
             font-size: larger;
         }
+
+        .grabbable {
+            cursor: move;
+            cursor: -webkit-grab;
+        }
+        .grabbed {
+            cursor: move;
+            cursor: -webkit-grabbing;
+        }
     
     `]
 }) export class BulkSampleUploadComponent implements OnDestroy {
 
+    @ViewChild('topmostLeftmost') topmostLeftmost: ElementRef;
+
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
     @ViewChild('fileInput') fileInput: ElementRef;
+
+
+    originalXClick: number = 0;
+    originalYClick: number = 0;
+
+    protected positionX: number = 0;
+    protected positionY: number = 0;
+
+    movingDialog: boolean = false;
+
 
     public file: any;
     protected fileUploaded: boolean = false;
@@ -114,6 +145,7 @@ import {Subscription} from "rxjs/Subscription";
     private rows_original: any[];
 
     private uploadSubscription: Subscription;
+    private importSamplesSubscription: Subscription;
 
     public context: any = this;
 
@@ -312,9 +344,55 @@ import {Subscription} from "rxjs/Subscription";
                 private dialogService: DialogsService,
                 private sampleUploadService: SampleUploadService) { }
 
+
+
+    onMouseDownHeader(event: any): void {
+        if (!event) {
+            return;
+        }
+
+        this.positionX = this.topmostLeftmost.nativeElement.offsetLeft;
+        this.positionY = this.topmostLeftmost.nativeElement.offsetTop;
+
+        this.originalXClick = event.screenX;
+        this.originalYClick = event.screenY;
+
+        this.movingDialog = true;
+    }
+    @HostListener('window:mousemove', ['$event'])
+    onMouseMove(event: any): void {
+        if (!event) {
+            return;
+        }
+
+        if (this.movingDialog) {
+            this.positionX += event.screenX - this.originalXClick;
+            this.positionY += event.screenY - this.originalYClick;
+
+            this.originalXClick = event.screenX;
+            this.originalYClick = event.screenY;
+
+            let newDialogPosition: DialogPosition = {
+                left:   '' + this.positionX + 'px',
+                top:    '' + this.positionY + 'px',
+            };
+
+            this.dialogRef.updatePosition(newDialogPosition);
+        }
+    }
+    @HostListener('window:mouseup', ['$event'])
+    onMouseUp(): void {
+        this.movingDialog = false;
+    }
+
+
+
     public ngOnDestroy(): void {
         if (this.uploadSubscription) {
             this.uploadSubscription.unsubscribe();
+        }
+        if (this.importSamplesSubscription) {
+            this.importSamplesSubscription.unsubscribe();
         }
     }
 
@@ -415,7 +493,10 @@ import {Subscription} from "rxjs/Subscription";
             formData.append("value", this.file, this.file.name);
 
             if (!this.uploadSubscription) {
+                this.dialogService.startDefaultSpinnerDialog();
                 this.uploadSubscription = this.sampleUploadService.uploadBulkSampleSheet(formData).subscribe((result) => {
+                    this.dialogService.stopAllSpinnerDialogs();
+
                     if (!!result) {
                         this.errorRows_original = result.Errors;
                         this.rows_original = result.Rows;
@@ -504,6 +585,7 @@ import {Subscription} from "rxjs/Subscription";
                     }
                 });
             } else {
+                this.dialogService.startDefaultSpinnerDialog();
                 this.sampleUploadService.uploadBulkSampleSheet(formData)
             }
         }
@@ -523,7 +605,29 @@ import {Subscription} from "rxjs/Subscription";
     }
 
     public importSamplesButton(): void {
-        console.log("import samples!");
+        if (this.errorRows_original && Array.isArray(this.errorRows_original) && this.errorRows_original.length > 0) {
+            let temp: string = '';
+
+            if (this.errorRows_original.length !== 1) {
+                temp = "There are "+ this.errorRows_original.length +" errors in the sheet. These errors may result in rows and/or columns being ignored in the spread sheet. Do you wish to continue?"
+            } else {
+                temp = "There is an error in the sheet. These errors may result in rows and/or columns being ignored in the spread sheet. Do you wish to continue?"
+            }
+
+            this.dialogService.yesNoDialog(["Data Skipped Warning", temp], this, "importSamples");
+        } else {
+            this.importSamples();
+        }
+    }
+
+    private importSamples(): void {
+        if (!this.importSamplesSubscription) {
+            this.importSamplesSubscription = this.sampleUploadService.importSamplesFromBulkSampleSheet(this.sampleGridHeaders, this.rows_original).subscribe((result) => {
+
+            });
+        } else {
+            this.sampleUploadService.importSamplesFromBulkSampleSheet(this.sampleGridHeaders, this.rows_original);
+        }
     }
 
     public selectASample(event: any): void {

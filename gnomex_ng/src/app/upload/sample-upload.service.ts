@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {Http, Headers} from "@angular/http";
 
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
@@ -16,6 +16,7 @@ export class SampleUploadService {
     private bulkSampleUpload_URL: string = null;
 
     private bulkUploadSubject: Subject<any>;
+    private bulkUploadImportedSubject: Subject<any>;
 
 
     constructor(private http: Http, private cookieUtilService: CookieUtilService) { }
@@ -46,5 +47,49 @@ export class SampleUploadService {
         }
 
         return this.bulkUploadSubject.asObservable();
+    }
+
+    public importSamplesFromBulkSampleSheet(columnHeaders: any[], rows: any[]): Observable<any> {
+        if (!columnHeaders || !rows) {
+            return null;
+        }
+
+        if (!this.bulkUploadImportedSubject) {
+            this.bulkUploadImportedSubject = new Subject();
+        }
+
+        let processedHeaders: any[] = [
+            {
+                name: "@rowOrdinal",
+                header: "Row"
+            }
+        ];
+
+        for (let header of columnHeaders) {
+            processedHeaders.push({
+                name: ("@n" + header.columnOrdinal),
+                header: ("" + header.header)
+            });
+        }
+
+        let params: URLSearchParams = new URLSearchParams();
+
+        params.set('sampleSheetHeaderXMLString', JSON.stringify(processedHeaders));
+        params.set('sampleSheetRowXMLString',    JSON.stringify(rows));
+
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+
+        this.cookieUtilService.formatXSRFCookie();
+
+        this.http.post('/gnomex/SaveMultiRequestSampleSheet.gx', params.toString(), {headers: headers}).subscribe((response: any) => {
+            if (response && response.status === 200) {
+                this.bulkUploadImportedSubject.next(response.json());
+            } else {
+                this.bulkUploadImportedSubject.next(null);
+            }
+        });
+
+        return this.bulkUploadImportedSubject;
     }
 }

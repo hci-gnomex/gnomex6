@@ -7,7 +7,6 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 		<div [matTooltip]="this.errorMessage"
              [matTooltipShowDelay]="300"
              [matTooltipHideDelay]="300"
-			 (click)="onClick()"
 			 class="full-width full-height {{this.errorMessage && this.errorMessage !== '' ? 'error' : ''}}">
 			<div class="t full-width full-height fix-table">
 				<div class="tr">
