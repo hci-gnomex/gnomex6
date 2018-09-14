@@ -7,7 +7,7 @@
     <div mat-dialog-content class="full-width flex-grow padded no-margin no-max-height background">
         <div class="full-height full-width">
             <div #oneEmWidth class="no-height single-em"></div>
-            <div *ngIf="!fileUploaded" class="full-height full-width flex-container-row align-center">
+            <div *ngIf="!fileParsed" class="full-height full-width flex-container-row align-center">
                 <div class="full-height flex-grow">
                 </div>
                 <div>
@@ -17,7 +17,7 @@
                 <div class="full-height flex-grow">
                 </div>
             </div>
-            <div *ngIf="fileUploaded" class="full-height full-width">
+            <div *ngIf="fileParsed && !fileUploaded" class="full-height full-width">
                 <div *ngIf="!showErrorsAndSamplesScreen" class="full-height full-width flex-container-col">
                     <div class="full-width flex-container-row align-center">
                         <div class="flex-grow">
@@ -157,9 +157,56 @@
                     </div>
                 </div>
             </div>
+            <div *ngIf="fileParsed && fileUploaded" class="full-height full-width flex-container-col">
+                <div class="full-width padded">
+                    Import Results
+                </div>
+                <div class="full-width flex-grow">
+                    <split>
+                        <split-area [size]="20">
+                            <div class="full-width full-height flex-container-col foreground bordered">
+                                <div class="full-width padded">
+                                    Experiments Imported
+                                </div>
+                                <div class="full-width flex-grow">
+                                    <div *ngFor="let request of finalRequests" class="full-width">
+                                        <button mat-button (click)="navigateButton(request.requestNumber)">{{request.requestNumber}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </split-area>
+                        <split-area [size]="80">
+                            <div class="full-width full-height flex-container-col foreground bordered">
+                                <div class="full-width padded">
+                                    Import Errors
+                                </div>
+                                <div class="full-width flex-grow">
+                                    <ag-grid-angular
+                                            class="ag-fresh small-font full-width full-height"
+                                            [context]="context"
+                                            [singleClickEdit]="true"
+                                            [enableSorting]="true"
+                                            [enableColResize]="true"
+                                            [rowSelection]="'single'"
+                                            (gridSizeChanged)="onGridSizeChanged($event)"
+                                            (gridReady)="onFinalErrorsGridReady($event)">
+                                    </ag-grid-angular>
+                                </div>
+                            </div>
+                        </split-area>
+                    </split>
+                </div>
+            </div>
         </div>
     </div>
-    <div mat-dialog-actions *ngIf="!showErrorsAndSamplesScreen" class="flex-container-row full-width padded-left-right-bottom no-margin background">
+    <div mat-dialog-actions *ngIf="!fileParsed" class="flex-container-row full-width padded-left-right-bottom no-margin background">
+        <div class="full-height flex-grow">
+        </div>
+        <div>
+            <button mat-raised-button (click)="closeButton()">Close</button>
+        </div>
+    </div>
+    <div mat-dialog-actions *ngIf="fileParsed && !fileUploaded" class="flex-container-row full-width padded-left-right-bottom no-margin background">
         <div class="full-height flex-grow">
         </div>
         <div class="padded-left-right">
@@ -167,6 +214,13 @@
         </div>
         <div>
             <button mat-raised-button (click)="closeButton()">Close</button>
+        </div>
+    </div>
+    <div mat-dialog-actions *ngIf="fileParsed && fileUploaded" class="flex-container-row full-width padded-left-right-bottom no-margin background">
+        <div>
+            <button mat-raised-button (click)="closeButton()">Close</button>
+        </div>
+        <div class="full-height flex-grow">
         </div>
     </div>
 </div>

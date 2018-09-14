@@ -6,6 +6,7 @@ import {SampleUploadService} from "./sample-upload.service";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {ShowErrorsShowSamplesRenderer} from "../util/grid-renderers/show-errors-show-samples.renderer";
 import {Subscription} from "rxjs/Subscription";
+import {GnomexService} from "../services/gnomex.service";
 
 @Component({
     selector: 'bulk-sample-upload-launcher',
@@ -61,7 +62,10 @@ import {Subscription} from "rxjs/Subscription";
         
         .underline { text-decoration: underline; }
         
+        .foreground { background-color: white;   }
         .background { background-color: #eeeeee; }
+        
+        .bordered { border: solid silver 1px; }
         
         
         
@@ -123,6 +127,7 @@ import {Subscription} from "rxjs/Subscription";
 
 
     public file: any;
+    protected fileParsed: boolean = false;
     protected fileUploaded: boolean = false;
     protected showErrorsAndSamplesScreen: boolean = false;
     protected showErrorsAboveSamples: boolean = true;
@@ -131,6 +136,7 @@ import {Subscription} from "rxjs/Subscription";
     protected importableGridApi: any;
     protected errorTopGridApi: any;
     protected errorBottomGridApi: any;
+    protected finalErrorsGridApi: any;
     protected samplesTopGridApi: any;
     protected samplesBottomGridApi: any;
 
@@ -148,6 +154,9 @@ import {Subscription} from "rxjs/Subscription";
     private importSamplesSubscription: Subscription;
 
     public context: any = this;
+
+    private finalErrors:   any;
+    private finalRequests: any;
 
 
     private get importedGridColumnDefs(): any[] {
@@ -290,6 +299,75 @@ import {Subscription} from "rxjs/Subscription";
         return columnDefinitions;
     }
 
+    private get finalErrorGridColumnDefs(): any[] {
+        let columnDefinitions: any[] = [];
+
+        columnDefinitions.push({
+            headerName: "Row",
+            editable: false,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "rowOrdinal"
+        });
+        columnDefinitions.push({
+            headerName: "Col",
+            editable: false,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "columnOrdinal"
+        });
+        columnDefinitions.push({
+            headerName: "Experiment",
+            editable: false,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "requestNumber"
+        });
+        columnDefinitions.push({
+            headerName: "Sample",
+            editable: false,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "sampleNumber"
+        });
+        columnDefinitions.push({
+            headerName: "Col Name",
+            editable: false,
+            width:    6 * this.emToPxConversionRate,
+            maxWidth: 6 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "header"
+        });
+        columnDefinitions.push({
+            headerName: "Status",
+            editable: false,
+            width:    6 * this.emToPxConversionRate,
+            maxWidth: 6 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "status"
+        });
+
+        columnDefinitions.push({
+            headerName: "Message",
+            editable: false,
+            width:    4 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            field: "message"
+        });
+
+        return columnDefinitions;
+    }
+
     private get samplesGridColumnDefs(): any[] {
         let columnDefinitions: any[] = [];
 
@@ -342,6 +420,7 @@ import {Subscription} from "rxjs/Subscription";
 
     constructor(private dialogRef: MatDialogRef<BulkSampleUploadComponent>,
                 private dialogService: DialogsService,
+                private gnomexService: GnomexService,
                 private sampleUploadService: SampleUploadService) { }
 
 
@@ -579,7 +658,7 @@ import {Subscription} from "rxjs/Subscription";
                                 this.importableGridApi.sizeColumnsToFit();
                             }
                         });
-                        this.fileUploaded = true;
+                        this.fileParsed = true;
                     } else {
                         this.dialogService.alert("File failed to upload.");
                     }
@@ -622,8 +701,35 @@ import {Subscription} from "rxjs/Subscription";
 
     private importSamples(): void {
         if (!this.importSamplesSubscription) {
-            this.importSamplesSubscription = this.sampleUploadService.importSamplesFromBulkSampleSheet(this.sampleGridHeaders, this.rows_original).subscribe((result) => {
+            this.dialogService.startDefaultSpinnerDialog();
 
+            this.importSamplesSubscription = this.sampleUploadService.importSamplesFromBulkSampleSheet(this.sampleGridHeaders, this.rows_original).subscribe((result) => {
+                if (result) {
+                    this.finalRequests = result.Requests;
+                    this.finalErrors   = result.Errors;
+
+                    if (!this.finalRequests) {
+                        this.finalRequests = [];
+                    }
+                    if (!this.finalErrors) {
+                        this.finalErrors = [];
+                    }
+
+                    if (!Array.isArray(this.finalRequests)) {
+                        this.finalRequests = [ this.finalRequests.Request ];
+                    }
+                    if (!Array.isArray(this.finalErrors)) {
+                        this.finalErrors = [ this.finalErrors.Error ];
+                    }
+
+                    this.dialogService.stopAllSpinnerDialogs();
+
+                    this.fileUploaded = true;
+
+                    setTimeout(() => {
+                        this.assignFinalErrorGridContents();
+                    });
+                }
             });
         } else {
             this.sampleUploadService.importSamplesFromBulkSampleSheet(this.sampleGridHeaders, this.rows_original);
@@ -658,6 +764,10 @@ import {Subscription} from "rxjs/Subscription";
         }
     }
 
+    public navigateButton(requestNumber: string) {
+        this.gnomexService.navByNumber(requestNumber);
+    }
+
 
     public assignImportableGridContents() {
         this.importableGridApi.setColumnDefs(this.importedGridColumnDefs);
@@ -688,6 +798,15 @@ import {Subscription} from "rxjs/Subscription";
             this.samplesBottomGridApi.formGroup = null;
             this.samplesBottomGridApi.setColumnDefs(this.samplesGridColumnDefs);
             this.samplesBottomGridApi.setRowData(this.rows);
+        }
+
+        this.dialogService.stopAllSpinnerDialogs();
+    }
+
+    public assignFinalErrorGridContents() {
+        if (this.finalErrorsGridApi) {
+            this.finalErrorsGridApi.setColumnDefs(this.finalErrorGridColumnDefs);
+            this.finalErrorsGridApi.setRowData(this.finalErrors);
         }
 
         this.dialogService.stopAllSpinnerDialogs();
@@ -744,6 +863,15 @@ import {Subscription} from "rxjs/Subscription";
         this.assignSampleGridContents();
 
         this.samplesBottomGridApi.hideOverlay();
+    }
+
+    public onFinalErrorsGridReady(event: any) {
+        this.finalErrorsGridApi = event.api;
+
+        this.assignFinalErrorGridContents();
+        this.onGridSizeChanged(event);
+
+        this.finalErrorsGridApi.hideOverlay();
     }
 
     public onGridSizeChanged(event: any) {
