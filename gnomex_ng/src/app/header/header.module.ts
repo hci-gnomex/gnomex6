@@ -48,6 +48,7 @@ import {TextSelectXorMultiselectRenderer} from "../util/grid-renderers/text-sele
 import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
 import {TreeModule} from "angular-tree-component";
 import {ServicesModule} from "../services/services.module";
+import {UploadModule} from "../upload/upload.module";
 
 @NgModule({
     imports: [
@@ -74,7 +75,8 @@ import {ServicesModule} from "../services/services.module";
             TextSelectXorMultiselectRenderer
         ]),
         TreeModule,
-        ServicesModule
+        ServicesModule,
+        UploadModule
     ],
     providers: [
        AdvancedSearchService,

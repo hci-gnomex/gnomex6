@@ -23,30 +23,26 @@ export class BillingPOFormService {
         this.cookieUtilService.formatXSRFCookie();
 
         if (this.poUpload_URL != null) {
-            console.log("Uploaded a file using " + this.poUpload_URL+ "!");
             this.http.post(this.poUpload_URL, params).subscribe((response) => {
-                if (response.status === 200) {
+                if (response && response.status === 200) {
                     this.uploadSucceededSubject.next(true);
-                    console.log("Form Added!");
                 } else {
                     this.uploadSucceededSubject.next(false);
-                    console.log("Form not Added!");
                 }
             });
         } else {
             this.http.get(BillingPOFormService.getPOUploadURL_URL, {}).subscribe((response) => {
                 if (response && response.status === 200) {
                     this.poUpload_URL = response.json().url;
-                    console.log("Uploaded a file using " + this.poUpload_URL+ "!");
                     this.http.post(this.poUpload_URL, params).subscribe((response) => {
-                        if (response.status === 200) {
+                        if (response && response.status === 200) {
                             this.uploadSucceededSubject.next(true);
-                            console.log("Form Added!");
                         } else {
                             this.uploadSucceededSubject.next(false);
-                            console.log("Form not Added!");
                         }
                     });
+                } else {
+                    this.uploadSucceededSubject.next(false);
                 }
             });
         }

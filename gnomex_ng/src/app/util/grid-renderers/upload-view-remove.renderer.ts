@@ -129,7 +129,6 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
     selectFile(event: any) {
         if(event.target.files && event.target.files.length > 0) {
             this.file = event.target.files[0];
-            console.log("Selected a file! " + this.file.name);
 
             let formData: FormData = new FormData();
             formData.append("Filename", this.file.name);

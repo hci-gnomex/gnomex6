@@ -44,8 +44,6 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 export class TextAlignLeftMiddleRenderer extends CellRendererValidation {
     value: string;
 
-    errorMessage: string = '';
-
 	agInit2(params: any): void {
 		this.value = (this.params && this.params.value) ? this.params.value : "";
 	}

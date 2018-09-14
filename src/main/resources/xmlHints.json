@@ -319,6 +319,30 @@
           "elementheader": "someEntry3"
         }
       ]
+    },
+    {
+      "command": "SaveMultiRequestSampleSheet",
+      "parameter": "sampleSheetHeaderXMLString",
+      "nodeheader": "Headers",
+      "nodeprefix": "Header",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveMultiRequestSampleSheet",
+      "parameter": "sampleSheetRowXMLString",
+      "nodeheader": "Rows",
+      "nodeprefix": "Row",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
     }
   ]
 }
