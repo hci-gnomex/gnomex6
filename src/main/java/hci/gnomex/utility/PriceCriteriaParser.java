@@ -5,73 +5,47 @@ import hci.gnomex.model.PriceCriteria;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 public class PriceCriteriaParser extends DetailObject implements Serializable {
-  
-  protected Document   doc;
-  protected Map        priceCriteriaMap = new HashMap();
-  
-  public PriceCriteriaParser(Document doc) {
-    this.doc = doc;
- 
-  }
-  
-  public void parse(Session sess) throws Exception{
-    
-    Element root = this.doc.getRootElement();
-    
-    
-    int count = 0;
-    for(Iterator i = root.getChildren("PriceCriteria").iterator(); i.hasNext();) {
-      Element node = (Element)i.next();
-      
-      String idPriceCriteriaString = node.getAttributeValue("idPriceCriteria");
-      PriceCriteria priceCriteria = null;
-      if (idPriceCriteriaString.startsWith("PriceCriteria")) {
-        idPriceCriteriaString += count++;
-        priceCriteria = new PriceCriteria();
-      } else {
-        priceCriteria = (PriceCriteria)sess.load(PriceCriteria.class, new Integer(idPriceCriteriaString));
-      }
-      
-      
-      
-      this.initializePriceCriteria(sess, node, priceCriteria);
-      
-      priceCriteriaMap.put(idPriceCriteriaString, priceCriteria);
+
+    protected JsonArray array;
+    private Map<String, PriceCriteria> priceCriteriaMap = new HashMap<>();
+
+    public PriceCriteriaParser(JsonArray arr) {
+        this.array = arr;
     }
-    
-   
-  }
-  
-  protected void initializePriceCriteria(Session sess, Element n, PriceCriteria priceCriteria) throws Exception {
 
-    if (n.getAttributeValue("filter1") != null && !n.getAttributeValue("filter1").equals("")) {
-      priceCriteria.setFilter1(n.getAttributeValue("filter1"));
-    } 
-    if (n.getAttributeValue("filter2") != null && !n.getAttributeValue("filter2").equals("")) {
-      priceCriteria.setFilter2(n.getAttributeValue("filter2"));
-    } 
-    
-  }
+    public void parse(Session sess) throws Exception {
+        for (int i = 0; i < this.array.size(); i++) {
+            JsonObject node = this.array.getJsonObject(i);
+            String idPriceCriteriaString = node.getString("idPriceCriteria");
+            PriceCriteria priceCriteria;
+            if (idPriceCriteriaString.startsWith("PriceCriteria")) {
+                priceCriteria = new PriceCriteria();
+            } else {
+                priceCriteria = sess.load(PriceCriteria.class, new Integer(idPriceCriteriaString));
+            }
+            this.initializePriceCriteria(node, priceCriteria);
+            priceCriteriaMap.put(idPriceCriteriaString, priceCriteria);
+        }
+    }
 
-  
-  public Map getPriceCriteriaMap() {
-    return priceCriteriaMap;
-  }
+    private void initializePriceCriteria(JsonObject n, PriceCriteria priceCriteria) throws Exception {
+        if (n.get("filter1") != null && !n.getString("filter1").equals("")) {
+            priceCriteria.setFilter1(n.getString("filter1"));
+        }
+        if (n.get("filter2") != null && !n.getString("filter2").equals("")) {
+            priceCriteria.setFilter2(n.getString("filter2"));
+        }
+    }
 
-  
-  public void setPriceCriteriaMap(Map priceCriteriaMap) {
-    this.priceCriteriaMap = priceCriteriaMap;
-  }
-  
-
-
+    public Map<String, PriceCriteria> getPriceCriteriaMap() {
+        return this.priceCriteriaMap;
+    }
 }

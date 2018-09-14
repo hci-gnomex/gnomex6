@@ -1,0 +1,72 @@
+<h6 mat-dialog-title>{{this.title}}</h6>
+<mat-dialog-content>
+    <form [formGroup]="this.form">
+        <div>
+            <mat-form-field class="full-width">
+                <input matInput placeholder="Name" [formControlName]="'name'">
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-checkbox [formControlName]="'active'">Active</mat-checkbox>
+        </div>
+        <div>
+            <mat-form-field class="full-width">
+                <textarea matInput placeholder="Notes" [formControlName]="'notes'"
+                          matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class="full-width">
+                <mat-select placeholder="Charge Kind" [formControlName]="'chargeKind'">
+                    <mat-option *ngFor="let kind of this.allChargeKinds" [value]="kind.codeBillingChargeKind">{{kind.display}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div>
+            <label>Determine experiment's price using</label>
+        </div>
+        <div>
+            <mat-form-field class="full-width">
+                <mat-select [formControlName]="'filter1'">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let filterType of this.allFilterTypes" [value]="filterType.className">{{filterType.displayName}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class="full-width">
+                <mat-select [formControlName]="'filter2'">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let filterType of this.allFilterTypes" [value]="filterType.className">{{filterType.displayName}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class="full-width">
+                <input matInput placeholder="Plugin Class" [formControlName]="'plugin'">
+            </mat-form-field>
+        </div>
+        <div>
+            <label>Workflow Steps</label>
+        </div>
+        <div>
+            <button mat-button (click)="this.addStep()"><img src="../../assets/add.png" class="icon">Add</button>
+            <button mat-button [disabled]="!this.selectedStep" (click)="this.removeStep()"><img src="../../assets/delete.png" class="icon">Remove</button>
+        </div>
+        <div class="grid-div">
+            <ag-grid-angular class="ag-theme-balham full-height full-width"
+                             (gridReady)="this.onGridReady($event)"
+                             (gridSizeChanged)="this.onGridSizeChanged($event)"
+                             (selectionChanged)="this.onGridSelectionChanged($event)"
+                             [singleClickEdit]="true"
+                             [stopEditingWhenGridLosesFocus]="true"
+                             [rowSelection]="'single'"
+                             [rowData]="this.steps">
+            </ag-grid-angular>
+        </div>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button color="primary" (click)="this.save()">Save</button>
+    <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>

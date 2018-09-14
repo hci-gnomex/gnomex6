@@ -1,8 +1,13 @@
 <div style="display:flex; flex-direction: column; height:100%; width:100%;">
-    <div *ngIf="secAdvisor.isSuperAdmin" style="margin-bottom: 0.5em">
-        <button mat-button color="primary" type="button" (click)="addCore($event)">
-            <img [src]="constService.PAGE_ADD">Add Core Facility
+    <div *ngIf="secAdvisor.isSuperAdmin" style="display:flex; margin-bottom: 0.5em">
+        <button mat-button color="primary" type="button" (click)="addPlatform($event)">
+            <img class="icon" [src]="constService.ICON_ADD">Add Platform
         </button>
+        <button [disabled]="selectedPlatformList.length === 0" mat-button color="primary" type="button" (click)="removePlatform($event)">
+            <img class="icon" [src]="constService.ICON_DELETE">Remove Platform
+        </button>
+        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+
     </div>
     <div style="display:flex;height:100%; width:100%;">
         <split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
@@ -23,7 +28,6 @@
             </split-area>
 
             <split-area size="80">
-
                 <div style="padding-left:2em;" class="full-height full-width border">
                     <mat-tab-group (selectedTabChange)="tabChanged($event)" class="full-height full-width border">
                         <mat-tab [label]="tab.name" *ngFor="let tab of experimentPlatformTabs ">
@@ -38,5 +42,9 @@
         </split>
 
     </div>
+    <save-footer *ngIf="!removeSave" style="width: 100%"
+                 [disableSave]="true"
+                 [dirty]="this.expPlatformService.expPlatformOverviewForm.dirty">
+    </save-footer>
 
 </div>

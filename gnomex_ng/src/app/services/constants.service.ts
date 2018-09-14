@@ -61,7 +61,7 @@ export class ConstantsService {
 
     public readonly DEFAULT_TOOLBAR_SETTINGS: string = "bold italic underline | left center right |  format font size |" +
         " color | ul ol | outdent indent";
-
+    public readonly ICON_SAVE:string = "assets/save.png";
     public readonly GLOBE_LINK: string = "assets/globe_link.png";
     public readonly EMAIL_GO_LINK: string = "assets/email_go.png";
     public readonly ICON_UCSC: string = "assets/ucscFavicon.png";

@@ -11,6 +11,9 @@ import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
 import {MatTabChangeEvent} from "@angular/material";
+import {HttpParams} from "@angular/common/http";
+import {IconTextRendererComponent} from "../../util/grid-renderers";
+import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
 //assets/page_add.png
 
 @Component({
@@ -40,9 +43,12 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     private currentRow:number=0;
     private gridOpt:GridOptions = {};
     private selectRowIndex:number = -1 ;
+    public  selectedPlatformList:any[] = [];
     public experimentPlatformTabs: any[] = [];
     public platformListSubscription: Subscription;
     private tabComponentRefList:ComponentRef<any>[] = [];
+    public showSpinner:boolean = true;
+    public removeSave:boolean = false;
 
 
 
@@ -51,6 +57,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             headerName: "Experiment Platform",
             editable: false,
             field: "display",
+            cellRendererFramework : IconTextRendererComponent,
             width: 100
         }
 
@@ -60,8 +67,8 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         'ExperimentPlatformTabComponent': {name: 'Experiment Platform', component: ExperimentPlatformTabComponent, inputs: {}},
         'EpSampleTypeTabComponent': {name: 'Sample Type', component: EpSampleTypeTabComponent,inputs:{} },
         'EpLibraryPrepTabComponent': {name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{}},
-        'ConfigureAnnotationsComponent': {name:'Property', component: ConfigureAnnotationsComponent, inputs:{experimentPlatformType:'GENERIC',experimentPlatformMode:true }}
-
+        'ConfigureAnnotationsComponent': {name:'Property', component: ConfigureAnnotationsComponent, inputs:{}},
+        'EpPipelineProtocolTabComponent': {name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent}
     };
 
 
@@ -79,18 +86,20 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     ngOnInit():void{
         this.expPlatformService.getExperimentPlatformList_fromBackend(); // need
 
-
-
         this.platformListSubscription = this.expPlatformService.getExperimentPlatformListObservable()
             .subscribe(resp =>{
-            if(resp){
-                this.rowData = (<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
-            }else if(resp && resp.message){
-                this.dialogService.alert(resp.message);
-            }else{
-                this.dialogService.alert("An error has occurred getting ExperimentPlatformList");
-            }
-        });
+                if(resp){
+
+                    this.showSpinner = false;
+                    this.rowData = (<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
+                }else if(resp && resp.message){
+                    this.dialogService.alert(resp.message);
+                }else{
+                    this.dialogService.alert("An error has occurred getting ExperimentPlatformList");
+                }
+                this.expPlatformService.expPlatformOverviewForm.markAsPristine();
+                this.expPlatformService.expPlatformOverviewForm.markAsUntouched();
+            });
 
         this.expPlatformService.getExperimentPlatformTypeChangeObservable()
             .subscribe((expPlatform) =>{
@@ -121,8 +130,11 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         })
     }
     selectedRow(event:any){
-        let selectedRow:Array<any> = this.gridOpt.api.getSelectedRows();
-        let exPlatform = selectedRow[0];
+        this.selectedPlatformList = this.gridOpt.api.getSelectedRows();
+        let exPlatform = null;
+        if(this.selectedPlatformList.length > 0){
+            exPlatform = this.selectedPlatformList[0];
+        }
 
         if( this.selectRowIndex != event.rowIndex){
             console.log("Previous tab: " + this.selectRowIndex + " current Tab: " + event.rowIndex  );
@@ -148,9 +160,8 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             //this.experimentPlatformTabs =
         }
 
-
     }
-    addCore(event:any){
+    addPlatform(event:any){
         let tempCFacilitiesICanManage:any[] =  this.secAdvisor.coreFacilitiesICanManage;
         tempCFacilitiesICanManage.push({facilityName:''});
         this.gridOpt.api.setRowData(this.rowData);
@@ -166,6 +177,32 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         })
 
     }
+    removePlatform(){
+        let expPlatform = this.selectedPlatformList.length > 0 ? this.selectedPlatformList[0] : null;
+        if(expPlatform){
+            this.dialogService.confirm("Remove Platform ",
+                "Are you sure you want to remove experiment platform " + expPlatform.display + "?")
+                .first().subscribe((result:boolean) => {
+                if(result){
+                    this.showSpinner = true;
+                    let params:HttpParams = new HttpParams().set("codeRequestCategory", expPlatform.codeRequestCategory);
+                    console.log(params);
+                    this.expPlatformService.deleteExperimentPlatform(params).first()
+                        .subscribe(resp => {
+                            if(resp && resp.result === "SUCCESS"){
+                                this.expPlatformService.getExperimentPlatformList_fromBackend();
+                            }else if(resp && resp.message){
+                                this.dialogService.alert(resp.message);
+                            }
+                        });
+
+                }
+            })
+        }
+
+
+    }
+
 
     propagateTabChange() { // programmatically reloading tabs
         let tabList: any[] = [];
@@ -176,10 +213,16 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     }
 
     tabChanged(event:MatTabChangeEvent){ // user selected a new tab
+        this.removeSave = false;
         if(event.tab.textLabel  === "Property"){
             let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
                 this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
             propertyTabRef.instance.externallyResizeGrid();
+            this.removeSave = true;
+        }else if (event.tab.textLabel === "Sample Type"){
+            let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
+                this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
+            sampleTypeTabRef.instance.externallyResizeGrid();
         }
 
 
