@@ -1,9 +1,10 @@
-import {Component, EventEmitter, Inject, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Inject, Input, OnInit, Output} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {LabListService} from "../services/lab-list.service";
 import {GetLabService} from "../services/get-lab.service";
 import {BillingPeriod} from "../util/billing-period-selector.component";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Component({
     selector: 'billing-filter',
@@ -29,6 +30,14 @@ export class BillingFilterComponent implements OnInit {
     public form: FormGroup;
     @Output() onChange = new EventEmitter<BillingFilterEvent>();
     private previousChangeEvent: BillingFilterEvent;
+
+    @Input() public selectedItem: ITreeNode = null;
+    @Input() private isDirty: boolean = false;
+    @Input() private filterByOrderType: string;
+    @Input() private showRelatedCharges: boolean;
+    @Input() private totalPrice: number;
+
+    private billingPeriodString: string;
 
     public coreFacilityList: any[] = [];
     private labList: any[] = [];
@@ -130,6 +139,7 @@ export class BillingFilterComponent implements OnInit {
 
     public onBillingPeriodChange(value: BillingPeriod): void {
         this.form.controls['idBillingPeriod'].setValue(value ? value.idBillingPeriod : '');
+        this.billingPeriodString = value ? value.display : '';
     }
 
     public onRequestNumberChange(): void {

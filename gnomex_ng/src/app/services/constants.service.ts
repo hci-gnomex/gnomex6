@@ -102,6 +102,8 @@ export class ConstantsService {
     public readonly ICON_INFORMATION:string= "assets/information.png";
     public readonly ICON_UPLOAD:string= "assets/upload.png";
 
+    public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
+
 
 
     public getTreeIcon(item:any,name:string) {

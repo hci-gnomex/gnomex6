@@ -3,8 +3,11 @@
     <div class="flex-container-col">
         <div class="flex-container-row">
             <menu-header-billing class="large-margin-right"
-                    [idBillingPeriod]="this.form.controls['idBillingPeriod'].value"
-                    [idCoreFacility]="this.form.controls['idCoreFacility'].value"></menu-header-billing>
+                                 [idBillingPeriod]="this.form.controls['idBillingPeriod'].value"
+                                 [filterByOrderType]="this.filterByOrderType" [showRelatedCharges]="this.showRelatedCharges"
+                                 [totalPrice]="this.totalPrice" [billingPeriodString]="this.billingPeriodString"
+                                 [idCoreFacility]="this.form.controls['idCoreFacility'].value" [selectedItem]="this.selectedItem" [isDirty]="this.isDirty">
+            </menu-header-billing>
             <div>
                 <mat-form-field class="small-margin-right">
                     <input matInput placeholder="Experiment #" (change)="this.onRequestNumberChange()" [ngModelOptions]="{standalone: true}" [(ngModel)]="this.requestNumberModel">
