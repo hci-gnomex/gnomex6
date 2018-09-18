@@ -19,6 +19,8 @@ import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-render
 import {PriceSheetViewComponent} from "./price-sheet-view.component";
 import {PriceCategoryViewComponent} from "./price-category-view.component";
 import {PriceViewComponent} from "./price-view.component";
+import {InvoiceEmailWindowComponent} from "./invoice-email-window.component";
+import {BillingGlInterfaceViewComponent} from "./billing-gl-interface-view.component";
 
 @NgModule({
     imports: [
@@ -44,12 +46,16 @@ import {PriceViewComponent} from "./price-view.component";
         PriceSheetViewComponent,
         PriceCategoryViewComponent,
         PriceViewComponent,
+        InvoiceEmailWindowComponent,
+        BillingGlInterfaceViewComponent,
     ],
     exports: [],
     entryComponents: [
         PriceSheetViewComponent,
         PriceCategoryViewComponent,
         PriceViewComponent,
+        InvoiceEmailWindowComponent,
+        BillingGlInterfaceViewComponent,
     ],
 })
 

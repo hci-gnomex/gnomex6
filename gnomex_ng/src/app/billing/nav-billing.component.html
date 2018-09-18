@@ -1,5 +1,6 @@
 <div class="full-height full-width">
-    <billing-filter (onChange)="this.onFilterChange($event)"></billing-filter>
+    <billing-filter (onChange)="this.onFilterChange($event)" [selectedItem]="this.billingItemsTreeSelectedNode" [totalPrice]="this.totalPrice"
+                    [isDirty]="this.showDirtyNote" [filterByOrderType]="this.filterByOrderType" [showRelatedCharges]="this.showRelatedCharges"></billing-filter>
     <div class="flex-container-row padding height-eighty">
         <div class="full-height flex-three bordered">
             <mat-tab-group class="full-height">

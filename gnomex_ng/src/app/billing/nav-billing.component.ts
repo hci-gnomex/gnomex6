@@ -157,6 +157,8 @@ export class NavBillingComponent implements OnInit {
     public showInactivePricesCheckbox: boolean = false;
     public disableAddBillingItemButton: boolean = true;
 
+    public totalPrice: number = 0;
+
     constructor(private billingService: BillingService,
                 private dialogsService: DialogsService,
                 private constantsService: ConstantsService,
@@ -583,7 +585,7 @@ export class NavBillingComponent implements OnInit {
             this.addRequestBillingItems(node.data.requestNumber, billingItems);
         }
 
-        let totalPrice: number = 0;
+        this.totalPrice = 0;
         for (let r of billingItems) {
             if (r.totalPrice) {
                 let price: string = r.totalPrice;
@@ -592,10 +594,10 @@ export class NavBillingComponent implements OnInit {
                     .replace(',', '')
                     .replace("(", "-")
                     .replace(")", "");
-                totalPrice += Number(price);
+                this.totalPrice += Number(price);
             }
         }
-        this.billingItemGridLabel = node.data.label + " " + totalPrice.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+        this.billingItemGridLabel = node.data.label + " " + this.totalPrice.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
 
         if (node.data.idInvoice && this.invoiceMap[node.data.idInvoice]) {
             let invoice: any = this.invoiceMap[node.data.idInvoice];
