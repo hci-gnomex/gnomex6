@@ -14,6 +14,7 @@ import {MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {IconTextRendererComponent} from "../../util/grid-renderers";
 import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
+import {EpIlluminaSeqTabComponent} from "./ep-illumina-seq-tab.component";
 //assets/page_add.png
 
 @Component({
@@ -64,11 +65,12 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     ];
 
     public tabComponentTemplate:any = {
-        'ExperimentPlatformTabComponent': {name: 'Experiment Platform', component: ExperimentPlatformTabComponent, inputs: {}},
-        'EpSampleTypeTabComponent': {name: 'Sample Type', component: EpSampleTypeTabComponent,inputs:{} },
-        'EpLibraryPrepTabComponent': {name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{}},
-        'ConfigureAnnotationsComponent': {name:'Property', component: ConfigureAnnotationsComponent, inputs:{}},
-        'EpPipelineProtocolTabComponent': {name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent}
+        'ExperimentPlatformTabComponent': { name: 'Experiment Platform', component: ExperimentPlatformTabComponent, inputs: {} },
+        'EpSampleTypeTabComponent': { name: 'Sample Type', component: EpSampleTypeTabComponent,inputs:{} },
+        'EpLibraryPrepTabComponent': { name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{} },
+        'ConfigureAnnotationsComponent': { name:'Property', component: ConfigureAnnotationsComponent, inputs:{} },
+        'EpPipelineProtocolTabComponent': { name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent },
+        'EpIlluminaSeqTabComponent':{ name:'Illumina Seq', component:EpIlluminaSeqTabComponent }
     };
 
 

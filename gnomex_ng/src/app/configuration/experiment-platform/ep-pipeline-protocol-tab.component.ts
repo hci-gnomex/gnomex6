@@ -190,6 +190,8 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
                 if(result){
                     this.pipelineRowData.splice(this.selectRowIndex,1);
                     this.gridApi.setRowData(this.pipelineRowData);
+                    this.disableControl = true;
+                    this.clearProtocolInfo();
                     this.formGroup.markAsDirty();
                 }
         });

@@ -110,6 +110,7 @@ export class ExperimentPlatformService implements OnDestroy{
                 'ExperimentPlatformTabComponent',
                 'EpSampleTypeTabComponent',
                 "EpLibraryPrepTabComponent",
+                "EpIlluminaSeqTabComponent",
                 "EpPipelineProtocolTabComponent",
                 "ConfigureAnnotationsComponent"
             ]
