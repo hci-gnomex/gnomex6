@@ -29,6 +29,7 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
 import {EpIlluminaSeqTabComponent} from "./ep-illumina-seq-tab.component";
 import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
+import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-dialog.component";
 
 
 
@@ -71,7 +72,8 @@ import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
         SortOrderDialogComponent,
         EpPipelineProtocolTabComponent,
         EpIlluminaSeqTabComponent,
-        IlluminaSeqDialogComponent
+        IlluminaSeqDialogComponent,
+        AddExperimentPlatformDialogComponent,
 
 
 
@@ -79,7 +81,8 @@ import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
     entryComponents: [
         SampleTypeDetailDialogComponent,
         SortOrderDialogComponent,
-        IlluminaSeqDialogComponent
+        IlluminaSeqDialogComponent,
+        AddExperimentPlatformDialogComponent
 
     ],
     exports: [
