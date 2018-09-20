@@ -20,6 +20,7 @@ export class CreateSecurityAdvisorService {
     private result: any;
     static readonly CAN_ACCESS_ANY_OBJECT : string = "canAccessAnyObject";
     static readonly CAN_WRITE_ANY_OBJECT : string = "canWriteAnyObject";
+    static readonly CAN_WRITE_DICTIONARIES: string = "canWriteDictionaries";
 
 
     private idAppUserValue: number;
