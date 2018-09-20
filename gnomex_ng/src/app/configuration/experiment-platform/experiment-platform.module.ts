@@ -27,6 +27,8 @@ import {DialogsModule} from "../../util/popup/dialogs.module";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
+import {EpIlluminaSeqTabComponent} from "./ep-illumina-seq-tab.component";
+import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
 
 
 
@@ -55,7 +57,8 @@ import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.compone
         DynamicModule.withComponents([ExperimentPlatformTabComponent,
             EpSampleTypeTabComponent,
             EpLibraryPrepTabComponent,ConfigureAnnotationsComponent,
-            EpPipelineProtocolTabComponent
+            EpPipelineProtocolTabComponent,
+            EpIlluminaSeqTabComponent
         ])
 
     ],
@@ -66,14 +69,17 @@ import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.compone
         EpLibraryPrepTabComponent,
         SampleTypeDetailDialogComponent,
         SortOrderDialogComponent,
-        EpPipelineProtocolTabComponent
+        EpPipelineProtocolTabComponent,
+        EpIlluminaSeqTabComponent,
+        IlluminaSeqDialogComponent
 
 
 
     ],
     entryComponents: [
         SampleTypeDetailDialogComponent,
-        SortOrderDialogComponent
+        SortOrderDialogComponent,
+        IlluminaSeqDialogComponent
 
     ],
     exports: [
