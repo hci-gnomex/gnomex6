@@ -75,6 +75,7 @@ import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
 import {RouterModule} from "@angular/router";
 import {TabBioinformaticsViewComponent} from "./new-experiment/tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina.component";
+import {UploadModule} from "../upload/upload.module";
 
 /**
  * @author mbyrne
@@ -128,6 +129,7 @@ import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina
             CheckboxRenderer,
         ]),
         ExperimentDetailModule,
+        UploadModule
     ],
     declarations: [
                     BrowseExperimentsComponent,

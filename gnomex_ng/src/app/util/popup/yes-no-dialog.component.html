@@ -1,3 +1,6 @@
+<div mat-dialog-title *ngIf="!!title">
+    {{title}}
+</div>
 <mat-dialog-content>
     <div *ngIf="message" class="full-width full-height">
         {{message}}
