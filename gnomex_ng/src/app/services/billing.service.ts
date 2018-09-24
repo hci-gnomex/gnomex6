@@ -185,4 +185,9 @@ export class BillingService {
         return this.httpClient.post("/gnomex/SavePrice.gx", null, {params: params});
     }
 
+    public sendBillingInvoiceEmail(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/SendBillingInvoiceEmail.gx", null, {params: params});
+    }
+
 }

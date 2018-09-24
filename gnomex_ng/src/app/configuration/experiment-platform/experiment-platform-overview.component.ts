@@ -1,7 +1,6 @@
 import { Component, ComponentRef, OnDestroy, OnInit } from "@angular/core";
 import {GridOptions} from "ag-grid/main";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {ConfigurationService} from "../../services/configuration.service";
 import {ConstantsService} from "../../services/constants.service";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {ExperimentPlatformTabComponent} from "./experiment-platform-tab.component";
@@ -10,11 +9,13 @@ import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
-import {MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {IconTextRendererComponent} from "../../util/grid-renderers";
 import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
-//assets/page_add.png
+import {EpIlluminaSeqTabComponent} from "./ep-illumina-seq-tab.component";
+import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-dialog.component";
+
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -64,12 +65,15 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     ];
 
     public tabComponentTemplate:any = {
-        'ExperimentPlatformTabComponent': {name: 'Experiment Platform', component: ExperimentPlatformTabComponent, inputs: {}},
-        'EpSampleTypeTabComponent': {name: 'Sample Type', component: EpSampleTypeTabComponent,inputs:{} },
-        'EpLibraryPrepTabComponent': {name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{}},
-        'ConfigureAnnotationsComponent': {name:'Property', component: ConfigureAnnotationsComponent, inputs:{}},
-        'EpPipelineProtocolTabComponent': {name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent}
+        'ExperimentPlatformTabComponent': { name: 'Experiment Platform', component: ExperimentPlatformTabComponent, inputs: {} },
+        'EpSampleTypeTabComponent': { name: 'Sample Type', component: EpSampleTypeTabComponent,inputs:{} },
+        'EpLibraryPrepTabComponent': { name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{} },
+        'ConfigureAnnotationsComponent': { name:'Property', component: ConfigureAnnotationsComponent, inputs:{} },
+        'EpPipelineProtocolTabComponent': { name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent },
+        'EpIlluminaSeqTabComponent':{ name:'Illumina Seq', component:EpIlluminaSeqTabComponent }
     };
+
+
 
 
 
@@ -80,7 +84,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     constructor(private secAdvisor:CreateSecurityAdvisorService,
                 private constService:ConstantsService,
                 public expPlatformService: ExperimentPlatformService,
-                private dialogService:DialogsService){
+                private dialogService:DialogsService,private dialog:MatDialog){
     }
 
     ngOnInit():void{
@@ -161,20 +165,33 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         }
 
     }
+
+    private addedFn = ()=>{
+        this.showSpinner = true;
+    };
+
     addPlatform(event:any){
-        let tempCFacilitiesICanManage:any[] =  this.secAdvisor.coreFacilitiesICanManage;
-        tempCFacilitiesICanManage.push({facilityName:''});
-        this.gridOpt.api.setRowData(this.rowData);
 
         let end:number = this.rowData.length - 1;
+        let config: MatDialogConfig = new MatDialogConfig();
+
+        config.data = {
+            addFn: this.addedFn
+        };
+        config.panelClass = "no-padding-dialog";
+        this.dialog.open(AddExperimentPlatformDialogComponent,config);
+
+
+
+
 
         // need to use setTimeout since just setting rowData doesn't update immediately
 
-        this.gridOpt.api.forEachNode(node=> {
+        /*this.gridOpt.api.forEachNode(node=> {
             this.currentRow = node.rowIndex === end ? node.rowIndex : -1;
             return node.rowIndex === end  ? node.setSelected(true) : -1;
 
-        })
+        })*/
 
     }
     removePlatform(){
@@ -195,9 +212,11 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                                 this.dialogService.alert(resp.message);
                             }
                         });
-
+                    this.experimentPlatformTabs = [];
                 }
-            })
+
+            });
+
         }
 
 
@@ -214,18 +233,19 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     tabChanged(event:MatTabChangeEvent){ // user selected a new tab
         this.removeSave = false;
-        if(event.tab.textLabel  === "Property"){
-            let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
-                this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
-            propertyTabRef.instance.externallyResizeGrid();
-            this.removeSave = true;
-        }else if (event.tab.textLabel === "Sample Type"){
-            let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
-                this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
-            sampleTypeTabRef.instance.externallyResizeGrid();
+        if(event.tab){
+            if(event.tab.textLabel  === "Property"){
+                let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
+                    this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
+                propertyTabRef.instance.externallyResizeGrid();
+                this.removeSave = true;
+            }else if (event.tab.textLabel === "Sample Type"){
+                let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
+                    this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
+                sampleTypeTabRef.instance.externallyResizeGrid();
+            }
+
         }
-
-
     }
 
     componentInit(expPlatform:any){
