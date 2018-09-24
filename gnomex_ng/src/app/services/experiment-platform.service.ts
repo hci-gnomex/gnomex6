@@ -38,7 +38,9 @@ export class ExperimentPlatformService implements OnDestroy{
 
 
     setExperimentPlatformState(reqCategory:any ):void{
-        if(reqCategory){
+        if(reqCategory && reqCategory.codeRequestCategoryType){
+            this._selectedType = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY_TYPE, reqCategory.codeRequestCategoryType);
+        }else{
             this._selectedType = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY_TYPE, reqCategory.type);
         }
 
@@ -111,6 +113,7 @@ export class ExperimentPlatformService implements OnDestroy{
                 'EpSampleTypeTabComponent',
                 "EpLibraryPrepTabComponent",
                 "EpIlluminaSeqTabComponent",
+                "EpLibraryPrepQCTabComponent",
                 "EpPipelineProtocolTabComponent",
                 "ConfigureAnnotationsComponent"
             ]
