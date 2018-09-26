@@ -9,13 +9,15 @@ import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
-import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig,MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {IconTextRendererComponent} from "../../util/grid-renderers";
 import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
 import {EpIlluminaSeqTabComponent} from "./ep-illumina-seq-tab.component";
 import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-dialog.component";
-
+import {EpLibraryPrepQCTabComponent} from "./ep-library-prep-qc-tab.component";
+import * as _ from "lodash";
+import {EpPrepTypesTabComponent} from "./ep-prep-types-tab.component";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -70,10 +72,10 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         'EpLibraryPrepTabComponent': { name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{} },
         'ConfigureAnnotationsComponent': { name:'Property', component: ConfigureAnnotationsComponent, inputs:{} },
         'EpPipelineProtocolTabComponent': { name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent },
-        'EpIlluminaSeqTabComponent':{ name:'Illumina Seq', component:EpIlluminaSeqTabComponent }
+        'EpIlluminaSeqTabComponent':{ name:'Illumina Seq', component:EpIlluminaSeqTabComponent },
+        'EpLibraryPrepQCTabComponent': { name:'Lib Prep QC', component:EpLibraryPrepQCTabComponent },
+        'EpPrepTypesTabComponent': { name:'Prep Types', component:EpPrepTypesTabComponent}
     };
-
-
 
 
 
@@ -137,7 +139,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         this.selectedPlatformList = this.gridOpt.api.getSelectedRows();
         let exPlatform = null;
         if(this.selectedPlatformList.length > 0){
-            exPlatform = this.selectedPlatformList[0];
+            exPlatform =  _.cloneDeep(this.selectedPlatformList[0]);
         }
 
         if( this.selectRowIndex != event.rowIndex){
@@ -203,7 +205,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 if(result){
                     this.showSpinner = true;
                     let params:HttpParams = new HttpParams().set("codeRequestCategory", expPlatform.codeRequestCategory);
-                    console.log(params);
                     this.expPlatformService.deleteExperimentPlatform(params).first()
                         .subscribe(resp => {
                             if(resp && resp.result === "SUCCESS"){
@@ -234,16 +235,16 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     tabChanged(event:MatTabChangeEvent){ // user selected a new tab
         this.removeSave = false;
         if(event.tab){
-            if(event.tab.textLabel  === "Property"){
-                let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
-                    this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
-                propertyTabRef.instance.externallyResizeGrid();
-                this.removeSave = true;
-            }else if (event.tab.textLabel === "Sample Type"){
-                let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
-                    this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
-                sampleTypeTabRef.instance.externallyResizeGrid();
-            }
+        if(event.tab.textLabel  === "Property"){
+            let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
+                this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
+            propertyTabRef.instance.externallyResizeGrid();
+            this.removeSave = true;
+        }else if (event.tab.textLabel === "Sample Type"){
+            let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
+                this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
+            sampleTypeTabRef.instance.externallyResizeGrid();
+        }
 
         }
     }
