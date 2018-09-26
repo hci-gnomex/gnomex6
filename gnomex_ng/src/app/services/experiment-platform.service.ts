@@ -38,7 +38,9 @@ export class ExperimentPlatformService implements OnDestroy{
 
 
     setExperimentPlatformState(reqCategory:any ):void{
-        if(reqCategory){
+        if(reqCategory && reqCategory.codeRequestCategoryType){
+            this._selectedType = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY_TYPE, reqCategory.codeRequestCategoryType);
+        }else{
             this._selectedType = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY_TYPE, reqCategory.type);
         }
 
@@ -111,13 +113,14 @@ export class ExperimentPlatformService implements OnDestroy{
                 'EpSampleTypeTabComponent',
                 "EpLibraryPrepTabComponent",
                 "EpIlluminaSeqTabComponent",
+                "EpLibraryPrepQCTabComponent",
                 "EpPipelineProtocolTabComponent",
                 "ConfigureAnnotationsComponent"
             ]
         }else if(this.isQC){
-            return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent',"ConfigureAnnotationsComponent"]
+            return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent',"ConfigureAnnotationsComponent"];
         }else{
-            return ['ExperimentPlatformTabComponent', 'ConfigureAnnotationsComponent']
+            return ['ExperimentPlatformTabComponent', 'ConfigureAnnotationsComponent', "EpPrepTypesTabComponent"];
         }
     }
 
@@ -137,8 +140,6 @@ export class ExperimentPlatformService implements OnDestroy{
 
     }
     getExperimentPlatformSortOrderList(params:HttpParams): Observable<any>{
-        //this.cookieUtilService.formatXSRFCookie();
-        //return this.httpClient.post("/gnomex/MakeDataTrackIGVLink.gx",null);
         return this.httpClient.get("/gnomex/GetExperimentPlatformSortOrderList.gx",{params: params});
 
     }

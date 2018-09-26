@@ -227,6 +227,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
                     this.seqOptionsList = Array.isArray(data.sequencingOptions) ? data.sequencingOptions : [data.NumberSequencingCycles];
                     this.showInactive = false;
                     this.selectedSeqOpt = [];
+                    this.formGroup.markAsPristine();
 
                 }
             });
