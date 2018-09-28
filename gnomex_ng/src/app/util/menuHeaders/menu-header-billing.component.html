@@ -4,8 +4,8 @@
     <button mat-button (click)="showGeneralLedgerInterface()"><img src="../../../assets/feed_disk.png">General Ledger Interface</button>
     <button mat-button [matMenuTriggerFor]="reportsMenu"><img src="../../../assets/page.png">Reports...</button>
     <mat-menu #reportsMenu="matMenu">
-        <button mat-menu-item (click)="showInvoiceReport()">Invoice Report</button>
-        <button mat-menu-item matTooltip="Monthend Billing Report (uMerge Format)" matTooltipPosition="right" (click)="showMonthendBillingReport()">Monthend Billing Report (uMerge Format)</button>
+        <button mat-menu-item (click)="showMonthendBillingReport()">Invoice Report</button>
+        <button mat-menu-item matTooltip="Monthend Billing Report (uMerge Format)" matTooltipPosition="right" (click)="showMonthendBillingReport(true)">Monthend Billing Report (uMerge Format)</button>
         <button mat-menu-item matTooltip="Billing by Lab and Experiment Platform" matTooltipPosition="right" (click)="showBillingByLabReport()">Billing by Lab and Experiment Platform</button>
         <button mat-menu-item (click)="showUsageReport()">Usage Report</button>
         <button mat-menu-item (click)="showNotesToCore()">Notes to Core</button>

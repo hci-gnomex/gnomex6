@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {BillingFilterEvent} from "./billing-filter.component";
 import {ITreeOptions, TreeComponent} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
@@ -28,6 +28,7 @@ import {Observable} from "rxjs/Observable";
 import {PriceSheetViewComponent} from "./price-sheet-view.component";
 import {PriceCategoryViewComponent} from "./price-category-view.component";
 import {PriceViewComponent} from "./price-view.component";
+import {ISubscription} from "rxjs/Subscription";
 
 @Component({
     selector: 'nav-billing',
@@ -93,7 +94,7 @@ import {PriceViewComponent} from "./price-view.component";
     `]
 })
 
-export class NavBillingComponent implements OnInit {
+export class NavBillingComponent implements OnInit, OnDestroy {
 
     private lastFilterEvent: BillingFilterEvent = null;
 
@@ -158,6 +159,7 @@ export class NavBillingComponent implements OnInit {
     public disableAddBillingItemButton: boolean = true;
 
     public totalPrice: number = 0;
+    private onCoreCommentsWindowRequestSelected: ISubscription;
 
     constructor(private billingService: BillingService,
                 private dialogsService: DialogsService,
@@ -251,6 +253,20 @@ export class NavBillingComponent implements OnInit {
         this.billingItemsTreeOptions = {
             displayField: 'display',
         };
+
+        this.onCoreCommentsWindowRequestSelected = this.billingService.requestSelectedFromCoreCommentsWindow.subscribe((requestNumber: string) => {
+            if (this.billingItemGridApi && this.billingItemGridData && this.billingItemGridData.length > 0) {
+                this.billingItemGridApi.forEachNode((node: RowNode) => {
+                    if (node.data.requestNumber && node.data.requestNumber === requestNumber) {
+                        node.setSelected(true, true);
+                    }
+                });
+            }
+        });
+    }
+
+    ngOnDestroy() {
+        this.onCoreCommentsWindowRequestSelected.unsubscribe();
     }
 
     public onBillingItemGridReady(event: GridReadyEvent): void {
@@ -662,11 +678,13 @@ export class NavBillingComponent implements OnInit {
     public onHideEmptyRequestsChange(event: MatCheckboxChange): void {
         this.hideEmptyRequests = event.checked;
         this.buildBillingItemsTree(this.billingItemsTreeLastResult, true);
+        this.billingService.broadcastBillingViewChangeForCoreCommentsWindow(null, null, this.hideEmptyRequests);
     }
 
     public onShowRelatedChargesChange(event: MatCheckboxChange): void {
         this.showRelatedCharges = event.checked;
         this.refreshBillingItemList(this.lastFilterEvent, true);
+        this.billingService.broadcastBillingViewChangeForCoreCommentsWindow(null, this.showRelatedCharges, null);
     }
 
     private selectTreeNode(node: ITreeNode): void {
