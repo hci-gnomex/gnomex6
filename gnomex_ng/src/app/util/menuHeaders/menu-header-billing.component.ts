@@ -173,7 +173,6 @@ export class MenuHeaderBillingComponent implements OnInit {
     }
 
     public showNotesToCore(): void {
-        // TODO
         if (!this.idBillingPeriod) {
             this.dialogsService.confirm("Please select a billing period", null);
             return;
