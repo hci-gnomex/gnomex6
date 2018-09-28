@@ -5,6 +5,7 @@ import {LabListService} from "../services/lab-list.service";
 import {GetLabService} from "../services/get-lab.service";
 import {BillingPeriod} from "../util/billing-period-selector.component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {BillingService} from "../services/billing.service";
 
 @Component({
     selector: 'billing-filter',
@@ -50,7 +51,8 @@ export class BillingFilterComponent implements OnInit {
     constructor(@Inject(FormBuilder) private fb: FormBuilder,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private labListService: LabListService,
-                private getLabService: GetLabService) {
+                private getLabService: GetLabService,
+                private billingService: BillingService) {
         this.form = fb.group({
             idCoreFacility: '',
             idBillingPeriod: '',
@@ -95,6 +97,7 @@ export class BillingFilterComponent implements OnInit {
             if (!BillingFilterEvent.areEqualEvents(this.previousChangeEvent, event)) {
                 this.previousChangeEvent = event;
                 this.onChange.emit(event);
+                this.billingService.broadcastBillingViewChangeForCoreCommentsWindow(event, null, null);
             }
         });
 

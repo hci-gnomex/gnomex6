@@ -21,6 +21,7 @@ import {PriceCategoryViewComponent} from "./price-category-view.component";
 import {PriceViewComponent} from "./price-view.component";
 import {InvoiceEmailWindowComponent} from "./invoice-email-window.component";
 import {BillingGlInterfaceViewComponent} from "./billing-gl-interface-view.component";
+import {NotesToCoreComponent} from "./notes-to-core.component";
 
 @NgModule({
     imports: [
@@ -48,6 +49,7 @@ import {BillingGlInterfaceViewComponent} from "./billing-gl-interface-view.compo
         PriceViewComponent,
         InvoiceEmailWindowComponent,
         BillingGlInterfaceViewComponent,
+        NotesToCoreComponent,
     ],
     exports: [],
     entryComponents: [
@@ -56,6 +58,7 @@ import {BillingGlInterfaceViewComponent} from "./billing-gl-interface-view.compo
         PriceViewComponent,
         InvoiceEmailWindowComponent,
         BillingGlInterfaceViewComponent,
+        NotesToCoreComponent,
     ],
 })
 
