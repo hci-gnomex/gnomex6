@@ -7,6 +7,7 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {InvoiceEmailWindowComponent} from "../../billing/invoice-email-window.component";
 import {BillingGlInterfaceViewComponent} from "../../billing/billing-gl-interface-view.component";
 import {NotesToCoreComponent} from "../../billing/notes-to-core.component";
+import {BillingService} from "../../services/billing.service";
 
 @Component({
     selector: 'menu-header-billing',
@@ -25,7 +26,8 @@ export class MenuHeaderBillingComponent implements OnInit {
     @Input() private billingPeriodString: string;
 
     constructor(private dialog: MatDialog,
-                private dialogsService: DialogsService) {
+                private dialogsService: DialogsService,
+                private billingService: BillingService) {
     }
 
     ngOnInit() {
@@ -184,6 +186,18 @@ export class MenuHeaderBillingComponent implements OnInit {
         config.data = {
         };
         this.dialog.open(NotesToCoreComponent, config);
+    }
+
+    public refresh(): void {
+        if (this.isDirty) {
+            this.dialogsService.confirm("Unsaved changes will be discarded. Proceed?", " ").subscribe((result: boolean) => {
+                if (result) {
+                    this.billingService.requestBillingScreenRefresh();
+                }
+            });
+        } else {
+            this.billingService.requestBillingScreenRefresh();
+        }
     }
 
 }

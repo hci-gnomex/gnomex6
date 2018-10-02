@@ -15,6 +15,7 @@ export class BillingService {
     private lastBillingViewChangeForCoreCommentsWindowEvent: BillingViewChangeForCoreCommentsWindowEvent;
     @Output() public billingViewChangeForCoreCommentsWindow: EventEmitter<BillingViewChangeForCoreCommentsWindowEvent> = new EventEmitter<BillingViewChangeForCoreCommentsWindowEvent>();
     @Output() public requestSelectedFromCoreCommentsWindow: EventEmitter<string> = new EventEmitter<string>();
+    @Output() public refreshBillingScreenRequest: EventEmitter<any> = new EventEmitter<any>();
 
     constructor(private http: Http,
                 private httpClient: HttpClient,
@@ -222,6 +223,10 @@ export class BillingService {
 
     public getCoreCommentsForBillingPeriod(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetCoreCommentsForBillingPeriod.gx", {params: params});
+    }
+
+    public requestBillingScreenRefresh(): void {
+        this.refreshBillingScreenRequest.emit();
     }
 
 }

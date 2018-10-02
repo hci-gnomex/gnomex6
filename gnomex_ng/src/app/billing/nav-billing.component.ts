@@ -160,6 +160,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
     public totalPrice: number = 0;
     private onCoreCommentsWindowRequestSelected: ISubscription;
+    private refreshSubscription: ISubscription;
 
     constructor(private billingService: BillingService,
                 private dialogsService: DialogsService,
@@ -263,10 +264,15 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 });
             }
         });
+
+        this.refreshSubscription = this.billingService.refreshBillingScreenRequest.subscribe(() => {
+            this.onFilterChange(this.lastFilterEvent);
+        });
     }
 
     ngOnDestroy() {
         this.onCoreCommentsWindowRequestSelected.unsubscribe();
+        this.refreshSubscription.unsubscribe();
     }
 
     public onBillingItemGridReady(event: GridReadyEvent): void {
