@@ -61,7 +61,12 @@ import {CellRendererValidation} from "./cell-renderer-validation";
         this.defaultDisplayValue = "";
 
 		if (this.params) {
-			this.value = this.params.value;
+			if(this.params.value){
+                this.value = this.params.value;
+			}else{
+				this.value = '';
+			}
+
 		}
 
 		if (this.params && this.params.column && this.params.column.colDef) {

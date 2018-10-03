@@ -7,7 +7,6 @@
             <img class="icon" [src]="constService.ICON_DELETE">Remove Platform
         </button>
         <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-
     </div>
     <div style="display:flex;height:100%; width:100%;">
         <split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
@@ -29,7 +28,7 @@
 
             <split-area size="80">
                 <div style="padding-left:2em;" class="full-height full-width border">
-                    <mat-tab-group (selectedTabChange)="tabChanged($event)" class="full-height full-width border">
+                    <mat-tab-group [(selectedIndex)]="tabIndex" (selectedTabChange)="tabChanged($event)" class="full-height full-width border">
                         <mat-tab [label]="tab.name" *ngFor="let tab of experimentPlatformTabs ">
                             <ndc-dynamic style="height: 100%;width: 100%" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)">
                             </ndc-dynamic>
