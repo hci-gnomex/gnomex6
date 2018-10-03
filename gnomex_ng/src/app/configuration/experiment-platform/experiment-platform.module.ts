@@ -28,6 +28,7 @@ import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-di
 import {EpLibraryPrepQCTabComponent} from "./ep-library-prep-qc-tab.component";
 import {EpPrepTypesTabComponent} from "./ep-prep-types-tab.component";
 import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.component";
+import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
 
 
 
@@ -59,7 +60,8 @@ import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.compone
             EpPipelineProtocolTabComponent,
             EpIlluminaSeqTabComponent,
             EpLibraryPrepQCTabComponent,
-            EpPrepTypesTabComponent
+            EpPrepTypesTabComponent,
+            EpExperimentTypeTabComponent
         ])
 
     ],
@@ -76,7 +78,8 @@ import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.compone
         AddExperimentPlatformDialogComponent,
         EpLibraryPrepQCTabComponent,
         EpPrepTypesTabComponent,
-        PrepTypePricingDialogComponent
+        PrepTypePricingDialogComponent,
+        EpExperimentTypeTabComponent
 
 
 

@@ -18,6 +18,7 @@ import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-di
 import {EpLibraryPrepQCTabComponent} from "./ep-library-prep-qc-tab.component";
 import * as _ from "lodash";
 import {EpPrepTypesTabComponent} from "./ep-prep-types-tab.component";
+import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -43,7 +44,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     public readonly rowSelection = "single";
     private rowData = [];
-    private currentRow:number=0;
     private gridOpt:GridOptions = {};
     private selectRowIndex:number = -1 ;
     public  selectedPlatformList:any[] = [];
@@ -52,6 +52,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     private tabComponentRefList:ComponentRef<any>[] = [];
     public showSpinner:boolean = true;
     public removeSave:boolean = false;
+    public tabIndex = 0;
 
 
 
@@ -74,14 +75,9 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         'EpPipelineProtocolTabComponent': { name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent },
         'EpIlluminaSeqTabComponent':{ name:'Illumina Seq', component:EpIlluminaSeqTabComponent },
         'EpLibraryPrepQCTabComponent': { name:'Lib Prep QC', component:EpLibraryPrepQCTabComponent },
-        'EpPrepTypesTabComponent': { name:'Prep Types', component:EpPrepTypesTabComponent}
+        'EpPrepTypesTabComponent': { name:'Prep Types', component:EpPrepTypesTabComponent},
+        'EpExperimentTypeTabComponent': {name:'Library Prep', component:EpExperimentTypeTabComponent}
     };
-
-
-
-
-
-
 
     constructor(private secAdvisor:CreateSecurityAdvisorService,
                 private constService:ConstantsService,
@@ -97,7 +93,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 if(resp){
 
                     this.showSpinner = false;
-                    this.rowData = (<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
+                    this.rowData = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
                 }else if(resp && resp.message){
                     this.dialogService.alert(resp.message);
                 }else{
@@ -135,25 +131,9 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             return node.rowIndex === start  ? node.setSelected(true) : -1;
         })
     }
-    selectedRow(event:any){
-        this.selectedPlatformList = this.gridOpt.api.getSelectedRows();
-        let exPlatform = null;
-        if(this.selectedPlatformList.length > 0){
-            exPlatform =  _.cloneDeep(this.selectedPlatformList[0]);
-        }
 
-        if( this.selectRowIndex != event.rowIndex){
-            console.log("Previous tab: " + this.selectRowIndex + " current Tab: " + event.rowIndex  );
-            this.selectRowIndex = event.rowIndex;
-        }
-
-        /*if(event.node.selected){
-            this.selectRowIndex = event.rowIndex;
-            console.log(this.selectRowIndex);
-        }*/
-
-
-        if(exPlatform && event.node.selected){
+    changeExperimentPlaform(exPlatform){
+        if(exPlatform){
 
 
             this.expPlatformService.setExperimentPlatformState(exPlatform);
@@ -165,6 +145,43 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
             //this.experimentPlatformTabs =
         }
+
+    }
+
+    selectedRow(event:any){
+        this.selectedPlatformList = this.gridOpt.api.getSelectedRows();
+        let exPlatform = null;
+        if(this.selectedPlatformList.length > 0){
+            exPlatform =  _.cloneDeep(this.selectedPlatformList[0]);
+        }
+
+        if( this.selectRowIndex != event.rowIndex && event.node.selected){
+            console.log("Previous tab: " + this.selectRowIndex + " current Tab: " + event.rowIndex  );
+            if(this.expPlatformService.expPlatformOverviewForm.dirty){
+                this.dialogService.confirm("Warning","Your changes have not been saved.  Discard changes?").first().subscribe(answer =>{
+                    if(!answer){
+                        this.gridOpt.api.forEachNode(node=> {
+                            return node.rowIndex === this.selectRowIndex  ? node.setSelected(true) : -1;
+                        });
+                        return;
+                    }else{
+                        this.selectRowIndex = event.rowIndex;
+                        this.changeExperimentPlaform(exPlatform);
+                    }
+                })
+            }else{
+                this.selectRowIndex = event.rowIndex;
+                this.changeExperimentPlaform(exPlatform);
+            }
+
+
+
+        }
+
+
+
+
+
 
     }
 
@@ -182,18 +199,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         };
         config.panelClass = "no-padding-dialog";
         this.dialog.open(AddExperimentPlatformDialogComponent,config);
-
-
-
-
-
-        // need to use setTimeout since just setting rowData doesn't update immediately
-
-        /*this.gridOpt.api.forEachNode(node=> {
-            this.currentRow = node.rowIndex === end ? node.rowIndex : -1;
-            return node.rowIndex === end  ? node.setSelected(true) : -1;
-
-        })*/
 
     }
     removePlatform(){
@@ -229,22 +234,27 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         this.expPlatformService.getExperimentPlatformTabList().forEach(tabStr => {
             tabList.push(this.tabComponentTemplate[tabStr]);
         });
+        this.tabIndex = 0;
         this.experimentPlatformTabs = tabList;
     }
 
     tabChanged(event:MatTabChangeEvent){ // user selected a new tab
         this.removeSave = false;
         if(event.tab){
-        if(event.tab.textLabel  === "Property"){
-            let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
-                this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
-            propertyTabRef.instance.externallyResizeGrid();
-            this.removeSave = true;
-        }else if (event.tab.textLabel === "Sample Type"){
-            let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
-                this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
-            sampleTypeTabRef.instance.externallyResizeGrid();
-        }
+            if(event.tab.textLabel  === "Property"){
+                let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
+                    this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
+                propertyTabRef.instance.externallyResizeGrid();
+                this.removeSave = true;
+            }else if (event.tab.textLabel === "Sample Type"){
+                let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
+                    this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
+                sampleTypeTabRef.instance.externallyResizeGrid();
+            }else if (event.tab.textLabel === "Library Prep"){
+                let experimentTypeTabRef: ComponentRef<EpExperimentTypeTabComponent> =
+                    this.tabComponentRefList.find(compRef => compRef.instance instanceof EpExperimentTypeTabComponent );
+                experimentTypeTabRef.instance.externallyResizeGrid();
+            }
 
         }
     }
@@ -273,7 +283,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 }
             }
             propertyTab.instance.setupExpPlatformMode(expPlatform);
-
 
         });
     }
