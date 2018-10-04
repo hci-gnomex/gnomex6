@@ -1,6 +1,9 @@
-<div style="display:flex; flex-direction:column ; height:100%; width:100%;">
-    <div style="display:flex; flex: 1;">
-        <mat-tab-group class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
+<div class="full-width full-height flex-container-col">
+    <div class="full-width flex-grow">
+        <mat-tab-group class="full-width full-height bordered" (selectedTabChange)="tabChanged($event)">
+            <mat-tab label="Overview">
+                <experiment-overview-tab [experiment]="experiment"></experiment-overview-tab>
+            </mat-tab>
             <mat-tab label="Other Details">
                 <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.EXPERIMENT"> </annotation-tab>
             </mat-tab>
@@ -15,7 +18,7 @@
             </mat-tab>
         </mat-tab-group>
     </div>
-    <div>
+    <div class="full-width">
         <save-footer (saveClicked)="save()"
                      [disableSave]="true"
                      [dirty]="false">

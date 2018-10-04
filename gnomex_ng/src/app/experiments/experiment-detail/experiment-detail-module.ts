@@ -18,6 +18,7 @@ import {
 import {
     RichEditorModule,
 } from '../../../modules/index';
+import {ExperimentOverviewTabComponent} from "./experiment-overview-tab.component";
 
 
 
@@ -34,6 +35,7 @@ import {
     ],
 
     declarations: [
+        ExperimentOverviewTabComponent,
         ExperimentDetailOverviewComponent,
         DescriptionTab
     ],
