@@ -31,6 +31,11 @@ export class PropertyService {
     public static readonly PROPERTY_DESCRIPTION_NAME_MANDATORY_FOR_INTERNAL_EXPERIMENTS:string = "description_name_mandatory_for_internal_experiments";
     public static readonly PROPERTY_STATUS_TO_USE_PRODUCTS:string = "status_to_use_products";
     public static readonly PROPERTY_NEW_REQUEST_SAVE_BEFORE_SUBMIT:string =  "new_request_save_before_submit";
+    public static readonly PROPERTY_INTERNAL_PRICE_LABEL:string = "internal_price_label";
+    public static readonly PROPERTY_EXTERNAL_ACADEMIC_PRICE_LABEL:string = "external_academic_price_label";
+    public static readonly  PROPERTY_EXTERNAL_COMMERCIAL_PRICE_LABEL:string = "external_commercial_price_label";
+
+
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,

@@ -38,7 +38,9 @@ export class ExperimentPlatformService implements OnDestroy{
 
 
     setExperimentPlatformState(reqCategory:any ):void{
-        if(reqCategory){
+        if(reqCategory && reqCategory.codeRequestCategoryType){
+            this._selectedType = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY_TYPE, reqCategory.codeRequestCategoryType);
+        }else{
             this._selectedType = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY_TYPE, reqCategory.type);
         }
 
@@ -106,18 +108,29 @@ export class ExperimentPlatformService implements OnDestroy{
 
     getExperimentPlatformTabList():string[]{
         if(this.isIllumina || this.isNanoString || this.isSequenom){
-            return [
+            let illuminaLikeList:string[] = [
                 'ExperimentPlatformTabComponent',
                 'EpSampleTypeTabComponent',
                 "EpLibraryPrepTabComponent",
                 "EpIlluminaSeqTabComponent",
+                "EpLibraryPrepQCTabComponent",
                 "EpPipelineProtocolTabComponent",
                 "ConfigureAnnotationsComponent"
-            ]
+            ];
+            if(!this.isIllumina){
+                illuminaLikeList.splice(3,1);
+            }
+            return illuminaLikeList;
         }else if(this.isQC){
-            return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent',"ConfigureAnnotationsComponent"]
+            return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent',"ConfigureAnnotationsComponent"];
         }else{
-            return ['ExperimentPlatformTabComponent', 'ConfigureAnnotationsComponent']
+            return [
+                'ExperimentPlatformTabComponent',
+                'EpSampleTypeTabComponent',
+                'EpExperimentTypeTabComponent',
+                'ConfigureAnnotationsComponent',
+                "EpPrepTypesTabComponent"
+            ];
         }
     }
 
@@ -137,8 +150,6 @@ export class ExperimentPlatformService implements OnDestroy{
 
     }
     getExperimentPlatformSortOrderList(params:HttpParams): Observable<any>{
-        //this.cookieUtilService.formatXSRFCookie();
-        //return this.httpClient.post("/gnomex/MakeDataTrackIGVLink.gx",null);
         return this.httpClient.get("/gnomex/GetExperimentPlatformSortOrderList.gx",{params: params});
 
     }

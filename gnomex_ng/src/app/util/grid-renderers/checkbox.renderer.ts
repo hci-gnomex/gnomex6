@@ -51,7 +51,17 @@ export class CheckboxRenderer implements ICellRendererAngularComp {
 
 	onChange(event: any): void {
 		if (this.editable) {
+            let oldValue = this.params.data[this.params.colDef.field];
             this.params.data[this.params.colDef.field] = event.currentTarget.checked ? "Y" : "N";
+            let newValue = this.params.data[this.params.colDef.field];
+            this.params.api.dispatchEvent({
+				api:this.params.api,
+				node:this.params.node,
+				column: this.params.column,
+				type:'cellValueChanged',
+				rowPinned:'',
+				oldValue: oldValue,
+				newValue: newValue });
 		}
 	}
 }

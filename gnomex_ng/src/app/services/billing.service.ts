@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {EventEmitter, Injectable, Output} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 
@@ -6,9 +6,16 @@ import 'rxjs/add/operator/map';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {BillingTemplate} from "../util/billing-template-window.component";
+import {BillingViewChangeForCoreCommentsWindowEvent} from "../billing/billing-view-change-for-core-comments-window-event.model";
+import {BillingFilterEvent} from "../billing/billing-filter.component";
 
 @Injectable()
 export class BillingService {
+
+    private lastBillingViewChangeForCoreCommentsWindowEvent: BillingViewChangeForCoreCommentsWindowEvent;
+    @Output() public billingViewChangeForCoreCommentsWindow: EventEmitter<BillingViewChangeForCoreCommentsWindowEvent> = new EventEmitter<BillingViewChangeForCoreCommentsWindowEvent>();
+    @Output() public requestSelectedFromCoreCommentsWindow: EventEmitter<string> = new EventEmitter<string>();
+    @Output() public refreshBillingScreenRequest: EventEmitter<any> = new EventEmitter<any>();
 
     constructor(private http: Http,
                 private httpClient: HttpClient,
@@ -188,6 +195,38 @@ export class BillingService {
     public sendBillingInvoiceEmail(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/SendBillingInvoiceEmail.gx", null, {params: params});
+    }
+
+    public broadcastBillingViewChangeForCoreCommentsWindow(billingFilterEvent: BillingFilterEvent = null, showOtherBillingItems: boolean = null, excludeNewRequests: boolean = null): void {
+        let event: BillingViewChangeForCoreCommentsWindowEvent = this.lastBillingViewChangeForCoreCommentsWindowEvent ? this.lastBillingViewChangeForCoreCommentsWindowEvent : new BillingViewChangeForCoreCommentsWindowEvent();
+        if (billingFilterEvent != null) {
+            event.idLab = billingFilterEvent.idLab;
+            event.requestNumber = billingFilterEvent.requestNumber;
+            event.idBillingPeriod = billingFilterEvent.idBillingPeriod;
+            event.idCoreFacility = billingFilterEvent.idCoreFacility;
+            event.invoiceLookupNumber = billingFilterEvent.invoiceNumber;
+            event.idBillingAccount = billingFilterEvent.idBillingAccount;
+        }
+        if (showOtherBillingItems != null) {
+            event.showOtherBillingItems = showOtherBillingItems;
+        }
+        if (excludeNewRequests != null) {
+            event.excludeNewRequests = excludeNewRequests;
+        }
+        this.lastBillingViewChangeForCoreCommentsWindowEvent = event;
+        this.billingViewChangeForCoreCommentsWindow.emit(event);
+    }
+
+    public broadcastRequestSelectedFromCoreCommentsWindow(requestNumber: string): void {
+        this.requestSelectedFromCoreCommentsWindow.emit(requestNumber);
+    }
+
+    public getCoreCommentsForBillingPeriod(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetCoreCommentsForBillingPeriod.gx", {params: params});
+    }
+
+    public requestBillingScreenRefresh(): void {
+        this.refreshBillingScreenRequest.emit();
     }
 
 }
