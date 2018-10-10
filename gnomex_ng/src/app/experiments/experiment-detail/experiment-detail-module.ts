@@ -19,6 +19,7 @@ import {
     RichEditorModule,
 } from '../../../modules/index';
 import {ExperimentOverviewTabComponent} from "./experiment-overview-tab.component";
+import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 
 
 
@@ -35,12 +36,15 @@ import {ExperimentOverviewTabComponent} from "./experiment-overview-tab.componen
     ],
 
     declarations: [
+        CollaboratorsDialogComponent,
         ExperimentOverviewTabComponent,
         ExperimentDetailOverviewComponent,
         DescriptionTab
     ],
     providers: [],
-    entryComponents: [],
+    entryComponents: [
+        CollaboratorsDialogComponent
+    ],
     exports: []
 })
 export class ExperimentDetailModule { }

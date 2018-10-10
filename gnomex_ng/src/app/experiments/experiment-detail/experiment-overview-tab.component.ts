@@ -5,6 +5,11 @@ import {LabListService} from "../../services/lab-list.service";
 import {GetLabService} from "../../services/get-lab.service";
 import {Subscription} from "rxjs/Subscription";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {PropertyService} from "../../services/property.service";
+import {ConstantsService} from "../../services/constants.service";
+import {FormControl} from "@angular/forms";
+import {MatDialog, MatDialogConfig} from "@angular/material";
+import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 
 
 @Component({
@@ -41,9 +46,21 @@ import {DialogsService} from "../../util/popup/dialogs.service";
             border: solid silver 1px;
             border-radius: 0.3em;
         }
+
+        .multi-line { white-space: pre-line; }
+        
+        .max-height {
+            max-height: 6em;
+            overflow: auto;
+        }
+        
+        .limit-width { max-width: 100%; }
         
         .padded { padding: 0.3em; }
         
+        .margin { margin: 0.5em; }
+        
+        .margin-top { margin-top: 0.3em; }
         .margin-top-bottom {
             margin-top:    0.6em;
             margin-bottom: 0.6em;
@@ -60,15 +77,21 @@ import {DialogsService} from "../../util/popup/dialogs.service";
         .max-width { max-width: 70em; }
 
         .align-right { text-align: right; }
+
+        .highlight { 
+            color: green;
+            font-weight: bold;
+        }
         
     `]
 }) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy {
 
     @Input('experiment') set experiment(experiment: any) {
         this.isReady_filteredApplicationDictionary = false;
-        this.isReady_filteredLabDictionary = false;
 
-        this.dialogService.startDefaultSpinnerDialog();
+        setTimeout(() => {
+            this.dialogService.startDefaultSpinnerDialog();
+        });
 
         this._experiment = experiment;
 
@@ -133,13 +156,85 @@ import {DialogsService} from "../../util/popup/dialogs.service";
             this.isExternal = experiment.isExternal && experiment.isExternal === 'Y';
 
             this.filterApplicationDictionary();
-            this.filterLabDictionary();
 
             if (!this.labSubscription) {
                 this.labSubscription = this.getLabService.getLabById(this._experiment.idLab).subscribe((result) => {
                     this.lab = result;
+
+                    this.filterLabDictionary();
                 });
             }
+
+            this.workflowSteps = [];
+            this.progresses = [];
+            this.numberOfSteps = 0;
+
+            this.processedWorkflowSteps = [];
+
+            if (this._experiment.workflowStatus) {
+                this.numberOfSteps = this._experiment.workflowStatus.numberOfSteps;
+
+                if (this._experiment.workflowStatus.Step) {
+                    if (Array.isArray(this._experiment.workflowStatus.Step)) {
+                        this.workflowSteps = this._experiment.workflowStatus.Step;
+                    } else {
+                        this.workflowSteps = [this._experiment.workflowStatus.Step];
+                    }
+                }
+
+                if (this._experiment.workflowStatus.Progress) {
+                    if (Array.isArray(this._experiment.workflowStatus.Progress)) {
+                        this.progresses = this._experiment.workflowStatus.Progress;
+                    } else {
+                        this.progresses = [this._experiment.workflowStatus.Progress];
+                    }
+
+                    for (let progress of this.progresses) {
+                        progress.displayArray = [];
+                        progress.undisplayArray = [];
+
+                        for (let i: number = 1; i < progress.stepNumber; i++) {
+                            progress.displayArray.push(i);
+                            progress.displayArray.push(i);
+                        }
+
+                        let isCompleted: boolean = true;
+
+                        for (let i: number = this.numberOfSteps; i > progress.stepNumber; i--) {
+                            isCompleted = false;
+                            progress.undisplayArray.push(i);
+                            progress.undisplayArray.push(i);
+                        }
+
+                        if (!isCompleted) {
+                            progress.displayArray.push(-1);
+                            progress.undisplayArray.push(-1);
+                        } else {
+                            progress.displayArray.push(-1);
+                            progress.displayArray.push(-1);
+                        }
+                    }
+                }
+
+
+                for (let step of this.workflowSteps) {
+                    let tempCopy: any = {
+                        name: step.name,
+                        found: false
+                    };
+
+                    for (let progress of this.progresses) {
+                        if (progress.stepName === step.name) {
+                            tempCopy.found = true;
+                            break;
+                        }
+                    }
+
+                    this.processedWorkflowSteps.push(tempCopy);
+                }
+            }
+
+            this.updateCollaboratorsDisplay();
         });
     };
 
@@ -170,6 +265,19 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 
     public filteredApplicationDictionary: any[];
     public filteredLabDictionary:         any[];
+
+    public workflowSteps: any[];
+    public progresses   : any[];
+    public numberOfSteps: any;
+
+    public processedWorkflowSteps: any[];
+
+    public visibilityOptions: any[];
+
+    public privacyExp: Date;
+    public isPrivacyExpSupported: boolean = false;
+
+    public currentCollaboratorsDisplay: string = '';
 
     private _isReady_applicationDictionary:      boolean = false;
     private _isReady_coreFacilitiesDictionary:   boolean = false;
@@ -243,11 +351,14 @@ import {DialogsService} from "../../util/popup/dialogs.service";
         return this.secAdvisor.isAdmin;
     }
 
-    constructor(private secAdvisor: CreateSecurityAdvisorService,
+    constructor(private constantsService: ConstantsService,
+                private secAdvisor: CreateSecurityAdvisorService,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private getLabService: GetLabService,
-                private labListService: LabListService) { }
+                private labListService: LabListService,
+                private matDialog: MatDialog,
+                private propertyService: PropertyService) { }
 
     public get selectedExperimentCategory(): string {
         if (!this._experiment || !this._experiment.experimentCategoryName) {
@@ -264,7 +375,9 @@ import {DialogsService} from "../../util/popup/dialogs.service";
     }
 
     ngOnInit() {
-        this.dialogService.startDefaultSpinnerDialog();
+        setTimeout(() => {
+            this.dialogService.startDefaultSpinnerDialog();
+        });
 
         this.applicationDictionary     = this.dictionaryService.getEntries('hci.gnomex.model.Application');
         this.coreFacilitiesDictionary  = this.dictionaryService.getEntries('hci.gnomex.model.CoreFacility');
@@ -307,6 +420,39 @@ import {DialogsService} from "../../util/popup/dialogs.service";
         }
 
         this.filterApplicationDictionary();
+
+        this.visibilityOptions = [
+            {
+                display: 'Owner',
+                value: 'OWNER',
+                icon: this.constantsService.ICON_TOPIC_OWNER,
+                tooltip:'Visible to the submitter and the lab PI'
+            },
+            {
+                display: 'All Lab Members',
+                value: 'MEM',
+                icon: this.constantsService.ICON_TOPIC_MEMBER,
+                tooltip:'Visible to all members of the lab group'
+            }
+        ];
+
+        if(this.propertyService.isPublicVisbility()){
+            this.visibilityOptions.push({
+                display: 'Public Access',
+                value: 'PUBLIC',
+                icon: this.constantsService.ICON_TOPIC_PUBLIC,
+                tooltip: 'Visible to everyone'
+            });
+        }
+
+        this.isPrivacyExpSupported= this.propertyService.isPrivacyExpirationSupported;
+
+        let dateParsed = this.parsePrivacyDate(this._experiment.privacyExpirationDate);
+        if (dateParsed.length > 0 ) {
+            this.privacyExp = new Date(dateParsed[0],dateParsed[1],dateParsed[2]);
+        } else {
+            this.privacyExp = null;
+        }
     }
 
     ngOnDestroy(): void {
@@ -315,7 +461,40 @@ import {DialogsService} from "../../util/popup/dialogs.service";
         }
     }
 
-    public onClickCollaborators(): void { }
+    public onClickCollaborators(): void {
+        if (this._experiment.codeVisibility === 'PUBLIC') {
+            return;
+        }
+
+        let prepCollabsList: any[] = [];
+
+        if (this._experiment.codeVisibility === 'MEM' && this.lab && this.lab.Lab) {
+            prepCollabsList = this.lab.Lab.membersCollaborators;
+        } else if (this._experiment.codeVisibility === 'OWNER' && this.lab && this.lab.Lab) {
+            prepCollabsList = this.lab.Lab.possibleCollaborators;
+        }
+
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.height = '33em';
+        configuration.width  = '44em';
+        configuration.panelClass = 'no-padding-dialog';
+
+        configuration.data = {
+            currentCollaborators:  this._experiment.collaborators,
+            possibleCollaborators:  prepCollabsList,
+            idRequest: this._experiment.idRequest
+        };
+
+        let collaboratorsDialogReference = this.matDialog.open(CollaboratorsDialogComponent, configuration);
+
+        collaboratorsDialogReference.afterClosed().subscribe(result => {
+            if (result) {
+                this._experiment.collaborators = result;
+            }
+
+            this.updateCollaboratorsDisplay();
+        });
+    }
 
 
     public onChange_lab(event: any): void {
@@ -568,7 +747,48 @@ import {DialogsService} from "../../util/popup/dialogs.service";
             && this._isReady_filteredApplicationDictionary
             && this._isReady_filteredLabDictionary) {
 
-            this.dialogService.stopAllSpinnerDialogs();
+            setTimeout(() => {
+                this.dialogService.stopAllSpinnerDialogs();
+            });
+        }
+    }
+
+    private updateCollaboratorsDisplay() {
+        this.currentCollaboratorsDisplay = '';
+
+        if (this._experiment) {
+            for (let collaborator of this._experiment.collaborators) {
+                if (this.currentCollaboratorsDisplay) {
+                    this.currentCollaboratorsDisplay = this.currentCollaboratorsDisplay + '\n';
+                }
+
+                if (!collaborator.displayName) {
+                    let currentRequestOwner: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', collaborator.idAppUser);
+
+                    collaborator.displayName = currentRequestOwner.display;
+                }
+
+                this.currentCollaboratorsDisplay = this.currentCollaboratorsDisplay + collaborator.displayName;
+            }
+        }
+    }
+
+    public onUpdateVisibility(event: any) {
+        if (event) {
+            this._experiment.codeVisibility = event.value;
+        }
+    }
+
+    private parsePrivacyDate(date: string): number[] {
+        let parseDateList:string[] = date.split("-");
+        if(parseDateList.length > 1){
+            let year:number = +parseDateList[0];
+            let month:number = (+parseDateList[1]) - 1;
+            let day:number = +parseDateList[2];
+            return [year,month,day]
+
+        } else {
+            return [];
         }
     }
 }
