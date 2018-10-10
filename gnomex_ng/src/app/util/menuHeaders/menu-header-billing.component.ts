@@ -6,6 +6,8 @@ import {DialogsService} from "../popup/dialogs.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {InvoiceEmailWindowComponent} from "../../billing/invoice-email-window.component";
 import {BillingGlInterfaceViewComponent} from "../../billing/billing-gl-interface-view.component";
+import {NotesToCoreComponent} from "../../billing/notes-to-core.component";
+import {BillingService} from "../../services/billing.service";
 
 @Component({
     selector: 'menu-header-billing',
@@ -24,7 +26,8 @@ export class MenuHeaderBillingComponent implements OnInit {
     @Input() private billingPeriodString: string;
 
     constructor(private dialog: MatDialog,
-                private dialogsService: DialogsService) {
+                private dialogsService: DialogsService,
+                private billingService: BillingService) {
     }
 
     ngOnInit() {
@@ -92,7 +95,7 @@ export class MenuHeaderBillingComponent implements OnInit {
                     '&idLab=' + labNode.data.idLab +
                     '&idBillingAccount=' + labNode.data.idBillingAccount +
                     '&idCoreFacility=' + this.idCoreFacility;
-                let resultWindow = window.open(url, '_blank');
+                window.open(url, '_blank');
             }
         } else if (!sendEmail && this.selectedItem.data.name === "Status" && (this.selectedItem.data.status === "APPROVED" || this.selectedItem.data.status === "APPROVEDEX" || this.selectedItem.data.status === "APPROVEDCC" || this.selectedItem.data.status === "COMPLETE")) {
             this.dialogsService.confirm("Print all invoices for this folder?", " ").subscribe((result: boolean) => {
@@ -108,7 +111,7 @@ export class MenuHeaderBillingComponent implements OnInit {
                         '&idLabs=' + idLabs +
                         '&idBillingAccounts=' + idBillingAccounts +
                         '&idCoreFacility=' + this.idCoreFacility;
-                    let resultWindow = window.open(url, '_blank');
+                    window.open(url, '_blank');
                 }
             });
         } else {
@@ -127,12 +130,30 @@ export class MenuHeaderBillingComponent implements OnInit {
         this.dialog.open(InvoiceEmailWindowComponent, config);
     }
 
-    public showInvoiceReport(): void {
-        // TODO
-    }
+    public showMonthendBillingReport(uMergeFormat: boolean = false): void {
+        if (!this.idBillingPeriod) {
+            this.dialogsService.confirm("Please select a billing period", null);
+            return;
+        }
 
-    public showMonthendBillingReport(): void {
-        // TODO
+        let statusNode: any;
+        if (this.selectedItem && this.selectedItem.data.name === "Lab") {
+            statusNode = this.selectedItem.parent.data;
+        } else if (this.selectedItem && this.selectedItem.data.name === "Status") {
+            statusNode = this.selectedItem.data;
+        }
+
+        if (!statusNode || !(statusNode.status === "APPROVED" || statusNode.status === "APPROVEDEX" || statusNode.status === "APPROVEDCC")) {
+            this.dialogsService.confirm("Please select an approved folder", null);
+            return;
+        }
+
+        let controller: string = uMergeFormat ? "ShowBillingMonthendReportUMergeFormat.gx" : "ShowBillingMonthendReport.gx";
+        let url: string = controller +
+            '?codeBillingStatus=' + statusNode.status +
+            '&idCoreFacility=' + this.idCoreFacility +
+            '&idBillingPeriod=' + this.idBillingPeriod;
+        window.open(url, '_blank');
     }
 
     public showBillingByLabReport(): void {
@@ -154,7 +175,29 @@ export class MenuHeaderBillingComponent implements OnInit {
     }
 
     public showNotesToCore(): void {
-        // TODO
+        if (!this.idBillingPeriod) {
+            this.dialogsService.confirm("Please select a billing period", null);
+            return;
+        }
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.disableClose = true;
+        config.hasBackdrop = false;
+        config.data = {
+        };
+        this.dialog.open(NotesToCoreComponent, config);
+    }
+
+    public refresh(): void {
+        if (this.isDirty) {
+            this.dialogsService.confirm("Unsaved changes will be discarded. Proceed?", " ").subscribe((result: boolean) => {
+                if (result) {
+                    this.billingService.requestBillingScreenRefresh();
+                }
+            });
+        } else {
+            this.billingService.requestBillingScreenRefresh();
+        }
     }
 
 }

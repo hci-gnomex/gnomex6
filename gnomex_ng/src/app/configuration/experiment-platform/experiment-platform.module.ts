@@ -1,16 +1,12 @@
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {TreeModule} from "angular-tree-component";
-
 import {AgGridModule} from "ag-grid-angular";
 import {AngularSplitModule} from "angular-split";
 import {CONFIGURATION_ROUTING} from "../configuration.routes";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {ServicesModule} from "../../services/services.module";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
-import {DateEditor} from "../../util/grid-editors/date.editor";
-import {DateRenderer} from "../../util/grid-renderers/date.renderer";
 import {UtilModule} from "../../util/util.module";
 import {RichEditorModule} from "../../../modules";
 import {ExperimentPlatformOverviewComponent} from "./experiment-platform-overview.component";
@@ -23,13 +19,16 @@ import { DynamicModule } from 'ng-dynamic-component';
 import {AgGridRendererModule, IconTextRendererComponent} from "../../util/grid-renderers";
 import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
 import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
-import {DialogsModule} from "../../util/popup/dialogs.module";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
 import {EpIlluminaSeqTabComponent} from "./ep-illumina-seq-tab.component";
 import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
 import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-dialog.component";
+import {EpLibraryPrepQCTabComponent} from "./ep-library-prep-qc-tab.component";
+import {EpPrepTypesTabComponent} from "./ep-prep-types-tab.component";
+import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.component";
+import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
 
 
 
@@ -59,7 +58,10 @@ import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-di
             EpSampleTypeTabComponent,
             EpLibraryPrepTabComponent,ConfigureAnnotationsComponent,
             EpPipelineProtocolTabComponent,
-            EpIlluminaSeqTabComponent
+            EpIlluminaSeqTabComponent,
+            EpLibraryPrepQCTabComponent,
+            EpPrepTypesTabComponent,
+            EpExperimentTypeTabComponent
         ])
 
     ],
@@ -74,6 +76,11 @@ import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-di
         EpIlluminaSeqTabComponent,
         IlluminaSeqDialogComponent,
         AddExperimentPlatformDialogComponent,
+        EpLibraryPrepQCTabComponent,
+        EpPrepTypesTabComponent,
+        PrepTypePricingDialogComponent,
+        EpExperimentTypeTabComponent
+
 
 
 
@@ -82,7 +89,8 @@ import {AddExperimentPlatformDialogComponent} from "./add-experiment-platform-di
         SampleTypeDetailDialogComponent,
         SortOrderDialogComponent,
         IlluminaSeqDialogComponent,
-        AddExperimentPlatformDialogComponent
+        AddExperimentPlatformDialogComponent,
+        PrepTypePricingDialogComponent
 
     ],
     exports: [

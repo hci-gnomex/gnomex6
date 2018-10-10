@@ -54,7 +54,7 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 		}
 
 		if (this.params) {
-			this.value = "" + this.params.value;
+			this.value = this.params.value ? "" + this.params.value : "" ;
 		}
 
 		if (this.showFillButton && (!this.fillGroupAttribute || this.fillGroupAttribute === '')) {
@@ -93,7 +93,7 @@ import { ICellEditorAngularComp } from "ag-grid-angular";
 	}
 
 	getValue(): any {
-		return this.value;
+		return this.value ? this.value : '';
 	}
 
 	isPopup(): boolean {

@@ -34,9 +34,15 @@
             </mat-form-field>
             <mat-form-field  class="medium-form-input">
                 <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
+                <mat-error *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
+                    Enter a valid currency
+                </mat-error>
             </mat-form-field>
             <mat-form-field  class="medium-form-input">
                 <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
+                <mat-error *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
+                    Enter a valid currency
+                </mat-error>
             </mat-form-field>
         </div>
         <mat-form-field class="short-input">

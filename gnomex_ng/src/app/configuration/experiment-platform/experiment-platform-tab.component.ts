@@ -128,6 +128,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
                 this.formGroup.get('icon').setValue(data.icon);
                 this.formGroup.get('coreFacility').setValue(data.idCoreFacility);
                 this.formGroup.get('notes').setValue(data.notes);
+                this.formGroup.get('vendor').setValue(data.idVendor);
                 this.formGroup.get('isInternal').setValue(data && data.isInternal === 'Y');
                 this.formGroup.get('isExternal').setValue(data && data.isExternal === 'Y');
                 this.formGroup.get('sortOrder').setValue(data.sortOrder);
