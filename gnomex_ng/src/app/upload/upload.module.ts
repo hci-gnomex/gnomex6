@@ -4,7 +4,8 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 import {AgGridModule} from "ag-grid-angular";
 
-import {AgGridRendererModule} from "../util/grid-renderers/ag-grid-renderer.module";
+import {AgGridEditorModule} from "../util/grid-editors/ag-grid-editor.module";
+import {AgGridRendererModule} from "../util/grid-renderers/index";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {AngularSplitModule} from "angular-split";
 import {ServicesModule} from "../services/services.module";
@@ -13,15 +14,15 @@ import {WindowModule} from "../../modules/window.module";
 
 import {UPLOAD_ROUTING} from "./upload.routes";
 
-import {
-    BulkSampleUploadComponent,
-    BulkSampleUploadLauncherComponent
-} from "./bulk-sample-upload.component";
+import {BulkSampleUploadComponent, BulkSampleUploadLauncherComponent} from "./bulk-sample-upload.component";
+import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.component";
+import {UploadSampleSheetComponent} from "./upload-sample-sheet.component";
 
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
 import {MultipleLineTextRenderer} from "../util/grid-renderers/multiple-line-text.renderer";
+import {SelectEditor} from "../util/grid-editors/select.editor";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {ShowErrorsShowSamplesRenderer} from "../util/grid-renderers/show-errors-show-samples.renderer";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
@@ -43,12 +44,14 @@ import {SampleUploadService} from "./sample-upload.service";
         UtilModule,
         WindowModule,
         AngularMaterialModule,
+        AgGridEditorModule,
         AgGridRendererModule,
         AgGridModule.withComponents([
             DateRenderer,
             IconTextRendererComponent,
             IconRendererComponent,
             MultipleLineTextRenderer,
+            SelectEditor,
             SelectRenderer,
             ShowErrorsShowSamplesRenderer,
             TextAlignLeftMiddleRenderer,
@@ -62,14 +65,20 @@ import {SampleUploadService} from "./sample-upload.service";
     ],
     declarations: [
         BulkSampleUploadComponent,
-        BulkSampleUploadLauncherComponent
+        BulkSampleUploadLauncherComponent,
+        SampleSheetColumnFormatsComponent,
+        UploadSampleSheetComponent
     ],
     exports: [
         BulkSampleUploadComponent,
-        BulkSampleUploadLauncherComponent
+        BulkSampleUploadLauncherComponent,
+        SampleSheetColumnFormatsComponent,
+        UploadSampleSheetComponent
     ],
     entryComponents: [
-        BulkSampleUploadComponent
+        BulkSampleUploadComponent,
+        SampleSheetColumnFormatsComponent,
+        UploadSampleSheetComponent
     ],
     providers: [
         SampleUploadService
