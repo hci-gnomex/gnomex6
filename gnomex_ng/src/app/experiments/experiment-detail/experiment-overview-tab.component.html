@@ -1,0 +1,305 @@
+<div class="full-height full-width padded small-font">
+    <div class="full-width flex-container-col">
+        <div class="full-width flex-container-row">
+            <div class="flex-container-col">
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Core Facility
+                    </div>
+                    <div class="flex-grow">
+                        {{ coreFacilityName }}
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Lab Group
+                    </div>
+                    <div class="flex-grow">
+                        <div [matTooltip]="_experiment?.labName">
+                            <mat-form-field class="full-width">
+                                <mat-select [(value)]="_experiment.idLab"
+                                            [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"
+                                            (change)="onChange_lab($event)">
+                                    <mat-option [value]="">
+                                        {{ '' }}
+                                    </mat-option>
+                                    <mat-option *ngFor="let lab of filteredLabDictionary" [value]="lab.idLab">
+                                        {{ lab.display }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Project
+                    </div>
+                    <div class="flex-grow">
+                        <div [matTooltip]="_experiment?.project?.Project?.name">
+                            <mat-form-field class="full-width">
+                                <mat-select [(value)]="_experiment.idProject"
+                                            [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"
+                                            (change)="onChange_project($event)">
+                                    <mat-option *ngFor="let project of projectsDictionary" [value]="project.idProject">
+                                        {{ project.name }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Name
+                    </div>
+                    <div class="flex-grow">
+                        {{ _experiment?.name }}
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="full-height label label-width">
+                        Experiment
+                    </div>
+                    <div class="flex-grow">
+                        <div class="full-width">
+                            {{ requestCategoryName }}
+                        </div>
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="full-height label label-width">
+                        Experiment Type
+                    </div>
+                    <div class="flex-grow">
+                        <div class="full-width">
+                            <div [matTooltip]="_experiment?.application?.Application?.display">
+                                <mat-form-field class="full-width">
+                                    <mat-select
+                                            [(value)]="_experiment.codeApplication"
+                                            [disabled]="!(isAdmin || (_experiment.canUpdate === 'Y' && _experiment.isExternal =='Y'))"
+                                            (change)="onChange_application($event)" >
+                                        <mat-option [value]="">
+                                            {{ '' }}
+                                        </mat-option>
+                                        <mat-option *ngFor="let application of filteredApplicationDictionary" [value]="application.value">
+                                            {{ application.display }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Organism
+                    </div>
+                    <div class="flex-grow">
+                        {{ _experiment?.organismName }}
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        {{ isExternal ? 'Registered on' : 'Submitted on' }}
+                    </div>
+                    <div class="flex-grow">
+                        {{ _experiment?.createDate }}
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Last modified
+                    </div>
+                    <div class="flex-grow">
+                        {{ _experiment?.lastModifyDate }}
+                    </div>
+                </div>
+                <div *ngIf="!isExternal" class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Completed
+                    </div>
+                    <div class="flex-grow">
+                        {{ _experiment?.completedDate }}
+                    </div>
+                </div>
+            </div>
+            <div class="full-width horizontal-spacing">
+            </div>
+            <div class="flex-container-col">
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Owned by
+                    </div>
+                    <div class="flex-grow">
+                        <div [matTooltip]="_experiment?.ownerName">
+                            <mat-form-field class="full-width">
+                                <mat-select
+                                        [(value)]="_experiment.idAppUser"
+                                        (change)="onChange_owner($event)"
+                                        [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')">
+                                    <mat-option [value]="">
+                                        {{ '' }}
+                                    </mat-option>
+                                    <mat-option *ngFor="let appUser of possibleOwnersForLabDictionary" [value]="appUser.idAppUser">
+                                        {{ appUser.displayName }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        {{ isExternal ? 'Registered by' : 'Submitted by' }}
+                    </div>
+                    <div class="flex-grow">
+                        <div [matTooltip]="_experiment?.submitterName">
+                            <mat-form-field class="full-width">
+                                <mat-select
+                                        [(value)]="_experiment.idSubmitter"
+                                        (change)="onChange_submitter($event)"
+                                        [disabled]="!isAdmin">
+                                    <mat-option [value]="">
+                                        {{ '' }}
+                                    </mat-option>
+                                    <mat-option *ngFor="let appUser of possibleSubmittersForLabDictionary" [value]="appUser.idAppUser">
+                                        {{ appUser.displayName }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="_experiment?.email" class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Email
+                    </div>
+                    <div class="flex-grow">
+                        {{ _experiment?.email }}
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Phone
+                    </div>
+                    <div class="flex-grow">
+                        {{ _experiment?.phone }}
+                    </div>
+                </div>
+                <div class="field-width align-center flex-container-row padded">
+                    <div class="label label-width">
+                        Institution
+                    </div>
+                    <div class="flex-grow">
+                        {{ institutionName }}
+                    </div>
+                </div>
+                <div class="field-width flex-container-row padded">
+                    <div class="label label-width">
+                        Visibility
+                    </div>
+                    <div class="flex-grow flex-container-row align-center">
+                        <mat-radio-group class="flex-container-col"  [(value)]="_experiment.codeVisibility" (change)="onUpdateVisibility($event)" >
+                            <mat-radio-button
+                                    *ngFor="let rad of visibilityOptions"
+                                    [value]="rad.value"
+                                    [matTooltip]="rad.tooltip">
+                                <img [src]="rad.icon">
+                                {{ rad.display }}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        <div class="full-height horizontal-spacing">
+                        </div>
+                        <div *ngIf="isPrivacyExpSupported && _experiment.codeVisibility !== 'PUBLIC'" class="flex-grow">
+                            <mat-form-field class="short-input"
+                                            matTooltip="Date of Public Visibility &#13;(Visibility automatically changes to public on this date)">
+                                <input matInput
+                                       [(value)]="privacyExp"
+                                       placeholder="Privacy Expiration"
+                                       [matDatepicker]="privacyPicker"
+                                       [min]="this.today">
+                                <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
+                                <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-width flex-container-row padded">
+                    <div class="label label-width padded">
+                        <button mat-button
+                                class="label underline minimize limit-width"
+                                style="padding-left: 0;"
+                                [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"
+                                (click)="onClickCollaborators()">
+                            Collaborators
+                        </button>
+                    </div>
+                    <div class="flex-grow flex-container-col multi-line max-height padded">
+                        {{ currentCollaboratorsDisplay }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="full-width max-width bordered padded margin-top-bottom">
+            <div class="label">
+                Order Status
+            </div>
+            <div class="full-width flex-container-col tiny-font">
+                <div class="full-width flex-container-row align-center margin-top">
+                    <div *ngFor="let step of processedWorkflowSteps" class="flex-grow text-center {{ step.found ? ' highlight ' : ' '}}">
+                        {{ step.name }}
+                    </div>
+                    <div class="minor-label minor-label-width"></div>
+                </div>
+                <div *ngFor="let progress of progresses" class="full-width flex-container-row align-center margin-top">
+                    <div class="full-height flex-grow bordered flex-container-row">
+                        <div *ngFor="let display of progress.displayArray" class="full-height flex-grow gnomex-progress-bar">
+                        </div>
+                        <div *ngFor="let undisplay of progress.undisplayArray" class="full-height flex-grow">
+                        </div>
+                    </div>
+                    <div class="minor-label minor-label-width padded align-right">
+                        {{ progress.title }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="_experiment?.libPrepCompletedBy" class="field-width flex-container-row align-center padded">
+            <div class="label">
+                Library Prep Completed by: {{ _experiment?.libPrepCompletedBy }}
+            </div>
+        </div>
+        <div *ngIf="_experiment?.reagent" class="field-width flex-container-row align-center padded">
+            <div class="label label-width">
+                Sample Reagent
+            </div>
+            <div class="flex-grow">
+                {{ _experiment?.reagent }}
+            </div>
+        </div>
+        <div *ngIf="_experiment?.elutionBuffer" class="field-width flex-container-row align-center padded">
+            <div class="label label-width">
+                Elution Buffer
+            </div>
+            <div class="flex-grow">
+                {{ _experiment?.elutionBuffer }}
+            </div>
+        </div>
+        <div *ngIf="_experiment?.usedDnase === 'Y'" class="field-width flex-container-row align-center padded">
+            <div class="label">
+                Samples were treated with DNase
+            </div>
+        </div>
+        <div *ngIf="_experiment?.usedRnase === 'Y'" class="field-width flex-container-row align-center padded">
+            <div class="label">
+                Samples were treated with RNase
+            </div>
+        </div>
+        <div *ngIf="_experiment?.keepSamples" class="field-width flex-container-row align-center padded">
+            <div class="label">
+                {{ _experiment?.keepSamples === 'Y' ? 'Lab has requested to pick up samples' : 'Lab has declined to pick up samples' }}
+            </div>
+        </div>
+    </div>
+</div>

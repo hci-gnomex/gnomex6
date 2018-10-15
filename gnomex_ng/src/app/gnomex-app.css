@@ -189,6 +189,40 @@ img.icon {
 .ellipsis {
   text-overflow: ellipsis;
 }
+.no-padding {
+  padding: 0;
+}
+.no-margin {
+  margin: 0;
+}
+
+.padded { padding: 0.3em; }
+
+.padded-left   { padding-left:   0.3em; }
+.padded-right  { padding-right:  0.3em; }
+.padded-top    { padding-top:    0.3em; }
+.padded-bottom { padding-bottom: 0.3em; }
+
+.padded-left-right {
+  padding-left:  0.3em;
+  padding-right: 0.3em;
+}
+.padded-top-bottom {
+  padding-top:    0.3em;
+  padding-bottom: 0.3em;
+}
+
+.padded-left-right-top {
+  padding-top:   0.3em;
+  padding-left:  0.3em;
+  padding-right: 0.3em;
+}
+.padded-left-right-bottom {
+  padding-left:   0.3em;
+  padding-right:  0.3em;
+  padding-bottom: 0.3em;
+}
+
 .warningLabelMinor
 {
   color: #17871C;
@@ -206,7 +240,6 @@ button.mat-button.minimize      { min-width: 0; }
 button.mat-button.minimize span { min-width: 0; }
 
 .dialog-header-colors{
-
   background-color: #84b278;
   color: white;
 }

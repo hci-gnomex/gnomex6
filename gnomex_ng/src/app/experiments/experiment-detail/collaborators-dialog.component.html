@@ -1,0 +1,56 @@
+<div class="full-height full-width flex-container-col">
+    <div mat-dialog-title class="dialog-header-colors no-padding no-margin">
+        <div class="full-width full-height padded title-size">
+            Edit Collaborators allowed to access this Experiment
+        </div>
+    </div>
+    <div mat-dialog-content class="flex-grow no-padding no-margin">
+        <div class="full-width full-height flex-container-col padded">
+            <div class="full-width flex-container-row align-center">
+                <mat-form-field class="flex-grow">
+                    <mat-select
+                            placeholder="Possible Collaborator to Add"
+                            [compareWith]="compareByID"
+                            (selectionChange)="collaboratorDropdownChange($event)">
+                        <mat-option></mat-option>
+                        <mat-option *ngFor="let collab of filteredPossibleCollaborators" [value]="collab" >
+                            {{ collab.displayName }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button mat-button [disabled]="!enableAdd" type="button" (click)="addCollaborator()">
+                    <img *ngIf=" enableAdd" [src]="this.constantsService.ICON_ADD">
+                    <img *ngIf="!enableAdd" [src]="this.constantsService.ICON_ADD_DISABLE">
+                    Add
+                </button>
+                <!--<button mat-button [disabled]="selectedCollaboratorRow.length < 1" type="button" (click)="removeCollaborator()">-->
+                    <!--<img *ngIf="selectedCollaboratorRow.length >= 1" [src]="this.constantsService.ICON_DELETE">-->
+                    <!--<img *ngIf="selectedCollaboratorRow.length  < 1" [src]="this.constantsService.ICON_DELETE_DISABLE">-->
+                    <!--Remove-->
+                <!--</button>-->
+            </div>
+            <div *ngIf="showCollaboratorBlock" class="full-width flex-grow padded-top">
+                <div #oneEmWidth class="no-height single-em"></div>
+                <ag-grid-angular class="ag-fresh full-width full-height"
+                                 [context]="context"
+                                 [rowSelection]="'single'"
+                                 [rowDeselection]="true"
+                                 (gridReady)="onCollabGridReady($event)"
+                                 (gridSizeChanged)="onGridSizeChanged()">
+                </ag-grid-angular>
+            </div>
+        </div>
+    </div>
+    <div mat-dialog-actions class="no-padding no-margin">
+        <div class="full-width right-align flex-container-row padded">
+            <div class="full-height flex-grow">
+            </div>
+            <div class="padded-right">
+                <button mat-button (click)="onClickOkay()">Ok</button>
+            </div>
+            <div>
+                <button mat-button mat-dialog-close>Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
