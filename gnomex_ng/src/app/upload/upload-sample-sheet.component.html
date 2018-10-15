@@ -1,0 +1,84 @@
+<div class="full-height full-width flex-container-col">
+    <div mat-dialog-title class="full-width no-margin title">
+        <div class="padded">
+            Upload Sample Sheet
+        </div>
+    </div>
+    <div mat-dialog-content class="full-width flex-grow no-margin no-max-height background padded">
+        <div class="full-width full-height bordered foreground small-font">
+            <div *ngIf="!fileParsed" class="full-height full-width flex-container-row align-center">
+                <div class="full-height flex-grow">
+                </div>
+                <div>
+                    <input type="file" class="hidden" (change)="onFileSelected($event)" #fileInput>
+                    <button mat-raised-button (click)="openFileChooser()">Upload</button>
+                </div>
+                <div class="full-height flex-grow">
+                </div>
+            </div>
+            <div *ngIf="fileParsed && !reportResults" class="full-width full-height flex-container-col">
+                <div class="full-width flex-container-row align-center tiny-font padded-left-right-bottom">
+                    <div class="flex-grow flex-container-row align-center">
+                        <mat-checkbox [(ngModel)]="firstRowIsColumnHeadings" class="checkbox-margin-evener"></mat-checkbox>
+                        <div>
+                            First row contains column headings
+                        </div>
+                    </div>
+                    <div class="flex-container-row align-center">
+                        <mat-checkbox [(ngModel)]="appendSamples" class="checkbox-margin-evener"></mat-checkbox>
+                        <div>
+                            Append these samples to the samples in the grid
+                        </div>
+                    </div>
+                </div>
+                <div class="full-width padded-left-right-bottom small-font">
+                    Please indicate which sample sheet column corresponds to each field. It is not
+                    necessary to select a field for a column you do not wish to populate.
+                </div>
+                <div class="full-width flex-grow padded-left-right-bottom">
+                    <ag-grid-angular
+                            class="ag-fresh small-font full-width full-height"
+                            [context]="context"
+                            [singleClickEdit]="true"
+                            [rowSelection]="'single'"
+                            (gridSizeChanged)="onGridSizeChanged($event)"
+                            (gridReady)="onGridReady($event)">
+                    </ag-grid-angular>
+                </div>
+                <div class="full-width flex-container-row align-center padded-left-right-bottom">
+                    <div class="flex-grow">
+                        <button mat-button class="link-button" (click)="onFieldFormats()">
+                            (Field formats)
+                        </button>
+                    </div>
+                    <div>
+                        <button mat-raised-button (click)="onPopulateFields()">
+                            Populate Fields
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="fileParsed && reportResults" class="full-width full-height flex-container-col small-font">
+                <div class="full-width padded">
+                    Errors Detected. Upload Results:
+                </div>
+                <div class="full-width flex-grow padded-left-right-bottom">
+                    <div class="full-width full-height padded bordered">
+                        <pre>{{reportText}}</pre>
+                    </div>
+                </div>
+                <div class="full-width flex-container-row align-center padded-left-right-bottom">
+                    <div class="full-height flex-grow">
+                    </div>
+                    <div class="full-height">
+                        <button mat-raised-button mat-dialog-close>
+                            Done
+                        </button>
+                    </div>
+                    <div class="full-height flex-grow">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

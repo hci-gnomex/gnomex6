@@ -12,9 +12,11 @@ import { MatDialogRef } from '@angular/material';
     `]
 }) export class YesNoDialogComponent {
 
+    public title: string = '';
     public message: string = '';
     public parent: any = null;
     public onYesFunctionName: string = '';
+    public onNoFunctionName: string = '';
     public lines: string[] = null;
 
     constructor(public dialogRef: MatDialogRef<YesNoDialogComponent>) { }
@@ -28,6 +30,10 @@ import { MatDialogRef } from '@angular/material';
     }
 
     onClickNo(): void {
+        if (this.parent && this.onNoFunctionName && this.onNoFunctionName !== '') {
+            this.parent[this.onNoFunctionName]();
+        }
+
         this.dialogRef.close(false);
     }
 }

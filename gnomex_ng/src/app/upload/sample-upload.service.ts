@@ -15,12 +15,60 @@ export class SampleUploadService {
     private sampleUpload_URL: string = null;
     private bulkSampleUpload_URL: string = null;
 
+    private hasSampleUploadURLSubject: Subject<any>;
+
+
+    private uploadSampleSheetSubject: Subject<any>;
+
     private bulkUploadSubject: Subject<any>;
     private bulkUploadImportedSubject: Subject<any>;
 
 
-    constructor(private http: Http, private cookieUtilService: CookieUtilService) { }
+    constructor(private http: Http, private cookieUtilService: CookieUtilService) {
+        this.hasSampleUploadURLSubject = new Subject();
+    }
 
+
+    private getSampleUpload_URL(): void {
+        this.http.get(SampleUploadService.getUploadSampleSheetURL_URL, {}).subscribe((response: any) => {
+            if (response) {
+                this.sampleUpload_URL = '' + response.json().url;
+
+                this.hasSampleUploadURLSubject.next(this.sampleUpload_URL);
+                this.hasSampleUploadURLSubject.unsubscribe();
+            }
+        });
+    }
+
+    public uploadSampleSheet(formData): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+
+        if (!this.sampleUpload_URL) {
+            // try again once we actually do have it.
+            this.hasSampleUploadURLSubject.subscribe(() => {
+                this.uploadSampleSheet(formData);
+            });
+
+            this.getSampleUpload_URL();
+        } else {
+            this.cookieUtilService.formatXSRFCookie();
+
+            this.http.post("/gnomex/UploadSampleSheetFileServlet.gx", formData).subscribe((response: any) => {
+                if (response && response.status === 200) {
+                    let result = response.json();
+                    this.uploadSampleSheetSubject.next(result);
+                } else {
+                    this.uploadSampleSheetSubject.next(null);
+                }
+            });
+        }
+
+        if (!this.uploadSampleSheetSubject) {
+            this.uploadSampleSheetSubject = new Subject();
+        }
+
+        return this.uploadSampleSheetSubject.asObservable();
+    }
 
     public uploadBulkSampleSheet(params: any): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
@@ -33,7 +81,6 @@ export class SampleUploadService {
 
                 this.http.post('/gnomex/UploadMultiRequestSampleSheetFileServlet.gx', params).subscribe((response: any) => {
                     if (response && response.status === 200) {
-                        // this.bulkUploadSubject.next(true);
                         this.bulkUploadSubject.next(response.json());
                     } else {
                         this.bulkUploadSubject.next(null);

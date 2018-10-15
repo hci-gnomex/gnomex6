@@ -22,7 +22,7 @@ export class DialogsService {
 
     constructor(private dialog: MatDialog) { }
 
-    public alert(message: string): Observable<boolean> {
+    public alert(message: string, title?: string): Observable<boolean> {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '20em';
 
@@ -30,6 +30,7 @@ export class DialogsService {
 
         dialogRef = this.dialog.open(AlertDialogComponent, configuration);
         dialogRef.componentInstance.message = message;
+        dialogRef.componentInstance.title = title;
 
         return dialogRef.afterClosed();
     }
@@ -61,7 +62,7 @@ export class DialogsService {
         return dialogRef.afterClosed();
     }
 
-    public yesNoDialog(message: string|string[], parent: any, onYesFunctionName: string): Observable<boolean> {
+    public yesNoDialog(message: string|string[], parent: any, onYesFunctionName: string, onNoFunctionName?: string, title?: string): Observable<boolean> {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '20em';
 
@@ -73,8 +74,10 @@ export class DialogsService {
         } else {
             dialogRef.componentInstance.message = message;
         }
+        dialogRef.componentInstance.title = title;
         dialogRef.componentInstance.parent = parent;
         dialogRef.componentInstance.onYesFunctionName = onYesFunctionName;
+        dialogRef.componentInstance.onNoFunctionName = onNoFunctionName;
 
         return dialogRef.afterClosed();
     }

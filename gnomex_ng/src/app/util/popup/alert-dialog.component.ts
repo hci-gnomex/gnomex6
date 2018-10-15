@@ -13,6 +13,7 @@ import { MatDialogRef } from '@angular/material';
 }) export class AlertDialogComponent {
 
     public message: string = '';
+    public title: string = '';
 
     constructor(public dialogRef: MatDialogRef<AlertDialogComponent>) { }
 

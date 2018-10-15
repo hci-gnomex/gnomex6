@@ -1,0 +1,40 @@
+<div class="full-height full-width flex-container-col">
+    <div mat-dialog-title class="full-width no-margin title">
+        <div class="padded">
+            Sample Sheet Column Formats
+        </div>
+    </div>
+    <div mat-dialog-content class="full-width flex-grow no-margin no-max-height background padded">
+        <div class="full-height full-width foreground padded bordered">
+            <pre><b><u>Field Type</u></b>           <b><u>Spreadsheet Column Format</u></b>                   <b><u>Example</u></b>
+
+Text                 Text with correct format (e.g. don't        SS07-041 (e.g Sample name field)
+                     enter letters in a number column)           162.25   (e.g. Conc. field)
+
+Checkbox             Y, N, or blank                              N
+
+URL                  url, [alias] separated by |                 www.huntsmancancer.org,hci|www.amazon.com|www.msn.com,Microsoft
+                     ([alias] is optional)
+
+Dropdown             The text should exactly match the           standard
+(single selection)   dropdown item to be selected
+
+Dropdown             Exact text of each item to be               blue, hazel
+(mult. selection)    selected, separated by commas
+
+Label                cy3 or cy5                                  cy5
+(2-color Microarray)</pre>
+        </div>
+    </div>
+    <div mat-dialog-actions class="full-width flex-container-row no-margin background padded-left-right-bottom">
+        <div class="full-height flex-grow">
+        </div>
+        <div class="full-height">
+            <button mat-button mat-dialog-close>
+                Ok
+            </button>
+        </div>
+        <div class="full-height flex-grow">
+        </div>
+    </div>
+</div>

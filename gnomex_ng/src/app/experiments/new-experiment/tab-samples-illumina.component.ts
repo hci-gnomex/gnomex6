@@ -10,6 +10,8 @@ import {SamplesService} from "../../services/samples.service";
 import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {GnomexService} from "../../services/gnomex.service";
+import {MatDialog, MatDialogConfig} from "@angular/material";
+import {UploadSampleSheetComponent} from "../../upload/upload-sample-sheet.component";
 
 @Component({
     selector: "tabSamplesView",
@@ -46,6 +48,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 private constService: ConstantsService,
                 private gnomexService: GnomexService,
                 private fb: FormBuilder,
+                private dialog: MatDialog,
                 private samplesService: SamplesService,
                 private newExperimentService: NewExperimentService) {
         this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
@@ -233,4 +236,44 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     }
 
+    upload(): void {
+        let data = {
+            sampleColumns: this.newExperimentService.samplesGridColumnDefs,
+            rowData: this.newExperimentService.samplesGridRowData
+        };
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = '60em';
+        config.height = '45em';
+        config.panelClass = 'no-padding-dialog';
+        config.data = data;
+
+        let dialogRef = this.dialog.open(UploadSampleSheetComponent, config);
+
+        dialogRef.afterClosed().subscribe((result) => {
+
+            // finish putting the new data into the grid
+            this.newExperimentService.samplesGridApi.refreshCells();
+            // this.newExperimentService.samplesGridApi.setRowData(result);
+
+            // TODO
+            //// This stuff needs to be handled when the result comes back.
+            //// Compare to UploadSampleSheetsView.mxml end of clickPopulateFieldsButtonAfterWarning()
+
+            // if (tabSamplesView.hasPlates() && samplesViewState != 'IScanState') {
+            //     tabSamplesView.fillPlates();
+            // }
+            // if ( samplesViewState == 'IScanState'){
+            //     tabSamplesView.initializeSamplesGrid();
+            // }
+            //
+            // tabSamplesView.propagateBarcode();
+            // sampleGridDataRows.refresh();
+            // if(sampleGroupingCollection != null) {
+            //     sampleGroupingCollection.refresh(false);
+            // }
+            //
+            // callLater(tabSamplesView.checkSamplesCompleteness);
+        });
+    }
 }
