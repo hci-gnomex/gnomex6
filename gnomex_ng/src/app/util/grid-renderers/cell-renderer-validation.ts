@@ -65,26 +65,15 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
         this.params = params;
         this.formBuilder = new FormBuilder();
 
-        this.createAllFormControls();
-
         if (this.params
             && this.params.node
-            && this.params.column
-            && this.params.column.colDef
-            && this.params.column.colDef.field) {
+            && this.params.node.gridApi
+            && !this.params.node.gridApi.formGroup) {
 
-            if (this.params.node.formGroup
-                && this.params.node.formGroup.controls) {
-                // In case of editing and re-creating renderers.
-                this.errorMessage = CellRendererValidation.updateErrorMessage(
-                    this.params.node.formGroup.controls[this.params.column.colDef.field + "_formControl"],
-                    this.params.node,
-                    this.params.column.colDef
-                );
-            }
-
-            this.errorMessage = this.params.node[this.params.column.colDef.field + "_errorMessage"];
+            this.createAllFormControls();
         }
+
+        this.getExistingErrorMessage();
 
         this.agInit2(params);
     }
@@ -96,8 +85,7 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
         return false;
     }
 
-    // This function iterates over every cell in the grid and prepares all their needed formGroups and formControls
-    // After the first run, further calls should do nothing because the grid's formGroup is defined.
+    // This function iterates over every cell in the grid and prepares all their needed formGroups and formControls.
     //
     // This was done this way (in the cell renderer) for three reasons :
     //   1. We need to wait until the column and row data have been provided to the grid
@@ -117,44 +105,56 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
             && this.params.node.gridApi
             && this.params.node.gridApi.getModel()) {
 
+            if (this.params.node.gridApi.gridOptionsWrapper
+                && this.params.node.gridApi.gridOptionsWrapper.gridOptions
+                && !this.params.node.gridApi.gridOptionsWrapper.gridOptions._eventsChangedByCellRendererValidation) {
+
+                this.changeGridOptionsEvents();
+
+                this.params.node.gridApi.gridOptionsWrapper.gridOptions._eventsChangedByCellRendererValidation = true;
+            }
+
             let allNodes = this.params.node.gridApi.getModel().rowsToDisplay;
             let columns: any[];
 
             if (!this.params.node.gridApi.formGroup
                 || (this.params.node.gridApi.formGroup
                     && this.params.node.gridApi.formGroup.controls
-                    && this.params.node.gridApi.formGroup.controls.length != allNodes.length
-                )) {
+                    && this.params.node.gridApi.formGroup.controls.length != allNodes.length)) {
+
                 this.params.node.gridApi.formGroup = new FormGroup({});
             }
 
             if (this.params && this.params.columnApi && this.params.columnApi.columnController) {
-                columns = this.params.columnApi.columnController.gridColumns;
+                columns = this.params.columnApi.columnController.gridColumns.filter((column) => {
+                    return column.colDef
+                        && column.colDef.field
+                        && (column.colDef.validators || column.colDef.setErrors);
+                });
             }
 
             for (let node of allNodes) {
-
-                if (!node.formGroup) {
-                    node.formGroup = new FormGroup({});
-                }
-
                 for (let column of columns) {
-                    if (column.colDef && column.colDef.field) {
-
+                    if (column.colDef
+                        && column.colDef.field
+                        && (column.colDef.validators || column.colDef.setErrors)) {
                         node[column.colDef.field + "_errorMessage"] = '';
 
                         let formControl: FormControl = new FormControl(column.colDef.field + '_formControl', []);
-                        node.formGroup.addControl(column.colDef.field + '_formControl', formControl);
 
-                        if (column.colDef.validators) {
-                            if (!Array.isArray(column.colDef.validators)) {
-                                column.colDef.validators = [column.colDef.validators];
-                            }
-
-                            formControl.setValidators(column.colDef.validators);
+                        if (!node.formGroup) {
+                            node.formGroup = new FormGroup({});
                         }
 
-                        CellRendererValidation.updateErrorMessage(formControl, node, column.colDef);
+                        node.formGroup.addControl(column.colDef.field + '_formControl', formControl);
+
+                        if (!Array.isArray(column.colDef.validators)) {
+                            column.colDef.validators = [column.colDef.validators];
+                        }
+
+                        formControl.setValidators(column.colDef.validators);
+
+                        this.updateErrorMessage(formControl, node, column.colDef);
                     }
                 }
 
@@ -165,14 +165,76 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
         }
     }
 
-    static refreshFormControlValue(formControl: FormControl, data: any, fieldName: string): void {
+    private changeGridOptionsEvents(): void {
+        if (!this.params
+            || !this.params.node
+            || !this.params.node.gridApi
+            || !this.params.node.gridApi.gridOptionsWrapper
+            || !this.params.node.gridApi.gridOptionsWrapper.gridOptions) {
+            return;
+        }
+
+        if (this.params.node.gridApi.gridOptionsWrapper.gridOptions.onRowDataChanged) {
+            this.params.node.gridApi.gridOptionsWrapper.gridOptions.onRowDataChanged2 = this.params.node.gridApi.gridOptionsWrapper.gridOptions.onRowDataChanged;
+        }
+
+        this.params.node.gridApi.gridOptionsWrapper.gridOptions.onRowDataChanged = ((event: any) => {
+            this.createAllFormControls();
+
+            let getCellRendererParams: any = { rowNodes: this.params.node.gridApi.getRenderedNodes() };
+
+            for (let cellRenderer of this.params.node.gridApi.getCellRendererInstances(getCellRendererParams)) {
+                if (cellRenderer._agAwareComponent && cellRenderer._agAwareComponent.getExistingErrorMessage) {
+                    cellRenderer._agAwareComponent.getExistingErrorMessage();
+                }
+            }
+
+            if (this.params.node.gridApi.gridOptionsWrapper.gridOptions.onRowDataChanged2) {
+                this.params.node.gridApi.gridOptionsWrapper.gridOptions.onRowDataChanged2(event);
+            }
+        });
+
+
+        if (this.params.node.gridApi.gridOptionsWrapper.gridOptions.onGridColumnsChanged) {
+            this.params.node.gridApi.gridOptionsWrapper.gridOptions.onGridColumnsChanged2 = this.params.node.gridApi.gridOptionsWrapper.gridOptions.onGridColumnsChanged;
+        }
+
+        this.params.node.gridApi.gridOptionsWrapper.gridOptions.onGridColumnsChanged = ((event: any) => {
+            this.createAllFormControls();
+
+            let getCellRendererParams: any = { rowNodes: this.params.node.gridApi.getRenderedNodes() };
+
+            for (let cellRenderer of this.params.node.gridApi.getCellRendererInstances(getCellRendererParams)) {
+                if (cellRenderer._agAwareComponent && cellRenderer._agAwareComponent.getExistingErrorMessage) {
+                    cellRenderer._agAwareComponent.getExistingErrorMessage();
+                }
+            }
+
+            if (this.params.node.gridApi.gridOptionsWrapper.gridOptions.onGridColumnsChanged2) {
+                this.params.node.gridApi.gridOptionsWrapper.gridOptions.onGridColumnsChanged2(event);
+            }
+        });
+    }
+
+    private getExistingErrorMessage(): void {
+        if (this.params
+            && this.params.node
+            && this.params.column
+            && this.params.column.colDef
+            && this.params.column.colDef.field) {
+
+            this.errorMessage = this.params.node[this.params.column.colDef.field + "_errorMessage"];
+        }
+    }
+
+    private refreshFormControlValue(formControl: FormControl, data: any, fieldName: string): void {
         if (formControl && data && fieldName && data[fieldName] !== undefined) {
             formControl.setValue(data[fieldName]);
             formControl.updateValueAndValidity();
         }
     }
 
-    static updateErrorMessage(formControl: FormControl, node: any, columnDefinition: any): string {
+    private updateErrorMessage(formControl: FormControl, node: any, columnDefinition: any): string {
         if (!formControl || !node || !columnDefinition) {
             return '';
         }
@@ -190,15 +252,17 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
             );
         }
 
-        CellRendererValidation.refreshFormControlValue(formControl, node.data, columnDefinition.field);
+        let errorMessageName: string = columnDefinition.field + "_errorMessage";
 
-        node[columnDefinition.field + "_errorMessage"] = '';
+        this.refreshFormControlValue(formControl, node.data, columnDefinition.field);
+
+        node[errorMessageName] = '';
 
         if (formControl.invalid || (customErrorMessage && customErrorMessage !== '')) {
             if (columnDefinition.errorMessageHeader) {
-                node[columnDefinition.field + "_errorMessage"] += '' + columnDefinition.errorMessageHeader + '\n';
+                node[errorMessageName] += '' + columnDefinition.errorMessageHeader + '\n';
             } else {
-                node[columnDefinition.field + "_errorMessage"] +=
+                node[errorMessageName] +=
                     'Invalid value "' + node.data[columnDefinition.field] + '" for field (' + columnDefinition.field + ')\n';
             }
         }
@@ -211,15 +275,15 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
             for (let errorNameErrorMessagePair of columnDefinition.errorNameErrorMessageMap) {
                 if (!!errorNameErrorMessagePair.errorName && !!errorNameErrorMessagePair.errorMessage) {
                     if (formControl.hasError(errorNameErrorMessagePair.errorName)) {
-                        node[columnDefinition.field + "_errorMessage"] += errorNameErrorMessagePair.errorMessage +'\n';
+                        node[errorMessageName] += errorNameErrorMessagePair.errorMessage +'\n';
                     }
                 }
             }
         }
 
-        node[columnDefinition.field + "_errorMessage"] += customErrorMessage;
+        node[errorMessageName] += customErrorMessage;
 
-        return node[columnDefinition.field + "_errorMessage"];
+        return node[errorMessageName];
     }
 
 }
