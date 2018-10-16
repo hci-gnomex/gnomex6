@@ -183,6 +183,12 @@ div.mainnav {
 .justify-space-between {
   justify-content: space-between;
 }
+.justify-flex-end {
+  justify-content: flex-end;
+}
+.underlined {
+  text-decoration: underline !important;
+}
 img.icon {
   margin-right: 0.5em;
 }

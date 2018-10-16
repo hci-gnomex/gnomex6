@@ -14,6 +14,7 @@ import {UtilModule} from "../../util/util.module";
 import {RelatedDataModule} from "../../util/related-data.module";
 import {AngularSplitModule} from "angular-split";
 import {TreeModule} from "angular-tree-component";
+import {AnalysisInfoTabComponent} from "./analysis-info-tab.component";
 
 
 
@@ -33,7 +34,8 @@ import {TreeModule} from "angular-tree-component";
     declarations: [
         AnalysisDetailOverviewComponent,
         AnalysisExperimentTabComponent,
-        LinkToExperimentDialogComponent
+        LinkToExperimentDialogComponent,
+        AnalysisInfoTabComponent,
     ],
     providers: [],
     entryComponents: [LinkToExperimentDialogComponent],

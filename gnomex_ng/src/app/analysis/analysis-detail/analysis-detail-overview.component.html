@@ -15,6 +15,9 @@
 
     <div style="display:flex; flex: 9">
         <mat-tab-group class="mat-tab-group-border"  (selectedTabChange)="tabChanged($event)">
+            <mat-tab label="Info">
+                <analysis-info-tab></analysis-info-tab>
+            </mat-tab>
             <mat-tab label="Annotations">
                 <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.ANALYSIS"> </annotation-tab>
             </mat-tab>

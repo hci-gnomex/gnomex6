@@ -13,9 +13,9 @@ import {BillingFilterEvent} from "../billing/billing-filter.component";
 export class BillingService {
 
     private lastBillingViewChangeForCoreCommentsWindowEvent: BillingViewChangeForCoreCommentsWindowEvent;
-    @Output() public billingViewChangeForCoreCommentsWindow: EventEmitter<BillingViewChangeForCoreCommentsWindowEvent> = new EventEmitter<BillingViewChangeForCoreCommentsWindowEvent>();
-    @Output() public requestSelectedFromCoreCommentsWindow: EventEmitter<string> = new EventEmitter<string>();
-    @Output() public refreshBillingScreenRequest: EventEmitter<any> = new EventEmitter<any>();
+    public billingViewChangeForCoreCommentsWindow: EventEmitter<BillingViewChangeForCoreCommentsWindowEvent> = new EventEmitter<BillingViewChangeForCoreCommentsWindowEvent>();
+    public requestSelectedFromCoreCommentsWindow: EventEmitter<string> = new EventEmitter<string>();
+    public refreshBillingScreenRequest: EventEmitter<any> = new EventEmitter<any>();
 
     constructor(private http: Http,
                 private httpClient: HttpClient,
