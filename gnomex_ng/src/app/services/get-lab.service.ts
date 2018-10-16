@@ -73,6 +73,10 @@ export class GetLabService {
         });
     }
 
+    public getLabNew(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetLab.gx", {params: params});
+    }
+
     deleteLab(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/DeleteLab.gx", {search: params}).map((response: Response) => {
             if (response.status === 200) {
