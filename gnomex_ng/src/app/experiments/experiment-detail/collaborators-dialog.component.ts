@@ -34,7 +34,8 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
     public currentCollaborators:  any[] = [];
     public possibleCollaborators: any[] = [];
     public filteredPossibleCollaborators: any[] = [];
-    public idRequest: string = '';
+    public idFieldValue: string = '';
+    public idField: string = '';
 
     public showCollaboratorBlock: boolean = true;
 
@@ -89,9 +90,12 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
     constructor(public constantsService: ConstantsService,
                 private dialogRef: MatDialogRef<CollaboratorsDialogComponent>,
                 @Inject(MAT_DIALOG_DATA) private data) {
-        if (!this.data || !this.data.possibleCollaborators || !this.data.idRequest || !Array.isArray(this.data.possibleCollaborators)) {
+        if (!this.data || !this.data.possibleCollaborators || !this.data.idFieldValue || !this.data.idField || !Array.isArray(this.data.possibleCollaborators)) {
             this.dialogRef.close();
         }
+
+        this.idFieldValue = this.data.idFieldValue;
+        this.idField = this.data.idField;
 
         this.currentCollaborators  = [];
 
@@ -101,15 +105,14 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
                 canUploadData: '' + collaborator.canUploadData,
                 displayName:   '' + collaborator.displayName,
                 idAppUser:     '' + collaborator.idAppUser,
-                idRequest:     '' + collaborator.idRequest,
                 buttonName:    'Remove'
             };
+            deepCopy[this.idField] = '' + collaborator[this.idField];
 
             this.currentCollaborators.push(deepCopy);
         }
 
         this.possibleCollaborators = this.data.possibleCollaborators;
-        this.idRequest = this.data.idRequest;
 
         this.filterPossibleCollaborators();
     }
@@ -153,9 +156,9 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
                 canUploadData: "N",
                 displayName: this.collaboratorToAdd.displayName,
                 idAppUser: this.collaboratorToAdd.idAppUser,
-                idRequest: this.idRequest,
                 buttonName: 'Remove'
             };
+            newEntry[this.idField] = this.idFieldValue;
 
             this.currentCollaborators.push(newEntry);
 
@@ -204,9 +207,9 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
                 canUploadData: '' + collaborator.canUploadData,
                 displayName:   '' + collaborator.displayName,
                 idAppUser:     '' + collaborator.idAppUser,
-                idRequest:     '' + collaborator.idRequest,
                 buttonName:    'Remove'
             };
+            deepCopy[this.idField] = '' + collaborator[this.idField];
 
             returnedCollaborators.push(deepCopy);
         }

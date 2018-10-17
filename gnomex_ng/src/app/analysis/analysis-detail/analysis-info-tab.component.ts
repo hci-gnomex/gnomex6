@@ -13,6 +13,7 @@ import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {BrowseDictionaryComponent} from "../../configuration/browse-dictionary.component";
 import {ConfigureOrganismsComponent} from "../../configuration/configure-organisms.component";
 import {PropertyService} from "../../services/property.service";
+import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/collaborators-dialog.component";
 
 @Component({
     selector: 'analysis-info-tab',
@@ -189,6 +190,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
     public institutionList: any[] = [];
 
     public form: FormGroup;
+    public lab: any = null;
 
     public today: Date = new Date();
 
@@ -291,7 +293,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
             this.form.controls['submitDate'].setValue(this.analysis.createDate);
             this.form.controls['visibility'].setValue(this.analysis.codeVisibility);
             this.form.controls['institution'].setValue(this.analysis.idInstitution ? this.analysis.idInstitution : "");
-            this.form.controls['collaborators'].setValue(this.analysis.collaborators? (Array.isArray(this.analysis.collaborators) ? this.analysis.collaborators : [this.analysis.collaborators.AnalysisCollaborator]) : []);
+            this.form.controls['collaborators'].setValue(this.analysis.collaborators ? (Array.isArray(this.analysis.collaborators) ? this.analysis.collaborators : [this.analysis.collaborators.AnalysisCollaborator]) : []);
             this.form.controls['genomeBuildToAdd'].setValue(null);
             this.form.controls['privacyExp'].setValue(this.analysis.privacyExpirationDate ? this.analysis.privacyExpirationDate : "");
             this.genomeBuildToRemove = null;
@@ -324,6 +326,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
                 this.form.controls['genomeBuildToAdd'].disable();
             }
 
+            this.lab = null;
             this.institutionList = [];
 
             let owner: any = {idAppUser: this.analysis.idAppUser, displayName: this.analysis.ownerName};
@@ -335,6 +338,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
                     .set("includeProductCounts", "N");
                 this.getLabService.getLabNew(params).subscribe((result: any) => {
                     if (result && result.Lab) {
+                        this.lab = result.Lab;
                         let list: any[] = Array.isArray(result.Lab.members) ? result.Lab.members : [result.Lab.members.AppUser];
                         let managers: any[] = Array.isArray(result.Lab.managers) ? result.Lab.managers : [result.Lab.managers.AppUser];
                         for (let manager of managers) {
@@ -453,7 +457,54 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
     }
 
     public openCollaboratorsWindow(): void {
-        // TODO integrate with new collaborators popup
+        if (this.form.controls['visibility'].disabled || this.form.controls['visibility'].value === 'PUBLIC') {
+            return;
+        }
+        if (!this.lab) {
+            let params: HttpParams = new HttpParams()
+                .set("idLab", this.analysis.idLab)
+                .set("includeBillingAccounts", "N")
+                .set("includeProductCounts", "N");
+            this.getLabService.getLabNew(params).subscribe((result: any) => {
+                if (result && result.Lab) {
+                    this.lab = result.Lab;
+                    this.openCollaboratorsWindow();
+                } else {
+                    let message: string = "";
+                    if (result && result.message) {
+                        message = ": " + result.message;
+                    }
+                    this.dialogsService.confirm("An error occurred while retrieving lab" + message, null);
+                }
+            });
+            return;
+        }
+
+        let possibleCollaborators: any[] = [];
+        if (this.form.controls['visibility'].value === 'MEM') {
+            possibleCollaborators = this.lab.membersCollaborators ? (Array.isArray(this.lab.membersCollaborators) ? this.lab.membersCollaborators : [this.lab.membersCollaborators.AppUser]) : [];
+        } else if (this.form.controls['visibility'].value === 'OWNER') {
+            possibleCollaborators = this.lab.possibleCollaborators ? (Array.isArray(this.lab.possibleCollaborators) ? this.lab.possibleCollaborators : [this.lab.possibleCollaborators.AppUser]) : [];
+        }
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.height = '33em';
+        config.width  = '44em';
+        config.panelClass = 'no-padding-dialog';
+
+        config.data = {
+            currentCollaborators:  this.form.controls['collaborators'].value,
+            possibleCollaborators:  possibleCollaborators,
+            idField: 'idAnalysis',
+            idFieldValue: this.analysis.idAnalysis
+        };
+
+        let dialogRef: MatDialogRef<CollaboratorsDialogComponent> = this.dialog.open(CollaboratorsDialogComponent, config);
+        dialogRef.afterClosed().subscribe((result: any[]) => {
+            if (result) {
+                this.form.controls['collaborators'].setValue(result);
+            }
+        });
     }
 
     ngOnDestroy() {
