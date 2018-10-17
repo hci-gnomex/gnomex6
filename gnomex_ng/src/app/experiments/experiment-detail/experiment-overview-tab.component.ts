@@ -469,9 +469,9 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
         let prepCollabsList: any[] = [];
 
         if (this._experiment.codeVisibility === 'MEM' && this.lab && this.lab.Lab) {
-            prepCollabsList = this.lab.Lab.membersCollaborators;
+            prepCollabsList = Array.isArray(this.lab.Lab.membersCollaborators) ? this.lab.Lab.membersCollaborators : [this.lab.Lab.membersCollaborators.AppUser];
         } else if (this._experiment.codeVisibility === 'OWNER' && this.lab && this.lab.Lab) {
-            prepCollabsList = this.lab.Lab.possibleCollaborators;
+            prepCollabsList = Array.isArray(this.lab.Lab.possibleCollaborators) ? this.lab.Lab.possibleCollaborators : [this.lab.Lab.possibleCollaborators.AppUser];
         }
 
         let configuration: MatDialogConfig = new MatDialogConfig();
@@ -482,7 +482,8 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
         configuration.data = {
             currentCollaborators:  this._experiment.collaborators,
             possibleCollaborators:  prepCollabsList,
-            idRequest: this._experiment.idRequest
+            idField: 'idRequest',
+            idFieldValue: this._experiment.idRequest
         };
 
         let collaboratorsDialogReference = this.matDialog.open(CollaboratorsDialogComponent, configuration);
