@@ -14,6 +14,7 @@ import {
     BillingTemplateWindowParams
 } from "../util/billing-template-window.component";
 import {BillingService} from "../services/billing.service";
+import {WorkAuthorizationTypeSelectorDialogComponent} from "./work-authorization-type-selector-dialog.component";
 
 @Component({
     selector: 'order-products',
@@ -274,7 +275,18 @@ export class OrderProductsComponent implements OnInit {
     }
 
     public showSubmitWorkAuthorization(): void {
-        // TODO
+        // TODO WorkAuthorizationTypeSelector
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width  = "40em";
+        configuration.height = "30em";
+        configuration.panelClass = 'no-padding-dialog';
+        configuration.data = { idLab: "" + this.idLab };
+
+        let dialogRef: MatDialogRef<WorkAuthorizationTypeSelectorDialogComponent> = this.dialog.open(WorkAuthorizationTypeSelectorDialogComponent, configuration);
+
+        dialogRef.afterClosed().subscribe(() => {
+            this.onLabChange();
+        });
     }
 
     public showSplitBilling(): void {

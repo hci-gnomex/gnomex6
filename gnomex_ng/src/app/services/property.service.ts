@@ -33,9 +33,11 @@ export class PropertyService {
     public static readonly PROPERTY_NEW_REQUEST_SAVE_BEFORE_SUBMIT:string =  "new_request_save_before_submit";
     public static readonly PROPERTY_INTERNAL_PRICE_LABEL:string = "internal_price_label";
     public static readonly PROPERTY_EXTERNAL_ACADEMIC_PRICE_LABEL:string = "external_academic_price_label";
-    public static readonly  PROPERTY_EXTERNAL_COMMERCIAL_PRICE_LABEL:string = "external_commercial_price_label";
-
-
+    public static readonly PROPERTY_EXTERNAL_COMMERCIAL_PRICE_LABEL:string = "external_commercial_price_label";
+    public static readonly PROPERTY_WORK_AUTHORIZATION_MAIN_GNOMEX_NAME: string = "workauth1_name";
+    public static readonly PROPERTY_WORK_AUTHORIZATION_MAIN_GNOMEX_URL: string  = "workauth1_url";
+    public static readonly PROPERTY_WORK_AUTHORIZATION_ALT_GNOMEX_NAME: string = "workauth2_name";
+    public static readonly PROPERTY_WORK_AUTHORIZATION_ALT_GNOMEX_URL: string  = "workauth2_url";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,

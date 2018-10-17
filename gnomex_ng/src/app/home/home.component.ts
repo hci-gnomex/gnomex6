@@ -134,6 +134,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.site_logo = p.value;
                     break;
                 }
+                case "university_user_authentication" : {
+                    this.gnomexService.isUniversityUserAuthentication = (p.value === "Y");
+                    break;
+                }
             }
         }
         if (!this.site_splash) {

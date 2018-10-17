@@ -61,6 +61,7 @@ export class GnomexService {
     public isCoreGenomics: boolean = false;
     public showBioinformaticsLinks: boolean = true;
     public showCoreGenomicsLinks: boolean = true;
+    public isUniversityUserAuthentication: boolean = false;
     public idCoreFacilityHTG: any;
     public idCoreFacilityDNASeq: any;
     public idCoreFacilityMolecular: any;

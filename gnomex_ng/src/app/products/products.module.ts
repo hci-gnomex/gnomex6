@@ -14,34 +14,43 @@ import {AddLedgerEntryComponent} from "./add-ledger-entry.component";
 import {AddProductWindowComponent} from "./add-product-window.component";
 import {ProductOrdersComponent} from "./product-orders.component";
 import {OrderProductsComponent} from "./order-products.component";
+import {WorkAuthorizationTypeSelectorDialogComponent} from "./work-authorization-type-selector-dialog.component";
+import {RouterModule} from "@angular/router";
+import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
+import {DialogsModule} from "../util/popup/dialogs.module";
 
 @NgModule({
     imports: [
         PRODUCTS_ROUTING,
         AngularMaterialModule,
+        RouterModule,
         CommonModule,
         FormsModule,
+        DialogsModule,
         ServicesModule,
         UtilModule,
         ReactiveFormsModule,
         TreeModule,
-        AgGridModule.withComponents([]),
+        NewBillingAccountModule,
+        AgGridModule.withComponents([])
     ],
     declarations: [
-        ConfigureProductsComponent,
-        ConfigureProductTypesComponent,
-        ProductLedgerComponent,
-        ProductOrdersComponent,
-        OrderProductsComponent,
         AddLedgerEntryComponent,
         AddProductWindowComponent,
+        ConfigureProductsComponent,
+        ConfigureProductTypesComponent,
+        OrderProductsComponent,
+        ProductLedgerComponent,
+        ProductOrdersComponent,
+        WorkAuthorizationTypeSelectorDialogComponent
     ],
     exports: [
     ],
     entryComponents: [
-        ConfigureProductTypesComponent,
         AddLedgerEntryComponent,
         AddProductWindowComponent,
+        ConfigureProductTypesComponent,
+        WorkAuthorizationTypeSelectorDialogComponent
     ]
 })
 
