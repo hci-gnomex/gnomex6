@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import { URLSearchParams } from "@angular/http";
 import { Router } from "@angular/router";
 
@@ -14,8 +14,12 @@ import { PropertyService } from "../../services/property.service";
 
 import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
-import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig} from "@angular/material";
+import {
+    MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig,
+    MAT_DIALOG_DATA
+} from "@angular/material";
 import {Subscription} from "rxjs/Subscription";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Component({
 	selector: "new-billing-account-launcher",
@@ -347,20 +351,42 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 
 	constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
-							private createSecurityAdvisorService: CreateSecurityAdvisorService,
-							private dialog: MatDialog,
-							private dialogRef: MatDialogRef<NewBillingAccountComponent>,
-							private dictionaryService: DictionaryService,
-							private labListService: LabListService,
-							private newBillingAccountService: NewBillingAccountService,
-							private propertyService: PropertyService) { }
+				private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private dialogService: DialogsService,
+				private dialog: MatDialog,
+				private dialogRef: MatDialogRef<NewBillingAccountComponent>,
+				private dictionaryService: DictionaryService,
+				private labListService: LabListService,
+				private newBillingAccountService: NewBillingAccountService,
+				private propertyService: PropertyService,
+				@Inject(MAT_DIALOG_DATA) private data) { }
 
 	ngOnInit(): void {
+        if (this.data && this.data.idLab) {
+        	setTimeout(() => {
+        		this.dialogService.startDefaultSpinnerDialog();
+            });
+        }
+
 		this.selectedLab = null;
 		this.selectedCoreFacilities = [];
 
 		this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
 			this.labList = response;
+
+			if (this.data && this.data.idLab) {
+                let temp: any[] = this.labList.filter((a) => {
+                	return a.idLab === this.data.idLab;
+				});
+
+                if (temp.length === 1) {
+                	this.selectedLab = temp[0];
+
+                	this.onLabListSelection({ value: temp[0] });
+				}
+
+				this.dialogService.stopAllSpinnerDialogs();
+			}
 		});
 
 		this.submitterEmail_chartfield = this.createSecurityAdvisorService.userEmail;

@@ -25,7 +25,7 @@
                 <mat-option *ngFor="let ba of this.billingAccountList" [value]="ba.idBillingAccount">{{ba.accountNameAndNumber}}</mat-option>
             </mat-select>
         </mat-form-field>
-        <button mat-button (click)="this.showSubmitWorkAuthorization()">Submit Work Authorization</button>
+        <button mat-button matTooltip="New accounts must be approved before they can be used." (click)="this.showSubmitWorkAuthorization()">Submit Work Authorization</button>
         <button mat-button *ngIf="this.showSplitBillingButton" (click)="this.showSplitBilling()">Split Billing</button>
     </div>
     <div *ngIf="this.billingTemplate" class="padding-bottom">
