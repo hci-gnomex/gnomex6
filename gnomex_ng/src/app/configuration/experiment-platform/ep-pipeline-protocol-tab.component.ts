@@ -180,15 +180,16 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
             idCoreFacility:this.expPlatfromNode.idCoreFacility,
             isNew:'Y', isDefault:'N'
         };
-        this.pipelineRowData.push(rowObj);
+        this.pipelineRowData.splice(0,0,rowObj);
         this.gridApi.setRowData(this.pipelineRowData);
         this.formGroup.markAsDirty();
     }
     removeProtocol(){
         this.dialogService.confirm("Remove protocol","Are you sure you want to remove pipeline protocol "
             + this.selectedProtocolRow[0].protocol + "?" ).subscribe(result =>{
-                if(result){
-                    this.pipelineRowData.splice(this.selectRowIndex,1);
+                let removeIndex:number = this.pipelineRowData.indexOf(this.selectedProtocolRow[0]);
+                if(result && removeIndex > -1){
+                    this.pipelineRowData.splice(removeIndex,1);
                     this.gridApi.setRowData(this.pipelineRowData);
                     this.disableControl = true;
                     this.clearProtocolInfo();

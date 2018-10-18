@@ -14,6 +14,7 @@ export class ConstantsService {
     public readonly SEGMENGT_IMPORT = "assets/segment_import.png";
     public readonly SEGMENGT_IMPORT_DISABLE = "assets/segment_remove_disable.png";
     public readonly PAGE_ADD = "assets/page_add.png";
+    public readonly PAGE_GO = "assets/page_go.png";
     public readonly PAGE_REMOVE = "assets/page_remove.png";
     public readonly PAGE_REMOVE_DISABLE = "assets/page_remove_disable.png";
     public readonly PAGE_NEW = "assets/page_new.png";
@@ -89,9 +90,7 @@ export class ConstantsService {
     public readonly ICON_FOLDER:string = "assets/folder.png";
     public readonly ICON_FLASK:string = "assets/flask.png";
     public readonly ICON_ADD:string = "assets/add.png";
-    public readonly ICON_ADD_DISABLE:string = "assets/add_disable.png";
     public readonly ICON_DELETE:string = "assets/delete.png";
-    public readonly ICON_DELETE_DISABLE:string = "assets/delete_disable.png";
     public readonly ICON_FOLDER_DELETE:string= "assets/folder_delete.png";
     public readonly EXP_ICON_LIST:string[]=
         [ "assets/noIcon.png" ,"assets/DNA_diag.png" ,"assets/DNA_diag_lightening.png" ,"assets/microarray_chip.png" ,

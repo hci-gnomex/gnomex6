@@ -44,7 +44,7 @@ import {GridApi, RowSelectedEvent} from "ag-grid";
 
         </div>
     `,
-    styles:[`        
+    styles:[`
     `]
 })
 
@@ -104,12 +104,12 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
         let selectedRow = this.gridApi.getSelectedRows();
         this.selectedRow = Array.isArray(selectedRow) && selectedRow.length > 0  ? selectedRow[0] : null;
         if(event.node.isSelected()){
-            this.selectedRowIndex =  event.rowIndex
+            this.selectedRowIndex =  event.rowIndex // selectedRowIndex isn't correct when grid sorted
         }
     }
 
     addLibPrepQC(){
-        this.rowData.push(
+        this.rowData.splice(0,0,
             {
                 protocolDisplay:'Enter Lib Prep QC Protocol here...',
                 codeRequestCategory: this.expPlatformNode.codeRequestCategory,
@@ -120,19 +120,22 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
 
     }
     removeLibPrepQC(){
-        if(this.selectedRowIndex > -1){
-            let experimentType:string = this.selectedRow.protocolDisplay? this.selectedRow.protocolDisplay :'';
-            this.dialogService.confirm('Remove Lib Prep QC Protocol',
-                'Are you sure you want to remove experiment type ' + "\'"+ experimentType +'\'?')
-                .subscribe(action => {
-                    if(action){
-                        this.rowData.splice(this.selectedRowIndex, 1);
+
+        let experimentType:string = this.selectedRow.protocolDisplay? this.selectedRow.protocolDisplay :'';
+        this.dialogService.confirm('Remove Lib Prep QC Protocol',
+            'Are you sure you want to remove experiment type ' + "\'"+ experimentType +'\'?')
+            .subscribe(action => {
+                if(action){
+                    let removeIndex:number = this.rowData.indexOf(this.selectedRow);
+                    if(removeIndex > -1){
+                        this.rowData.splice(removeIndex, 1);
                         this.gridApi.setRowData(this.rowData);
                         this.formGroup.markAsDirty();
                         this.selectedRow = null;
                     }
-                })
-        }
+                }
+            })
+
     }
 
 

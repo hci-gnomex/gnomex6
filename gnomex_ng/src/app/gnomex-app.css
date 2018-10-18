@@ -195,6 +195,9 @@ img.icon {
 .ellipsis {
   text-overflow: ellipsis;
 }
+.spaced-children-margin > *:not(:last-child) {
+  margin-right: 2em;
+}
 .no-padding {
   padding: 0;
 }

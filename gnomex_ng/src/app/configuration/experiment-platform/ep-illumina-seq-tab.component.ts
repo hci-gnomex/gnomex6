@@ -21,7 +21,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
             <div class="flex-grow flex-container-row" style="align-items:center;"  >
                 <button mat-button color="primary"
                         type="button"
-                        (click)="addSampleType()">
+                        (click)="addSeqOption()">
                     <img [src]="this.constService.ICON_ADD"> Add
                 </button>
                 <button [disabled]="selectedSeqOpt.length === 0"
@@ -322,7 +322,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
 
 
     }
-    addProtocol(){
+    addSeqOption(){
         let newSeqOpt = {
             idNumberSequencingCyclesAllowed: "NumberSequencingCyclesAllowed",
             codeRequestCategory: this.expPlatfromNode.codeRequestCategory,
@@ -333,7 +333,9 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             isActive:'Y',
             sortOrder:'0',
         };
-        this.seqOptionsList.push(newSeqOpt);
+        this.seqOptionsList.splice(0,0,newSeqOpt);
+        this.selectedSeqOpt = [newSeqOpt];
+        this.gridApi.setRowData(this.seqOptionsList);
         this.openSeqEditor()
 
     }

@@ -62,6 +62,11 @@ export class ProtocolService {
         });
     }
 
+    public saveProtocol(params:HttpParams): Observable<any>{ // used for experiment platform
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post('/gnomex/SaveProtocol.gx',null,{params:params})
+    }
+
     public saveNewProtocol(protocolName: string, codeRequestCategory: string, protocolClassName: string, idAnalysisType: string): void {
         this.cookieUtilService.formatXSRFCookie();
 

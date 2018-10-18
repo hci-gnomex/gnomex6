@@ -13,7 +13,6 @@ import {ExperimentPlatformOverviewComponent} from "./experiment-platform-overvie
 import {ExperimentPlatformTabComponent} from "./experiment-platform-tab.component";
 import {EpSampleTypeTabComponent} from "./ep-sample-type-tab.component";
 import {SortOrderDialogComponent} from "./sort-order-dialog.component";
-import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
 import { DynamicModule } from 'ng-dynamic-component';
 import {AgGridRendererModule, IconTextRendererComponent} from "../../util/grid-renderers";
@@ -29,6 +28,10 @@ import {EpLibraryPrepQCTabComponent} from "./ep-library-prep-qc-tab.component";
 import {EpPrepTypesTabComponent} from "./ep-prep-types-tab.component";
 import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.component";
 import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
+import {EpExperimentTypeIlluminaTabComponent} from "./ep-experiment-type-illumina-tab.component";
+import {LibraryPrepDialogComponent} from "./library-prep-dialog.component";
+import {LibraryPrepProtocolDialogComponent} from "./library-prep-protocol-dialog.component";
+import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.component";
 
 
 
@@ -56,12 +59,13 @@ import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
         AngularSplitModule,
         DynamicModule.withComponents([ExperimentPlatformTabComponent,
             EpSampleTypeTabComponent,
-            EpLibraryPrepTabComponent,ConfigureAnnotationsComponent,
+            ConfigureAnnotationsComponent,
             EpPipelineProtocolTabComponent,
             EpIlluminaSeqTabComponent,
             EpLibraryPrepQCTabComponent,
             EpPrepTypesTabComponent,
-            EpExperimentTypeTabComponent
+            EpExperimentTypeTabComponent,
+            EpExperimentTypeIlluminaTabComponent
         ])
 
     ],
@@ -69,7 +73,6 @@ import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
         ExperimentPlatformOverviewComponent,
         ExperimentPlatformTabComponent,
         EpSampleTypeTabComponent,
-        EpLibraryPrepTabComponent,
         SampleTypeDetailDialogComponent,
         SortOrderDialogComponent,
         EpPipelineProtocolTabComponent,
@@ -79,7 +82,12 @@ import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
         EpLibraryPrepQCTabComponent,
         EpPrepTypesTabComponent,
         PrepTypePricingDialogComponent,
-        EpExperimentTypeTabComponent
+        EpExperimentTypeTabComponent,
+        EpExperimentTypeIlluminaTabComponent,
+        LibraryPrepDialogComponent,
+        LibraryPrepProtocolDialogComponent,
+        LibraryPrepStepsDialogComponent
+
 
 
 
@@ -90,7 +98,10 @@ import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
         SortOrderDialogComponent,
         IlluminaSeqDialogComponent,
         AddExperimentPlatformDialogComponent,
-        PrepTypePricingDialogComponent
+        PrepTypePricingDialogComponent,
+        LibraryPrepDialogComponent,
+        LibraryPrepProtocolDialogComponent,
+        LibraryPrepStepsDialogComponent
 
     ],
     exports: [

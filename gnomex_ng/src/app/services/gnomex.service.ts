@@ -56,7 +56,7 @@ export class GnomexService {
 
 
     public properties: Map<string, string> = new Map<string, string>();
-    private requestCategoryTypeMap: Map<string, string> = new Map<string, string>();
+    public requestCategoryTypeMap: Map<string, any> = new Map<string, any>();
     public isExternalDataSharingSite: boolean = false;
     public isCoreGenomics: boolean = false;
     public showBioinformaticsLinks: boolean = true;
@@ -193,7 +193,7 @@ export class GnomexService {
         this.setExternalDataSharingSite();
 
         for (let rct of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryType")) {
-            this.requestCategoryTypeMap[rct.codeRequestCategoryType] = rct;
+            this.requestCategoryTypeMap.set(rct.codeRequestCategoryType, rct);
         }
 
 
@@ -225,10 +225,10 @@ export class GnomexService {
 
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.onGetLabList(response);
-        })
+        });
         this.labListService.getOrganismList().subscribe((response: any[]) => {
             this.onGetOrganismList(response);
-        })
+        });
         return new Promise((resolve) => {
             resolve()
         });
@@ -464,7 +464,7 @@ export class GnomexService {
             let found: boolean = false;
             for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
                 if (rc.isActive === 'Y') {
-                    let rct = this.requestCategoryTypeMap[rc.type];
+                    let rct = this.requestCategoryTypeMap.get(rc.type);
                     if (rct && rct.isIllumina == 'Y') {
                         found = true;
                         break;
@@ -475,9 +475,9 @@ export class GnomexService {
         }
         //TODO Is myCoreFacilities equiv. to createSecurityAdvisor.lastResult..CoreFacility
         for (let cf of this.myCoreFacilities) {
-            for (let requestCategory of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
+            for (let requestCategory of this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY)) {
                 if (requestCategory.isActive === 'Y' && requestCategory.idCoreFacility === cf.idCoreFacility) {
-                    let rct1 = this.requestCategoryTypeMap[requestCategory.type];
+                    let rct1 = this.requestCategoryTypeMap.get(requestCategory.type);
                     if (rct1 && rct1.isIllumina === 'Y') {
                         return true;
                     }

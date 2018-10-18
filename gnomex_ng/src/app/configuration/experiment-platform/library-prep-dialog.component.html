@@ -1,0 +1,119 @@
+<form [formGroup]="formGroup">
+    <div mat-dialog-title class="padded-outer">
+        <div class="dialog-header-colors padded-inner">
+            Edit Library Prep
+        </div>
+    </div>
+    <div mat-dialog-content style="margin: 0; padding: 0;">
+        <div style="margin: 0.5em;">
+            <div class="flex-container-row spaced-children-margin">
+                <mat-form-field  class="medium-form-input">
+                    <input matInput placeholder="Sequencing Experiment Type" formControlName="application">
+                    <mat-error *ngIf="this.formGroup?.controls['application']?.hasError('required')">
+                        This field is required
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field  class="short-input">
+                    <input matInput placeholder="Sort Order" formControlName="sortOrder">
+                    <mat-error *ngIf="formGroup?.controls['sortOrder']?.hasError('numberRange')">
+                        {{this.formGroup.get('sortOrder').errors.numberRange }}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <mat-form-field class="medium-form-input">
+                <mat-select  placeholder="Sequencing Experiment Type Theme" formControlName="idApplicationTheme">
+                    <mat-option
+                            *ngFor="let theme of appThemeList"
+                            [value]="theme.value" >{{theme.display}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="flex-container-col">
+                <label class="gx-label"> Experiment Platform Compatibility </label>
+                <ng-container *ngFor="let app of reqCategoryAppList">
+                    <mat-checkbox *ngIf="showReqCategoryCheckbox(app)" [formControlName]="app.value">
+                        {{app.requestCategory}}
+                    </mat-checkbox>
+                </ng-container>
+            </div>
+
+            <div class="flex-container-row spaced-children-margin">
+                <mat-form-field class="medium-form-input">
+                    <mat-select placeholder="Index Family A" formControlName="idBarcodeSchemeA">
+                        <mat-option *ngFor="let indexA of indexFamily" [value]="indexA.value" >
+                            {{indexA.display}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="medium-form-input">
+                    <mat-select placeholder="Index Family B" formControlName="idBarcodeSchemeB">
+                        <mat-option *ngFor="let indexB of indexFamily" [value]="indexB.value" >
+                            {{indexB.display}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="flex-container-row spaced-children-margin" style="font-size: small">
+                <div class="flex-container-col" style="flex:2">
+                    <label class="gx-label"> Experiment Platform Compatibility </label>
+                    <mat-radio-group class="flex-container-col"  formControlName="onlyForLabPrepped">
+                        <mat-radio-button  value="N">
+                            Always Available
+                        </mat-radio-button>
+                        <mat-radio-button  value="Y">
+                            Only Available when Client performs library prep
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div class="flex-container-col" style="flex:2">
+                    <mat-form-field >
+                        <span matPrefix>$ &nbsp;</span>
+                        <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
+                        <mat-error *ngIf="formGroup.get('unitPriceInternal')?.hasError('pattern')">
+                            Invalid dollar amount
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field >
+                        <span matPrefix>$ &nbsp;</span>
+                        <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
+                        <mat-error *ngIf="formGroup.get('unitPriceExternalAcademic')?.hasError('pattern')">
+                            Invalid dollar amount
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field >
+                        <span matPrefix>$ &nbsp;</span>
+                        <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
+                        <mat-error *ngIf="formGroup.get('unitPriceExternalCommercial')?.hasError('pattern')">
+                            Invalid dollar amount
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-container-col" style="align-items:start; flex:1">
+                    <button mat-button color="accent" (click)="openProtocolEditor()"> Edit Protocol </button>
+                    <button mat-button color="accent" (click)="openStepsEditor()" > Lib Prep Steps </button>
+                    <mat-checkbox formControlName="hasCaptureLibDesign">
+                        Custom Design Id
+                    </mat-checkbox>
+                </div>
+
+            </div>
+
+
+
+
+        </div>
+    </div>
+    <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
+        <div class="padded-inner flex-container-row" style="align-items:center" >
+            <div class="flex-grow">
+                <save-footer
+                        [actionType]="applyText"
+                        [disableSave]="formGroup.invalid"
+                        (saveClicked)="applyLibPrepChanges()"
+                        [dirty]="formGroup.dirty" >
+                </save-footer>
+            </div>
+            <button mat-button  mat-dialog-close> Cancel  </button>
+        </div>
+    </div>
+</form>
