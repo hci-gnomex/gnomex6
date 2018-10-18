@@ -5,7 +5,6 @@ import {ConstantsService} from "../../services/constants.service";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {ExperimentPlatformTabComponent} from "./experiment-platform-tab.component";
 import {EpSampleTypeTabComponent} from "./ep-sample-type-tab.component";
-import {EpLibraryPrepTabComponent} from "./ep-library-prep-tab.component";
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
@@ -19,6 +18,7 @@ import {EpLibraryPrepQCTabComponent} from "./ep-library-prep-qc-tab.component";
 import * as _ from "lodash";
 import {EpPrepTypesTabComponent} from "./ep-prep-types-tab.component";
 import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
+import {EpExperimentTypeIlluminaTabComponent} from "./ep-experiment-type-illumina-tab.component";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -70,13 +70,13 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     public tabComponentTemplate:any = {
         'ExperimentPlatformTabComponent': { name: 'Experiment Platform', component: ExperimentPlatformTabComponent, inputs: {} },
         'EpSampleTypeTabComponent': { name: 'Sample Type', component: EpSampleTypeTabComponent,inputs:{} },
-        'EpLibraryPrepTabComponent': { name:'LibraryPrep', component: EpLibraryPrepTabComponent,inputs:{} },
         'ConfigureAnnotationsComponent': { name:'Property', component: ConfigureAnnotationsComponent, inputs:{} },
         'EpPipelineProtocolTabComponent': { name:'Pipeline Protocol',component:EpPipelineProtocolTabComponent },
         'EpIlluminaSeqTabComponent':{ name:'Illumina Seq', component:EpIlluminaSeqTabComponent },
         'EpLibraryPrepQCTabComponent': { name:'Lib Prep QC', component:EpLibraryPrepQCTabComponent },
         'EpPrepTypesTabComponent': { name:'Prep Types', component:EpPrepTypesTabComponent},
-        'EpExperimentTypeTabComponent': {name:'Library Prep', component:EpExperimentTypeTabComponent}
+        'EpExperimentTypeTabComponent': {name:'Library Prep', component:EpExperimentTypeTabComponent},
+        'EpExperimentTypeIlluminaTabComponent':{name:'Library Prep', component:EpExperimentTypeIlluminaTabComponent}
     };
 
     constructor(private secAdvisor:CreateSecurityAdvisorService,
@@ -178,11 +178,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
         }
 
-
-
-
-
-
     }
 
     private addedFn = ()=>{
@@ -251,8 +246,9 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                     this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
                 sampleTypeTabRef.instance.externallyResizeGrid();
             }else if (event.tab.textLabel === "Library Prep"){
-                let experimentTypeTabRef: ComponentRef<EpExperimentTypeTabComponent> =
-                    this.tabComponentRefList.find(compRef => compRef.instance instanceof EpExperimentTypeTabComponent );
+                let experimentTypeTabRef: ComponentRef<EpExperimentTypeTabComponent> | ComponentRef<EpExperimentTypeIlluminaTabComponent> =
+                    this.tabComponentRefList.find(compRef => compRef.instance instanceof EpExperimentTypeTabComponent
+                        || compRef.instance instanceof EpExperimentTypeIlluminaTabComponent );
                 experimentTypeTabRef.instance.externallyResizeGrid();
             }
 
@@ -264,7 +260,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             let propertyTab:ComponentRef<ConfigureAnnotationsComponent> = null;
             let tempTabComponentRefList:ComponentRef<any>[] = [];
             for(let i = 0; i< this.tabComponentRefList.length; i++){
-                let pt = this.experimentPlatformTabs.find(platTab => this.tabComponentRefList[i].instance instanceof platTab.component)
+                let pt = this.experimentPlatformTabs.find(platTab => this.tabComponentRefList[i].instance instanceof platTab.component);
                 if(pt){
                     tempTabComponentRefList.push(this.tabComponentRefList[i]);
                 }else{

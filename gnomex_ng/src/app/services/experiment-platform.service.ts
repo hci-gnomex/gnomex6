@@ -111,14 +111,14 @@ export class ExperimentPlatformService implements OnDestroy{
             let illuminaLikeList:string[] = [
                 'ExperimentPlatformTabComponent',
                 'EpSampleTypeTabComponent',
-                "EpLibraryPrepTabComponent",
+                'EpExperimentTypeIlluminaTabComponent',
                 "EpIlluminaSeqTabComponent",
                 "EpLibraryPrepQCTabComponent",
                 "EpPipelineProtocolTabComponent",
                 "ConfigureAnnotationsComponent"
             ];
             if(!this.isIllumina){
-                illuminaLikeList.splice(3,1);
+                illuminaLikeList.splice(2,1);
             }
             return illuminaLikeList;
         }else if(this.isQC){

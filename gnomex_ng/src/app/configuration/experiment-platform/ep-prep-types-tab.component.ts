@@ -186,7 +186,7 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
             type:'DNA',
             codeRequestCategory: this.expPlatfromNode.codeRequestCategory
         };
-        this.rowData.push(newPrepType);
+        this.rowData.splice(0,0,newPrepType);
         this.gridApi.setRowData(this.rowData);
         this.formGroup.markAsDirty();
 
@@ -197,9 +197,12 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
             "Are you sure you want to remove prep type named \'" + prepType.isolationPrepType +'\'?')
             .subscribe(result =>{
             if(result){
-                this.rowData.splice(this.selectedPrepTypeRowIndex,1);
-                this.gridApi.setRowData(this.rowData);
-                this.formGroup.markAsDirty();
+                let removeIndex:number = this.rowData.indexOf(prepType);
+                if(removeIndex > -1){
+                    this.rowData.splice(removeIndex,1);
+                    this.gridApi.setRowData(this.rowData);
+                    this.formGroup.markAsDirty();
+                }
             }
         });
 

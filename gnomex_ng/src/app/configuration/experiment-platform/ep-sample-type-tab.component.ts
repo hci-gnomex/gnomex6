@@ -237,7 +237,7 @@ export class EpSampleTypeTabComponent implements OnInit{
                 notes:'',
                 idCoreFacility: this.expPlatformNode.idCoreFacility
             };
-            this.sampleTypeRowData.push(newSampleType);
+            this.sampleTypeRowData.splice(0,0,newSampleType);
             this.gridApi.setRowData(this.sampleTypeRowData);
             this.expPlatfromService.findExpPlatformFormMember(this.constructor.name).markAsDirty();
 
@@ -246,9 +246,13 @@ export class EpSampleTypeTabComponent implements OnInit{
     }
 
     removeSampleType(){
-        this.sampleTypeRowData.splice(this.currentSelectedIndex,1);
-        this.gridApi.setRowData(this.sampleTypeRowData);
-        this.expPlatfromService.findExpPlatformFormMember(this.constructor.name).markAsDirty();
+        let removeIndex = this.sampleTypeRowData.indexOf(this.selectedSampleTypeRows[0]);
+        if(removeIndex > -1){
+            this.sampleTypeRowData.splice(removeIndex,1);
+            this.gridApi.setRowData(this.sampleTypeRowData);
+            this.expPlatfromService.findExpPlatformFormMember(this.constructor.name).markAsDirty();
+        }
+
     }
 
 

@@ -289,7 +289,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
             idFeatureExtractionProtocolDefault:'',
             isActive:'Y'
         };
-        this.applicationList.push(newLibPrep);
+        this.applicationList.splice(0,0,newLibPrep);
         this.gridApi.setRowData(this.applicationList);
         this.formGroup.markAsDirty();
 
@@ -299,10 +299,13 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
         this.dialogService.confirm("Remove Lib Prep","Are you sure you want to remove experiment type named "
             + libPrep.display + "?" ).subscribe(result =>{
             if(result){
-                this.applicationList.splice(this.selectedLibPrepIndex,1);
-                this.formGroup.markAsDirty();
-                this.selectedLibPrep = [];
-                this.gridApi.setRowData(this.applicationList);
+                let removeIndex:number = this.applicationList.indexOf(libPrep);
+                if(removeIndex > -1){
+                    this.applicationList.splice(removeIndex,1);
+                    this.formGroup.markAsDirty();
+                    this.selectedLibPrep = [];
+                    this.gridApi.setRowData(this.applicationList);
+                }
             }
         });
 
