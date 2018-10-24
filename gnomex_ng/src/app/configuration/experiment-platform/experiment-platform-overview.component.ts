@@ -19,6 +19,7 @@ import * as _ from "lodash";
 import {EpPrepTypesTabComponent} from "./ep-prep-types-tab.component";
 import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
 import {EpExperimentTypeIlluminaTabComponent} from "./ep-experiment-type-illumina-tab.component";
+import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.component";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -53,6 +54,8 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     public showSpinner:boolean = true;
     public removeSave:boolean = false;
     public tabIndex = 0;
+    public showInactive:boolean = false;
+    private allExpPlatorms:any[] = [];
 
 
 
@@ -76,7 +79,8 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         'EpLibraryPrepQCTabComponent': { name:'Lib Prep QC', component:EpLibraryPrepQCTabComponent },
         'EpPrepTypesTabComponent': { name:'Prep Types', component:EpPrepTypesTabComponent},
         'EpExperimentTypeTabComponent': {name:'Library Prep', component:EpExperimentTypeTabComponent},
-        'EpExperimentTypeIlluminaTabComponent':{name:'Library Prep', component:EpExperimentTypeIlluminaTabComponent}
+        'EpExperimentTypeIlluminaTabComponent':{name:'Library Prep', component:EpExperimentTypeIlluminaTabComponent},
+        'EpExperimentTypeQcTabComponent':{name:'QC Assay', component:EpExperimentTypeQcTabComponent}
     };
 
     constructor(private secAdvisor:CreateSecurityAdvisorService,
@@ -91,9 +95,12 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         this.platformListSubscription = this.expPlatformService.getExperimentPlatformListObservable()
             .subscribe(resp =>{
                 if(resp){
-
                     this.showSpinner = false;
-                    this.rowData = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
+                    this.allExpPlatorms = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
+                    this.filterExperimentPlatform();
+                    for(let row of this.rowData){
+                        this.constService.getTreeIcon(row,'RequestCategory');
+                    }
                 }else if(resp && resp.message){
                     this.dialogService.alert(resp.message);
                 }else{
@@ -282,6 +289,14 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
         });
     }
+    filterExperimentPlatform(){
+        if(this.showInactive){
+            this.rowData = this.allExpPlatorms;
+        }else{
+            this.rowData = this.allExpPlatorms.filter(expPlat => expPlat.isActive === 'Y' );
+        }
+
+    }
 
 
 
@@ -291,12 +306,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
 
     refresh(event:any){
-        //this.rowData.find()
-        let tempRowData:Array<any> = [];
-        let rowItem: any = this.rowData[this.selectRowIndex];
-        rowItem.idCoreFacility =event.idCoreFacility;
-        rowItem.facilityName = event.facilityName;
-        this.rowData = this.rowData.slice();
 
     }
 

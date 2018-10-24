@@ -118,6 +118,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
                 let requireNameStr:string = this.gnomexService
                     .getRequestCategoryProperty(data.idCoreFacility,data.codeRequestCategory, PropertyService.PROPERTY_DESCRIPTION_NAME_MANDATORY_FOR_INTERNAL_EXPERIMENTS);
 
+
                 //this.state = this.expPlatformService.getState(data.value, this.name );
                 this.formGroup.get('name').setValue(data.requestCategory);
                 this.formGroup.get('type').setValue(data.type);
@@ -125,7 +126,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
                 this.formGroup.get('associateAnalysis').setValue(data && data.associatedWithAnalysis === 'Y');
                 this.formGroup.get('requireNameDescipt').setValue(requireNameStr && requireNameStr === 'Y');
                 this.formGroup.get('code').setValue(data.codeRequestCategory);
-                this.formGroup.get('icon').setValue(data.icon);
+                this.formGroup.get('icon').setValue(this.findICON(data.icon) );
                 this.formGroup.get('coreFacility').setValue(data.idCoreFacility);
                 this.formGroup.get('notes').setValue(data.notes);
                 this.formGroup.get('vendor').setValue(data.idVendor);
@@ -152,6 +153,16 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
                 this.formGroup.markAsUntouched();
             });
 
+
+    }
+
+    findICON(icon:string):string{
+        let i = this.iconList.indexOf(icon);
+        if(i > -1){
+            return this.iconList[i];
+        }else{
+            return this.iconList[0];
+        }
 
     }
 

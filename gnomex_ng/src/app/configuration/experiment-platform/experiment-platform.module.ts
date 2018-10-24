@@ -32,6 +32,9 @@ import {EpExperimentTypeIlluminaTabComponent} from "./ep-experiment-type-illumin
 import {LibraryPrepDialogComponent} from "./library-prep-dialog.component";
 import {LibraryPrepProtocolDialogComponent} from "./library-prep-protocol-dialog.component";
 import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.component";
+import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.component";
+import {QcAssayDialogComponent} from "./qc-assay-dialog.component";
+import {QcAssayChipTypeDialogComponent} from "./qc-assay-chip-type-dialog.component";
 
 
 
@@ -65,7 +68,8 @@ import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.compo
             EpLibraryPrepQCTabComponent,
             EpPrepTypesTabComponent,
             EpExperimentTypeTabComponent,
-            EpExperimentTypeIlluminaTabComponent
+            EpExperimentTypeIlluminaTabComponent,
+            EpExperimentTypeQcTabComponent
         ])
 
     ],
@@ -86,7 +90,10 @@ import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.compo
         EpExperimentTypeIlluminaTabComponent,
         LibraryPrepDialogComponent,
         LibraryPrepProtocolDialogComponent,
-        LibraryPrepStepsDialogComponent
+        LibraryPrepStepsDialogComponent,
+        EpExperimentTypeQcTabComponent,
+        QcAssayDialogComponent,
+        QcAssayChipTypeDialogComponent
 
 
 
@@ -101,7 +108,9 @@ import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.compo
         PrepTypePricingDialogComponent,
         LibraryPrepDialogComponent,
         LibraryPrepProtocolDialogComponent,
-        LibraryPrepStepsDialogComponent
+        LibraryPrepStepsDialogComponent,
+        QcAssayDialogComponent,
+        QcAssayChipTypeDialogComponent
 
     ],
     exports: [

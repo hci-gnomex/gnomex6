@@ -38,6 +38,8 @@ export class PropertyService {
     public static readonly PROPERTY_WORK_AUTHORIZATION_MAIN_GNOMEX_URL: string  = "workauth1_url";
     public static readonly PROPERTY_WORK_AUTHORIZATION_ALT_GNOMEX_NAME: string = "workauth2_name";
     public static readonly PROPERTY_WORK_AUTHORIZATION_ALT_GNOMEX_URL: string  = "workauth2_url";
+    public static readonly PROPERTY_QC_ASSAY_HIDE_BUFFER_STRENGTH: string = "qc_assay_hide_buffer_strength";
+    public static readonly PROPERTY_QC_ASSAY_HIDE_WELLS_PER_CHIP: string = "qc_assay_hide_wells_per_chip";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
