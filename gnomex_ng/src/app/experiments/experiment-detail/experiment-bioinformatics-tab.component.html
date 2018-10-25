@@ -1,0 +1,128 @@
+<div class="full-height full-width padded small-font">
+    <div *ngIf="masterDisabled" class="full-width full-height flex-container-col">
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                Organism(s) :
+            </div>
+            <div class="flex-grow">
+                {{ organismName }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                Align to Genome Build :
+            </div>
+            <div class="flex-grow">
+                {{ alignToGenomeBuild }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                Genome Build(s) :
+            </div>
+            <div class="flex-grow">
+                {{ genomeBuild }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                {{ experiment?.bioinformaticsAssist === 'Y' ? 'Bioinformatics Core Assistance Requested' : 'No Bioinformatics Core Assistance Desired' }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                Notes for Bioinformatics Group :
+            </div>
+        </div>
+        <div class="full-width padded bordered">
+            <textarea matInput
+                      matTextareaAutosize
+                      matAutosizeMinRows="8"
+                      matAutosizeMaxRows="8"
+                      [(ngModel)]="experiment.analysisInstructions"
+                      [disabled]="true"
+                      placeholder="Description">
+            </textarea>
+        </div>
+    </div>
+    <div *ngIf="!masterDisabled" class="full-width full-height flex-container-col">
+        <div class="full-width bold">
+            {{ header }}
+        </div>
+        <div>
+            <div class="min-size">
+                <div class="flex-container-row align-center padded highlight">
+                    <div class="padded">
+                        Questions? Please contact the {{ groupName }} at:
+                    </div>
+                    <a href="{{ 'mailto:' + linkUrl }}">
+                        {{ linkUrl }}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="consolidatedGenomeInformation?.length > 0" class="full-width flex-container-row">
+            <div class="padded">
+                (1)
+            </div>
+            <div class="flex-grow padded">
+                <div>
+                    Do you want the sequence data to be aligned?
+                    {{ alignmentNote }}
+                </div>
+                <div *ngFor="let item of consolidatedGenomeInformation" class="flex-container-row align-center">
+                    <div class="label-width">
+                        {{ item.organismName }}
+                    </div>
+                    <div class="margin-top">
+                        <mat-checkbox [(ngModel)]="item.alignToGenomeBuild" (change)="onCheckboxChanged(item, $event)">Yes, align to genome build</mat-checkbox>
+                    </div>
+                    <div class="margin">
+                        <mat-form-field class="medium-width">
+                            <mat-select [(ngModel)]="item.idGenomeBuildAlignTo" [disabled]="!item.alignToGenomeBuild" (selectionChange)="onSelectChanged(item, $event)">
+                                <mat-option [value]=""> -- </mat-option>
+                                <mat-option *ngFor="let option of item.dictionary" [value]="option.value">{{ option.display }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="full-width flex-container-row">
+            <div class="padded">
+                {{ (consolidatedGenomeInformation?.length > 0) ? '(2)': '(1)' }}
+            </div>
+            <div class="flex-grow padded">
+                <div>
+                    Would you like the {{ groupName }} to assist you with analysis?
+                </div>
+                <div class="flex-container-row align-center">
+                    <div class="label-width margin-top">
+                        <mat-checkbox [(ngModel)]="bioinformaticsAssist">Yes</mat-checkbox>
+                    </div>
+                    <div>
+                        {{ analysisNote }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="full-width flex-container-col padded">
+            <div *ngIf="bioinformaticsAssist">
+                Enter a note regarding analysis. (optional)
+            </div>
+            <div *ngIf="!bioinformaticsAssist" class="disabled-color">
+                Disabled.
+            </div>
+            <div class="full-width padded {{bioinformaticsAssist ? 'enable-bordered' : 'disable-bordered'}}">
+                <textarea matInput
+                          matTextareaAutosize
+                          matAutosizeMinRows="8"
+                          matAutosizeMaxRows="8"
+                          [(ngModel)]="experiment.analysisInstructions"
+                          [disabled]="!bioinformaticsAssist"
+                          placeholder="Description">
+                </textarea>
+            </div>
+        </div>
+    </div>
+</div>

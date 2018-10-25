@@ -41,6 +41,11 @@ export class PropertyService {
     public static readonly PROPERTY_QC_ASSAY_HIDE_BUFFER_STRENGTH: string = "qc_assay_hide_buffer_strength";
     public static readonly PROPERTY_QC_ASSAY_HIDE_WELLS_PER_CHIP: string = "qc_assay_hide_wells_per_chip";
 
+    public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
+    public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
+    public static readonly PROPERTY_REQUEST_BIO_ALIGNMENT_NOTE: string = "request_bio_alignment_note";
+    public static readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string  = "request_bio_analysis_note";
+
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
                 private cookieUtilService: CookieUtilService) {}
