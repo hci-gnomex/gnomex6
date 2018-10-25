@@ -20,6 +20,7 @@ import {
 } from '../../../modules/index';
 import {ExperimentOverviewTabComponent} from "./experiment-overview-tab.component";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
+import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-tab.component";
 
 
 
@@ -37,6 +38,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 
     declarations: [
         CollaboratorsDialogComponent,
+        ExperimentBioinformaticsTabComponent,
         ExperimentOverviewTabComponent,
         ExperimentDetailOverviewComponent,
         DescriptionTab

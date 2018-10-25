@@ -636,35 +636,41 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             this.possibleOwnersForLabDictionary.push(member);
         }
 
-        for (let manager of this.lab.Lab.managers) {
-            let managerFoundInAppUsers: boolean = false;
+        if (this.lab.Lab.managers) {
+            if (!Array.isArray(this.lab.Lab.managers)) {
+                this.lab.Lab.managers = [this.lab.Lab.managers];
+            }
 
-            for (let appUser of this.possibleOwnersForLabDictionary) {
-                if (appUser.idAppUser === manager.idAppUser) {
-                    managerFoundInAppUsers = true;
-                    break;
+            for (let manager of this.lab.Lab.managers) {
+                let managerFoundInAppUsers: boolean = false;
+
+                for (let appUser of this.possibleOwnersForLabDictionary) {
+                    if (appUser.idAppUser === manager.idAppUser) {
+                        managerFoundInAppUsers = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!managerFoundInAppUsers) {
-                this.possibleOwnersForLabDictionary.push(manager);
-            }
-
-            let needToAddCurrentOwner:Boolean = true;
-
-            for (let appUser of this.possibleOwnersForLabDictionary) {
-                if (appUser.idAppUser == this._experiment.idAppUser) {
-                    needToAddCurrentOwner = false;
-                    break;
+                if (!managerFoundInAppUsers) {
+                    this.possibleOwnersForLabDictionary.push(manager);
                 }
-            }
-            if (needToAddCurrentOwner) {
-                let currentRequestOwner: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', this._experiment.idAppUser);
-                let newNode: any = {
-                    idAppUser: currentRequestOwner.idAppUser,
-                    displayName: currentRequestOwner.display
-                };
-                this.possibleOwnersForLabDictionary.push(newNode);
+
+                let needToAddCurrentOwner:Boolean = true;
+
+                for (let appUser of this.possibleOwnersForLabDictionary) {
+                    if (appUser.idAppUser == this._experiment.idAppUser) {
+                        needToAddCurrentOwner = false;
+                        break;
+                    }
+                }
+                if (needToAddCurrentOwner) {
+                    let currentRequestOwner: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', this._experiment.idAppUser);
+                    let newNode: any = {
+                        idAppUser: currentRequestOwner.idAppUser,
+                        displayName: currentRequestOwner.display
+                    };
+                    this.possibleOwnersForLabDictionary.push(newNode);
+                }
             }
         }
 

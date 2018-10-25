@@ -39,6 +39,11 @@ export class PropertyService {
     public static readonly PROPERTY_WORK_AUTHORIZATION_ALT_GNOMEX_NAME: string = "workauth2_name";
     public static readonly PROPERTY_WORK_AUTHORIZATION_ALT_GNOMEX_URL: string  = "workauth2_url";
 
+    public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
+    public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
+    public static readonly PROPERTY_REQUEST_BIO_ALIGNMENT_NOTE: string = "request_bio_alignment_note";
+    public static readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string  = "request_bio_analysis_note";
+
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
                 private cookieUtilService: CookieUtilService) {}
