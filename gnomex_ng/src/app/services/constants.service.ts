@@ -92,6 +92,8 @@ export class ConstantsService {
     public readonly ICON_ADD:string = "assets/add.png";
     public readonly ICON_DELETE:string = "assets/delete.png";
     public readonly ICON_FOLDER_DELETE:string= "assets/folder_delete.png";
+    public readonly ICON_BASKET:string ="assets/basket.png";
+    public readonly ICON_REFRESH:string = "assets/refresh.png";
     public readonly EXP_ICON_LIST:string[]=
         [ "assets/noIcon.png" ,"assets/DNA_diag.png" ,"assets/DNA_diag_lightening.png" ,"assets/microarray_chip.png" ,
             "assets/microarray_small.png" ,"assets/microarray_small_single_color.png" ,"assets/chart_line.png" ,
@@ -108,11 +110,16 @@ export class ConstantsService {
 
 
     public getTreeIcon(item:any,name:string) {
+        if(item.icon){
+            return;
+        }
 
         if (name === "DataTrack") {
              this.getDataTrackIcon(item,name);
         }else if(name === "Analysis" ){
             item.icon = this.ICON_ANALYSIS;
+        }else if(name === "RequestCategory"){
+            item.icon = this.ICON_BASKET;
         }
         else if (name === "Topic") {
             if (item.codeVisibility === "MEM") {

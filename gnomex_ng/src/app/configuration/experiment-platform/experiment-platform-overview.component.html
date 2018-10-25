@@ -7,8 +7,18 @@
             <img class="icon" [src]="constService.ICON_DELETE">Remove Platform
         </button>
         <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+        <div style="margin-left:auto ">
+            <button mat-button color="primary" (click)="refresh()" >
+                <img class="icon" [src]="constService.ICON_REFRESH"> Refresh
+            </button>
+        </div>
+
+
     </div>
-    <div style="display:flex;height:100%; width:100%;">
+    <div>
+        <mat-checkbox [(ngModel)]="showInactive" (change)="filterExperimentPlatform()" > Show Inactive Platforms </mat-checkbox>
+    </div>
+    <div  class="flex-container-row full-width flex-grow" >
         <split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
             <split-area size="20">
                 <div style="height:100%;width:100%;">

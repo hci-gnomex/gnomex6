@@ -122,7 +122,11 @@ export class ExperimentPlatformService implements OnDestroy{
             }
             return illuminaLikeList;
         }else if(this.isQC){
-            return ['ExperimentPlatformTabComponent', 'EpSampleTypeTabComponent',"ConfigureAnnotationsComponent"];
+            return [
+                'ExperimentPlatformTabComponent',
+                'EpSampleTypeTabComponent',
+                "EpExperimentTypeQcTabComponent",
+                "ConfigureAnnotationsComponent"];
         }else{
             return [
                 'ExperimentPlatformTabComponent',
