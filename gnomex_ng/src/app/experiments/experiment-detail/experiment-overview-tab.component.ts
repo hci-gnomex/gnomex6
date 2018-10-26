@@ -638,7 +638,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 
         if (this.lab.Lab.managers) {
             if (!Array.isArray(this.lab.Lab.managers)) {
-                this.lab.Lab.managers = [this.lab.Lab.managers];
+                this.lab.Lab.managers = [this.lab.Lab.managers.AppUser];
             }
 
             for (let manager of this.lab.Lab.managers) {
@@ -685,7 +685,14 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             return;
         }
 
-        let temp: any[] = this.lab.Lab.members;
+        let temp: any[] = [];
+
+        if (this.lab.Lab.members && !Array.isArray(this.lab.Lab.members)) {
+            temp = [this.lab.Lab.members.AppUser];
+        } else {
+            temp = this.lab.Lab.members;
+        }
+
         for (let member of temp) {
             this.possibleSubmittersForLabDictionary.push(member);
         }
