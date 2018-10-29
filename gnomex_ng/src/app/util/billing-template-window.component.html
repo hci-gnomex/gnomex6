@@ -1,7 +1,7 @@
 <h6 mat-dialog-title>Billing Template</h6>
 <mat-dialog-content>
     <div>
-        <span class="margin-right" matTooltip="{{this.helpTooltip}}" [matTooltipPosition]="'left'"><img src="../../assets/information.png" class="icon">Help</span>
+        <context-help class="margin-right" name="billingTemplateHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
         <mat-form-field class="margin-right">
             <mat-select placeholder="Lab" [(value)]="this.selectedLab" (change)="this.loadAccountsForLab()">
                 <mat-option>None</mat-option>

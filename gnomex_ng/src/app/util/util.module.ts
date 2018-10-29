@@ -33,6 +33,9 @@ import {UrlAnnotationComponent} from "./url-annotation.component";
 import {BillingPeriodSelectorComponent} from "./billing-period-selector.component";
 import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-popup.component";
 import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
+import {ContextHelpComponent} from "./context-help.component";
+import {ContextHelpPopupComponent} from "./context-help-popup.component";
+import {RichEditorModule} from "../../modules/rich-editor.module";
 
 @NgModule({
     imports: [
@@ -47,6 +50,7 @@ import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
         AgGridModule.withComponents([
             CheckboxRenderer,
         ]),
+        RichEditorModule,
     ],
     declarations: [
         BillingUsageReportComponent,
@@ -72,7 +76,9 @@ import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
         UrlAnnotationComponent,
         BillingPeriodSelectorComponent,
         BillingPeriodSelectorPopupComponent,
-        VisibilityDetailTabComponent
+        VisibilityDetailTabComponent,
+        ContextHelpComponent,
+        ContextHelpPopupComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -85,6 +91,7 @@ import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
         BillingTemplateWindowComponent,
         NewTopicComponent,
         BillingPeriodSelectorPopupComponent,
+        ContextHelpPopupComponent,
     ],
     exports: [
         BrowseFilterComponent,
@@ -109,7 +116,9 @@ import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
         AnnotationTabComponent,
         UrlAnnotationComponent,
         BillingPeriodSelectorComponent,
-        VisibilityDetailTabComponent
+        VisibilityDetailTabComponent,
+        ContextHelpComponent,
+        ContextHelpPopupComponent,
     ]
 })
 export class UtilModule {

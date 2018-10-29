@@ -196,8 +196,11 @@
                     </div>
                 </div>
                 <div class="field-width flex-container-row padded">
-                    <div class="label label-width">
+                    <div class="label label-width flex-container-col">
                         Visibility
+                        <context-help name="visibilityLevel" [isEditMode]="this.secAdvisor.isAdmin"
+                                      popupTitle="Visibility Level Help"
+                                      [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
                     </div>
                     <div class="flex-grow flex-container-row align-center">
                         <mat-radio-group class="flex-container-col"  [(value)]="_experiment.codeVisibility" (change)="onUpdateVisibility($event)" >
@@ -222,6 +225,9 @@
                                 <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
                                 <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
                             </mat-form-field>
+                            <context-help name="visibilityPrivacyExpiration" [isEditMode]="this.secAdvisor.isAdmin"
+                                          popupTitle="Visibility Privacy Expiration Help"
+                                          [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
                         </div>
                     </div>
                 </div>
@@ -235,6 +241,9 @@
                             Collaborators
                         </button>
                     </div>
+                    <context-help name="visibilityCollaborators" [isEditMode]="this.secAdvisor.isAdmin"
+                                  popupTitle="Visibility Collaborator Help"
+                                  [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
                     <div class="flex-grow flex-container-col multi-line max-height padded">
                         {{ currentCollaboratorsDisplay }}
                     </div>

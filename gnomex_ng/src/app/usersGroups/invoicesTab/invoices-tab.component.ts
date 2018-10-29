@@ -81,7 +81,7 @@ export class InvoicesTabComponent implements OnInit {
 
     constructor(public billingService: BillingService,
                 private dictionaryService: DictionaryService,
-                private secAdvisor: CreateSecurityAdvisorService,
+                public secAdvisor: CreateSecurityAdvisorService,
                 @Inject(DOCUMENT) private document: Document) {
 
     }

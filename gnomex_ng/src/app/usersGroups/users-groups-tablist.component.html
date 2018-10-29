@@ -231,7 +231,11 @@
                                                 </div>
                                                 <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && (this.secAdvisor.isSuperAdmin||this.secAdvisor.isBillingAdmin)" class="foreground border-padding margin-left">
                                                     <div class="full-width full-height large-padding-right">
-                                                        <label class="full-width">Submit experiments in all labs in core</label>
+                                                        <div class="flex-container-row align-center">
+                                                            <label class="full-width">Submit experiments in all labs in core</label>
+                                                            <context-help name="SubmitterPermissionHelp" tooltipPosition="right"
+                                                                          [isEditMode]="this.secAdvisor.isSuperAdmin" popupTitle="Submitter Help"></context-help>
+                                                        </div>
                                                         <div class="flex-container-col">
                                                             <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>
                                                                 {{cf.display}}

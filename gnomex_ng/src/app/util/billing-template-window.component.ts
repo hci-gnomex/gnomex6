@@ -6,6 +6,7 @@ import {DialogsService} from "./popup/dialogs.service";
 import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowSelectedEvent} from "ag-grid";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {DictionaryService} from "../services/dictionary.service";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 
 @Component({
     selector: 'billing-template-window',
@@ -21,10 +22,6 @@ import {DictionaryService} from "../services/dictionary.service";
 })
 
 export class BillingTemplateWindowComponent implements OnInit {
-
-    // TODO this needs to eventually be converted to a dedicated ContextHelp component
-    public readonly helpTooltip: string = "Add any applicable billing accounts to the grid and assign a percentage amount to each."
-        + " Please designate one account to assume the remaining balance";
 
     public idCoreFacility: string = "";
     public codeRequestCategory: string = "";
@@ -47,7 +44,8 @@ export class BillingTemplateWindowComponent implements OnInit {
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 private billingService: BillingService,
                 private dialogsService: DialogsService,
-                private dictionaryService: DictionaryService) {
+                private dictionaryService: DictionaryService,
+                public createSecurityAdvisorService: CreateSecurityAdvisorService) {
         if (data && data.params) {
             let params: BillingTemplateWindowParams = data.params as BillingTemplateWindowParams;
             if (params.idCoreFacility) {

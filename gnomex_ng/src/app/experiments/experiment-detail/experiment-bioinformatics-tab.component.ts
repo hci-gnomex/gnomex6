@@ -1,6 +1,7 @@
 import {Component, Input} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 @Component({
     selector: 'experiment-bioinformatics-tab',
@@ -228,7 +229,8 @@ export class ExperimentBioinformaticsTabComponent {
 
 
     constructor(private dictionaryService: DictionaryService,
-                private propertyService: PropertyService) {
+                private propertyService: PropertyService,
+                public createSecurityAdvisorService: CreateSecurityAdvisorService) {
 
         this.cachedGenomeBuilds =  this.dictionaryService.getEntries('hci.gnomex.model.GenomeBuildLite');
     }

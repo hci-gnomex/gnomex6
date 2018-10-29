@@ -28,7 +28,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 })
 export class NewBillingAccountLauncher {
 
-	constructor(private dialog: MatDialog, private router: Router) {
+	constructor(private dialog: MatDialog, private router: Router,
+				public createSecurityAdvisorService: CreateSecurityAdvisorService) {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = '60em';
         config.panelClass = 'no-padding-dialog';

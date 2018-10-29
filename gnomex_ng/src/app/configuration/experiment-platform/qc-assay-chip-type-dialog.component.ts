@@ -9,6 +9,7 @@ import {GridApi, CellValueChangedEvent} from "ag-grid";
 import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {numberRange} from "../../util/validators/number-range-validator";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -52,6 +53,9 @@ import {numberRange} from "../../util/validators/number-range-validator";
                     </div>
                     
                     <!-- billing  -->
+                    <div *ngIf="!this.canEnterPrice || this.createSecurityAdvisorService.isSuperAdmin">
+                        <context-help name="ExperimentPlatformQCPricingHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Why can't I edit prices?" popupTitle="Pricing Help" tooltipPosition="right"></context-help>
+                    </div>
                     <div class="flex-container-row spaced-children-margin" >
                         <mat-form-field class="flex-grow">
                             <span matPrefix>$ &nbsp;</span>
@@ -133,6 +137,8 @@ export class QcAssayChipTypeDialogComponent implements OnInit{
     hideWellPerChip:boolean = true;
     readonly currencyRegex = /^[0-9]+\.\d{2}$/;
 
+    public canEnterPrice: boolean = false;
+
 
     constructor(private dialogRef: MatDialogRef<QcAssayChipTypeDialogComponent>,
                 public constService:ConstantsService, private fb: FormBuilder,
@@ -141,7 +147,8 @@ export class QcAssayChipTypeDialogComponent implements OnInit{
                 private dialog: MatDialog,
                 private dictionaryService: DictionaryService,
                 private dialogService:DialogsService,
-                @Inject(MAT_DIALOG_DATA) private data) {
+                @Inject(MAT_DIALOG_DATA) private data,
+                public createSecurityAdvisorService: CreateSecurityAdvisorService) {
         if (this.data) {
             this.rowData = this.data.rowData;
             this.applyFn = this.data.applyFn;
@@ -150,7 +157,7 @@ export class QcAssayChipTypeDialogComponent implements OnInit{
     }
 
     ngOnInit(){
-        let canEntryPrice:boolean = this.expPlatform.canEnterPrices == 'Y';
+        this.canEnterPrice = this.expPlatform.canEnterPrices == 'Y';
         this.hideBufferStrength  =
             this.gnomexService.getCoreFacilityProperty(this.expPlatform.idCoreFacility,PropertyService.PROPERTY_QC_ASSAY_HIDE_BUFFER_STRENGTH ) === 'Y';
         this.hideWellPerChip =
@@ -163,15 +170,15 @@ export class QcAssayChipTypeDialogComponent implements OnInit{
             maxSampleBufferStrength: this.rowData.maxSampleBufferStrength ? this.rowData.maxSampleBufferStrength : '',
             sampleWellsPerChip: [this.rowData.sampleWellsPerChip ? this.rowData.sampleWellsPerChip : '', numberRange(0,99) ],
             unitPriceInternal: [
-                {value:this.rowData.unitPriceInternal ? this.rowData.unitPriceInternal : '0.00', disabled:!canEntryPrice},
+                {value:this.rowData.unitPriceInternal ? this.rowData.unitPriceInternal : '0.00', disabled: !this.canEnterPrice},
                 Validators.pattern(this.currencyRegex)
             ],
             unitPriceExternalAcademic:[
-                {value:this.rowData.unitPriceExternalAcademic ? this.rowData.unitPriceExternalAcademic : '0.00',disabled:!canEntryPrice},
+                {value:this.rowData.unitPriceExternalAcademic ? this.rowData.unitPriceExternalAcademic : '0.00', disabled: !this.canEnterPrice},
                 Validators.pattern(this.currencyRegex)
             ],
             unitPriceExternalCommercial: [
-                {value:this.rowData.unitPriceExternalCommercial ? this.rowData.unitPriceExternalCommercial : '0.00',disabled:!canEntryPrice},
+                {value:this.rowData.unitPriceExternalCommercial ? this.rowData.unitPriceExternalCommercial : '0.00', disabled: !this.canEnterPrice},
                 Validators.pattern(this.currencyRegex)
             ],
             protocolDescription: this.rowData.protocolDescription ? this.rowData.protocolDescription : '',

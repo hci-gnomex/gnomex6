@@ -352,7 +352,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
     }
 
     constructor(private constantsService: ConstantsService,
-                private secAdvisor: CreateSecurityAdvisorService,
+                public secAdvisor: CreateSecurityAdvisorService,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private getLabService: GetLabService,
@@ -712,7 +712,8 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             }
         }
 
-        for (let submitter of this._experiment.submitterFromOtherCores) {
+        let submittersFromOtherCores: any[] = Array.isArray(this._experiment.submitterFromOtherCores) ? this._experiment.submitterFromOtherCores : [this._experiment.submitterFromOtherCores.AppUser];
+        for (let submitter of submittersFromOtherCores) {
             let submitterFoundInAppUsers: boolean = false;
 
             for (let appUser of this.possibleSubmittersForLabDictionary) {

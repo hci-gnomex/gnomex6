@@ -9,6 +9,8 @@
                         <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let cor of filterCores(this.core)" [value]="cor.display">{{cor.display}}</mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
+                <context-help name="coreFacilityHelp" label="Help me choose" popupTitle="Core Facility Information"
+                              [isEditMode]="this.secAdvisor.isSuperAdmin" tooltipPosition="right"></context-help>
             </div>
             <div>
                 <app-month-picker label="Billing period"
