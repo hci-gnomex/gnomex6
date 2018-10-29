@@ -66,10 +66,9 @@
                 (1)
             </div>
             <div class="flex-grow padded">
-                <div>
-                    Do you want the sequence data to be aligned?
-                    {{ alignmentNote }}
-                </div>
+                <context-help name="bioSequenceAligned" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                              [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Sequence Alignment Help"
+                              label="Do you want the sequence data to be aligned? {{ alignmentNote }}"></context-help>
                 <div *ngFor="let item of consolidatedGenomeInformation" class="flex-container-row align-center">
                     <div class="label-width">
                         {{ item.organismName }}
@@ -93,9 +92,9 @@
                 {{ (consolidatedGenomeInformation?.length > 0) ? '(2)': '(1)' }}
             </div>
             <div class="flex-grow padded">
-                <div>
-                    Would you like the {{ groupName }} to assist you with analysis?
-                </div>
+                <context-help name="bioAnalysisAssistance" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                              [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Assistance Help"
+                              label="Would you like the {{ groupName }} to assist you with analysis?"></context-help>
                 <div class="flex-container-row align-center">
                     <div class="label-width margin-top">
                         <mat-checkbox [(ngModel)]="bioinformaticsAssist">Yes</mat-checkbox>
@@ -107,9 +106,9 @@
             </div>
         </div>
         <div class="full-width flex-container-col padded">
-            <div *ngIf="bioinformaticsAssist">
-                Enter a note regarding analysis. (optional)
-            </div>
+            <context-help *ngIf="bioinformaticsAssist" name="bioNote" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                          [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Note Help"
+                          label="Enter a note regarding analysis. (optional)"></context-help>
             <div *ngIf="!bioinformaticsAssist" class="disabled-color">
                 Disabled.
             </div>

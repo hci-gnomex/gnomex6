@@ -201,13 +201,6 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 displayName: 'Help',
                 children: [
                     {
-                        displayName: 'Enable Help Edit',
-                        class: 'mat-menu-item',
-                        context: 'helpEdit',
-                        iconName: '../../assets/white_information.png',
-                        route: ''
-                    },
-                    {
                         displayName: 'User Guide',
                         class: 'mat-menu-item',
                         route: ''
@@ -2240,11 +2233,6 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 this.navItems = this.managerESNavItems;
                 break;
             }
-        }
-
-        // Hide help edit unless admin
-        if (!this.isAdminState) {
-            this.hideMenusByContext(this.linkNavItems, 'helpEdit');
         }
 
         if (this.createSecurityAdvisorService.isGuest) {

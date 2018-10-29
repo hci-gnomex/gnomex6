@@ -16,6 +16,7 @@ import { AccountFieldsConfigurationService } from "../../services/account-fields
 import { DictionaryService } from "../../services/dictionary.service";
 import { LabListService } from "../../services/lab-list.service";
 import { PropertyService } from "../../services/property.service";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -359,6 +360,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 				private dictionaryService: DictionaryService,
 				private labListService: LabListService,
 				private propertyService: PropertyService,
+                public createSecurityAdvisorService: CreateSecurityAdvisorService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (data) {
             this.labActiveSubmitters = data.labActiveSubmitters;

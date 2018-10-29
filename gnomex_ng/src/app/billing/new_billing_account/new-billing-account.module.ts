@@ -12,6 +12,7 @@ import {NewBillingAccountSuccessDialogComponent} from "./dialogs/new-billing-acc
 import {NewBillingAccountLauncher, NewBillingAccountComponent} from "./new-billing-account.component";
 
 import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
+import {UtilModule} from "../../util/util.module";
 
 @NgModule({
 	imports: [
@@ -20,7 +21,8 @@ import {NEW_BILLING_ACCOUNT_ROUTING} from "./new-billing-account.routes";
 		CommonModule,
 		FormsModule,
 		ReactiveFormsModule,
-		ServicesModule
+		ServicesModule,
+		UtilModule
 	],
 	declarations: [
 		NewBillingAccountComponent,
