@@ -424,9 +424,9 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         config.height = '800px';
         let dialogRef: MatDialogRef<BrowseDictionaryComponent> = this.dialog.open(BrowseDictionaryComponent, config);
         dialogRef.afterClosed().subscribe(() => {
-            this.dictionaryService.reload(() => {
+            this.dictionaryService.reloadAndRefresh(() => {
                 this.analysisTypes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
-            });
+            }, null, DictionaryService.ANALYSIS_TYPE);
         });
     }
 
@@ -449,7 +449,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         config.height = '800px';
         let dialogRef: MatDialogRef<ConfigureOrganismsComponent> = this.dialog.open(ConfigureOrganismsComponent, config);
         dialogRef.afterClosed().subscribe(() => {
-            this.dictionaryService.reload(() => {
+            this.dictionaryService.reloadAndRefresh(() => {
                 this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
                 this.refreshGenomeBuilds();
             });

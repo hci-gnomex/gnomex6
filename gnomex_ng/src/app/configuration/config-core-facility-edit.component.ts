@@ -137,11 +137,11 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
         this.saveCoreFacilitySubscription = this.configService.saveCoreFacility(params).subscribe(resp => {
             this.showSpinner = false;
             this.coreFacilityForm.markAsPristine();
-            this.dictionaryService.reload(() =>{
+            this.dictionaryService.reloadAndRefresh(() => {
                 this.idCoreFacility = resp.idCoreFacility;
-               this.refreshedCore.emit({
-                   'facilityName':this.coreFacilityForm.get("facilityName").value,
-                   'idCoreFacility':resp.idCoreFacility
+                this.refreshedCore.emit({
+                    'facilityName':this.coreFacilityForm.get("facilityName").value,
+                    'idCoreFacility':resp.idCoreFacility
                });
             });
         })

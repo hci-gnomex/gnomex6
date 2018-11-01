@@ -1,8 +1,9 @@
-import {EventEmitter, Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 
-import 'rxjs/add/operator/timeout';
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {Dictionary} from "../configuration/dictionary.interface";
+import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 
 @Injectable()
 export class DictionaryService {
@@ -80,128 +81,119 @@ export class DictionaryService {
     public static readonly USER_PERMISSION_KIND: string = "hci.gnomex.model.UserPermissionKind";
     public static readonly VENDOR: string = "hci.gnomex.model.Vendor";
     public static readonly VISIBILITY: string = "hci.gnomex.model.Visibility";
-    public static readonly VISIBILTY: string = "hci.gnomex.model.Visibility";   // ***** REMOVE ME WHEN SAFE *****
     public static readonly WORKFLOW_PROPERTY: string = "hci.gnomex.model.WorkflowProperty";
 
-    private cachedDictionaries: any;
-    private cachedEntries: any;
-    private cacheExpirationTime: number = 0;
-    private CACHE_EXPIRATION_MILLIS = 600000;   // ten minutes = 600000 millis
-    private reloadInProgress: Observable<any> = null;
-    private RELOAD_EXPIRATION_MILLIS = 10000;   // ten seconds = 10000 millis
+    private cachedDictionaries: Dictionary[] = [];
+    private cachedEntries: { [key: string]: DictionaryEntry[] } = {};
 
-    constructor(private _http: Http) {}
+    constructor(private httpClient: HttpClient) {
+    }
 
-    private cacheDictionaryData(dictionaryData) {
+    public load(callback?: () => void | null, errorCallback?: () => void | null, className?: string): void {
+        this.loadDictionaries(className).subscribe((result: any) => {
+            if (result && result.result && result.result !== 'SUCCESS') {
+                if (errorCallback) {
+                    errorCallback();
+                }
+                return;
+            }
+
+            if (className) {
+                this.cacheDictionary(result[0]);
+            } else {
+                this.cacheDictionaries(result);
+            }
+
+            if (callback) {
+                callback();
+            }
+        }, () => {
+            if (errorCallback) {
+                errorCallback();
+            }
+        });
+    }
+
+    public reload(callback?: () => void | null, errorCallback?: () => void | null): void {
+        this.reloadDictionaries().subscribe((result: any) => {
+            if (result && result.result && result.result === 'SUCCESS') {
+                if (callback) {
+                    callback();
+                }
+            } else {
+                if (errorCallback) {
+                    errorCallback();
+                }
+            }
+        }, () => {
+            if (errorCallback) {
+                errorCallback();
+            }
+        });
+    }
+
+    public reloadAndRefresh(callback?: () => void | null, errorCallback?: () => void | null, className?: string): void {
+        this.reload(() => {
+            this.load(callback, errorCallback, className);
+        }, errorCallback);
+    }
+
+    private callManageDictionaries(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/ManageDictionaries.gx", {params: params});
+    }
+
+    private loadDictionaries(className?: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("action", "load");
+        if (className) {
+            params = params.set("className", className);
+        }
+        return this.callManageDictionaries(params);
+    }
+
+    private reloadDictionaries(): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("action", "reload");
+        return this.callManageDictionaries(params);
+    }
+
+    public getMetaData(className: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("action", "metadata")
+            .set("className", className);
+        return this.callManageDictionaries(params);
+    }
+
+    private cacheDictionaries(dictionaryData: Dictionary[]): void {
         this.cachedDictionaries = [];
         this.cachedEntries = {};
         for (let dictionary of dictionaryData) {
-            this.cachedEntries[dictionary.className] = dictionary.DictionaryEntry;
-            delete dictionary.DictionaryEntry;
+            this.cacheDictionary(dictionary);
+        }
+    }
+
+    private cacheDictionary(dictionary: Dictionary, isRefresh: boolean = false): void {
+        this.cachedEntries[dictionary.className] = Array.isArray(dictionary.DictionaryEntry) ? dictionary.DictionaryEntry : [dictionary.DictionaryEntry.DictionaryEntry];
+        delete dictionary.DictionaryEntry;
+        dictionary.Filters = Array.isArray(dictionary.Filters) ? dictionary.Filters : [(dictionary.Filters as any).filter];
+
+        if (isRefresh) {
+            for (let index: number = 0; index < this.cachedDictionaries.length; index++) {
+                if (this.cachedDictionaries[index].className === dictionary.className) {
+                    this.cachedDictionaries[index] = dictionary;
+                    break;
+                }
+            }
+        } else {
             this.cachedDictionaries.push(dictionary);
         }
     }
 
-    /**
-     * Forces a full reload of the dictionary, returns an observable of an empty object when it is done.
-     * Provide a callback function to query the dictionary if you need it to run after the reload is complete
-     * This should be called when the application first loads.
-     * @param callback A function to be called when the reload is complete
-     * @param errorCallback A function (with 'error' parameter) to be called if the reload fails
-     */
-    reload(callback?, errorCallback?): void {
-        if (this.reloadInProgress) {
-            if (callback || errorCallback) {
-                this.reloadInProgress.subscribe((response) => {
-                    if (callback) {
-                        callback();
-                    }
-                }, (error) => {
-                    if (errorCallback) {
-                        errorCallback(error);
-                    }
-                });
-            }
-        } else {
-            this.reloadInProgress = this.loadDictionariesObservable();
-            this.reloadInProgress.subscribe((response) => {
-                this.cacheDictionaryData(response);
-                this.cacheExpirationTime = Date.now() + this.CACHE_EXPIRATION_MILLIS;
-                this.reloadInProgress = null;
-                if (callback) {
-                    callback();
-                }
-            }, (error) => {
-                this.reloadInProgress = null;
-                if (errorCallback) {
-                    errorCallback(error);
-                }
-            });
-        }
-    }
-
-    /**
-     * Backend call to load all dictionaries from the database
-     * Forces a database call and returns an observable that will throw an error
-     * if data is not returned in a specific amount of time (RELOAD_EXPIRATION_MILLIS)
-     * @returns {Observable<any>}
-     */
-    private loadDictionariesObservable(): Observable<any> {
-        let emitter: EventEmitter<any> = new EventEmitter();
-        this.loadDictionaries().subscribe((response) => {
-            emitter.emit(response);
-            emitter.complete();
-        });
-        return emitter.asObservable().timeout(this.RELOAD_EXPIRATION_MILLIS);
-    }
-
-    /**
-     * Backend call to load all dictionaries from the database
-     * Follows typical GNomEx backend format, which returns an Observable without forcing a database call
-     * The database call only happens when the caller to this method subscribes to the Observable
-     * @returns {Observable<any>} The dictionary object
-     */
-    private loadDictionaries(): Observable<any> {
-        return this._http.get("/gnomex/ManageDictionaries.gx?action=load", {withCredentials: true}).map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error in ManageDictionaries");
-            }
-        });
-    }
-
-    /**
-     * Internal method to get the current list of cached dictionary objects without the entries
-     * If the cache has expired this will initiate a reload but not wait for the newest version
-     * @returns {any[]}
-     */
-    private getCachedDictionaries(): any[] {
-        if (!this.cachedDictionaries) {
-            this.reload();
-            throw "error in dictionary service: missing cached dictionaries";
-        }
-        if (Date.now() > this.cacheExpirationTime) {
-            this.reload();
-        }
+    private getCachedDictionaries(): Dictionary[] {
         return this.cachedDictionaries;
     }
 
-    /**
-     * Internal method to get the current list of cached dictionary entries for the given className
-     * If the cache has expired this will initiate a reload but not wait for the newest version
-     * If there is no dictionary for the given className, returns an empty array
-     * @param {string} className
-     * @returns {any[]}
-     */
-    private getCachedEntries(className: string): any[] {
-        if (!this.cachedEntries) {
-            this.reload();
-            throw "error in dictionary service: missing cached entries";
-        }
-        if (Date.now() > this.cacheExpirationTime) {
-            this.reload();
-        }
+    private getCachedEntries(className: string): DictionaryEntry[] {
         if (this.cachedEntries[className]) {
             return this.cachedEntries[className];
         } else {
@@ -209,169 +201,73 @@ export class DictionaryService {
         }
     }
 
-    private sortArrayByField(array: any[], fieldName: string) {
-        return array.sort((o1, o2) => {
-            if (o1[fieldName] < o2[fieldName]) {
-                return -1;
-            } else if (o1[fieldName] > o2[fieldName]) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+    public getAllDictionaries(): Dictionary[] {
+        let dictionaries: Dictionary[] = DictionaryService.cloneObject(this.getCachedDictionaries());
+        return DictionaryService.sortArrayByField(dictionaries, "displayName");
     }
 
-    /**
-     * Get an array of all dictionary objects (no entries), sorted by displayName
-     * @returns {any[]}
-     */
-    getAllDictionaries(): any[] {
-        let dictionaries: any[] = this.cloneObject(this.getCachedDictionaries());
-        return this.sortArrayByField(dictionaries, "displayName");
+    public getEditableDictionaries(): Dictionary[] {
+        return this.getAllDictionaries().filter((value: Dictionary) => (value.canWrite === "Y"));
     }
 
-    /**
-     * Get an array of all editable dictionary objects (no entries), sorted by displayName
-     * @returns {any[]}
-     */
-    getEditableDictionaries(): any[] {
-        return this.getAllDictionaries().filter((value) => (value.canWrite == "Y"));
+    public getDictionary(className: string): Dictionary {
+        let dictionary: Dictionary = this.getCachedDictionaries().find((value: Dictionary) => (value.className === className));
+        return DictionaryService.cloneObject(dictionary);
     }
 
-    /**
-     * Get the dictionary object (no entries) for a specific className, returns undefined if not found
-     * @param {string} className
-     * @returns {any}
-     */
-    getDictionary(className: string): any {
-        let dictionary = this.getCachedDictionaries().find((value) => (value.className == className));
-        return this.cloneObject(dictionary);
+    public getEntries(className: string): DictionaryEntry[] {
+        let entries: DictionaryEntry[] = DictionaryService.cloneObject(this.getCachedEntries(className));
+        return DictionaryService.sortArrayByField(entries, "display");
     }
 
-    /**
-     * Get all dictionary entries for a specific className, including blank entries, sorted by display
-     * Returns an empty array if not found
-     * @param {string} className
-     * @returns {any[]}
-     */
-    getEntries(className: string): any[] {
-        let entries = this.cloneObject(this.getCachedEntries(className));
-        return this.sortArrayByField(entries, "display");
+    public getEntriesExcludeBlank(className: string): DictionaryEntry[] {
+        return this.getEntries(className).filter((value: DictionaryEntry) => value.value !== "");
     }
 
-    /**
-     * Get all dictionary entries for a specific className, excluding blank entries, sorted by display
-     * Returns an empty array if not found
-     * @param {string} className
-     * @returns {any[]}
-     */
-    getEntriesExcludeBlank(className: string): any[] {
-        return this.getEntries(className).filter((value) => value.value != "");
+    public getEntry(className: string, value: string): DictionaryEntry {
+        let entry: DictionaryEntry = this.getCachedEntries(className).find((entry: DictionaryEntry) => entry.value === value);
+        return DictionaryService.cloneObject(entry);
     }
 
-    /**
-     * Get all core facilities
-     * @returns {any[]}
-     */
-    coreFacilities(): any[] {
-        return this.getEntries(DictionaryService.CORE_FACILITY);
-    }
-
-    /**
-     * Get the dictionary entry for a specific className and value. Returns undefined if no match is found.
-     * @param {string} className
-     * @param {string} value
-     * @returns {any}
-     */
-    getEntry(className: string, value: string): any {
-        let entry = this.getCachedEntries(className).find((entry) => entry.value == value);
-        return this.cloneObject(entry);
-    }
-
-    /**
-     * Returns an array of dictionary entries for a specific className and array of values.
-     * @param {string} className
-     * @param {string[]} values
-     * @returns {any}
-     */
-    getEntryArray(className: string, values: string[]): any {
+    public getEntryArray(className: string, values: string[]): DictionaryEntry[] {
         if (!values) {
             return [];
         }
-        if (Array.isArray(values)) {
-            return values.map((value) => this.getEntry(className, value));
-        } else {
-            return this.getEntry(className, values);
-        }
+        return values.map((value: string) => this.getEntry(className, value));
     }
 
-    /**
-     * Returns the display text for the dictionary entry matching the className and value provided.
-     * Returns an empty string if no match is found.
-     * @param {string} className
-     * @param {string} value
-     * @returns {string}
-     */
-    getEntryDisplay(className: string, value: string): string {
-        let entry = this.getEntry(className, value);
-        if (entry && entry.display) {
-            return entry.display;
-        } else {
-            return "";
-        }
+    public getEntryDisplay(className: string, value: string): string {
+        let entry: DictionaryEntry = this.getEntry(className, value);
+        return entry ? entry.display : "";
     }
 
-    /**
-     * Asynchronous call to retrieve dictionary metadata
-     * @param {string} className
-     * @returns {Observable<any>}
-     */
-    getMetaData(className: string): Observable<any> {
-        return this._http.get("/gnomex/ManageDictionaries.gx?action=metadata&className=" + className, {withCredentials: true}).map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error in metaData for class: " + className);
-            }
-        });
+    public findEntryByField(className: string, fieldName: string, fieldValue: string): DictionaryEntry {
+        let entry: DictionaryEntry = this.getCachedEntries(className).find((entry: DictionaryEntry) => entry[fieldName] === fieldValue);
+        return DictionaryService.cloneObject(entry);
     }
 
-    /**
-     * Get the dictionary entry for the application that matches the specified idSeqLibProtocol. Returns undefined if no match is found.
-     * There should never be multiple matches for a single protocol - this method will either return a single match or undefined.
-     * @param {string} idSeqLibProtocol
-     * @returns {any}
-     */
-    public getApplicationForProtocol(idSeqLibProtocol: string): any {
-        let application;
-        let seqLibProtocolApplication = this.findEntryByField(DictionaryService.SEQ_LIB_PROTOCOL_APPLICATION, "idSeqLibProtocol", idSeqLibProtocol);
+    public coreFacilities(): DictionaryEntry[] {
+        return this.getEntries(DictionaryService.CORE_FACILITY);
+    }
+
+    public getApplicationForProtocol(idSeqLibProtocol: string): DictionaryEntry {
+        let application: DictionaryEntry;
+        let seqLibProtocolApplication: DictionaryEntry = this.findEntryByField(DictionaryService.SEQ_LIB_PROTOCOL_APPLICATION, "idSeqLibProtocol", idSeqLibProtocol);
         if (seqLibProtocolApplication) {
             application = this.findEntryByField(DictionaryService.APPLICATION, "codeApplication", seqLibProtocolApplication.codeApplication);
         }
         return application;
     }
 
-    // public getOligoBarcodes(): any[] {
-    //     for (var barcodeScheme of this.findEntryByField(()))
-    // }
-
-    /**
-     * Get the dictionary entry for a specific className and field value. Returns undefined if no match is found.
-     * This method will return the first match it finds and should not be used if multiple matches are expected.
-     * @param {string} className
-     * @param {string} fieldName
-     * @param {string} fieldValue
-     * @returns {any}
-     */
-    public findEntryByField(className: string, fieldName: string, fieldValue: string): any {
-        let entry = this.getCachedEntries(className).find((entry) => entry[fieldName] == fieldValue);
-        return this.cloneObject(entry);
+    private static sortArrayByField<T>(array: T[], fieldName: string): T[] {
+        return array.sort((o1: T, o2: T) => {
+            return o1[fieldName] - o2[fieldName];
+        });
     }
 
-    private cloneObject(object: any): any {
+    private static cloneObject<T>(object: T): T {
         if (!object) {
-            // leave null and undefined unchanged
-            return object;
+            return object; // leave null and undefined unchanged
         }
         return JSON.parse(JSON.stringify(object));
     }

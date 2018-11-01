@@ -118,7 +118,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
 
     ngOnInit() {
         this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
-        this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILTY);
+        this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILITY);
 
         this.activeOrganismList = this.organismList.filter(org =>
             org.isActive === "Y");

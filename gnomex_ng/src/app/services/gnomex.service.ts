@@ -691,7 +691,7 @@ export class GnomexService {
                     this.projectService.getProjectList().subscribe((response: any) => {
                         this.projectList = response;
                     });
-                    this.dictionaryService.reload(() => {
+                    this.dictionaryService.load(() => {
                         this.progressService.displayLoader(30);
                         Observable.forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
                             .first().subscribe((response: any[]) => {
@@ -744,7 +744,7 @@ export class GnomexService {
         params.set("idCoreFacility",null)
         this.createSecurityAdvisorService.createGuestSecurityAdvisor(params).first().subscribe(response => {
             this.progressService.displayLoader(15);
-            this.dictionaryService.reload(() => {
+            this.dictionaryService.load(() => {
                 this.progressService.displayLoader(30);
                 Observable.forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
                     .first().subscribe((response: any[]) => {

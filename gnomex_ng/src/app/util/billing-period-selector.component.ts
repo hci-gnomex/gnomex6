@@ -2,6 +2,7 @@ import {Component, EventEmitter, OnInit, Output} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-popup.component";
+import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 
 @Component({
     selector: 'billing-period-selector',
@@ -31,7 +32,7 @@ export class BillingPeriodSelectorComponent implements OnInit {
         this.minYear = currentYear;
         this.maxYear = currentYear;
 
-        this.billingPeriodList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD);
+        this.billingPeriodList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD) as BillingPeriod[];
         for (let bp of this.billingPeriodList) {
             let year: number = parseInt(bp.calendarYear);
             if (year < this.minYear) {
@@ -72,12 +73,11 @@ export class BillingPeriodSelectorComponent implements OnInit {
 
 }
 
-export interface BillingPeriod {
-    readonly idBillingPeriod: string;
-    readonly display: string;
-    readonly calendarYear: string;
-    readonly isCurrentPeriod: string;
-    readonly startDate: string;
-    readonly endDate: string;
-    readonly startDateSort: string;
+export type BillingPeriod = DictionaryEntry & {
+    idBillingPeriod: string;
+    calendarYear: string;
+    isCurrentPeriod: string;
+    startDate: string;
+    endDate: string;
+    startDateSort: string;
 }

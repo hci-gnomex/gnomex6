@@ -187,7 +187,7 @@ export class ConfigureProductTypesComponent implements OnInit {
                     this.showSpinner = true;
                     this.productsService.deleteProductType(this.collectFields()).subscribe((response: any) => {
                         if (response && Array.isArray(response) && response[0].DictionaryEntry) {
-                            this.dictionaryService.reload();
+                            this.dictionaryService.reloadAndRefresh(null, null, DictionaryService.PRODUCT_TYPE);
                             this.loadProductTypes(response[0].DictionaryEntry);
                             this.snackBar.open("Product Type Deleted", "Configure Product Types", {
                                 duration: 2000,
@@ -217,7 +217,7 @@ export class ConfigureProductTypesComponent implements OnInit {
             this.showSpinner = true;
             this.productsService.saveProductType(this.collectFields(), this.selectedProductType.idProductType === 0).subscribe((response: any) => {
                 if (response && Array.isArray(response) && response[0].DictionaryEntry) {
-                    this.dictionaryService.reload();
+                    this.dictionaryService.reloadAndRefresh(null, null, DictionaryService.PRODUCT_TYPE);
                     this.loadProductTypes(response[0].DictionaryEntry);
                     this.snackBar.open("Product Type Saved", "Configure Product Types", {
                         duration: 2000,

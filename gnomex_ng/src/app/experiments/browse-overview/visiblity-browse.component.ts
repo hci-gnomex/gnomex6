@@ -192,7 +192,7 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
         //this.myGrid.setColumns(this.columns);
         //this.myGrid.setDataAdapterSource(this.source);
 
-        this.visList = this.dictionaryService.getEntries(DictionaryService.VISIBILTY);
+        this.visList = this.dictionaryService.getEntries(DictionaryService.VISIBILITY);
         this.instList = this.dictionaryService.getEntries(DictionaryService.INSTITUTION);
 
         this.filteredExperimentOverviewListSubscript = this.experimentService.getFilteredOverviewListObservable()
@@ -275,7 +275,7 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
     prepVisList():Array<string>{
 
         if(!this.visList){
-            this.visList= this.dictionaryService.getEntries(DictionaryService.VISIBILTY);
+            this.visList= this.dictionaryService.getEntries(DictionaryService.VISIBILITY);
         }
         let visDisplays = [];
         if(this.visList){

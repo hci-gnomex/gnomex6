@@ -42,7 +42,7 @@ export class NewDataTrackComponent implements OnInit{
     }
 
     ngOnInit() {
-        this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILTY);
+        this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILITY);
     }
 
     public onLabSelect(event: any): void {
