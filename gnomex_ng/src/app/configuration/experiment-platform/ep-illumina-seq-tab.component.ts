@@ -219,14 +219,16 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     }
 
     ngOnInit(){
-        this.formGroup = this.fb.group({seqOptions:[]});
+        this.formGroup = this.fb.group({sequencingOptions:[]});
         this.expPlatform1Subscription = this.expPlatfromService.getExperimentPlatformObservable()
             .subscribe(data =>{
-                if(data &&( data.sequencingOptions || data.NumberSequencingCycles) ){
+                if(data && data.sequencingOptions ){
                     this.expPlatfromNode = data;
-                    this.seqOptionsList = Array.isArray(data.sequencingOptions) ? data.sequencingOptions : [data.NumberSequencingCycles];
+                    this.seqOptionsList = Array.isArray(data.sequencingOptions) ? data.sequencingOptions :
+                        [data.sequencingOptions.NumberSequencingCyclesAllowed];
                     this.showInactive = false;
                     this.selectedSeqOpt = [];
+                    this.formGroup.get('sequencingOptions').setValue(this.seqOptionsList);
                     this.formGroup.markAsPristine();
 
                 }

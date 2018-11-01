@@ -768,7 +768,7 @@ export class ConfigureAnnotationsComponent {
 
     public setupExpPlatformMode(expPlatform:any){
         this.formGroup.reset();
-        let expPlatCoreFacilityFC = this.expPlatformService.findExpPlatformFormMember("ExperimentPlatformTabComponent.coreFacility");
+        let expPlatCoreFacilityFC = this.expPlatformService.findExpPlatformFormMember("ExperimentPlatformTabComponent.idCoreFacility");
         this.expPlatform = expPlatform;
         this.requestCategory = expPlatform.requestCategory;
         this.idCoreFacility = expPlatCoreFacilityFC.value;

@@ -4,7 +4,7 @@ import {Observable} from "rxjs/Observable";
 
 import 'rxjs/add/operator/map';
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {ExperimentPlatformTabComponent} from "../configuration/experiment-platform/experiment-platform-tab.component";
 import {EpSampleTypeTabComponent} from "../configuration/experiment-platform/ep-sample-type-tab.component";
@@ -56,6 +56,12 @@ export class ExperimentPlatformService implements OnDestroy{
         }
     }
 
+
+    removeExpPlatformMember(name:string,afterControlAddedfn?:any){
+        if(this._expPlatformOverviewForm.controls[name]){
+            this._expPlatformOverviewForm.removeControl(name);
+        }
+    }
 
     addExpPlatformFormMember(control: AbstractControl, name:string,afterControlAddedfn?:any):void{
         this._expPlatformOverviewForm.addControl(name, control);
@@ -189,8 +195,9 @@ export class ExperimentPlatformService implements OnDestroy{
     }
 
     saveExperimentPlatform(params:HttpParams): Observable<any>{
+        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/SaveExperimentPlatform.gx", null, {params:params})
+        return this.httpClient.post("/gnomex/SaveExperimentPlatform.gx",params.toString(),{headers: headers})
     }
 
     saveExperimentPlatformSortOrderList(params: HttpParams): Observable<any> {

@@ -22,8 +22,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 
 export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
     public formGroup:FormGroup;
-    private expPlatform1Subscription: Subscription;
-    private expPlatform2Subscription: Subscription;
+    private expPlatformSubscription: Subscription;
+    private expPlatformTypeSubscription: Subscription;
     private expPlatfromNode:any;
     private gridApi: GridApi;
     public applicationList:any[] = [];
@@ -93,7 +93,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
     }
 
     ngOnInit(){
-        this.formGroup = this.fb.group({seqOptions:[]});
+        this.formGroup = this.fb.group({applications:[]});
 
 
 
@@ -232,14 +232,15 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
     onGridReady(params:any){
         this.gridApi= params.api;
         //if hiseq, extra column is added for it
-        this.expPlatform1Subscription = this.expPlatfromService.getExperimentPlatformObservable()
+        this.expPlatformSubscription = this.expPlatfromService.getExperimentPlatformObservable()
             .subscribe(data =>{
-                if(data &&( data.applications || data.Application) ){
+                if(data && data.applications){
                     this.newAppNumber = 0;
                     this.expPlatfromNode = data;
-                    this.applicationList = Array.isArray(data.applications) ? data.applications : [data.Application];
+                    this.applicationList = Array.isArray(data.applications) ? data.applications : [data.applications.Application];
                     this.showInactive = false;
                     this.selectedLibPrep = [];
+                    this.formGroup.get('applications').setValue(this.applicationList);
                     this.formGroup.markAsPristine();
                     this.columnDefs =  this.setColumnDefByState();
                     this.gridApi.setColumnDefs(this.columnDefs);
@@ -248,7 +249,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 }
             });
 
-        this.expPlatform2Subscription = this.expPlatfromService.getExperimentPlatformTypeChangeObservable()
+        this.expPlatformTypeSubscription = this.expPlatfromService.getExperimentPlatformTypeChangeObservable()
             .subscribe(data => {
                 this.columnDefs = this.setColumnDefByState();
                 this.gridApi.setColumnDefs(this.columnDefs);
@@ -315,8 +316,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
 
 
     ngOnDestroy(){
-        this.expPlatform1Subscription.unsubscribe();
-        this.expPlatform2Subscription.unsubscribe();
+        this.expPlatformSubscription.unsubscribe();
+        this.expPlatformTypeSubscription.unsubscribe();
     }
 
 

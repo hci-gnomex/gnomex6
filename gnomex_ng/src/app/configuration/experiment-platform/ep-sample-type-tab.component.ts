@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ConstantsService} from "../../services/constants.service";
 import {GridApi} from "ag-grid";
@@ -10,6 +10,7 @@ import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {Subscription} from "rxjs";
 //assets/page_add.png
 
 @Component({
@@ -64,8 +65,9 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
     `]
 })
 
-export class EpSampleTypeTabComponent implements OnInit{
+export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     public formGroup:FormGroup;
+    private expPlatformSubscription: Subscription;
     public selectedState:string = "Select all";
     public currentSelectedIndex:number = -1;
     public selectedSampleTypeRows:any[] = [];
@@ -187,15 +189,17 @@ export class EpSampleTypeTabComponent implements OnInit{
     }
 
     ngOnInit(){
-        this.formGroup = this.fb.group({});
-        this.expPlatfromService.getExperimentPlatformObservable()
+        this.formGroup = this.fb.group({sampleTypes:[]});
+        this.expPlatformSubscription = this.expPlatfromService.getExperimentPlatformObservable()
             .subscribe(resp =>{
-                if(resp && !resp.message) {
+                if(resp.sampleTypes && !resp.message) {
                     this.expPlatformNode = resp;
-                    this.sampleTypeList = Array.isArray(resp.sampleTypes) ? resp.sampleTypes : [resp.sampleTypes];
+                    this.sampleTypeList = Array.isArray(resp.sampleTypes) ? resp.sampleTypes : [resp.sampleTypes.SampleType];
                     this.sampleTypeList.sort(this.sortSampleTypefn);
                     this.sampleTypeRowData = this.sampleTypeList;
+                    this.formGroup.get('sampleTypes').setValue(this.sampleTypeRowData);
                    this.formGroup.markAsPristine();
+
                 }
             });
 
@@ -293,6 +297,10 @@ export class EpSampleTypeTabComponent implements OnInit{
         if(this.gridApi){
             this.gridApi.sizeColumnsToFit();
         }
+    }
+
+    ngOnDestroy(){
+        this.expPlatformSubscription.unsubscribe();
     }
 
 

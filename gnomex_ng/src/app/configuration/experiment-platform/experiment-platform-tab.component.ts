@@ -73,26 +73,25 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
         this.name = this.constructor.name;
         this.formGroup = this.fb.group({
-            name:['',Validators.required ],
+            requestCategory:['',Validators.required ],
             type:'',
-            active: false,
-            associateAnalysis:'',
-            requireNameDescipt:'',
+            isActive: false,
+            associatedWithAnalysis:'',
+            requireNameDescription:'',
             code: [{value:'', disabled:true }],
             icon: '',
-            coreFacility: '',
+            idCoreFacility: '',
             notes:'',
-            vendor:'',
-            organisms:'',
+            idVendor:'',
             sortOrder: ['',numberRange(0,99)],
             isInternal: '',
             isExternal: '',
             numberOfChannels:'',
             sampleBatchSize:['',numberRange(0,100000)],
             customWarningMessage:'',
-            organism:'',
+            idOrganism:'',
             useProduct: false,
-            productType: '',
+            idProductType: '',
             noProductsMessage:'',
             productStatus: '',
             saveAndSubmit: ''
@@ -120,25 +119,25 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
 
                 //this.state = this.expPlatformService.getState(data.value, this.name );
-                this.formGroup.get('name').setValue(data.requestCategory);
+                this.formGroup.get('requestCategory').setValue(data.requestCategory);
                 this.formGroup.get('type').setValue(data.type);
-                this.formGroup.get('active').setValue(data && data.isActive === 'Y');
-                this.formGroup.get('associateAnalysis').setValue(data && data.associatedWithAnalysis === 'Y');
-                this.formGroup.get('requireNameDescipt').setValue(requireNameStr && requireNameStr === 'Y');
+                this.formGroup.get('isActive').setValue(data && data.isActive === 'Y');
+                this.formGroup.get('associatedWithAnalysis').setValue(data && data.associatedWithAnalysis === 'Y');
+                this.formGroup.get('requireNameDescription').setValue(requireNameStr && requireNameStr === 'Y');
                 this.formGroup.get('code').setValue(data.codeRequestCategory);
                 this.formGroup.get('icon').setValue(this.findICON(data.icon) );
-                this.formGroup.get('coreFacility').setValue(data.idCoreFacility);
+                this.formGroup.get('idCoreFacility').setValue(data.idCoreFacility);
                 this.formGroup.get('notes').setValue(data.notes);
-                this.formGroup.get('vendor').setValue(data.idVendor);
+                this.formGroup.get('idVendor').setValue(data.idVendor);
                 this.formGroup.get('isInternal').setValue(data && data.isInternal === 'Y');
                 this.formGroup.get('isExternal').setValue(data && data.isExternal === 'Y');
                 this.formGroup.get('sortOrder').setValue(data.sortOrder);
                 this.formGroup.get('numberOfChannels').setValue(data.numberOfChannels);
                 this.formGroup.get('sampleBatchSize').setValue(data.sampleBatchSize);
                 this.formGroup.get('customWarningMessage').setValue(sampleBatchWarningMessage);
-                this.formGroup.get('organism').setValue(data.idOrganism);
+                this.formGroup.get('idOrganism').setValue(data.idOrganism);
                 this.formGroup.get('useProduct').setValue(data.idProductType != '');
-                this.formGroup.get('productType').setValue(data.idProductType);
+                this.formGroup.get('idProductType').setValue(data.idProductType);
                 this.formGroup.get('noProductsMessage').setValue(data.noProductsMessage);
 
 
@@ -175,8 +174,8 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
     }
     showFieldByProperty(propertyName:string): boolean {
         let val:String = 'N';
-        if (this.formGroup.get("coreFacility").value) {
-            val = this.gnomexService.getCoreFacilityProperty(this.formGroup.get("coreFacility").value, propertyName);
+        if (this.formGroup.get("idCoreFacility").value) {
+            val = this.gnomexService.getCoreFacilityProperty(this.formGroup.get("idCoreFacility").value, propertyName);
         }
         if (val == 'Y') {
             return false;
@@ -256,7 +255,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
     filterProjectTypeList(){
         let filterProductList:any[] = this.dictionaryService.getEntries(DictionaryService.PRODUCT_TYPE);
-        let idCoreFacility = this.formGroup.get("coreFacility").value;
+        let idCoreFacility = this.formGroup.get("idCoreFacility").value;
         filterProductList = filterProductList.filter(p => p.idCoreFacility === idCoreFacility);
         this.productTypeList = filterProductList;
     }
@@ -288,7 +287,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
     updateProductType(){
 
-        let idCoreFacility = this.formGroup.get("coreFacility").value;
+        let idCoreFacility = this.formGroup.get("idCoreFacility").value;
         let codeReqCategory = this.formGroup.get("code").value;
         let noProductsMessage = this.gnomexService.getRequestCategoryProperty(idCoreFacility, codeReqCategory,PropertyService.PROPERTY_NO_PRODUCTS_MESSAGE);
         this.formGroup.get("noProductsMessage").setValue(noProductsMessage);

@@ -73,7 +73,7 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
 
     ngOnInit(){
         this.formGroup = this.fb.group({
-            LibPreQC: []
+            prepQCProtocols: []
         });
         this.expPlatformSubscription = this.expPlatformService.getExperimentPlatformObservable()
             .subscribe(data =>{
@@ -81,6 +81,7 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
                     this.expPlatformNode = data;
                     this.rowData = Array.isArray(data.prepQCProtocols) ? data.prepQCProtocols : [data.prepQCProtocols.LibraryPrepQCProtocol];
                     this.selectedRow = null;
+                    this.formGroup.get('prepQCProtocols').setValue(this.rowData);
                     this.formGroup.markAsPristine();
 
                 }

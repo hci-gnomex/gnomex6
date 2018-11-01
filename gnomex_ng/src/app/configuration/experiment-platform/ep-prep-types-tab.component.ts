@@ -117,10 +117,11 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
         this.formGroup = this.fb.group({prepTypes:[]});
         this.expPlatformSubscription = this.expPlatfromService.getExperimentPlatformObservable()
             .subscribe(data =>{
-                if(data &&( data.prepTypes || data.prepTypes.IsolationPrepType) ){
+                if(data &&( data.prepTypes || data.prepTypes) ){
                     this.expPlatfromNode = data;
                     this.rowData = Array.isArray(data.prepTypes) ? data.prepTypes : [data.prepTypes.IsolationPrepType];
                     this.selectedPrepTypeRow = [];
+                    this.formGroup.get('prepTypes').setValue(this.rowData);
                     this.formGroup.markAsPristine()
                 }
             });

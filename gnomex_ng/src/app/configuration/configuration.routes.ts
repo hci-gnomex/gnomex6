@@ -14,7 +14,7 @@ const ROUTES: Routes = [
     { path: "editDictionary", component: BrowseDictionaryComponent, outlet: 'modal' },
     { path: "configure-core-facility", component: ConfigCoreFacilityComponent},
     { path: "configure-annotations", component: ConfigureAnnotationsComponent },
-    { path: "configure-experiment-platform", component: ExperimentPlatformOverviewComponent },
+    { path: "configure-experiment-platform", component: ExperimentPlatformOverviewComponent, canActivate: [SubRouteGuardService] },
 
     { path: "configure-annotations/:idCoreFacility", component: ConfigureAnnotationsComponent },
     { path: "configure-organisms", component: ConfigureOrganismsComponent },

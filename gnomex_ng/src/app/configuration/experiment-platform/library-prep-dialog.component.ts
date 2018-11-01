@@ -8,6 +8,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {LibraryPrepProtocolDialogComponent} from "./library-prep-protocol-dialog.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.component";
+import * as _ from "lodash";
 
 
 
@@ -35,6 +36,7 @@ import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.compo
 export class LibraryPrepDialogComponent implements OnInit{
 
     rowData:any;
+    uncomittedRowData:any;
     applyFn:any;
     appThemeList: string;
     isDirty = false;
@@ -76,24 +78,26 @@ export class LibraryPrepDialogComponent implements OnInit{
     ngOnInit(){
         this.initSeqLibProtocol(this.rowData.idSeqLibProtocols); // don't see any case where there should be more than one idSeqLibProtocol
         this.rowData.application = this.rowData.display;
-        this.formGroup = this.fb.group({
-            application: [this.rowData.application ? this.rowData.application : '' , Validators.required] ,
-            sortOrder: [this.rowData.sortOrder ? this.rowData.sortOrder : '', numberRange(0,99)],
-            idApplicationTheme: this.rowData.idApplicationTheme ? this.rowData.idApplicationTheme : '',
-            idBarcodeSchemeA: this.rowData.idBarcodeSchemeA,
-            idBarcodeSchemeB: this.rowData.idBarcodeSchemeB,
-            onlyForLabPrepped: this.rowData.onlyForLabPrepped === 'Y' ? 'Y' : 'N',
-            unitPriceInternal: [this.rowData.unitPriceInternal ? this.rowData.unitPriceInternal : '0.00', Validators.pattern(this.currencyRegex)],
-            unitPriceExternalAcademic: [this.rowData.unitPriceExternalAcademic ? this.rowData.unitPriceExternalAcademic : '0.00', Validators.pattern(this.currencyRegex)],
-            unitPriceExternalCommercial: [this.rowData.unitPriceExternalCommercial? this.rowData.unitPriceExternalCommercial: '0.00', Validators.pattern(this.currencyRegex)],
-            hasCaptureLibDesign: this.rowData.hasCaptureLibDesign ? this.rowData.hasCaptureLibDesign === 'Y' : false ,
-            idSeqLibProtocols: this.rowData.idSeqLibProtocols ? this.rowData.idSeqLibProtocols : '' ,
-            coreSteps: this.rowData.coreSteps ? this.rowData.coreSteps : '',
-            coreStepsNoLibPrep: this.rowData.coreStepsNoLibPrep ? this.rowData.coreStepsNoLibPrep : ''
+        this.uncomittedRowData = _.cloneDeep(this.rowData);
 
+        this.formGroup = this.fb.group({
+            application: [this.uncomittedRowData.application ? this.uncomittedRowData.application : '' , Validators.required] ,
+            sortOrder: [this.uncomittedRowData.sortOrder ? this.uncomittedRowData.sortOrder : '', numberRange(0,99)],
+            idApplicationTheme: this.uncomittedRowData.idApplicationTheme ? this.uncomittedRowData.idApplicationTheme : '',
+            idBarcodeSchemeA: this.uncomittedRowData.idBarcodeSchemeA,
+            idBarcodeSchemeB: this.uncomittedRowData.idBarcodeSchemeB,
+            onlyForLabPrepped: this.uncomittedRowData.onlyForLabPrepped === 'Y' ? 'Y' : 'N',
+            unitPriceInternal: [this.uncomittedRowData.unitPriceInternal ? this.uncomittedRowData.unitPriceInternal : '0.00', Validators.pattern(this.currencyRegex)],
+            unitPriceExternalAcademic: [this.uncomittedRowData.unitPriceExternalAcademic ? this.uncomittedRowData.unitPriceExternalAcademic : '0.00', Validators.pattern(this.currencyRegex)],
+            unitPriceExternalCommercial: [this.uncomittedRowData.unitPriceExternalCommercial? this.uncomittedRowData.unitPriceExternalCommercial: '0.00', Validators.pattern(this.currencyRegex)],
+            hasCaptureLibDesign: this.uncomittedRowData.hasCaptureLibDesign ? this.uncomittedRowData.hasCaptureLibDesign === 'Y' : false ,
+            idSeqLibProtocols: this.uncomittedRowData.idSeqLibProtocols ? this.uncomittedRowData.idSeqLibProtocols : '' ,
+            coreSteps: this.uncomittedRowData.coreSteps ? this.uncomittedRowData.coreSteps : '',
+            coreStepsNoLibPrep: this.uncomittedRowData.coreStepsNoLibPrep ? this.uncomittedRowData.coreStepsNoLibPrep : ''
 
         });
-        this.reqCategoryAppList = Array.isArray(this.rowData.RequestCategoryApplication) ? this.rowData.RequestCategoryApplication : [this.rowData.RequestCategoryApplication];
+        this.reqCategoryAppList = Array.isArray(this.uncomittedRowData.RequestCategoryApplication) ? this.uncomittedRowData.RequestCategoryApplication
+            : [this.uncomittedRowData.RequestCategoryApplication];
         for(let app of this.reqCategoryAppList){
             this.formGroup.addControl(app.value, new FormControl(app.isSelected === 'Y'))
         }
@@ -145,8 +149,8 @@ export class LibraryPrepDialogComponent implements OnInit{
         if(core != this.formGroup.get('coreSteps').value || lab != this.formGroup.get('coreStepsNoLibPrep').value ){
             this.formGroup.get('coreSteps').setValue(core);
             this.formGroup.get('coreStepsNoLibPrep').setValue(lab);
-            this.rowData.coreSteps = core;
-            this.rowData.coreStepsNoLibPrep = lab;
+            this.uncomittedRowData.coreSteps = core;
+            this.uncomittedRowData.coreStepsNoLibPrep = lab;
             this.formGroup.markAsDirty();
         }
     };
@@ -156,7 +160,7 @@ export class LibraryPrepDialogComponent implements OnInit{
         if(this.protocolParam){
             config.data = {
                 applyStepsFn: this.applySteps,
-                rowData: this.rowData
+                rowData: this.uncomittedRowData
             };
         }
         config.disableClose = true;
