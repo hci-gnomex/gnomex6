@@ -59,7 +59,9 @@ export class ContextHelpComponent implements OnInit {
         let dialogRef: MatDialogRef<ContextHelpPopupComponent> = this.dialog.open(ContextHelpPopupComponent, config);
         dialogRef.afterClosed().subscribe((result: any) => {
             if (result) {
-                // TODO reload dictionary
+                this.dictionaryService.reloadAndRefresh(() => {
+                    this.loadDictionary();
+                }, null, DictionaryService.CONTEXT_SENSITIVE_HELP);
             }
         });
     }

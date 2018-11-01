@@ -180,7 +180,7 @@ export class AnalysisVisibleTabComponent implements OnInit{
 
 
     ngOnInit(){
-        this.visList = this.dictionaryService.getEntries(DictionaryService.VISIBILTY);
+        this.visList = this.dictionaryService.getEntries(DictionaryService.VISIBILITY);
         this.instList = this.dictionaryService.getEntries(DictionaryService.INSTITUTION);
 
         this.filteredExperimentOverviewListSubscript = this.analysisService.getFilteredOverviewListObservable().subscribe( data =>{
@@ -263,7 +263,7 @@ export class AnalysisVisibleTabComponent implements OnInit{
 
     prepVisList():Array<string>{
         if(!this.visList){
-            this.visList= this.dictionaryService.getEntries(DictionaryService.VISIBILTY);
+            this.visList= this.dictionaryService.getEntries(DictionaryService.VISIBILITY);
         }
 
         let visDisplays = [];
