@@ -105,7 +105,7 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
 
     ngOnInit(){
         this.formGroup = this.fb.group({
-            protocolList: [],
+            pipelineProtocols: [],
         });
 
         this.expPlatformSubscription = this.expPlatformService.getExperimentPlatformObservable()
@@ -113,10 +113,12 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
                 if(data && data.pipelineProtocols){
                     this.expPlatfromNode = data;
                     this.coreFacilityHeader = this.dictionaryService.getEntryDisplay(DictionaryService.CORE_FACILITY,data.idCoreFacility);
-
-                    this.pipelineRowData = Array.isArray(data.pipelineProtocols) ? data.pipelineProtocols : [data.PipelineProtocol];
+                    this.pipelineRowData = Array.isArray(data.pipelineProtocols) ? data.pipelineProtocols :
+                        [data.pipelineProtocols.PipelineProtocol];
                     this.clearProtocolInfo();
                     this.selectedProtocolRow = [];
+                    this.formGroup.get('pipelineProtocols').setValue(this.pipelineRowData);
+                    this.formGroup.markAsPristine();
 
                 }
         });

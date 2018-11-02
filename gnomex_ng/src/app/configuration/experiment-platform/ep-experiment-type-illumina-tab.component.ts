@@ -255,6 +255,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         if(event.oldValue !== event.newValue){
             this.formGroup.markAsDirty();
             if(event.column.getColId() === "sortOrder"){
+                this.rowData.sort(this.compareApplications);
                 this.gridApi.setRowData(this.rowData);
             }
             if(event.column.getColId() === "display"){
@@ -283,14 +284,20 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             app.coreStepsNoLibPrep =  libPrepDialogForm.get('coreStepsNoLibPrep').value;
 
             Object.keys(libPrepDialogForm.controls).forEach(key =>{
-                let reqCategoryAppList: any = app.RequestCategoryApplication;
-                if(reqCategoryAppList && Array.isArray(reqCategoryAppList)){
+                let reqCategoryAppList: any[] = [];
+                if(app.RequestCategoryApplication){
+                    // saving back to app incase  only one object is returned and breaks pointer to parent by reassign to new array
+                    reqCategoryAppList =  Array.isArray(app.RequestCategoryApplication) ? app.RequestCategoryApplication : [app.RequestCategoryApplication];
+                    app.RequestCategoryApplication = reqCategoryAppList;
+
                     let rca = reqCategoryAppList.find(reqCatApp => reqCatApp.value === key );
                     if(rca){
                         rca.isSelected = libPrepDialogForm.controls[key].value ? 'Y' : 'N';
                     }
                 }
             });
+            this.rowData.sort(this.compareApplications);
+            this.gridApi.setRowData(this.rowData);
             this.formGroup.markAsDirty();
         }
     };

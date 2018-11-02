@@ -144,7 +144,7 @@ export class QcAssayDialogComponent implements OnInit{
     selectedAssay:any[] =[];
     chipTypeList:any[] = [];
     readonly currencyRegex = /^[0-9]+\.\d{2}$/;
-    uncommitedChipTypeList:any[]; // for uncommited changes that user has made before final decision
+    uncommitedChipTypeList:any[] = []; // for uncommited changes that user has made before final decision
 
     private parseSortOrder(params){
         if(Number.isNaN(Number.parseInt(params.newValue))){

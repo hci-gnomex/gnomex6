@@ -20,6 +20,7 @@ import {EpPrepTypesTabComponent} from "./ep-prep-types-tab.component";
 import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
 import {EpExperimentTypeIlluminaTabComponent} from "./ep-experiment-type-illumina-tab.component";
 import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.component";
+import {FormGroup} from "@angular/forms";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -91,25 +92,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     ngOnInit():void{
         this.expPlatformService.getExperimentPlatformList_fromBackend(); // need
-
-        this.platformListSubscription = this.expPlatformService.getExperimentPlatformListObservable()
-            .subscribe(resp =>{
-                if(resp){
-                    this.showSpinner = false;
-                    this.allExpPlatorms = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
-                    this.filterExperimentPlatform();
-                    for(let row of this.rowData){
-                        this.constService.getTreeIcon(row,'RequestCategory');
-                    }
-                }else if(resp && resp.message){
-                    this.dialogService.alert(resp.message);
-                }else{
-                    this.dialogService.alert("An error has occurred getting ExperimentPlatformList");
-                }
-                this.expPlatformService.expPlatformOverviewForm.markAsPristine();
-                this.expPlatformService.expPlatformOverviewForm.markAsUntouched();
-            });
-
         this.expPlatformService.getExperimentPlatformTypeChangeObservable()
             .subscribe((expPlatform) =>{
                 this.expPlatformService.setExperimentPlatformState(expPlatform);
@@ -133,10 +115,32 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     onGridReady(event){
         this.gridOpt.api.sizeColumnsToFit();
-        let start:number = 0;
-        this.gridOpt.api.forEachNode(node=> {
-            return node.rowIndex === start  ? node.setSelected(true) : -1;
-        })
+        this.platformListSubscription = this.expPlatformService.getExperimentPlatformListObservable()
+            .subscribe(resp =>{
+                if(resp){
+                    if(resp.message){
+                        this.dialogService.alert(resp.message);
+                    }else{
+                        this.allExpPlatorms = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
+                        this.filterExperimentPlatform();
+                        for(let row of this.rowData){
+                            this.constService.getTreeIcon(row,'RequestCategory');
+                        }
+                        if(this.selectRowIndex > -1){
+                            this.gridOpt.api.forEachNode(node=> {
+                                return node.rowIndex === this.selectRowIndex  ? node.setSelected(true) : -1;
+                            });
+                        }
+
+
+                    }
+                }else{
+                    this.dialogService.alert("An error has occurred getting ExperimentPlatformList");
+                }
+                this.expPlatformService.expPlatformOverviewForm.markAsPristine();
+                this.expPlatformService.expPlatformOverviewForm.markAsUntouched();
+                this.showSpinner = false;
+            });
     }
 
     changeExperimentPlaform(exPlatform){
@@ -282,8 +286,10 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                     this.expPlatformService.addExpPlatformFormMember(compRef.instance.formGroup,name);
                 }
                 if(compRef.instance instanceof ConfigureAnnotationsComponent ){
+                    this.expPlatformService.removeExpPlatformMember(name);
                     propertyTab = compRef;
                 }
+
             }
             propertyTab.instance.setupExpPlatformMode(expPlatform);
 
@@ -292,8 +298,10 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     filterExperimentPlatform(){
         if(this.showInactive){
             this.rowData = this.allExpPlatorms;
+            this.gridOpt.api.setRowData( this.rowData)// = this.allExpPlatorms;
         }else{
             this.rowData = this.allExpPlatorms.filter(expPlat => expPlat.isActive === 'Y' );
+            this.gridOpt.api.setRowData(this.rowData);
         }
 
     }
@@ -309,9 +317,113 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     }
 
+    getRequestCategoryList(apps:any[]): any[]{
+        let rcAppList:any[] = [];
+        apps.forEach(app =>{
+            let rcList =  Array.isArray(app.RequestCategoryApplication)? app.RequestCategoryApplication : [app.RequestCategoryApplication];
+            for(let rc of rcList){
+                rcAppList.push({
+                    isSelected: rc.isSelected,
+                    codeRequestCategory: rc.codeRequestCategory,
+                    codeApplication: app.codeApplication,
+                    appIsActive: app.isActive,
+                    requestCategoryIsActive: rc.isActive
+                });
+            }
+        });
+        return rcAppList;
 
-    onCreate(event:any){
+    }
 
+
+    save(){
+        this.showSpinner = true;
+        let expPlatformForm:FormGroup = this.expPlatformService.expPlatformOverviewForm;
+        let applications = null;
+        let rcApplications = null;
+        let sampleTypes: any[] = [];
+        let sequencingOptionsForm: FormGroup = null;
+        let prepQCProtocolsForm: FormGroup = null;
+        let pipelineProtocolsForm: FormGroup = null;
+        let prepTypesForm: FormGroup = null;
+
+        let params:HttpParams = new HttpParams();
+        params = params.set('isClinicalResearch',this.selectedPlatformList[0].isClinicalResearch)
+            .set("codeRequestCategory", this.selectedPlatformList[0].codeRequestCategory)
+            .set("isOwnerOnly", this.selectedPlatformList[0].isOwnerOnly);
+
+        let experimentPlatformTabForm:FormGroup = <FormGroup>expPlatformForm.get('ExperimentPlatformTabComponent');
+        Object.keys(experimentPlatformTabForm.controls).forEach( key => {
+            let control = experimentPlatformTabForm.get(key).value;
+            if(typeof control == "boolean"){
+                let decisionStr = control ? 'Y' : 'N';
+                params = params.set(key,decisionStr);
+            }else if(control){
+                params = params.set(key,control);
+            }
+        });
+
+
+        if(this.expPlatformService.isIllumina && !this.expPlatformService.isNanoString){
+            applications = expPlatformForm.get('EpExperimentTypeIlluminaTabComponent.applications').value;
+            rcApplications =this.getRequestCategoryList(applications);
+            params = params.set("applicationsXMLString",JSON.stringify(applications))
+                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
+
+        }else if(this.expPlatformService.isQC){
+            applications = expPlatformForm.get('EpExperimentTypeQcTabComponent.applications').value;
+            rcApplications = this.getRequestCategoryList(applications);
+            params = params.set("applicationsXMLString",JSON.stringify(applications))
+                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
+        }else if(!this.expPlatformService.isNanoString){
+            applications = expPlatformForm.get('EpExperimentTypeTabComponent.applications').value;
+            rcApplications=  this.getRequestCategoryList(applications);
+            params = params.set("applicationsXMLString",JSON.stringify(applications))
+                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
+        }
+
+        sampleTypes = expPlatformForm.get('EpSampleTypeTabComponent.sampleTypes').value;
+        if(sampleTypes && sampleTypes.length > 0){
+            params = params.set('sampleTypesXMLString', JSON.stringify(sampleTypes));
+        }
+        sequencingOptionsForm = <FormGroup>expPlatformForm.get('EpIlluminaSeqTabComponent');
+        if(sequencingOptionsForm){
+            let seqOptions = sequencingOptionsForm.get('sequencingOptions').value;
+            params = params.set('sequencingOptionsXMLString', JSON.stringify(seqOptions));
+        }
+        prepQCProtocolsForm = <FormGroup>expPlatformForm.get('EpLibraryPrepQCTabComponent');
+        if(prepQCProtocolsForm){
+            let prepQCProtocols = prepQCProtocolsForm.get('prepQCProtocols').value;
+            params = params.set('prepQCProtocolsXMLString', JSON.stringify(prepQCProtocols));
+        }
+        pipelineProtocolsForm = <FormGroup>expPlatformForm.get('EpPipelineProtocolTabComponent');
+        if(pipelineProtocolsForm){
+            let pipelineProtocols = pipelineProtocolsForm.get('pipelineProtocols').value;
+            params = params.set('pipelineProtocolsXMLString',JSON.stringify(pipelineProtocols));
+        }
+        prepTypesForm = <FormGroup>expPlatformForm.get('EpPrepTypesTabComponent');
+        if(prepTypesForm){
+            let prepTypes = prepTypesForm.get('prepTypes').value;
+            params = params.set('prepTypesXMLString',JSON.stringify(prepTypes));
+        }
+
+
+        //let params:HttpParams = new HttpParams().set("applicationsXMLString",JSON.stringify(application));
+        //let params: FormData = new FormData();
+        //formData.append("applicationsXMLString",JSON.stringify(application));
+
+        this.expPlatformService.saveExperimentPlatform(params).first().subscribe( resp => {
+            if(resp && resp.result && resp.result === "SUCCESS" ){
+                this.expPlatformService.getExperimentPlatformList_fromBackend();
+            }else if(resp && resp.message){
+                this.dialogService.alert(resp.message);
+                this.showSpinner = false;
+                //this.expPlatformService.getExperimentPlatformList_fromBackend();
+            }else{
+                this.dialogService.alert("Unknown Error occurred please contact GNomEx Support.");
+                this.showSpinner = false;
+            }
+        })
     }
 
     ngOnDestroy(){

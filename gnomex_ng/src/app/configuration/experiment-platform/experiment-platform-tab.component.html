@@ -2,14 +2,14 @@
 <form [formGroup]="formGroup" style=" height:100%;width:100%; display:flex; flex-direction:column; font-size: small;">
     <div class="flex-container-row">
         <mat-form-field  class="medium-form-input">
-            <input matInput placeholder="Name" formControlName="name">
-            <mat-error *ngIf="this.formGroup?.controls['name']?.hasError('required')">
+            <input matInput placeholder="Name" formControlName="requestCategory">
+            <mat-error *ngIf="this.formGroup?.controls['requestCategory']?.hasError('required')">
                 This field is required
             </mat-error>
         </mat-form-field>
         <div class="padded-checkbox">
             <label style="margin-right: 1em;"  > Active  </label>
-            <mat-checkbox  formControlName="active" > </mat-checkbox>
+            <mat-checkbox  formControlName="isActive" > </mat-checkbox>
         </div>
 
     </div>
@@ -26,11 +26,11 @@
         </mat-form-field>
         <div class="padded-checkbox" >
             <label style="margin-right: 1em;" > Associated With Analysis  </label>
-            <mat-checkbox  formControlName="associateAnalysis" > </mat-checkbox>
+            <mat-checkbox  formControlName="associatedWithAnalysis" > </mat-checkbox>
         </div>
         <div class="padded-checkbox">
             <label style="margin-right: 1em;"  > Require Name & Description  </label>
-            <mat-checkbox  formControlName="requireNameDescipt" > </mat-checkbox>
+            <mat-checkbox  formControlName="requireNameDescription" > </mat-checkbox>
         </div>
 
     </div>
@@ -57,7 +57,7 @@
     </div>
 
     <mat-form-field class="medium-form-input">
-        <mat-select placeholder="Core Facility" formControlName="coreFacility" (selectionChange)="onCoreChanged($event)">
+        <mat-select placeholder="Core Facility" formControlName="idCoreFacility" (selectionChange)="onCoreChanged($event)">
             <mat-option *ngFor="let core of coreFacilityList" [value]="core.idCoreFacility" > {{core.display}}
             </mat-option>
         </mat-select>
@@ -68,7 +68,7 @@
     </mat-form-field>
 
     <mat-form-field class="medium-form-input" *ngIf="showVendor">
-        <mat-select placeholder="Vendor" formControlName="vendor" >
+        <mat-select placeholder="Vendor" formControlName="idVendor" >
             <mat-option *ngFor="let vendor of vendorList" [value]="vendor.idVendor" > {{vendor.display}}
             </mat-option>
         </mat-select>
@@ -117,7 +117,7 @@
 
     </div>
     <mat-form-field class="medium-form-input"  *ngIf="showOrganism">
-        <mat-select placeholder="Default Organism" formControlName="organism" >
+        <mat-select placeholder="Default Organism" formControlName="idOrganism" >
             <mat-option *ngFor="let organism of organismList" [value]="organism.value" > {{organism.display}}
             </mat-option>
         </mat-select>
@@ -133,7 +133,7 @@
                 <label class="gx-label" style="margin-left:0.5em;"  > Use Products  </label>
             </div>
             <mat-form-field class="margin-right-field" style="flex:4"  *ngIf="this.formGroup.get('useProduct')?.value;">
-                <mat-select placeholder="Product Type" formControlName="productType" >
+                <mat-select placeholder="Product Type" formControlName="idProductType" >
                     <mat-option *ngFor="let productType of productTypeList" [value]="productType.idProductType" > {{productType.display}}
                     </mat-option>
                 </mat-select>

@@ -215,6 +215,11 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         if(qcDialogForm.dirty){
             if(committedChipTypes){
                 this.selectedApp[0].ChipTypes = committedChipTypes;
+                if(qcDialogForm.get('hasChipTypes').value && committedChipTypes.length > 0){
+                    this.selectedApp[0].hasChipTypes = 'Y';
+                }else{
+                    this.selectedApp[0].hasChipTypes = 'N';
+                }
             }
             this.selectedApp[0].isActive = 'Y';
             this.selectedApp[0].application = qcDialogForm.get('application').value;
