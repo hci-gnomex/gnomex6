@@ -274,9 +274,12 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="_experiment?.libPrepCompletedBy" class="field-width flex-container-row align-center padded">
+        <div *ngIf="!!libraryPreparedBy" class="field-width flex-container-row padded">
             <div class="label">
-                Library Prep Completed by: {{ _experiment?.libPrepCompletedBy }}
+                Library Prep Completed by :
+            </div>
+            <div class="label padded-left allow-line-breaks">
+                {{ libraryPreparedBy }}
             </div>
         </div>
         <div *ngIf="_experiment?.reagent" class="field-width flex-container-row align-center padded">

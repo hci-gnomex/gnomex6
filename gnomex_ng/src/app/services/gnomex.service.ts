@@ -54,6 +54,10 @@ export class GnomexService {
     public readonly PROPERTY_HIDE_SAMPLETYPE_ON_EXTERNAL_EXPERIMENT: string = "hide_sampletype_on_external_experiment";
 
 
+    public readonly TYPE_MICROARRAY: string = "MICROARRAY";
+    public readonly TYPE_NANOSTRING: string = "NANOSTRING";
+
+
 
     public properties: Map<string, string> = new Map<string, string>();
     public requestCategoryTypeMap: Map<string, any> = new Map<string, any>();
