@@ -14,9 +14,9 @@ import {ExperimentsService} from "../experiments.service";
 import {URLSearchParams} from "@angular/http";
 import {HttpParams} from "@angular/common/http";
 import {MatAutocomplete} from "@angular/material";
-import {TabSeqSetupView} from "./tab-seq-setup-view";
+import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
-import {TabSeqProtoView} from "./tab-seq-proto-view";
+import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
 import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
 import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
 import {TabPropertiesViewComponent} from "./tab-properties-view.component";
@@ -27,7 +27,7 @@ import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.com
 
 @Component({
     selector: 'tabs',
-    templateUrl: "./new-experiment.html",
+    templateUrl: "./new-experiment.component.html",
     styles: [`
         .row-one {
             display: flex;
@@ -273,8 +273,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 this.newExperimentService.currentState.next('SolexaBaseExternalState');
             let propertyTab = {label: "Other Details", disabled: true, component: AnnotationTabComponent};
             let sampleSetupTab = {label: "Sample Details", disabled: true, component: TabSampleSetupViewComponent};
-            let libPrepTab = {label: "Library Prep", disabled: true, component: TabSeqSetupView};
-            let seqProtoTab = {label: "Seq Options", disabled: true, component: TabSeqProtoView};
+            let libPrepTab = {label: "Library Prep", disabled: true, component: TabSeqSetupViewComponent};
+            let seqProtoTab = {label: "Seq Options", disabled: true, component: TabSeqProtoViewComponent};
             let annotationsTab = {label: "Annotations", disabled: true, component: TabAnnotationViewComponent};
             let samplesTab = {label: "Experiment Design", disabled: true, component: TabSamplesIlluminaComponent};
             let visibilityTab = {label: "Visibility", disabled: true, component: VisibilityDetailTabComponent};

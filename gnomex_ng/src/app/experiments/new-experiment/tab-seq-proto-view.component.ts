@@ -8,7 +8,7 @@ import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: "tabSeqProtoView",
-    templateUrl: "./tab-seq-proto-view.html",
+    templateUrl: "./tab-seq-proto-view.component.html",
     styles: [`
         .radio-group-container {
             display: inline-flex;
@@ -27,7 +27,7 @@ import {HttpParams} from "@angular/common/http";
     `]
 })
 
-export class TabSeqProtoView implements OnInit {
+export class TabSeqProtoViewComponent implements OnInit {
     @Input() requestCategory: any;
 
     private filteredNumberSequencingCyclesAllowedList: any[] = [];

@@ -7,7 +7,7 @@ import {BillingService} from "../../services/billing.service";
 
 @Component({
     selector: "tabSeqSetupView",
-    templateUrl: "./tab-seq-setup-view.html",
+    templateUrl: "./tab-seq-setup-view.component.html",
     styles: [`
         .radio-group-container {
             display: inline-flex;
@@ -30,7 +30,7 @@ import {BillingService} from "../../services/billing.service";
     `]
 })
 
-export class TabSeqSetupView implements OnInit {
+export class TabSeqSetupViewComponent implements OnInit {
     public readonly YES: string = "yes";
     public readonly NO: string = "no";
     public readonly SEPARATE: string = "separate";

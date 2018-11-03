@@ -17,7 +17,7 @@ import {BehaviorSubject} from "rxjs";
 
 @Component({
     selector: "tabSamplesView",
-    templateUrl: "./tab-samples-illumina.html",
+    templateUrl: "./tab-samples-illumina.component.html",
     styles: [`
         .tooltip-line-break {
             white-space: pre-line;

@@ -2,7 +2,7 @@ import {Component, OnInit} from "@angular/core";
 
 @Component({
     selector: "tabNotesView",
-    templateUrl: "./tab-notes-view.html",
+    templateUrl: "./tab-notes-view.component.html",
     styles: [`
     `]
 })

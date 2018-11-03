@@ -7,7 +7,7 @@ import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
     selector: "tabBioinformaticsView",
-    templateUrl: "./tab-bioinformatics-view.html",
+    templateUrl: "./tab-bioinformatics-view.component.html",
     styles: [`
         button.link-button {
             background: none;

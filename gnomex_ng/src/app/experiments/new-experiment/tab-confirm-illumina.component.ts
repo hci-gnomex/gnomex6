@@ -18,7 +18,7 @@ import {URLSearchParams} from "@angular/http";
 
 @Component({
     selector: "tabConfirmIllumina",
-    templateUrl: "./tab-confirm-illumina.html",
+    templateUrl: "./tab-confirm-illumina.component.html",
     styles: [`
         .confirm-instructions {
             background-color: lightyellow;

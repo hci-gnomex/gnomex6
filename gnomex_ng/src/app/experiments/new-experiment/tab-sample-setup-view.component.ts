@@ -11,7 +11,7 @@ import {AnnotationTabComponent} from "../../util/annotation-tab.component";
 
 @Component({
     selector: "tabSampleSetupView",
-    templateUrl: "./tab-sample-setup-view.html",
+    templateUrl: "./tab-sample-setup-view.component.html",
     styles: [`        
         .row-one {
             display: flex;
