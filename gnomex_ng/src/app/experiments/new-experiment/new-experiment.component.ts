@@ -20,9 +20,10 @@ import {TabSeqProtoView} from "./tab-seq-proto-view";
 import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
 import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
 import {TabPropertiesViewComponent} from "./tab-properties-view.component";
-import {Subscription} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 import {TabBioinformaticsViewComponent} from "./tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
+import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
 
 @Component({
     selector: 'tabs',
@@ -86,17 +87,21 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
     @Output() properties = new EventEmitter<any[]>();
 
-    tabs: any[] = [];
+    // tabs: any[] = [];
     types = OrderType;
     private selectedCategory: any;
     private categories: any[] = [];
     private requestCategories: any[] = [];
     private filteredProjectList: any[] = [];
+    private priceMap: Map<string, string> = new Map<string, string>();
+    themeMap: Map<string, any> = new Map<string, any>();
+    themes: any[] = [];
     private requestCategoriesExternal: any[] = [];
-    private authorizedBillingAccounts: any[] = [];
+    private authorizedBillingAccounts: any;
+    public appPrices: any[] = [];
     private coreFacility: any;
     private sub: any;
-    private label: string = "New Experiment Order for ";
+    // private label: string = "New Experiment Order for ";
     private icon: any;
     private form: FormGroup;
     private currentIdLab: string;
@@ -121,6 +126,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     private disableNext: boolean = true;
     navigationSubscription: Subscription;
     private numTabs: number;
+    private visibilityDetailObj: VisibilityDetailTabComponent;
+    private showPool: boolean = false;
 
     inputs = {
         requestCategory: null,
@@ -162,11 +169,14 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     }
 
+    private addDescriptionFieldToAnnotations(props: any[]): void {
+        let descNode: any = {PropertyEntry: {idProperty: "-1", name: "Description", otherLabel: "", Description: "false", isActive: "Y"}};
+        props.splice(1, 0, descNode);
+    }
+
     ngOnInit() {
-        this.sub = this.route
-            .queryParams
-            .subscribe(params => {
-                if (params.id) {
+        this.sub = this.route.queryParams.subscribe((params: any) => {
+                if (params && params.id) {
                     this.initialize();
                     for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
                         this.categories.push(category);
@@ -181,9 +191,13 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     this.coreFacility = this.dictionaryService.getEntry('hci.gnomex.model.CoreFacility', this.newExperimentService.idCoreFacility);
                     this.requestCategories = this.filterRequestCategories(this.requestCategories);
                     this.requestCategories.sort(this.sortRequestCategory);
-                    this.label = this.label.concat(this.coreFacility.facilityName);
+                    this.newExperimentService.expTypeLabel = this.newExperimentService.expTypeLabel.concat(this.coreFacility.facilityName);
                     this.experimentService.getNewRequest().subscribe((response: any) => {
                         this.newExperimentService.request = response.Request;
+                        if (!this.gnomexService.isInternalExperimentSubmission) {
+                            this.addDescriptionFieldToAnnotations(this.newExperimentService.request.PropertyEntries);
+                        }
+
                         // this.newExperimentService.buildPropertiesByUser();
                         this.newExperimentService.propertyEntries = this.newExperimentService.request.PropertyEntries;
                         this.annotations = this.newExperimentService.request.RequestProperties;
@@ -227,8 +241,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.newExperimentService.components = [];
         this.newExperimentService.organisms = [];
         this.newExperimentService.componentRefs = [];
+        this.newExperimentService.samplesGridRowData = [];
         this.newExperimentService.currentComponent = null;
-        this.label = "";
+        this.newExperimentService.expTypeLabel = "";
     }
 
     selectCategory(event) {
@@ -239,12 +254,20 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.setVisibility();
         this.showTabs();
         this.newExperimentService.category = this.form.get("selectedCategory").value;
-        this.label = "New " + this.newExperimentService.category.display + " Experiment For " + this.coreFacility.facilityName;
+        this.newExperimentService.expTypeLabel = "New " + this.newExperimentService.category.display + " Experiment For " + this.coreFacility.facilityName;
     }
 
     showTabs() {
+        this.newExperimentService.tabs = [];
         let category = this.getRequestCategory();
         this.inputs.requestCategory = category;
+        this.newExperimentService.request.applicationNotes = '';
+        this.newExperimentService.request.codeApplication = '';
+        this.newExperimentService.request.codeIsolationPrepType = '';
+        this.newExperimentService.request.coreToExtractDNA = 'N';
+        this.newExperimentService.request.includeBisulfideConversion = 'N';
+        this.newExperimentService.request.includeQubitConcentration = 'N';
+
         if (category.isIlluminaType === 'Y') {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('SolexaBaseState') :
                 this.newExperimentService.currentState.next('SolexaBaseExternalState');
@@ -254,20 +277,26 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             let seqProtoTab = {label: "Seq Options", disabled: true, component: TabSeqProtoView};
             let annotationsTab = {label: "Annotations", disabled: true, component: TabAnnotationViewComponent};
             let samplesTab = {label: "Experiment Design", disabled: true, component: TabSamplesIlluminaComponent};
+            let visibilityTab = {label: "Visibility", disabled: true, component: VisibilityDetailTabComponent};
             let bioTab = {label: "Bioinformatics", disabled: true, component: TabBioinformaticsViewComponent};
             let confirmTab = {label: "Confirm", disabled: true, component: TabConfirmIlluminaComponent};
-            this.tabs.push(sampleSetupTab);
-            this.tabs.push(propertyTab);
-            this.tabs.push(libPrepTab);
-            this.tabs.push(seqProtoTab);
-            this.tabs.push(annotationsTab);
-            this.tabs.push(samplesTab);
-            this.tabs.push(bioTab);
-            this.tabs.push(confirmTab);
-            this.numTabs = 9;
+            this.newExperimentService.tabs.push(sampleSetupTab);
+            this.newExperimentService.tabs.push(propertyTab);
+            this.newExperimentService.tabs.push(libPrepTab);
+            this.newExperimentService.tabs.push(seqProtoTab);
+            this.newExperimentService.tabs.push(annotationsTab);
+            this.newExperimentService.tabs.push(samplesTab);
+            this.newExperimentService.tabs.push(visibilityTab);
+            this.newExperimentService.tabs.push(bioTab);
+            this.newExperimentService.tabs.push(confirmTab);
+            this.numTabs = 10;
         } else if (category.type === this.newExperimentService.TYPE_QC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('QCState') :
                 this.newExperimentService.currentState.next('QCExternalState');
+            let sampleSetupTab = {label: "Sample Details", disabled: true, component: TabSampleSetupViewComponent};
+            let visibilityTab = {label: "Visibility", disabled: true, component: VisibilityDetailTabComponent};
+            this.newExperimentService.tabs.push(sampleSetupTab);
+            this.newExperimentService.tabs.push(visibilityTab);
         } else if (category.type == this.newExperimentService.TYPE_GENERIC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('GenericState') :
                 this.newExperimentService.currentState.next('GenericExternalState');
@@ -302,7 +331,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.newExperimentService.samplesGridApi.sizeColumnsToFit();
             this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
         }
-        this.selectedIndex = event.index;
+        this.newExperimentService.selectedIndex = event.index;
+        if (event.tab.textLabel === "Confirm") {
+            this.newExperimentService.onConfirmTab.next(true);
+        }
     }
 
     filterRequestCategories(categories: any[]): any[] {
@@ -352,6 +384,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         }
         this.newExperimentService.lab = $event.source.value;
         this.newExperimentService.getHiSeqPriceList();
+        this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
     }
 
 
@@ -382,9 +415,14 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     onUserSelection(event) {
         if (this.form.get('selectOwner')) {
-            let appUser = this.form.get('selectOwner');
+            let appUser = this.form.get('selectOwner').value;
             this.newExperimentService.experimentOwner = appUser;
             this.setVisibility();
+            this.newExperimentService.request.idAppUser = this.newExperimentService.idAppUser;
+            this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
+            this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
+            this.visibilityDetailObj.currentOrder = this.newExperimentService.request;
+            this.visibilityDetailObj.ngOnInit();
         }
     }
 
@@ -406,6 +444,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.newExperimentService.idAppUser = this.securityAdvisor.idAppUser.toString();
 
         let cat = this.getRequestCategory();
+        if (!Array.isArray(this.authorizedBillingAccounts)) {
+            this.authorizedBillingAccounts = [this.authorizedBillingAccounts.BillingAccount];
+        }
         this.authorizedBillingAccounts = this.authorizedBillingAccounts.filter(account => {
             return account.overrideFilter === 'Y' || (cat.idCoreFacility && account.idCoreFacility === cat.idCoreFacility);
         });
@@ -415,14 +456,21 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     checkSecurity(): void {
+        let iCanSubmitToThisCoreFacility: boolean = !!this.gnomexService.coreFacilitiesICanSubmitTo.find((a) => {
+            return this.coreFacility && a.idCoreFacility === this.coreFacility.idCoreFacility;
+        });
+
         if (this.gnomexService.hasPermission("canWriteAnyObject")) {
             if (this.gnomexService.submitInternalExperiment()) {
                 this.adminState = "AdminState";
             } else {
                 this.adminState = "AdminExternalExperimentState";
             }
-        } else if (this.gnomexService.hasPermission('canSubmitForOtherCores') && this.gnomexService.coreFacilitiesICanSubmitTo.includes(this.coreFacility)) {
+            this.newExperimentService.idAppUser = this.form.controls['selectOwner'].value != null && this.form.controls['selectOwner'].value.idAppUser != '' ? this.form.controls['selectOwner'].value.idAppUser : '';
+
+        } else if (this.gnomexService.hasPermission('canSubmitForOtherCores') && iCanSubmitToThisCoreFacility) {
             this.adminState = "AdminState";
+            this.newExperimentService.idAppUser = this.form.controls['selectOwner'].value != null && this.form.controls['selectOwner'].value.idAppUser != '' ? this.form.controls['selectOwner'].value.idAppUser : '';
         } else {
             if (this.gnomexService.submitInternalExperiment()) {
                 this.adminState = "";
@@ -448,7 +496,21 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 this.showAccessAuthorizedAccountsLink = response && response.hasAccountsWithinCore && response.hasAccountsWithinCore === 'Y';
             });
         } else if (this.newExperimentService.idAppUser != null && this.newExperimentService.idAppUser != '') {
-            // TODO
+            let idCoreFacility: string = this.newExperimentService.idCoreFacility;
+            // if (this.authorizedBillingAccounts == null || authAccountParamsChange(idAppUser, idCoreFacility)) {
+            //     this.showAccessAuthorizedAccountsLink = false;
+            //     updateAuthAccountsParams(null, null);
+            //
+            //     var params2:Object = new Object();
+            //     params2.idAppUser = idAppUser;
+            //     if (idCoreFacility != null) {
+            //         params2.idCoreFacility = idCoreFacility;
+            //     }
+            //
+            //     getAuthorizedBillingAccounts.send(params2);
+            //
+            //     updateAuthAccountsParams(idAppUser, idCoreFacility);
+            // }
         }
 
     }
@@ -516,6 +578,11 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.newExperimentService.billingAccount = this.form.get("selectAccount").value;
         this.setVisibility();
         this.disableNext = false;
+        this.getFilteredApps();
+    }
+
+    getFilteredApps() {
+        this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
     }
 
     incrementNext() {
@@ -530,45 +597,62 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 for (var project of this.filteredProjectList) {
                     if (project.idAppUser === this.newExperimentService.idAppUser) {
                         this.form.get('selectProject').setValue(project);
+                        this.newExperimentService.project = this.form.get('selectProject').value;
                         break;
                     }
                 }
             }
         } else {
             this.form.get('selectProject').setValue(this.filteredProjectList[0]);
+            this.newExperimentService.project = this.form.get('selectProject').value;
         }
+        this.newExperimentService.request.idProject = this.newExperimentService.project.idProject;
     }
 
     goBack() {
-        this.selectedIndex--;
-        this.newExperimentService.currentComponent = this.newExperimentService.components[this.selectedIndex]
+        this.newExperimentService.selectedIndex--;
+        this.newExperimentService.currentComponent = this.newExperimentService.components[this.newExperimentService.selectedIndex]
     }
 
     goNext() {
         switch(this.newExperimentService.currentState.value) {
             case 'SolexaBaseState' : {
-                if (this.selectedIndex === 0) {
-                    this.tabs[0].disabled = false;
-                    this.tabs[1].disabled = false;
-                } else if (this.selectedIndex === 1) {
-                    this.tabs[2].disabled = false;
-                } else if (this.selectedIndex === 2) {
-                    this.tabs[3].disabled = false;
-                } else if (this.selectedIndex === 3) {
-                    this.tabs[4].disabled = false;
-                } else if (this.selectedIndex === 4) {
-                    this.tabs[5].disabled = false;
-                } else if (this.selectedIndex === 5) {
-                    this.tabs[6].disabled = false;
-                } else if (this.selectedIndex === 6) {
-                    this.tabs[7].disabled = false;
-                } else if (this.selectedIndex === 7) {
-                    // this.tabs[7].disabled = false;
+                if (this.newExperimentService.selectedIndex === 0) {
+                    this.newExperimentService.tabs[0].disabled = false;
+                    this.newExperimentService.tabs[1].disabled = false;
+                } else if (this.newExperimentService.selectedIndex === 1) {
+                    this.newExperimentService.tabs[2].disabled = false;
+                } else if (this.newExperimentService.selectedIndex === 2) {
+                    this.newExperimentService.tabs[3].disabled = false;
+                } else if (this.newExperimentService.selectedIndex === 3) {
+                    this.newExperimentService.tabs[4].disabled = false;
+                } else if (this.newExperimentService.selectedIndex === 4) {
+                    this.newExperimentService.tabs[5].disabled = false;
+                } else if (this.newExperimentService.selectedIndex === 5) {
+                    this.newExperimentService.tabs[6].disabled = false;
+                } else if (this.newExperimentService.selectedIndex === 6) {
+                    this.newExperimentService.tabs[7].disabled = false;
+                } else if (this.newExperimentService.selectedIndex === 7) {
+                    this.newExperimentService.tabs[8].disabled = false;
+                } else if (this.newExperimentService.selectedIndex === 8) {
+                    this.newExperimentService.hideSubmit = false;
+                    this.newExperimentService.disableSubmit = true;
+                }
+                break;
+            }
+            case 'QCState' : {
+                if (this.newExperimentService.selectedIndex === 0) {
+                    this.newExperimentService.tabs[0].disabled = false;
                 }
             }
+
         }
-        this.selectedIndex++;
-        this.newExperimentService.currentComponent = this.newExperimentService.components[this.selectedIndex];
+        this.newExperimentService.selectedIndex++;
+        this.newExperimentService.currentComponent = this.newExperimentService.components[this.newExperimentService.selectedIndex];
+        this.newExperimentService.currentComponent.form.markAsPristine();
+        Object.keys(this.form.controls).forEach((key: string) => {
+            this.form.controls[key].markAsPristine();
+        });
     }
 
     destroyComponents() {
@@ -584,6 +668,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     componentCreated(compRef: ComponentRef<any>) {
         if (compRef) {
             this.newExperimentService.components.push(compRef.instance);
+            if (compRef.instance instanceof VisibilityDetailTabComponent) {
+                this.visibilityDetailObj = compRef.instance as VisibilityDetailTabComponent;
+            } else if (compRef.instance instanceof TabSampleSetupViewComponent) {
+            }
             this.newExperimentService.componentRefs.push(compRef);
         }
     }

@@ -133,9 +133,11 @@ export class TabSeqSetupView implements OnInit {
         let appPriceListParams: HttpParams = new HttpParams().set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
             .set("idLab", this.newExperimentService.lab.idLab);
         this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
-            for (let price of response) {
-                let key: string = price.codeApplication;
-                this.priceMap[key] = price.price;
+            if (response) {
+                for (let price of response) {
+                    let key: string = price.codeApplication;
+                    this.priceMap[key] = price.price;
+                }
             }
             this.themes = [];
             this.appPrices = [];
@@ -209,6 +211,10 @@ export class TabSeqSetupView implements OnInit {
         if (detectChanges) {
             this.changeRef.detectChanges();
         }
+    }
+
+    onNumTubesChanged(event) {
+        this.newExperimentService.numTubes = event
     }
 
     onNumSamplesChanged(event) {

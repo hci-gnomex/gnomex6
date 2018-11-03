@@ -63,10 +63,11 @@ export class TabSampleSetupViewComponent implements OnInit {
     @Output() goBack = new EventEmitter<string>();
     @Output() goNext = new EventEmitter<string>();
     @ViewChild("autoOrg") orgAutocomplete: MatAutocomplete;
-    private form: FormGroup;
+    public form: FormGroup;
     private sampleType: any;
     private filteredSampleTypeListDna: any[] = [];
     private filteredSampleTypeListRna: any[] = [];
+    private filteredChipTypeList: any[] = [];
     private previousOrganismMatOption: MatOption;
     private sampleSetupContainer: boolean = true;
     private showSampleNotes: boolean = false;
@@ -75,14 +76,12 @@ export class TabSampleSetupViewComponent implements OnInit {
     private showDnaseBox: boolean = false;
 
     constructor(private dictionaryService: DictionaryService,
-                private newExperimentService: NewExperimentService,
+                public newExperimentService: NewExperimentService,
                 private annotationService: AnnotationService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
                 private fb: FormBuilder) {
-    }
 
-    ngOnInit() {
         this.form = this.fb.group({
             numSamples: ['', Validators.required],
             selectedDna: [''],
@@ -97,6 +96,9 @@ export class TabSampleSetupViewComponent implements OnInit {
             acid: [''],
             coreNotes: ['', [Validators.maxLength(5000)]],
         }, { validator: this.oneCategoryRequired});
+    }
+
+    ngOnInit() {
         this.newExperimentService.organisms = this.gnomexService.activeOrganismList;
         this.newExperimentService.currentState.subscribe((value) =>{
             if (value) {
@@ -105,6 +107,7 @@ export class TabSampleSetupViewComponent implements OnInit {
             }
         });
         this.newExperimentService.sampleSetupView = this;
+        this.form.markAsPristine();
     }
 
     oneCategoryRequired(group : FormGroup) : {[s:string ]: boolean} {
@@ -283,8 +286,33 @@ export class TabSampleSetupViewComponent implements OnInit {
         }
     }
 
-    onKeepChange(event) {
+    onReagentChanged(event) {
+        this.newExperimentService.request.reagent = this.form.get("reagent").value;
+    }
 
+    onElutionChanged(event) {
+        this.newExperimentService.request.elutionBuffer = this.form.get("elution").value;
+
+    }
+
+    onDnaseChanged(event) {
+        if (event.checked) {
+            this.newExperimentService.request.usedDnase = 'Y';
+        }
+    }
+
+    onRnaseChanged(event) {
+        if (event.checked) {
+            this.newExperimentService.request.usedRnase = 'Y';
+        }
+    }
+
+    onKeepChange(event) {
+        if (event.value === 1) {
+            this.newExperimentService.request.keepSamples = 'Y';
+        } else {
+            this.newExperimentService.request.keepSamples = 'N';
+        }
     }
 
     onGridReady(event) {
@@ -293,6 +321,16 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     setNumSamples(event) {
         this.newExperimentService.numSamples = this.form.get("numSamples").value;
-        this.newExperimentService.numSamplesChanged.next(true);
+        // this.newExperimentService.numSamplesChanged.next(true);
     }
+
+    onTypeChange(event) {
+
+    }
+
+    selectType(event) {
+
+    }
+
+
 }

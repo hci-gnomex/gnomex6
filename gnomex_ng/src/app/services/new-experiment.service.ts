@@ -12,6 +12,48 @@ import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 
 @Injectable()
 export class NewExperimentService {
+    get filteredApps(): any[] {
+        return this._filteredApps;
+    }
+
+    set filteredApps(value: any[]) {
+        this._filteredApps = value;
+    }
+    get lanes(): any[] {
+        return this._lanes;
+    }
+
+    set lanes(value: any[]) {
+        this._lanes = value;
+    }
+    get project(): any {
+        return this._project;
+    }
+
+    set project(value: any) {
+        this._project = value;
+    }
+    get expTypeLabel(): string {
+        return this._expTypeLabel;
+    }
+
+    set expTypeLabel(value: string) {
+        this._expTypeLabel = value;
+    }
+    get numTubes(): number {
+        return this._numTubes;
+    }
+
+    set numTubes(value: number) {
+        this._numTubes = value;
+    }
+    get barCodes(): any[] {
+        return this._barCodes;
+    }
+
+    set barCodes(value: any[]) {
+        this._barCodes = value;
+    }
     get preppedByClient(): boolean {
         return this._preppedByClient;
     }
@@ -115,6 +157,7 @@ export class NewExperimentService {
 
     set organism(value: any) {
         this._organism = value;
+        this.organismChanged.next(true);
     }
     get experimentOwner(): any {
         return this._experimentOwner;
@@ -145,6 +188,7 @@ export class NewExperimentService {
 
     set numSamples(value: any) {
         this._numSamples = value;
+        this.numSamplesChanged.next(true);
     }
     get propertyEntriesForUser(): any[] {
         return this._propertyEntriesForUser;
@@ -181,6 +225,7 @@ export class NewExperimentService {
 
     set codeApplication(value: string) {
         this._codeApplication = value;
+        this.codeChanged.next(true);
     }
     get lab(): any {
         return this._lab;
@@ -227,8 +272,19 @@ export class NewExperimentService {
     private _sampleOrganisms: Set<any> = new Set<any>();
     private _organisms: any[] = [];
     private _filteredGenomeBuildList: any[] = [];
+    private _barCodes: any[] = [];
+    private _numTubes: number;
+    private _expTypeLabel: string;
+    private _project: any;
+    private _lanes: any[] = [];
+    private _filteredApps: any[] = [];
     public samplesColumnApi: any;
     private hiSeqPrices: any[] = [];
+    public selectedIndex: number = 0;
+    public tabs: any[] = [];
+    public samplesView;
+    public hideSubmit: boolean = true;
+    public disableSubmit: boolean = true;
     public propEntriesChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public hiSeqPricesChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public sampleTypeChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -239,12 +295,16 @@ export class NewExperimentService {
     public accountChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public protoChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public preppedChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public codeChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public organismChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public Changed: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public onSamplesTab: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public onConfirmTab: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public samplesGridColumnDefs: any[] = [];
     public priceMap: Map<string, string> = new Map<string, string>();
     public filteredAppList: any[] = [];
     public genomeList: any[] = [];
-    public selectedIndex = new BehaviorSubject<number>(1);
+    // public selectedIndex = new BehaviorSubject<number>(1);
 
     public readonly TYPE_MICROARRAY: string = 'MICROARRAY';
     public readonly TYPE_HISEQ: string = 'HISEQ';
@@ -274,7 +334,7 @@ export class NewExperimentService {
                 private httpClient: HttpClient) {
         this.filteredAppList = this.dictionaryService.getEntries('hci.gnomex.model.Application').sort(this.sortApplication);
         this.genomeList = this.dictionaryService.getEntries('hci.gnomex.model.GenomeBuildLite');
-
+        this.buildBarCodes();
     }
 
 
@@ -299,6 +359,13 @@ export class NewExperimentService {
         }
     }
 
+    buildBarCodes () {
+        let codes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcode");
+        for (let code of codes) {
+            code.idOligoBarcodeB = code.idOligoBarcode;
+            this.barCodes.push(code);
+        }
+    }
 
     public filterSampleType(codeNucleotideType: string, currentState: string, requestCategory: any): any[] {
         let doesMatchRequestCategory: boolean = false;
@@ -413,6 +480,74 @@ export class NewExperimentService {
         // return fAnnotations;
     }
 
+    public getMultiplexLanes(): void {
+        if (this.isSolexaState() && this.gnomexService.isInternalExperimentSubmission) {
+            this.initializeRequest();
+
+            let stringifiedRequest = JSON.stringify(this.request);
+
+            let params: HttpParams = new HttpParams()
+                .set("requestXMLString", stringifiedRequest);
+
+            // this.experimentService.getMultiplexLaneList(params).subscribe((respose) => {
+            //
+            // });
+
+        }
+    }
+
+
+    public initializeRequest() {
+        this.request.isExternal = this.isExternalExperimentSubmission() ? "Y" : "N";
+
+        this.request.codeRequestCategory = this.requestCategory.codeRequestCategory.toString();
+        this.request.idCoreFacility = this.requestCategory.idCoreFacility;
+
+        this.request.idSubmitter = this.getIdAppUserOwner();
+        if (this.gnomexService.hasPermission("canSubmitForOtherCores")) {
+            this.request.idSubmitter = this.securityAdvisor.idAppUser;
+        }
+        this.request.idAppUser = this.getIdAppUserOwner();
+
+        this.request.idLab = this.lab.idLab;
+        if (this.request.isExternal === 'N') {
+            if (this.billingAccount != null) {
+                this.request.idBillingAccount = this.billingAccount.idBillingAccount;
+            }
+            // else if (setupView.selectedBillingTemplate != null) {
+            //     request.billingTemplate = <billingTemplate></billingTemplate>;
+            //     request.billingTemplate.appendChild(new XMLList(setupView.selectedBillingTemplate));
+            // }
+        }
+        this.request.idProject = this.project.idProject;
+        this.request.codeApplication = this.codeApplication;
+        let requestCategory: any = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', this.request.codeRequestCategory);
+        this.request.samples = this.samplesGridRowData;
+
+        this.request.idSlideProduct = '';
+
+        // if (this.isSolexaState()) {
+        //     for (var lane of lanes) {
+        //         this.request.sequenceLanes.push(lane);
+        //     }
+        // }
+
+
+    }
+
+    public isExternalExperimentSubmission(): boolean {
+        if (this.setupView.currentState == "ExternalExperimentState" ||
+            this.setupView.currentState == "ExternalMicroarrayState" ||
+            this.setupView.currentState == "AdminExternalExperimentState" ||
+            this.setupView.currentState == "AdminExternalMicroarrayState") {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+
     public sortSampleTypes(obj1, obj2): number {
         if (obj1 == null && obj2 == null) {
             return 0;
@@ -473,6 +608,162 @@ export class NewExperimentService {
                     }
                 }
             }
+        }
+    }
+
+    updateRequestProperties():void {
+
+        let application: any = this.dictionaryService.getEntry('hci.gnomex.model.Application', this.request.codeApplication);
+
+        this.request.samples = this.samplesGridRowData;
+        this.request.hybridizations = {};
+        this.request.sequenceLanes = this.lanes;
+
+        // Visibility
+        // todo
+        // this.request.codeVisibility = visibilityView.visibilityRadioGroup.selectedValue;
+        // if (this.request.@codeVisibility != null && this.request.@codeVisibility == 'INST') {
+        //     // Only set the institution if the visibility view in initialized, meaning
+        //     // that the user has selected the visibility tab.  Otherwise, just leave
+        //     // the institution to is previously set value.
+        //     if (visibilityView.institutionCombo != null && visibilityView.institutionCombo.selectedItem != null) {
+        //         request.@idInstitution = visibilityView.institutionCombo.selectedItem.@idInstitution;
+        //     }
+        //     else if (parentApplication.getProperty(parentApplication.PROPERTY_ID_DEFAULT_INSTITUTION) != null) {
+        //         request.@idInstitution = parentApplication.getProperty(parentApplication.PROPERTY_ID_DEFAULT_INSTITUTION);
+        //     }
+        //     else {
+        //         request.@idInstitution = "";
+        //     }
+        // }
+
+        // Collaborators
+        // todo
+        // if (visibilityView != null && visibilityView.enabled) {
+        //     request.replace("collaborators", <collaborators></collaborators>);
+        //         for each(var collaborator:Object in visibilityView.getCollaborators()) {
+        //         request.collaborators.appendChild(collaborator);
+        //     }
+        // }
+        // request.@privacyExpirationDate = visibilityView.privacyExpirationPicker.text;
+
+        this.request.idAppUser = this.idAppUser;
+        this.request.idSubmitter = this.experimentOwner.idAppUser;
+        this.request.idLab = this.lab.idLab;
+        this.request.idProject = this.project.idProject;
+
+        //TODO
+        //Add new annotations to Sample that have not had data added to them in samples grid.
+        // if (request.samples.Sample.length() > 0) {
+        //     for each(var prop:XML in this.propertyEntries) {
+        //         if (prop.@isSelected == "true" && !(request.samples.Sample[0].hasOwnProperty("@ANNOT" + prop.@idProperty))) {
+        //             request.samples.Sample[0]["@ANNOT" + prop.@idProperty] = "";
+        //         }
+        //     }
+        // }
+    }
+
+    public checkSamplesCompleteness() {
+        let numberOfAdditionalLanes: number = 0;
+        for (let s2 of this.samplesGridRowData) {
+            if (this.isEntered(s2, "numberSequencingLanes")) {
+                numberOfAdditionalLanes += s2.numberSequencingLanes;
+            }
+        }
+        let completeCount: number = 0;
+        let nameCompleteCount: number = 0;
+
+        for (let sample of this.samplesGridRowData) {
+
+            if (this.isEntered(sample, "name") &&
+            this.isEntered(sample, "idSampleType") &&
+            this.isEntered(sample, "idOrganism") &&
+            this.isEntered(sample, "idSeqRunType") &&
+            this.isEntered(sample, "idNumberSequencingCycles") &&
+            this.isEntered(sample, "idNumberSequencingCyclesAllowed") &&
+            this.isEntered(sample, "multiplexGroupNumber") &&
+            (this.isEntered(sample, "numberSequencingLanes") && numberOfAdditionalLanes > 0)) {
+                completeCount++;
+            }
+
+        }
+        let isValidNumberSeqLanes: boolean = true;
+        if (isValidNumberSeqLanes) {
+            var lanesAdded:Boolean = false;
+            for (let theSample of this.samplesGridRowData) {
+                let numberLanesForSample: number = this.getLaneCount(theSample);
+                let numLanes: number = 1;
+                numLanes = theSample.numberSequencingLanes;
+                if (numberLanesForSample < numLanes) {
+                    let numberLanesToAdd: number = numLanes - numberLanesForSample;
+                    for (let x: number = 0; x < numberLanesToAdd; x++) {
+                        this.addSequencingLaneForSample(theSample);
+                        lanesAdded = true;
+                    }
+                } else if (numberLanesForSample > numLanes) {
+                    let numberLanesToRemove: number = numberLanesForSample - numLanes;
+                    for (let lane of this.getLanes(theSample, numberLanesToRemove)) {
+                        // TODO
+                        // parentDocument.lanes.removeItemAt(parentDocument.lanes.getItemIndex(lane));
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    getLanes(sample: any, numberOfLanes: number): any[] {
+        let theLanes: any[] = [];
+        if (theLanes != null) {
+            for (let sequenceLane of this.lanes) {
+                if (sequenceLane.idSample === sample.idSample) {
+                    theLanes.push(sequenceLane);
+                    if (numberOfLanes != -1 && theLanes.length == numberOfLanes) {
+                        break;
+                    }
+                }
+            }
+        }
+        return theLanes;
+    }
+
+
+    addSequencingLaneForSample(sample: any):void {
+        let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
+        let laneStr: string = lanePlus.toString().substr(1);
+
+        let laneObj = {
+            idSequenceLane: 'SequenceLane' + laneStr,
+            notes: '',
+            idSeqRunType: sample.idSeqRunType,
+            idNumberSequencingCycles: sample.idNumberSequencingCycles,
+            idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
+            idSample: sample.idSample,
+            idGenomeBuildAlignTo: ''
+
+        };
+        this.lanes.push(laneObj);
+    }
+
+    getLaneCount(sample: any): number {
+        let count: number = 0;
+        if (this.lanes != null) {
+            for (let sequenceLane of this.lanes) {
+                if (sequenceLane.idSample === sample.idSample) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+
+    isEntered(sample: any, fieldName: string): boolean {
+        if (!sample.hasOwnProperty(fieldName) || sample[fieldName] == '') {
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -623,9 +914,11 @@ export class NewExperimentService {
             .set("idLab", this.lab.idLab);
         this.billingService.getHiSeqRunTypePriceList(appPriceListParams).subscribe((response: any) => {
             this.hiSeqPrices = response;
+            if (Array.isArray(response)) {
             for (let price of response) {
                 let key: string = price.idNumberSequencingCyclesAllowed;
                 this.priceMap.set(key, price.price);
+            }
             }
             this.hiSeqPricesChanged.next(true);
 
@@ -748,9 +1041,12 @@ export class NewExperimentService {
 
     public getSubmitterName(): string {
         if (this.experimentOwner) {
-            return this.experimentOwner.display;
+            return this.experimentOwner.displayName;
         } else {
             return this.securityAdvisor.userName;
         }
     }
+
+    submit() { }
+
 }

@@ -15,6 +15,7 @@ import { TextSelectXorMultiselectEditor } from "./text-select-xor-multiselect.ed
 import { TextAlignLeftMiddleEditor } from "./text-align-left-middle.editor";
 import {TextAlignRightMiddleEditor} from "./text-align-right-middle.editor";
 import {MultiSelectEditor} from "./multi-select.editor";
+import {NumericEditor} from "./numeric-editor.component";
 import {UrlAnnotEditor} from "./url-annot-editor";
 import {UrlAnnotDialogComponent} from "./popups/url-annot-dialog.component";
 import {UtilModule} from "../util.module";
@@ -47,6 +48,7 @@ import {AgGridRendererModule} from "../grid-renderers";
         TextAlignRightMiddleEditor,
         TextSelectXorMultiselectEditor,
         MultiSelectEditor,
+        NumericEditor,
         UrlAnnotEditor,
         UrlAnnotDialogComponent
     ],
@@ -64,6 +66,7 @@ import {AgGridRendererModule} from "../grid-renderers";
         TextAlignRightMiddleEditor,
         TextSelectXorMultiselectEditor,
         MultiSelectEditor,
+        NumericEditor,
         UrlAnnotEditor,
         UrlAnnotDialogComponent
     ]

@@ -2,6 +2,17 @@
     <div>
         <div class="flex-container-col">
             <ng-container *ngIf="sampleSetupContainer">
+                <!--<div>Select a sample quality experiment type.</div>-->
+                <!--<mat-radio-group *ngIf="this.newExperimentService.currentState.value==='QCState'" placeholder="Select a sample quality experiment type." (change)="onTypeChange($event)" formControlName="selectedType">-->
+                    <!--<div *ngFor="let type of this.newExperimentService.filteredApps">-->
+                        <!--<mat-radio-button (click)="selectType($event)" [value]="type">-->
+                                                        <!--<span class="inline-span">-->
+                                                            <!--{{type.display}}-->
+                                                       <!--</span>-->
+                        <!--</mat-radio-button>-->
+                    <!--</div>-->
+                <!--</mat-radio-group>-->
+
                 <ng-container>
                     <div>
                         <mat-form-field class="formField" [floatLabel]="auto">
@@ -68,14 +79,14 @@
                         <div class="flex-container-col full-width">
                             <mat-form-field class="formField" [floatLabel]="auto">
                                 <mat-label>Specify the kit or reagents used for the purification of the samples you will be submitting.</mat-label>
-                                <input matInput formControlName="reagent" placeholder="Reagent">
+                                <input matInput formControlName="reagent" (change)="onReagentChanged($event)" placeholder="Reagent">
                             </mat-form-field>
-                            <mat-form-field class="formField" [floatLabel]="auto">
+                            <mat-form-field *ngIf="this.newExperimentService.currentState.value!=='QCState'" class="formField" [floatLabel]="auto">
                                 <mat-label>Specify the elution buffer used for the purification of the samples you will be submitting.</mat-label>
-                                <input matInput formControlName="elution" placeholder="Elution">
+                                <input matInput formControlName="elution" (change)="onElutionChanged($event)" placeholder="Elution">
                             </mat-form-field>
-                            <mat-checkbox *ngIf="showDnaseBox" formControlName="dnaseBox">Click if RNA samples were treated with DNase"</mat-checkbox>
-                            <mat-checkbox *ngIf="showRnaseBox" formControlName="rnaseBox">Click if DNA samples were treated with RNase"</mat-checkbox>
+                            <mat-checkbox *ngIf="showDnaseBox" formControlName="dnaseBox" (change)="onDnaseChanged($event)">Click if RNA samples were treated with DNase"</mat-checkbox>
+                            <mat-checkbox *ngIf="showRnaseBox" formControlName="rnaseBox" (change)="onRnaseChanged($event)">Click if DNA samples were treated with RNase"</mat-checkbox>
                         </div>
                     </div>
                 </ng-container>

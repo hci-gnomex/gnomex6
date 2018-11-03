@@ -76,6 +76,8 @@ import {RouterModule} from "@angular/router";
 import {TabBioinformaticsViewComponent} from "./new-experiment/tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina.component";
 import {UploadModule} from "../upload/upload.module";
+import {VisibilityDetailTabComponent} from "../util/visibility-detail-tab.component";
+// import {V} from "@angular/core/src/render3";
 
 /**
  * @author mbyrne
@@ -158,9 +160,9 @@ import {UploadModule} from "../upload/upload.module";
                     TabConfirmIlluminaComponent
     ],
     entryComponents:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupView, NewExperimentComponent,
-        TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent],
+        TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent, VisibilityDetailTabComponent],
     exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupView, NewExperimentComponent,
-        TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent]
+        TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent, VisibilityDetailTabComponent]
 })
 export class ExperimentsModule {
 }

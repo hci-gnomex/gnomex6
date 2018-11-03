@@ -117,7 +117,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     public edit = false;
     public visibilityForm: FormGroup;
     private visRadio:Array<any> = [];
-    private currentOrder:any;
+    public currentOrder:any;
     private currentLab:any;
 
 
@@ -213,19 +213,20 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
         this.route.data.forEach(data => { // new datatrack
             this.currentOrder = this.getOrder(data);
 
-            let dateParsed = this.parsePrivacyDate(this.currentOrder.privacyExpirationDate);
-            if(dateParsed.length > 0 ){
-                this.visibilityForm.get("privacyExp").setValue(new Date(dateParsed[0],dateParsed[1],dateParsed[2]));
-            }else{
-                this.visibilityForm.get("privacyExp").setValue(null);
-            }
-
             this.enableAdd = false;
             //this.enableRemove = false;
 
             if(!this.currentOrder){
                 return;
             }
+
+            let dateParsed = this.parsePrivacyDate(this.currentOrder.privacyExpirationDate);
+            if (dateParsed.length > 0) {
+                this.visibilityForm.get("privacyExp").setValue(new Date(dateParsed[0],dateParsed[1],dateParsed[2]));
+            } else {
+                this.visibilityForm.get("privacyExp").setValue(null);
+            }
+
             let currentCollaborators = this.currentOrder.collaborators;
             if(currentCollaborators){
                 currentCollaborators = Array.isArray(currentCollaborators) ? currentCollaborators : [currentCollaborators[this.currentOrder.collabType]];
@@ -372,7 +373,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     }
 
 
-    getOrder(data:any){
+    getOrder(data:any): any {
         if(data){
             if(data.analysis && data.analysis.Analysis){
                 data.analysis.Analysis.collabType = 'AnalysisCollaborator';

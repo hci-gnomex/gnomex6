@@ -3,7 +3,7 @@
         <img src="{{icon}}" height="16" width="16" style="margin-top: .5em">
         {{label}}
     </div>
-    <mat-tab-group class="full-height" id="linkDataTabs" #tabGroup [selectedIndex]="this.selectedIndex" (selectedTabChange)="onTabChange($event)">
+    <mat-tab-group class="full-height" id="linkDataTabs" #tabGroup [selectedIndex]="this.newExperimentService.selectedIndex" (selectedTabChange)="onTabChange($event)">
         <mat-tab *ngIf="setupView" label="Setup" class="full-height">
             <form [formGroup]="form" class="flex-container-col full-width full-height">
                 <div class="category-margin">
@@ -99,7 +99,7 @@
             </form>
         </mat-tab>
 
-        <mat-tab *ngFor="let tab of tabs" label="{{tab.label}}" [disabled]="tab.disabled" class="full-height full-width">
+        <mat-tab *ngFor="let tab of newExperimentService.tabs" label="{{tab.label}}" [disabled]="tab.disabled" class="full-height full-width">
             <div *ngIf="tab.label!=='Other Details';else annotate" class="full-width full-height">
                 <ndc-dynamic class="full-height full-width" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)" [ndcDynamicInputs]="inputs" [ndcDynamicOutputs]="outputs"></ndc-dynamic>
             </div>
@@ -109,7 +109,8 @@
         </mat-tab>
     </mat-tab-group>
     <div class="flex-container row-one" style="flex-grow:.1">
-        <button mat-button [disabled]="this.selectedIndex===0" (click)="goBack()"><mat-icon>arrow_left</mat-icon>Back</button>
-        <button mat-button [disabled]="!this.newExperimentService.currentComponent.form.valid||this.selectedIndex===numTabs-1" (click)="goNext()"><mat-icon>arrow_right</mat-icon>Next</button>
+        <button mat-button [disabled]="this.newExperimentService.selectedIndex===0" (click)="goBack()"><mat-icon>arrow_left</mat-icon>Back</button>
+        <button mat-button [disabled]="!this.newExperimentService.currentComponent.form.valid||this.newExperimentService.selectedIndex===numTabs-1" (click)="goNext()"><mat-icon>arrow_right</mat-icon>Next</button>
+        <button *ngIf="!newExperimentService.hideSubmit" mat-button [disabled]="!this.newExperimentService.disableSubmit||this.newExperimentService.selectedIndex===numTabs-1" (click)="newExperimentService.submit()"><img src="../../../assets/accept.png">Submit</button>
     </div>
 </div>

@@ -56,9 +56,9 @@ export class TabBioinformaticsViewComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.newExperimentService.samplesChanged.subscribe((value) => {
-            if (this.newExperimentService.samplesChanged.value === true) {
-                this.newExperimentService.samplesChanged.next(false);
+        this.newExperimentService.organismChanged.subscribe((value) => {
+            if (this.newExperimentService.organismChanged.value === true) {
+                this.newExperimentService.organismChanged.next(false);
             }
 
             let organismsFormArray: any[] = [];
