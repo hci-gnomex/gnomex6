@@ -27,7 +27,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
         .underline { text-decoration: underline; }
         
         .label {  
-            color: blue;  
+            color: darkblue;  
             font-style: italic;
         }
         
@@ -82,6 +82,8 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             color: green;
             font-weight: bold;
         }
+        
+        .allow-line-breaks { white-space: pre-line; }
         
     `]
 }) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy {
@@ -163,6 +165,29 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 
                     this.filterLabDictionary();
                 });
+            }
+
+            if (this._experiment && this._experiment.samples) {
+
+                let samplesRef: any[] = Array.isArray(this._experiment.samples) ? this._experiment.samples : [this._experiment.samples.Sample];
+                let addedIds: string[] = [];
+
+                this.libraryPreparedBy = '';
+
+                for (let sample of samplesRef) {
+                    if (sample.idLibPrepPerformedBy && !addedIds.find((a) => { return a === sample.idLibPrepPerformedBy}) ) {
+                        let libraryPreparer: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', sample.idLibPrepPerformedBy);
+
+                        if (libraryPreparer && libraryPreparer.display) {
+                            if (this.libraryPreparedBy.length > 0) {
+                                this.libraryPreparedBy = this.libraryPreparedBy += '\n';
+                            }
+                            this.libraryPreparedBy = this.libraryPreparedBy += libraryPreparer.display
+                        }
+
+                        addedIds.push('' + sample.idLibPrepPerformedBy);
+                    }
+                }
             }
 
             this.workflowSteps = [];
@@ -247,6 +272,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
     public experimentCategoryName: string = '';
     public visibility:             string = '';
     public institutionName:        string = '';
+    public libraryPreparedBy:      string = '';
 
     public isExternal: boolean = false;
 
@@ -674,6 +700,8 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             }
         }
 
+        this.possibleOwnersForLabDictionary.sort(this.sortAppUsers);
+
         this.isReady_possibleOwnersForLabDictionary = true;
     }
 
@@ -731,21 +759,51 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
         let needToAddCurrentSubmitter:Boolean = true;
 
         for (let appUser of this.possibleSubmittersForLabDictionary) {
-            if (appUser.idAppUser == this._experiment.idAppUser) {
+            if (appUser.idAppUser === this._experiment.idSubmitter) {
                 needToAddCurrentSubmitter = false;
                 break;
             }
         }
         if (needToAddCurrentSubmitter) {
-            let currentRequestOwner: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', this._experiment.idAppUser);
+            let currentRequestOwner: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', this._experiment.idSubmitter);
             let newNode: any = {
                 idAppUser: currentRequestOwner.idAppUser,
                 displayName: currentRequestOwner.display
             };
             this.possibleSubmittersForLabDictionary.push(newNode);
         }
+        this.possibleSubmittersForLabDictionary.sort(this.sortAppUsers);
 
         this.isReady_possibleSubmittersForLabDictionary = true;
+    }
+
+    private sortAppUsers(a, b): number {
+        if (!a && !b) {
+            return 0;
+        } else if (!a) {
+            return 1;
+        } else if (!b) {
+            return -1;
+        } else {
+            if (!a.displayName && !b.displayName) {
+                return 0;
+            } else if (!a.displayName) {
+                return 1;
+            } else if (!b.displayName) {
+                return -1;
+            } else {
+                if (a.displayName.toLowerCase() === b.displayName.toLowerCase()) {
+                    return 0;
+                } else if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
+                    return 1;
+                } else if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
+                    return -1;
+                } else {
+                    // should never be reached.
+                    return 0;
+                }
+            }
+        }
     }
 
     private finishLoadingIfAllDictionariesAreLoaded(): void {

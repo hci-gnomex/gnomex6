@@ -16,7 +16,7 @@
             <mat-tab label="Description">
                 <description-tab [showEditor]="initDescriptionTab" ></description-tab>
             </mat-tab>
-            <mat-tab label="Bioinformatics">
+            <mat-tab *ngIf="showBioinformaticsTab" label="Bioinformatics">
                 <experiment-bioinformatics-tab [experiment]="experiment"></experiment-bioinformatics-tab>
             </mat-tab>
         </mat-tab-group>

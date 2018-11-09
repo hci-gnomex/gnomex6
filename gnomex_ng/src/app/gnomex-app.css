@@ -182,6 +182,9 @@ div.mainnav {
 .underlined {
   text-decoration: underline !important;
 }
+.overflow-auto {
+  overflow: auto;
+}
 img.icon {
   margin-right: 0.5em;
 }

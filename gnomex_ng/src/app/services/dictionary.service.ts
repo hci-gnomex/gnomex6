@@ -1,9 +1,10 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Dictionary} from "../configuration/dictionary.interface";
 import {DictionaryEntry} from "../configuration/dictionary-entry.type";
+import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class DictionaryService {
@@ -86,7 +87,8 @@ export class DictionaryService {
     private cachedDictionaries: Dictionary[] = [];
     private cachedEntries: { [key: string]: DictionaryEntry[] } = {};
 
-    constructor(private httpClient: HttpClient) {
+    constructor(private httpClient: HttpClient,
+                private cookieUtilService: CookieUtilService) {
     }
 
     public load(callback?: () => void | null, errorCallback?: () => void | null, className?: string): void {
@@ -99,7 +101,7 @@ export class DictionaryService {
             }
 
             if (className) {
-                this.cacheDictionary(result[0]);
+                this.cacheDictionary(result[0], true);
             } else {
                 this.cacheDictionaries(result);
             }
@@ -138,8 +140,45 @@ export class DictionaryService {
         }, errorCallback);
     }
 
-    private callManageDictionaries(params: HttpParams): Observable<any> {
+    public save(insertMode: boolean, object: HttpParams, className: string, callback?: () => void | null, errorCallback?: () => void | null): void {
+        this.changeDictionary(object, insertMode ? "add" : "save", className, callback, errorCallback);
+    }
+
+    public delete(object: HttpParams, className: string, callback?: () => void | null, errorCallback?: () => void | null): void {
+        this.changeDictionary(object, "delete", className, callback, errorCallback);
+    }
+
+    private changeDictionary(object: HttpParams, action: string, className: string, callback?: () => void | null, errorCallback?: () => void | null): void {
+        let params: HttpParams = object
+            .set("action", action)
+            .set("className", className);
+        this.callManageDictionariesPOST(params).subscribe((result: any) => {
+            if (result && Array.isArray(result)) {
+                this.cacheDictionary(result[0], true);
+                if (callback) {
+                    callback();
+                }
+            } else {
+                if (errorCallback) {
+                    errorCallback();
+                }
+            }
+        }, () => {
+            if (errorCallback) {
+                errorCallback();
+            }
+        });
+    }
+
+    private callManageDictionariesGET(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/ManageDictionaries.gx", {params: params});
+    }
+
+    private callManageDictionariesPOST(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/ManageDictionaries.gx", params.toString(), {headers: headers});
     }
 
     private loadDictionaries(className?: string): Observable<any> {
@@ -148,20 +187,20 @@ export class DictionaryService {
         if (className) {
             params = params.set("className", className);
         }
-        return this.callManageDictionaries(params);
+        return this.callManageDictionariesGET(params);
     }
 
     private reloadDictionaries(): Observable<any> {
         let params: HttpParams = new HttpParams()
             .set("action", "reload");
-        return this.callManageDictionaries(params);
+        return this.callManageDictionariesPOST(params);
     }
 
     public getMetaData(className: string): Observable<any> {
         let params: HttpParams = new HttpParams()
             .set("action", "metadata")
             .set("className", className);
-        return this.callManageDictionaries(params);
+        return this.callManageDictionariesGET(params);
     }
 
     private cacheDictionaries(dictionaryData: Dictionary[]): void {
@@ -178,11 +217,16 @@ export class DictionaryService {
         dictionary.Filters = Array.isArray(dictionary.Filters) ? dictionary.Filters : [(dictionary.Filters as any).filter];
 
         if (isRefresh) {
+            let found: boolean = false;
             for (let index: number = 0; index < this.cachedDictionaries.length; index++) {
                 if (this.cachedDictionaries[index].className === dictionary.className) {
+                    found = true;
                     this.cachedDictionaries[index] = dictionary;
                     break;
                 }
+            }
+            if (!found) {
+                this.cachedDictionaries.push(dictionary);
             }
         } else {
             this.cachedDictionaries.push(dictionary);

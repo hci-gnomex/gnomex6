@@ -55,6 +55,10 @@ export class GnomexService {
     public readonly PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB: string = "request_props_on_confirm_tab";
 
 
+    public readonly TYPE_MICROARRAY: string = "MICROARRAY";
+    public readonly TYPE_NANOSTRING: string = "NANOSTRING";
+
+
 
     public properties: Map<string, string> = new Map<string, string>();
     public requestCategoryTypeMap: Map<string, any> = new Map<string, any>();
