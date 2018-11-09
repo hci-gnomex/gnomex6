@@ -9,7 +9,7 @@ import {TreeModule} from "angular-tree-component";
 
 import {AgGridModule} from "ag-grid-angular";
 import {AngularSplitModule} from "angular-split";
-import {BrowseDictionaryComponent, BrowseDictionaryComponentLauncher} from "./browse-dictionary.component";
+import {BrowseDictionaryComponent} from "./browse-dictionary.component";
 import {ConfigureAnnotationsModule} from "../util/configure-annotations.module";
 import {RichEditorModule} from "../../modules/rich-editor.module";
 import {UtilModule} from "../util/util.module";
@@ -51,7 +51,6 @@ import {ExperimentPlatformModule} from "./experiment-platform/experiment-platfor
     ],
     declarations: [
         BrowseDictionaryComponent,
-        BrowseDictionaryComponentLauncher,
         ConfigCoreFacilityComponent,
         ConfigCoreFacilityEditComponent,
         ConfigurationBrowsePanelComponent,
@@ -65,7 +64,6 @@ import {ExperimentPlatformModule} from "./experiment-platform/experiment-platfor
         CreateProtocolDialogComponent
     ],
     exports: [
-        BrowseDictionaryComponentLauncher
     ]
 
 })
