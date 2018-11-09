@@ -158,12 +158,11 @@ div.mainnav {
   font-style: italic;
 }
 
-.full-height {
-  height: 100%;
-}
-.full-width {
-  width: 100%;
-}
+.inline-block { display: inline-block; }
+
+.full-height { height: 100%; }
+.full-width  { width:  100%; }
+
 .flex-container-row {
   display: flex;
 }
@@ -171,21 +170,15 @@ div.mainnav {
   display: flex;
   flex-direction: column;
 }
-.flex-grow {
-  flex: 1;
-}
-.flex-wrap {
-  flex-wrap: wrap;
-}
-.align-center {
-  align-items: center;
-}
-.justify-space-between {
-  justify-content: space-between;
-}
-.justify-flex-end {
-  justify-content: flex-end;
-}
+.flex-grow { flex: 1; }
+.flex-wrap { flex-wrap: wrap; }
+
+.align-center   { align-items: center;   }
+.align-baseline { align-items: baseline; }
+
+.justify-space-between { justify-content: space-between; }
+.justify-flex-end      { justify-content: flex-end;      }
+
 .underlined {
   text-decoration: underline !important;
 }
@@ -245,8 +238,15 @@ img.icon {
 }
 
 
-button.mat-button.minimize      { min-width: 0; }
-button.mat-button.minimize span { min-width: 0; }
+button.mat-button.minimize      {
+  min-width: 0;
+  line-height: 1rem;
+  padding: 0.3em;
+}
+button.mat-button.minimize span {
+  min-width: 0;
+  padding: 0.3em;
+}
 
 .dialog-header-colors{
   background-color: #84b278;

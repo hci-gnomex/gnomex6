@@ -1,116 +1,241 @@
-<div class="flex-container-col" style="height: 100%">
-    <div>
-        <img src="{{icon}}" height="16" width="16" style="margin-top: .5em">
-        {{label}}
-    </div>
-    <mat-tab-group class="full-height" id="linkDataTabs" #tabGroup [selectedIndex]="this.newExperimentService.selectedIndex" (selectedTabChange)="onTabChange($event)">
-        <mat-tab *ngIf="setupView" label="Setup" class="full-height">
-            <form [formGroup]="form" class="flex-container-col full-width full-height">
-                <div class="category-margin">
-                    Select a service category
-                </div>
-                <mat-radio-group *ngIf="requestCategories.length>0; else noPlatforms" placeholder="Select a service category" class="cat-type-radio-group" (change)="onCategoryChange($event)" formControlName="selectedCategory">
-                    <div *ngFor="let category of requestCategories">
-                        <mat-radio-button (click)="selectCategory($event)" [value]="category">
-                            <span class="inline-block">
-                                <img src="{{category.icon}}">
-                                {{category.display}}
-                            </span>
-                            {{category.notes}}
-                        </mat-radio-button>
-                    </div>
-                </mat-radio-group>
-                <ng-template #noPlatforms>
-                    No experiment platforms are associated with this lab. Please contact customer support.
-                </ng-template>
-                <div *ngIf="showLab" class="flex-container-row">
-                    <mat-form-field class="formField">
-                        <input matInput placeholder="Lab" aria-label="Lab" [matAutocomplete]="autoLab"
-                               formControlName="selectLab" (keyup.enter)="chooseFirstLabOption()"  >
-                        <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
-                            <mat-option (onSelectionChange)="selectLabOption($event)" *ngFor="let lab of  filterLabList(form.get('selectLab').value)" [value]="lab">
-                                {{lab.name }}
-                            </mat-option>
-                        </mat-autocomplete>
-                        <mat-error *ngIf="form?.get('selectLab')?.hasError('required')">
-                            Lab is required
-                        </mat-error>
-                    </mat-form-field>
-
-                    <mat-form-field *ngIf="adminState==='AdminState'" class="formField">
-                        <mat-select placeholder="Owner" formControlName="selectOwner" (change)="onUserSelection($event)">
-                            <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem">
-                                {{ mem.displayName }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="form?.get('selectOwner')?.hasError('required')"> Owner is required</mat-error>
-                    </mat-form-field>
-
-                </div>
-                <div *ngIf="showBilling" class="flex-container-row">
-                    <mat-form-field class="formField">
-                        <mat-select placeholder="Account" formControlName="selectAccount" (change)="onBillingSelection($event)">
-                            <mat-option *ngFor="let account of authorizedBillingAccounts" [value]="account">
-                                {{ account.accountNameDisplay }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="form?.get('selectAccount')?.hasError('required')"> Account is required</mat-error>
-                    </mat-form-field>
-                    <div class="flex-column-container">
-                        <p class="billing-instructions">
-                            {{workAuthInstructions}}
-                        </p>
-                        <div style="justify-content: left">
-                            <button mat-button class="link-button" (click)="onNewAccount()">{{workAuthLabel}}</button>
-                        </div>
-                        <div *ngIf="showAccessAuthorizedAccountsLink" class="billing-instructions">
-                            {{accessAuthorizedBillingAccountInstructions}}
-                        </div>
-                        <div class="flex-container-row" style="justify-content: left">
-                            <button mat-button class="link-button" (click)="onNewAccount()">Show Other Blling Accounts</button>
-                            <button mat-button class="link-button" (click)="onNewAccount()">Split Billing</button>
-                        </div>
-                    </div>
-                </div>
-                <div *ngIf="showProject" class="flex-container-row">
-                    <mat-form-field class="formField">
-                        <mat-select placeholder="Project" formControlName="selectProject" (change)="onProjectSelection($event)">
-                            <mat-option *ngFor="let project of filteredProjectList" [value]="project">
-                                {{ project.name }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="form?.get('selectProject')?.hasError('required')"> Project is required</mat-error>
-                    </mat-form-field>
-                    <div class="flex-container-row" style="justify-content: left;flex-grow: 1">
-                        <button mat-button class="link-button" (click)="onNewAccount()">Edit</button>
-                        <button mat-button class="link-button" (click)="onNewAccount()">New</button>
-                    </div>
-                </div>
-
-                <div *ngIf="showNameDesc">
-                    <mat-form-field class="formField">
-                        <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder">
-                    </mat-form-field>
-                    <mat-form-field class="formField">
-                        <textarea matInput placeholder="Experimental Details" formControlName="description" matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="5"></textarea>
-                        <mat-error *ngIf="form?.get('description')?.hasError('maxlength')">Details can be at most 5000 characters</mat-error>
-                    </mat-form-field>
-                </div>
-            </form>
-        </mat-tab>
-
-        <mat-tab *ngFor="let tab of newExperimentService.tabs" label="{{tab.label}}" [disabled]="tab.disabled" class="full-height full-width">
-            <div *ngIf="tab.label!=='Other Details';else annotate" class="full-width full-height">
-                <ndc-dynamic class="full-height full-width" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)" [ndcDynamicInputs]="inputs" [ndcDynamicOutputs]="outputs"></ndc-dynamic>
+<div class="full-height full-width flex-container-col padded bordered overflow">
+    <div *ngIf="!!icon || !!label" class="full-width align-center padded-bottom">
+        <div class="full-height full-width flex-container-row">
+            <div *ngIf="!!icon" class="padded-left">
+                <img src="{{ icon }}" height="16" width="16">
             </div>
-            <ng-template #annotate>
-                <ndc-dynamic class="full-width full-height" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)" [ndcDynamicInputs]="annotationInputs"></ndc-dynamic>
-            </ng-template>
-        </mat-tab>
-    </mat-tab-group>
-    <div class="flex-container row-one" style="flex-grow:.1">
-        <button mat-button [disabled]="this.newExperimentService.selectedIndex===0" (click)="goBack()"><mat-icon>arrow_left</mat-icon>Back</button>
-        <button mat-button [disabled]="!this.newExperimentService.currentComponent.form.valid||this.newExperimentService.selectedIndex===numTabs-1" (click)="goNext()"><mat-icon>arrow_right</mat-icon>Next</button>
-        <button *ngIf="!newExperimentService.hideSubmit" mat-button [disabled]="!this.newExperimentService.disableSubmit||this.newExperimentService.selectedIndex===numTabs-1" (click)="newExperimentService.submit()"><img src="../../../assets/accept.png">Submit</button>
+            <div *ngIf="!!label" class="flex-grow padded" style="min-height: calc(0.6em + 16px);">
+                {{ label }}
+            </div>
+        </div>
+    </div>
+    <div class="full-width flex-grow overflow bordered">
+        <mat-tab-group #tabGroup
+                       class="full-width full-height"
+                       id="linkDataTabs"
+                       [selectedIndex]="this.newExperimentService.selectedIndex"
+                       (selectedTabChange)="onTabChange($event)">
+            <mat-tab label="Setup" class="full-width full-height">
+                <form [formGroup]="form" class="full-width full-height font-small extra-padded">
+                    <ol class="full-width three-depth-numbering">
+                        <li>
+                            <div class="flex-container-row">
+                                <div class="heading">
+                                    Select a service category :
+                                </div>
+                                <mat-radio-group *ngIf="requestCategories.length > 0; else noPlatforms"
+                                                 class="flex-container-col"
+                                                 placeholder="Select a service category"
+                                                 formControlName="selectedCategory"
+                                                 (change)="onCategoryChange($event)">
+                                    <div *ngFor="let category of requestCategories" class="full-width">
+                                        <mat-radio-button (click)="selectCategory($event)" [value]="category">
+                                            <div class="full-width flex-container-row">
+                                                <div class="label-width">
+                                                    <img src="{{ category.icon }}">
+                                                    {{ category.display }}
+                                                </div>
+                                                <div>
+                                                    {{ category.notes }}
+                                                </div>
+                                            </div>
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                                <ng-template #noPlatforms>
+                                    No experiment platforms are associated with this lab. Please contact customer support.
+                                </ng-template>
+                            </div>
+                        </li>
+                        <li *ngIf="showLab" class="full-width align-baseline">
+                            <div class="full-width flex-container-row align-baseline">
+                                <div class="heading">
+                                    Verify your lab group :
+                                </div>
+                                <mat-form-field class="moderate-width">
+                                    <input matInput
+                                           placeholder="Select a Lab"
+                                           aria-label="Lab"
+                                           formControlName="selectLab"
+                                           [matAutocomplete]="autoLab"
+                                           (keyup.enter)="chooseFirstLabOption()">
+                                    <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
+                                        <mat-option *ngFor="let lab of  filterLabList(form.get('selectLab').value)"
+                                                    [value]="lab"
+                                                    (onSelectionChange)="selectLabOption($event)">
+                                            {{lab.name }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <mat-error *ngIf="form?.get('selectLab')?.hasError('required')">
+                                        Lab is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </li>
+                        <li *ngIf="showName" class="full-width align-baseline">
+                            <div class="full-width flex-container-row align-baseline">
+                                <div class="heading">
+                                    Verify your name :
+                                </div>
+                                <mat-form-field *ngIf="adminState==='AdminState'" class="moderate-width">
+                                    <mat-select placeholder="Your name" formControlName="selectName" (change)="onUserSelection($event)">
+                                        <mat-option *ngFor="let mem of possibleSubmitters" [value]="mem">
+                                            {{ mem.displayName }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="form?.get('selectOwner')?.hasError('required')">Name is required</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </li>
+                        <li *ngIf="showBilling" class="full-width align-baseline">
+                            <div class="full-width flex-container-row">
+                                <div class="flex-container-row align-baseline">
+                                    <div class="heading">
+                                        Select a payment method :
+                                    </div>
+                                    <mat-form-field class="moderate-width">
+                                        <mat-select placeholder="Account" formControlName="selectAccount" (change)="onBillingSelection($event)">
+                                            <mat-option *ngFor="let account of authorizedBillingAccounts" [value]="account">
+                                                {{ account.accountNameDisplay }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="form?.get('selectAccount')?.hasError('required')"> Account is required</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="flex-column-container moderate-width major-padding-left">
+                                    <div class="double-padded-left billing-instructions">
+                                        {{ workAuthInstructions }}
+                                    </div>
+                                    <div>
+                                        <button mat-button class="link-button minimize" (click)="onNewAccount()">{{workAuthLabel}}</button>
+                                    </div>
+                                    <div *ngIf="showAccessAuthorizedAccountsLink" class="double-padded-left billing-instructions">
+                                        {{ accessAuthorizedBillingAccountInstructions }}
+                                    </div>
+                                    <div class="flex-container-row">
+                                        <div class="padded-right">
+                                            <button mat-button class="link-button minimize" (click)="onNewAccount()">Show Other Blling Accounts</button>
+                                        </div>
+                                        <div class="padded-right">
+                                            <button mat-button class="link-button minimize" (click)="onNewAccount()">Split Billing</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li *ngIf="showProject" class="full-width align-baseline">
+                            <div class="full-width flex-container-row align-baseline">
+                                <div class="heading word-wrap">
+                                    {{ "Select a folder : \n (for organizing experiments)" }}
+                                </div>
+                                <mat-form-field class="moderate-width">
+                                    <mat-select placeholder="Project" formControlName="selectProject" (change)="onProjectSelection($event)">
+                                        <mat-option *ngFor="let project of filteredProjectList" [value]="project">
+                                            {{ project.name }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="form?.get('selectProject')?.hasError('required')"> Project is required</mat-error>
+                                </mat-form-field>
+                                <div class="flex-container-row major-padding-left">
+                                    <div class="padded-right">
+                                        <button mat-button class="link-button minimize" (click)="onNewAccount()">Edit</button>
+                                    </div>
+                                    <div class="padded-right">
+                                        <button mat-button class="link-button minimize" (click)="onNewAccount()">New</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li *ngIf="showExperimentName" class="full-width align-baseline">
+                            <div class="full-width flex-container-row align-baseline">
+                                <div class="heading word-wrap">
+                                    {{ "Provide an experiment name \n for the data folder (optional)" }}
+                                </div>
+                                <mat-form-field class="moderate-width">
+                                    <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder">
+                                </mat-form-field>
+                            </div>
+                        </li>
+                        <li *ngIf="showExperimentTextbox" class="full-width align-baseline">
+                            <div class="full-width">
+                                <div class="full-width flex-container-row align-baseline padding-bottom">
+                                    <div class="heading word-wrap">
+                                        Document experimental details in the text field below (optional)
+                                    </div>
+                                </div>
+                                <mat-form-field class="long-width">
+                                    <textarea matInput
+                                              matTextareaAutosize
+                                              placeholder="Experimental Details"
+                                              formControlName="description"
+                                              matAutosizeMinRows="1"
+                                              matAutosizeMaxRows="5">
+                                    </textarea>
+                                    <mat-error *ngIf="form?.get('description')?.hasError('maxlength')">Details can be at most 5000 characters</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </li>
+                    </ol>
+                </form>
+            </mat-tab>
+
+            <mat-tab *ngFor="let tab of newExperimentService.tabs"
+                     label="{{tab.label}}"
+                     class="full-height full-width"
+                     [disabled]="tab.disabled" >
+                <div *ngIf="tab.label !== 'Other Details'; else annotate" class="full-width full-height">
+                    <ndc-dynamic class="full-height full-width"
+                                 [ndcDynamicComponent]="tab.component"
+                                 [ndcDynamicInputs]="inputs"
+                                 [ndcDynamicOutputs]="outputs"
+                                 (ndcDynamicCreated)="componentCreated($event)">
+                    </ndc-dynamic>
+                </div>
+                <ng-template #annotate>
+                    <ndc-dynamic class="full-width full-height"
+                                 [ndcDynamicComponent]="tab.component"
+                                 [ndcDynamicInputs]="annotationInputs"
+                                 (ndcDynamicCreated)="componentCreated($event)" >
+                    </ndc-dynamic>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+    <div class="full-width padded-top">
+        <div class="full-width flex-container-row">
+            <div class="padded-right">
+                <button mat-raised-button
+                        [disabled]="this.newExperimentService.selectedIndex === 0"
+                        (click)="goBack()">
+                    <mat-icon>arrow_left</mat-icon>
+                    Back
+                </button>
+            </div>
+            <div class="padded-right">
+                <button mat-raised-button
+                        [disabled]="!this.newExperimentService?.currentComponent?.form?.valid || this.newExperimentService?.selectedIndex >= numTabs"
+                        (click)="goNext()">
+                    <mat-icon>arrow_right</mat-icon>
+                    Next
+                </button>
+            </div>
+            <div class="full-height flex-grow">
+            </div>
+            <div class="padded-left">
+                <button *ngIf="!newExperimentService.hideSubmit"
+                        mat-raised-button
+                        [disabled]="!this.newExperimentService.disableSubmit||this.newExperimentService.selectedIndex===numTabs-1"
+                        (click)="newExperimentService.submit()">
+                    <img src="../../../assets/accept.png">
+                    Submit
+                </button>
+            </div>
+            <div class="padded-left">
+                <button mat-raised-button
+                        (click)="clickCancel()">
+                    Cancel
+                </button>
+            </div>
+        </div>
     </div>
 </div>

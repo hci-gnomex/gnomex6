@@ -53,13 +53,15 @@ export class TabSeqProtoViewComponent implements OnInit {
                     this.newExperimentService.hiSeqPricesChanged.next(false);
                 }
 
-                this.filteredNumberSequencingCyclesAllowedList = this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed')
-                    .sort(this.newExperimentService.sortNumberSequencingCyclesAllowed);
-                this.filteredNumberSequencingCyclesAllowedList = this.newExperimentService.filterNumberSequencingCyclesAllowed(this.filteredNumberSequencingCyclesAllowedList, this.requestCategory);
-                this.runTypeLabel = this.gnomexService.getRequestCategoryProperty(this.requestCategory.idCoreFacility, this.requestCategory.codeRequestCategory, this.gnomexService.PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD);
-                for (let proto of this.filteredNumberSequencingCyclesAllowedList) {
-                    let price = this.newExperimentService.priceMap.get(proto.idNumberSequencingCyclesAllowed);
-                    proto.price = price;
+                if (this.requestCategory) {
+                    this.filteredNumberSequencingCyclesAllowedList = this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed')
+                        .sort(this.newExperimentService.sortNumberSequencingCyclesAllowed);
+                    this.filteredNumberSequencingCyclesAllowedList = this.newExperimentService.filterNumberSequencingCyclesAllowed(this.filteredNumberSequencingCyclesAllowedList, this.requestCategory);
+                    this.runTypeLabel = this.gnomexService.getRequestCategoryProperty(this.requestCategory.idCoreFacility, this.requestCategory.codeRequestCategory, this.gnomexService.PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD);
+                    for (let proto of this.filteredNumberSequencingCyclesAllowedList) {
+                        let price = this.newExperimentService.priceMap.get(proto.idNumberSequencingCyclesAllowed);
+                        proto.price = price;
+                    }
                 }
             }
         });

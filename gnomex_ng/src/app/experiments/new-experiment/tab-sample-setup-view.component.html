@@ -85,8 +85,8 @@
                                 <mat-label>Specify the elution buffer used for the purification of the samples you will be submitting.</mat-label>
                                 <input matInput formControlName="elution" (change)="onElutionChanged($event)" placeholder="Elution">
                             </mat-form-field>
-                            <mat-checkbox *ngIf="showDnaseBox" formControlName="dnaseBox" (change)="onDnaseChanged($event)">Click if RNA samples were treated with DNase"</mat-checkbox>
-                            <mat-checkbox *ngIf="showRnaseBox" formControlName="rnaseBox" (change)="onRnaseChanged($event)">Click if DNA samples were treated with RNase"</mat-checkbox>
+                            <mat-checkbox *ngIf="showDnaseBox" formControlName="dnaseBox" (change)="onDnaseChanged($event)">Click if RNA samples were treated with DNase</mat-checkbox>
+                            <mat-checkbox *ngIf="showRnaseBox" formControlName="rnaseBox" (change)="onRnaseChanged($event)">Click if DNA samples were treated with RNase</mat-checkbox>
                         </div>
                     </div>
                 </ng-container>

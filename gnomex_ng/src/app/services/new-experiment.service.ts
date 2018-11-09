@@ -368,7 +368,7 @@ export class NewExperimentService {
     }
 
     public filterSampleType(codeNucleotideType: string, currentState: string, requestCategory: any): any[] {
-        let doesMatchRequestCategory: boolean = false;
+        // let doesMatchRequestCategory: boolean = false;
         let types: any[] = [];
 
 
@@ -377,11 +377,11 @@ export class NewExperimentService {
                 continue;
             }
 
-            if (codeNucleotideType != null && category.codeNucleotideType != codeNucleotideType) {
+            if (codeNucleotideType != null && category.codeNucleotideType !== codeNucleotideType) {
                 continue;
             }
             let theRequestCategories = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleTypeRequestCategory").filter(category2 =>
-                category2.value != "" && category2.idSampleType === category.value
+                category2.value !== "" && category2.idSampleType === category.value
             );
             for (let category3 of theRequestCategories) {
                 if (category3.codeRequestCategory === requestCategory.codeRequestCategory) {
@@ -419,55 +419,41 @@ export class NewExperimentService {
     }
 
     public isEditState(currentState: string): boolean {
-        if (currentState == 'EditState' ||
-            currentState == 'GenericEditState' ||
-            currentState == 'SolexaEditState' ||
-            currentState == 'SeqExternalEditState' ||
-            currentState == 'QCEditState' ||
-            currentState == 'MicroarrayEditState' ||
-            currentState == 'CapSeqEditState' ||
-            currentState == 'CherryPickEditState' ||
-            currentState == 'FragAnalEditState' ||
-            currentState == 'MitSeqEditState' ||
-            currentState == 'IScanEditState' ||
-            currentState == 'SequenomEditState' ||
-            currentState == 'IsolationEditState' ||
-            currentState == 'ClinicalSequenomEditState' ||
-            currentState == 'NanoStringEditState') {
-            return true;
-        } else {
-            return false;
-        }
+        return (currentState === 'EditState'
+            || currentState === 'GenericEditState'
+            || currentState === 'SolexaEditState'
+            || currentState === 'SeqExternalEditState'
+            || currentState === 'QCEditState'
+            || currentState === 'MicroarrayEditState'
+            || currentState === 'CapSeqEditState'
+            || currentState === 'CherryPickEditState'
+            || currentState === 'FragAnalEditState'
+            || currentState === 'MitSeqEditState'
+            || currentState === 'IScanEditState'
+            || currentState === 'SequenomEditState'
+            || currentState === 'IsolationEditState'
+            || currentState === 'ClinicalSequenomEditState'
+            || currentState === 'NanoStringEditState');
     }
 
     public isSequenomState(currentState): boolean {
-        if (currentState == 'SequenomState' || currentState == 'SequenomEditState') {
-            return true;
-        } else {
-            return false;
-        }
+        return (currentState === 'SequenomState'
+            || currentState === 'SequenomEditState');
     }
 
     public isClinicalSequenomState(currentState): boolean {
-        if (currentState == 'ClinicalSequenomState' || currentState == 'ClinicalSequenomEditState') {
-            return true;
-        } else {
-            return false;
-        }
+        return (currentState === 'ClinicalSequenomState'
+            || currentState === 'ClinicalSequenomEditState');
     }
 
     public isQCState(currentState): boolean {
-        if (currentState == 'QCState' ||
-            currentState == 'QCExternalState' ||
-            currentState == 'QCEditState') {
-            return true;
-        } else {
-            return false;
-        }
+        return (currentState === 'QCState'
+            || currentState === 'QCExternalState'
+            || currentState === 'QCEditState');
     }
 
     public filterAnnotations(idOrganism): any[] {
-        let fAnnotations: any[] = this.filterPropertiesByUser(this.annotations);;
+        let fAnnotations: any[] = this.filterPropertiesByUser(this.annotations);
 
         return fAnnotations;
         // let fAnnotations: any[] = [];
@@ -521,7 +507,9 @@ export class NewExperimentService {
         }
         this.request.idProject = this.project.idProject;
         this.request.codeApplication = this.codeApplication;
-        let requestCategory: any = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', this.request.codeRequestCategory);
+
+        // let requestCategory: any = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', this.request.codeRequestCategory);
+
         this.request.samples = this.samplesGridRowData;
 
         this.request.idSlideProduct = '';
@@ -536,15 +524,10 @@ export class NewExperimentService {
     }
 
     public isExternalExperimentSubmission(): boolean {
-        if (this.setupView.currentState == "ExternalExperimentState" ||
-            this.setupView.currentState == "ExternalMicroarrayState" ||
-            this.setupView.currentState == "AdminExternalExperimentState" ||
-            this.setupView.currentState == "AdminExternalMicroarrayState") {
-            return true;
-        } else {
-            return false;
-        }
-
+        return (this.setupView.currentState === "ExternalExperimentState"
+            || this.setupView.currentState === "ExternalMicroarrayState"
+            || this.setupView.currentState === "AdminExternalExperimentState"
+            || this.setupView.currentState === "AdminExternalMicroarrayState");
     }
 
 
@@ -559,9 +542,9 @@ export class NewExperimentService {
             let order1: number = Number(obj1.sortOrder);
             let order2: number = Number(obj2.sortOrder);
 
-            if (obj1.value == '') {
+            if (obj1.value === '') {
                 return -1;
-            } else if (obj2.value == '') {
+            } else if (obj2.value === '') {
                 return 1;
             } else {
                 if (order1 < order2) {
@@ -584,10 +567,10 @@ export class NewExperimentService {
         } else if (obj2 === null) {
             return -1;
         } else {
-            var order1: number = obj1.sortOrder;
-            var order2: number = obj2.sortOrder;
-            var disp1: string = obj1.display;
-            var disp2: string = obj2.display;
+            let order1: number = obj1.sortOrder;
+            let order2: number = obj2.sortOrder;
+            let disp1: string = obj1.display;
+            let disp2: string = obj2.display;
 
             if (obj1.value === '') {
                 return -1;
@@ -671,25 +654,26 @@ export class NewExperimentService {
             }
         }
         let completeCount: number = 0;
-        let nameCompleteCount: number = 0;
+        // let nameCompleteCount: number = 0;
 
         for (let sample of this.samplesGridRowData) {
 
-            if (this.isEntered(sample, "name") &&
-            this.isEntered(sample, "idSampleType") &&
-            this.isEntered(sample, "idOrganism") &&
-            this.isEntered(sample, "idSeqRunType") &&
-            this.isEntered(sample, "idNumberSequencingCycles") &&
-            this.isEntered(sample, "idNumberSequencingCyclesAllowed") &&
-            this.isEntered(sample, "multiplexGroupNumber") &&
-            (this.isEntered(sample, "numberSequencingLanes") && numberOfAdditionalLanes > 0)) {
+            if (this.isEntered(sample, "name")
+                && this.isEntered(sample, "idSampleType")
+                && this.isEntered(sample, "idOrganism")
+                && this.isEntered(sample, "idSeqRunType")
+                && this.isEntered(sample, "idNumberSequencingCycles")
+                && this.isEntered(sample, "idNumberSequencingCyclesAllowed")
+                && this.isEntered(sample, "multiplexGroupNumber")
+                && (this.isEntered(sample, "numberSequencingLanes") && numberOfAdditionalLanes > 0)) {
                 completeCount++;
             }
 
         }
         let isValidNumberSeqLanes: boolean = true;
         if (isValidNumberSeqLanes) {
-            var lanesAdded:Boolean = false;
+            let lanesAdded:Boolean = false;
+
             for (let theSample of this.samplesGridRowData) {
                 let numberLanesForSample: number = this.getLaneCount(theSample);
                 let numLanes: number = 1;
@@ -719,7 +703,7 @@ export class NewExperimentService {
             for (let sequenceLane of this.lanes) {
                 if (sequenceLane.idSample === sample.idSample) {
                     theLanes.push(sequenceLane);
-                    if (numberOfLanes != -1 && theLanes.length == numberOfLanes) {
+                    if (numberOfLanes !== -1 && theLanes.length === numberOfLanes) {
                         break;
                     }
                 }
@@ -760,11 +744,7 @@ export class NewExperimentService {
 
 
     isEntered(sample: any, fieldName: string): boolean {
-        if (!sample.hasOwnProperty(fieldName) || sample[fieldName] == '') {
-            return false;
-        } else {
-            return true;
-        }
+        return (sample.hasOwnProperty(fieldName) && ('' + sample[fieldName]) !== '');
     }
 
     public filterApplication(requestCategory, seqPrepByCore): any[] {
@@ -776,19 +756,18 @@ export class NewExperimentService {
             if (app.isActive === 'N') {
                 continue;
             }
-            var doesMatchRequestCategory: boolean = false;
-            let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter(reqCatApp =>
-
-                reqCatApp.value != "" && reqCatApp.codeApplication === app.value
-            );
-            for (var xref of theApplications) {
+            let doesMatchRequestCategory: boolean = false;
+            let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter((reqCatApp) => {
+                    return reqCatApp.value !== "" && reqCatApp.codeApplication === app.value;
+            });
+            for (let xref of theApplications) {
                 if (xref.codeRequestCategory === requestCategory.codeRequestCategory) {
                     doesMatchRequestCategory = true;
                     break;
                 }
             }
 
-            var doesMatchSeqPrepByCore: boolean = false;
+            let doesMatchSeqPrepByCore: boolean = false;
             if (doesMatchRequestCategory) {
                 if (requestCategory.isIlluminaType !== 'Y' || !this.gnomexService.isInternalExperimentSubmission) {
                     doesMatchSeqPrepByCore = true;
@@ -817,12 +796,12 @@ export class NewExperimentService {
             } else if (obj2.value === '') {
                 return 1;
             } else {
-                var isCustom1:String = obj1.isCustom;
-                var isCustom2:String = obj2.isCustom
-                var numberCycles1:Number = obj1.numberSequencingCyclesDisplay;
-                var numberCycles2:Number = obj2.numberSequencingCyclesDisplay;
-                var sortOrder1:Number = obj1.sortOrder === '' ? -1 : obj1.sortOrder;
-                var sortOrder2:Number = obj2.sortOrder === '' ? -1 : obj2.sortOrder;
+                let isCustom1: String = obj1.isCustom;
+                let isCustom2: String = obj2.isCustom;
+                let numberCycles1: Number = obj1.numberSequencingCyclesDisplay;
+                let numberCycles2: Number = obj2.numberSequencingCyclesDisplay;
+                let sortOrder1: Number = obj1.sortOrder === '' ? -1 : obj1.sortOrder;
+                let sortOrder2: Number = obj2.sortOrder === '' ? -1 : obj2.sortOrder;
 
                 if (isCustom1 < isCustom2) {
                     return -1;
@@ -848,26 +827,27 @@ export class NewExperimentService {
     }
 
     public filterNumberSequencingCyclesAllowed(cycles: any[], requestCategory: any): any[] {
+        if (!cycles || !Array.isArray(cycles) || !requestCategory) {
+            return [];
+        }
+
         let seqCycles: any[] = [];
 
         for (let cycle of cycles) {
-            if (cycle.value) {
-
-                var doesMatch: Boolean = false;
-                if (cycle.codeRequestCategory === requestCategory.codeRequestCategory && cycle.isActive.toString() === 'Y') {
-                    seqCycles.push(cycle);
-                }
+            if (cycle.value && cycle.codeRequestCategory === requestCategory.codeRequestCategory && cycle.isActive.toString() === 'Y') {
+                seqCycles.push(cycle);
             }
         }
+
         return seqCycles;
     }
 
     public getOrganism(): any {
-        if (this.sampleSetupView && (this.isMicroarrayState() || this.isSolexaState()) && this.currentState.value != 'SolexaLaneAmendState') {
+        if (this.sampleSetupView && (this.isMicroarrayState() || this.isSolexaState()) && this.currentState.value !== 'SolexaLaneAmendState') {
             return this.sampleSetupView.form.get("organism").value;
         } else if (this.request != null) {
             let idOrganism = null;
-            if (this.request.idOrganismSampleDefault && this.request.idOrganismSampleDefault != '') {
+            if (this.request.idOrganismSampleDefault && this.request.idOrganismSampleDefault !== '') {
                 idOrganism = this.request.idOrganismSampleDefault;
             } else {
                 if (this.request.samples.length > 0) {
@@ -933,7 +913,7 @@ export class NewExperimentService {
             idOrganism = this.getOrganism().idOrganism;
         }
         if (AnnotationService.isApplicableProperty(property, this.requestCategory, idOrganism, this.codeApplication)) {
-            if (sce.isSelected == 'true' || property.isActive != 'N') {
+            if (sce.isSelected === 'true' || property.isActive !== 'N') {
                 keep = true;
             }
         }
@@ -1048,5 +1028,4 @@ export class NewExperimentService {
     }
 
     submit() { }
-
 }
