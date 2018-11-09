@@ -9,6 +9,8 @@ import {Subscription} from "rxjs/Subscription";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {ExperimentsService} from "../experiments.service";
 import {MatTabChangeEvent} from "@angular/material";
+import {DictionaryService} from "../../services/dictionary.service";
+import {GnomexService} from "../../services/gnomex.service";
 
 
 @Component({
@@ -29,8 +31,14 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
     private showRelatedDataTab:boolean =false;
     public initDescriptionTab = false;
 
+    public showBioinformaticsTab: boolean = false;
 
-    constructor(private experimentService: ExperimentsService,
+    private requestCategory: any;
+
+
+    constructor(private dictionaryService: DictionaryService,
+                private experimentService: ExperimentsService,
+                private gnomexService: GnomexService,
                 private route: ActivatedRoute) {
     }
 
@@ -48,6 +56,16 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
             }
 
             if (this.experiment) {
+                if (!this.requestCategory || this.requestCategory.codeRequestCategory !== this.experiment.codeRequestCategory) {
+                    this.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', this.experiment.codeRequestCategory);
+
+                    this.showBioinformaticsTab = this.requestCategory
+                        && this.requestCategory.type !== this.gnomexService.TYPE_MICROARRAY
+                        && (this.requestCategory.type === this.gnomexService.TYPE_NANOSTRING
+                            || (this.requestCategory.isIlluminaType === 'Y' && this.gnomexService.submitInternalExperiment())
+                            || (this.requestCategory.isIlluminaType === 'Y' && this.experiment && this.experiment.isExternal !== 'Y'));
+                }
+
                 let annots = this.experiment.RequestProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.experiment);
 
