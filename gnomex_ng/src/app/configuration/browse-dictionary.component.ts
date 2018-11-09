@@ -1,254 +1,454 @@
 import {Component, OnInit, ViewChild} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
 
-import {TreeComponent, ITreeOptions, TreeModel} from "angular-tree-component";
-import {Router} from "@angular/router";
-import {MatDialog} from "@angular/material";
-//
-@Component({
-    selector: "browse-dictionary-component-launcher",
-    template: `<div></div>`,
-    styles: [``]
-})
-
-export class BrowseDictionaryComponentLauncher {
-
-    constructor(private dialog: MatDialog, private router: Router) {
-        let dialogRef = this.dialog.open(BrowseDictionaryComponent, { width: '60em', panelClass: 'no-padding-dialog' });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            // After closing the dialog, route away from this component so that the dialog could
-            // potentially be reopened.
-            this.router.navigate([{ outlets: {modal: null}}]);
-        });
-    }
-}
-
+import {TreeComponent, ITreeOptions, TreeNode} from "angular-tree-component";
+import {Dictionary} from "./dictionary.interface";
+import {DictionaryEntry} from "./dictionary-entry.type";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {GridApi, GridReadyEvent} from "ag-grid";
+import {FormControl, FormGroup} from "@angular/forms";
+import {HttpParams} from "@angular/common/http";
+import {ValueFormatterParams} from "ag-grid/dist/lib/entities/colDef";
 
 @Component({
     selector: "browse-dictionary",
     template: `
-        <div style="display: flex; flex-direction: row; flex-wrap: nowrap; flex-basis: 350px">
-            <div class="flex-column-container">
-                <div>
-                    Dictionaries
-                    <button (click)="addEntry()">
-                        <img src="../../assets/add.png" height="16" width="16">
-                    </button>
-                    <button (click)="deleteEntry()">
-                        <img src="../../assets/delete.png" height="16" width="16">
-                    </button>
+        <div class="flex-container-row padded full-height full-width">
+            <div class="full-height panel">
+                <div class="flex-container-row justify-space-between align-center tree-row">
+                    <label>Dictionaries</label>
+                    <div>
+                        <button mat-button (click)="refreshAll()"><img src="../../assets/refresh.png" class="button-image"></button>
+                        <button mat-button [disabled]="!this.selectedDictionary && !this.selectedEntry" (click)="addEntry()">
+                            <img [src]="!this.selectedDictionary && !this.selectedEntry ? '../../assets/add_disable.png' : '../../assets/add.png'" class="button-image">
+                        </button>
+                        <button mat-button [disabled]="!this.selectedEntry" (click)="deleteEntry()">
+                            <img [src]="!this.selectedEntry ? '../../assets/delete_disable.png' : '../../assets/delete.png'" class="button-image">
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    Search Dictionaries:
+                <div class="flex-container-row align-center tree-row">
+                    <mat-form-field class="flex-one">
+                        <input matInput placeholder="Search" [(ngModel)]="this.searchText">
+                    </mat-form-field>
+                    <div>
+                        <button mat-button (click)="searchDictionary()"><img src="../../assets/magnifier.png" class="button-image"></button>
+                        <button mat-button (click)="clearSearch()"><img src="../../assets/cross.png" class="button-image"></button>
+                    </div>
                 </div>
-                <div>
-                    <input type="text" name="searchText" [(ngModel)]="searchText" size="40" (keypress)="searchKeypress($event)">
-                    <button (click)="searchDictionary()">
-                        <img src="../../assets/magnifier.png" height="16" width="16">
-                    </button>
-                    <button (click)="clearSearch()">
-                        <img src="../../assets/cross.png" height="16" width="16">
-                    </button>
+                <div class="tree-container">
+                    <tree-root #treeComponent
+                               (activate)="this.selectTreeItem($event)"
+                               [nodes]="this.dictionaries"
+                               [options]="this.treeOptions">
+                        <ng-template #treeNodeTemplate let-node>
+                            <img src="{{node.data.icon}}" class="button-image icon">
+                            <span>{{node.data.display}}</span>
+                        </ng-template>
+                    </tree-root>
                 </div>
-                <tree-root #treeComponent
-                           (activate)="selectTreeItem($event)"
-                           [nodes]="items"
-                           [options]="options">
-                    <ng-template #treeNodeTemplate let-node>
-                        <img src="{{node.data.icon}}" height="16" width="16">
-                        <span>{{node.data.display}}</span>
-                    </ng-template>
-                </tree-root>
             </div>
-            <div class="flex-column-container">
-                <div>
-                    {{selectedDictionaryText}}
+            <div class="full-height flex-container-col detail-view extra-padded">
+                <div [hidden]="!this.dictionaryName">
+                    <label>{{this.dictionaryName}}</label>
                 </div>
-                <div *ngIf="selectedDictionary">
-                    * GRID *
+                <div [hidden]="!this.selectedDictionary" class="flex-one">
+                    <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                     (gridReady)="this.onGridReady($event)"
+                                     [enableSorting]="true"
+                                     [enableColResize]="true">
+                    </ag-grid-angular>
                 </div>
-                <div *ngIf="selectedEntry">
-                    <div *ngFor="let editField of editFields">
-                        <div *ngIf="editField.dataType == 'text'">
-                            {{editField.caption}}<br />
-                            <input type="text" name="{{editField.dataField}}" value="{{editField.value}}" size="60">
-                        </div>
-                        <div *ngIf="editField.dataType == 'textArea'">
-                            {{editField.caption}}<br />
-                            <textarea name="{{editField.dataField}}" rows="3" cols="80">{{editField.value}}</textarea>
-                        </div>
-                        <div *ngIf="editField.dataType == 'comboBox'">
-                            {{editField.caption}}<br />
-                            <mat-form-field>
-                                <mat-select [(value)]="editField.value">
-                                    <mat-option *ngFor="let option of editField.options" [value]="option.value">
-                                        {{option.display}}
-                                    </mat-option>
+                <form [hidden]="!this.selectedEntry" class="flex-one overflow-auto" [formGroup]="this.entryForm">
+                    <ng-container *ngFor="let field of this.visibleEntryFields">
+                        <div [ngSwitch]="field.dataType" class="full-width">
+                            <mat-form-field *ngSwitchCase="'text'" class="full-width">
+                                <input matInput [placeholder]="field.caption" [formControlName]="field.dataField">
+                            </mat-form-field>
+                            <mat-form-field *ngSwitchCase="'textArea'" class="full-width">
+                                <textarea matInput [placeholder]="field.caption" [formControlName]="field.dataField"
+                                          matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+                            </mat-form-field>
+                            <mat-form-field *ngSwitchCase="'comboBox'" class="full-width">
+                                <mat-select [placeholder]="field.caption" [formControlName]="field.dataField">
+                                    <mat-option>None</mat-option>
+                                    <mat-option *ngFor="let opt of field.options" [value]="opt.value">{{opt.display}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
-                        </div>
-                        <div *ngIf="editField.dataType == 'isActive'">
-                            {{editField.caption}}<br />
-                            <mat-form-field>
-                                <mat-select [(value)]="editField.value">
-                                    <mat-option></mat-option>
+                            <mat-form-field *ngSwitchCase="'isActive'" class="full-width">
+                                <mat-select [placeholder]="field.caption" [formControlName]="field.dataField">
                                     <mat-option value="Y">Yes</mat-option>
                                     <mat-option value="N">No</mat-option>
                                 </mat-select>
                             </mat-form-field>
+                            <mat-checkbox *ngSwitchCase="'YN'" [formControlName]="field.dataField">{{field.caption}}</mat-checkbox>
+                            <mat-form-field *ngSwitchCase="'date'" class="full-width">
+                                <input matInput [matDatepicker]="datePicker" [placeholder]="field.caption" [formControlName]="field.dataField">
+                                <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #datePicker [disabled]="false"></mat-datepicker>
+                            </mat-form-field>
                         </div>
-                        <div *ngIf="editField.dataType == 'YN'">
-                            {{editField.caption}}<br />
-                            <div *ngIf="editField.value == 'Y'; else ynFalse">
-                                <input type="checkbox" name="{{editField.dataField}}" checked>
-                            </div>
-                            <ng-template #ynFalse>
-                                <input type="checkbox" name="{{editField.dataField}}">
-                            </ng-template>
-                        </div>
-                        <div *ngIf="editField.dataType == 'date'">
-                            {{editField.caption}}<br />
-                            <input type="text" name="{{editField.dataField}}" value="{{editField.value}}" size="60">
-                        </div>
-                    </div>
+                    </ng-container>
+                </form>
+                <div class="full-width" [hidden]="!this.selectedEntry">
+                    <save-footer [disableSave]="this.entryForm.invalid || !this.selectedEntry" 
+                                 [showSpinner]="this.showSpinner" (saveClicked)="this.save()" [dirty]="this.entryForm.dirty">
+                    </save-footer>
                 </div>
             </div>
         </div>
-        `,
+    `,
+    styles: [`
+        .extra-padded {
+            padding: 1em;
+        }
+        .flex-one {
+            flex: 1;
+        }
+        img.button-image {
+            height: 16px;
+            width: 16px;
+        }
+        div.tree-row {
+            height: 3em;
+        }
+        div.tree-container {
+            height: calc(100% - 7em);
+            min-height: 10em;
+        }
+        div.panel {
+            width: 25%;
+            min-width: 23em;
+        }
+        div.detail-view {
+            width: 75%;
+            min-width: 50em;
+        }
+    `],
 })
 
-export class BrowseDictionaryComponent implements OnInit{
+export class BrowseDictionaryComponent implements OnInit {
 
-    @ViewChild("treeComponent") treeComponent: TreeComponent;
-
-    editFields: any[];
-    selectedDictionary: any;
-    selectedEntry: any;
-    selectedDictionaryText: string = "";
-    selectedValue: string[] = [];
-    searchText: string = "";
-
-    options: ITreeOptions = {
+    @ViewChild("treeComponent") private treeComponent: TreeComponent;
+    public treeOptions: ITreeOptions = {
         displayField: "display",
-        childrenField: "items",
+        childrenField: "DictionaryEntry",
         useVirtualScroll: true,
         nodeHeight: 22,
     };
 
-    items: any;
+    public dictionaries: Dictionary[] = [];
+    public selectedTreeNode: ITreeNode = null;
+    public selectedDictionary: Dictionary = null;
+    public selectedEntry: DictionaryEntry = null;
+    public dictionaryName: string = "";
+    public searchText: string = "";
 
-    constructor(private dictionaryService:DictionaryService) {
-        this.items = [];
+    public entryForm: FormGroup;
+    public entryFields: any[] = [];
+    public visibleEntryFields: any[] = [];
+    public showSpinner: boolean = false;
+
+    private cachedMetaDataClassName: string = "";
+    private cachedMetaDataFields: any[] = [];
+
+    private gridApi: GridApi;
+
+    constructor(private dictionaryService: DictionaryService,
+                private dialogsService: DialogsService) {
     }
 
     ngOnInit() {
+        this.entryForm = new FormGroup({});
         this.buildTree();
     }
 
-    addEntry(): void {
-        alert("no");
-    }
-
-    deleteEntry(): void {
-        alert("no");
-    }
-
-    searchDictionary(): void {
-        this.treeComponent.treeModel.filterNodes((node) => {
-            if (node.data.display.toUpperCase().includes(this.searchText.toUpperCase())) {
-                return true;
-            }
-            if (node.data.dictionaryDisplay.toUpperCase().includes(this.searchText.toUpperCase())) {
-                return true;
-            }
-            if (node.data.hasOwnProperty("propertyDescription") && node.data.propertyDescription.toUpperCase().includes(this.searchText.toUpperCase())) {
-                return true;
-            }
-            return false;
-        },false);
-    }
-
-    clearSearch(): void {
-        this.searchText = "";
-        this.searchDictionary();
-    }
-
-    searchKeypress(event): void {
-        if (event.keyCode == 13) {   // ENTER
-            this.searchDictionary();
-        }
-    }
-
-    buildTree(): void {
-        let dictionaries: any[] = this.dictionaryService.getEditableDictionaries();
-        for (let dictionary of dictionaries) {
-            dictionary.id = dictionary.className;
-            dictionary.parentid = -1;
+    private buildTree(): void {
+        let dictionariesTemp: Dictionary[] = this.dictionaryService.getEditableDictionaries();
+        for (let dictionary of dictionariesTemp) {
             dictionary.display = dictionary.displayName;
-            dictionary.dictionaryDisplay = dictionary.displayName;
             dictionary.icon = "assets/folder.png";
-            dictionary.items = this.dictionaryService.getEntriesExcludeBlank(dictionary.className);
-            for (let entry of dictionary.items) {
-                entry.parentid = dictionary.id;
-                entry.className = dictionary.className;
-                entry.dictionaryDisplay = dictionary.displayName;
+            dictionary.DictionaryEntry = this.dictionaryService.getEntriesExcludeBlank(dictionary.className);
+            for (let entry of (dictionary.DictionaryEntry as DictionaryEntry[])) {
                 entry.icon = "assets/page_white.png";
             }
         }
-        this.items = dictionaries;
+        dictionariesTemp.sort((a: Dictionary, b:Dictionary) => {
+            return a.display.toUpperCase().localeCompare(b.display.toUpperCase());
+        });
+        this.dictionaries = dictionariesTemp;
     }
 
-    selectTreeItem(event: any): void {
+    public selectTreeItem(event: any): void {
         this.selectedDictionary = null;
         this.selectedEntry = null;
-        this.selectedDictionaryText = "";
-        this.editFields = null;
-        let selectedObject = JSON.parse(JSON.stringify(event.node.data));
-        if (event.node.level === 1) {
-            this.selectedDictionary = selectedObject;
-            this.selectedDictionaryText = selectedObject.display;
-            this.selectDictionary();
-        }
-        if (event.node.level === 2) {
-            this.selectedEntry = selectedObject;
-            this.selectedDictionaryText = selectedObject.dictionaryDisplay;
-            this.selectEntry();
+
+        this.selectedTreeNode = event.node;
+        let selectedData: any = JSON.parse(JSON.stringify(this.selectedTreeNode.data));
+        if (!this.selectedTreeNode.hasChildren) {
+            this.selectEntry(selectedData);
+            this.dictionaryName = this.selectedTreeNode.parent.data.display;
+        } else {
+            this.selectDictionary(selectedData);
+            this.selectedTreeNode.expand();
+            this.dictionaryName = this.selectedTreeNode.data.display;
         }
     }
 
-    private selectDictionary() {
+    private selectDictionary(dict: any): void {
+        this.selectedDictionary = dict;
+        if (this.cachedMetaDataClassName === dict.className) {
+            this.prepareGrid();
+        } else {
+            this.gatherMetaData(dict.className, () => {
+                this.prepareGrid();
+            });
+        }
     }
 
-    private selectEntry() {
-        this.dictionaryService.getMetaData(this.selectedEntry.className).subscribe((response) => {
-            let newFields: any[] = [];
-            for (let field of response.Dictionary.Field) {
-                if (field.visible == 'Y') {
-                    let newField: any = {};
-                    newField.dataField = field.dataField;
-                    newField.dataType = field.dataType;
-                    newField.caption = field.caption;
-                    newField.value = this.fieldAsString(this.selectedEntry, field.dataField);
-                    this.selectedValue[newField.dataField] = newField.value;
-                    if (field.dataType == "text" && field.length >= 50) {
-                        newField.dataType = "textArea";
-                    }
-                    if (field.dataType == "comboBox") {
-                        newField.options = this.dictionaryService.getEntries(field.className);
-                    }
-                    newFields.push(newField);
+    private gatherMetaData(className: string, callback?: () => void | null): void {
+        this.dictionaryService.getMetaData(className).subscribe((response: any) => {
+            if (response && response.Dictionary) {
+                this.cachedMetaDataClassName = response.Dictionary.className;
+                this.cachedMetaDataFields = Array.isArray(response.Dictionary.Field) ? response.Dictionary.Field : [response.Dictionary.Field.Field];
+                if (callback) {
+                    callback();
                 }
+            } else {
+                let message: string = "";
+                if (response && response.message) {
+                    message = ": " + response.message;
+                }
+                this.dialogsService.confirm("An error occurred while retrieving dictionary meta data" + message, null);
             }
-            this.editFields = newFields;
         });
     }
 
-    private fieldAsString(obj, field): string {
-        if (obj && obj[field]) {
-            return obj[field];
+    private prepareGrid(): void {
+        let colDefs: any[] = [];
+        for (let field of this.cachedMetaDataFields) {
+            if (field.visible === 'Y') {
+                let colDef: any = {
+                    headerName: field.caption, headerTooltip: field.caption, field: field.dataField, tooltipField: field.dataField
+                };
+                if (field.dataType === "comboBox") {
+                    colDef.valueFormatter = this.optionsFieldValueFormatter;
+                    colDef.comboBoxOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
+                }
+                colDefs.push(colDef);
+            }
         }
-        return "";
+        this.gridApi.setColumnDefs(colDefs);
+        this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
+        this.gridApi.sizeColumnsToFit();
+    }
+
+    private optionsFieldValueFormatter(params: ValueFormatterParams): any {
+        if (!params.value) {
+            return "";
+        }
+        let option: DictionaryEntry = ((params.colDef as any).comboBoxOptions as DictionaryEntry[]).find((entry: DictionaryEntry) => (entry.value === params.value));
+        if (option) {
+            return option.display;
+        } else {
+            return "";
+        }
+    }
+
+    private selectEntry(entry: any) {
+        this.selectedEntry = entry;
+        if (this.cachedMetaDataClassName === this.selectedTreeNode.parent.data.className) {
+            this.prepareForm();
+        } else {
+            this.gatherMetaData(this.selectedTreeNode.parent.data.className, () => {
+                this.prepareForm();
+            });
+        }
+    }
+
+    private prepareForm(): void {
+        this.entryFields = [];
+        this.visibleEntryFields = [];
+        this.entryForm = new FormGroup({});
+        let isInsertMode: boolean = !this.selectedEntry.value;
+        for (let field of this.cachedMetaDataFields) {
+            let entryField: any = {
+                dataField: field.dataField, dataType: field.dataType, caption: field.caption, isIdentifier: field.isIdentifier,
+                value: BrowseDictionaryComponent.getFieldAsString(this.selectedEntry, field.dataField), visible: field.visible
+            };
+            if (field.dataType === "text" && field.length >= 50) {
+                entryField.dataType = "textArea";
+            }
+            if (field.dataType === "comboBox") {
+                entryField.options = this.dictionaryService.getEntriesExcludeBlank(field.className);
+            }
+            if (field.dataType === "YN") {
+                this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value === 'Y'));
+            } else if (field.dataType === 'date') {
+                this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value ? new Date(entryField.value) : ""));
+                this.entryForm.get(entryField.dataField).disable();
+            } else {
+                this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value));
+            }
+            if (field.visible !== 'Y' || (field.isIdentifier && field.isIdentifier === "Y" && !isInsertMode)) {
+                this.entryForm.get(entryField.dataField).disable();
+            }
+            this.entryFields.push(entryField);
+            if (field.visible === 'Y') {
+                this.visibleEntryFields.push(entryField);
+            }
+        }
+    }
+
+    public onGridReady(event: GridReadyEvent): void {
+        this.gridApi = event.api;
+    }
+
+    public searchDictionary(): void {
+        let formattedSearchText: string = this.searchText.toUpperCase();
+        this.treeComponent.treeModel.filterNodes((node: TreeNode) => {
+            return node.data.display.toUpperCase().includes(formattedSearchText) ||
+                (node.data.propertyDescription && node.data.propertyDescription.toUpperCase().includes(formattedSearchText));
+        }, false);
+    }
+
+    public clearSearch(): void {
+        this.searchText = "";
+        this.treeComponent.treeModel.clearFilter();
+    }
+
+    public save(): void {
+        if (this.selectedEntry && !this.entryForm.invalid && this.entryForm.dirty) {
+            let isInsertMode: boolean = !this.selectedEntry.value;
+            this.showSpinner = true;
+            let dataKeyField: string;
+            let dataKeyValue: string;
+
+            let object: HttpParams = new HttpParams();
+            for (let field of this.entryFields) {
+                let value: string;
+                if (field.dataType === "YN") {
+                    value = this.entryForm.get(field.dataField).value ? "Y" : "N";
+                } else if (field.dataType === 'date' && this.entryForm.get(field.dataField).value) {
+                    let date: Date = this.entryForm.get(field.dataField).value;
+                    let month: string = "" + (date.getMonth() + 1);
+                    let day: string = "" + date.getDate();
+                    let year: string = "" + date.getFullYear();
+                    value = month + "/" + day + "/" + year;
+                } else {
+                    value = this.entryForm.get(field.dataField).value;
+                }
+                object = object.set(field.dataField, value);
+
+                if (!isInsertMode && field.isIdentifier && field.isIdentifier === "Y" && field.dataField !== "display") {
+                    dataKeyField = field.dataField;
+                    dataKeyValue = this.entryForm.get(field.dataField).value;
+                }
+            }
+
+            let className: string = this.selectedTreeNode.data.className ? this.selectedTreeNode.data.className : this.selectedTreeNode.parent.data.className;
+            this.dictionaryService.save(isInsertMode, object, className, () => {
+                this.buildTree();
+                this.showSpinner = false;
+                setTimeout(() => {
+                    for (let dict of this.treeComponent.treeModel.roots) {
+                        if (dict.data.className === className) {
+                            dict.expand();
+                            if (isInsertMode) {
+                                dict.toggleActivated(null);
+                            } else {
+                                for (let entry of dict.children) {
+                                    if (entry.data[dataKeyField] === dataKeyValue) {
+                                        entry.toggleActivated(null);
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                });
+            }, () => {
+                this.showSpinner = false;
+                this.dialogsService.confirm("An error occurred while saving dictionary", null);
+            });
+        }
+    }
+
+    public addEntry(): void {
+        if (!this.selectedDictionary && !this.selectedEntry) {
+            return;
+        }
+
+        this.selectedDictionary = null;
+        this.selectedEntry = {
+            canDelete: "",
+            canRead: "",
+            canWrite: "",
+            canUpdate: "",
+            display: "",
+            value: "",
+            datakey: ""
+        };
+        this.prepareForm();
+    }
+
+    public deleteEntry(): void {
+        if (!this.selectedEntry) {
+            return;
+        }
+        let className: string = this.selectedTreeNode.data.className ? this.selectedTreeNode.data.className : this.selectedTreeNode.parent.data.className;
+        if (!this.selectedEntry.value) {
+            this.selectedEntry = null;
+            this.selectDictionaryInTree(className);
+            return;
+        }
+
+        this.showSpinner = true;
+        let object: HttpParams = new HttpParams();
+        for (let field of this.entryFields) {
+            let value: string = "";
+            if (field.isIdentifier === "Y") {
+                value = this.entryForm.get(field.dataField).value;
+            }
+            object = object.set(field.dataField, value);
+        }
+        this.dictionaryService.delete(object, className, () => {
+            this.buildTree();
+            this.showSpinner = false;
+            setTimeout(() => {
+                this.selectDictionaryInTree(className);
+            });
+        }, () => {
+            this.showSpinner = false;
+            this.dialogsService.confirm("An error occurred while deleting dictionary", null);
+        });
+    }
+
+    private selectDictionaryInTree(className: string): void {
+        if (this.treeComponent.treeModel.getActiveNode()) {
+            this.treeComponent.treeModel.getActiveNode().toggleActivated(null);
+        }
+        for (let dict of this.treeComponent.treeModel.roots) {
+            if (dict.data.className === className) {
+                dict.expand();
+                dict.toggleActivated(null);
+                break;
+            }
+        }
+    }
+
+    public refreshAll(): void {
+        this.selectedDictionary = null;
+        this.selectedEntry = null;
+        this.dictionaryService.reloadAndRefresh(() => {
+            this.buildTree();
+        });
+    }
+
+    private static getFieldAsString(obj: any, field: string): string {
+        return (obj && obj[field]) ? obj[field] : "";
     }
 
 }
