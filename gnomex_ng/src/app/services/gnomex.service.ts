@@ -4,7 +4,6 @@ import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
 import {LabListService} from "./lab-list.service";
 import {Subject} from "rxjs/Subject";
-import {AuthenticationService} from "@hci/authentication";
 import {Subscription} from "rxjs/Subscription";
 import {ProgressService} from "../home/progress.service";
 import {Observable} from "rxjs/Observable";
@@ -14,6 +13,7 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Router} from "@angular/router";
 import {ProjectService} from "./project.service";
 import {AppUserListService} from "./app-user-list.service";
+import {AuthenticationService} from "../auth/authentication.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";

@@ -6,7 +6,6 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {ProgressService} from "../home/progress.service";
-import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {Observable} from "rxjs/Observable";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
@@ -23,6 +22,7 @@ import {TopicService} from "../services/topic.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {MatDialog, MatDialogConfig, MatToolbar} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
+import {AuthenticationService} from "../auth/authentication.service";
 
 @Component({
     selector: "gnomex-header",

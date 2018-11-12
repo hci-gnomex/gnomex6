@@ -9,11 +9,6 @@ import {Observable} from "rxjs/Observable";
 import {Http, HttpModule, XHRBackend} from "@angular/http";
 import {RouterTestingModule} from "@angular/router/testing";
 import {ILocalStorageServiceConfig, LocalStorageService} from "angular-2-local-storage";
-import {
-    AuthenticationModule, AuthenticationService,
-    AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_ROUTE,
-    AUTHENTICATION_TOKEN_KEY, AUTHENTICATION_TOKEN_ENDPOINT, AUTHENTICATION_DIRECT_ENDPOINT, AUTHENTICATION_MAX_INACTIVITY_MINUTES
-} from "@hci/authentication";
 import {ProgressService} from "../home/progress.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
@@ -36,6 +31,13 @@ import {GetLabService} from '../services/get-lab.service';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MockBackend} from "@angular/http/testing";
 import {By} from "@angular/platform-browser";
+import {
+    AUTHENTICATION_DIRECT_ENDPOINT,
+    AUTHENTICATION_LOGOUT_PATH,
+    AUTHENTICATION_ROUTE,
+    AUTHENTICATION_TOKEN_ENDPOINT, AuthenticationService
+} from "../auth/authentication.service";
+import {AUTHENTICATION_TOKEN_KEY} from "../auth/authentication.provider";
 
 const MOCKDATA=[{name:'jj'},
     {name: 'dd'}

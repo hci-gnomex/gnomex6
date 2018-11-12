@@ -1,12 +1,12 @@
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { Observable } from "rxjs";
-import {AuthenticationService} from "@hci/authentication";
 import {ExperimentsService} from "../../experiments/experiments.service";
 import {Injectable} from "@angular/core";
 import {GnomexService} from "../gnomex.service";
 import {URLSearchParams} from "@angular/http";
 import {HttpParams} from "@angular/common/http";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {AuthenticationService} from "../../auth/authentication.service";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.

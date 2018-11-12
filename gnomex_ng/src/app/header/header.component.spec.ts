@@ -17,11 +17,6 @@ import {Observable} from "rxjs/Observable";
 import {HttpModule} from "@angular/http";
 import {RouterTestingModule} from "@angular/router/testing";
 import {ILocalStorageServiceConfig, LocalStorageService} from "angular-2-local-storage";
-import {
-    AuthenticationModule, AuthenticationService,
-    AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_ROUTE,
-    AUTHENTICATION_TOKEN_KEY, AUTHENTICATION_TOKEN_ENDPOINT, AUTHENTICATION_DIRECT_ENDPOINT, AUTHENTICATION_MAX_INACTIVITY_MINUTES
-} from "@hci/authentication";
 import {ProgressService} from "../home/progress.service";
 import {MenuItemComponent} from "./menu-item/menu-item.component";
 import {DictionaryService} from "../services/dictionary.service";
@@ -30,6 +25,13 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {LabListService} from "../services/lab-list.service";
 import {GnomexService} from "../services/gnomex.service";
 import {PropertyService} from "../services/property.service";
+import {
+    AUTHENTICATION_DIRECT_ENDPOINT,
+    AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_ROUTE,
+    AUTHENTICATION_TOKEN_ENDPOINT,
+    AuthenticationService
+} from "../auth/authentication.service";
+import {AUTHENTICATION_TOKEN_KEY} from "../auth/authentication.provider";
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
     prefix: "gnomex",

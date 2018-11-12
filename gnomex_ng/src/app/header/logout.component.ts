@@ -1,10 +1,10 @@
 
 import {Component, OnInit} from "@angular/core";
-import {AuthenticationService} from "@hci/authentication";
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
 import {ProgressService} from "../home/progress.service";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {AuthenticationService} from "../auth/authentication.service";
 
 @Component({
     template: ''
