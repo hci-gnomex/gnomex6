@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {GnomexAppComponent} from "./gnomex-app.component";
 import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from "@angular/core";
@@ -18,9 +15,6 @@ import {ProgressService} from "./home/progress.service";
 import {RouteReuseStrategy, RouterModule} from "@angular/router";
 import {TestPageModule} from "./testing/test-page.module";
 import {FormsModule} from "@angular/forms";
-import {
-    AUTHENTICATED_USER_ENDPOINT, UserModule, UserService
-} from "@hci/user";
 import {LocalStorageModule, ILocalStorageServiceConfig} from "angular-2-local-storage";
 
 import "./gnomex-app.css";
@@ -50,6 +44,8 @@ import {
     AUTHENTICATION_ROUTE, AUTHENTICATION_TOKEN_ENDPOINT, AuthenticationService
 } from "./auth/authentication.service";
 import {AUTHENTICATION_TOKEN_KEY} from "./auth/authentication.provider";
+import {UserModule} from "./hci-user/user.module";
+import {AUTHENTICATED_USER_ENDPOINT, UserService} from "./hci-user/user.service";
 
 
 
