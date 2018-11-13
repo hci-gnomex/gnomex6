@@ -1844,6 +1844,26 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
         return obj;
     }
 
+    /**
+     * Create a new experiment menu item.  Modified from createMenuItem due to odd usage in avoiding routing with id numbers?
+     * @param {string} displayName
+     * @param {string} context
+     * @param {string} icon
+     * @param {string} route
+     * @param {string} idCoreFacility
+     * @param {any[]} children
+     * @returns {Object} The new menu item.
+     */
+    createExperimentMenuItem(displayName: string, context: string, icon: string, route: string, idCoreFacility: string, children: any[]): object {
+        return {
+            displayName: displayName,
+            context: context,
+            iconName: icon,
+            children: children,
+            route: '' + route + (!!idCoreFacility ? '/' + idCoreFacility : '')
+        };
+    }
+
     createLinkMenuItem(displayName: string, context: string, icon: string, route: string, idCoreFacility: string, children: any[]): object {
         let indx = displayName.indexOf(' ');
         let startRoute: string = "";
@@ -1974,7 +1994,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
             if (core.hasRequestCategories === 'Y') {
                 let label: string = template.displayName + " for " + core.facilityName;
                 let route: string = "/newExperiment";
-                let menuItem = this.createMenuItem(label, "", template.iconName, route, core.idCoreFacility,[]);
+                let menuItem = this.createExperimentMenuItem(label, "", template.iconName, route, core.idCoreFacility,[]);
                 children[coreCtr] = menuItem;
                 coreCtr++;
             }

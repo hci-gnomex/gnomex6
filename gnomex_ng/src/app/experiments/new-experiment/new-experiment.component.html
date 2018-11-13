@@ -29,7 +29,7 @@
                                                  formControlName="selectedCategory"
                                                  (change)="onCategoryChange($event)">
                                     <div *ngFor="let category of requestCategories" class="full-width">
-                                        <mat-radio-button (click)="selectCategory($event)" [value]="category">
+                                        <mat-radio-button [value]="category">
                                             <div class="full-width flex-container-row">
                                                 <div class="label-width">
                                                     <img src="{{ category.icon }}">
@@ -82,6 +82,9 @@
                                         <mat-option *ngFor="let mem of possibleSubmitters" [value]="mem">
                                             {{ mem.displayName }}
                                         </mat-option>
+                                        <mat-option [value]="">
+                                            --
+                                        </mat-option>
                                     </mat-select>
                                     <mat-error *ngIf="form?.get('selectOwner')?.hasError('required')">Name is required</mat-error>
                                 </mat-form-field>
@@ -103,13 +106,13 @@
                                     </mat-form-field>
                                 </div>
                                 <div class="flex-column-container moderate-width major-padding-left">
-                                    <div class="double-padded-left billing-instructions">
+                                    <div class="double-padded-left instructions">
                                         {{ workAuthInstructions }}
                                     </div>
                                     <div>
                                         <button mat-button class="link-button minimize" (click)="onNewAccount()">{{workAuthLabel}}</button>
                                     </div>
-                                    <div *ngIf="showAccessAuthorizedAccountsLink" class="double-padded-left billing-instructions">
+                                    <div *ngIf="showAccessAuthorizedAccountsLink" class="double-padded-left instructions">
                                         {{ accessAuthorizedBillingAccountInstructions }}
                                     </div>
                                     <div class="flex-container-row">

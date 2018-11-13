@@ -19,8 +19,7 @@ import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.compo
 import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
 import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
 import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
-import {TabPropertiesViewComponent} from "./tab-properties-view.component";
-import {BehaviorSubject, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import {TabBioinformaticsViewComponent} from "./tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
 import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
@@ -98,8 +97,6 @@ import {Observable} from "rxjs/Observable";
             min-width: 40em;
         }
 
-
-        .inline-block { display: inline-block; }
         
         .bordered { border: 1px solid silver; }
         
@@ -122,21 +119,8 @@ import {Observable} from "rxjs/Observable";
             margin-right: 0.3em !important;
         }
         
-        
-        
-        
 
-
-        .mat-button.mat-small {
-            min-width: 1%;
-        }
-
-        .category-margin {
-            margin-top: .5em;
-            margin-bottom: .5em
-        }
-
-        .billing-instructions {
+        .instructions {
             font-style: italic;
         }
 
@@ -144,25 +128,6 @@ import {Observable} from "rxjs/Observable";
             font-size: small;
             text-decoration: underline;
             color: blue
-        }
-
-        mat-radio-button.radioOption {
-            margin: 0 0.25rem;
-        }
-
-        /deep/ .mat-radio-button.mat-accent .mat-radio-label {
-            font-size: .75rem;
-            margin-right: 1em;
-        }
-
-        /deep/ .mat-radio-button.mat-accent .mat-radio-label .mat-radio-container .mat-radio-inner-circle {
-            height: 15px;
-            width: 15px;
-        }
-
-        /deep/ .mat-radio-button.mat-accent .mat-radio-label .mat-radio-container .mat-radio-outer-circle {
-            height: 15px;
-            width: 15px;
         }
 
     `]
@@ -173,16 +138,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
     @Output() properties = new EventEmitter<any[]>();
 
-    // tabs: any[] = [];
     types = OrderType;
     private selectedCategory: any;
-    private categories: any[] = [];
     private requestCategories: any[] = [];
     private filteredProjectList: any[] = [];
-    private priceMap: Map<string, string> = new Map<string, string>();
-    themeMap: Map<string, any> = new Map<string, any>();
-    themes: any[] = [];
-    private requestCategoriesExternal: any[] = [];
     private authorizedBillingAccounts: any;
     public appPrices: any[] = [];
     private coreFacility: any;
@@ -190,19 +149,14 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     public label: string = "New Experiment Order for ";
 
-    private icon: any;
+    public icon: any;
+
     private form: FormGroup;
     private currentIdLab: string;
     private labList: Array<any>;
 
-    // private showProject: boolean = false;
-    // private showBilling: boolean = false;
-    // private showNameDesc: boolean = false;
     private showAccessAuthorizedAccountsLink: boolean = false;
     private defaultCodeRequestCategory: any = null;
-    private requestCategory: any;
-    private codeRequestCategory: any;
-    private selectedIndex: number = 0;
     private nextButtonIndex: number = -1;
     private adminState: string;
     private workAuthInstructions: string;
@@ -211,7 +165,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     private accessAuthLabel: string;
     private annotations: any;
     private disableNext: boolean = true;
-    navigationSubscription: Subscription;
+    private navigationSubscription: Subscription;
     private numTabs: number;
     private visibilityDetailObj: VisibilityDetailTabComponent;
     private showPool: boolean = false;
@@ -241,8 +195,12 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     };
 
 
+    private possibleSubmitters_loaded: boolean = false;
+    private _showBilling_previousValue: boolean = false;
+
+
     public get showLab(): boolean {
-        return !!(this.form.get("selectedCategory").value)
+        return !!(this.form && this.form.get("selectedCategory").value)
             || !this.gnomexService.submitInternalExperiment();
     }
     public get showName(): boolean {
@@ -250,14 +208,29 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             && this.form
             && this.form.get('selectLab')
             && this.form.get('selectLab').valid
-            && this.possibleSubmitters
-            && this.possibleSubmitters.length > 0;
+            && !!this.possibleSubmitters
+            && this.possibleSubmitters_loaded;
     }
     public get showBilling(): boolean {
-        return this.showName
+
+        let newValue: boolean = this.showName
             && this.form
             && this.form.get('selectName')
             && this.form.get('selectName').valid;
+
+        // If there is only one choice for billing account, automatically select it for the user.
+        if (this.authorizedBillingAccounts
+            && Array.isArray(this.authorizedBillingAccounts)
+            && this.authorizedBillingAccounts.length === 1
+            && this.form.get("selectAccount")
+            && (this._showBilling_previousValue === false && newValue === true)) {
+
+            this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
+        }
+
+        this._showBilling_previousValue = newValue;
+
+        return newValue;
     }
     public get showProject(): boolean {
         return this.showBilling
@@ -287,36 +260,38 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.navigationSubscription = this.router.events.subscribe((e: any) => {
             // If it is a NavigationEnd event re-initalise the component
             if (e instanceof NavigationEnd) {
-                // this.initialize();
             }
         });
     }
 
     ngOnInit() {
-        this.sub = this.route.queryParams.subscribe((params: any) => {
-            if (params && params.id) {
-                this.initialize();
-                for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-                    this.categories.push(category);
-                }
-                this.requestCategories = this.categories.filter(category =>
-                    category.isActive === 'Y' && category.isInternal === 'Y'
-                );
-                this.requestCategoriesExternal = this.categories.filter(category =>
-                    category.isActive === 'Y' && category.isExternal === 'Y'
-                );
-                this.newExperimentService.idCoreFacility = params.id;
+        this.sub = this.route.params.subscribe((params: any) => {
+
+            this.requestCategories = [];
+            this.newExperimentService.components = [];
+            this.newExperimentService.organisms = [];
+            this.newExperimentService.componentRefs = [];
+            this.newExperimentService.samplesGridRowData = [];
+            this.newExperimentService.currentComponent = null;
+
+            if (params && params.idCoreFacility) {
+                this.newExperimentService.idCoreFacility = params.idCoreFacility;
                 this.coreFacility = this.dictionaryService.getEntry('hci.gnomex.model.CoreFacility', this.newExperimentService.idCoreFacility);
 
                 if (!!this.coreFacility) {
                     this.label = "New Experiment for " + this.coreFacility.display;
                 }
 
-                this.requestCategories = this.filterRequestCategories(this.requestCategories);
-                this.requestCategories.sort(this.sortRequestCategory);
-                this.newExperimentService.expTypeLabel = this.newExperimentService.expTypeLabel.concat(this.coreFacility.facilityName);
+                this.requestCategories = this.getFilteredRequestCategories().sort(this.sortRequestCategory);
+
                 this.experimentService.getNewRequest().subscribe((response: any) => {
+
+                    if (!response) {
+                        return;
+                    }
+
                     this.newExperimentService.request = response.Request;
+
                     if (!this.gnomexService.isInternalExperimentSubmission) {
                         this.addDescriptionFieldToAnnotations(this.newExperimentService.request.PropertyEntries);
                     }
@@ -330,28 +305,27 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     this.newExperimentService.annotations = this.annotations;
                     this.annotationInputs.annotations = this.annotations;
                 });
-                this.labList = this.gnomexService.labList
-                    .filter(lab => lab.canGuestSubmit === 'Y' || lab.canSubmitRequests === 'Y');
+
+                this.labList = this.gnomexService.labList.filter((lab) => {
+                    return lab.canGuestSubmit === 'Y' || lab.canSubmitRequests === 'Y';
+                });
 
                 this.form = this.fb.group({
                     selectedCategory: ['', Validators.required],
-                    selectLab: ['', Validators.required],
-                    selectName: ['', Validators.required],
-                    selectProject: ['', Validators.required],
-                    selectAccount: ['', Validators.required],
-                    experimentName: [''],
-                    description: ["", Validators.maxLength(5000)]
+                    selectLab:        ['', Validators.required],
+                    selectName:       ['', Validators.required],
+                    selectProject:    ['', Validators.required],
+                    selectAccount:    ['', Validators.required],
+                    experimentName:   [''],
+                    description:      ["", Validators.maxLength(5000)]
                 });
 
                 this.filteredProjectList = this.gnomexService.projectList;
                 this.checkSecurity();
-                this.setVisibility();
                 this.nextButtonIndex = 1;
                 this.newExperimentService.currentComponent = this;
                 this.newExperimentService.components.push(this);
                 this.newExperimentService.setupView = this;
-                // this.newExperimentService.filterPropertiesByUser(this.);
-
             }
         });
     }
@@ -363,18 +337,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         if (this.submittersSubscription) {
             this.submittersSubscription.unsubscribe();
         }
-    }
-
-    initialize() {
-        this.categories = [];
-        this.requestCategories = [];
-        this.requestCategoriesExternal = [];
-        this.newExperimentService.components = [];
-        this.newExperimentService.organisms = [];
-        this.newExperimentService.componentRefs = [];
-        this.newExperimentService.samplesGridRowData = [];
-        this.newExperimentService.currentComponent = null;
-        this.newExperimentService.expTypeLabel = "";
     }
 
 
@@ -391,21 +353,35 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         props.splice(1, 0, descNode);
     }
 
-    public selectCategory(event: any) {
-        this.label = "New " + " Experiment for " + this.coreFacility.display;
-    }
-
     onCategoryChange(event) {
         this.icon = event.value.icon;
-        this.setVisibility();
+
+        if (this.form && this.form.get("selectedCategory")) {
+            this.newExperimentService.category = this.form.get("selectedCategory").value;
+
+            let code = this.form.get("selectedCategory").value;
+
+            // Special code for CLINSEQ request from BST.
+            if (code == null && this.defaultCodeRequestCategory != null) {
+                code = this.defaultCodeRequestCategory;
+            }
+
+            this.newExperimentService.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', code.value);
+
+            if (this.newExperimentService.requestCategory) {
+                this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
+
+                this.workAuthLabel   = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
+                this.accessAuthLabel = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT);
+            }
+        }
+
         this.showTabs();
-        this.newExperimentService.category = this.form.get("selectedCategory").value;
-        this.newExperimentService.expTypeLabel = "New " + this.newExperimentService.category.display + " Experiment For " + this.coreFacility.facilityName;
     }
 
     showTabs() {
         this.newExperimentService.tabs = [];
-        let category = this.getRequestCategory();
+        let category = this.newExperimentService.requestCategory;
         this.inputs.requestCategory = category;
         this.newExperimentService.request.applicationNotes = '';
         this.newExperimentService.request.codeApplication = '';
@@ -415,8 +391,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.newExperimentService.request.includeQubitConcentration = 'N';
 
         if (category.isIlluminaType === 'Y') {
-            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('SolexaBaseState') :
-                this.newExperimentService.currentState.next('SolexaBaseExternalState');
+            this.gnomexService.submitInternalExperiment()
+                ? this.newExperimentService.currentState.next('SolexaBaseState')
+                : this.newExperimentService.currentState.next('SolexaBaseExternalState');
+
             let propertyTab = {
                 label: "Other Details",
                 disabled: true,
@@ -509,8 +487,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         } else if (category.type === this.newExperimentService.TYPE_CLINICAL_SEQUENOM) {
             this.newExperimentService.currentState.next("ClinicalSequenomState");
         } else if (category.type === this.newExperimentService.TYPE_MICROARRAY) {
-            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('MicroarrayState') :
-                this.newExperimentService.currentState.next('MicroarrayExternalState');
+            this.gnomexService.submitInternalExperiment()
+                ? this.newExperimentService.currentState.next('MicroarrayState')
+                : this.newExperimentService.currentState.next('MicroarrayExternalState');
         }
 
     }
@@ -527,9 +506,18 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         }
     }
 
-    filterRequestCategories(categories: any[]): any[] {
-        let keep: Boolean = false;
+    getFilteredRequestCategories(): any[] {
+        let categories: any[] = [];
         let requestCategories: any[] = [];
+
+        for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
+            categories.push(category);
+        }
+
+        this.requestCategories = categories.filter(category =>
+            category.isActive === 'Y' && category.isInternal === 'Y'
+        );
+
         for (let category of categories) {
             if (this.coreFacility) {
                 if (category.codeRequestCategory === this.coreFacility.codeRequestCategory) {
@@ -545,11 +533,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     public selectLabOption(event: any) {
-        if (event && event.source) {
-            this.form.get("selectName").setValue("");
-            this.possibleSubmitters = [];
-        }
-
         if (event && event.source && event.source.selected == true) {
             let value = event.source.value;
             this.filteredProjectList = this.gnomexService.projectList;
@@ -564,6 +547,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 this.form.markAsPristine();
 
                 this.possibleSubmitters = [];
+                this.possibleSubmitters_loaded = false;
                 let temp: Observable<any[]> = this.getLabService.getSubmittersForLab(value.idLab, 'Y', 'N');
                 if (!this.submittersSubscription) {
                     this.submittersSubscription = temp.subscribe((submitters: any[]) => {
@@ -574,6 +558,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                         } else {
                             this.possibleSubmitters = [];
                         }
+                        this.possibleSubmitters_loaded = true;
                     });
                 }
 
@@ -626,9 +611,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     onUserSelection(event) {
-        if (this.form.get('selectName')) {
+        if (this.form.get('selectName') && this.form.get('selectName').value) {
             this.newExperimentService.experimentOwner = this.form.get('selectName').value;
-            this.setVisibility();
             this.newExperimentService.request.idAppUser = this.newExperimentService.idAppUser;
             this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
             this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
@@ -647,14 +631,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     refreshBillingAccounts() {
         this.checkForOtherAccounts();
-        // If not admin then show project and billing since onOwner is not shown
-        // if (!this.securityAdvisor.isAdmin && !this.securityAdvisor.isSuperAdmin) {
-        //     this.showProject = true;
-        //     // this.showBilling = true;
-        // }
         this.newExperimentService.idAppUser = this.securityAdvisor.idAppUser.toString();
 
-        let cat = this.getRequestCategory();
+        let cat = this.newExperimentService.requestCategory;
         if (!Array.isArray(this.authorizedBillingAccounts)) {
             this.authorizedBillingAccounts = [this.authorizedBillingAccounts.BillingAccount];
         }
@@ -663,7 +642,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         });
 
         this.selectDefaultUserProject();
-        this.setVisibility();
     }
 
     checkSecurity(): void {
@@ -708,82 +686,19 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             });
         } else if (this.newExperimentService.idAppUser != null && this.newExperimentService.idAppUser != '') {
             let idCoreFacility: string = this.newExperimentService.idCoreFacility;
-            // if (this.authorizedBillingAccounts == null || authAccountParamsChange(idAppUser, idCoreFacility)) {
-            //     this.showAccessAuthorizedAccountsLink = false;
-            //     updateAuthAccountsParams(null, null);
-            //
-            //     let params2:Object = new Object();
-            //     params2.idAppUser = idAppUser;
-            //     if (idCoreFacility != null) {
-            //         params2.idCoreFacility = idCoreFacility;
-            //     }
-            //
-            //     getAuthorizedBillingAccounts.send(params2);
-            //
-            //     updateAuthAccountsParams(idAppUser, idCoreFacility);
-            // }
         }
 
-    }
-
-    setVisibility(): void {
-        let visible: boolean = true;
-        // if (!this.form.get("selectedCategory").value) {
-        //     visible = !this.gnomexService.submitInternalExperiment();
-        // }
-        // this.showLab = visible;
-        //
-        // if (this.form.get("selectLab").value === null) {
-        //     visible = !this.gnomexService.submitInternalExperiment();
-        // }
-        // if (!this.newExperimentService.idAppUser) {
-        //     visible = !this.gnomexService.submitInternalExperiment();
-        // }
-        // this.showBilling = visible;
-
-        if (this.authorizedBillingAccounts
-            && Array.isArray(this.authorizedBillingAccounts)
-            && this.authorizedBillingAccounts.length === 1
-            && this.form.get("selectAccount")
-            && !this.form.get("selectAccount").value) {
-
-            this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
-        }
-
-        if (this.form.get("selectedCategory").value && this.getRequestCategory()) {
-            this.workAuthLabel = this.gnomexService.getCoreFacilityProperty(this.getRequestCategory().idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
-            this.accessAuthLabel = this.gnomexService.getCoreFacilityProperty(this.getRequestCategory().idCoreFacility, this.gnomexService.PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT);
-        }
-        // if (!this.form.get("selectAccount").value) {
-        //     visible = !this.gnomexService.submitInternalExperiment();
-        // }
-        // this.showProject = visible;
-        // this.showNameDesc = visible;
     }
 
     getIdCoreFacility(): string {
         //TODO Need to handle CLINSEQ TYPES
-        let cat = this.requestCategory;
+        // let cat = this.requestCategory;
+        let cat = this.newExperimentService.requestCategory;
         let idCoreFacility: string = null;
         if (cat != null && cat.idCoreFacility.toString() != '') {
             idCoreFacility = cat.idCoreFacility.toString();
         }
         return idCoreFacility;
-    }
-
-    getRequestCategory(): any {
-        let code = this.form.get("selectedCategory").value;
-
-        // Special code for CLINSEQ request from BST.
-        if (code == null && this.defaultCodeRequestCategory != null) {
-            code = this.defaultCodeRequestCategory;
-        }
-        this.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', code.value);
-        if (!this.newExperimentService.requestCategory) {
-            this.newExperimentService.requestCategory = this.requestCategory;
-        }
-        this.codeRequestCategory = this.requestCategory.codeRequestCategory;
-        return this.requestCategory;
     }
 
 
@@ -796,17 +711,13 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     onBillingSelection(event) {
         this.newExperimentService.billingAccount = this.form.get("selectAccount").value;
-        this.setVisibility();
         this.disableNext = false;
         this.getFilteredApps();
     }
 
     getFilteredApps() {
-        this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
-    }
-
-    incrementNext() {
-        this.nextButtonIndex++;
+        // this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
+        this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);
     }
 
     selectDefaultUserProject(): void {

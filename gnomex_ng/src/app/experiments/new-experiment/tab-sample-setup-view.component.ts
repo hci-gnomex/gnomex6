@@ -13,6 +13,14 @@ import {AnnotationTabComponent} from "../../util/annotation-tab.component";
     selector: "tabSampleSetupView",
     templateUrl: "./tab-sample-setup-view.component.html",
     styles: [`        
+        
+        
+        
+        
+        
+        /************************/
+        
+        
         .row-one {
             display: flex;
             flex-grow: 1;

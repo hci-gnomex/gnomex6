@@ -39,8 +39,8 @@ const ROUTES: Routes = [
 
     { path: "experiments-orders", component:ExperimentOrdersComponent},
     { path: "newProject", component: CreateProjectLauncherComponent, outlet: 'modal' },
-    { path: "newExperiment", component: NewExperimentComponent,
-        runGuardsAndResolvers: 'paramsOrQueryParamsChange' }
+    { path: "newExperiment", component: NewExperimentComponent, runGuardsAndResolvers: 'paramsOrQueryParamsChange' },
+    { path: "newExperiment/:idCoreFacility", component: NewExperimentComponent, runGuardsAndResolvers: 'paramsOrQueryParamsChange' }
 
 ];
 
