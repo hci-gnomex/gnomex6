@@ -2,9 +2,10 @@ import {Component, ElementRef, ViewChild, Inject} from "@angular/core";
 import {Location, PopStateEvent} from '@angular/common';
 import {Router} from "@angular/router";
 import {DomSanitizer} from "@angular/platform-browser";
-import {Observable, Subscription} from "rxjs";
+import {interval, Observable, Subscription} from "rxjs";
 
 import {AuthenticationService, AUTHENTICATION_ROUTE} from "./authentication.service";
+import {first} from "rxjs/operators";
 
 @Component({
   selector: "authentication-iframe",
@@ -133,8 +134,8 @@ export class AuthenticationComponent {
      * their browser open, then attempt to log back in in the morning. In order to work around this, this component will re-request
      * the token prior to IdP timeout, which will reset the  process. This will happen 1 minute before idpInactivityMinutes
      **/
-    this.resetSubscription = Observable.interval((this.authenticationService.idpInactivityMinutes - 1) * 60 * 1000)
-      .first()
+    this.resetSubscription = interval((this.authenticationService.idpInactivityMinutes - 1) * 60 * 1000)
+      .pipe(first())
       .subscribe((value) => {
         this.beginAuthenticationProcess();
       });

@@ -1,11 +1,9 @@
 /**
  * Created by u6008750 on 5/12/2017.
  */
-import 'rxjs/add/operator/switchMap';
 import {Component, OnInit} from "@angular/core";
 import { ActivatedRoute, Params } from '@angular/router';
 import {ExperimentsService} from "./experiments.service";
-import {Request} from "@angular/http";
 
 @Component({
     selector: "experiment",

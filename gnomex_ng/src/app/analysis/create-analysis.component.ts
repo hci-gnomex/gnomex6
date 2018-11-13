@@ -11,8 +11,6 @@ import {
 } from "@angular/core";
 import {AnalysisService} from "../services/analysis.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/map';
 import {GetLabService} from "../services/get-lab.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";

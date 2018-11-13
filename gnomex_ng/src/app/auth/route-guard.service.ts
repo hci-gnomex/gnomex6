@@ -4,6 +4,7 @@ import {CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot} from "
 import {Observable} from "rxjs";
 
 import {AuthenticationService, AUTHENTICATION_ROUTE} from "./authentication.service";
+import {map} from "rxjs/operators";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.
@@ -26,7 +27,7 @@ export class RouteGuardService implements CanActivate {
    * @returns {Observable<boolean>} describing the result of this calculation
    */
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    return this._authenticationService.isAuthenticated().map((authenticated) => {
+    return this._authenticationService.isAuthenticated().pipe(map((authenticated) => {
       if (!authenticated) {
         // Store the attempted URL for redirecting
         this._authenticationService.redirectUrl = state.url;
@@ -38,7 +39,7 @@ export class RouteGuardService implements CanActivate {
       return authenticated;
     }, (error: any) => {
       return false;
-    });
+    }));
   };
 }
 

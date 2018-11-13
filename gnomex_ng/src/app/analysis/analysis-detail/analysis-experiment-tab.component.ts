@@ -1,11 +1,11 @@
 
 import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input} from "@angular/core";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ActivatedRoute} from "@angular/router";
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
 import {ITreeOptions} from "angular-tree-component";
@@ -13,6 +13,7 @@ import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
+import {first} from "rxjs/operators";
 
 
 @Component({
@@ -139,7 +140,7 @@ export class AnalysisExperimentTabComponent implements OnInit{
             .set("searchPublicProjects",'N');
 
 
-        this.analysisService.getExperimentPickList(params).first()
+        this.analysisService.getExperimentPickList(params).pipe(first())
             .subscribe(resp =>{
                 if(resp){
                     let projects:any[] = Array.isArray(resp) ? resp : resp.Project ? [resp.Project] : [];

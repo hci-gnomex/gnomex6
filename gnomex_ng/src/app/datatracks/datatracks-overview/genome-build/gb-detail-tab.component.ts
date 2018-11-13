@@ -5,8 +5,9 @@ import {PrimaryTab} from "../../../util/tabs/primary-tab.component"
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../../services/create-security-advisor.service";
 import {GenomeBuildValidateService} from "../../../services/genome-build-validate.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {specialChars} from "../../../util/validators/special-characters.validator";
+import {distinctUntilChanged} from "rxjs/operators";
 
 
 
@@ -59,7 +60,7 @@ export class GBDetailTabComponent extends PrimaryTab implements OnInit{
 
         });
 
-        this.gbFormGroup.valueChanges.distinctUntilChanged()
+        this.gbFormGroup.valueChanges.pipe(distinctUntilChanged())
             .subscribe(value =>{
                 if(this.formInit){
                     this.dirty = true;

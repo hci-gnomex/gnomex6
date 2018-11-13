@@ -8,8 +8,6 @@ import {
 import { URLSearchParams } from "@angular/http";
 import {AnalysisService} from "../services/analysis.service";
 import {FormControl, Validators} from '@angular/forms';
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/map';
 
 @Component({
     selector: 'create-analysis-group-dialog',

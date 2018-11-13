@@ -3,7 +3,7 @@ import {Http} from "@angular/http";
 import {ExperimentsService} from "../experiments/experiments.service";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {BehaviorSubject} from "rxjs";
 import {GnomexService} from "./gnomex.service";
 import {AnnotationService} from "./annotation.service";
 import {BillingService} from "./billing.service";
@@ -106,7 +106,7 @@ export class NewExperimentService {
     set sampleType(value: any) {
         this._sampleType = value;
         if (this.sampleTypeChanged) {
-            !this.sampleTypeChanged.next(true);
+            this.sampleTypeChanged.next(true);
         }
     }
     get organism(): any {

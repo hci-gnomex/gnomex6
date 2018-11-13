@@ -12,7 +12,7 @@ import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-com
 
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {AdvancedSearchService} from "./advanced-search.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {SpinnerDialogComponent} from "../../util/popup/spinner-dialog.component";
 

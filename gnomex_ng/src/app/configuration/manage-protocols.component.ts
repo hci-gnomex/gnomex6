@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 
 import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 
 import {SpinnerDialogComponent} from "../util/popup/spinner-dialog.component";
 

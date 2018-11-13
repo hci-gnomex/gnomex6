@@ -14,7 +14,7 @@ import {
     TreeComponent, ITreeOptions, TreeNode, TreeModel, IActionMapping,
     TREE_ACTIONS
 } from "angular-tree-component";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationExtras, Router} from "@angular/router";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {LabListService} from "../services/lab-list.service";

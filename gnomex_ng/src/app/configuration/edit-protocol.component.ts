@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ProtocolService} from "../services/protocol.service";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {SpinnerDialogComponent} from "../util/popup/spinner-dialog.component";
 import {MatDialogRef} from "@angular/material";
 import {FormControl} from "@angular/forms";

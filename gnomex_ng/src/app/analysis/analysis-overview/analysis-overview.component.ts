@@ -9,7 +9,7 @@ import {TabContainer} from "../../util/tabs/tab-container.component";
 import {TabChangeEvent} from "../../util/tabs/tab-change-event"
 import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {AnalysisService} from "../../services/analysis.service";
 import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
 import {AnalysisGroupComponent} from "./analysis-group.component";

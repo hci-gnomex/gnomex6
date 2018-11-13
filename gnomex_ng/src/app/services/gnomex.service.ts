@@ -3,17 +3,18 @@ import {DictionaryService} from "./dictionary.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
 import {LabListService} from "./lab-list.service";
-import {Subject} from "rxjs/Subject";
-import {Subscription} from "rxjs/Subscription";
+import {forkJoin, Subject} from "rxjs";
+import {Subscription} from "rxjs";
 import {ProgressService} from "../home/progress.service";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {HttpClient, HttpParams, HttpResponse} from "@angular/common/http";
 import {LaunchPropertiesService} from "./launch-properites.service";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {BehaviorSubject} from "rxjs";
 import {Router} from "@angular/router";
 import {ProjectService} from "./project.service";
 import {AppUserListService} from "./app-user-list.service";
 import {AuthenticationService} from "../auth/authentication.service";
+import {first} from "rxjs/operators";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -687,18 +688,18 @@ export class GnomexService {
     }
 
     initApp(): void{
-        this.authSubscription = this.authenticationService.isAuthenticated().first().subscribe(authenticated => {
+        this.authSubscription = this.authenticationService.isAuthenticated().pipe(first()).subscribe(authenticated => {
             //this._isLoggedIn = authenticated && this.progressService.hideLoader.asObservable()
             if (authenticated) {
-                this.createSecurityAdvisorService.createSecurityAdvisor().first().subscribe(response => {
+                this.createSecurityAdvisorService.createSecurityAdvisor().pipe(first()).subscribe(response => {
                     this.progressService.displayLoader(15);
                     this.projectService.getProjectList().subscribe((response: any) => {
                         this.projectList = response;
                     });
                     this.dictionaryService.load(() => {
                         this.progressService.displayLoader(30);
-                        Observable.forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
-                            .first().subscribe((response: any[]) => {
+                        forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
+                            .pipe(first()).subscribe((response: any[]) => {
                                 this.progressService.displayLoader(45);
                                 this.appUserList = response[0];
                                 this.labList = response[1];
@@ -707,7 +708,7 @@ export class GnomexService {
                                 this.progressService.displayLoader(75);
                                 this.onDictionariesLoaded().then((response) => {
                                     this.progressService.displayLoader(90);
-                                    this.launchPropertiesService.getFAQ().first().subscribe((response: any) => {
+                                    this.launchPropertiesService.getFAQ().pipe(first()).subscribe((response: any) => {
                                         if (response != null) {
                                             if (!this.createSecurityAdvisorService.isArray(response)) {
                                                 this.faqList = [response.FAQ];
@@ -746,12 +747,12 @@ export class GnomexService {
 
         let params:URLSearchParams = new URLSearchParams();
         params.set("idCoreFacility",null)
-        this.createSecurityAdvisorService.createGuestSecurityAdvisor(params).first().subscribe(response => {
+        this.createSecurityAdvisorService.createGuestSecurityAdvisor(params).pipe(first()).subscribe(response => {
             this.progressService.displayLoader(15);
             this.dictionaryService.load(() => {
                 this.progressService.displayLoader(30);
-                Observable.forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
-                    .first().subscribe((response: any[]) => {
+                forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
+                    .pipe(first()).subscribe((response: any[]) => {
                     this.progressService.displayLoader(45);
                     this.appUserList = response[0];
                     this.labList = response[1];
@@ -939,7 +940,7 @@ export class GnomexService {
 
 
     private getOrderID(params:HttpParams,path:string[],initOrderSubject:BehaviorSubject<any> ){
-        this.getOrderFromNumber(params).first().subscribe(data =>{
+        this.getOrderFromNumber(params).pipe(first()).subscribe(data =>{
             if(data.result === 'SUCCESS'){
                 this.orderInitObj = data;
                 this.orderInitObj.urlSegList = path;

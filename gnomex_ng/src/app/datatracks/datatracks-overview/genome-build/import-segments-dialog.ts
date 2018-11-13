@@ -7,6 +7,7 @@ import { URLSearchParams } from "@angular/http";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
+import {first} from "rxjs/operators";
 
 @Component({
     templateUrl:'./import-segments-dialog.html',
@@ -70,10 +71,10 @@ export class ImportSegmentsDialog implements OnInit {
         params.set("chromosomeInfo", valueStr );
 
 
-        this.datatrackService.getImportSegments(params).first().subscribe(resp => {
+        this.datatrackService.getImportSegments(params).pipe(first()).subscribe(resp => {
             let params:URLSearchParams = new URLSearchParams();
             params.set("idGenomeBuild", resp.idGenomeBuild);
-            this.datatrackService.getGenomeBuild(params).first().subscribe( resp =>{
+            this.datatrackService.getGenomeBuild(params).pipe(first()).subscribe( resp =>{
                 let segs:Array<any> = <Array<any>>resp.Segments;
                 this.parseImport(segs);
             })

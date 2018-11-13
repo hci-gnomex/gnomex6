@@ -1,10 +1,11 @@
 import {Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Subject} from "rxjs/Subject";
+import {Http, Response, URLSearchParams} from "@angular/http";
+import {Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
+import {Subject} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class TopicService {
@@ -20,23 +21,13 @@ export class TopicService {
     }
 
     public saveTopic(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveTopic.gx", {search: params}).map((response:Response) =>{
+        return this.http.get("/gnomex/SaveTopic.gx", {search: params}).pipe(map((response:Response) =>{
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
-    }
-
-    getTopicList(): Observable<any> {
-        return this.http.get("/gnomex/GetTopicList.gx").map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        });
+        }));
     }
 
     emitTopicsList(): void {
@@ -64,43 +55,43 @@ export class TopicService {
 
 
     addItemToTopic(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/AddItemToTopic.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/AddItemToTopic.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     unlinkItemFromTopic(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/UnlinkItemFromTopic.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/UnlinkItemFromTopic.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     deleteTopic(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/DeleteTopic.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteTopic.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     moveOrCopyTopic(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/MoveOrCopyTopic.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/MoveOrCopyTopic.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     emitSelectedTreeNode(data:any):void{

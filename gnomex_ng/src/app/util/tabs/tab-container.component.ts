@@ -19,9 +19,6 @@ import { PrimaryTab } from './primary-tab.component'
 import { TabChangeEvent } from './tab-change-event'
 import { TabsStatusEvent } from './tab-status-event'
 import {ComponentCommunicatorEvent} from './component-status-event'
-//import {PrepTab} from "../../experiments/experiment-detail/prep-tab.component";
-import 'rxjs/add/operator/distinctUntilChanged';
-
 
 @Directive({
     selector: 'tab-container, [tab-container]'

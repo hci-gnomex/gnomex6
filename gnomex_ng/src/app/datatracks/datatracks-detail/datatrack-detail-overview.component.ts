@@ -19,6 +19,7 @@ import {FormGroup} from "@angular/forms";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {URLSearchParams} from "@angular/http";
+import {first} from "rxjs/operators";
 
 
 
@@ -201,7 +202,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             }
         }
 
-        this.dataTrackService.makeUCSCLinks(params).first().subscribe(resp => {
+        this.dataTrackService.makeUCSCLinks(params).pipe(first()).subscribe(resp => {
                 if(resp && resp.result && resp.result === "SUCCESS"){
                     console.log(resp.ucscURL1);
                     window.open(resp.ucscURL1, "_blank");
@@ -240,14 +241,14 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dialogService.confirm("Creating an IGV data repository containing all user-visible datatracks affiliated with IGV-supported genome builds. " +
                     "If there are unconverted USeq files, this can take a significant amount of time.  When finished, a URL link will be displayed. " +
                     "Paste the link into IGV's Data Registry URL field.  If new data tracks are added, a new repository must be created, but the " +
-                    "link will remain valid.","Do you wish to continue?").first().subscribe((answer:boolean) =>{
+                    "link will remain valid.","Do you wish to continue?").pipe(first()).subscribe((answer:boolean) =>{
                         if(answer) {
-                            this.dataTrackService.makeIGVLink().first().subscribe(IGVLinkCallBack);
+                            this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack);
                         }
                     });
             }
         }
-        this.dataTrackService.makeIGVLink().first().subscribe(IGVLinkCallBack);
+        this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack);
 
 
     }
@@ -256,7 +257,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         let params: HttpParams = new HttpParams().set("requestType" ,"IOBIO")
             .set("idDataTrack", this.datatrack.idDataTrack);
 
-        this.dataTrackService.makeIOBIOLink(params).first().subscribe( resp =>{
+        this.dataTrackService.makeIOBIOLink(params).pipe(first()).subscribe( resp =>{
             if(resp && resp.result && resp.result === "SUCCESS"){
                 window.open(resp.urlsToLink, "_blank");
 
@@ -279,7 +280,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.showSpinner = true;
         let params: HttpParams = new HttpParams().set("idDataTrack", this.datatrack.idDataTrack);
 
-        this.dataTrackService.makeURLLink(params).first().subscribe( resp =>{
+        this.dataTrackService.makeURLLink(params).pipe(first()).subscribe( resp =>{
             if(resp && resp.result && resp.result === "SUCCESS"){
                 this.dialogService.confirm(resp.urlsToLink,null);
 
@@ -297,7 +298,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
     destroyLinks():void{
         this.showSpinner = true;
-        this.dataTrackService.destroyLinks().first()
+        this.dataTrackService.destroyLinks().pipe(first())
             .subscribe(resp =>{
                 if(resp && resp.result && resp.result === "SUCCESS"){
                     this.dialogService.confirm("All Links Destroyed.",null);

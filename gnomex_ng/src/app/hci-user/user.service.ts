@@ -1,11 +1,12 @@
 import {Injectable, InjectionToken, Inject, isDevMode} from "@angular/core";
 import {HttpClient, HttpResponse} from "@angular/common/http";
 
-import {Observable} from "rxjs";
+import {Observable, of} from "rxjs";
 
 import {UserEntity} from "./user.entity";
 import {RoleEntity} from "./authorization/role.entity";
 import {PermissionEntity} from "./authorization/permission.entity";
+import {catchError, map} from "rxjs/operators";
 
 export let AUTHENTICATED_USER_ENDPOINT = new InjectionToken<string>("authenticated_user_url");
 
@@ -42,16 +43,16 @@ export class UserService {
         console.debug("_authenticationUserEndpoint: " + this._authenticationUserEndpoint);
       }
 
-      return this._http.get(this._authenticationUserEndpoint, { observe: "response" }).map((resp: HttpResponse<any>) => {
+      return this._http.get(this._authenticationUserEndpoint, { observe: "response" }).pipe(map((resp: HttpResponse<any>) => {
         if (resp.status === 200) {
           this._authenticatedUser = this.buildUserEntity(resp.body);
           return this._authenticatedUser;
         } else {
           throw new Error("Get authenticated user failed. " + resp.status + ": " + resp.statusText);
         }
-      }).catch(this.handleError);
+      }), catchError(this.handleError));
     } else {
-      return Observable.of(this._authenticatedUser);
+      return of(this._authenticatedUser);
     }
   }
 

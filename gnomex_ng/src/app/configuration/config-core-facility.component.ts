@@ -3,7 +3,7 @@ import {Component, OnInit, ViewChild} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
 
 import {TreeComponent, ITreeOptions, TreeModel} from "angular-tree-component";
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ConfigurationService} from "../services/configuration.service";
 import {ConstantsService} from "../services/constants.service";
@@ -18,10 +18,10 @@ import {ConstantsService} from "../services/constants.service";
                 </button>
             </div>
             <div style="display:flex;height:100%; width:100%;">
-                <split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
-                    <split-area size="20">
+                <as-split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
+                    <as-split-area size="20">
                         <div style="height:100%;width:100%;">
-                            <ag-grid-angular style="width: 100%; height: 90%;" class="ag-fresh"
+                            <ag-grid-angular style="width: 100%; height: 90%;" class="ag-theme-fresh"
                                              [gridOptions]="gridOpt"
                                              [rowData]="rowData"
                                              [columnDefs]="columnDefs"
@@ -33,16 +33,16 @@ import {ConstantsService} from "../services/constants.service";
                             </ag-grid-angular>
 
                         </div>
-                    </split-area>
+                    </as-split-area>
 
-                    <split-area size="80">
+                    <as-split-area size="80">
 
                         <div style="padding-left:2em;">
                             <core-facility-edit (refreshedCore)="refresh($event)"></core-facility-edit>
                         </div>
 
-                    </split-area>
-                </split>
+                    </as-split-area>
+                </as-split>
 
             </div>
             

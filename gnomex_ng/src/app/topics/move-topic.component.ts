@@ -1,7 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {TopicService} from "../services/topic.service";
 

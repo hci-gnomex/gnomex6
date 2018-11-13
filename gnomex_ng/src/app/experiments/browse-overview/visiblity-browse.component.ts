@@ -2,14 +2,14 @@
 import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {ExperimentsService} from "../experiments.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ActivatedRoute} from "@angular/router";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 import {URLSearchParams} from "@angular/http"
 
 
@@ -20,7 +20,7 @@ import {URLSearchParams} from "@angular/http"
         <div style="width:100%; height:100%; display:flex; flex-direction: column ">
             <div style="display:flex; flex-direction:column; flex:1; width:100%;">
                 <ag-grid-angular style="width: 100%; height: 100%;" 
-                                 class="ag-fresh"
+                                 class="ag-theme-fresh"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"

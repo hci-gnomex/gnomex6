@@ -6,20 +6,20 @@ import {
     ViewEncapsulation
 } from "@angular/core";
 import {ProgressService} from "../home/progress.service";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {DictionaryService} from "../services/dictionary.service";
 import {Router} from "@angular/router";
 import {LabListService} from "../services/lab-list.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
 import * as _ from "lodash";
 import {HttpParams} from "@angular/common/http";
 import {TopicService} from "../services/topic.service";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {BehaviorSubject} from "rxjs";
 import {MatDialog, MatDialogConfig, MatToolbar} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 import {AuthenticationService} from "../auth/authentication.service";

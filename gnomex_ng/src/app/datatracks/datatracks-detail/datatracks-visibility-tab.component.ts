@@ -9,6 +9,7 @@
         import {ConstantsService} from "../../services/constants.service";
         import {GnomexService} from "../../services/gnomex.service";
         import {GetLabService} from "../../services/get-lab.service";
+        import {first} from "rxjs/operators";
 
 
 
@@ -96,7 +97,7 @@
                         labParams.set('idLab', idLab);
                         labParams.set('includeBillingAccounts', 'N');
                         labParams.set('includeProductCounts','N');
-                        this.getLabService.getLab(labParams).first().subscribe( data =>{
+                        this.getLabService.getLab(labParams).pipe(first()).subscribe( data =>{
                             if(data.Lab){
                                 this.makeOwnerList(data.Lab);
                                 this.visibilityForm.get("idAppUser").setValue(this.currentDatatrack.idAppUser);
@@ -174,7 +175,7 @@
                     params.set("includeProductCounts", "N");
 
 
-                    this.getLabService.getLab(params).first().subscribe( data =>{
+                    this.getLabService.getLab(params).pipe(first()).subscribe( data =>{
                         if(data.Lab){
 
                             this.visibilityForm.get("idAppUser").setValue(""); // setting empty string because new lab won't match owner

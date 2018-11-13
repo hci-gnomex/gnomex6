@@ -8,7 +8,7 @@
     <span class="top-menu-item lookup horizontal-center">
       <div class="inline-block horizontal-padding">
         <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
-                        [floatPlaceholder]="options.value.floatPlaceholder">
+                        [floatLabel]="options.value.floatPlaceholder">
           <input matInput type="text" [(ngModel)]="objNumber"  placeholder="Lookup by #">
         </mat-form-field>
         <button (click)="searchNumber()">
@@ -16,7 +16,7 @@
         </button>
       </div>
       <div class="inline-block horizontal-padding">
-        <mat-form-field floatPlaceholder='auto'>
+        <mat-form-field floatLabel='auto'>
           <input matInput [(ngModel)]="searchText"  placeholder="Search">
         </mat-form-field>
         <button (click)="searchByText()">

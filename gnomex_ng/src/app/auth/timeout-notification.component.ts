@@ -1,9 +1,10 @@
 import {Component} from "@angular/core";
 import {animate, state, style, transition, trigger} from "@angular/animations";
 
-import {Observable, Subscription} from "rxjs";
+import {Observable, Subscription, timer} from "rxjs";
 
 import {AuthenticationService} from "./authentication.service";
+import {map, take} from "rxjs/operators";
 
 @Component({
   selector: "timeout-notification",
@@ -138,8 +139,8 @@ export class TimeoutNotificationComponent {
   }
 
   startCountdown(): void {
-    this.seconds = Observable.timer(0, 1000).take(this.authenticationService.userCountdownSeconds + 1)
-      .map((value)=> this.authenticationService.userCountdownSeconds - value);
+    this.seconds = timer(0, 1000).pipe(take(this.authenticationService.userCountdownSeconds + 1))
+      .pipe(map((value)=> this.authenticationService.userCountdownSeconds - value));
 
     this.subscription = this.seconds.subscribe((value)=> {
        if (value < 1) {

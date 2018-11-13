@@ -13,7 +13,7 @@ import {
 }  from '@angular/material';
 import {FormsModule, FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {RouterModule} from "@angular/router";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {HttpModule} from "@angular/http";
 import {RouterTestingModule} from "@angular/router/testing";
 import {ILocalStorageServiceConfig, LocalStorageService} from "angular-2-local-storage";

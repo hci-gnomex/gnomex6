@@ -6,17 +6,11 @@ import {
 } from '@angular/material';
 import { URLSearchParams } from "@angular/http";
 import {
-    AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild
+    AfterViewInit, Component, Inject, OnInit, ViewChild
 } from "@angular/core";
 import { jqxComboBoxComponent } from "jqwidgets-framework";
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/map';
-import {GetLabService} from "../services/get-lab.service";
 import {ExperimentsService} from "./experiments.service";
-import {DictionaryService} from "../services/dictionary.service";
-import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {ProjectService} from "../services/project.service";
 
 @Component({
     selector: 'create-project-dialog',

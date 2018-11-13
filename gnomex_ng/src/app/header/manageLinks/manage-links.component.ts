@@ -1,10 +1,10 @@
 
 import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output} from "@angular/core";
 import {FormBuilder } from "@angular/forms"
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {GridOptions, RowDataChangedEvent} from "ag-grid/main";
+import {GridOptions, RowDataChangedEvent} from "ag-grid-community/main";
 import {URLSearchParams} from "@angular/http"
 import {LaunchPropertiesService} from "../../services/launch-properites.service";
 import {MatDialogRef} from "@angular/material";

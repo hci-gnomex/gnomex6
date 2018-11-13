@@ -3,11 +3,12 @@ import {LocationStrategy} from "@angular/common";
 import {Router} from "@angular/router";
 import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from "@angular/common/http";
 
-import {Observable, BehaviorSubject, Subscription} from "rxjs";
+import {Observable, BehaviorSubject, Subscription, interval} from "rxjs";
 import {CoolLocalStorage} from "angular2-cool-storage";
 import {JwtHelperService} from "@auth0/angular-jwt";
 
 import {AuthenticationProvider} from "./authentication.provider";
+import {catchError, first, map} from "rxjs/operators";
 
 /**
  * The token used for injection of the server side endpoint for the currently authenticated subject.
@@ -152,8 +153,8 @@ export class AuthenticationService {
     this.unsubscribeFromTimout();
 
     //Only taking the first value of the subscription. A new subscription will be created when a new token is stored.
-    this._timeoutSubscription = Observable.interval(((this._maxInactivityMinutes * 60) - this.userCountdownSeconds) * 1000)
-      .first()
+    this._timeoutSubscription = interval(((this._maxInactivityMinutes * 60) - this.userCountdownSeconds) * 1000)
+      .pipe(first())
       .subscribe((value) => {
         this._userIsAboutToTimeOut.next(true);
       });
@@ -242,13 +243,13 @@ export class AuthenticationService {
       this.directLoginLocation(),
       {username: _username, password: _password},
       {observe: "response"}
-    ).map((resp: HttpResponse<any>) => {
+    ).pipe(map((resp: HttpResponse<any>) => {
       if (resp.status === 201) {
         return true;
       } else {
         throw new Error("Authentication failed. " + resp.status + ": " + resp.statusText);
       }
-    }).catch(this.handleError);
+    }), catchError(this.handleError));
   }
 
 
@@ -342,8 +343,8 @@ export class AuthenticationService {
     let msToExpiry = (exp.valueOf() - new Date().valueOf());
 
     //Only taking the first value of the subscription. A new subscription will be created when a new token is stored.
-    this._refreshSubscription = Observable.interval((msToExpiry > 60000) ? msToExpiry - 60000 : 0)
-      .first()
+    this._refreshSubscription = interval((msToExpiry > 60000) ? msToExpiry - 60000 : 0)
+      .pipe(first())
       .subscribe((value) => {
         this.refreshTokenIfUserIsActive();
       });

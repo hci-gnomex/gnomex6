@@ -3,7 +3,7 @@ import {Component, OnInit} from "@angular/core";
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
 import {ProgressService} from "../home/progress.service";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {BehaviorSubject} from "rxjs";
 import {AuthenticationService} from "../auth/authentication.service";
 
 @Component({

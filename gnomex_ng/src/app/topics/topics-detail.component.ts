@@ -4,7 +4,7 @@
 import {AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {TopicService} from "../services/topic.service";
 import {ActivatedRoute} from "@angular/router";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
@@ -20,6 +20,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {jqxEditorComponent} from "../../assets/jqwidgets-ts/angular_jqxeditor";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
+import {first} from "rxjs/operators";
 
 @Component({
     templateUrl: './topics-detail.component.html',
@@ -229,7 +230,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
         params.set("idParentTopic", this.topicNode.idParentTopic);
         params.set("codeVisibility", this.visOpt);
 
-        this.topicService.saveTopic(params).first().subscribe( resp =>{
+        this.topicService.saveTopic(params).pipe(first()).subscribe( resp =>{
             this.visOpt = resp.codeVisibility;
             this.topicService.refreshTopicsList_fromBackend();
             this.showSpinner = false;
@@ -284,7 +285,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
 
 
 
-            this.topicService.emailTopicOwner(params).first().subscribe(resp =>{
+            this.topicService.emailTopicOwner(params).pipe(first()).subscribe(resp =>{
                 let email =<BasicEmailDialogComponent>this.emailImportDialogRef.componentInstance;
                 email.showSpinner =false;
 

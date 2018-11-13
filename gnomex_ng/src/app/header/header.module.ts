@@ -69,7 +69,7 @@ import {UploadModule} from "../upload/upload.module";
             TextSelectXorMultiselectEditor,
             TextSelectXorMultiselectRenderer
         ]),
-        TreeModule,
+        TreeModule.forRoot(),
         ServicesModule,
         UploadModule
     ],

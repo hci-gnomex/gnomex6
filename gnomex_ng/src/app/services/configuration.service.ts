@@ -1,10 +1,9 @@
 import {Injectable} from "@angular/core";
 import {Http, Headers, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
-import {Subject} from "rxjs/Subject";
+import {Observable} from "rxjs";
+import {Subject} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 
 @Injectable()
@@ -19,13 +18,13 @@ export class ConfigurationService {
     }
 
     public getUploadURL(): Observable<any> {
-        return this.getUploadURLCall().map((response: Response) => {
+        return this.getUploadURLCall().pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 return null;
             }
-        });
+        }));
     }
 
     emitCoreList(data:any): void {
@@ -38,15 +37,11 @@ export class ConfigurationService {
     saveCoreFacility(params:URLSearchParams): Observable<any>{
         this.cookieUtilService.formatXSRFCookie();
         return this.http.post("/gnomex/SaveCoreFacility.gx",params)
-            .map((response: Response) => {
+            .pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 }
-            }).catch((err) =>{
-
-                console.log(err);
-                return Observable.throw(err);
-            });
+            }));
     }
 
 

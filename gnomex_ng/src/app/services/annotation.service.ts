@@ -1,8 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Http, Response} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
+import {Observable} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class AnnotationService {
@@ -15,13 +14,13 @@ export class AnnotationService {
     }
 
     public getPropertyList(): Observable<any[]> {
-        return this.getPropertyListCall().map((response: Response) => {
+        return this.getPropertyListCall().pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 return [];
             }
-        });
+        }));
     }
 
     public static isApplicableProperty(property, reqCategory, idOrganism: string, codeApplication: string): boolean {

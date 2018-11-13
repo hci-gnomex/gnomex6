@@ -19,10 +19,10 @@
         <mat-checkbox [(ngModel)]="showInactive" (change)="filterExperimentPlatform()" > Show Inactive Platforms </mat-checkbox>
     </div>
     <div  class="flex-container-row full-width flex-grow" >
-        <split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
-            <split-area size="20">
+        <as-split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
+            <as-split-area size="20">
                 <div style="height:100%;width:100%;">
-                    <ag-grid-angular style="width: 100%; height: 90%;" class="ag-fresh"
+                    <ag-grid-angular style="width: 100%; height: 90%;" class="ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [columnDefs]="columnDefs"
                                      [rowSelection]="rowSelection"
@@ -33,9 +33,9 @@
                     </ag-grid-angular>
 
                 </div>
-            </split-area>
+            </as-split-area>
 
-            <split-area size="80">
+            <as-split-area size="80">
                 <div style="padding-left:2em;" class="full-height full-width border">
                     <mat-tab-group [(selectedIndex)]="tabIndex" (selectedTabChange)="tabChanged($event)" class="full-height full-width border">
                         <mat-tab [label]="tab.name" *ngFor="let tab of experimentPlatformTabs ">
@@ -46,8 +46,8 @@
                     </mat-tab-group>
                 </div>
 
-            </split-area>
-        </split>
+            </as-split-area>
+        </as-split>
 
     </div>
     <save-footer *ngIf="!removeSave && selectedPlatformList.length > 0" style="width: 100%"

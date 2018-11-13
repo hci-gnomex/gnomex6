@@ -18,7 +18,7 @@ import {
     TREE_ACTIONS
 } from "angular-tree-component";
 import * as _ from "lodash";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {NavigationEnd, Router} from "@angular/router";
 import {MatDialogRef, MatDialog, MatAutocomplete,MatOption} from '@angular/material';
 import {ITreeNode} from "angular-tree-component/dist/defs/api";

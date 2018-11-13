@@ -1,7 +1,5 @@
 import {Http, HttpModule, URLSearchParams} from "@angular/http";
 import {ExperimentsService} from "./experiments.service";
-import {Observable} from "rxjs/Observable";
-import 'rxjs/add/observable/of';
 import {BrowseExperimentsComponent} from "./browse-experiments.component"
 import {} from 'jasmine';
 import {async, ComponentFixture, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
@@ -38,6 +36,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {CookieService} from "angular2-cookie/services";
 import {ConstantsService} from "../services/constants.service";
+import {of} from "rxjs";
 
 @Directive({
 
@@ -51,11 +50,11 @@ class MockAppUserListService extends AppUserListService {
         super(_http);
     }
     getMembersOnly() {
-        return Observable.of([
+        return of([
         ])
     }
     getAppUserList() {
-        return Observable.of([
+        return of([
         ])
     }
 }
@@ -277,7 +276,7 @@ describe('Browse Experiment Component...', () => {
         console.log("in before each");
 
         TestBed.configureTestingModule({
-            imports: [FormsModule, HttpModule, TreeModule, ButtonModule, ToggleButtonModule, ComboBoxModule,
+            imports: [FormsModule, HttpModule, TreeModule.forRoot(), ButtonModule, ToggleButtonModule, ComboBoxModule,
                 WindowModule, InputModule, NotificationModule, TextAreaModule, CalendarModule, LoaderModule,
                 UtilModule, RouterTestingModule, AngularMaterialModule, AngularSplitModule],
             declarations: [BrowseExperimentsComponent, BrowsePanelComponent],

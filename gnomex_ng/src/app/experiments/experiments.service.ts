@@ -1,10 +1,11 @@
 import {Inject, Injectable, InjectionToken, Injector} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Subject} from "rxjs/Subject";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subject} from "rxjs";
+import {Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {map} from "rxjs/operators";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -47,19 +48,6 @@ export class ExperimentsService {
     constructor(private _http: Http,
                 private httpClient: HttpClient,
                 @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
-
-    getExperiments() {
-        //return this._http.get("/gnomex/GetProjectRequestList.gx?idLab=1500&showCategory='N'", {withCredentials: true}).map((response: Response) => {
-        //return this._http.get("/gnomex/GetProjectRequestList.gx?showEmptyProjectFolders=N&allExperiments=Y&showSamples=N&showCategory=N", {withCredentials: true}).map((response: Response) => {
-
-        return this._http.get("/gnomex/GetProjectRequestList.gx?showEmptyProjectFolders=N&allExperiments=Y&showSamples=N&showCategory=N&idCoreFacility=3&showEmptyProjectFolders=N", {withCredentials: true}).map((response: Response) => {
-            if (response.status === 200) {
-                return response.json().Lab;
-            } else {
-                throw new Error("Error");
-            }
-        });
-    }
 
 	getExperimentsObservable(): Observable<any> {
 		return this.experimentOrdersSubject.asObservable();
@@ -173,13 +161,13 @@ export class ExperimentsService {
     }
 
     getExperiment(id: string): Observable<any> {
-        return this._http.get("/gnomex/GetRequest.gx?idRequest=" + id, {withCredentials: true}).map((response: Response) => {
+        return this._http.get("/gnomex/GetRequest.gx?idRequest=" + id, {withCredentials: true}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     public getNewRequest(): Observable<any> {
@@ -188,24 +176,24 @@ export class ExperimentsService {
     }
 
     getLab(params: URLSearchParams): Observable<any> {
-        return this._http.get("/gnomex/GetLab.gx", {search: params}).map((response: Response) => {
+        return this._http.get("/gnomex/GetLab.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json().Lab;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     saveRequestProject(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/SaveRequestProject.gx", {search: params}).map((response: Response) => {
+        return this._http.get("/gnomex/SaveRequestProject.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
@@ -219,13 +207,13 @@ export class ExperimentsService {
         }
         parameters.set("visibilityXMLString", strBody);
 
-        return this._http.get("/gnomex/SaveVisibility.gx", {search: parameters}).map((response: Response) => {
+        return this._http.get("/gnomex/SaveVisibility.gx", {search: parameters}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error: In SaveVisibility");
             }
-        });
+        }));
 
 
     }
@@ -255,58 +243,46 @@ export class ExperimentsService {
 
 
     getProject(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/GetProject.gx", {search: params}).map((response: Response) => {
+        return this._http.get("/gnomex/GetProject.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     saveProject(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/SaveProject.gx", {search: params}).map((response: Response) => {
+        return this._http.get("/gnomex/SaveProject.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     deleteExperiment(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/DeleteRequest.gx", {search: params}).map((response: Response) => {
+        return this._http.get("/gnomex/DeleteRequest.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getProjectRequestList(params: URLSearchParams) {
-        //return this._http.get("/gnomex/GetProjectRequestList.gx?idLab=1500&showCategory='N'", {withCredentials: true}).map((response: Response) => {
-        return this._http.get("/gnomex/GetProjectRequestList.gx", {search: params, withCredentials: true}).map((response: Response) => {
+        return this._http.get("/gnomex/GetProjectRequestList.gx", {search: params, withCredentials: true}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json().Lab;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
-
-    getRequestList(params: URLSearchParams): Observable<any> {
-        return this._http.get("/gnomex/GetRequestList.gx", {search: params}).map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        });
-    }
-
 
     getRequestProgressListObservable():Observable<any>{
         return this.requestProgressList;

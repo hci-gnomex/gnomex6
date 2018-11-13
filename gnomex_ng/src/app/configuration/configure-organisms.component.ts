@@ -1,5 +1,5 @@
 import {Component, OnInit} from "@angular/core";
-import {GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid";
+import {GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
 import {OrganismService} from "../services/organism.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {DictionaryService} from "../services/dictionary.service";

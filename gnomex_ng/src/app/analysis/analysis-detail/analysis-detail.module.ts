@@ -24,7 +24,7 @@ import {AnalysisInfoTabComponent} from "./analysis-info-tab.component";
         AgGridModule.withComponents([IconTextRendererComponent]),
         AngularMaterialModule,
         FormsModule,
-        TreeModule,
+        TreeModule.forRoot(),
         ReactiveFormsModule,
         UtilModule,
         RelatedDataModule,

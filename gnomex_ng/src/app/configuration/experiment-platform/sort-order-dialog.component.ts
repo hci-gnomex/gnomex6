@@ -6,8 +6,9 @@ import {Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {HttpParams} from "@angular/common/http";
-import {GridApi} from "ag-grid";
+import {GridApi} from "ag-grid-community";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {first} from "rxjs/operators";
 
 @Component({
     templateUrl:'./sort-order-dialog.component.html',
@@ -139,7 +140,7 @@ export class SortOrderDialogComponent implements OnInit{
             .subscribe((answer:boolean) =>{
                 if(answer){
                     this.expPlatformService.getExperimentPlatformSortOrderList(new HttpParams().set('idCoreFacility',this.idCoreFacility)).
-                        first().subscribe(resp => {
+                        pipe(first()).subscribe(resp => {
                             if(resp && !resp.message ){
                                 this.sortOrderList = Array.isArray(resp)? resp : [resp];
                                 this.rowData = this.sortOrderList;

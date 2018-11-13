@@ -1,12 +1,13 @@
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
-import { Observable } from "rxjs";
+import {Observable, of} from "rxjs";
 import {ExperimentsService} from "../../experiments/experiments.service";
 import {Injectable} from "@angular/core";
 import {GnomexService} from "../gnomex.service";
 import {URLSearchParams} from "@angular/http";
 import {HttpParams} from "@angular/common/http";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {BehaviorSubject} from "rxjs";
 import {AuthenticationService} from "../../auth/authentication.service";
+import {flatMap, map} from "rxjs/operators";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.
@@ -40,7 +41,7 @@ export class AuthRouteGuardService implements CanActivate {
 
 
         return this._authenticationService.isAuthenticated()
-            .flatMap(auth =>{
+            .pipe(flatMap(auth =>{
                 // Store the attempted URL for redirecting
                 this._authenticationService.redirectUrl = state.url;
                 if(paramNumb > 0){
@@ -52,15 +53,15 @@ export class AuthRouteGuardService implements CanActivate {
                             // Navigate to the login page
                             this._router.navigate(["authenticate"]);
                         }
-                        return Observable.of(auth);
+                        return of(auth);
                 }
-            })
+            }))
 
     }
 
 
     private redirectByURL(params:HttpParams,initOrderSubject:BehaviorSubject<any>,isAuthed:boolean,numberObj:any):Observable<boolean>{
-        return this.gnomexService.getOrderFromNumber(params).map((res) =>{
+        return this.gnomexService.getOrderFromNumber(params).pipe(map((res) =>{
             this.setIDsFromResponse(res,numberObj); // no navigation
             this.gnomexService.orderInitObj = numberObj;
             initOrderSubject.next(this.gnomexService.orderInitObj);
@@ -77,7 +78,7 @@ export class AuthRouteGuardService implements CanActivate {
                 this._router.navigate(["authenticate"]);
                 return false;
             }
-        });
+        }));
 
     }
 
@@ -121,7 +122,7 @@ export class AuthRouteGuardService implements CanActivate {
 
 
         } else {
-            return Observable.of(false);
+            return of(false);
         }
 
 

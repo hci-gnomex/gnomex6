@@ -5,13 +5,14 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {GridApi, CellValueChangedEvent} from "ag-grid";
+import {GridApi, CellValueChangedEvent} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {QcAssayChipTypeDialogComponent} from "./qc-assay-chip-type-dialog.component";
 import * as _ from "lodash";
 import {numberRange} from "../../util/validators/number-range-validator";
+import {first} from "rxjs/operators";
 
 
 @Component({
@@ -294,7 +295,7 @@ export class QcAssayDialogComponent implements OnInit{
         let display = this.selectedAssay[0].display;
 
         this.dialogService.confirm("Warning",
-            "Are you sure you want to remove assay \'" + display + "\'?" ).first().subscribe( action =>{
+            "Are you sure you want to remove assay \'" + display + "\'?" ).pipe(first()).subscribe( action =>{
                 if(action){
                     if(removeIndex > -1){
                         this.uncommitedChipTypeList.splice(removeIndex,1);

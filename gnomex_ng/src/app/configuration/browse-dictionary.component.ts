@@ -6,10 +6,10 @@ import {Dictionary} from "./dictionary.interface";
 import {DictionaryEntry} from "./dictionary-entry.type";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {GridApi, GridReadyEvent} from "ag-grid";
+import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {FormControl, FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
-import {ValueFormatterParams} from "ag-grid/dist/lib/entities/colDef";
+import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
 
 @Component({
     selector: "browse-dictionary",

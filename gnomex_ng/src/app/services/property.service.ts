@@ -1,10 +1,9 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams, Headers} from "@angular/http";
 import {DictionaryService} from "./dictionary.service";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
+import {Observable} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 export enum annotType
 {
@@ -118,13 +117,13 @@ export class PropertyService {
     }
 
     public getPropertyList(propertyOnly: boolean): Observable<any[]> {
-        return this.getPropertyListCall(propertyOnly).map((response: Response) => {
+        return this.getPropertyListCall(propertyOnly).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 return [];
             }
-        });
+        }));
     }
 
     public getPropertyAnnotationCall(idProperty: string): Observable<Response> {
@@ -134,13 +133,13 @@ export class PropertyService {
     }
 
     public getPropertyAnnotation(idProperty: string): Observable<any> {
-        return this.getPropertyAnnotationCall(idProperty).map((response: Response) => {
+        return this.getPropertyAnnotationCall(idProperty).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 return null;
             }
-        });
+        }));
     }
 
     public savePropertyAnnotation(params: URLSearchParams):  Observable<Response> {

@@ -72,7 +72,17 @@ module.exports = function (options) {
                 },
                 {
                     test: /\.scss$/,
-                    use: ["raw-loader", "sass-loader"]
+                    use: [
+                        {
+                            loader: "raw-loader"
+                        },
+                        {
+                            loader: "sass-loader",
+                            options: {
+                                includePaths: ["node_modules"]
+                            }
+                        }
+                        ]
                 },
                 {
                     test: /bootstrap\/dist\/js\/umd\//,
@@ -141,7 +151,8 @@ module.exports = function (options) {
                 Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
                 Modal: "exports-loader?Modal!bootstrap/js/dist/modal",
                 Tab: "exports-loader?Tab!bootstrap/js/dist/tab",
-                Util: "exports-loader?Util!bootstrap/js/dist/util"
+                Util: "exports-loader?Util!bootstrap/js/dist/util",
+                Popper: ['popper.js', 'default']
             })
         ]
     };

@@ -1,8 +1,10 @@
 import {Injectable, Injector, isDevMode} from "@angular/core";
 import {HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpHeaders} from "@angular/common/http";
 
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {AuthenticationService} from "./authentication.service";
+import {of} from "rxjs";
+import {catchError} from "rxjs/operators";
 
 @Injectable()
 export class AuthorizationInterceptor implements HttpInterceptor {
@@ -33,8 +35,8 @@ export class AuthorizationInterceptor implements HttpInterceptor {
       headers: headers
     });
 
-    return next.handle(reqClone)
-      .catch((error) => {
+    return next.handle(reqClone).pipe(
+      catchError((error) => {
         if (isDevMode()) {
           console.error("AuthorizationInterceptor.error");
           console.error(error);
@@ -50,7 +52,7 @@ export class AuthorizationInterceptor implements HttpInterceptor {
             if (authenticated) {
               // If authenticated, then logout which will redirect.
               authService.logout(true);
-              return Observable.of(error.message);
+              return of(error.message);
             } else {
               // Otherwise, for example, when the user first opens Core, 401s are expected.
               return Observable.throw(error);
@@ -61,6 +63,6 @@ export class AuthorizationInterceptor implements HttpInterceptor {
           // TODO: Trigger notification for unauthorized.
         }
         return Observable.throw(error);
-      });
+      }));
   }
 }

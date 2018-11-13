@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
-import {GridApi} from "ag-grid";
+import {GridApi} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {ConstantsService} from "../../services/constants.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
@@ -28,7 +28,7 @@ import {DictionaryService} from "../../services/dictionary.service";
                 </button>
             </div>
             <div style="flex:7" class="full-width">
-                <ag-grid-angular class="full-height full-width ag-fresh"
+                <ag-grid-angular class="full-height full-width ag-theme-fresh"
                                  [columnDefs]="columnDefs"
                                  [rowData]="this.pipelineRowData"
                                  (gridReady)="onGridReady($event)"

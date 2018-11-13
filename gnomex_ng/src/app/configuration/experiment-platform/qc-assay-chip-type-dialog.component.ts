@@ -1,11 +1,10 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig, MatDialog} from "@angular/material";
+import {MatDialogRef, MAT_DIALOG_DATA, MatDialog} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
 import {FormBuilder,FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {GridApi, CellValueChangedEvent} from "ag-grid";
 import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {numberRange} from "../../util/validators/number-range-validator";

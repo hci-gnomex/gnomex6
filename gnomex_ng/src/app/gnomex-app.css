@@ -7,9 +7,9 @@
 @footerText: #333;*/
 @import '~angular-tree-component/dist/angular-tree-component.css';
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
-@import '~ag-grid/dist/styles/ag-grid.css';
-@import '~ag-grid/dist/styles/theme-fresh.css';
-@import '~ag-grid/dist/styles/ag-theme-balham.css';
+@import '~ag-grid-community/dist/styles/ag-grid.css';
+@import '~ag-grid-community/dist/styles/ag-theme-fresh.css';
+@import '~ag-grid-community/dist/styles/ag-theme-balham.css';
 html {
   position: relative;
   height: 100%;
@@ -122,30 +122,30 @@ div.mainnav {
   height: 100%;
 }
 
-.ag-fresh .annotationRequiredRow {
+.ag-theme-fresh .annotationRequiredRow {
   font-weight: bold !important;
   font-style: italic !important;
   color: black !important;
 }
-.ag-fresh .annotationActiveRow {
+.ag-theme-fresh .annotationActiveRow {
   font-style: normal !important;
   color: black !important;
 }
-.ag-fresh .annotationInactiveRow {
+.ag-theme-fresh .annotationInactiveRow {
   font-style: italic !important;
   color: #647478 !important;
 }
-.ag-fresh .otherBillingItem {
+.ag-theme-fresh .otherBillingItem {
   font-style: italic !important;
   color: grey !important;
 }
-.ag-fresh .workFlowOnColor {
+.ag-theme-fresh .workFlowOnColor {
   background-color: #f1eed6 !important;
 }
-.ag-fresh .workFlowOffColor {
+.ag-theme-fresh .workFlowOffColor {
   background-color: white !important;
 }
-.ag-fresh .workFlowSelectedColor {
+.ag-theme-fresh .workFlowSelectedColor {
   background-color: deepskyblue !important;
 }
 

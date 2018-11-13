@@ -103,7 +103,7 @@ import {UploadModule} from "../upload/upload.module";
         ServicesModule,
         TextAreaModule,
         ToggleButtonModule,
-        TreeModule,
+        TreeModule.forRoot(),
         UtilModule,
         WindowModule,
         ReactiveFormsModule,

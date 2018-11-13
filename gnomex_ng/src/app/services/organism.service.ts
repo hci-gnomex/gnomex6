@@ -1,11 +1,9 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/of';
+import {Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class OrganismService {
@@ -35,7 +33,7 @@ export class OrganismService {
     }
 
     public getDas2OrganismList(): Observable<any[]> {
-        return this.getOrganismListCall().map((response: Response) => {
+        return this.getOrganismListCall().pipe(map((response: Response) => {
             if (response.status === 200) {
                 let allOrganisms: any[] = response.json();
                 return allOrganisms.filter((organism: any) => {
@@ -44,24 +42,11 @@ export class OrganismService {
             } else {
                 return [];
             }
-        });
+        }));
     }
 
     public saveOrganism(params: URLSearchParams):  Observable<Response> {
         return this.http.get("/gnomex/SaveOrganism.gx", {search: params});
-    }
-
-
-
-  getOrganismList(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/GetOrganismList.gx", {search: params}).map((response: Response) => {
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error("Error");
-            }
-        });
-
     }
 
 }

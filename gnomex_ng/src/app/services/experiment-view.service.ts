@@ -1,9 +1,9 @@
 import {Injectable, EventEmitter} from '@angular/core'
 import {ValidatorFn, Validators} from "@angular/forms";
 import {emailMatcher} from "../util/validators/email-matcher.validator"
-import {Subject} from "rxjs/Subject";
+import {Subject} from "rxjs";
 import {ControlChangeState} from "../util/tabs/control-change-state"
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 
 @Injectable()
 export class ExperimentViewService {

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { CookieUtilService } from "./cookie-util.service";
-import { Observable } from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
+import { Observable } from "rxjs";
+import {Subject} from "rxjs";
 
 @Injectable()
 export class ProtocolService {

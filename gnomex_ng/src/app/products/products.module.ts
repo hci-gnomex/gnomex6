@@ -30,7 +30,7 @@ import {DialogsModule} from "../util/popup/dialogs.module";
         ServicesModule,
         UtilModule,
         ReactiveFormsModule,
-        TreeModule,
+        TreeModule.forRoot(),
         NewBillingAccountModule,
         AgGridModule.withComponents([])
     ],

@@ -29,7 +29,7 @@
                 <button [disabled]="!this.selectedProduct" *ngIf="this.isAdminState" mat-button color="accent" (click)="this.addRow()"><img src="../../assets/add.png" class="icon">Add Row</button>
             </div>
             <div class="ninety-percent-height">
-                <ag-grid-angular class="ag-fresh full-height full-width"
+                <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (cellValueChanged)="this.onGridCellValueChanged()"
                                  [singleClickEdit]="true"

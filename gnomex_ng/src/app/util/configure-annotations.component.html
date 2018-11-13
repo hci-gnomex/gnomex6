@@ -43,7 +43,7 @@
     </div>
     <div class="gridAndDetailRow">
         <ag-grid-angular style="width: 30%;"
-                         class="ag-fresh"
+                         class="ag-theme-fresh"
                          (gridReady)="this.onAnnotGridReady($event)"
                          (rowDataChanged)="this.onAnnotGridRowDataChanged()"
                          [rowSelection]="'single'"
@@ -115,7 +115,7 @@
                                 <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOptionIndex == null" (click)="this.deleteOption()"><img class="icon" src="../../assets/delete.png">Delete option</button>
                             </div>
                             <ag-grid-angular style="width: 30%; height: 100%;"
-                                             class="ag-fresh"
+                                             class="ag-theme-fresh"
                                              (gridReady)="this.onOptionGridReady($event)"
                                              [rowSelection]="'single'"
                                              (rowSelected)="this.onOptionGridRowSelected($event)"
@@ -151,7 +151,7 @@
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedPlatformIndex == null" (click)="this.deletePlatform()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
-                                         class="ag-fresh"
+                                         class="ag-theme-fresh"
                                          (gridReady)="this.onPlatformGridReady($event)"
                                          [rowSelection]="'single'"
                                          (rowSelected)="this.onPlatformGridRowSelected($event)"
@@ -174,7 +174,7 @@
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOrganismIndex == null" (click)="this.deleteOrganism()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
-                                         class="ag-fresh"
+                                         class="ag-theme-fresh"
                                          (gridReady)="this.onOrganismGridReady($event)"
                                          [rowSelection]="'single'"
                                          (rowSelected)="this.onOrganismGridRowSelected($event)"
@@ -197,7 +197,7 @@
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedAnalysisTypeIndex == null" (click)="this.deleteAnalysisType()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
-                                         class="ag-fresh"
+                                         class="ag-theme-fresh"
                                          (gridReady)="this.onAnalysisTypeGridReady($event)"
                                          [rowSelection]="'single'"
                                          (rowSelected)="this.onAnalysisTypeGridRowSelected($event)"
@@ -220,7 +220,7 @@
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedUserIndex == null" (click)="this.deleteUser()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
-                                         class="ag-fresh"
+                                         class="ag-theme-fresh"
                                          (gridReady)="this.onUserGridReady($event)"
                                          [rowSelection]="'single'"
                                          (rowSelected)="this.onUserGridRowSelected($event)"

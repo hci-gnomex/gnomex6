@@ -8,6 +8,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {first} from "rxjs/operators";
 
 
 
@@ -138,7 +139,7 @@ export class AddExperimentPlatformDialogComponent implements OnInit{
             .set('icon',this.formGroup.get("type").value.defaultIcon);
 
 
-        this.expPlatformService.saveExperimentPlatform(params).first().subscribe(resp =>{
+        this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe(resp =>{
             console.log(resp);
             if(resp){ // response is the code request category if successful
                 if(resp.message){ // had a known error

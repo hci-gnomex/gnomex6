@@ -2,7 +2,7 @@
 import {Component, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {MatAutocomplete} from "@angular/material";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Router} from "@angular/router";
 

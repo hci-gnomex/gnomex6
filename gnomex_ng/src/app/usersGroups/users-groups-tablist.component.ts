@@ -3,9 +3,9 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {URLSearchParams} from "@angular/http";
 import {MatDialog, MatDialogConfig, MatDialogRef, MatSnackBar, MatSnackBarConfig} from "@angular/material";
 
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 
 import {BillingAdminTabComponent} from "./billingAdminTab/billing-admin-tab.component";
 import {DeleteGroupDialogComponent} from "./delete-group-dialog.component";

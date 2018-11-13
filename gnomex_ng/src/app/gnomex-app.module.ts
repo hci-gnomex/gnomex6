@@ -46,6 +46,7 @@ import {
 import {AUTHENTICATION_TOKEN_KEY} from "./auth/authentication.provider";
 import {UserModule} from "./hci-user/user.module";
 import {AUTHENTICATED_USER_ENDPOINT, UserService} from "./hci-user/user.service";
+import {AngularSplitModule} from "angular-split";
 
 
 
@@ -88,6 +89,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         WorkflowModule,
         ProductsModule,
         BillingModule,
+        AngularSplitModule,
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],

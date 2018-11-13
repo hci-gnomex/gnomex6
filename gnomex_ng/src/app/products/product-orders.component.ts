@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {GridReadyEvent, GridSizeChangedEvent, SelectionChangedEvent} from "ag-grid";
+import {GridReadyEvent, GridSizeChangedEvent, SelectionChangedEvent} from "ag-grid-community";
 import {LabListService} from "../services/lab-list.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
