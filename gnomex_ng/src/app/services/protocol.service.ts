@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from "@angular/common/http";
+import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
 import { CookieUtilService } from "./cookie-util.service";
 import { Observable } from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import 'rxjs/add/operator/catch';
+import {ErrorObservable} from "rxjs/observable/ErrorObservable";
 
 @Injectable()
 export class ProtocolService {
@@ -43,7 +45,7 @@ export class ProtocolService {
             .set('id', id)
             .set('protocolClassName', protocolClassName);
 
-        this.httpClient.post('gnomex/GetProtocol.gx', null, {params: params}).subscribe((result) => {
+        this.httpClient.post('gnomex/GetProtocol.gx', null, {params: params}).catch(this.handleError).subscribe((result) => {
             this.protocolSubject.next(result);
         });
     }
@@ -65,7 +67,17 @@ export class ProtocolService {
     public saveProtocol(params:HttpParams): Observable<any>{ // used for experiment platform
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post('/gnomex/SaveProtocol.gx',null,{params:params})
+            .catch(this.handleError);
     }
+    private handleError(errorResponse: HttpErrorResponse){
+        if(errorResponse.error instanceof ErrorEvent){
+            console.error("Client side Error: ", errorResponse.error.message);
+        }else{
+            console.log("Server Side Error: ", errorResponse);
+        }
+        return new ErrorObservable("An error occured please contact GNomEx Support.");
+    }
+
 
     public saveNewProtocol(protocolName: string, codeRequestCategory: string, protocolClassName: string, idAnalysisType: string): void {
         this.cookieUtilService.formatXSRFCookie();

@@ -8,6 +8,10 @@ import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.hibernate.Session;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -599,6 +603,16 @@ public class Util {
 
         return thejson;
     }
+    public static JsonObject addToJsonObject(JsonObject obj, String key, JsonValue val) {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        for (Map.Entry<String, JsonValue> e : obj.entrySet()) {
+            builder.add(e.getKey(), e.getValue());
+        }
+        builder.add(key, val);
+        return builder.build();
+    }
+
+
 
 }
 

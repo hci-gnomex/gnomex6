@@ -236,6 +236,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
                 isSelected:'N',
                 idSampleType:'SampleType',
                 display:'enter sample type here...',
+                isActive: 'Y',
                 codeNucleotideType: 'DNA',
                 sortOrder: '99',
                 notes:'',

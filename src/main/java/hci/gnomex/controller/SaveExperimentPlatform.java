@@ -1,5 +1,6 @@
 package hci.gnomex.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -8,7 +9,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -21,7 +24,8 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
@@ -34,25 +38,13 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger(SaveExperimentPlatform.class);
 
-  private String sampleTypesXMLString;
-  private Document sampleTypesDoc;
-
-  private String applicationsXMLString;
-  private Document applicationsDoc;
-
-  private String sequencingOptionsXMLString;
-  private Document sequencingOptionsDoc;
-
-  private String prepTypesXMLString;
-  private Document prepTypesDoc;
-
-  private String prepQCProtocolsXMLString;
-  private Document prepQCProtocolsDoc;
-
-  private String pipelineProtocolsXMLString;
-  private Document pipelineProtocolsDoc;
-
-  private Document requestCategoryApplicationsDoc;
+  private JsonArray sampleTypesList;
+  private JsonArray applicationList;
+  private JsonArray sequencingOptionList;
+  private JsonArray prepTypesList;
+  private JsonArray prepQCProtocolList;
+  private JsonArray pipelineProtocolList;
+  private JsonArray requestCategoryApplicationList;
 
   private RequestCategory rcScreen;
   private boolean isNewRequestCategory = false;
@@ -72,6 +64,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     rcScreen = new RequestCategory();
+
     newCodeRequestCategory = request.getParameter("newCodeRequestCategory");
     HashMap errors = this.loadDetailObject(request, rcScreen);
     this.addInvalidFields(errors);
@@ -104,112 +97,123 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
       this.saveAndSubmit = request.getParameter("saveAndSubmit");
     }
 
-    if (request.getParameter("sampleTypesXMLString") != null && !request.getParameter("sampleTypesXMLString").equals("")) {
-      sampleTypesXMLString = request.getParameter("sampleTypesXMLString");
-      StringReader reader = new StringReader(sampleTypesXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        sampleTypesDoc = sax.build(reader);
-      } catch (JDOMException je) {
-        this.addInvalidField("sampleTypesXMLString", "Invalid sampleTypesXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse sampleTypesXMLString", je);
+    if (request.getParameter("sampleTypesJSONString") != null && !request.getParameter("sampleTypesJSONString").equals("")) {
+      String sampleTypesJSONString = request.getParameter("sampleTypesJSONString");
+      if(Util.isParameterNonEmpty(sampleTypesJSONString)){
+        try(JsonReader jsonReader = Json.createReader(new StringReader(sampleTypesJSONString))){
+          this.sampleTypesList = jsonReader.readArray();
+        }catch (Exception e){
+          this.addInvalidField("sampleTypesJSONString", "Invalid sampleTypesJSONString");
+          this.errorDetails = Util.GNLOG(LOG, "Cannot parse sampleTypesJSONString",e);
+        }
       }
     }
 
-    if (request.getParameter("prepTypesXMLString") != null && !request.getParameter("prepTypesXMLString").equals("")) {
-      prepTypesXMLString = request.getParameter("prepTypesXMLString");
-      StringReader reader = new StringReader(prepTypesXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        prepTypesDoc = sax.build(reader);
-      } catch (JDOMException je) {
-         this.addInvalidField("prepTypesXMLString", "Invalid prepTypesXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse prepTypesXMLString", je);
+    if (request.getParameter("prepTypesJSONString") != null && !request.getParameter("prepTypesJSONString").equals("")) {
+      String prepTypesJSONString = request.getParameter("prepTypesJSONString");
+      if(Util.isParameterNonEmpty(prepTypesJSONString)){
+        try(JsonReader jsonReader = Json.createReader(new StringReader(prepTypesJSONString))) {
+          this.prepTypesList = jsonReader.readArray();
+        } catch (Exception e) {
+          this.addInvalidField("prepTypesJSONString", "Invalid prepTypesJSONString");
+          this.errorDetails = Util.GNLOG(LOG,"Cannot parse prepTypesJSONString", e);
+        }
+
+      }
+
+    }
+
+    if (request.getParameter("prepQCProtocolsJSONString") != null && !request.getParameter("prepQCProtocolsJSONString").equals("")) {
+      String prepQCProtocolsJSONString = request.getParameter("prepQCProtocolsJSONString");
+      if(Util.isParameterNonEmpty(prepQCProtocolsJSONString)){
+        try(JsonReader jsonReader = Json.createReader(new StringReader(prepQCProtocolsJSONString))) {
+          this.prepQCProtocolList = jsonReader.readArray();
+        } catch (Exception e) {
+          LOG.error("Cannot parse prepQCProtocolsJSONString", e);
+          this.addInvalidField("prepQCProtocolsJSONString", "Invalid prepQCProtocolsJSONString");
+          this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestCategoriesXMLString", e);
+        }
+
+      }
+    }
+    if (request.getParameter("pipelineProtocolsJSONString") != null && !request.getParameter("pipelineProtocolsJSONString").equals("")) {
+      String pipelineProtocolsJSONString = request.getParameter("pipelineProtocolsJSONString");
+      if(Util.isParameterNonEmpty(pipelineProtocolsJSONString)){
+        try(JsonReader jsonReader = Json.createReader(new StringReader(pipelineProtocolsJSONString))) {
+          this.pipelineProtocolList = jsonReader.readArray();
+        } catch (Exception e) {
+          this.addInvalidField("pipelineProtocolsJSONString", "Invalid pipelineProtocolsJSONString");
+          this.errorDetails = Util.GNLOG(LOG,"pipelineProtocolsJSONString", e);
+        }
       }
     }
 
-    if (request.getParameter("prepQCProtocolsXMLString") != null && !request.getParameter("prepQCProtocolsXMLString").equals("")) {
-      prepQCProtocolsXMLString = request.getParameter("prepQCProtocolsXMLString");
-      StringReader reader = new StringReader(prepQCProtocolsXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        prepQCProtocolsDoc = sax.build(reader);
-      } catch (JDOMException je) {
-        LOG.error("Cannot parse prepQCProtocolsXMLString", je);
-        this.addInvalidField("prepQCProtocolsXMLString", "Invalid prepQCProtocolsXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestCategoriesXMLString", je);
+    if (request.getParameter("applicationsJSONString") != null && !request.getParameter("applicationsJSONString").equals("")) {
+      String applicationsJSONString = request.getParameter("applicationsJSONString");
+      if(Util.isParameterNonEmpty(applicationsJSONString)){
+        try(JsonReader jsonReader = Json.createReader(new StringReader(applicationsJSONString))) {
+          this.applicationList = jsonReader.readArray();
+        } catch (Exception e) {
+          this.addInvalidField("applicationsJSONString", "Invalid applicationsJSONString");
+          this.errorDetails = Util.GNLOG(LOG,"Cannot parse applicationsJSONString", e);
+        }
       }
     }
 
-    if (request.getParameter("pipelineProtocolsXMLString") != null && !request.getParameter("pipelineProtocolsXMLString").equals("")) {
-      pipelineProtocolsXMLString = request.getParameter("pipelineProtocolsXMLString");
-      StringReader reader = new StringReader(pipelineProtocolsXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        pipelineProtocolsDoc = sax.build(reader);
-      } catch (JDOMException je) {
-        this.addInvalidField("pipelineProtocolsXMLString", "Invalid pipelineProtocolsXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"pipelineProtocolsXMLString", je);
+    if (request.getParameter("sequencingOptionsJSONString") != null && !request.getParameter("sequencingOptionsJSONString").equals("")) {
+      String sequencingOptionsJSONString = request.getParameter("sequencingOptionsJSONString");
+      if(Util.isParameterNonEmpty(sequencingOptionsJSONString)){
+        try(JsonReader jsonReader = Json.createReader(new StringReader(sequencingOptionsJSONString))) {
+          this.sequencingOptionList = jsonReader.readArray();
+        } catch (Exception e) {
+          this.addInvalidField("sequencingOptionsJSONString", "Invalid sequencingOptionsJSONString");
+          this.errorDetails = Util.GNLOG(LOG,"Cannot parse sequencingOptionsJSONString", e);
+        }
       }
-    }
+      if(sequencingOptionList != null){
+        for (int i = 0;  i < this.sequencingOptionList.size(); i++) {
+          JsonObject node = this.sequencingOptionList.getJsonObject(i);
+          try {
+            Integer ti = Integer.valueOf( node.getString("idNumberSequencingCycles"));
+            if (ti < 0) {
+              this.addInvalidField("sequencingOptions.idNumberSequencingLanes", "Invalid number sequencing lanes");
+            }
 
-    if (request.getParameter("applicationsXMLString") != null && !request.getParameter("applicationsXMLString").equals("")) {
-      applicationsXMLString = request.getParameter("applicationsXMLString");
-      StringReader reader = new StringReader(applicationsXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        applicationsDoc = sax.build(reader);
-      } catch (JDOMException je) {
-        this.addInvalidField("applicationsXMLString", "Invalid applicationsXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse applicationsXMLString", je);
-      }
-    }
-
-    if (request.getParameter("sequencingOptionsXMLString") != null && !request.getParameter("sequencingOptionsXMLString").equals("")) {
-      sequencingOptionsXMLString = request.getParameter("sequencingOptionsXMLString");
-      StringReader reader = new StringReader(sequencingOptionsXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        sequencingOptionsDoc = sax.build(reader);
-      } catch (JDOMException je) {
-        this.addInvalidField("sequencingOptionsXMLString", "Invalid sequencingOptionsXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse sequencingOptionsXMLString", je);
-      }
-
-      for (Iterator i = this.sequencingOptionsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-        Element node = (Element) i.next();
-        try {
-          Integer ti = Integer.valueOf(node.getAttributeValue("idNumberSequencingCycles"));
-          if (ti < 0) {
+          }catch(NullPointerException e){
+            this.addInvalidField("sequencingOptions.idNumberSequencingLanes", "No sequencing lanes were provided");
+          }
+          catch (NumberFormatException e) {
             this.addInvalidField("sequencingOptions.idNumberSequencingLanes", "Invalid number sequencing lanes");
           }
-        } catch (NumberFormatException e) {
-          this.addInvalidField("sequencingOptions.idNumberSequencingLanes", "Invalid number sequencing lanes");
-        }
-        try {
-          Integer ti = Integer.valueOf(node.getAttributeValue("idSeqRunType"));
-          if (ti < 0) {
+          try {
+            Integer ti = Integer.valueOf(node.getString("idSeqRunType"));
+            if (ti < 0) {
+              this.addInvalidField("sequencingOptions.idSeqRunType", "Invalid sequence run type");
+            }
+          }catch (NullPointerException e){
+            this.addInvalidField("sequencingOptions.idSeqRunType", "idSeqRunType was not provided sequence");
+          }
+          catch (NumberFormatException e) {
             this.addInvalidField("sequencingOptions.idSeqRunType", "Invalid sequence run type");
           }
-        } catch (NumberFormatException e) {
-          this.addInvalidField("sequencingOptions.idSeqRunType", "Invalid sequence run type");
-        }
-        String name = node.getAttributeValue("name");
-        if (name == null || name.length() == 0) {
-          this.addInvalidField("sequencingOptions.name", "Sequence option must have a non-blank name");
+          String name = node.get("name") != null ? node.getString("name") : "";
+          if (name == null || name.length() == 0) {
+            this.addInvalidField("sequencingOptions.name", "Sequence option must have a non-blank name");
+          }
         }
       }
     }
 
-    if (request.getParameter("requestCategoryApplicationXMLString") != null && !request.getParameter("requestCategoryApplicationXMLString").equals("")) {
-      String requestCategoryApplicationXMLString = request.getParameter("requestCategoryApplicationXMLString");
-      StringReader reader = new StringReader(requestCategoryApplicationXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        requestCategoryApplicationsDoc = sax.build(reader);
-      } catch (JDOMException je) {
-        this.addInvalidField("requestCategoryApplicationXMLString", "Invalid requestCategoryApplicationXMLString");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestCategoryApplicationXMLString", je);
+    if (request.getParameter("requestCategoryApplicationJSONString") != null && !request.getParameter("requestCategoryApplicationJSONString").equals("")) {
+      String requestCategoryApplicationJSONString = request.getParameter("requestCategoryApplicationJSONString");
+      if(Util.isParameterNonEmpty(requestCategoryApplicationJSONString)){
+        try(JsonReader jsonReader = Json.createReader(new StringReader(requestCategoryApplicationJSONString))) {
+          this.requestCategoryApplicationList = jsonReader.readArray();
+        } catch (Exception e) {
+          this.addInvalidField("requestCategoryApplicationJSONString", "Invalid requestCategoryApplicationJSONString");
+          this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestCategoryApplicationJSONString", e);
+        }
+
       }
     }
 
@@ -301,9 +305,14 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         }
 
         if(unableToDeleteMsg.length() > 0){
-          this.xmlResult = "<SUCCESS codeRequestCategory=\"" + rc.getCodeRequestCategory() + "\" unableToDelete=\"" + unableToDeleteMsg.toString() + "\"/>";
-        } else{
-          this.xmlResult = "<SUCCESS codeRequestCategory=\"" + rc.getCodeRequestCategory() + "\"/>";
+          this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS")
+                  .add("codeRequestCategory", rc.getCodeRequestCategory())
+                  .add("unableToDelete",  unableToDeleteMsg.toString() )
+                  .build().toString();
+
+        } else {
+          this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").add("codeRequestCategory", rc.getCodeRequestCategory())
+                  .build().toString();
         }
 
         setResponsePage(this.SUCCESS_JSP);
@@ -381,26 +390,27 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
 
   private Boolean savePrepQCProtocols(Session sess, RequestCategory rc){
     Boolean unableToDelete = false;
-    if(prepQCProtocolsDoc == null || prepQCProtocolsDoc.getRootElement().getChildren().size() == 0){
+    if(prepQCProtocolList == null || prepQCProtocolList.size() == 0){
       return unableToDelete;
     }
 
     List prepQCProtocols = new ArrayList();
-    for (Iterator i = this.prepQCProtocolsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-      Element node = (Element) i.next();
+    for (int i = 0; i <  this.prepQCProtocolList.size(); i++) {
+      JsonObject node = prepQCProtocolList.getJsonObject(i);
       LibraryPrepQCProtocol lpqp = null;
 
-      String isNew = node.getAttributeValue("isNew");
+      String isNew = node.get("isNew") != null ? node.getString("isNew") : "" ;
 
       // Save new prep type or load the existing one
       if (isNew != null && isNew.equals("Y")) {
         lpqp = new LibraryPrepQCProtocol();
       } else {
-        lpqp = sess.load(LibraryPrepQCProtocol.class, Integer.parseInt(node.getAttributeValue("idLibPrepQCProtocol")));
+        String idLibPrepQCProtocol =  node.get("idLibPrepQCProtocol") != null ? node.getString("idLibPrepQCProtocol") : "";
+        lpqp = sess.load(LibraryPrepQCProtocol.class, Integer.parseInt(idLibPrepQCProtocol));
       }
 
-      lpqp.setProtocolDisplay(node.getAttributeValue("protocolDisplay"));
-      lpqp.setCodeRequestCategory(node.getAttributeValue("codeRequestCategory"));
+      lpqp.setProtocolDisplay( node.get("protocolDisplay") != null ? node.getString("protocolDisplay") : "");
+      lpqp.setCodeRequestCategory(node.get("codeRequestCategory") != null ? node.getString("codeRequestCategory") : "");
       sess.save(lpqp);
       prepQCProtocols.add(lpqp);
     }
@@ -430,28 +440,29 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
 
   private Boolean savePipelineProtocols(Session sess, RequestCategory rc){
     Boolean unableToDelete = false;
-    if(pipelineProtocolsDoc == null || pipelineProtocolsDoc.getRootElement().getChildren().size() == 0){
+    if(pipelineProtocolList == null || pipelineProtocolList.size() == 0){
       return unableToDelete;
     }
 
     List pipelineProtocols = new ArrayList();
-    for (Iterator i = this.pipelineProtocolsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-      Element node = (Element) i.next();
+    for (int i = 0; i < this.pipelineProtocolList.size(); i++) {
+      JsonObject node = pipelineProtocolList.getJsonObject(i) ;
       PipelineProtocol protocol = null;
 
-      String isNew = node.getAttributeValue("isNew");
+      String isNew = node.get("isNew") != null ? node.getString("isNew") : "";
 
       // Save new prep type or load the existing one
+      String idPipelineProtocol = node.get("idPipelineProtocol") != null ? node.getString("idPipelineProtocol") : "";
       if (isNew != null && isNew.equals("Y")) {
         protocol = new PipelineProtocol();
       } else {
-        protocol = sess.load(PipelineProtocol.class, Integer.parseInt(node.getAttributeValue("idPipelineProtocol")));
+        protocol = sess.load(PipelineProtocol.class, Integer.parseInt(idPipelineProtocol));
       }
 
-      protocol.setProtocol(node.getAttributeValue("protocol"));
-      protocol.setDescription(node.getAttributeValue("description"));
-      protocol.setIdCoreFacility(Integer.parseInt(node.getAttributeValue("idCoreFacility")));
-      protocol.setIsDefault(node.getAttributeValue("isDefault"));
+      protocol.setProtocol(node.get("protocol") != null ? node.getString("protocol") : "");
+      protocol.setDescription(node.get("description") != null ? node.getString("description") : "");
+      protocol.setIdCoreFacility(Integer.parseInt(node.get("idCoreFacility") != null ? node.getString("idCoreFacility") : ""));
+      protocol.setIsDefault(node.get("isDefault") != null ? node.getString("isDefault") : "");
       sess.save(protocol);
       pipelineProtocols.add(protocol);
     }
@@ -479,7 +490,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
   }
 
   private Boolean savePrepTypes(Session sess) {
-    if (prepTypesDoc == null || prepTypesDoc.getRootElement().getChildren().size() == 0) {
+    if (prepTypesList == null || prepTypesList.size() == 0) {
       return false;
     }
 
@@ -488,11 +499,11 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     List prepTypes = new ArrayList();
     int currentPrepTypeCount = sess.createQuery("Select x from IsolationPrepType x").list().size();
 
-    for (Iterator i = this.prepTypesDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-      Element node = (Element) i.next();
+    for (int i = 0;  i < this.prepTypesList.size(); i++) {
+      JsonObject node = prepTypesList.getJsonObject(i);
       IsolationPrepType ipt = null;
 
-      String isNew = node.getAttributeValue("isNew");
+      String isNew = node.get("isNew") != null ? node.getString("isNew") : "";
       String codeIsolationPrepType = "";
 
       // Save new prep type or load the existing one
@@ -500,31 +511,38 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         ipt = new IsolationPrepType();
         codeIsolationPrepType = IsolationPrepType.CODE_PREP_PREFIX + ++currentPrepTypeCount;
       } else {
-        ipt = sess.load(IsolationPrepType.class, node.getAttributeValue("codeIsolationPrepType"));
-        codeIsolationPrepType = node.getAttributeValue("codeIsolationPrepType");
+        ipt = sess.load(IsolationPrepType.class, node.get("codeIsolationPrepType") != null ? node.getString("codeIsolationPrepType") : "" );
+        codeIsolationPrepType = node.get("codeIsolationPrepType") != null ? node.getString("codeIsolationPrepType") : "";
       }
 
-      ipt.setIsActive(node.getAttributeValue("isActive"));
+
+      ipt.setIsActive(node.get("isActive") != null ? node.getString("isActive") : "");
       ipt.setCodeIsolationPrepType(codeIsolationPrepType.toUpperCase());
-      ipt.setType(node.getAttributeValue("type"));
-      ipt.setIsolationPrepType(node.getAttributeValue("isolationPrepType"));
-      ipt.setCodeRequestCategory(node.getAttributeValue("codeRequestCategory"));
+      ipt.setType( node.get("type") != null ? node.getString("type") : "" );
+      ipt.setIsolationPrepType(node.get("isolationPrepType") != null ? node.getString("isolationPrepType") : "");
+      ipt.setCodeRequestCategory(node.get("codeRequestCategory") != null ? node.getString("codeRequestCategory") : "");
       prepTypes.add(ipt);
       sess.save(ipt);
 
       Price price = IsolationPrepType.getIsolationPrepTypePrice(sess, ipt);
 
+      String unitPriceInternal = node.get("unitPriceInternal") != null ? node.getString("unitPriceInternal") : "";
+      String unitPriceExternalAcademic = node.get("unitPriceExternalAcademic") != null ? node.getString("unitPriceExternalAcademic") : "";
+      String unitPriceExternalCommercial = node.get("unitPriceExternalCommercial") != null ? node.getString("unitPriceExternalCommercial") : "";
+
+
       if (price == null) {
 
-        RequestCategory rc = sess.load(RequestCategory.class, node.getAttributeValue("codeRequestCategory"));
+        RequestCategory rc = sess.load(RequestCategory.class, node.get("codeRequestCategory") != null ? node.getString("codeRequestCategory") : "");
         price = new Price();
         price.setName(ipt.getIsolationPrepType());
         price.setDescription("");
         price.setIdPriceCategory(getDefaultIsolationPrepTypePriceCategoryId(sess, rc));
         price.setIsActive(ipt.getIsActive());
-        price.setUnitPrice(node.getAttributeValue("unitPriceInternal") != null && !node.getAttributeValue("unitPriceInternal").equals("") ? new BigDecimal(node.getAttributeValue("unitPriceInternal")) : BigDecimal.ZERO);
-        price.setUnitPriceExternalAcademic(node.getAttributeValue("unitPriceExternalAcademic") != null && !node.getAttributeValue("unitPriceExternalAcademic").equals("") ? new BigDecimal(node.getAttributeValue("unitPriceExternalAcademic")) : BigDecimal.ZERO);
-        price.setUnitPriceExternalCommercial(node.getAttributeValue("unitPriceExternalCommercial") != null && !node.getAttributeValue("unitPriceExternalCommercial").equals("") ? new BigDecimal(node.getAttributeValue("unitPriceExternalCommercial")) : BigDecimal.ZERO);
+
+        price.setUnitPrice(unitPriceInternal != null && !unitPriceInternal.equals("") ? new BigDecimal(unitPriceInternal) : BigDecimal.ZERO);
+        price.setUnitPriceExternalAcademic(unitPriceExternalAcademic != null && !unitPriceExternalAcademic.equals("") ? new BigDecimal(unitPriceExternalAcademic) : BigDecimal.ZERO);
+        price.setUnitPriceExternalCommercial(unitPriceExternalCommercial != null && !unitPriceExternalCommercial.equals("") ? new BigDecimal(unitPriceExternalCommercial) : BigDecimal.ZERO);
         sess.save(price);
         sess.flush();
 
@@ -533,9 +551,9 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         crit.setFilter1(ipt.getCodeIsolationPrepType());
         sess.save(crit);
       } else {
-        price.setUnitPrice(node.getAttributeValue("unitPriceInternal") != null && !node.getAttributeValue("unitPriceInternal").equals("") ? new BigDecimal(node.getAttributeValue("unitPriceInternal")) : BigDecimal.ZERO);
-        price.setUnitPriceExternalAcademic(node.getAttributeValue("unitPriceExternalAcademic") != null && !node.getAttributeValue("unitPriceExternalAcademic").equals("") ? new BigDecimal(node.getAttributeValue("unitPriceExternalAcademic")) : BigDecimal.ZERO);
-        price.setUnitPriceExternalCommercial(node.getAttributeValue("unitPriceExternalCommercial") != null && !node.getAttributeValue("unitPriceExternalCommercial").equals("") ? new BigDecimal(node.getAttributeValue("unitPriceExternalCommercial")) : BigDecimal.ZERO);
+        price.setUnitPrice(unitPriceInternal != null && !unitPriceInternal.equals("") ? new BigDecimal(unitPriceInternal) : BigDecimal.ZERO);
+        price.setUnitPriceExternalAcademic(unitPriceExternalAcademic != null && !unitPriceExternalAcademic.equals("") ? new BigDecimal(unitPriceExternalAcademic) : BigDecimal.ZERO);
+        price.setUnitPriceExternalCommercial( !unitPriceExternalCommercial.equals("") ? new BigDecimal(unitPriceExternalCommercial) : BigDecimal.ZERO);
         price.setIsActive(ipt.getIsActive());
         price.setName(ipt.getIsolationPrepType());
         sess.save(price);
@@ -591,7 +609,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
   }
 
   private void saveSampleTypes(Session sess, RequestCategory rc) {
-    if (sampleTypesDoc == null || sampleTypesDoc.getRootElement().getChildren().size() == 0) {
+    if (sampleTypesList == null || sampleTypesList.size() == 0) {
       return;
     }
     //
@@ -599,11 +617,11 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     //
     HashMap sampleTypeMap = new HashMap();
 
-    for (Iterator i = this.sampleTypesDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-      Element node = (Element) i.next();
+    for (int i = 0;  i < this.sampleTypesList.size(); i++) {
+      JsonObject node = this.sampleTypesList.getJsonObject(i);
       SampleType st = null;
 
-      String id = node.getAttributeValue("idSampleType");
+      String id = node.get("idSampleType") != null ? node.getString("idSampleType") : "";
 
       // Save new sample type or load the existing one
       if (id.startsWith("SampleType")) {
@@ -612,16 +630,18 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         st = sess.load(SampleType.class, Integer.valueOf(id));
       }
 
-      st.setSampleType(node.getAttributeValue("display"));
-      st.setIsActive(node.getAttributeValue("isActive"));
-      st.setCodeNucleotideType(node.getAttributeValue("codeNucleotideType"));
-      st.setNotes(node.getAttributeValue("notes"));
+      st.setSampleType(node.get("display") != null ? node.getString("display") : "");
+      st.setIsActive(node.get("isActive") != null ? node.getString("isActive") : "");
+      st.setCodeNucleotideType( node.get("codeNucleotideType") != null ? node.getString("codeNucleotideType") : "");
+      st.setNotes(node.get("notes") != null ? node.getString("notes") : "");
       st.setIdCoreFacility(rc.getIdCoreFacility());
-      if (node.getAttributeValue("sortOrder") == null || node.getAttributeValue("sortOrder").length() == 0) {
+
+      String sortOrder = node.get("sortOrder") != null ? node.getString("sortOrder") : "";
+      if (sortOrder.length() == 0) {
         st.setSortOrder(null);
       } else {
         try {
-          st.setSortOrder(Integer.parseInt(node.getAttributeValue("sortOrder")));
+          st.setSortOrder(Integer.parseInt(sortOrder));
         } catch (NumberFormatException e) {
           st.setSortOrder(null);
         }
@@ -633,7 +653,8 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
       //
       List existingAssociations = sess.createQuery("SELECT x from SampleTypeRequestCategory x where idSampleType = " + st.getIdSampleType() + " and x.codeRequestCategory = '" + rc.getCodeRequestCategory() + "'").list();
 
-      if (node.getAttributeValue("isSelected").equals("Y")) {
+      String isSelected = node.get("isSelected") != null ? node.getString("isSelected") : "";
+      if (isSelected.equals("Y")) {
         if (existingAssociations.size() == 0) {
           SampleTypeRequestCategory x = new SampleTypeRequestCategory();
           x.setIdSampleType(st.getIdSampleType());
@@ -688,7 +709,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
   }
 
   private void saveApplications(Session sess, RequestCategory rc) {
-    if (applicationsDoc == null || applicationsDoc.getRootElement().getChildren().size() == 0) {
+    if (applicationList == null || applicationList.size() == 0) {
       return;
     }
 
@@ -707,11 +728,11 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     // Save applications
     //
     HashMap applicationMap = new HashMap();
-    for (Iterator i = this.applicationsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-      Element node = (Element) i.next();
+    for (int i = 0; i < this.applicationList.size(); i++) {
+      JsonObject node = this.applicationList.getJsonObject(i);
       Application app = null;
 
-      String codeApplication = node.getAttributeValue("codeApplication");
+      String codeApplication = node.getString("codeApplication");
 
       // Save new application or load the existing one
       if (codeApplication.startsWith("Application")) {
@@ -726,25 +747,28 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         app.setCodeApplicationType(ApplicationType.getCodeApplicationType(rct));
       }
 
-      String idLabelingProtocolDefault = node.getAttributeValue("idLabelingProtocolDefault");
-      String idHybProtocolDefault = node.getAttributeValue("idHybProtocolDefault");
-      String idScanProtocolDefault = node.getAttributeValue("idScanProtocolDefault");
-      String idFeatureExtractionProtocolDefault = node.getAttributeValue("idFeatureExtractionProtocolDefault");
-      String idApplicationTheme = node.getAttributeValue("idApplicationTheme");
-      String sortOrder = node.getAttributeValue("sortOrder");
-      String samplesPerBatch = node.getAttributeValue("samplesPerBatch");
+      String idLabelingProtocolDefault = node.get("idLabelingProtocolDefault") != null ? node.getString("idLabelingProtocolDefault") : "";
+      String idHybProtocolDefault = node.get("idHybProtocolDefault") != null ? node.getString("idHybProtocolDefault") : "";
+      String idScanProtocolDefault = node.get("idScanProtocolDefault") != null ? node.getString("idScanProtocolDefault") : "";
+      String idFeatureExtractionProtocolDefault = node.get("idFeatureExtractionProtocolDefault") != null ? node.getString("idFeatureExtractionProtocolDefault") : "";
+      String idApplicationTheme = node.get("idApplicationTheme") != null ? node.getString("idApplicationTheme") : "";
+      String sortOrder = node.get("sortOrder") != null ? node.getString("sortOrder") : "";
+      String samplesPerBatch = node.get("samplesPerBatch") != null ? node.getString("samplesPerBatch") : "";
 
-      app.setHasCaptureLibDesign(node.getAttributeValue("hasCaptureLibDesign"));
-      app.setOnlyForLabPrepped(node.getAttributeValue("onlyForLabPrepped"));
+      app.setHasCaptureLibDesign(node.get("hasCaptureLibDesign") != null ? node.getString("hasCaptureLibDesign") : "");
+      app.setOnlyForLabPrepped(node.get("onlyForLabPrepped") != null ? node.getString("onlyForLabPrepped") : "");
       if (app.getOnlyForLabPrepped() == null) {
         app.setOnlyForLabPrepped("Y");
       }
-      app.setHasChipTypes(node.getAttributeValue("hasChipTypes"));
+      app.setHasChipTypes(node.get("hasChipTypes") != null ? node.getString("hasChipTypes") : "");
       if (app.getHasChipTypes() == null || (!app.getHasChipTypes().equals("Y") && !app.getHasChipTypes().equals("N"))) {
         app.setHasChipTypes("N");
       }
-      app.setApplication(node.getAttributeValue("display"));
-      if (app.getIsActive() != null && app.getIsActive().equals("Y") && !node.getAttributeValue("isActive").equals("Y")) {
+      app.setApplication(node.get("display") != null ? node.getString("display") : "");
+
+      app.setIsActive(node.get("isActive") != null ? node.getString("isActive") : "");
+      // block below doesn't seem to have any impact other than just setting is active. Erik
+      /*if (app.getIsActive() != null && app.getIsActive().equals("Y") && !node.getAttributeValue("isActive").equals("Y")) {
         // if app selected in request category just quietly ignore setting it to
         // inactive. Front end shouldn't allow this.
         // note null getIsActive() means it's a new one.
@@ -754,10 +778,10 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         }
       } else {
         app.setIsActive(node.getAttributeValue("isActive"));
-      }
+      }*/
       app.setIdApplicationTheme(idApplicationTheme != null && !idApplicationTheme.equals("") ? Integer.valueOf(idApplicationTheme) : null);
-      app.setCoreSteps(node.getAttributeValue("coreSteps"));
-      app.setCoreStepsNoLibPrep(node.getAttributeValue("coreStepsNoLibPrep"));
+      app.setCoreSteps(node.get("coreSteps") != null ? node.getString("coreSteps") : "" );
+      app.setCoreStepsNoLibPrep(node.get("coreStepsNoLibPrep") != null ? node.getString("coreStepsNoLibPrep") : "");
       app.setSortOrder(sortOrder != null && sortOrder.length() > 0 ? Integer.valueOf(sortOrder) : 0);
       app.setSamplesPerBatch(samplesPerBatch != null && !samplesPerBatch.equals("") ? Integer.valueOf(samplesPerBatch) : null);
       app.setIdCoreFacility(rc.getIdCoreFacility());
@@ -765,14 +789,15 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
 
       applicationMap.put(app.getCodeApplication(), null);
 
-      if (this.requestCategoryApplicationsDoc == null) {
+      if (this.requestCategoryApplicationList == null) {
         //
         // Save association between application and request category
         // Note if requestCategoryApplicationsDoc is parsed then it is done in
         // saveRequestCategoryApplications
         //
         List existingAssociations = sess.createQuery("SELECT x from RequestCategoryApplication x where codeApplication = '" + app.getCodeApplication() + "' and x.codeRequestCategory = '" + rc.getCodeRequestCategory() + "'").list();
-        if (node.getAttributeValue("isSelected").equals("Y")) {
+        String isSelected = node.get("isSelected") != null ? node.getString("isSelected") : "";
+        if (isSelected.equals("Y")) {
           // if selected make it active
           app.setIsActive("Y");
           if (existingAssociations.size() == 0) {
@@ -806,7 +831,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
       //
       // Save association between applications and seq lib protocols
       //
-      String idSeqLibProtocols = node.getAttributeValue("idSeqLibProtocols");
+      String idSeqLibProtocols = node.get("idSeqLibProtocols") != null ? node.getString("idSeqLibProtocols") : "";
       List existingAssociations = sess.createQuery("SELECT x from SeqLibProtocolApplication x where codeApplication = '" + app.getCodeApplication() + "'").list();
       HashMap<Integer, SeqLibProtocolApplication> existingProtocolMap = new HashMap<Integer, SeqLibProtocolApplication>();
       for (Iterator i1 = existingAssociations.iterator(); i1.hasNext();) {
@@ -934,7 +959,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     }
   }
 
-  private void saveOligoBarcodeSchemesAllowed(Session sess, RequestCategory rc, Application app, Element node, HashMap<Integer, SeqLibProtocol> protocolMap) {
+  private void saveOligoBarcodeSchemesAllowed(Session sess, RequestCategory rc, Application app, JsonObject node, HashMap<Integer, SeqLibProtocol> protocolMap) {
     // Only save barcode schemes for illumina request categories.
     if (!RequestCategory.isIlluminaRequestCategory(rc.getCodeRequestCategory()) && !RequestCategory.isSequenom(rc.getCodeRequestCategory())) {
       return;
@@ -990,22 +1015,23 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     }
   }
 
-  private Integer getIdOligoBarcodeScheme(Element node, String aOrB) {
+  private Integer getIdOligoBarcodeScheme(JsonObject node, String aOrB) {
     Integer id = null;
     String key = "idBarcodeScheme" + aOrB;
-    String idAsString = node.getAttributeValue(key);
+    String idAsString = node.get(key) != null ? node.getString(key) : "";
     if (idAsString != null && idAsString.length() > 0) {
       try {
         id = Integer.parseInt(idAsString);
       } catch (NumberFormatException e) {
-        LOG.error("Unable to parse oligo barcode scheme " + aOrB + " for app " + node.getAttributeValue("application"), e);
+        String application = node.get("application") != null ? node.getString("application") : "";
+        LOG.error("Unable to parse oligo barcode scheme " + aOrB + " for app " + application, e);
       }
     }
 
     return id;
   }
 
-  private void saveQCChipTypes(Session sess, RequestCategory rc, Application app, Element node, Map<String, Price> qcLibPrepPriceMap, Integer idQCPriceCategoryDefault) {
+  private void saveQCChipTypes(Session sess, RequestCategory rc, Application app, JsonObject node, Map<String, Price> qcLibPrepPriceMap, Integer idQCPriceCategoryDefault) {
     if (!RequestCategory.isQCRequestCategory(rc.getCodeRequestCategory()) || !app.getHasChipTypes().equals("Y") || !app.getIsActive().equals("Y")) {
       return;
     }
@@ -1023,25 +1049,24 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     }
 
     Map<String, String> foundChipTypes = new HashMap<String, String>();
-    for (Iterator appIter = node.getChildren().iterator(); appIter.hasNext();) {
-      Element appChild = (Element) appIter.next();
-      if (appChild.getName() == "ChipTypes") {
-        for (Iterator chipIter = appChild.getChildren().iterator(); chipIter.hasNext();) {
-          Element chipNode = (Element) chipIter.next();
-          BioanalyzerChipType chip = existMap.get(chipNode.getAttributeValue("codeBioanalyzerChipType"));
-          if (chip == null) {
-            chip = new BioanalyzerChipType();
-            chip.setCodeBioanalyzerChipType(getNextUnassignedCodeBioanalyzerChipType(sess));
-          } else {
-            foundChipTypes.put(chip.getCodeBioanalyzerChipType(), "");
-          }
-          setBioanalyzerChipType(chip, app, chipNode);
-          sess.save(chip);
-          saveQCLibPrepPrices(sess, rc, app, chip, chipNode, qcLibPrepPriceMap, idQCPriceCategoryDefault);
-          sess.flush();
+    JsonArray chipTypeList = node.get("ChipTypes") != null ? node.getJsonArray("ChipTypes") : null;
+    if(chipTypeList != null){
+      for (int i = 0; i < chipTypeList.size(); i++ ) {
+        JsonObject chipNode = chipTypeList.getJsonObject(i);
+        BioanalyzerChipType chip = existMap.get(chipNode.get("codeBioanalyzerChipType") != null ? chipNode.getString("codeBioanalyzerChipType") : "");
+        if (chip == null) {
+          chip = new BioanalyzerChipType();
+          chip.setCodeBioanalyzerChipType(getNextUnassignedCodeBioanalyzerChipType(sess));
+        } else {
+          foundChipTypes.put(chip.getCodeBioanalyzerChipType(), "");
         }
+        setBioanalyzerChipType(chip, app, chipNode);
+        sess.save(chip);
+        saveQCLibPrepPrices(sess, rc, app, chip, chipNode, qcLibPrepPriceMap, idQCPriceCategoryDefault);
+        sess.flush();
       }
     }
+
 
     // Remove ones that were removed
     for (Iterator existIter = existingChipTypes.iterator(); existIter.hasNext();) {
@@ -1053,23 +1078,27 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     sess.flush();
   }
 
-  private void setBioanalyzerChipType(BioanalyzerChipType chip, Application app, Element chipNode) {
+  private void setBioanalyzerChipType(BioanalyzerChipType chip, Application app, JsonObject chipNode) {
     chip.setIsActive("Y");
     chip.setCodeApplication(app.getCodeApplication());
-    chip.setBioanalyzerChipType(chipNode.getAttributeValue("bioanalyzerChipType"));
-    chip.setConcentrationRange(chipNode.getAttributeValue("concentrationRange"));
-    chip.setMaxSampleBufferStrength(chipNode.getAttributeValue("maxSampleBufferStrength"));
-    chip.setProtocolDescription(chipNode.getAttributeValue("protocolDescription"));
-    if (chipNode.getAttributeValue("sortOrder") != null)
-      chip.setSortOrder(!chipNode.getAttributeValue("sortOrder").trim().equals("") ? new Integer(chipNode.getAttributeValue("sortOrder")) : null);
-    if (chipNode.getAttributeValue("sampleWellsPerChip") != null) {
+    chip.setBioanalyzerChipType(chipNode.get("bioanalyzerChipType") != null ? chipNode.getString("bioanalyzerChipType") : "");
+    chip.setConcentrationRange(chipNode.get("concentrationRange") != null ? chipNode.getString("concentrationRange") : "");
+    chip.setMaxSampleBufferStrength(chipNode.get("maxSampleBufferStrength") != null ? chipNode.getString("maxSampleBufferStrength") : "");
+    chip.setProtocolDescription(chipNode.get("protocolDescription") != null ? chipNode.getString("protocolDescription") : "");
+    String sortOrder = chipNode.get("sortOrder") != null ? chipNode.getString("sortOrder") : "";
+    chip.setSortOrder(!sortOrder.trim().equals("") ? new Integer(sortOrder) : null);
+
+    String sampleWellsPerChip = chipNode.get("sampleWellsPerChip") != null ? chipNode.getString("sampleWellsPerChip") : "";
+    if(!sampleWellsPerChip.equals("")){
       try {
-        Integer wells = Integer.parseInt(chipNode.getAttributeValue("sampleWellsPerChip"));
+        Integer wells = Integer.parseInt(sampleWellsPerChip);
         chip.setSampleWellsPerChip(wells);
       } catch (Exception ex) {
-        // couldn't convert wells.
+        this.addInvalidField("Chip wells", "Wells could not be set");
+        this.errorDetails = Util.GNLOG(LOG,"Wells could not be set", ex);
       }
     }
+
   }
 
   private void removeChipType(BioanalyzerChipType chipType, Session sess) {
@@ -1229,7 +1258,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     return id;
   }
 
-  private void saveIlluminaLibPrepPrices(Session sess, RequestCategory rc, Application app, Element node, Map<String, Price> map, Integer defaultCategoryId) {
+  private void saveIlluminaLibPrepPrices(Session sess, RequestCategory rc, Application app, JsonObject node, Map<String, Price> map, Integer defaultCategoryId) {
     // Only save lib prep prices for illumina request categories that have price
     // sheet defined.
     if (map == null || !RequestCategory.isIlluminaRequestCategory(rc.getCodeRequestCategory())) {
@@ -1247,9 +1276,9 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
       price = new Price();
       newPrice = true;
     }
-    String internal = node.getAttributeValue("unitPriceInternal");
-    String academic = node.getAttributeValue("unitPriceExternalAcademic");
-    String commercial = node.getAttributeValue("unitPriceExternalCommercial");
+    String internal = node.get("unitPriceInternal") != null ? node.getString("unitPriceInternal") : "";
+    String academic = node.get("unitPriceExternalAcademic") != null ? node.getString("unitPriceExternalAcademic") : "";
+    String commercial = node.get("unitPriceExternalCommercial") != null ? node.getString("unitPriceExternalCommercial") : "";
 
     // If we don't have any price values then don't create a price
     if ((internal.length() == 0 && academic.length() == 0 && commercial.length() == 0) || (internal.equals("0.00") && academic.equals("0.00") && commercial.equals("0.00"))) {
@@ -1277,7 +1306,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     }
   }
 
-  private void saveSequenomPrices(Session sess, RequestCategory rc, Application app, Element node, Map<String, Price> map, Integer defaultCategoryId) {
+  private void saveSequenomPrices(Session sess, RequestCategory rc, Application app, JsonObject node, Map<String, Price> map, Integer defaultCategoryId) {
     // Only save lib prep prices for sequenom request categories that have price
     // sheet defined.
     if (map == null || !RequestCategory.isSequenom(rc.getCodeRequestCategory())) {
@@ -1299,9 +1328,14 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     price.setDescription("");
     price.setIdPriceCategory(defaultCategoryId);
     price.setIsActive(app.getIsActive());
-    setPrice(node.getAttributeValue("unitPriceInternal"), price.getUnitPrice(), price, PriceUtil.PRICE_INTERNAL);
-    setPrice(node.getAttributeValue("unitPriceExternalAcademic"), price.getUnitPriceExternalAcademic(), price, PriceUtil.PRICE_EXTERNAL_ACADEMIC);
-    setPrice(node.getAttributeValue("unitPriceExternalCommercial"), price.getUnitPriceExternalCommercial(), price, PriceUtil.PRICE_EXTERNAL_COMMERCIAL);
+
+    String unitPriceInternal = node.get("unitPriceInternal") != null ? node.getString("unitPriceInternal") : "";
+    String unitPriceExternalAcademic = node.get("unitPriceExternalAcademic") != null ? node.getString("unitPriceExternalAcademic") : "";
+    String unitPriceExternalCommercial = node.get("unitPriceExternalCommercial") != null ? node.getString("unitPriceExternalCommercial") : "";
+
+    setPrice(unitPriceInternal, price.getUnitPrice(), price, PriceUtil.PRICE_INTERNAL);
+    setPrice(unitPriceExternalAcademic, price.getUnitPriceExternalAcademic(), price, PriceUtil.PRICE_EXTERNAL_ACADEMIC);
+    setPrice(unitPriceExternalCommercial, price.getUnitPriceExternalCommercial(), price, PriceUtil.PRICE_EXTERNAL_COMMERCIAL);
 
     sess.save(price);
     sess.flush();
@@ -1316,14 +1350,18 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     }
   }
 
-  private Boolean priceModified(Element node) {
-    if (node.getAttributeValue("unitPriceInternal") != null && node.getAttributeValue("unitPriceInternal").length() > 0) {
+  private Boolean priceModified(JsonObject node) {
+    String unitPriceInternal = node.get("unitPriceInternal") != null ? node.getString("unitPriceInternal") : "";
+    String unitPriceExternalAcademic = node.get("unitPriceExternalAcademic") != null ? node.getString("unitPriceExternalAcademic") : "";
+    String unitPriceExternalCommercial = node.get("unitPriceExternalCommercial") != null ? node.getString("unitPriceExternalCommercial") : "";
+
+    if (unitPriceInternal.length() > 0) {
       return true;
     }
-    if (node.getAttributeValue("unitPriceExternalAcademic") != null && node.getAttributeValue("unitPriceExternalAcademic").length() > 0) {
+    if (unitPriceExternalAcademic.length() > 0) {
       return true;
     }
-    if (node.getAttributeValue("unitPriceExternalCommercial") != null && node.getAttributeValue("unitPriceExternalCommercial").length() > 0) {
+    if (unitPriceExternalCommercial.length() > 0) {
       return true;
     }
     return false;
@@ -1348,7 +1386,12 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     Query query = sess.createQuery(queryString);
     query.setParameter("code", rc.getCodeRequestCategory());
     try {
-      PriceCategory cat = (PriceCategory) query.uniqueResult();
+      // this is just a patch to fix issues
+      List<Object> priceCategories = query.list(); // doesn't always return one item, for different codeRequestCategories that aren't applicable for it return multiple.
+      PriceCategory cat = null;
+      if(priceCategories.size() > 0){
+        cat = (PriceCategory) priceCategories.get(0);
+      }
       if (cat != null) {
         id = cat.getIdPriceCategory();
       } else {
@@ -1363,7 +1406,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     return id;
   }
 
-  private void saveQCLibPrepPrices(Session sess, RequestCategory rc, Application app, BioanalyzerChipType chipType, Element node, Map<String, Price> map, Integer defaultCategoryId) {
+  private void saveQCLibPrepPrices(Session sess, RequestCategory rc, Application app, BioanalyzerChipType chipType, JsonObject node, Map<String, Price> map, Integer defaultCategoryId) {
     // Only save lib prep prices for qc request categories that have price sheet
     // defined.
     if (!RequestCategory.isQCRequestCategory(rc.getCodeRequestCategory()) || map == null || !priceModified(node)) {
@@ -1390,9 +1433,9 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     price.setDescription("");
     price.setIdPriceCategory(defaultCategoryId);
     price.setIsActive(app.getIsActive());
-    setPrice(node.getAttributeValue("unitPriceInternal"), price.getUnitPrice(), price, PriceUtil.PRICE_INTERNAL);
-    setPrice(node.getAttributeValue("unitPriceExternalAcademic"), price.getUnitPriceExternalAcademic(), price, PriceUtil.PRICE_EXTERNAL_ACADEMIC);
-    setPrice(node.getAttributeValue("unitPriceExternalCommercial"), price.getUnitPriceExternalCommercial(), price, PriceUtil.PRICE_EXTERNAL_COMMERCIAL);
+    setPrice(node.get("unitPriceInternal") != null ? node.getString("unitPriceInternal") : "", price.getUnitPrice(), price, PriceUtil.PRICE_INTERNAL);
+    setPrice(node.get("unitPriceExternalAcademic") != null ? node.getString("unitPriceExternalAcademic") : "", price.getUnitPriceExternalAcademic(), price, PriceUtil.PRICE_EXTERNAL_ACADEMIC);
+    setPrice(node.get("unitPriceExternalCommercial") != null ? node.getString("unitPriceExternalCommercial") : "", price.getUnitPriceExternalCommercial(), price, PriceUtil.PRICE_EXTERNAL_COMMERCIAL);
     sess.save(price);
     sess.flush();
 
@@ -1410,40 +1453,46 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
   }
 
   private void saveRequestCategoryApplications(Session sess) {
-    if (requestCategoryApplicationsDoc == null || requestCategoryApplicationsDoc.getRootElement().getChildren().size() == 0) {
+    if (requestCategoryApplicationList == null || requestCategoryApplicationList.size() == 0) {
       return;
     }
 
-    Map<String, Element> requestCategoryApplicationMap = new HashMap<String, Element>();
-    for (Iterator i = this.requestCategoryApplicationsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-      Element node = (Element) i.next();
-      String key = node.getAttributeValue("codeApplication") + "\t" + node.getAttributeValue("codeRequestCategory");
-      node.setAttribute("isStored", "N");
+    Map<String, JsonObject> requestCategoryApplicationMap = new HashMap<String, JsonObject>();
+    for (int i = 0;  i < this.requestCategoryApplicationList.size(); i++) {
+      JsonObject node = requestCategoryApplicationList.getJsonObject(i);
+      String codeApplication = node.get("codeApplication") != null ? node.getString("codeApplication") : "";
+      String codeRequestCategory = node.get("codeRequestCategory") != null ? node.getString("codeRequestCategory") : "";
+      String key = codeApplication + "\t" + codeRequestCategory;
+      node = Util.addToJsonObject(node,"isStored", Json.createValue("N"));
       requestCategoryApplicationMap.put(key, node);
     }
 
     for (RequestCategoryApplication recApp : (List<RequestCategoryApplication>) sess.createQuery("from RequestCategoryApplication").list()) {
       String key = recApp.getCodeApplication() + "\t" + recApp.getCodeRequestCategory();
-      Element node = requestCategoryApplicationMap.get(key);
+      JsonObject node = requestCategoryApplicationMap.get(key);
       if (node != null) {
-        if (!node.getAttributeValue("isSelected").equals("Y")) {
+        String isSelected = node.get("isSelected") != null ? node.getString("isSelected") : "";
+        if (!isSelected.equals("Y")) {
           sess.delete(recApp);
         } else {
-          node.setAttribute("isStored", "Y");
+          node = Util.addToJsonObject(node,"isStored", Json.createValue("Y"));
+          requestCategoryApplicationMap.put(key,node);
         }
       }
     }
 
     for (String key : requestCategoryApplicationMap.keySet()) {
-      Element node = requestCategoryApplicationMap.get(key);
-      if (!node.getAttributeValue("isStored").equals("Y") && node.getAttributeValue("isSelected").equals("Y")) {
+      JsonObject node = requestCategoryApplicationMap.get(key);
+      String isSelected = node.get("isSelected") != null ? node.getString("isSelected") : "";
+
+      if (!node.getString("isStored").equals("Y") && isSelected.equals("Y")) {
         RequestCategoryApplication recApp = new RequestCategoryApplication();
-        String codeApplication = node.getAttributeValue("codeApplication");
+        String codeApplication = node.get("codeApplication") != null ? node.getString("codeApplication") : "";
         if (this.newCodeApplicationMap.containsKey(codeApplication)) {
           codeApplication = this.newCodeApplicationMap.get(codeApplication);
         }
         recApp.setCodeApplication(codeApplication);
-        recApp.setCodeRequestCategory(node.getAttributeValue("codeRequestCategory"));
+        recApp.setCodeRequestCategory(node.get("codeRequestCategory") != null ? node.getString("codeRequestCategory") : "");
         sess.save(recApp);
       }
     }
@@ -1469,7 +1518,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
 
   private void saveSequencingOptions(Session sess, RequestCategory rc) {
 
-    if (sequencingOptionsDoc == null || sequencingOptionsDoc.getRootElement().getChildren().size() == 0) {
+    if (sequencingOptionList == null || sequencingOptionList.size() == 0) {
       return;
     }
 
@@ -1493,11 +1542,11 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     HashMap<Integer, Integer> numberSequencingCyclesAllowedMap = new HashMap<Integer, Integer>();
     Map<String, Price> illuminaSeqOptionPriceMap = getIlluminaSeqOptionPriceMap(sess, rc);
     Integer idPriceCategoryDefault = getDefaultSeqOptionPriceCategoryId(sess, rc);
-    for (Iterator i = this.sequencingOptionsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-      Element node = (Element) i.next();
+    for (int i = 0; i <  this.sequencingOptionList.size(); i++) {
+      JsonObject node = sequencingOptionList.getJsonObject(i);
       NumberSequencingCyclesAllowed cyclesAllowed = null;
 
-      String idNumberSequencingCyclesAllowed = node.getAttributeValue("idNumberSequencingCyclesAllowed");
+      String idNumberSequencingCyclesAllowed = node.get("idNumberSequencingCyclesAllowed") != null ? node.getString("idNumberSequencingCyclesAllowed") : "";
 
       // Save new numberSequencingCycles or load the existing one
       if (idNumberSequencingCyclesAllowed.startsWith("NumberSequencingCyclesAllowed")) {
@@ -1507,26 +1556,27 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
       }
 
       cyclesAllowed.setCodeRequestCategory(rc.getCodeRequestCategory());
-      cyclesAllowed.setIdNumberSequencingCycles(Integer.valueOf(node.getAttributeValue("idNumberSequencingCycles")));
-      cyclesAllowed.setIdSeqRunType(Integer.valueOf(node.getAttributeValue("idSeqRunType")));
-      String isCustom = node.getAttributeValue("isCustom");
+      cyclesAllowed.setIdNumberSequencingCycles(Integer.valueOf(node.get("idNumberSequencingCycles") != null ? node.getString("idNumberSequencingCycles") : "" ));
+      cyclesAllowed.setIdSeqRunType(Integer.valueOf(node.get("idSeqRunType") != null ? node.getString("idSeqRunType") : ""));
+      String isCustom = node.get("isCustom") != null ? node.getString("isCustom") : "";
       if (isCustom == null || !isCustom.equals("Y")) {
         cyclesAllowed.setIsCustom("N");
       } else {
         cyclesAllowed.setIsCustom("Y");
       }
-      cyclesAllowed.setName(node.getAttributeValue("name"));
-      cyclesAllowed.setIsActive(node.getAttributeValue("isActive"));
+      cyclesAllowed.setName(node.get("name") != null ? node.getString("name") : "" );
+      cyclesAllowed.setIsActive(node.get("isActive") != null ? node.getString("isActive") : "");
       Integer sortOrder = null;
-      if (node.getAttributeValue("sortOrder") != null && node.getAttributeValue("sortOrder").length() > 0) {
+      String sortOrderStr = node.get("sortOrder") != null ? node.getString("sortOrder") : "";
+      if (sortOrderStr.length() > 0) {
         try {
-          sortOrder = Integer.parseInt(node.getAttributeValue("sortOrder"));
+          sortOrder = Integer.parseInt(sortOrderStr);
         } catch (NumberFormatException ex) {
           sortOrder = null;
         }
       }
       cyclesAllowed.setSortOrder(sortOrder);
-      cyclesAllowed.setProtocolDescription(node.getAttributeValue("protocolDescription"));
+      cyclesAllowed.setProtocolDescription(node.get("protocolDescription") != null ? node.getString("protocolDescription") : "");
       sess.save(cyclesAllowed);
 
       numberSequencingCyclesAllowedMap.put(cyclesAllowed.getIdNumberSequencingCyclesAllowed(), cyclesAllowed.getIdNumberSequencingCyclesAllowed());
@@ -1624,7 +1674,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     return map;
   }
 
-  private void saveIlluminaSeqOptionPrices(Session sess, RequestCategory rc, NumberSequencingCyclesAllowed cyclesAllowed, Element node, Map<String, Price> map, Integer defaultCategoryId) {
+  private void saveIlluminaSeqOptionPrices(Session sess, RequestCategory rc, NumberSequencingCyclesAllowed cyclesAllowed, JsonObject node, Map<String, Price> map, Integer defaultCategoryId) {
     // Only save lib prep prices for illumina request categories that have price
     // sheet defined.
     if (!RequestCategory.isIlluminaRequestCategory(rc.getCodeRequestCategory()) || map == null || !priceModified(node)) {
@@ -1646,10 +1696,15 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     price.setName(cyclesAllowed.getName());
     price.setDescription("");
     price.setIdPriceCategory(defaultCategoryId);
-    price.setIsActive(node.getAttributeValue("isActive"));
-    setPrice(node.getAttributeValue("unitPriceInternal"), price.getUnitPrice(), price, PriceUtil.PRICE_INTERNAL);
-    setPrice(node.getAttributeValue("unitPriceExternalAcademic"), price.getUnitPriceExternalAcademic(), price, PriceUtil.PRICE_EXTERNAL_ACADEMIC);
-    setPrice(node.getAttributeValue("unitPriceExternalCommercial"), price.getUnitPriceExternalCommercial(), price, PriceUtil.PRICE_EXTERNAL_COMMERCIAL);
+    price.setIsActive(node.get("isActive") != null ? node.getString("isActive") : "");
+
+    String unitPriceInternal = node.get("unitPriceInternal") != null ? node.getString("unitPriceInternal") : "";
+    String unitPriceExternalAcademic = node.get("unitPriceExternalAcademic") != null ? node.getString("unitPriceExternalAcademic") : "";
+    String unitPriceExternalCommercial = node.get("unitPriceExternalCommercial") != null ? node.getString("unitPriceExternalCommercial") : "";
+
+    setPrice(unitPriceInternal, price.getUnitPrice(), price, PriceUtil.PRICE_INTERNAL);
+    setPrice(unitPriceExternalAcademic, price.getUnitPriceExternalAcademic(), price, PriceUtil.PRICE_EXTERNAL_ACADEMIC);
+    setPrice(unitPriceExternalCommercial, price.getUnitPriceExternalCommercial(), price, PriceUtil.PRICE_EXTERNAL_COMMERCIAL);
     sess.save(price);
     sess.flush();
 

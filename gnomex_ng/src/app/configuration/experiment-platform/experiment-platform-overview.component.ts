@@ -21,6 +21,7 @@ import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
 import {EpExperimentTypeIlluminaTabComponent} from "./ep-experiment-type-illumina-tab.component";
 import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.component";
 import {FormGroup} from "@angular/forms";
+import {DictionaryService} from "../../services/dictionary.service";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -87,7 +88,9 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     constructor(private secAdvisor:CreateSecurityAdvisorService,
                 private constService:ConstantsService,
                 public expPlatformService: ExperimentPlatformService,
-                private dialogService:DialogsService,private dialog:MatDialog){
+                private dialogService:DialogsService,private dialog:MatDialog,
+                private dictionaryService: DictionaryService
+    ){
     }
 
     ngOnInit():void{
@@ -366,46 +369,45 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
         if(this.expPlatformService.isIllumina && !this.expPlatformService.isNanoString){
             applications = expPlatformForm.get('EpExperimentTypeIlluminaTabComponent.applications').value;
-            rcApplications =this.getRequestCategoryList(applications);
-            params = params.set("applicationsXMLString",JSON.stringify(applications))
-                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
-
+            params = params.set("applicationsJSONString",JSON.stringify(applications));
         }else if(this.expPlatformService.isQC){
             applications = expPlatformForm.get('EpExperimentTypeQcTabComponent.applications').value;
-            rcApplications = this.getRequestCategoryList(applications);
-            params = params.set("applicationsXMLString",JSON.stringify(applications))
-                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
+            params = params.set("applicationsJSONString",JSON.stringify(applications))
         }else if(!this.expPlatformService.isNanoString){
             applications = expPlatformForm.get('EpExperimentTypeTabComponent.applications').value;
-            rcApplications=  this.getRequestCategoryList(applications);
-            params = params.set("applicationsXMLString",JSON.stringify(applications))
-                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
+            params = params.set("applicationsJSONString",JSON.stringify(applications));
+        }
+
+        if(this.expPlatformService.isIllumina || this.expPlatformService.isSequenom){
+            rcApplications =this.getRequestCategoryList(applications);
+            params = params.set("requestCategoryApplicationJSONString",JSON.stringify(rcApplications));
         }
 
         sampleTypes = expPlatformForm.get('EpSampleTypeTabComponent.sampleTypes').value;
         if(sampleTypes && sampleTypes.length > 0){
-            params = params.set('sampleTypesXMLString', JSON.stringify(sampleTypes));
+            params = params.set('sampleTypesJSONString', JSON.stringify(sampleTypes));
         }
         sequencingOptionsForm = <FormGroup>expPlatformForm.get('EpIlluminaSeqTabComponent');
         if(sequencingOptionsForm){
             let seqOptions = sequencingOptionsForm.get('sequencingOptions').value;
-            params = params.set('sequencingOptionsXMLString', JSON.stringify(seqOptions));
+            params = params.set('sequencingOptionsJSONString', JSON.stringify(seqOptions));
         }
         prepQCProtocolsForm = <FormGroup>expPlatformForm.get('EpLibraryPrepQCTabComponent');
         if(prepQCProtocolsForm){
             let prepQCProtocols = prepQCProtocolsForm.get('prepQCProtocols').value;
-            params = params.set('prepQCProtocolsXMLString', JSON.stringify(prepQCProtocols));
+            params = params.set('prepQCProtocolsJSONString', JSON.stringify(prepQCProtocols));
         }
         pipelineProtocolsForm = <FormGroup>expPlatformForm.get('EpPipelineProtocolTabComponent');
         if(pipelineProtocolsForm){
             let pipelineProtocols = pipelineProtocolsForm.get('pipelineProtocols').value;
-            params = params.set('pipelineProtocolsXMLString',JSON.stringify(pipelineProtocols));
+            params = params.set('pipelineProtocolsJSONString',JSON.stringify(pipelineProtocols));
         }
         prepTypesForm = <FormGroup>expPlatformForm.get('EpPrepTypesTabComponent');
         if(prepTypesForm){
             let prepTypes = prepTypesForm.get('prepTypes').value;
-            params = params.set('prepTypesXMLString',JSON.stringify(prepTypes));
+            params = params.set('prepTypesJSONString',JSON.stringify(prepTypes));
         }
+        params = params.set("noJSONToXMLConversionNeeded", "Y");
 
 
         //let params:HttpParams = new HttpParams().set("applicationsXMLString",JSON.stringify(application));
@@ -415,6 +417,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         this.expPlatformService.saveExperimentPlatform(params).first().subscribe( resp => {
             if(resp && resp.result && resp.result === "SUCCESS" ){
                 this.expPlatformService.getExperimentPlatformList_fromBackend();
+                //this.dictionaryService.reloadAndRefresh();
             }else if(resp && resp.message){
                 this.dialogService.alert(resp.message);
                 this.showSpinner = false;

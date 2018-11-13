@@ -284,7 +284,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
             codeApplication: "Application" + this.newAppNumber,
             display:'enter experiment type here...',
             idSeqLibProtocols:'',
-            idLabelingProtocolDefault:'N',
+            idLabelingProtocolDefault:'',
             idHybProtocolDefault:'',
             idScanProtocolDefault:'',
             idFeatureExtractionProtocolDefault:'',

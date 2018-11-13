@@ -116,8 +116,9 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
 
     ngOnInit(){
         this.formGroup = this.fb.group({
+                idProtocol:'',
                 name: ['',Validators.required],
-                isActive: '',
+                isActive: true,
                 url:'',
                 description:'',
                 adapterSequenceThreePrime:'',
@@ -130,6 +131,7 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
             this.protocolService.getProtocolObservable().first().subscribe(resp =>{
                 if(resp){
                     this.protocol = resp;
+                    this.formGroup.get('idProtocol').setValue(resp.idSeqLibProtocol ? resp.idSeqLibProtocol : '');
                     this.formGroup.get('name').setValue(resp.name? resp.name : '');
                     this.formGroup.get('isActive').setValue(resp.isActive ? resp.isActive === 'Y': false);
                     this.formGroup.get('url').setValue(resp.url ? resp.url : '');
@@ -138,7 +140,7 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
                     this.formGroup.get('adapterSequenceFivePrime').setValue(resp.adapterSequenceFivePrime ? resp.adapterSequenceFivePrime : '');
                     this.formGroup.markAsPristine();
                 }
-            });
+            },err =>{this.dialogService.alert(err)});
         }
 
     }
@@ -163,7 +165,7 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
     saveChanges(){
         this.showSpinner = true;
         let params:HttpParams = new HttpParams()
-            .set('idProtocol', this.protocol ? this.protocol.id : '')
+            .set('idProtocol', this.formGroup.get('idProtocol').value)
             .set('protocolName',this.formGroup.get('name').value)
             .set('protocolDescription',this.formGroup.get('description').value)
             .set('protocolUrl',this.formGroup.get('url').value)
@@ -184,7 +186,9 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
                     this.showSpinner = false;
                     this.dialogService.alert("An error occurred please contact GNomEx Support")
                 }
-            });
+            }, error => {
+                this.showSpinner = false;
+                this.dialogService.alert(error)});
     }
 
     ngOnDestroy(){
