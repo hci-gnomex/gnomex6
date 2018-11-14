@@ -74,7 +74,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
     }
     
     .login-box .btn-box {
-      margin: 10px 0 0px 0
+      margin: 10px 0 0 0
     }
   `]
 })

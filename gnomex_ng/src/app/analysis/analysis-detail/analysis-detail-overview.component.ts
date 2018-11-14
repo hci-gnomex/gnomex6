@@ -56,7 +56,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
 
         });
 
-        this.route.data.forEach(data => {
+        this.route.data.forEach((data: any) => {
             this.orderValidateService.dirtyNote = false;
 
             this.analysis = data.analysis.Analysis;

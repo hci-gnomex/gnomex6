@@ -55,7 +55,7 @@ export class AnalysisGroupComponent implements OnInit,OnDestroy{
             }
         });
 
-        this.route.data.forEach((data) => {  // need to update data when url changes
+        this.route.data.forEach((data: any) => {  // need to update data when url changes
             this.formInit = false;
             if(data.analysisGroup){ // save new project from tree will make data null since nothing is happening on the route but its refreshing
                 let ag = data['analysisGroup'];

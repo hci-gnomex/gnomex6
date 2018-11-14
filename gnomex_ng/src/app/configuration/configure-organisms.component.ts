@@ -9,7 +9,7 @@ import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateParserComponent} from "../util/parsers/date-parser.component";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {MatSnackBar} from "@angular/material";
+import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 
 @Component({
@@ -141,9 +141,9 @@ export class ConfigureOrganismsComponent implements OnInit {
                     this.showSpinner = true;
                     this.organismService.deleteOrganism(this.selectedOrganism.idOrganism).subscribe((response: any) => {
                         if (response && response.result && response.result === "SUCCESS") {
-                            this.snackBar.open("Organism Deleted", "Configure Organisms", {
-                                duration: 2000,
-                            });
+                            let config: MatSnackBarConfig = new MatSnackBarConfig();
+                            config.duration = 2000;
+                            this.snackBar.open("Organism Deleted", "Configure Organisms", config);
                         } else {
                             let message: string = "";
                             if (response && response.message) {
@@ -221,9 +221,9 @@ export class ConfigureOrganismsComponent implements OnInit {
 
         this.organismService.saveOrganismNew(params).subscribe((result: any) => {
             if (result && result.result && result.result === "SUCCESS") {
-                this.snackBar.open("Organism Saved", "Configure Organisms", {
-                    duration: 2000,
-                });
+                let config: MatSnackBarConfig = new MatSnackBarConfig();
+                config.duration = 2000;
+                this.snackBar.open("Organism Saved", "Configure Organisms", config);
             } else if (result && result.message) {
                 this.dialogsService.confirm(result.message, null);
             } else {

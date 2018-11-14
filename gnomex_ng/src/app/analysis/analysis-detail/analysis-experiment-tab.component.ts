@@ -497,7 +497,7 @@ export class AnalysisExperimentTabComponent implements OnInit{
         this.labList = this.gnomexService.labList;
         this.options = {
             displayField: 'label',
-            allowDrag: (node) =>{return node.level > 1}
+            allowDrag: (node: any) =>{return node.level > 1}
         };
 
 
@@ -506,7 +506,7 @@ export class AnalysisExperimentTabComponent implements OnInit{
                 this.analysisTreeNode = data;
             });
 
-        this.route.data.forEach((data) =>{
+        this.route.data.forEach((data: any) =>{
             if(data && data.analysis){
                 this.analysis = data.analysis.Analysis;
 
