@@ -7,7 +7,7 @@ import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {ColumnApi, GridApi, GridReadyEvent} from "ag-grid";
+import {ColumnApi, GridApi, GridReadyEvent} from "ag-grid-community";
 import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
 import {AddLedgerEntryComponent} from "./add-ledger-entry.component";
 import {HttpParams} from "@angular/common/http";

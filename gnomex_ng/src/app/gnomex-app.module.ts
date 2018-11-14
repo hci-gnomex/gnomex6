@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {GnomexAppComponent} from "./gnomex-app.component";
 import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from "@angular/core";
@@ -9,7 +6,7 @@ import {HeaderModule} from "./header/header.module";
 import {APP_ROUTING} from "./gnomex-app.routes";
 import {HttpModule} from "@angular/http";
 import {HomeModule} from "./home/home.module";
-import {BROWSE_EXPERIMENTS_ENDPOINT, VIEW_EXPERIMENT_ENDPOINT} from "./experiments/experiments.service";
+import {BROWSE_EXPERIMENTS_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
 import {ExperimentsModule} from "./experiments/experiments.module";
 import {ConfigurationModule} from "./configuration/configuration.module";
@@ -18,16 +15,7 @@ import {ProgressService} from "./home/progress.service";
 import {RouteReuseStrategy, RouterModule} from "@angular/router";
 import {TestPageModule} from "./testing/test-page.module";
 import {FormsModule} from "@angular/forms";
-import {
-    AUTHENTICATED_USER_ENDPOINT, UserModule, UserService
-} from "@hci/user";
-import {
-    AuthenticationModule, AuthenticationService,
-    AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_ROUTE,
-    AUTHENTICATION_TOKEN_KEY, AUTHENTICATION_TOKEN_ENDPOINT, AUTHENTICATION_DIRECT_ENDPOINT, AUTHENTICATION_MAX_INACTIVITY_MINUTES
-} from "@hci/authentication";
-//import {NavigationModule} from "@hci/navigation";
-import {LocalStorageModule, LocalStorageService, ILocalStorageServiceConfig} from "angular-2-local-storage";
+import {LocalStorageModule, ILocalStorageServiceConfig} from "angular-2-local-storage";
 
 import "./gnomex-app.css";
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -49,6 +37,16 @@ import {AboutModule} from "./about/about.module";
 import {ProductsModule} from "./products/products.module";
 import {BillingModule} from "./billing/billing.module";
 import {CustomRouteReuseStrategy} from "./custom-route-reuse-strategy";
+import {AuthenticationModule} from "./auth/authentication.module";
+import {
+    AUTHENTICATION_DIRECT_ENDPOINT,
+    AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_MAX_INACTIVITY_MINUTES,
+    AUTHENTICATION_ROUTE, AUTHENTICATION_TOKEN_ENDPOINT, AuthenticationService
+} from "./auth/authentication.service";
+import {AUTHENTICATION_TOKEN_KEY} from "./auth/authentication.provider";
+import {UserModule} from "./hci-user/user.module";
+import {AUTHENTICATED_USER_ENDPOINT, UserService} from "./hci-user/user.service";
+import {AngularSplitModule} from "angular-split";
 
 
 
@@ -70,7 +68,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         HeaderModule,
         HomeModule,
         UserModule,
-        AuthenticationModule.forRoot(),
         ExperimentsModule,
         ConfigurationModule,
         AboutModule,
@@ -92,6 +89,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         WorkflowModule,
         ProductsModule,
         BillingModule,
+        AngularSplitModule,
     ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],

@@ -1,9 +1,10 @@
 import {Component, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {MatAutocomplete, MatOption} from "@angular/material";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {DataSource} from '@angular/cdk/collections';
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {of} from "rxjs";
 
 @Component({
     selector: 'membership-tab',
@@ -354,7 +355,7 @@ export class MyDataSource extends DataSource<any> {
     }
 
     connect(): Observable<any[]> {
-        return Observable.of(this.data.sort((a, b) => {
+        return of(this.data.sort((a, b) => {
             if (a.displayName < b.displayName) return -1;
             else if (a.displayName > b.displayName) return 1;
             else {

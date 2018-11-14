@@ -1,10 +1,11 @@
 
 import {Injectable} from "@angular/core";
 import {Http, Response, Headers, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 export enum qcModes
 {
@@ -206,68 +207,68 @@ export class WorkflowService {
 
 
     getWorkItemList(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/GetWorkItemList.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetWorkItemList.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     saveCombinedWorkItemQualityControl(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveCombinedWorkItemQualityControl.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/SaveCombinedWorkItemQualityControl.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     saveWorkItemSolexaPrepQC(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveWorkItemSolexaPrepQC.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/SaveWorkItemSolexaPrepQC.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     saveWorkItemSolexaPrep(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveWorkItemSolexaPrep.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/SaveWorkItemSolexaPrep.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     deleteWorkItem(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/DeleteWorkItem.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteWorkItem.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     getCoreAdmins(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/GetCoreAdmins.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetCoreAdmins.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 

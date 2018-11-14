@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams, Headers} from "@angular/http";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 
 import {CookieUtilService} from "./cookie-util.service";
 

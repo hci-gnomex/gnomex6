@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ConstantsService} from "../../services/constants.service";
-import {GridApi} from "ag-grid";
+import {GridApi} from "ag-grid-community";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {GnomexService} from "../../services/gnomex.service";
@@ -39,7 +39,7 @@ import {Subscription} from "rxjs";
                 
             </div>
             <div style="flex:9" class="full-width">
-                <ag-grid-angular class="full-height full-width ag-fresh"
+                <ag-grid-angular class="full-height full-width ag-theme-fresh"
                                  [context]="context"
                                  [columnDefs]="columnDefs"
                                  (cellValueChanged)="onCellValueChanged($event)"

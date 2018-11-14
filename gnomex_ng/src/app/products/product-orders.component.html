@@ -54,7 +54,7 @@
                     <label *ngIf="this.selectedTreeNode">Product Orders for {{this.selectedTreeNode.data.display}}</label>
                 </div>
                 <div class="flex-thirteen">
-                    <ag-grid-angular class="ag-fresh full-height full-width"
+                    <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                      (gridReady)="this.onLabGridReady($event)"
                                      (gridSizeChanged)="this.onGridSizeChanged($event)"
                                      [rowData]="this.labLineItems">
@@ -98,7 +98,7 @@
                     </mat-tab>
                     <mat-tab label="Line Items">
                         <div class="full-height full-width padded">
-                            <ag-grid-angular class="ag-fresh full-height full-width"
+                            <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                              (gridReady)="this.onProductOrderGridReady($event)"
                                              (gridSizeChanged)="this.onGridSizeChanged($event)"
                                              [rowData]="this.productOrderLineItems">
@@ -113,7 +113,7 @@
         </div>
     </div>
     <div class="flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">
-        <ag-grid-angular class="ag-fresh full-height full-width"
+        <ag-grid-angular class="ag-theme-fresh full-height full-width"
                          (gridReady)="this.onOverviewGridReady($event)"
                          (gridSizeChanged)="this.onGridSizeChanged($event)"
                          (selectionChanged)="this.onOverviewGridSelectionChanged($event)"

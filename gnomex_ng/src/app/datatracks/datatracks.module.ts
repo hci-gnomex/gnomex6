@@ -57,7 +57,7 @@ import {DatatracksDetailModule} from "./datatracks-detail/datatracks-detail.modu
         ServicesModule,
         TextAreaModule,
         ToggleButtonModule,
-        TreeModule,
+        TreeModule.forRoot(),
         UtilModule,
         WindowModule,
         ReactiveFormsModule,

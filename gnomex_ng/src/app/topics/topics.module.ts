@@ -61,7 +61,7 @@ import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
         ServicesModule,
         TextAreaModule,
         ToggleButtonModule,
-        TreeModule,
+        TreeModule.forRoot(),
         UtilModule,
         WindowModule,
         ReactiveFormsModule,

@@ -1,12 +1,11 @@
 import {Injectable} from "@angular/core";
 import {Http,Headers, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
-import {Subject} from "rxjs/Subject";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable} from "rxjs";
+import {Subject} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
 import {HttpClient, HttpParams} from "@angular/common/http";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class DataTrackService {
@@ -42,123 +41,123 @@ export class DataTrackService {
     }
 
     getDataTrack(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetDataTrack.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetDataTrack.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getDataTrackList(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetDataTrackList.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetDataTrackList.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json().Organism;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     saveDataTrackFolder(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveDataTrackFolder.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/SaveDataTrackFolder.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     saveDataTrack(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveDataTrack.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/SaveDataTrack.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     deleteDataTrack(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/DeleteDataTrack.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteDataTrack.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     unlinkDataTrack(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/UnlinkDataTrack.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/UnlinkDataTrack.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     duplicateDataTrack(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/DuplicateDataTrack.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DuplicateDataTrack.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     moveDataTrack(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/MoveDataTrack.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/MoveDataTrack.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     moveDataTrackFolder(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/MoveDataTrackFolder.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/MoveDataTrackFolder.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     deleteDataTrackFolder(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/DeleteDataTrackFolder.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteDataTrackFolder.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     deleteGenomeBuild(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/DeleteGenomeBuild.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteGenomeBuild.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     deleteOrganism(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/DeleteOrganism.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteOrganism.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     emitDatatracksList(dtList?:any): void {
@@ -211,13 +210,13 @@ export class DataTrackService {
     }
 
     getGenomeBuild(params:URLSearchParams):Observable<any>{
-            return this.http.get("/gnomex/GetGenomeBuild.gx", {search: params}).map((response: Response) => {
+            return this.http.get("/gnomex/GetGenomeBuild.gx", {search: params}).pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 } else {
                     throw new Error("Error");
                 }
-            });
+            }));
     }
 
     saveGenomeBuild(params: URLSearchParams):  Observable<Response> {
@@ -225,30 +224,22 @@ export class DataTrackService {
         let headers: Headers = new Headers();
         headers.set("Content-Type", "application/x-www-form-urlencoded");
         return this.http.post("/gnomex/SaveGenomeBuild.gx",params,{headers:headers})
-            .map((response: Response) => {
+            .pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 }
-            }).catch((err) =>{
-
-                console.log(err);
-                return Observable.throw(err);
-            });
+            }));
     }
     saveFolder(params: URLSearchParams):  Observable<Response> {
         this.cookieUtilService.formatXSRFCookie();
         let headers: Headers = new Headers();
         headers.set("Content-Type", "application/x-www-form-urlencoded");
         return this.http.post("/gnomex/SaveDataTrackFolder.gx",params,{headers:headers})
-            .map((response: Response) => {
+            .pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 }
-            }).catch((err) =>{
-
-                console.log(err);
-                return Observable.throw(err);
-            });
+            }));
     }
 
 
@@ -258,13 +249,13 @@ export class DataTrackService {
         let headers: Headers = new Headers();
         headers.set("Content-Type", "application/x-www-form-urlencoded");
         return this.http.post("/gnomex/ImportSegments.gx",params.toString(), {headers: headers})
-            .map((response: Response) => {
+            .pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 } else {
                     throw new Error("Error");
                 }
-            });
+            }));
 
     }
     getImportSeqFiles(formData: FormData):Observable<any>{
@@ -273,15 +264,11 @@ export class DataTrackService {
         //headers.set("Content-Type", "application/x-www-form-urlencoded");
         //, {headers: headers})
         return this.http.post("/gnomex/UploadSequenceFileServlet.gx",formData)
-            .map((response: Response) => {
+            .pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 }
-            }).catch((err) =>{
-
-                console.log(err);
-                return Observable.throw(err);
-            });
+            }));
 
     }
 
@@ -290,15 +277,11 @@ export class DataTrackService {
         let headers: Headers = new Headers();
         headers.set("Content-Type", "application/x-www-form-urlencoded");
         return this.http.post("/gnomex/SaveOrganism.gx",params,{headers:headers})
-            .map((response: Response) => {
+            .pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 }
-            }).catch((err) =>{
-
-                console.log(err);
-                return Observable.throw(err);
-            });
+            }));
     }
 
     makeUCSCLinks(params:HttpParams): Observable<any>{

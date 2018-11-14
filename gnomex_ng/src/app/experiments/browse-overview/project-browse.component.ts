@@ -5,7 +5,8 @@ import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {ExperimentsService} from "../experiments.service";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {URLSearchParams} from "@angular/http";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
+import {distinctUntilChanged, first} from "rxjs/operators";
 
 
 @Component({
@@ -58,7 +59,7 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
             projectName: ['', Validators.required],
             description: ['', Validators.maxLength(500)]
         });
-        this.projectBrowseForm.valueChanges.distinctUntilChanged()
+        this.projectBrowseForm.valueChanges.pipe(distinctUntilChanged())
             .subscribe(value => {
                 if(this.formInit){
                     this.experimentsService.dirty = true;
@@ -81,7 +82,7 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
                 if(this.name === saveType){
                     this.save();
                 }});
-        this.projectBrowseForm.statusChanges.distinctUntilChanged()
+        this.projectBrowseForm.statusChanges.pipe(distinctUntilChanged())
             .subscribe(status =>{
                 if(status === "VALID"){
                     this.experimentsService.invalid = false;
@@ -111,12 +112,12 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
         saveParams.set("projectXMLString", stringifiedProject);
         saveParams.set("parseEntries", "Y");
 
-        this.experimentsService.saveProject(saveParams).first().subscribe(response =>{
+        this.experimentsService.saveProject(saveParams).pipe(first()).subscribe(response =>{
             this.experimentsService.refreshProjectRequestList_fromBackend();
             this.saveSuccess.emit();
             this.formInit = false;
 
-            this.experimentsService.getProject(getParams).first().subscribe(response =>{
+            this.experimentsService.getProject(getParams).pipe(first()).subscribe(response =>{
                 this.projectBrowseForm.get("projectName").setValue( response["Project"].name);
                 this.projectBrowseForm.get("description").setValue( response["Project"].description);
             });

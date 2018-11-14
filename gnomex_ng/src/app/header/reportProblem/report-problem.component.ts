@@ -2,8 +2,6 @@ import {Component, Inject, ViewChild, ElementRef} from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/map';
 import {ReportIssueService} from "../../services/report-issue.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 

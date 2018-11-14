@@ -1,12 +1,11 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
-import {Subject} from "rxjs/Subject";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable} from "rxjs";
+import {Subject} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class AnalysisService {
@@ -46,54 +45,54 @@ export class AnalysisService {
     }
 
     getAnalysis(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetAnalysis.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetAnalysis.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     saveAnalysis(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveAnalysis.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/SaveAnalysis.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getAnalysisGroup(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetAnalysisGroup.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetAnalysisGroup.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getAnalysisGroupList(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetAnalysisGroupList.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetAnalysisGroupList.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 this.analysisGroupList = response.json().Lab;
                 return this.analysisGroupList;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getAnalysisLabList(): Observable<any> {
-        return this.http.get("/gnomex/GetAnalysisGroupList.gx").map((response: Response) => {
+        return this.http.get("/gnomex/GetAnalysisGroupList.gx").pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     emitAnalysisGroupList(agList?:any): void {
@@ -154,46 +153,46 @@ export class AnalysisService {
     }
 
     saveAnalysisGroup(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveAnalysisGroup.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/SaveAnalysisGroup.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     deleteAnalysis(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/DeleteAnalysis.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteAnalysis.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     deleteAnalysisGroup(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/DeleteAnalysisGroup.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteAnalysisGroup.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
     moveAnalysis(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/MoveAnalysis.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/MoveAnalysis.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
 
     }
 
@@ -230,13 +229,13 @@ export class AnalysisService {
     }
 
     saveVisibility(params:URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveVisibilityAnalysis.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/SaveVisibilityAnalysis.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response;
             } else {
                 throw new Error("Error: In SaveVisibility");
             }
-        });
+        }));
     }
 
     getExperimentPickList(params:HttpParams):Observable<any>{

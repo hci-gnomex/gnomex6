@@ -19,7 +19,7 @@ import {TreeComponent, ITreeOptions, TreeNode, TreeModel} from "angular-tree-com
 import { BrowseFilterComponent } from "../util/browse-filter.component";
 import { transaction } from 'mobx';
 import * as _ from "lodash";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {ActivatedRoute, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";

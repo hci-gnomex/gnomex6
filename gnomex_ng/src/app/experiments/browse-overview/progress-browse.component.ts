@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import {DictionaryService} from "../../services/dictionary.service";
 import {jqxTreeGridComponent} from "../../../assets/jqwidgets-ts/angular_jqxtreegrid";
 import {ConstantsService} from "../../services/constants.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 
 
 @Component({

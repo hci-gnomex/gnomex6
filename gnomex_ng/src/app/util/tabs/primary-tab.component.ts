@@ -3,9 +3,8 @@ import {FormGroup, FormBuilder, FormArray, Validators, AbstractControl, FormCont
 import {ComponentCommunicatorEvent} from './component-status-event'
 import {TabContainer} from "./tab-container.component";
 import {ExperimentViewService} from '../../services/experiment-view.service'
-import 'rxjs/add/operator/debounceTime'
-import 'rxjs/add/operator/distinctUntilChanged'
 import {dependentControl} from "../validators/dependent-control.validator";
+import {debounceTime, distinctUntilChanged} from "rxjs/operators";
 
 @Component({
 
@@ -73,8 +72,8 @@ export class PrimaryTab implements OnDestroy{
             let childForms:FormArray= (<FormArray>this.theForm.controls["childForms"]);
             childForms.push(childForm);
             let index = childForms.length - 1;
-            childForm.statusChanges.distinctUntilChanged()
-                .debounceTime(100).subscribe(status => this.sendEventWhenFormChanges(status,childForm,index));
+            childForm.statusChanges.pipe(distinctUntilChanged())
+                .pipe(debounceTime(100)).subscribe(status => this.sendEventWhenFormChanges(status,childForm,index));
         });
     }
 
@@ -106,7 +105,7 @@ export class PrimaryTab implements OnDestroy{
                 controlName = name;
     }
         });
-        control.valueChanges.debounceTime(2000).subscribe(value => this.validateControl(value,dependentControlName,controlName))
+        control.valueChanges.pipe(debounceTime(2000)).subscribe(value => this.validateControl(value,dependentControlName,controlName))
     }
     protected setformRules(formName: string, categoryName: string) {
         this._formRules = this.rules.experimentViewRules[formName][categoryName];

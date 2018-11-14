@@ -78,7 +78,7 @@ import { TreeModule } from "angular-tree-component";
         ServicesModule,
         UtilModule,
         ReactiveFormsModule,
-        TreeModule,
+        TreeModule.forRoot(),
         DynamicModule.withComponents([QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
             FlowcellassmWorkflowComponent,  FinalizeWorkflowComponent])
     ],

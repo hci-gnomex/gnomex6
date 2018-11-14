@@ -1,7 +1,7 @@
 <div class="full-width full-height background border-padding">
     <div class="full-width full-height foreground">
-        <split (dragEnd)="onSplitDragEnd($event)">
-            <split-area size="20">
+        <as-split (dragEnd)="onSplitDragEnd($event)">
+            <as-split-area size="20">
                 <mat-tab-group class="full-height" [selectedIndex]="selectedTab" (selectedTabChange)="onTabChange($event)">
                     <mat-tab *ngIf="rowData.length > 0" #userTab label="Users" class="full-height">
                         <div class="full-height full-width flex-container-col foreground small-font">
@@ -12,7 +12,7 @@
                             </div>
                             <div class="full-width flex-grow padded-left-right small-font">
                                 <ag-grid-angular id="userTable"
-                                                 class="full-width full-height ag-fresh"
+                                                 class="full-width full-height ag-theme-fresh"
                                                  [gridOptions]="gridOptions"
                                                  [rowData]="rowData"
                                                  [columnDefs]="columnDefs"
@@ -77,7 +77,7 @@
                                 </mat-accordion>
                             </div>
                             <div class="full-width flex-grow padded-left-right">
-                                <ag-grid-angular class="full-width full-height ag-fresh"
+                                <ag-grid-angular class="full-width full-height ag-theme-fresh"
                                                  [gridOptions]="groupsGridOptions"
                                                  [rowData]="groupsData"
                                                  [columnDefs]="groupsColumnDefs"
@@ -118,12 +118,12 @@
                         </div>
                     </mat-tab>
                 </mat-tab-group>
-            </split-area>
-            <split-area size="80">
+            </as-split-area>
+            <as-split-area size="80">
                 <div *ngIf="isUserTab && selectedUser" #userDetail class="full-height full-width flex-container-col background border-padding small-font">
                     <div class="full-width flex-grow">
-                        <split direction="vertical">
-                            <split-area size="75" class="foreground">
+                        <as-split direction="vertical">
+                            <as-split-area size="75" class="foreground">
                                 <!--user detail-->
                                 <div class="full-height full-width foreground flex-container-col">
                                     <form class="full-height full-width flex-container-col" [formGroup]="userForm">
@@ -247,11 +247,11 @@
                                         </div>
                                     </form>
                                 </div>
-                            </split-area>
-                            <split-area size="25">
+                            </as-split-area>
+                            <as-split-area size="25">
                                 <div class="full-height full-width flex-container-row foreground padded">
                                     <div class="flex-grow">
-                                        <ag-grid-angular class="full-height full-width ag-fresh"
+                                        <ag-grid-angular class="full-height full-width ag-theme-fresh"
                                                          [gridOptions]="labGridOptions"
                                                          [rowData]="labs"
                                                          [columnDefs]="labColumnDefs"
@@ -263,7 +263,7 @@
                                     <div class="horizontal-spacer">
                                     </div>
                                     <div class="flex-grow">
-                                        <ag-grid-angular class="full-height full-width ag-fresh"
+                                        <ag-grid-angular class="full-height full-width ag-theme-fresh"
                                                          [gridOptions]="collGridOptions"
                                                          [rowData]="collaboratingLabs"
                                                          [columnDefs]="collColumnDefs"
@@ -275,7 +275,7 @@
                                     <div class="horizontal-spacer">
                                     </div>
                                     <div class="flex-grow">
-                                        <ag-grid-angular class="full-height full-width ag-fresh"
+                                        <ag-grid-angular class="full-height full-width ag-theme-fresh"
                                                          [gridOptions]="manGridOptions"
                                                          [rowData]="managingLabs"
                                                          [columnDefs]="manColumnDefs"
@@ -286,8 +286,8 @@
                                         </ag-grid-angular>
                                     </div>
                                 </div>
-                            </split-area>
-                        </split>
+                            </as-split-area>
+                        </as-split>
                     </div>
                     <div class="full-width right-align foreground padded-left-right-bottom reserve-height">
                         <div class="flex-container-row">
@@ -417,7 +417,7 @@
                         <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
                     </div>
                 </div>
-            </split-area>
-        </split>
+            </as-split-area>
+        </as-split>
     </div>
 </div>

@@ -1,5 +1,5 @@
 import { Component, ComponentRef, OnDestroy, OnInit } from "@angular/core";
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {ConstantsService} from "../../services/constants.service";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
@@ -21,6 +21,7 @@ import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
 import {EpExperimentTypeIlluminaTabComponent} from "./ep-experiment-type-illumina-tab.component";
 import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.component";
 import {FormGroup} from "@angular/forms";
+import {first} from "rxjs/operators";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -169,7 +170,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         if( this.selectRowIndex != event.rowIndex && event.node.selected){
             console.log("Previous tab: " + this.selectRowIndex + " current Tab: " + event.rowIndex  );
             if(this.expPlatformService.expPlatformOverviewForm.dirty){
-                this.dialogService.confirm("Warning","Your changes have not been saved.  Discard changes?").first().subscribe(answer =>{
+                this.dialogService.confirm("Warning","Your changes have not been saved.  Discard changes?").pipe(first()).subscribe(answer =>{
                     if(!answer){
                         this.gridOpt.api.forEachNode(node=> {
                             return node.rowIndex === this.selectRowIndex  ? node.setSelected(true) : -1;
@@ -212,11 +213,11 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         if(expPlatform){
             this.dialogService.confirm("Remove Platform ",
                 "Are you sure you want to remove experiment platform " + expPlatform.display + "?")
-                .first().subscribe((result:boolean) => {
+                .pipe(first()).subscribe((result:boolean) => {
                 if(result){
                     this.showSpinner = true;
                     let params:HttpParams = new HttpParams().set("codeRequestCategory", expPlatform.codeRequestCategory);
-                    this.expPlatformService.deleteExperimentPlatform(params).first()
+                    this.expPlatformService.deleteExperimentPlatform(params).pipe(first())
                         .subscribe(resp => {
                             if(resp && resp.result === "SUCCESS"){
                                 this.expPlatformService.getExperimentPlatformList_fromBackend();
@@ -412,7 +413,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         //let params: FormData = new FormData();
         //formData.append("applicationsXMLString",JSON.stringify(application));
 
-        this.expPlatformService.saveExperimentPlatform(params).first().subscribe( resp => {
+        this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe( resp => {
             if(resp && resp.result && resp.result === "SUCCESS" ){
                 this.expPlatformService.getExperimentPlatformList_fromBackend();
             }else if(resp && resp.message){

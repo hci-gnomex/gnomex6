@@ -18,7 +18,7 @@ import {AngularMaterialModule} from "../../modules/angular-material.module";
         CommonModule,
         FormsModule,
         ServicesModule,
-        TreeModule,
+        TreeModule.forRoot(),
         AngularMaterialModule
 
     ],

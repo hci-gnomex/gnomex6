@@ -6,8 +6,9 @@ import {ExperimentPlatformService} from "../../services/experiment-platform.serv
 import {DictionaryService} from "../../services/dictionary.service";
 import {ProtocolService} from "../../services/protocol.service";
 import {HttpParams} from "@angular/common/http";
-import {ISubscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {first} from "rxjs/operators";
 
 
 
@@ -95,7 +96,7 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
     protocolParams:any;
     protocol:any;
     formGroup:FormGroup;
-    private protocolSubscription: ISubscription;
+    private protocolSubscription: Subscription;
     public showSpinner:boolean = false;
 
 
@@ -127,7 +128,7 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
         );
         if(this.protocolParams){
             this.protocolService.getProtocolByIdAndClass(this.protocolParams.idSeqLibProtocol, DictionaryService.SEQ_LIB_PROTOCOL);
-            this.protocolService.getProtocolObservable().first().subscribe(resp =>{
+            this.protocolService.getProtocolObservable().pipe(first()).subscribe(resp =>{
                 if(resp){
                     this.protocol = resp;
                     this.formGroup.get('name').setValue(resp.name? resp.name : '');

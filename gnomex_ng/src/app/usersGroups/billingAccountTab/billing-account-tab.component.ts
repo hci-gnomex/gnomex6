@@ -23,7 +23,7 @@ import { UploadViewRemoveRenderer } from "../../util/grid-renderers/upload-view-
 import * as _ from "lodash";
 import {DateParserComponent} from "../../util/parsers/date-parser.component";
 import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
 import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-users-selector.component";

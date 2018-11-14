@@ -105,7 +105,7 @@ import {VisibilityDetailTabComponent} from "../util/visibility-detail-tab.compon
         ServicesModule,
         TextAreaModule,
         ToggleButtonModule,
-        TreeModule,
+        TreeModule.forRoot(),
         UtilModule,
         WindowModule,
         ReactiveFormsModule,

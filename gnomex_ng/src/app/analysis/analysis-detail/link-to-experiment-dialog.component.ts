@@ -8,10 +8,11 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {GnomexService} from "../../services/gnomex.service";
 import {HttpParams} from "@angular/common/http";
 import {AnalysisService} from "../../services/analysis.service";
-import {GridApi} from "ag-grid";
+import {GridApi} from "ag-grid-community";
 import {ConstantsService} from "../../services/constants.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {Router} from "@angular/router";
+import {debounceTime, distinctUntilChanged, first} from "rxjs/operators";
 
 
 @Component({
@@ -109,7 +110,7 @@ export class LinkToExperimentDialogComponent implements OnInit{
         let init = true;
 
 
-        this.labControl.valueChanges.distinctUntilChanged().subscribe(value =>{
+        this.labControl.valueChanges.pipe(distinctUntilChanged()).subscribe(value =>{
             console.log("This is the a test: " + value);
             let params = new HttpParams();
             this.showSpinner = true;
@@ -129,7 +130,7 @@ export class LinkToExperimentDialogComponent implements OnInit{
         });
 
 
-        this.numberControl.valueChanges.distinctUntilChanged().debounceTime(3000).subscribe(value => {
+        this.numberControl.valueChanges.pipe(distinctUntilChanged()).pipe(debounceTime(3000)).subscribe(value => {
             this.showSpinner = true;
             let params = this.filterResults();
             this.getRequestsForGrid(params);
@@ -143,7 +144,7 @@ export class LinkToExperimentDialogComponent implements OnInit{
 
     getRequestsForGrid(params:HttpParams){
         this.selectedAnalysisToLink = [];
-        this.analysisService.getRequestList(params).first().subscribe(resp =>{
+        this.analysisService.getRequestList(params).pipe(first()).subscribe(resp =>{
             this.showSpinner = false;
             if(resp){
                 if(+resp.requestCount === 0){
@@ -203,7 +204,7 @@ export class LinkToExperimentDialogComponent implements OnInit{
             let params:HttpParams =  new HttpParams().set("idAnalysis", this.idAnalysis,)
                 .set("idRequest", this.selectedAnalysisToLink[0].idRequest);
 
-            this.analysisService.linkExpToAnalysis(params).first()
+            this.analysisService.linkExpToAnalysis(params).pipe(first())
                 .subscribe(resp =>{
                     if(resp && resp.result && resp.result === "SUCCESS"){
                         this.dialogService.alert("Analysis was successfully linked");

@@ -2,13 +2,13 @@
 import {Component, OnInit, ViewChild,AfterViewInit} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 import {URLSearchParams} from "@angular/http"
 import {AnalysisService} from "../../services/analysis.service";
 import {GnomexStringUtilService} from "../../services/gnomex-string-util.service";
@@ -41,7 +41,7 @@ import {ConstantsService} from "../../services/constants.service";
                     </div>
                 </div>
                 <div class="full-width flex-grow">
-                    <ag-grid-angular class="full-width full-height ag-fresh"
+                    <ag-grid-angular class="full-width full-height ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [columnDefs]="columnDefs"
                                      [rowData]="rowData"

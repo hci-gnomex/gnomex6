@@ -1,11 +1,12 @@
 import {Injectable} from "@angular/core";
 import {Http, Response} from "@angular/http";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 
-import 'rxjs/add/operator/map';
+
 import {LabListService} from "./lab-list.service";
 import {DictionaryService} from "./dictionary.service";
 import {ProgressService} from "../home/progress.service";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class CreateSecurityAdvisorService {
@@ -153,7 +154,7 @@ export class CreateSecurityAdvisorService {
 
     createSecurityAdvisor(): Observable<any> {
         console.log("createSecurityAdvisor new");
-        return this.http.get("/gnomex/CreateSecurityAdvisor.gx", {withCredentials: true}).map((response: Response) => {
+        return this.http.get("/gnomex/CreateSecurityAdvisor.gx", {withCredentials: true}).pipe(map((response: Response) => {
             console.log("return createSecurityAdvisor");
             if (response.status === 200) {
                 this.result = response.json();
@@ -198,11 +199,11 @@ export class CreateSecurityAdvisorService {
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     createGuestSecurityAdvisor(params:URLSearchParams):Observable<any> {
-        return this.http.get("/gnomex/CreateSecurityAdvisorForGuest.gx",{search:params}).map((response: Response) => {
+        return this.http.get("/gnomex/CreateSecurityAdvisorForGuest.gx",{search:params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 this.result = response.json();
 
@@ -225,7 +226,7 @@ export class CreateSecurityAdvisorService {
             else {
                 throw new Error("Error");
             }
-        })
+        }))
     }
 
     /*

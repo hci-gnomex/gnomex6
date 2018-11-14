@@ -5,7 +5,7 @@ import {ActivatedRoute} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {OrderType} from "../../util/annotation-tab.component";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {MatDialog, MatDialogConfig, MatDialogRef, MatTabChangeEvent} from "@angular/material";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";

@@ -3,7 +3,7 @@ import {MatDialog, MatDialogRef} from "@angular/material";
 import {Router} from "@angular/router";
 import {GnomexService} from "../../services/gnomex.service";
 import {ManageLinksComponent} from "./manage-links.component";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'report-problem-launcher',

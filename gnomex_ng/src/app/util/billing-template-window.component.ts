@@ -3,7 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {BillingService} from "../services/billing.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "./popup/dialogs.service";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowSelectedEvent} from "ag-grid";
+import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowSelectedEvent} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";

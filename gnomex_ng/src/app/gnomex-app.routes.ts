@@ -1,13 +1,7 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {Routes, RouterModule} from "@angular/router";
-
-
-import {DirectLoginComponent} from "@hci/authentication";
-
 import {HomeComponent} from "./home/home.component";
 import {AuthRouteGuardService} from "./services/route-guards/auth-route-guard.service";
+import {DirectLoginComponent} from "./auth/directlogin.component";
 
 /**
  * A file defining and exporting the router configuration for the seed application.

@@ -1,10 +1,9 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class GetLabService {
@@ -135,13 +134,13 @@ export class GetLabService {
         });
     }
     getLab(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetLab.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetLab.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     public getLabNew(params: HttpParams): Observable<any> {
@@ -149,13 +148,13 @@ export class GetLabService {
     }
 
     deleteLab(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/DeleteLab.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/DeleteLab.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getLabById(idLab: string): Observable<any> {
@@ -184,14 +183,14 @@ export class GetLabService {
     }
 
     public getLabMembers(idLab: string): Observable<any[]> {
-        return this.getLabBasic(idLab).map((response: Response) => {
+        return this.getLabBasic(idLab).pipe(map((response: Response) => {
             if (response.status === 200) {
                 let lab = response.json();
                 return lab.Lab.members;
             } else {
                 return [];
             }
-        });
+        }));
     }
 
     private makeParams(idLab: string, includeBillingAccounts: boolean, includeProductCounts: boolean,

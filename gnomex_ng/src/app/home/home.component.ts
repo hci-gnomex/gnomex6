@@ -5,15 +5,16 @@ import {Component, OnInit, ViewChild, ViewEncapsulation, AfterViewInit, OnDestro
 import {URLSearchParams} from "@angular/http";
 import {Router} from "@angular/router";
 
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Observable} from "rxjs/Observable";
-import {Subscription} from "rxjs/Subscription";
+import {BehaviorSubject} from "rxjs";
+import {Observable} from "rxjs";
+import {Subscription} from "rxjs";
 
 import {jqxProgressBarComponent} from "../../assets/jqwidgets-ts/angular_jqxprogressbar"; //jqwidgets-framework
 
 import {GnomexService} from "../services/gnomex.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
 import {ProgressService} from "./progress.service";
+import {first} from "rxjs/operators";
 
 @Component({
     selector: "gnomex-home",
@@ -89,7 +90,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         let params: URLSearchParams = new URLSearchParams();
 
-        this.launchPropertiesService.getLaunchProperties(params).first().subscribe((response: any) => {
+        this.launchPropertiesService.getLaunchProperties(params).pipe(first()).subscribe((response: any) => {
             this.launchProperties = response;
             this.getProps(response);
             this.gnomexService.coreFacilityList = response.CoreFacilities;
@@ -114,7 +115,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
 
-        this.gnomexService.isAppInitCompleteObservable().first().subscribe(complete =>{
+        this.gnomexService.isAppInitCompleteObservable().pipe(first()).subscribe(complete =>{
             if(this.gnomexService.redirectURL){
                 console.log(this.router.parseUrl(this.gnomexService.redirectURL));
                 this.router.navigateByUrl("/" + this.gnomexService.redirectURL);

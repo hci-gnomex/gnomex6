@@ -5,7 +5,7 @@ import {
     MatDialogRef,
 } from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions} from "ag-grid";
+import {GridOptions} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";

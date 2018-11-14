@@ -37,7 +37,7 @@ import {ExperimentPlatformModule} from "./experiment-platform/experiment-platfor
         CommonModule,
         FormsModule,
         ServicesModule,
-        TreeModule,
+        TreeModule.forRoot(),
         AgGridModule.withComponents([
             CheckboxRenderer,
             DateEditor,

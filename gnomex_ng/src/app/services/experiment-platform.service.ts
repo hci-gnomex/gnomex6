@@ -1,9 +1,7 @@
 import {Injectable, OnDestroy} from "@angular/core";
 import {Http,Headers, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {ExperimentPlatformTabComponent} from "../configuration/experiment-platform/experiment-platform-tab.component";

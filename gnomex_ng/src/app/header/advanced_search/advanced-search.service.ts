@@ -1,10 +1,10 @@
 import {Injectable, OnDestroy} from "@angular/core";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
-import {Subscription} from "rxjs/Subscription";
+import {BehaviorSubject} from "rxjs";
+import {Observable} from "rxjs";
+import {Subject} from "rxjs";
+import {Subscription} from "rxjs";
 import {AdvancedSearchComponent} from "./advanced-search.component";
 import {CookieUtilService} from "../../services/cookie-util.service";
 

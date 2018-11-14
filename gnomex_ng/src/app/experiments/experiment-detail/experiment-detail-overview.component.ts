@@ -5,12 +5,12 @@ import {ActivatedRoute} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {OrderType} from "../../util/annotation-tab.component";
-import {Subscription} from "rxjs/Subscription";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {ExperimentsService} from "../experiments.service";
 import {MatTabChangeEvent} from "@angular/material";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
+import {Subscription} from "rxjs";
 
 
 @Component({

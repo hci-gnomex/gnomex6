@@ -4,11 +4,10 @@
 import { Router } from "@angular/router";
 import { Http } from "@angular/http";
 import { GnomexAppComponent } from "./gnomex-app.component";
-import {UserService} from "@hci/user";
-import {AuthenticationService} from "@hci/authentication";
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
 import {ProgressService} from "./home/progress.service";
 import {DictionaryService} from "./services/dictionary.service";
+import {AuthenticationService} from "./auth/authentication.service";
 
 /**
  * Unit tests for the CoreAppComponent.

@@ -5,8 +5,6 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ProtocolService} from "../../services/protocol.service";
-import {HttpParams} from "@angular/common/http";
-import {ISubscription} from "rxjs/Subscription";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
 

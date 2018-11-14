@@ -1,8 +1,8 @@
 import {Component,OnInit,OnDestroy,ViewChild} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {ExperimentViewService} from "../../services/experiment-view.service";

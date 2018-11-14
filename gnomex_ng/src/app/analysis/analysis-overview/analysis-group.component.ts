@@ -5,7 +5,8 @@ import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {URLSearchParams} from "@angular/http";
 import {AnalysisService} from "../../services/analysis.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
+import {distinctUntilChanged, first} from "rxjs/operators";
 
 
 @Component({
@@ -70,7 +71,7 @@ export class AnalysisGroupComponent implements OnInit,OnDestroy{
                 if(this.name === saveType){
                     this.save();
                 }});
-        this.projectBrowseForm.statusChanges.distinctUntilChanged()
+        this.projectBrowseForm.statusChanges.pipe(distinctUntilChanged())
             .subscribe(status =>{
                 if(status === "VALID"){
                     this.analysisService.invalid = false;
@@ -103,12 +104,12 @@ export class AnalysisGroupComponent implements OnInit,OnDestroy{
 
         getParams.set("idAnalysisGroup",idAnalysisGroup);
 
-        this.analysisService.saveAnalysisGroup(saveParams).first().subscribe(response =>{
+        this.analysisService.saveAnalysisGroup(saveParams).pipe(first()).subscribe(response =>{
             this.analysisService.refreshAnalysisGroupList_fromBackend();
             this.saveSuccess.emit();
             this.formInit = false;
 
-            this.analysisService.getAnalysisGroup(getParams).first().subscribe(response =>{
+            this.analysisService.getAnalysisGroup(getParams).pipe(first()).subscribe(response =>{
                 this.projectBrowseForm.get("name").setValue( response["AnalysisGroup"].name);
                 this.projectBrowseForm.get("description").setValue( response["AnalysisGroup"].description);
             });

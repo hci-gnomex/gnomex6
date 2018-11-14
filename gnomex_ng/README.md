@@ -1,10 +1,6 @@
 
 ## Getting Started
 
-At this time not all of the @hci npm modules have been published to a public repository, so if you are trying to build 
-this project and you are outside of the HCI organization, then you may experience some problems. We are working to 
-correct this situation.
-
 ### Prerequisites
 You will, of course need [Git](http://git-scm.com) to clone the project.  You will also need NodeJS and 
 [npm](https://www.npmjs.com/) (node package manager).  You can get them from here http://nodejs.org

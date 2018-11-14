@@ -5,15 +5,10 @@ import {
     MatTabGroup, MatTab
 } from '@angular/material';
 import {FormsModule, FormBuilder, ReactiveFormsModule} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {Http, HttpModule, XHRBackend} from "@angular/http";
 import {RouterTestingModule} from "@angular/router/testing";
 import {ILocalStorageServiceConfig, LocalStorageService} from "angular-2-local-storage";
-import {
-    AuthenticationModule, AuthenticationService,
-    AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_ROUTE,
-    AUTHENTICATION_TOKEN_KEY, AUTHENTICATION_TOKEN_ENDPOINT, AUTHENTICATION_DIRECT_ENDPOINT, AUTHENTICATION_MAX_INACTIVITY_MINUTES
-} from "@hci/authentication";
 import {ProgressService} from "../home/progress.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
@@ -24,7 +19,7 @@ import {PropertyService} from "../services/property.service";
 import {DebugElement} from "@angular/core";
 import {UsersGroupsTablistComponent} from "./users-groups-tablist.component";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
-import {AgGridModule} from "ag-grid-angular";
+import {AgGridModule} from "ag-grid-community-angular";
 import {AngularSplitModule} from "angular-split";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {BillingAdminTabComponent} from "./billingAdminTab/billing-admin-tab.component";
@@ -36,6 +31,14 @@ import {GetLabService} from '../services/get-lab.service';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MockBackend} from "@angular/http/testing";
 import {By} from "@angular/platform-browser";
+import {
+    AUTHENTICATION_DIRECT_ENDPOINT,
+    AUTHENTICATION_LOGOUT_PATH,
+    AUTHENTICATION_ROUTE,
+    AUTHENTICATION_TOKEN_ENDPOINT, AuthenticationService
+} from "../auth/authentication.service";
+import {AUTHENTICATION_TOKEN_KEY} from "../auth/authentication.provider";
+import {of} from "rxjs";
 
 const MOCKDATA=[{name:'jj'},
     {name: 'dd'}
@@ -114,7 +117,7 @@ class MockSecurityAdvisorService extends CreateSecurityAdvisorService {
 
 class MockAppUserListService extends AppUserListService {
     getFullAppUserList(): Observable<any> {
-        return Observable.of([{"displayName":"Aagaard, Christin (inactive)","qualifiedDisplayName":"Aagaard, Christin (inactive)","displayNameXMLSafe":"Aagaard, Christin (inactive)","firstLastDisplayName":"Christin Aagaard","idAppUser":"807","firstName":"Christin","lastName":"Aagaard","email":"jj@intera.com","confirmEmailGuid":"","passwordExpired":"","guidExpiration":"","shortName":"caagaard","isActive":"N","ucscUrl":"","coreFacilitiesICanSubmitTo":{"lazy":"true"},"managingCoreFacilities":{"lazy":"true"}},
+        return of([{"displayName":"Aagaard, Christin (inactive)","qualifiedDisplayName":"Aagaard, Christin (inactive)","displayNameXMLSafe":"Aagaard, Christin (inactive)","firstLastDisplayName":"Christin Aagaard","idAppUser":"807","firstName":"Christin","lastName":"Aagaard","email":"jj@intera.com","confirmEmailGuid":"","passwordExpired":"","guidExpiration":"","shortName":"caagaard","isActive":"N","ucscUrl":"","coreFacilitiesICanSubmitTo":{"lazy":"true"},"managingCoreFacilities":{"lazy":"true"}},
             {"displayName":"Abdellaoui, Sofiene","qualifiedDisplayName":"Abdellaoui, Sofiene","displayNameXMLSafe":"Abdellaoui, Sofiene","firstLastDisplayName":"Sofiene Abdellaoui","idAppUser":"2607","firstName":"Sofiene","lastName":"Abdellaoui","email":"u1000484@utah.edu","confirmEmailGuid":"","passwordExpired":"","guidExpiration":"","shortName":"sabdellaoui","isActive":"Y","ucscUrl":"","coreFacilitiesICanSubmitTo":{"lazy":"true"},"managingCoreFacilities":{"lazy":"true"}},
             {"displayName":"Abdul-Wajid, Sarah","qualifiedDisplayName":"Abdul-Wajid, Sarah","displayNameXMLSafe":"Abdul-Wajid, Sarah","firstLastDisplayName":"Sarah Abdul-Wajid","idAppUser":"2871","firstName":"Sarah","lastName":"Abdul-Wajid","email":"saraha@genetics.utah.edu","confirmEmailGuid":"","passwordExpired":"","guidExpiration":"","shortName":"sabdul-wajid","isActive":"Y","ucscUrl":"","coreFacilitiesICanSubmitTo":{"lazy":"true"},"managingCoreFacilities":{"lazy":"true"}},
             {"displayName":"Abedi, Majid","qualifiedDisplayName":"Abedi, Majid (external user)","displayNameXMLSafe":"Abedi, Majid","firstLastDisplayName":"Majid Abedi","idAppUser":"2833","firstName":"Majid","lastName":"Abedi","email":"majid@dxterity.com","confirmEmailGuid":"","passwordExpired":"","guidExpiration":"2015-09-23 15:13:14.117","shortName":"mabedi","isActive":"Y","ucscUrl":"","coreFacilitiesICanSubmitTo":{"lazy":"true"},"managingCoreFacilities":{"lazy":"true"}},
@@ -486,7 +489,7 @@ class MockAppUserListService extends AppUserListService {
         }
         // let appUser1 = {AppUser:{"displayName":"Abdellaoui, Sofiene","qualifiedDisplayName":"Abdellaoui, Sofiene","displayNameXMLSafe":"Abdellaoui, Sofiene","firstLastDisplayName":"Sofiene Abdellaoui","idAppUser":"2607","firstName":"Sofiene","lastName":"Abdellaoui","email":"u1000484@utah.edu","confirmEmailGuid":"","passwordExpired":"","guidExpiration":"","shortName":"sabdellaoui","isActive":"Y","ucscUrl":"","coreFacilitiesICanSubmitTo":{"lazy":"true"},"managingCoreFacilities":{"lazy":"true"}},
         //                 }
-            return Observable.of(appUser);
+            return of(appUser);
     }
 
 }

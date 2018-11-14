@@ -6,7 +6,7 @@ import {ExperimentPlatformService} from "../../services/experiment-platform.serv
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ConstantsService} from "../../services/constants.service";
 import {Subscription} from "rxjs";
-import {GridApi, RowSelectedEvent} from "ag-grid";
+import {GridApi, RowSelectedEvent} from "ag-grid-community";
 
 @Component({
     template: `

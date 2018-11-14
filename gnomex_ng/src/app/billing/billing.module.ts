@@ -30,7 +30,7 @@ import {NotesToCoreComponent} from "./notes-to-core.component";
         FormsModule,
         AngularMaterialModule,
         ServicesModule,
-        TreeModule,
+        TreeModule.forRoot(),
         AgGridModule.withComponents([
             DateEditor,
             DateRenderer,

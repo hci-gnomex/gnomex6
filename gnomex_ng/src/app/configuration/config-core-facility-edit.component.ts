@@ -8,7 +8,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {PrimaryTab} from "../util/tabs/primary-tab.component";
 import {ConfigurationService} from "../services/configuration.service";
 import {GnomexStringUtilService} from "../services/gnomex-string-util.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DictionaryService} from "../services/dictionary.service";
 
 

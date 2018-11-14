@@ -3,7 +3,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {LabListService} from "../../services/lab-list.service";
 import {GetLabService} from "../../services/get-lab.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {PropertyService} from "../../services/property.service";
 import {ConstantsService} from "../../services/constants.service";

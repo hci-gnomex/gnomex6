@@ -1,9 +1,8 @@
 import {Injectable} from "@angular/core";
 import {Http, Headers, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
+import {Observable} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class BroadcastEmailService {
@@ -17,13 +16,13 @@ export class BroadcastEmailService {
     }
 
     public getUploadURL(): Observable<any> {
-        return this.getUploadURLCall().map((response: Response) => {
+        return this.getUploadURLCall().pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 return null;
             }
-        });
+        }));
     }
 
     public sendBroadcastEmail(params: URLSearchParams):  Observable<Response> {

@@ -1,9 +1,8 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams, Headers} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
+import {Observable} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class AppUserPublicService {
@@ -19,13 +18,13 @@ export class AppUserPublicService {
     }
 
     public getAppUserPublic(idAppUser: string): Observable<any> {
-        return this.getAppUserPublicCall(idAppUser).map((response: Response) => {
+        return this.getAppUserPublicCall(idAppUser).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 return null;
             }
-        });
+        }));
     }
 
     public saveAppUserPublic(params: URLSearchParams):  Observable<Response> {

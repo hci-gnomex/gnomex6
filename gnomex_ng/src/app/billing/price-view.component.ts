@@ -5,7 +5,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectEditor} from "../util/grid-editors/select.editor";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, SelectionChangedEvent} from "ag-grid";
+import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, SelectionChangedEvent} from "ag-grid-community";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 

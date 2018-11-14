@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import { FormControl, FormGroupDirective, NgForm, Validators } from "@angular/forms";
 
 import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig, MAT_DIALOG_DATA} from "@angular/material";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 
 import { EditBillingAccountErrorDialogComponent } from "./dialogs/edit-billing-account-error-dialog.component";
 import { EditBillingAccountSuccessDialogComponent } from "./dialogs/edit-billing-account-success-dialog.component";

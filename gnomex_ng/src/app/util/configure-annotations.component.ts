@@ -9,7 +9,7 @@ import {ConstantsService} from "../services/constants.service";
 import {DialogsService} from "./popup/dialogs.service";
 import {MatSnackBar} from "@angular/material";
 import {ExperimentPlatformService} from "../services/experiment-platform.service";
-import 'rxjs/add/operator/distinctUntilChanged';
+import {first, take} from "rxjs/operators";
 
 @Component({
     selector: 'configure-annotations',
@@ -481,7 +481,7 @@ export class ConfigureAnnotationsComponent {
 
     public onAnnotGridRowSelected(event: any): void {
         if (event.node.selected && event.data.idProperty) {
-            this.propertyService.getPropertyAnnotation(event.data.idProperty).first().subscribe((prop: any) => {
+            this.propertyService.getPropertyAnnotation(event.data.idProperty).pipe(first()).subscribe((prop: any) => {
                 this.setProperty(prop.Property);
                 this.formGroup.markAsPristine();
             });
@@ -775,7 +775,7 @@ export class ConfigureAnnotationsComponent {
         this.orderType = this.SHOW_FOR_EXPERIMENTS;
 
         // need to know that getPropertyList has loaded. Also need experiment platform's core facility, platform, and orderType is set before updateDisplayedProperties is ran
-        this.expPlatformService.getPropertyListObservable().take(2).subscribe( data =>{
+        this.expPlatformService.getPropertyListObservable().pipe(take(2)).subscribe( data =>{
             if(data){
                 this.updateDisplayedProperties();
             }

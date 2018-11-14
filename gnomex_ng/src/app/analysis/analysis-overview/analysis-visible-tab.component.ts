@@ -2,13 +2,13 @@
 import {Component, OnInit, ViewChild, AfterViewInit, Output, EventEmitter} from "@angular/core";
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 import {URLSearchParams} from "@angular/http"
 import {AnalysisService} from "../../services/analysis.service";
 import {GnomexStringUtilService} from "../../services/gnomex-string-util.service";
@@ -20,7 +20,7 @@ import {GnomexStringUtilService} from "../../services/gnomex-string-util.service
         
         <div class="flexbox-column">
             <div style="flex:1; display:flex; width:100%;">
-                <ag-grid-angular style="width: 100%;" class="ag-fresh"
+                <ag-grid-angular style="width: 100%;" class="ag-theme-fresh"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"

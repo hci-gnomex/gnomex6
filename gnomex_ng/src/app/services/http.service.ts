@@ -1,7 +1,7 @@
 import {EventEmitter, Injectable} from "@angular/core";
 import {Http, RequestOptionsArgs, Response} from '@angular/http';
-import {Observable} from "rxjs/Observable";
-import 'rxjs/add/operator/map';
+import {Observable} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class HttpService {
@@ -22,7 +22,7 @@ export class HttpService {
         if (debugText) {
             console.log("Http get: " + debugText);
         }
-        return http.get(url, options).map((response: Response) => {
+        return http.get(url, options).pipe(map((response: Response) => {
             if (response.status === 200) {
                 if (debugText) {
                     console.log("Http success: " + debugText);
@@ -34,7 +34,7 @@ export class HttpService {
                 }
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
 }

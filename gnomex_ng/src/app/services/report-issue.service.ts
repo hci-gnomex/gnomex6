@@ -1,9 +1,8 @@
 import {Injectable} from "@angular/core";
 import {Http, Headers, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
+import {Observable} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class ReportIssueService {
@@ -18,13 +17,13 @@ export class ReportIssueService {
     }
 
     reportIssueServletGetURL(): Observable<any> {
-        return this.http.get("/gnomex/ReportIssueServletGetURL.gx").map((response: Response) => {
+        return this.http.get("/gnomex/ReportIssueServletGetURL.gx").pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
 }

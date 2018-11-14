@@ -9,9 +9,10 @@ import {DataTrackService} from "../../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import { ProgressBarModule } from "../../../../modules/progressbar.module";
 import {jqxProgressBarComponent} from "../../../../assets/jqwidgets-ts/angular_jqxprogressbar";
-import {Subscription} from "rxjs/Subscription";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subscription} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {ProgressService} from "../../../home/progress.service";
+import {first} from "rxjs/operators";
 
 @Component({
     templateUrl:'./sequence-files-dialog.component.html',
@@ -166,7 +167,7 @@ export class SequenceFilesDialog implements OnInit{
             formData.append("Upload", "Submit Query");
 
             this.datatrackService.getImportSeqFiles(formData)
-                .first().subscribe(resp =>{
+                .pipe(first()).subscribe(resp =>{
                         this.progressVal = ((idx + 1) / this.fileInfoList.length) * 100;
                         this.save(this.fileInfoList,idx + 1);
 
@@ -176,7 +177,7 @@ export class SequenceFilesDialog implements OnInit{
         else if( idx == this.fileInfoList.length){
             let params:URLSearchParams = new URLSearchParams();
             params.set("idGenomeBuild", this.idGenomeBuild);
-            this.datatrackService.getGenomeBuild(params).first().subscribe( resp =>{
+            this.datatrackService.getGenomeBuild(params).pipe(first()).subscribe( resp =>{
                 let seqFiles = Array.isArray(resp.SequenceFiles.Dir.File) ? resp.SequenceFiles.Dir.File
                     : [ resp.SequenceFiles.Dir.File];
                 this.setSeqGridFunc(seqFiles);

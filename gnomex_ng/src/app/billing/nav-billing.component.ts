@@ -12,7 +12,7 @@ import {
     CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent, RowClickedEvent, RowDoubleClickedEvent,
     RowDragEvent,
     RowNode
-} from "ag-grid";
+} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -24,11 +24,10 @@ import {
     BillingTemplate, BillingTemplateWindowComponent,
     BillingTemplateWindowParams
 } from "../util/billing-template-window.component";
-import {Observable} from "rxjs/Observable";
+import {Observable, Subscription} from "rxjs";
 import {PriceSheetViewComponent} from "./price-sheet-view.component";
 import {PriceCategoryViewComponent} from "./price-category-view.component";
 import {PriceViewComponent} from "./price-view.component";
-import {ISubscription} from "rxjs/Subscription";
 
 @Component({
     selector: 'nav-billing',
@@ -159,8 +158,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public disableAddBillingItemButton: boolean = true;
 
     public totalPrice: number = 0;
-    private onCoreCommentsWindowRequestSelected: ISubscription;
-    private refreshSubscription: ISubscription;
+    private onCoreCommentsWindowRequestSelected: Subscription;
+    private refreshSubscription: Subscription;
 
     constructor(private billingService: BillingService,
                 private dialogsService: DialogsService,

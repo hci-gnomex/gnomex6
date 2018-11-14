@@ -1,8 +1,8 @@
 import {Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {DialogPosition, MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {GridApi, GridReadyEvent, RowClickedEvent} from "ag-grid";
+import {GridApi, GridReadyEvent, RowClickedEvent} from "ag-grid-community";
 import {BillingService} from "../services/billing.service";
-import {ISubscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {HttpParams} from "@angular/common/http";
 import {BillingViewChangeForCoreCommentsWindowEvent} from "./billing-view-change-for-core-comments-window-event.model";
 
@@ -56,7 +56,7 @@ export class NotesToCoreComponent implements OnInit, OnDestroy {
     public notesGridColDefs: any[];
     public notesGridData: any[] = [];
 
-    private onParentViewChangedSubscription: ISubscription;
+    private onParentViewChangedSubscription: Subscription;
 
     constructor(@Inject(MAT_DIALOG_DATA) private data: any,
                 private dialogRef: MatDialogRef<NotesToCoreComponent>,

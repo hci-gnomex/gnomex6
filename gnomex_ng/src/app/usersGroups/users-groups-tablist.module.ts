@@ -83,7 +83,7 @@ import {CopyAccountsDialogComponent} from "./billingAccountTab/dialogs/copy-acco
         FormsModule,
         ReactiveFormsModule,
         ServicesModule,
-        TreeModule,
+        TreeModule.forRoot(),
         USERS_GROUPS_ROUTING,
         UtilModule
     ],

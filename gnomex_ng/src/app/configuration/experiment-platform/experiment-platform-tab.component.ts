@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ConstantsService} from "../../services/constants.service";

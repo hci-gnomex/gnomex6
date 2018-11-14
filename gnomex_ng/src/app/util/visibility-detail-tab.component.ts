@@ -11,9 +11,10 @@ import {GnomexService} from "../services/gnomex.service";
 import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
 import {ActivatedRoute} from "@angular/router";
-import {GridApi} from "ag-grid";
+import {GridApi} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {MatSelectChange} from "@angular/material";
+import {first} from "rxjs/operators";
 
 @Component({
     selector: 'visibility-detail-tab',
@@ -73,7 +74,7 @@ import {MatSelectChange} from "@angular/material";
 
             <div style="flex:3" *ngIf="showCollaboratorBlock" >
                 <ag-grid-angular style="width: 50%; height:100% "
-                                 class="ag-fresh"
+                                 class="ag-theme-fresh"
                                  [rowDeselection]="true"
                                  (gridReady)="this.onCollabGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged()"
@@ -243,7 +244,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
                 labParams.set('idLab', idLab);
                 labParams.set('includeBillingAccounts', 'N');
                 labParams.set('includeProductCounts','N');
-                this.getLabService.getLab(labParams).first().subscribe( data =>{
+                this.getLabService.getLab(labParams).pipe(first()).subscribe( data =>{
                     this.currentLab = data.Lab ? data.Lab : data;
                     this.memCollaborators = this.formatCollabList(this.currentLab.membersCollaborators);
                     this.possibleCollaborators  = this.formatCollabList(this.currentLab.possibleCollaborators);

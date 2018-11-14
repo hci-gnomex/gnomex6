@@ -2,7 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions} from "ag-grid";
+import {GridOptions} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";

@@ -1,8 +1,9 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from "@angular/core";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UsageService} from "../services/usage.service";
-import {Observable} from "rxjs/Observable";
+import {Observable} from "rxjs";
 import {URLSearchParams} from "@angular/http";
+import {of} from "rxjs";
 
 @Component({
     selector: 'track-usage',
@@ -141,7 +142,7 @@ export class TrackUsageComponent implements AfterViewInit {
             this.lastParams = params;
             return this.usageService.getUsageData(params);
         } else {
-            return Observable.of(this.data);
+            return of(this.data);
         }
     }
 

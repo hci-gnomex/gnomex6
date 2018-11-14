@@ -18,7 +18,7 @@ import {
     MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig,
     MAT_DIALOG_DATA
 } from "@angular/material";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Component({

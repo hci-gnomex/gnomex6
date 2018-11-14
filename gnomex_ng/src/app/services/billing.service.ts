@@ -1,13 +1,12 @@
 import {EventEmitter, Injectable, Output} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
+import {Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {BillingTemplate} from "../util/billing-template-window.component";
 import {BillingViewChangeForCoreCommentsWindowEvent} from "../billing/billing-view-change-for-core-comments-window-event.model";
 import {BillingFilterEvent} from "../billing/billing-filter.component";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class BillingService {
@@ -23,43 +22,43 @@ export class BillingService {
     }
 
     getBillingRequestListDep(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetBillingRequestList.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetBillingRequestList.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getBillingItemListDep(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetBillingItemList.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetBillingItemList.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getBillingInvoiceListDep(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetBillingInvoiceList.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetBillingInvoiceList.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     getBillingAccountListForPeriodAndCore(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetBillingAccountListForPeriodAndCore.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetBillingAccountListForPeriodAndCore.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     public getLibPrepApplicationPriceList(params: HttpParams): Observable<any> {
@@ -105,7 +104,7 @@ export class BillingService {
             .set("targetClassIdentifier", targetClassIdentifier)
             .set("targetClassName", targetClassName);
 
-        return this.httpClient.get("/gnomex/GetBillingTemplate.gx", {params: params}).map((result: any) => {
+        return this.httpClient.get("/gnomex/GetBillingTemplate.gx", {params: params}).pipe(map((result: any) => {
             if (result && result.idBillingTemplate) {
                 let billingTemplateItems: any[] = Array.isArray(result.BillingTemplateItem) ? result.BillingTemplateItem : [result.BillingTemplateItem];
                 let totalPercentAccounted: number = 0;
@@ -127,7 +126,7 @@ export class BillingService {
             } else {
                 return null;
             }
-        });
+        }));
     }
 
     public saveBillingTemplate(template: BillingTemplate): Observable<any> {

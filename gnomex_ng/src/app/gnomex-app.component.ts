@@ -3,16 +3,13 @@
  */
 import {Component, ViewChild, OnInit} from "@angular/core";
 import {Http, Response} from "@angular/http";
-import {AuthenticationService, TimeoutNotificationComponent} from "@hci/authentication";
 import {HeaderComponent} from "./header/header.component";
 
-//import {NavigationAction, NavigationItem, PrimaryNavigationItem, PrimaryNavigationItemGroup} from "@hci/navigation";
-import {Observable} from "rxjs/Observable";
-import 'rxjs/operator/finally';
-import 'rxjs/add/operator/catch'
+import {Observable} from "rxjs";
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
 import {ProgressService} from "./home/progress.service";
 import {DictionaryService} from "./services/dictionary.service";
+import {AuthenticationService} from "./auth/authentication.service";
 
 /**
  * The gnomex application component.

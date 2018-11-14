@@ -6,7 +6,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { URLSearchParams } from "@angular/http";
 
 import * as moment from 'moment';
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {BehaviorSubject} from "rxjs";
 import {BillingService} from "../../services/billing.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";

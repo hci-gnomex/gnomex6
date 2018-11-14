@@ -1,9 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs/Observable";
-
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/of';
+import {Observable} from "rxjs";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class LabListService {
@@ -18,23 +16,23 @@ export class LabListService {
     }
 
     public getLabList(): Observable<any[]> {
-        return this.getLabListCall().map((response: Response) => {
+        return this.getLabListCall().pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 return [];
             }
-        });
+        }));
     }
 
     getLabListWithParams(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetLabList.gx", {search: params}).map((response: Response) => {
+        return this.http.get("/gnomex/GetLabList.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     saveLab(params: URLSearchParams): Observable<any> {
@@ -42,38 +40,38 @@ export class LabListService {
     }
 
     getOrganismList(): Observable<any> {
-        return this.http.get("/gnomex/GetOrganismList.gx").map((response: Response) => {
+        return this.http.get("/gnomex/GetOrganismList.gx").pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 throw new Error("Error");
             }
-        });
+        }));
     }
 
     generateUserAccountEmail(params: URLSearchParams): Observable<any> {
         if (params.paramsMap.size === 0) {
-            return this.http.get("/gnomex/GenerateUserAccountEmail.gx").map((response: Response) => {
+            return this.http.get("/gnomex/GenerateUserAccountEmail.gx").pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 } else {
                     throw new Error("Error");
                 }
-            });
+            }));
 
         } else {
-            return this.http.get("/gnomex/GenerateUserAccountEmail.gx", {search: params}).map((response: Response) => {
+            return this.http.get("/gnomex/GenerateUserAccountEmail.gx", {search: params}).pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
                 } else {
                     throw new Error("Error");
                 }
-            });
+            }));
         }
     }
 
     public getSubmitRequestLabList(): Observable<any[]> {
-        return this.getLabListCall().map((response: Response) => {
+        return this.getLabListCall().pipe(map((response: Response) => {
             if (response.status === 200) {
                 let allLabs: any[] = response.json();
                 return allLabs.filter((lab: any) => {
@@ -82,7 +80,7 @@ export class LabListService {
             } else {
                 return [];
             }
-        });
+        }));
     }
 
     public getAllLabsCall(): Observable<Response> {
@@ -90,13 +88,13 @@ export class LabListService {
     }
 
     public getAllLabs(): Observable<any[]> {
-        return this.getAllLabsCall().map((response: Response) => {
+        return this.getAllLabsCall().pipe(map((response: Response) => {
             if (response.status === 200) {
                 return response.json();
             } else {
                 return [];
             }
-        });
+        }));
     }
 
 }

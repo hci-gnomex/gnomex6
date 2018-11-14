@@ -2,13 +2,13 @@ import {AfterViewChecked, Component, OnDestroy, OnInit, ViewChild} from "@angula
 import {PrimaryTab} from "../../util/tabs/primary-tab.component";
 import {FormBuilder} from "@angular/forms";
 import {ExperimentsService} from "../experiments.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ConstantsService} from "../../services/constants.service";
 import {Router} from "@angular/router";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {IconRendererComponent} from "../../util/grid-renderers/icon-renderer.component";
-import {GridOptions} from "ag-grid/main";
+import {GridOptions} from "ag-grid-community/main";
 
 @Component({
     selector: "experiment-browse-tab",
@@ -17,7 +17,7 @@ import {GridOptions} from "ag-grid/main";
         <!--- <grid dataProvider={} > -->
         <div style="height:100%; width:100%; display:flex; flex-direction: column;">
             <div style="display:flex; flex-direction:column; flex:1; width:100%;">
-                <ag-grid-angular class="ag-fresh" style="width: 100%;  height: 100%;" 
+                <ag-grid-angular class="ag-theme-fresh" style="width: 100%;  height: 100%;" 
                                  (cellDoubleClicked)="forwardToExperiment($event)"
                                  (gridSizeChanged)="adjustColumnSize($event)"
                                  [gridOptions]="gridOpt" 

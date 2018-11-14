@@ -1,7 +1,7 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
 
 import {EmailRelatedUsersService} from "./email-related-users.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DialogsService} from "../popup/dialogs.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 

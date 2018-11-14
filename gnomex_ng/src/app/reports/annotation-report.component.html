@@ -37,7 +37,7 @@
 </div>
 <div>
     <ag-grid-angular style="width: 550px; height: 500px;"
-                     class="ag-fresh"
+                     class="ag-theme-fresh"
                      (gridReady)="onAnnotationGridReady($event)"
                      (rowDataChanged)="onAnnotationGridRowDataChanged($event)"
                      [rowSelection]="'multiple'"
@@ -46,7 +46,7 @@
     </ag-grid-angular>
     <ag-grid-angular *ngIf="annotationsFor === FOR_SAMPLES"
                      style="width: 550px; height: 500px;"
-                     class="ag-fresh"
+                     class="ag-theme-fresh"
                      (gridReady)="onCustomColumnsGridReady($event)"
                      [rowSelection]="'multiple'"
                      [rowData]="customColumnsRowData"

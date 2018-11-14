@@ -7,7 +7,7 @@ import {Response, URLSearchParams} from "@angular/http";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {AppUserListService} from "../../services/app-user-list.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {GridOptions} from "ag-grid";
+import {GridOptions} from "ag-grid-community";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {MultiSelectEditor} from "../../util/grid-editors/multi-select.editor";

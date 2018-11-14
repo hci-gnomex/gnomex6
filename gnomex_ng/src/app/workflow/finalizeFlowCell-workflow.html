@@ -1,6 +1,6 @@
 <div class="flex-column-container-outlet">
-<split style="background-color: white">
-    <split-area size="50">
+<as-split style="background-color: white">
+    <as-split-area size="50">
         <div class="flex-column-container-workflow">
             <div class="flex-row-container">
                 <img src="../../assets/DNA_diag.png" height="16" width="16" style="margin-top: .65em">
@@ -13,7 +13,7 @@
                 <span class="normal-text">&nbsp;{{assmFlowCellNumber}}</span>
             </div>
             <div class="row-one" style="width: 100%;height: 90%">
-                <ag-grid-angular id="flowTable" style="width: 100%;font-size: .85rem" class="ag-fresh"
+                <ag-grid-angular id="flowTable" style="width: 100%;font-size: .85rem" class="ag-theme-fresh"
                                  [gridOptions]="gridOptions"
                                  [rowData]="workingWorkItemList"
                                  [columnDefs]="columnDefs"
@@ -28,8 +28,8 @@
                 </ag-grid-angular>
             </div>
         </div>
-    </split-area>
-    <split-area size="50">
+    </as-split-area>
+    <as-split-area size="50">
         <div class="flex-column-container-workflow">
             <div class="flex-row-container" style="justify-content: flex-end" >
                 <button mat-button matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img class="icon" src="../../assets/action_refresh.gif">Refresh</button>
@@ -72,7 +72,7 @@
                 <span class="normal-text">&nbsp;{{flowCellRunFolder}}</span>
             </div>
             <div class="row-one" style="width: 100%;height: 90%">
-                <ag-grid-angular id="assmTable" style="width: 100%;font-size: .85rem" class="ag-fresh"
+                <ag-grid-angular id="assmTable" style="width: 100%;font-size: .85rem" class="ag-theme-fresh"
                                  [gridOptions]="assmGridOptions"
                                  [rowData]="assmItemList"
                                  [columnDefs]="assmColumnDefs"
@@ -88,8 +88,8 @@
             </div>
 
         </div>
-    </split-area>
-</split>
+    </as-split-area>
+</as-split>
 <div class="flex-row-container-end">
     <button mat-button [disabled]="this.selectedFlowCell.length===0" style="margin-top: 1.2em" matTooltip="Delete selected Flow Cell" (click)="deleteFlowCell($event)"><img src="../../assets/delete.png">Delete</button>
     <save-footer (saveClicked)="save()"

@@ -1,12 +1,8 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {UserModule} from "@hci/user";
 
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
@@ -60,7 +56,6 @@ import {UploadModule} from "../upload/upload.module";
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        UserModule,
         AngularMaterialModule,
         BrowserAnimationsModule,
         NewBillingAccountModule,
@@ -74,7 +69,7 @@ import {UploadModule} from "../upload/upload.module";
             TextSelectXorMultiselectEditor,
             TextSelectXorMultiselectRenderer
         ]),
-        TreeModule,
+        TreeModule.forRoot(),
         ServicesModule,
         UploadModule
     ],

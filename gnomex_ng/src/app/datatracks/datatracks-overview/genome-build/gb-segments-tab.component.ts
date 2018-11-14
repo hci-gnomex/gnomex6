@@ -6,9 +6,9 @@ import {MatDialog, MatDialogRef} from "@angular/material";
 import {ImportSegmentsDialog} from "./import-segments-dialog";
 import {CreateSecurityAdvisorService} from "../../../services/create-security-advisor.service";
 import {ConstantsService} from "../../../services/constants.service";
-import {GridOptions} from "ag-grid";
+import {GridOptions} from "ag-grid-community";
 import {GenomeBuildValidateService} from "../../../services/genome-build-validate.service";
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 import {DataTrackService} from "../../../services/data-track.service";
 
 
@@ -31,7 +31,7 @@ import {DataTrackService} from "../../../services/data-track.service";
                 </button>
             </div>
             <div style="flex:1; display:flex; width:100%; padding-top: 1em;">
-                <ag-grid-angular style="width: 100%;" class="ag-fresh"
+                <ag-grid-angular style="width: 100%;" class="ag-theme-fresh"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"
                                  [rowSelection]="'multiple'"

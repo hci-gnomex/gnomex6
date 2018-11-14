@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {URLSearchParams} from "@angular/http";
 
-import {Subscription} from "rxjs/Subscription";
+import {Subscription} from "rxjs";
 
 import {EmailRelatedUsersPopupComponent} from "../../util/emailRelatedUsersPopup/email-related-users-popup.component";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
