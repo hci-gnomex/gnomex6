@@ -21,6 +21,7 @@ import {EpExperimentTypeTabComponent} from "./ep-experiment-type-tab.component";
 import {EpExperimentTypeIlluminaTabComponent} from "./ep-experiment-type-illumina-tab.component";
 import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.component";
 import {FormGroup} from "@angular/forms";
+import {DictionaryService} from "../../services/dictionary.service";
 import {first} from "rxjs/operators";
 
 @Component({
@@ -58,6 +59,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     public tabIndex = 0;
     public showInactive:boolean = false;
     private allExpPlatorms:any[] = [];
+    private selectedExpPlatformexPlatform : any;
 
 
 
@@ -88,30 +90,25 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     constructor(private secAdvisor:CreateSecurityAdvisorService,
                 private constService:ConstantsService,
                 public expPlatformService: ExperimentPlatformService,
-                private dialogService:DialogsService,private dialog:MatDialog){
+                private dialogService:DialogsService,private dialog:MatDialog,
+                private dictionaryService: DictionaryService
+    ){
     }
 
     ngOnInit():void{
         this.expPlatformService.getExperimentPlatformList_fromBackend(); // need
         this.expPlatformService.getExperimentPlatformTypeChangeObservable()
             .subscribe((expPlatform) =>{
+                this.experimentPlatformTabs = [];
+                this.expPlatformService.clearOutExpPlatformForm();
                 this.expPlatformService.setExperimentPlatformState(expPlatform);
                 this.propagateTabChange();
-                this.componentInit(expPlatform);
 
             });
 
     }
 
-    componentCreated(event:ComponentRef<any>){
-        this.tabComponentRefList.push(event);
-        if(event.instance instanceof ConfigureAnnotationsComponent ){
-            let propertyTab:ConfigureAnnotationsComponent = event.instance;
-            propertyTab.experimentPlatformMode = true;
-        }
 
-        //this.expPlatformService.addExpPlatformFormMember()
-    }
 
 
     onGridReady(event){
@@ -124,7 +121,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                     }else{
                         this.allExpPlatorms = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
                         this.filterExperimentPlatform();
-                        for(let row of this.rowData){
+                        for(let row of this.allExpPlatorms){
                             this.constService.getTreeIcon(row,'RequestCategory');
                         }
                         if(this.selectRowIndex > -1){
@@ -149,26 +146,22 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
 
             this.expPlatformService.setExperimentPlatformState(exPlatform);
-            this.expPlatformService.emitExperimentPlatform(exPlatform); // existing platform
-            this.propagateTabChange();
-
-            this.componentInit(exPlatform);
-
-
-            //this.experimentPlatformTabs =
+            //this.expPlatformService.emitExperimentPlatform(expPlatform); // existing platform
+            this.experimentPlatformTabs = [];
+            this.expPlatformService.clearOutExpPlatformForm();
+            this.propagateTabChange(exPlatform);
         }
 
     }
 
     selectedRow(event:any){
         this.selectedPlatformList = this.gridOpt.api.getSelectedRows();
-        let exPlatform = null;
-        if(this.selectedPlatformList.length > 0){
-            exPlatform =  _.cloneDeep(this.selectedPlatformList[0]);
-        }
 
         if( this.selectRowIndex != event.rowIndex && event.node.selected){
-            console.log("Previous tab: " + this.selectRowIndex + " current Tab: " + event.rowIndex  );
+            if(this.selectedPlatformList.length > 0){
+                this.selectedExpPlatformexPlatform =  _.cloneDeep(this.selectedPlatformList[0]);
+            }
+            //console.log("Previous tab: " + this.selectRowIndex + " current Tab: " + event.rowIndex  );
             if(this.expPlatformService.expPlatformOverviewForm.dirty){
                 this.dialogService.confirm("Warning","Your changes have not been saved.  Discard changes?").pipe(first()).subscribe(answer =>{
                     if(!answer){
@@ -178,15 +171,13 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                         return;
                     }else{
                         this.selectRowIndex = event.rowIndex;
-                        this.changeExperimentPlaform(exPlatform);
+                        this.changeExperimentPlaform(this.selectedExpPlatformexPlatform);
                     }
                 })
             }else{
                 this.selectRowIndex = event.rowIndex;
-                this.changeExperimentPlaform(exPlatform);
+                this.changeExperimentPlaform(this.selectedExpPlatformexPlatform);
             }
-
-
 
         }
 
@@ -234,15 +225,39 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
 
     }
+    componentCreated(event:ComponentRef<any>){
+        this.tabComponentRefList.push(event);
 
-
-    propagateTabChange() { // programmatically reloading tabs
-        let tabList: any[] = [];
-        this.expPlatformService.getExperimentPlatformTabList().forEach(tabStr => {
-            tabList.push(this.tabComponentTemplate[tabStr]);
+        if(event.instance instanceof ConfigureAnnotationsComponent ){
+            let propertyTab:ConfigureAnnotationsComponent = event.instance;
+            propertyTab.experimentPlatformMode = true;
+        }
+        setTimeout(()=>{
+            let name = event.instance.constructor.name;
+            if(!(event.instance instanceof ConfigureAnnotationsComponent) ){
+                this.expPlatformService.addExpPlatformFormMember(event.instance.formGroup,name);
+            }else {
+                let propertyTab:ConfigureAnnotationsComponent = event.instance;
+                propertyTab.setupExpPlatformMode(this.selectedExpPlatformexPlatform);
+            }
         });
-        this.tabIndex = 0;
-        this.experimentPlatformTabs = tabList;
+
+    }
+
+
+    propagateTabChange(expPlatform?:any) { // programmatically reloading tabs
+        setTimeout(() =>{
+            if(expPlatform){
+                this.expPlatformService.emitExperimentPlatform(expPlatform); // existing platform
+            }
+            let tabList: any[] = [];
+            this.expPlatformService.getExperimentPlatformTabList().forEach(tabStr => {
+                tabList.push(this.tabComponentTemplate[tabStr]);
+            });
+            this.tabIndex = 0;
+            this.experimentPlatformTabs = tabList;
+
+        });
     }
 
     tabChanged(event:MatTabChangeEvent){ // user selected a new tab
@@ -267,35 +282,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         }
     }
 
-    componentInit(expPlatform:any){
-        setTimeout(() =>{
-            let propertyTab:ComponentRef<ConfigureAnnotationsComponent> = null;
-            let tempTabComponentRefList:ComponentRef<any>[] = [];
-            for(let i = 0; i< this.tabComponentRefList.length; i++){
-                let pt = this.experimentPlatformTabs.find(platTab => this.tabComponentRefList[i].instance instanceof platTab.component);
-                if(pt){
-                    tempTabComponentRefList.push(this.tabComponentRefList[i]);
-                }else{
-                    this.expPlatformService.initExpPlatformForm(this.tabComponentRefList[i].instance.constructor.name, true);
-                }
-            }
-            this.tabComponentRefList = tempTabComponentRefList;
-
-            for(let compRef of this.tabComponentRefList){
-                let name = compRef.instance.constructor.name;
-                if(compRef.instance.formGroup && !this.expPlatformService.findExpPlatformFormMember(name)){
-                    this.expPlatformService.addExpPlatformFormMember(compRef.instance.formGroup,name);
-                }
-                if(compRef.instance instanceof ConfigureAnnotationsComponent ){
-                    this.expPlatformService.removeExpPlatformMember(name);
-                    propertyTab = compRef;
-                }
-
-            }
-            propertyTab.instance.setupExpPlatformMode(expPlatform);
-
-        });
-    }
     filterExperimentPlatform(){
         if(this.showInactive){
             this.rowData = this.allExpPlatorms;
@@ -367,46 +353,45 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
         if(this.expPlatformService.isIllumina && !this.expPlatformService.isNanoString){
             applications = expPlatformForm.get('EpExperimentTypeIlluminaTabComponent.applications').value;
-            rcApplications =this.getRequestCategoryList(applications);
-            params = params.set("applicationsXMLString",JSON.stringify(applications))
-                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
-
+            params = params.set("applicationsJSONString",JSON.stringify(applications));
         }else if(this.expPlatformService.isQC){
             applications = expPlatformForm.get('EpExperimentTypeQcTabComponent.applications').value;
-            rcApplications = this.getRequestCategoryList(applications);
-            params = params.set("applicationsXMLString",JSON.stringify(applications))
-                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
+            params = params.set("applicationsJSONString",JSON.stringify(applications))
         }else if(!this.expPlatformService.isNanoString){
             applications = expPlatformForm.get('EpExperimentTypeTabComponent.applications').value;
-            rcApplications=  this.getRequestCategoryList(applications);
-            params = params.set("applicationsXMLString",JSON.stringify(applications))
-                .set("requestCategoryApplicationXMLString", JSON.stringify(rcApplications));
+            params = params.set("applicationsJSONString",JSON.stringify(applications));
+        }
+
+        if(this.expPlatformService.isIllumina || this.expPlatformService.isSequenom){
+            rcApplications =this.getRequestCategoryList(applications);
+            params = params.set("requestCategoryApplicationJSONString",JSON.stringify(rcApplications));
         }
 
         sampleTypes = expPlatformForm.get('EpSampleTypeTabComponent.sampleTypes').value;
         if(sampleTypes && sampleTypes.length > 0){
-            params = params.set('sampleTypesXMLString', JSON.stringify(sampleTypes));
+            params = params.set('sampleTypesJSONString', JSON.stringify(sampleTypes));
         }
         sequencingOptionsForm = <FormGroup>expPlatformForm.get('EpIlluminaSeqTabComponent');
         if(sequencingOptionsForm){
             let seqOptions = sequencingOptionsForm.get('sequencingOptions').value;
-            params = params.set('sequencingOptionsXMLString', JSON.stringify(seqOptions));
+            params = params.set('sequencingOptionsJSONString', JSON.stringify(seqOptions));
         }
         prepQCProtocolsForm = <FormGroup>expPlatformForm.get('EpLibraryPrepQCTabComponent');
         if(prepQCProtocolsForm){
             let prepQCProtocols = prepQCProtocolsForm.get('prepQCProtocols').value;
-            params = params.set('prepQCProtocolsXMLString', JSON.stringify(prepQCProtocols));
+            params = params.set('prepQCProtocolsJSONString', JSON.stringify(prepQCProtocols));
         }
         pipelineProtocolsForm = <FormGroup>expPlatformForm.get('EpPipelineProtocolTabComponent');
         if(pipelineProtocolsForm){
             let pipelineProtocols = pipelineProtocolsForm.get('pipelineProtocols').value;
-            params = params.set('pipelineProtocolsXMLString',JSON.stringify(pipelineProtocols));
+            params = params.set('pipelineProtocolsJSONString',JSON.stringify(pipelineProtocols));
         }
         prepTypesForm = <FormGroup>expPlatformForm.get('EpPrepTypesTabComponent');
         if(prepTypesForm){
             let prepTypes = prepTypesForm.get('prepTypes').value;
-            params = params.set('prepTypesXMLString',JSON.stringify(prepTypes));
+            params = params.set('prepTypesJSONString',JSON.stringify(prepTypes));
         }
+        params = params.set("noJSONToXMLConversionNeeded", "Y");
 
 
         //let params:HttpParams = new HttpParams().set("applicationsXMLString",JSON.stringify(application));
@@ -416,6 +401,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe( resp => {
             if(resp && resp.result && resp.result === "SUCCESS" ){
                 this.expPlatformService.getExperimentPlatformList_fromBackend();
+                //this.dictionaryService.reloadAndRefresh();
             }else if(resp && resp.message){
                 this.dialogService.alert(resp.message);
                 this.showSpinner = false;
@@ -429,6 +415,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     ngOnDestroy(){
         this.platformListSubscription.unsubscribe();
+        this.expPlatformService.clearOutExpPlatformForm();
     }
 
 
