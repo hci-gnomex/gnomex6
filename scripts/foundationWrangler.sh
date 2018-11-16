@@ -33,7 +33,13 @@ export CLASSPATH
 
 set -e
 
-echo hello out there from foundation
+flaggedIDParam=${1:-normal}
+idColumn=${2:-1}
+fileList=""
+verifiedTrfInfo=""
+idStr=""
+
+:<<'END'
 
 tree "$foundationPath" --noreport > "$pDataPath"localFoundationTree.out
 java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localFoundationTree.out "$pDataPath"localFoundationPath.out
@@ -42,31 +48,38 @@ ls $remoteDataPath*TRF* > "$pDataPath"remoteFoundationPath.out
 java hci.gnomex.daemon.auto_import.DiffParser  "$pDataPath"localFoundationPath.out  "$pDataPath"remoteFoundationPath.out > "$pDataPath"uniqueFilesToMove.out
 
 
-
-# Filter file order of types  params: in, out, path, out, out
-
-java hci.gnomex.daemon.auto_import.FilterFile "$pDataPath"uniqueFilesToMove.out "$pDataPath"remoteChecksums.out "$pDataPath"localChecksums.out "$pDataPath"remoteFileList.out "$pDataPath"hci-creds.properties
-java hci.gnomex.daemon.auto_import.DiffParser "$pDataPath"localChecksums.out  "$pDataPath"remoteChecksums.out "$pDataPath"
-
-cat "$pDataPath"inclusion.out "$pDataPath"remoteFileList.out > "$pDataPath"remoteFPath.out
-
-cat "$pDataPath"remoteChecksums.out
-cat "$pDataPath"localChecksums.out
+if [ "$flaggedIDParam" = "normal"  ]; then
+    bash "$scriptsPath"makeReattemptList.sh $remoteDataPath ".*RF.*"  "$pDataPath"reattemptFileList.out
+    # Filter file order of types  params: in, out, path, out, out
+    java hci.gnomex.daemon.auto_import.FilterFile "$pDataPath"uniqueFilesToMove.out "$pDataPath"remoteChecksums.out "$pDataPath"localChecksums.out "$pDataPath"remoteFileList.out "$pDataPath"hci-creds.properties "$pDataPath"filteredOutList.out
+    java hci.gnomex.daemon.auto_import.DiffParser "$pDataPath"localChecksums.out  "$pDataPath"remoteChecksums.out "$pDataPath"
 
 
-rm "$pDataPath"*Checksums.out
+    cat "$pDataPath"inclusion.out "$pDataPath"reattemptFileList.out "$pDataPath"remoteFileList.out > "$pDataPath"importableFileList.out
+    fileList="$pDataPath"importableFileList.out
+    #cat "$pDataPath"inclusion.out "$pDataPath"reattemptFileList.out > "$pDataPath"foundFileList.out
+
+    cat "$pDataPath"remoteChecksums.out
+    cat "$pDataPath"localChecksums.out
+    rm "$pDataPath"*Checksums.out
+
+else
+    # occur when user has verified the data and wants to intervene by supplying a file to use over database query
+    find $remoteDataPath"Flagged/" -regextype sed -regex ".*RF.*"  -printf '%f\n' > $remoteDataPath"Flagged/"tempFilesToVerify.out
+    bash "$scriptsPath"makeVerifiedList.sh $flaggedIDParam  $remoteDataPath"Flagged/"tempFilesToVerify.out "$pDataPath"verifiedFoundList.out $idColumn
+    fileList="$pDataPath"verifiedFoundList.out
+    echo else
+fi
+
+echo hello out there from foundation
 
 
- #echo  `wc -l < "$pDataPath"download.log`
-
-idStr=""
 
 while read fileName; do
         if [[ $fileName =~ $regex ]]; then
                 id=${BASH_REMATCH[1]}
                 fullMatch=$BASH_REMATCH
 
-                echo fileName $fileName this is the id: $id
                 #fileSeqType="${BASH_REMATCH[2]}"
 
                 if [ ! -z "$id" ]; then # If id variable is not empty
@@ -74,25 +87,31 @@ while read fileName; do
                 fi
                                 #echo $id
         fi
-done < "$pDataPath"inclusion.out # reading from this file 'inclusion.out'
+done < $fileList # has all file names that have never been imported plus reattempts
 
 echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder > "$pDataPath"tempStr.out
 echo The temp str:
+
 cat "$pDataPath"tempStr.out
 
+END
 
-java  hci.gnomex.daemon.auto_import.Linker "$pDataPath"tempStr.out "$pDataPath"hci-creds.properties "$pDataPath"trfInfo.out foundation
+if [ "$flaggedIDParam" = "normal"  ]; then
+    java  hci.gnomex.daemon.auto_import.Linker "$pDataPath"tempStr.out "$pDataPath"hci-creds.properties "$pDataPath"trfInfo.out foundation
+    verifiedTrfInfo="$pDataPath"trfInfo.out
+else
+    verifiedTrfInfo=$flaggedIDParam
+fi
+
+
 rm "$pDataPath"tempStr.out
 
-java hci.gnomex.daemon.auto_import.XMLParserMain -file "$pDataPath"trfInfo.out -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"tempRequest.xml -importMode foundation
-java hci.gnomex.daemon.auto_import.FileMover -file "$pDataPath"remoteFPath.out  -root $foundationPath -downloadPath $remoteDataPath -flaggedFile "$pDataPath"flaggedIDs.out -mode foundation
+java hci.gnomex.daemon.auto_import.XMLParserMain -file $verifiedTrfInfo -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"tempRequest.xml -importMode foundation
+java hci.gnomex.daemon.auto_import.FileMover -file $fileList  -root $foundationPath -downloadPath $remoteDataPath -flaggedFile "$pDataPath"flaggedIDs.out -mode foundation
 
 #rm "$pDataPath"tempAnalysisList.out
 
-
-
 echo ------------------------------------------------------------------------------------------------------------
 #cat matched.txt | java -jar fileNavParser.jar
-
 #rm ../Data/matched.txt
 #rm catList.txt
