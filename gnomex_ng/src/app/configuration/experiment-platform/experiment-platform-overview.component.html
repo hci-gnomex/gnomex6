@@ -36,10 +36,10 @@
             </as-split-area>
 
             <as-split-area size="80">
-                <div style="padding-left:2em;" class="full-height full-width border">
+                <div  class="full-height full-width border">
                     <mat-tab-group [(selectedIndex)]="tabIndex" (selectedTabChange)="tabChanged($event)" class="full-height full-width border">
                         <mat-tab [label]="tab.name" *ngFor="let tab of experimentPlatformTabs ">
-                            <ndc-dynamic style="height: 100%;width: 100%" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)">
+                            <ndc-dynamic style="height:100%; width: 100%;" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)">
                             </ndc-dynamic>
                         </mat-tab>
 

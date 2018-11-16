@@ -278,7 +278,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             app.unitPriceInternal =  libPrepDialogForm.get('unitPriceInternal').value;
             app.unitPriceExternalAcademic =  libPrepDialogForm.get('unitPriceExternalAcademic').value;
             app.unitPriceExternalCommercial =  libPrepDialogForm.get('unitPriceExternalCommercial').value;
-            app.hasCaptureLibDesign =  libPrepDialogForm.get('hasCaptureLibDesign').value;
+            app.hasCaptureLibDesign =  libPrepDialogForm.get('hasCaptureLibDesign').value ? "Y" : "N";
             app.idSeqLibProtocols =  libPrepDialogForm.get('idSeqLibProtocols').value;
             app.coreSteps =  libPrepDialogForm.get('coreSteps').value;
             app.coreStepsNoLibPrep =  libPrepDialogForm.get('coreStepsNoLibPrep').value;
