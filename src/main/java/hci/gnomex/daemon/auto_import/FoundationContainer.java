@@ -150,7 +150,7 @@ public class FoundationContainer {
 		}
 	}
 
-	public void makeLocalCheckSums(String localChecksum) {
+	public void makeLocalCheckSums(String localChecksum, List<String> filterOutList) {
 		List<String>  commands = new ArrayList<String>();
 		StringBuilder strBuild = new StringBuilder();
 		int count = 0;
@@ -161,19 +161,22 @@ public class FoundationContainer {
 			String file = entry.getKey();
 			String fileChecksum = entry.getValue();
 			if(file != null && fileChecksum != null && !fileChecksum.equals("")) {
-				System.out.println(file);
 				strBuild.append("md5sum ");
 				strBuild.append(file);
 				strBuild.append(" >> ");
 				strBuild.append(localChecksum);
 				strBuild.append(";");
-				//strBuild.append(" rm ");
-				//strBuild.append(fileChecksum);
-				//strBuild.append(";");
 				System.out.println(strBuild.toString());
 
 				commands.add(strBuild.toString());
 				strBuild = new StringBuilder();
+
+			}else if( fileChecksum == null || fileChecksum.equals("")){
+				if(file != null){// missing .md5 file indirectly will filtering out bam or bam.bia file
+					filterOutList.add(file);
+				}else{
+					System.out.println(" A bam or bam.bia file name is null, input file for FilterFile.java might be corrupt");
+				}
 
 			}
 

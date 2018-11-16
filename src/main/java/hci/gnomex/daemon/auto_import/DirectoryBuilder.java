@@ -4,6 +4,9 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.*;
 import org.hibernate.Session;
 
+import javax.mail.MessagingException;
+import javax.naming.NamingException;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,6 +35,9 @@ public class DirectoryBuilder {
 	private static final String DNA_ALIAS="DNA";
 	private static final String RNA_ALIAS="RNA";
 	private static final String FASTQ_ALIAS="Fastq";
+	private static final Integer AVATAR_GROUP_ID = 11;
+	private static final Integer FOUNDATION_GROUP_ID = 14;
+	private static final int TEST_TYPE_PROPERTY_ID = 21;
 	 
 
 	public DirectoryBuilder(String[] args) {
@@ -199,8 +205,8 @@ public class DirectoryBuilder {
 		}
 		
 		
-		this.moveTheFiles(filteredFiles);
-		return filesWithPaths;
+		this.moveTheFiles(filteredFiles); // These files we want to move into the flagged folder
+		return filesWithPaths; // These are the files we want to move to where data lives for gnomex
 
 		//boolean made = new File("C:\\Users\\u0566434\\Desktop\\ORIEN\\tEST13\\TESTAGAIN").mkdir();
 
@@ -317,7 +323,6 @@ public class DirectoryBuilder {
 	}
 	
 	public void moveTheFiles(List<String> files) {
-		System.out.println("Preparing to move flagged files");
 		StringBuilder strBuild = new StringBuilder();
 		List<String> commands = new ArrayList<String>();
 		
@@ -398,11 +403,7 @@ public class DirectoryBuilder {
 	private  List<String> readSampleIDs(String fileName){
 		BufferedReader bf = null;
 		List<String> idList = new ArrayList<String>();
-		
-		
-	
-	
-		
+
 		try {
 			bf = new BufferedReader(new FileReader(new File(fileName)));
 			String line = "";
@@ -430,23 +431,32 @@ public class DirectoryBuilder {
 	}
 
 
+
 	public void reportWorkSummary() {
+		System.out.println("[FileMover:DirectoryBuilder->reportWorkSummary] MAKING FINAL REPORT");
 
 		String path = XMLParser.getPathWithoutName(this.inFileName);
 		List<String> sampleIDList = new ArrayList<String>();
 		StringBuilder strBuild = new StringBuilder();
-		String from = "erik.rasmussen@hci.utah.edu";
-		String to = "erik.rasmussen@hci.utah.edu, dalton.wilson@hci.utah.edu";
-		String subject = "Imported Patient ID Report";
+		String from = "DoNotReply@hci.utah.edu";
+		String to = "erik.rasmussen@hci.utah.edu, dalton.wilson@hci.utah.edu, david.nix@hci.utah.edu, qing.li@hci.utah.edu, aaron.atkinson@hci.utah.edu";
+		String subject = "GNomEx Importer Automated Email - Patient ID Report";
+		Query q =  new Query(path+"gnomex-creds.properties");
+		List<String> reportIDList = new ArrayList<String>();
+
 
 		if(mode.equals("avatar")){
 			sampleIDList =  readSampleIDs(path +"importedSLList.out");
+			reportIDList =  q.getImportedIDReport(sampleIDList,DirectoryBuilder.AVATAR_GROUP_ID);
+
 		}else{
 			sampleIDList = readSampleIDs(path + "importedTRFList.out");
+			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.FOUNDATION_GROUP_ID);
 		}
 
-		Query q =  new Query(path+"gnomex-creds.properties");
-		List<String> reportIDList =  q.getImportedIDReport(sampleIDList);
+		//Map<String, HashMap<String,Long>> personMap = q.countPropertyByPerson(TEST_TYPE_PROPERTY_ID);
+
+
 		q.closeConnection();
 
 		strBuild.append("The following records have been successfully been imported into Translational GNomEx\n\n");
@@ -454,7 +464,6 @@ public class DirectoryBuilder {
 		for(String id : reportIDList){
 			strBuild.append(id);
 		}
-
 
 		if(reportIDList.size() > 0 ){
 			try{
@@ -471,25 +480,21 @@ public class DirectoryBuilder {
 
 
 	}
-	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail) throws Exception{
-		Session sess = null;
-		BatchDataSource dataSource = new BatchDataSource();
-		StringBuilder strBuild = new StringBuilder();
-
-			dataSource.connect();
-			Properties mailProps = new BatchMailer("").getMailProperties();
+	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail) {
 			//PropertyDictionaryHelper ph = PropertyDictionaryHelper.getInstance(sess);
 			//String gnomexSupportEmail = ph.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
 
-
+		try {
+			Properties mailProps = new BatchMailer("").getMailProperties();
+			System.out.println("The mailProps have been saved");
+			System.out.println(mailProps.toString());
 
 			boolean sendTestEmail = false;
-			if(testEmail != null){
-				if(testEmail.length() > 0){
+			if (testEmail != null) {
+				if (testEmail.length() > 0) {
 					sendTestEmail = true;
 				}
 			}
-
 
 			MailUtilHelper helper = new MailUtilHelper(
 					mailProps,
@@ -504,9 +509,19 @@ public class DirectoryBuilder {
 					sendTestEmail,
 					testEmail
 			);
+
 			MailUtil.validateAndSendEmail(helper);
-			System.out.println("Email has been sent!");
-			dataSource.close();
+		} catch (NamingException e) {
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Email has been sent!");
+
 
 	}
 
