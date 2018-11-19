@@ -51,7 +51,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
         this.route.data.forEach((data: any) => {
             this.experiment = null;
 
-            if (data && data.experiment) {
+            if (data && data.experiment && data.experiment.Request) {
                 this.experiment = data.experiment.Request;
             }
 
@@ -91,8 +91,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
 
     initRelatedData(experiment: any): boolean {
 
-        let rObjects = experiment.relatedObjects;
-        let relatedTopics = experiment.relatedTopics;
+        let rObjects = experiment ? experiment.relatedObjects : null;
+        let relatedTopics = experiment ? experiment.relatedTopics : null;
 
         if(rObjects){
 

@@ -5,7 +5,7 @@
             <mat-select [compareWith]="compareByID"
                         [(ngModel)]="this.currentLab"
                         placeholder="Lab Filter"
-                        (change)="selectLab($event)">
+                        (selectionChange)="selectLab($event)">
                 <mat-option *ngFor="let lab of labList" [value]="lab">
                     {{ lab.name }}
                 </mat-option>

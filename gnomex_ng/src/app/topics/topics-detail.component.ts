@@ -113,13 +113,13 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit{
 
         this.route.data.forEach(data =>{
             this.topicLab = data.topicLab.Lab;
-            this.currentIdLab = this.topicLab.idLab ? this.topicLab.idLab : "";
+            this.currentIdLab = this.topicLab && this.topicLab.idLab ? this.topicLab.idLab : "";
 
             if(this.topicNode.name){
                 this.visOpt = this.topicNode.codeVisibility;
                 this.currentIdAppUser = this.topicNode.idAppUser ? this.topicNode.idAppUser : '';
 
-                let memList: Array<any> = Array.isArray(this.topicLab.members) ? this.topicLab.members : [this.topicLab.members.AppUser];
+                let memList: Array<any> = (this.topicLab && this.topicLab.members) ? (Array.isArray(this.topicLab.members) ? this.topicLab.members : [this.topicLab.members.AppUser]) : [];
                 let activeMemList: Array<any> = memList.filter(appUser => appUser.isActive === 'Y');
                 this.getLabService.labMembersSubject.next(activeMemList);
 

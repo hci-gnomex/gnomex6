@@ -12,7 +12,7 @@
             </div>
             <div class="flex-row-container">
                 <mat-form-field style="width: 100%">
-                    <mat-select placeholder="Protocol" [(ngModel)]="protocol" (change)="onSeqListSelection($event)">
+                    <mat-select placeholder="Protocol" [(ngModel)]="protocol" (selectionChange)="onSeqListSelection($event)">
                         <mat-option *ngFor="let protocol of sequenceProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
                     </mat-select>
                 </mat-form-field>

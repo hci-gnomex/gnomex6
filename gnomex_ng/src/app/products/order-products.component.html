@@ -4,7 +4,7 @@
     </div>
     <div class="full-width">
         <mat-form-field class="half-width">
-            <mat-select placeholder="Verify your lab group" [(value)]="this.idLab" (change)="this.onLabChange()">
+            <mat-select placeholder="Verify your lab group" [(value)]="this.idLab" (selectionChange)="this.onLabChange()">
                 <mat-option>None</mat-option>
                 <mat-option *ngFor="let lab of this.labList" [value]="lab.idLab">{{lab.name}}</mat-option>
             </mat-select>

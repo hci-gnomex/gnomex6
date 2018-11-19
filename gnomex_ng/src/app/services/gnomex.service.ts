@@ -547,7 +547,8 @@ export class GnomexService {
     }
 
     private onGetLabList(labs: any[]):void {
-        this.labList = labs;
+        let labsNonNull: any[] = labs ? labs : [];
+        this.labList = labsNonNull;
 
         this.submitRequestLabList = this.labList.filter(lab => {
             return lab.canGuestSubmit === 'Y' || lab.canSubmitRequests === 'Y';
@@ -563,15 +564,15 @@ export class GnomexService {
         // will have a full list since they can submit a request on behalf
         // of any lab.
         if (this.createSecurityAdvisorService.isUniversityOnlyUser) {
-            this.workAuthLabList = labs;
-            this.promptedWorkAuthLabList = labs;
+            this.workAuthLabList = labsNonNull;
+            this.promptedWorkAuthLabList = labsNonNull;
         } else if (this.isGuestState) {
         } else if (this.canSubmitRequestForALab()) {
             this.workAuthLabList = this.submitRequestLabList;
             this.promptedWorkAuthLabList = this.submitRequestLabList;
         } else {
-            this.workAuthLabList = labs;
-            this.promptedWorkAuthLabList = labs;
+            this.workAuthLabList = labsNonNull;
+            this.promptedWorkAuthLabList = labsNonNull;
         }
     }
 
@@ -754,7 +755,7 @@ export class GnomexService {
                 forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
                     .pipe(first()).subscribe((response: any[]) => {
                     this.progressService.displayLoader(45);
-                    this.appUserList = response[0];
+                    this.appUserList = [];
                     this.labList = response[1];
                     this.progressService.displayLoader(60);
                     this.myCoreFacilities = this.dictionaryService.coreFacilities();

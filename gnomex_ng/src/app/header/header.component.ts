@@ -243,11 +243,6 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 iconName: '../../assets/flask.png',
             },
             {
-                displayName: 'New Billing Account',
-                iconName: '../../assets/money.png',
-                route: [{outlets: {'modal': 'NewBillingAccountModal'}}]
-            },
-            {
                 displayName: 'Analysis',
                 class: 'top-menu-item',
                 iconName: '../../assets/map.png',
@@ -2155,7 +2150,6 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
         this.customizeMenus(this.adminPlateBasedNavItems);
         this.customizeMenus(this.managerNavItems);
 
-        // TODO Handle guestMode
         if (this.createSecurityAdvisorService.isGuest || this.createSecurityAdvisorService.isUniversityOnlyUser) {
             this.currentState = "GuestState";
         } else if (this.gnomexService.hasPermission(CreateSecurityAdvisorService.CAN_ACCESS_ANY_OBJECT)) {
@@ -2231,6 +2225,10 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
             }
             case "ManagerESState" : {
                 this.navItems = this.managerESNavItems;
+                break;
+            }
+            case "GuestState" : {
+                this.navItems = this.guestNavItems;
                 break;
             }
         }

@@ -22,19 +22,19 @@
         <div class="embeddedRow" >
             <label class="leadingLabel">Applies To Specific</label>
             <mat-form-field class="embeddedField">
-                <mat-select placeholder="Organism" [(ngModel)]="idOrganism" (change)="this.onCriteriaChange()">
+                <mat-select placeholder="Organism" [(ngModel)]="idOrganism" (selectionChange)="this.onCriteriaChange()">
                     <mat-option>None</mat-option>
                     <mat-option *ngFor="let organism of listOrganism" [value]="organism.display">{{organism.display}}</mat-option>
                 </mat-select>
             </mat-form-field>
             <mat-form-field class="embeddedField">
-                <mat-select placeholder="Experiment Platform" [(ngModel)]="codeRequestCategory" (change)="this.onCriteriaChange()">
+                <mat-select placeholder="Experiment Platform" [(ngModel)]="codeRequestCategory" (selectionChange)="this.onCriteriaChange()">
                     <mat-option>None</mat-option>
                     <mat-option *ngFor="let plat of listExperimentPlatform" [value]="plat.display">{{plat.display}}</mat-option>
                 </mat-select>
             </mat-form-field>
             <mat-form-field class="embeddedField">
-                <mat-select placeholder="Analysis Type" [(ngModel)]="idAnalysisType" (change)="this.onCriteriaChange()">
+                <mat-select placeholder="Analysis Type" [(ngModel)]="idAnalysisType" (selectionChange)="this.onCriteriaChange()">
                     <mat-option>None</mat-option>
                     <mat-option *ngFor="let analysisType of listAnalysisType" [value]="analysisType.display">{{analysisType.display}}</mat-option>
                 </mat-select>

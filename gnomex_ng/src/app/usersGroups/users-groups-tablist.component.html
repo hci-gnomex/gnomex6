@@ -59,7 +59,7 @@
                                             </mat-panel-title>
                                         </mat-expansion-panel-header>
                                         <mat-form-field>
-                                            <mat-select placeholder="Core facility" (change)="searchCoreFacility($event)">
+                                            <mat-select placeholder="Core facility" (selectionChange)="searchCoreFacility($event)">
                                                 <mat-option *ngFor="let core of this.myCoreFacilitiesIManage" [value]="core.value">
                                                     {{core.facilityName}}
                                                 </mat-option>
@@ -67,7 +67,7 @@
                                         </mat-form-field>
                                         <mat-checkbox [(ngModel)]="externalGroup" (change)="onExternalGroupChange($event)">External</mat-checkbox>
                                         <mat-form-field>
-                                            <mat-select placeholder="Institution" (change)="searchInstitution($event)">
+                                            <mat-select placeholder="Institution" (selectionChange)="searchInstitution($event)">
                                                 <mat-option *ngFor="let institute of this.institutions" [value]="institute.value">
                                                     {{institute.institution}}
                                                 </mat-option>
