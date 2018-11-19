@@ -19,7 +19,7 @@
                             <mat-form-field class="full-width">
                                 <mat-select [(value)]="_experiment.idLab"
                                             [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"
-                                            (change)="onChange_lab($event)">
+                                            (selectionChange)="onChange_lab($event)">
                                     <mat-option [value]="">
                                         {{ '' }}
                                     </mat-option>
@@ -40,7 +40,7 @@
                             <mat-form-field class="full-width">
                                 <mat-select [(value)]="_experiment.idProject"
                                             [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"
-                                            (change)="onChange_project($event)">
+                                            (selectionChange)="onChange_project($event)">
                                     <mat-option *ngFor="let project of projectsDictionary" [value]="project.idProject">
                                         {{ project.name }}
                                     </mat-option>
@@ -78,7 +78,7 @@
                                     <mat-select
                                             [(value)]="_experiment.codeApplication"
                                             [disabled]="!(isAdmin || (_experiment.canUpdate === 'Y' && _experiment.isExternal =='Y'))"
-                                            (change)="onChange_application($event)" >
+                                            (selectionChange)="onChange_application($event)" >
                                         <mat-option [value]="">
                                             {{ '' }}
                                         </mat-option>
@@ -136,7 +136,7 @@
                             <mat-form-field class="full-width">
                                 <mat-select
                                         [(value)]="_experiment.idAppUser"
-                                        (change)="onChange_owner($event)"
+                                        (selectionChange)="onChange_owner($event)"
                                         [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')">
                                     <mat-option [value]="">
                                         {{ '' }}
@@ -158,7 +158,7 @@
                             <mat-form-field class="full-width">
                                 <mat-select
                                         [(value)]="_experiment.idSubmitter"
-                                        (change)="onChange_submitter($event)"
+                                        (selectionChange)="onChange_submitter($event)"
                                         [disabled]="!isAdmin">
                                     <mat-option [value]="">
                                         {{ '' }}

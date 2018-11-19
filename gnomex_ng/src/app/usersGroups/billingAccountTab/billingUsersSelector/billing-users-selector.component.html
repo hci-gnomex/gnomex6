@@ -28,7 +28,7 @@
 						<div class="td vertical-center center">
 
 							<mat-form-field style="width: 80%;">
-								<mat-select placeholder="Select a Lab..." [(value)]="selectedLab" (change)="onLabListSelection($event)">
+								<mat-select placeholder="Select a Lab..." [(value)]="selectedLab" (selectionChange)="onLabListSelection($event)">
 									<mat-option *ngFor="let lab of labList" [value]="lab">
 										{{ lab.name }}
 									</mat-option>

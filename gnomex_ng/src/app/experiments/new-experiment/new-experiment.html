@@ -38,7 +38,7 @@
                     </mat-form-field>
 
                     <mat-form-field *ngIf="adminState==='AdminState'" class="formField">
-                        <mat-select placeholder="Owner" formControlName="selectOwner" (change)="onUserSelection($event)">
+                        <mat-select placeholder="Owner" formControlName="selectOwner" (selectionChange)="onUserSelection($event)">
                             <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem">
                                 {{ mem.displayName }}
                             </mat-option>
@@ -49,7 +49,7 @@
                 </div>
                 <div *ngIf="showBilling" class="flex-container-row">
                     <mat-form-field class="formField">
-                        <mat-select placeholder="Account" formControlName="selectAccount" (change)="onBillingSelection($event)">
+                        <mat-select placeholder="Account" formControlName="selectAccount" (selectionChange)="onBillingSelection($event)">
                             <mat-option *ngFor="let account of authorizedBillingAccounts" [value]="account">
                                 {{ account.accountNameDisplay }}
                             </mat-option>
@@ -74,7 +74,7 @@
                 </div>
                 <div *ngIf="showProject" class="flex-container-row">
                     <mat-form-field class="formField">
-                        <mat-select placeholder="Project" formControlName="selectProject" (change)="onProjectSelection($event)">
+                        <mat-select placeholder="Project" formControlName="selectProject" (selectionChange)="onProjectSelection($event)">
                             <mat-option *ngFor="let project of filteredProjectList" [value]="project">
                                 {{ project.name }}
                             </mat-option>

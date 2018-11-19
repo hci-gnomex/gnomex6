@@ -1,1 +1,1 @@
-<SUCCESS/>
+{"SUCCESS": true}

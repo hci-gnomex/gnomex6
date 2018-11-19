@@ -423,12 +423,11 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 
         // this.labListService.getAllLabsUnbounded().subscribe((labs: any[]) => {
         this.labListService.getLabList().subscribe((labs: any[]) => {
-            if (labs) {
-                this.labDictionary = labs;
-                this.isReady_labDictionary = true;
+            let labsSafe: any[] = labs ? labs : [];
+            this.labDictionary = labsSafe;
+            this.isReady_labDictionary = true;
 
-                this.filterLabDictionary();
-            }
+            this.filterLabDictionary();
         });
 
         if (this._experiment && this._experiment.idLab && !this.labSubscription) {
@@ -656,10 +655,12 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             return;
         }
 
-        let temp: any[] = this.lab.Lab.members;
+        if (this.lab.Lab.members) {
+            let temp: any[] = this.lab.Lab.members;
 
-        for (let member of temp) {
-            this.possibleOwnersForLabDictionary.push(member);
+            for (let member of temp) {
+                this.possibleOwnersForLabDictionary.push(member);
+            }
         }
 
         if (this.lab.Lab.managers) {
@@ -829,7 +830,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
     private updateCollaboratorsDisplay() {
         this.currentCollaboratorsDisplay = '';
 
-        if (this._experiment) {
+        if (this._experiment && this._experiment.collaborators) {
             for (let collaborator of this._experiment.collaborators) {
                 if (this.currentCollaboratorsDisplay) {
                     this.currentCollaboratorsDisplay = this.currentCollaboratorsDisplay + '\n';
