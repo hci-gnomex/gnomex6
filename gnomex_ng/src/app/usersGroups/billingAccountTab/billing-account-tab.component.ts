@@ -492,7 +492,6 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             editable: false,
             width: 200,
             minWidth: 10 * this.emToPxConversionRate,
-            maxWidth: 15 * this.emToPxConversionRate,
             cellRendererFramework: IconLinkButtonRenderer,
             icon: "../../../assets/pricesheet.png",
             onClick: "openChartfieldEditor",
@@ -505,7 +504,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                     headerName: "Starts",
                     editable: true,
                     width:    4 * this.emToPxConversionRate,
-                    maxWidth: 4 * this.emToPxConversionRate,
+                    maxWidth: 6 * this.emToPxConversionRate,
                     minWidth: 4 * this.emToPxConversionRate,
                     cellRendererFramework: DateRenderer,
                     cellEditorFramework: DateEditor,
@@ -607,9 +606,9 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Bus",
                 editable: true,
-                width:    1.5 * this.emToPxConversionRate,
-                maxWidth: 1.5 * this.emToPxConversionRate,
-                minWidth: 1.5 * this.emToPxConversionRate,
+                width:    2 * this.emToPxConversionRate,
+                maxWidth: 2 * this.emToPxConversionRate,
+                minWidth: 2 * this.emToPxConversionRate,
                 validators: [
                     Validators.pattern(/^\d{2}$/)
                 ],
