@@ -60,10 +60,10 @@
                                            [matAutocomplete]="autoLab"
                                            (keyup.enter)="chooseFirstLabOption()">
                                     <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
-                                        <mat-option *ngFor="let lab of  filterLabList(form.get('selectLab').value)"
+                                        <mat-option *ngFor="let lab of filterLabList(form.get('selectLab').value)"
                                                     [value]="lab"
                                                     (onSelectionChange)="selectLabOption($event)">
-                                            {{lab.name }}
+                                            {{ lab.name }}
                                         </mat-option>
                                     </mat-autocomplete>
                                     <mat-error *ngIf="form?.get('selectLab')?.hasError('required')">
@@ -182,7 +182,7 @@
                 </form>
             </mat-tab>
 
-            <mat-tab *ngFor="let tab of newExperimentService.tabs"
+            <mat-tab *ngFor="let tab of tabs"
                      label="{{tab.label}}"
                      class="full-height full-width"
                      [disabled]="tab.disabled" >

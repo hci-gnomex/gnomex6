@@ -19,18 +19,17 @@ import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.compo
 import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
 import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
 import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
-import {Subscription} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {TabBioinformaticsViewComponent} from "./tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
 import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
-import {Observable} from "rxjs/Observable";
 
 @Component({
     selector: 'new-experiment',
     templateUrl: "./new-experiment.component.html",
     styles: [`
                 
-        li { margin-bottom: 1.5em; }
+        li { margin-bottom: 0.7em; }
         
         ol.three-depth-numbering {
             padding: 0;
@@ -139,8 +138,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     @Output() properties = new EventEmitter<any[]>();
 
     types = OrderType;
+
+    public tabs: any[];
     private selectedCategory: any;
-    private requestCategories: any[] = [];
+    public requestCategories: any[] = [];
     private filteredProjectList: any[] = [];
     private authorizedBillingAccounts: any;
     public appPrices: any[] = [];
@@ -209,7 +210,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             && this.form.get('selectLab')
             && this.form.get('selectLab').valid
             && !!this.possibleSubmitters
-            && this.possibleSubmitters_loaded;
+            && this.possibleSubmitters_loaded === true;
     }
     public get showBilling(): boolean {
 
@@ -260,8 +261,41 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.navigationSubscription = this.router.events.subscribe((e: any) => {
             // If it is a NavigationEnd event re-initalise the component
             if (e instanceof NavigationEnd) {
+                this.reinitialize();
             }
         });
+    }
+
+    reinitialize(): void {
+        if (this.form) {
+            if (this.form.get("selectedCategory")) {
+                this.form.get("selectedCategory").setValue(null);
+            }
+            if (this.form.get("selectLab")) {
+                this.form.get("selectLab").setValue(null);
+            }
+            if (this.form.get("selectName")) {
+                this.form.get("selectName").setValue(null);
+            }
+            if (this.form.get("selectProject")) {
+                this.form.get("selectProject").setValue(null);
+            }
+            if (this.form.get("selectAccount")) {
+                this.form.get("selectAccount").setValue(null);
+            }
+            if (this.form.get("experimentName")) {
+                this.form.get("experimentName").setValue(null);
+            }
+            if (this.form.get("description")) {
+                this.form.get("description").setValue(null);
+            }
+        }
+
+        this.requestCategories = [];
+        this.labList = [];
+        this.possibleSubmitters = [];
+        this.authorizedBillingAccounts = [];
+        this.filteredProjectList = [];
     }
 
     ngOnInit() {
@@ -380,7 +414,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     showTabs() {
-        this.newExperimentService.tabs = [];
+        this.tabs = [];
         let category = this.newExperimentService.requestCategory;
         this.inputs.requestCategory = category;
         this.newExperimentService.request.applicationNotes = '';
@@ -440,15 +474,15 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 disabled: true,
                 component: TabConfirmIlluminaComponent
             };
-            this.newExperimentService.tabs.push(sampleSetupTab);
-            this.newExperimentService.tabs.push(propertyTab);
-            this.newExperimentService.tabs.push(libPrepTab);
-            this.newExperimentService.tabs.push(seqProtoTab);
-            this.newExperimentService.tabs.push(annotationsTab);
-            this.newExperimentService.tabs.push(samplesTab);
-            this.newExperimentService.tabs.push(visibilityTab);
-            this.newExperimentService.tabs.push(bioTab);
-            this.newExperimentService.tabs.push(confirmTab);
+            this.tabs.push(sampleSetupTab);
+            this.tabs.push(propertyTab);
+            this.tabs.push(libPrepTab);
+            this.tabs.push(seqProtoTab);
+            this.tabs.push(annotationsTab);
+            this.tabs.push(samplesTab);
+            this.tabs.push(visibilityTab);
+            this.tabs.push(bioTab);
+            this.tabs.push(confirmTab);
             this.numTabs = 10;
         } else if (category.type === this.newExperimentService.TYPE_QC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('QCState') :
@@ -463,8 +497,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 disabled: true,
                 component: VisibilityDetailTabComponent
             };
-            this.newExperimentService.tabs.push(sampleSetupTab);
-            this.newExperimentService.tabs.push(visibilityTab);
+            this.tabs.push(sampleSetupTab);
+            this.tabs.push(visibilityTab);
         } else if (category.type === this.newExperimentService.TYPE_GENERIC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('GenericState') :
                 this.newExperimentService.currentState.next('GenericExternalState');
@@ -491,7 +525,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 ? this.newExperimentService.currentState.next('MicroarrayState')
                 : this.newExperimentService.currentState.next('MicroarrayExternalState');
         }
-
     }
 
     onTabChange(event) {
@@ -508,28 +541,23 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     getFilteredRequestCategories(): any[] {
         let categories: any[] = [];
-        let requestCategories: any[] = [];
 
         for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
             categories.push(category);
         }
 
-        this.requestCategories = categories.filter(category =>
-            category.isActive === 'Y' && category.isInternal === 'Y'
-        );
+        categories = categories.filter((category: any) => {
+            return category.isActive === 'Y'
+                && category.isInternal === 'Y'
+                && this.coreFacility
+                && ((category.codeRequestCategory === this.coreFacility.codeRequestCategory)
+                    || ((!!category.isClinicalResearch || category.isClinicalResearch === '')
+                        && category.isClinicalResearch !== 'Y'
+                        && category.idCoreFacility
+                        && category.idCoreFacility === this.coreFacility.idCoreFacility));
+        });
 
-        for (let category of categories) {
-            if (this.coreFacility) {
-                if (category.codeRequestCategory === this.coreFacility.codeRequestCategory) {
-                    requestCategories.push(category);
-                } else if (category.isClinicalResearch == null || category.isClinicalResearch != 'Y') {
-                    if (category.idCoreFacility === this.coreFacility.idCoreFacility) {
-                        requestCategories.push(category);
-                    }
-                }
-            }
-        }
-        return requestCategories;
+        return categories;
     }
 
     public selectLabOption(event: any) {
@@ -548,18 +576,22 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
                 this.possibleSubmitters = [];
                 this.possibleSubmitters_loaded = false;
-                let temp: Observable<any[]> = this.getLabService.getSubmittersForLab(value.idLab, 'Y', 'N');
                 if (!this.submittersSubscription) {
-                    this.submittersSubscription = temp.subscribe((submitters: any[]) => {
+                    this.submittersSubscription = this.getLabService.getSubmittersForLab(value.idLab, 'Y', 'N').subscribe((submitters: any[]) => {
                         if (submitters) {
                             this.possibleSubmitters = submitters.filter((a) => {
                                 return a && a.isActive && a.isActive === 'Y';
                             });
+                            setTimeout(() => {
+                                this.possibleSubmitters_loaded = true;
+                            });
                         } else {
                             this.possibleSubmitters = [];
+                            this.possibleSubmitters_loaded = false;
                         }
-                        this.possibleSubmitters_loaded = true;
                     });
+                } else {
+                    this.getLabService.getSubmittersForLab(value.idLab, 'Y', 'N');
                 }
 
                 let params: URLSearchParams = new URLSearchParams();
@@ -585,11 +617,11 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
 
-    displayLab(lab: any) {
+    public displayLab(lab: any) {
         return lab ? lab.name : lab;
     }
 
-    filterLabList(selectedLab: any) {
+    public filterLabList(selectedLab: any) {
         let fLabs: any[];
 
         if (selectedLab) {
@@ -610,7 +642,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         }
     }
 
-    onUserSelection(event) {
+    public onUserSelection(event) {
         if (this.form.get('selectName') && this.form.get('selectName').value) {
             this.newExperimentService.experimentOwner = this.form.get('selectName').value;
             this.newExperimentService.request.idAppUser = this.newExperimentService.idAppUser;
@@ -618,14 +650,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
             this.visibilityDetailObj.currentOrder = this.newExperimentService.request;
             this.visibilityDetailObj.ngOnInit();
-        }
-    }
-
-    indexEventHandler(event) {
-        if (event === '+') {
-            this.nextButtonIndex++;
-        } else {
-            this.nextButtonIndex--;
         }
     }
 
@@ -690,17 +714,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     }
 
-    getIdCoreFacility(): string {
-        //TODO Need to handle CLINSEQ TYPES
-        // let cat = this.requestCategory;
-        let cat = this.newExperimentService.requestCategory;
-        let idCoreFacility: string = null;
-        if (cat != null && cat.idCoreFacility.toString() != '') {
-            idCoreFacility = cat.idCoreFacility.toString();
-        }
-        return idCoreFacility;
-    }
-
 
     chooseFirstLabOption(): void {
         this.autoLabComplete.options.first.select();
@@ -752,22 +765,22 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         switch (this.newExperimentService.currentState.value) {
             case 'SolexaBaseState' : {
                 if (this.newExperimentService.selectedIndex === 0) {
-                    this.newExperimentService.tabs[0].disabled = false;
-                    this.newExperimentService.tabs[1].disabled = false;
+                    this.tabs[0].disabled = false;
+                    this.tabs[1].disabled = false;
                 } else if (this.newExperimentService.selectedIndex === 1) {
-                    this.newExperimentService.tabs[2].disabled = false;
+                    this.tabs[2].disabled = false;
                 } else if (this.newExperimentService.selectedIndex === 2) {
-                    this.newExperimentService.tabs[3].disabled = false;
+                    this.tabs[3].disabled = false;
                 } else if (this.newExperimentService.selectedIndex === 3) {
-                    this.newExperimentService.tabs[4].disabled = false;
+                    this.tabs[4].disabled = false;
                 } else if (this.newExperimentService.selectedIndex === 4) {
-                    this.newExperimentService.tabs[5].disabled = false;
+                    this.tabs[5].disabled = false;
                 } else if (this.newExperimentService.selectedIndex === 5) {
-                    this.newExperimentService.tabs[6].disabled = false;
+                    this.tabs[6].disabled = false;
                 } else if (this.newExperimentService.selectedIndex === 6) {
-                    this.newExperimentService.tabs[7].disabled = false;
+                    this.tabs[7].disabled = false;
                 } else if (this.newExperimentService.selectedIndex === 7) {
-                    this.newExperimentService.tabs[8].disabled = false;
+                    this.tabs[8].disabled = false;
                 } else if (this.newExperimentService.selectedIndex === 8) {
                     this.newExperimentService.hideSubmit = false;
                     this.newExperimentService.disableSubmit = true;
@@ -776,7 +789,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             }
             case 'QCState' : {
                 if (this.newExperimentService.selectedIndex === 0) {
-                    this.newExperimentService.tabs[0].disabled = false;
+                    this.tabs[0].disabled = false;
                 }
             }
 

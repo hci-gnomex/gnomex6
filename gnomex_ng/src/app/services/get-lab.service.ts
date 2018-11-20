@@ -1,9 +1,8 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {map} from "rxjs/operators";
+import {first, map} from "rxjs/operators";
 
 @Injectable()
 export class GetLabService {
@@ -61,7 +60,7 @@ export class GetLabService {
                 .set("includeBillingAccounts", includeBillingAccounts)
                 .set("includeProductCounts", includeProductCounts);
 
-            this.httpClient.get("/gnomex/GetLab.gx", { params: params }).first().subscribe((response: any) => {
+            this.httpClient.get("/gnomex/GetLab.gx", { params: params }).pipe(first()).subscribe((response: any) => {
 
                 if (!response) {
                     return;

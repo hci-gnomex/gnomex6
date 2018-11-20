@@ -281,7 +281,6 @@ export class NewExperimentService {
     public samplesColumnApi: any;
     private hiSeqPrices: any[] = [];
     public selectedIndex: number = 0;
-    public tabs: any[] = [];
     public samplesView;
     public hideSubmit: boolean = true;
     public disableSubmit: boolean = true;

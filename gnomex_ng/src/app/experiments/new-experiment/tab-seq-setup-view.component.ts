@@ -247,8 +247,8 @@ export class TabSeqSetupViewComponent implements OnInit {
         } else if (obj2 == null) {
             return -1;
         } else {
-            var sortOrder1: number = obj1.sortOrder == "" ? 999 : obj1.sortOrder;
-            var sortOrder2: number = obj2.sortOrder == "" ? 999 : obj2.sortOrder;
+            let sortOrder1: number = obj1.sortOrder == "" ? 999 : obj1.sortOrder;
+            let sortOrder2: number = obj2.sortOrder == "" ? 999 : obj2.sortOrder;
             if (sortOrder1 < sortOrder2) {
                 return -1;
             } else if (sortOrder1 > sortOrder2) {

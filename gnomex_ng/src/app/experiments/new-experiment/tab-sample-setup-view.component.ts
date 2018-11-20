@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {GnomexService} from "../../services/gnomex.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
@@ -12,48 +12,99 @@ import {AnnotationTabComponent} from "../../util/annotation-tab.component";
 @Component({
     selector: "tabSampleSetupView",
     templateUrl: "./tab-sample-setup-view.component.html",
-    styles: [`        
+    styles: [`
+        
+        .heading {
+            width: 30%;
+            min-width: 20em;
+            padding-right: 2em;
+        }
         
         
+        ol.three-depth-numbering {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: section;
+        }
+        ol.three-depth-numbering li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li::before {
+            counter-increment: section;
+            content: "(" counter(section) ")";
+            padding-right: 0.7em;
+        }
+        ol.three-depth-numbering li ol {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: subsection;
+        }
+        ol.three-depth-numbering li ol li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li ol li::before {
+            counter-increment: subsection;
+            content: "(" counter(section) "." counter(subsection) ")";
+            padding-right: 0.7em;
+        }
+        ol.three-depth-numbering li ol li ol {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: subsubsection;
+        }
+        ol.three-depth-numbering li ol li ol li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li ol li ol li::before {
+            counter-increment: subsubsection;
+            content: "(" counter(section) "." counter(subsection) "." counter(subsubsection) ")";
+            padding-right: 0.7em;
+        }
+
+        .small-font       { font-size: small; }
+        .normal-size-font { font-size: medium; }
         
+        .title {
+            font-weight: bold;
+            color: darkblue;
+            padding-left: 1.75em;
+            padding-bottom: 0.25em;
+        }
+
+        .short-width {
+            width: 20em;
+            min-width: 20em;
+        }
+        .moderate-width {
+            width: 40em;
+            min-width: 20em;
+        }
+        .long-width {
+            width: 80em;
+            min-width: 40em;
+        }
         
         
         /************************/
         
         
-        .row-one {
-            display: flex;
-            flex-grow: 1;
-        }
-        .row-one-quarter {
-            display: flex;
-            flex-grow: 1;
-        }
-        .exp-type-radio-group {
-            display: inline-flex;
-            flex-direction: column;
-        }
-        .mat-button.mat-small {
-            min-width: 1%;
-        }
         mat-form-field.formField {
             width: 30%;
             margin: 0 0.5em;
         }
-        .flex-container{
-            display: flex;
-            margin-top: 1em;
-            padding-left: 1em;
-        }
-        .inline-span {
-            width: 20em;
-            display: inline-block;
-        }
-        mat-radio-button.radioOption {
-            margin: 0 0.25rem;
-        }
-        /deep/ .mat-checkbox .mat-checkbox-label {
-            font-size: .75rem;
+        
+        /deep/ .mat-checkbox .mat-checkbox-layout {
+            padding: 0;
+            margin: 0;
         }
         /deep/ .mat-checkbox .mat-checkbox-inner-container{
             height: 15px;
@@ -64,53 +115,78 @@ import {AnnotationTabComponent} from "../../util/annotation-tab.component";
 })
 
 export class TabSampleSetupViewComponent implements OnInit {
-    public currState: string;
+    public currentState: string;
     @Input() requestCategory: any;
 
     @Output() indexEvent = new EventEmitter<string>();
     @Output() goBack = new EventEmitter<string>();
     @Output() goNext = new EventEmitter<string>();
+
     @ViewChild("autoOrg") orgAutocomplete: MatAutocomplete;
+
     public form: FormGroup;
     private sampleType: any;
     private filteredSampleTypeListDna: any[] = [];
     private filteredSampleTypeListRna: any[] = [];
-    private filteredChipTypeList: any[] = [];
     private previousOrganismMatOption: MatOption;
-    private sampleSetupContainer: boolean = true;
     private showSampleNotes: boolean = false;
     private showSamplePrepContatainer: boolean = true;
     private showRnaseBox: boolean = false;
     private showDnaseBox: boolean = false;
 
+
+
+    get numberOfSamples(): number|string {
+        return this.newExperimentService.numSamples;
+    }
+
+    set numberOfSamples(value: number|string) {
+        this.newExperimentService.numSamples = this.form.get("numSamples").value;
+    }
+
+
+    public get showElution(): boolean {
+        return this.newExperimentService.currentState.value !== 'QCState';
+    }
+
     constructor(private dictionaryService: DictionaryService,
                 public newExperimentService: NewExperimentService,
-                private annotationService: AnnotationService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
                 private fb: FormBuilder) {
 
         this.form = this.fb.group({
-            numSamples: ['', Validators.required],
-            selectedDna: [''],
-            selectedRna: [''],
-            sampleTypeNotes: [''],
-            organism: ['', Validators.required],
-            reagent: ['', [Validators.required, Validators.maxLength(100)]],
-            elution: ['', [Validators.required, Validators.maxLength(100)]],
-            dnaseBox: [''],
-            rnaseBox: [''],
-            keepSample: ['', Validators.required],
-            acid: [''],
-            coreNotes: ['', [Validators.maxLength(5000)]],
-        }, { validator: this.oneCategoryRequired});
+                numSamples:      ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+                selectedDna:     [''],
+                selectedRna:     [''],
+                sampleTypeNotes: [''],
+                organism:        ['', Validators.required],
+                reagent:         ['', [Validators.required, Validators.maxLength(100)]],
+                elution:         ['', [Validators.required, Validators.maxLength(100)]],
+                // elution:         ['', [this.validator_elution_requiredIfVisible, Validators.maxLength(100)]],
+                dnaseBox:        [''],
+                rnaseBox:        [''],
+                keepSample:      ['', Validators.required],
+                acid:            [''],
+                coreNotes:       ['', [Validators.maxLength(5000)]]
+            },
+            { validator: this.oneCategoryRequired }
+        );
+    }
+
+    private validator_elution_requiredIfVisible(formControl: FormControl): any {
+        if (this.showElution && (!formControl || !formControl.value)) {
+            return { message: 'field is required' };
+        } else {
+            return null;
+        }
     }
 
     ngOnInit() {
         this.newExperimentService.organisms = this.gnomexService.activeOrganismList;
         this.newExperimentService.currentState.subscribe((value) =>{
             if (value) {
-                this.currState = value;
+                this.currentState = value;
                 this.buildSampleTypes();
             }
         });
@@ -118,7 +194,7 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.form.markAsPristine();
     }
 
-    oneCategoryRequired(group : FormGroup) : {[s:string ]: boolean} {
+    oneCategoryRequired(group: FormGroup): {[s:string ]: boolean} {
         if (group) {
             if(group.controls['selectedDna'].value || group.controls['selectedRna'].value) {
                 return null;
@@ -129,11 +205,11 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     ngOnChanges() {
         if (this.filteredSampleTypeListDna.length === 0 && this.requestCategory) {
-            this.filteredSampleTypeListDna = this.newExperimentService.filterSampleType("DNA", this.currState, this.requestCategory)
+            this.filteredSampleTypeListDna = this.newExperimentService.filterSampleType("DNA", this.currentState, this.requestCategory)
                 .sort(this.newExperimentService.sortSampleTypes);
         }
         if (this.filteredSampleTypeListRna.length === 0 && this.requestCategory) {
-            this.filteredSampleTypeListRna = this.newExperimentService.filterSampleType("RNA", this.currState, this.requestCategory)
+            this.filteredSampleTypeListRna = this.newExperimentService.filterSampleType("RNA", this.currentState, this.requestCategory)
                 .sort(this.newExperimentService.sortSampleTypes);
         }
         if (this.newExperimentService.sampleTypes.length === 0) {
@@ -145,22 +221,26 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     buildSampleTypes() {
         if (this.filteredSampleTypeListDna.length === 0 && this.requestCategory) {
-            this.filteredSampleTypeListDna = this.newExperimentService.filterSampleType("DNA", this.currState, this.requestCategory)
+            this.filteredSampleTypeListDna = this.newExperimentService.filterSampleType("DNA", this.currentState, this.requestCategory)
                 .sort(this.newExperimentService.sortSampleTypes);
         }
         if (this.filteredSampleTypeListRna.length === 0 && this.requestCategory) {
-            this.filteredSampleTypeListRna = this.newExperimentService.filterSampleType("RNA", this.currState, this.requestCategory)
+            this.filteredSampleTypeListRna = this.newExperimentService.filterSampleType("RNA", this.currentState, this.requestCategory)
                 .sort(this.newExperimentService.sortSampleTypes);
         }
 
     }
 
     onDnaChange(event) {
-        if (this.form.get("selectedRna").value) {
+        if (this.form
+            && this.form.get("selectedRna")
+            && this.form.get("selectedRna").value) {
+
             this.form.get("selectedRna").setValue("");
         }
-        this.setState("");
-        this.showSampleNotes = this.form.get("selectedDna").value.notes ? true : false;;
+
+        this.setState();
+        this.showSampleNotes = !!(this.form.get("selectedDna").value.notes);
         this.sampleType = this.form.get("selectedDna").value;
         this.newExperimentService.sampleType = this.sampleType;
         this.pickSampleType();
@@ -170,21 +250,21 @@ export class TabSampleSetupViewComponent implements OnInit {
         if (this.form.get("selectedDna").value) {
             this.form.get("selectedDna").setValue("");
         }
-        this.setState("");
-        this.showSampleNotes = this.form.get("selectedRna").value.notes ? true : false;
+        this.setState();
+        this.showSampleNotes = !!(this.form.get("selectedRna").value.notes);
         this.sampleType = this.form.get("selectedRna").value;
         this.newExperimentService.sampleTypes = this.filteredSampleTypeListRna;
         this.newExperimentService.sampleType = this.sampleType;
         this.pickSampleType();
     }
 
-    setState(state) {
+    setState() {
         if (this.requestCategory) {
             if (this.requestCategory.codeRequestCategory === "MDMISEQ") {
                 //TODO this.sampleSetupView.currentState = 'MDMiSeqState';
             }
             if (this.gnomexService.submitInternalExperiment()) {
-                this.currState = "SolexaSetupState";
+                this.currentState = "SolexaSetupState";
                 this.showSamplePrepContatainer = false;
             }
         }
@@ -212,13 +292,13 @@ export class TabSampleSetupViewComponent implements OnInit {
 
         // TODO parentDocument.samplesView.initializeSamplesGrid();
 
-        if (this.newExperimentService.isSequenomState(this.currState) || this.newExperimentService.isClinicalSequenomState(this.currState)) {
+        if (this.newExperimentService.isSequenomState(this.currentState) || this.newExperimentService.isClinicalSequenomState(this.currentState)) {
             return;
         }
         // Select the default organism on sample setup if the request category specifies one
-        if (!this.newExperimentService.isQCState(this.currState)) {
+        if (!this.newExperimentService.isQCState(this.currentState)) {
             if (!this.form.get("organism")) {
-                if (this.requestCategory.idOrganism) {
+                if (this.requestCategory && this.requestCategory.idOrganism) {
                     let organism = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite',this.requestCategory.idOrganism);
                     if ( this.securityAdvisor.isArray(organism)) {
                         this.form.get("organism").setValue(organism[0]);
@@ -229,10 +309,8 @@ export class TabSampleSetupViewComponent implements OnInit {
                         return;
                     }
                 }
-
             }
         }
-        // this.newExperimentService.selectedIndex = 2;
     }
 
     chooseFirstOrgOption(): void {
@@ -325,11 +403,6 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     onGridReady(event) {
 
-    }
-
-    setNumSamples(event) {
-        this.newExperimentService.numSamples = this.form.get("numSamples").value;
-        // this.newExperimentService.numSamplesChanged.next(true);
     }
 
     onTypeChange(event) {
