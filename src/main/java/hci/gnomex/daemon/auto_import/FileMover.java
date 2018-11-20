@@ -12,8 +12,7 @@ public class FileMover {
 		DirectoryBuilder db = null;
 		
 		db = new DirectoryBuilder(args);
-		
-		 // "C:\\Users\\u0566434\\Desktop\\ORIEN\\Scripts\\");
+
 		List<String> filesToMove = db.preparePath();
 		db.moveTheFiles(filesToMove);
 		db.reportWorkSummary();

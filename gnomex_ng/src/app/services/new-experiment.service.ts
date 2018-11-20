@@ -759,6 +759,7 @@ export class NewExperimentService {
             let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter((reqCatApp) => {
                     return reqCatApp.value !== "" && reqCatApp.codeApplication === app.value;
             });
+
             for (let xref of theApplications) {
                 if (xref.codeRequestCategory === requestCategory.codeRequestCategory) {
                     doesMatchRequestCategory = true;

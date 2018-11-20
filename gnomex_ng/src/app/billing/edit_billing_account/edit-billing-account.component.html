@@ -35,7 +35,7 @@
 									class="full-width"
 									placeholder="Select Core Facilities"
 									[(ngModel)]="selectedCoreFacilities"
-									(change)="onCoreFacilitiesSelected($event)"
+									(selectionChange)="onCoreFacilitiesSelected($event)"
 									multiple
 									required>
 								<mat-option *ngFor="let coreFacility of coreFacilityReducedList" [value]="coreFacility">

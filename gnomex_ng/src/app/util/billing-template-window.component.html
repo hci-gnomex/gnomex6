@@ -3,7 +3,7 @@
     <div>
         <context-help class="margin-right" name="billingTemplateHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
         <mat-form-field class="margin-right">
-            <mat-select placeholder="Lab" [(value)]="this.selectedLab" (change)="this.loadAccountsForLab()">
+            <mat-select placeholder="Lab" [(value)]="this.selectedLab" (selectionChange)="this.loadAccountsForLab()">
                 <mat-option>None</mat-option>
                 <mat-option *ngFor="let lab of this.labList" [value]="lab">{{lab.name}}</mat-option>
             </mat-select>

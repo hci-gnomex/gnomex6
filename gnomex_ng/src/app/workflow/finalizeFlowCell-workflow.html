@@ -55,13 +55,13 @@
             </div>
             <div class="flex-row-container">
                 <mat-form-field class="formField">
-                    <mat-select placeholder="Instrument" (change)="createFlowCellFileName()" [formControl]="this.instrumentFC">
+                    <mat-select placeholder="Instrument" (selectionChange)="createFlowCellFileName()" [formControl]="this.instrumentFC">
                         <mat-option>None</mat-option>
                         <mat-option *ngFor="let instrument of instrumentList" [value]="instrument">{{instrument.instrument}}</mat-option>
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field class="formField">
-                    <mat-select placeholder="Protocol" (change)="createFlowCellFileName()" [formControl]="this.protocolFC">
+                    <mat-select placeholder="Protocol" (selectionChange)="createFlowCellFileName()" [formControl]="this.protocolFC">
                         <mat-option>Choose a protocol...</mat-option>
                         <mat-option *ngFor="let protocol of filteredProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
                     </mat-select>

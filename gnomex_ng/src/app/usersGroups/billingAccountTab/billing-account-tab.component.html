@@ -6,7 +6,7 @@
 					<mat-select
 							placeholder="Select Core Facility"
 							[(value)]="selectedCoreFacility"
-							(change)="onCoreFacilitySelected($event)"
+							(selectionChange)="onCoreFacilitySelected($event)"
 							required>
 						<mat-option *ngFor="let coreFacility of coreFacilities" [value]="coreFacility">
 							{{ coreFacility.display }}

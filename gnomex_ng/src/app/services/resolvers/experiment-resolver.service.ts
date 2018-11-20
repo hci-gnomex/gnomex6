@@ -10,6 +10,6 @@ export class ExperimentResolverService implements Resolve<any> {
     constructor(private experimentsService:ExperimentsService) {}
 
     resolve(route:ActivatedRouteSnapshot) { // resolve is good with asyncrous data, it waits to load before display component
-        return this.experimentsService.getExperiment(route.params['id']); // this is an obserable, but resolve doesn't require calling subscribe
+        return this.experimentsService.getExperiment(route.params['id']); // this is an observable, but resolve doesn't require calling subscribe
     }
 }

@@ -272,7 +272,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
         // this.showSpinner = true;
-        this.dialogService.startDefaultSpinnerDialog();
+        setTimeout(() => {
+            this.dialogService.startDefaultSpinnerDialog();
+        });
 
         this.topicListSubscription = this.topicService.getTopicsListObservable().subscribe(response => {
             this.items = [].concat([]);
@@ -527,19 +529,13 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     setLabel(leaf: any) {
         let label: string = "";
-        if (leaf.idRequest) {
-            label = leaf.number;
-            if (leaf.name) {
-                label = label + ' - ' + leaf.name;
+        if (leaf.idAnalysis || leaf.idDataTrack) {
+            if (leaf.label && leaf.name) {
+                label = leaf.number + ' - ' +leaf.name;
+            } else {
+                label = leaf.number;
             }
             leaf.label = label;
-        } else if (leaf.idAnalysis) {
-            label = leaf.number + ' - ' +leaf.name;
-            leaf.label = label;
-        } else if (leaf.idDataTrack) {
-            label = leaf.number + ' - ' + leaf.label;
-            leaf.label = label;
-
         }
     }
 
@@ -596,6 +592,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         }else if(name === "Data Tracks" || name === "Experiments" || name === "Analysis" ){
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
         }else {
+            if ((this.selectedItem.data.label as string).endsWith('(Restricted Visibility)')) {
+                this.dialogService.alert("You do not have permission to view this");
+                return;
+            }
+
             let pathPair:string = '';
             if(this.selectedItem.data.idAnalysis){
                 pathPair = "analysis/" + this.selectedItem.data.idAnalysis;
