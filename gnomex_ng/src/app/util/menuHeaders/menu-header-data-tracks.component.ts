@@ -35,6 +35,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     public newDTisDisabled: boolean = true;
     public newGenomeBuildisDisabled: boolean = true;
     public duplicateDTisDisabled: boolean = true;
+    public disableAll: boolean = false;
 
     constructor(private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
@@ -49,6 +50,10 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             this._showMenuItemNewGenomeBuild = true;
             this._showMenuItemNewOrganism = true;
             this._showMenuItemRemove = true;
+        }
+
+        if (this.createSecurityAdvisorService.isGuest) {
+            this.disableAll = true;
         }
     }
 

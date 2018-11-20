@@ -1,15 +1,16 @@
-import {Component, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, SimpleChanges} from '@angular/core';
 
 import {MatDialogRef, MatDialog} from '@angular/material';
 import {NewTopicComponent} from "../new-topic.component";
 import {DeleteTopicComponent} from "../../topics/delete-topic.component";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 @Component({
     selector: 'menu-header-topics',
     templateUrl: "./menu-header-topics.component.html"
 })
 
-export class MenuHeaderTopicsComponent {
+export class MenuHeaderTopicsComponent implements OnInit {
     @Input() selectedNode: any;
 
     private idParentTopic = "";
@@ -18,10 +19,18 @@ export class MenuHeaderTopicsComponent {
     public showRemoveLink: boolean = false;
     public showNewTopic: boolean = false;
     public message: string = "startLinkToData";
+    public disableAll: boolean = false;
 
     @Output() messageEvent = new EventEmitter<string>();
 
-    constructor(private dialog: MatDialog) {
+    constructor(private dialog: MatDialog,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService) {
+    }
+
+    ngOnInit() {
+        if (this.createSecurityAdvisorService.isGuest) {
+            this.disableAll = true;
+        }
     }
 
     public makeNewTopic(): void {
