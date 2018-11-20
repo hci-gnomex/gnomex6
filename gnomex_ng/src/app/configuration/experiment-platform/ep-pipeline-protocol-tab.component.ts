@@ -11,7 +11,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 @Component({
     template: `
 
-        <div class="full-height full-width flex-container-col">
+        <div class="flex-container-col" style="height: calc(100% - 1em); width: calc(100% - 1em); padding: 0.5em;">
             <div class="flex-grow" >Pipeline protocols for core facility: {{coreFacilityHeader}} </div>
             
             <div class="flex-grow flex-container-row"  >

@@ -362,7 +362,6 @@ export class QcAssayDialogComponent implements OnInit{
                 applyFn: this.applyAssayFn,
                 expPlatform: this.expPlatform
             };
-            config.height="30em";
             config.panelClass = "no-padding-dialog";
             this.dialog.open(QcAssayChipTypeDialogComponent,config);
         }

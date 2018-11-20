@@ -84,8 +84,8 @@ export class LibraryPrepDialogComponent implements OnInit{
             application: [this.uncomittedRowData.application ? this.uncomittedRowData.application : '' , Validators.required] ,
             sortOrder: [this.uncomittedRowData.sortOrder ? this.uncomittedRowData.sortOrder : '', numberRange(0,99)],
             idApplicationTheme: this.uncomittedRowData.idApplicationTheme ? this.uncomittedRowData.idApplicationTheme : '',
-            idBarcodeSchemeA: this.uncomittedRowData.idBarcodeSchemeA,
-            idBarcodeSchemeB: this.uncomittedRowData.idBarcodeSchemeB,
+            idBarcodeSchemeA: this.uncomittedRowData.idBarcodeSchemeA ? this.uncomittedRowData.idBarcodeSchemeA  : '',
+            idBarcodeSchemeB: this.uncomittedRowData.idBarcodeSchemeB ? this.uncomittedRowData.idBarcodeSchemeB  : '',
             onlyForLabPrepped: this.uncomittedRowData.onlyForLabPrepped === 'Y' ? 'Y' : 'N',
             unitPriceInternal: [this.uncomittedRowData.unitPriceInternal ? this.uncomittedRowData.unitPriceInternal : '0.00', Validators.pattern(this.currencyRegex)],
             unitPriceExternalAcademic: [this.uncomittedRowData.unitPriceExternalAcademic ? this.uncomittedRowData.unitPriceExternalAcademic : '0.00', Validators.pattern(this.currencyRegex)],
@@ -112,8 +112,14 @@ export class LibraryPrepDialogComponent implements OnInit{
         if(idSeqLibProtocol.split(',').length > 1){
             this.dialogService.alert("It appears mutiple seq protocols are associated with this application." +
                 "Editing the protocol may cause issues. Please notify GNomEx Support ");
-        }else{
-            this.protocolParam = (this.dictionaryService.getEntry(DictionaryService.SEQ_LIB_PROTOCOL,idSeqLibProtocol));
+        }else if(idSeqLibProtocol){
+            let tempProtocolParam = this.dictionaryService.getEntry(DictionaryService.SEQ_LIB_PROTOCOL,idSeqLibProtocol);
+            if(tempProtocolParam){
+                this.protocolParam = tempProtocolParam;
+            }else {// a new protocol saved but not saved to an application yet
+                this.protocolParam = {idSeqLibProtocol: idSeqLibProtocol};
+            }
+
         }
 
     }
@@ -124,6 +130,7 @@ export class LibraryPrepDialogComponent implements OnInit{
 
     private saveProtocolFn = (protocol:any)=> {
         this.formGroup.get('idSeqLibProtocols').setValue(protocol.idProtocolSaved);
+        this.protocolParam = {idSeqLibProtocol : protocol.idProtocolSaved}
 
     };
 
@@ -157,12 +164,10 @@ export class LibraryPrepDialogComponent implements OnInit{
 
     openStepsEditor(){
         let config: MatDialogConfig = new MatDialogConfig();
-        if(this.protocolParam){
-            config.data = {
-                applyStepsFn: this.applySteps,
-                rowData: this.uncomittedRowData
-            };
-        }
+        config.data = {
+            applyStepsFn: this.applySteps,
+            rowData: this.uncomittedRowData
+        };
         config.disableClose = true;
         config.panelClass = "no-padding-dialog";
         config.width = '65em';

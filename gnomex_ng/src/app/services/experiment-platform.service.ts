@@ -12,7 +12,7 @@ import {AbstractControl, FormGroup} from "@angular/forms";
 
 @Injectable()
 export class ExperimentPlatformService implements OnDestroy{
-    private reqCategorySubject:BehaviorSubject<any> = new BehaviorSubject<any>(null);
+    public reqCategorySubject:BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private expPlatformTypeChange: Subject<any> = new Subject<any>();
     private expPlatformListSubject: Subject<any> = new Subject<any>();
     private _expPlatformOverviewForm: FormGroup;
@@ -52,6 +52,9 @@ export class ExperimentPlatformService implements OnDestroy{
                 tabForm.reset();
             }
         }
+    }
+    clearOutExpPlatformForm():void{
+        this._expPlatformOverviewForm = new FormGroup({});
     }
 
 

@@ -181,7 +181,8 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
                 this.nextAppNumb = 0;
                 this.expPlatfromNode = data;
                 let allApps = (Array.isArray(data.applications) ? data.applications : [data.applications.ApplicationTheme]);
-                this.rowData = allApps.filter(app => app.isActive === 'Y').sort(this.compareApplications);
+                let refinedAllApps = this.formatChipsForApps(allApps);
+                this.rowData = refinedAllApps.filter(app => app.isActive === 'Y').sort(this.compareApplications);
                 this.selectedApp = [];
             }
 
@@ -210,6 +211,17 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         }
 
     }
+
+    formatChipsForApps(apps:any[]): any[]{
+        for(let app of apps){
+            if(app.ChipTypes){
+                app.ChipTypes = Array.isArray(app.ChipTypes) ? app.ChipTypes : [app.ChipTypes.BioanalyzerChipType]
+            }
+        }
+        return apps;
+    }
+
+
 
     private applyQCAssayFn = (qcDialogForm:FormGroup,committedChipTypes:any[])=> {
         if(qcDialogForm.dirty){

@@ -74,7 +74,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
         this.name = this.constructor.name;
         this.formGroup = this.fb.group({
             requestCategory:['',Validators.required ],
-            type:'',
+            type:[{value:'', disabled:true }],
             isActive: false,
             associatedWithAnalysis:'',
             requireNameDescription:'',

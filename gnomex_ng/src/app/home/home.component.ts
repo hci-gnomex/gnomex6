@@ -15,6 +15,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
 import {ProgressService} from "./progress.service";
 import {first} from "rxjs/operators";
+import {AuthenticationService} from "../auth/authentication.service";
 
 @Component({
     selector: "gnomex-home",
@@ -64,7 +65,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     constructor(private launchPropertiesService: LaunchPropertiesService,
                 private progressService: ProgressService,
                 private gnomexService: GnomexService,
-                private router:Router
+                private router:Router,
+                private authService: AuthenticationService,
     ) {
         // Do instance configuration here
     }
@@ -108,7 +110,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 }else{
                     this.gnomexService.initApp();
                 }
-            }else{
+            } else if (this.authService.isGuestMode()) {
+                this.gnomexService.initGuestApp();
+            } else {
                 this.gnomexService.initApp();
             }
 

@@ -18,7 +18,7 @@
                 <mat-checkbox formControlName="alignToGenome" (change)="onIsAlignChange($event, i)"></mat-checkbox>
                 <mat-label style="padding-right: 1em;padding-left: 1em">Yes, align to genome build</mat-label>
                 <mat-form-field class="formField">
-                    <mat-select placeholder="Genome Build" formControlName="selectGenomeBuild" (change)="onGenomeBuildSelection($event)">
+                    <mat-select placeholder="Genome Build" formControlName="selectGenomeBuild" (selectionChange)="onGenomeBuildSelection($event)">
                         <mat-option *ngFor="let genome of genomeBuilds[i]" [value]="genome.idGenomeBuild">
                             {{ genome.display }}
                         </mat-option>

@@ -45,6 +45,12 @@ public class DeIdentifier {
             System.out.println(parentSample.removeChild("ReceivedDate"));
 
 
+            expr = xFactory.compile("//rr:ResultsReport/rr:ResultsPayload", Filters.element(),null,defaultNs);
+            Element parentResultPayload = expr.evaluateFirst(jdomDocument);
+            parentResultPayload.removeChild("ReportPDF");
+
+
+
             for(Element node : parentPMI.getChildren()) {
                 System.out.println(node.getName());
             }
@@ -65,6 +71,7 @@ public class DeIdentifier {
             parentPMI.removeChild("CollDate");
             parentPMI.removeChild("ReceivedDate");
 
+            root.removeChild("ReportPDF");
 
 
             expr = xFactory.compile("//ResultsReport//Sample", Filters.element(),null);
@@ -125,7 +132,6 @@ public class DeIdentifier {
         }
 
         return doc;
-
 
     }
 

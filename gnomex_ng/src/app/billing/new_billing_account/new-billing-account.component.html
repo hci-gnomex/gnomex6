@@ -12,7 +12,7 @@
 					</div>
 					<div class="td">
 						<mat-form-field style="width: 100%; font-size: small;">
-							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" (change)="onLabListSelection($event)" required>
+							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" (selectionChange)="onLabListSelection($event)" required>
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let lab of labList" [value]="lab">
 									{{ lab.name }}
@@ -35,7 +35,7 @@
 									style="width: 100%;"
 									placeholder="Select Core Facilities"
 									[(ngModel)]="selectedCoreFacilities"
-									(change)="onCoreFacilitiesSelected($event)"
+									(selectionChange)="onCoreFacilitiesSelected($event)"
 									multiple
 									required>
 								<mat-option *ngFor="let coreFacility of coreFacilityReducedList" [value]="coreFacility">

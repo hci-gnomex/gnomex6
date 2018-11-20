@@ -20,9 +20,7 @@ import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.PropertyOptionComparator;
 import hci.gnomex.utility.RequestParser;
 
-import java.io.File;
-import java.io.Serializable;
-import java.io.StringReader;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -91,6 +89,7 @@ private String newAnalysisGroupDescription;
 private Integer newAnalysisGroupId = new Integer(-1);
 
 private boolean isLinkBySample = false;
+private String analysisIDFile;
 private boolean isBatchMode = false;
 private String organism;
 private String genomeBuild;
@@ -172,6 +171,9 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 
 	if(request.getParameter("linkBySample") != null && request.getParameter("isBatchMode").equals("Y")){
 		isLinkBySample = true;
+	}
+	if(request.getParameter("analysisIDFile") != null){
+		analysisIDFile = request.getParameter("analysisIDFile");
 	}
 
 	// Please look at this closely, if doing a batch mode createanalysis we are hiding the experiments
@@ -670,6 +672,12 @@ public Command execute() throws RollBackCommandException {
 
 			setResponsePage(this.SUCCESS_JSP);
 		}
+		if(isLinkBySample){
+			System.out.print("[SaveAnalysis]: The newly save analysis id: " + analysis.getIdAnalysis());
+			saveAnalyisIDToFile(analysisIDFile,analysis);
+		}
+
+
 
 	} catch (Exception e) {
 		this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in SaveAnalysis ", e);
@@ -678,6 +686,22 @@ public Command execute() throws RollBackCommandException {
 
 	return this;
 }
+
+	private void saveAnalyisIDToFile(String analysisIDFile, Analysis a) {
+		PrintWriter pw = null;
+		try {
+
+			pw = new PrintWriter(new FileOutputStream(new File(analysisIDFile), true));
+			pw.write( a.getIdAnalysis() + " ");
+
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			pw.close();
+		}
+
+	}
 
 	private void addExperimentItem(AnalysisLaneParser laneParser, boolean isLinkBySample, TreeSet experimentItems, Analysis analysis) {
 		List linkerList = null;

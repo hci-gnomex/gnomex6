@@ -30,6 +30,7 @@ public class CreateAnalysisServlet extends HttpClientServletBase {
   }
 
   protected void logError(String msg, Exception ex) {
+    System.err.println(ex.getStackTrace());
     LOG.error(msg, ex);
   }
 }

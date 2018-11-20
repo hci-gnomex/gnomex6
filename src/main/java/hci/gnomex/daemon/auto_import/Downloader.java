@@ -10,11 +10,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.sql.Timestamp;
 
 
@@ -26,13 +22,40 @@ public class Downloader {
 	private String dependentDataPath;
 	private String downloadPath;
 	private final String rootAvatar = "HCI_Molecular_Data:/";
-	
+	private List<String> flaggedFileList;
 	
 	Downloader(String dependentDataPath , String downloadPath ){
 		this.dependentDataPath = dependentDataPath;
 		this.downloadPath = downloadPath;
 		this.fileNameList = new TreeMap<String,String>();
+		this.flaggedFileList = new ArrayList<String>();
 		
+	}
+
+
+	private boolean hasSubProccessErrors(File errorFile) {
+		Scanner scan = null;
+		boolean hasError = false;
+		try{
+			scan = new Scanner(errorFile);
+			System.out.println("************************************************************");
+			System.out.println("Errors will appear below if found, in this file, " + errorFile.getName());
+			while(scan.hasNext()){
+				String line = scan.nextLine();
+				if(line.matches(".*Error.*|.*error.*")){
+					hasError = true;
+					System.out.println(line);
+				}
+
+			}
+			System.out.println("************************************************************");
+		}catch(FileNotFoundException e){
+			if(scan != null){ scan.close(); }
+			hasError = false;
+		}finally {
+			scan.close();
+		}
+		return hasError;
 	}
 	
 	private void executeCommands(List<String> commands) {
@@ -45,8 +68,17 @@ public class Downloader {
 			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
 			pb.inheritIO();
 			Process process;
+            File errorFile = new File( dependentDataPath +"download-error.log");
+            pb.redirectError(errorFile);
+
 			process = pb.start();
 			process.waitFor();
+			if(hasSubProccessErrors(errorFile)){
+				System.out.println("Error detected exiting script");
+				System.exit(1);
+			}
+
+
 			System.out.println("finished executing command");
 		}
 
@@ -89,7 +121,7 @@ public class Downloader {
 		
 		String parsedDownloadList = prepDownloadString(this.rootAvatar);
 		
-		if(parsedDownloadList.equals("")) { // downloading is in progress, no need to continue
+		if(parsedDownloadList.equals("unsafe")) { // downloading is in progress, no need to continue
 			System.out.println("The process has been aborted because files are already downloading" );
 			System.exit(3);
 		}
@@ -100,16 +132,22 @@ public class Downloader {
 		
 		List<String> status = Arrays.asList("Downloading in progress...");
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
-		
-		
+
+
 		// Execute download actually
 		String downloadCommand = "dx download " + parsedDownloadList;
 		//dx download "project-xxxx:/my_folder/example.bam"
+		System.out.println("These command for files to be downloaded: " + downloadCommand);
 		
 		commands.add("#!/bin/bash");
 		commands.add("cd " + this.downloadPath);
-		commands.add(downloadCommand);
-		System.out.print("The downloadCommand : " + downloadCommand);
+		commands.add("mv -t ./ " + this.downloadPath+ "/Flagged/*" );
+		if(!parsedDownloadList.equals("")){
+			commands.add(downloadCommand);
+		}else{
+			System.out.println("No files will be downloaded because there are only flagged files at this time ");
+		}
+
 
 		//commands.add("sleep 40s");
 		//commands.add("wget /dev/null http://speedtest.dal01.softlayer.com/downloads/test100.zip");
@@ -132,7 +170,7 @@ public class Downloader {
 	    
 			
 			downloadedList.add("Dowloaded successfully, " + timestamp );
-			downloadedList.add(this.createFormattedPath("~/", true).replace("\"", ""));
+			downloadedList.add(this.createFormattedPath("~/", true, true).replace("\"", ""));
 			
 			writeToFile(this.dependentDataPath + "download.log", downloadedList);
 			
@@ -178,7 +216,7 @@ public class Downloader {
 		
 	}
 
-	public void loadFileNames() throws Exception{
+	public void loadFileNames(){
 		
 		
 		FileReader reader = null;
@@ -199,22 +237,40 @@ public class Downloader {
 			if(fileNameList.size() < 1) {
 				throw new Exception("Appears to be no new files to download");
 			}
+
+			File flaggedFolder = new File(this.downloadPath + "/Flagged/");
+			for(File file: flaggedFolder.listFiles()){
+				if(!file.isDirectory()){
+					String fileName = this.fileNameList.remove(file.getName());
+					if(fileName != null){
+						System.out.println("Filtering out: " + fileName);
+						this.flaggedFileList.add(fileName);
+					}else{
+						System.out.println("[downloader] This flagged file wasn't found: "  +  file.getName());
+					}
+
+				}
+			}
+
+
 			writeToFile(this.dependentDataPath + "uniqueFilesToDownload.out", new ArrayList<String>());
 		
 		
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (Exception e) {
 			System.out.println(e.getMessage());
-			reader.close();
+			try{ reader.close(); } catch(IOException ioExcept){
+				System.out.print("Couldn't close the file reader");
+			}
 			System.exit(2);
 		}
 		finally{
-			reader.close();
+			try{ reader.close(); }catch(IOException ioExcept){
+				System.out.print("Couldn't close the file reader");
+			}
 		}
 		
 	}
@@ -222,12 +278,12 @@ public class Downloader {
 	
 	
 	public String prepDownloadString(String root) {
-		String strPaths = "";
+		String strPaths = "unsafe";
 		boolean hasNewLines = false;
 		boolean safe = downloadSafe();
 		
 		if (safe) {
-			strPaths = createFormattedPath(root, hasNewLines);
+			strPaths = createFormattedPath(root, hasNewLines, false);
 		}
 
 		// String fileNameArray = fileNameList.toString().replaceAll("[\\[,\\]]+", "");
@@ -275,10 +331,10 @@ public class Downloader {
 		return fileNameList;
 	}
 	
-	public String createFormattedPath(String root, boolean hasNewLine) {
+	public String createFormattedPath(String root, boolean hasNewLine, boolean afterDownload) {
 		StringBuilder strBuild = new StringBuilder();
 		int count = 0;
-		
+
 		for (Map.Entry<String, String> entry : fileNameList.entrySet()) {
 			String pathWithFileName = entry.getValue();
 			strBuild.append("\"");
@@ -299,6 +355,33 @@ public class Downloader {
 		
 			count++;
 		}
+
+		// flagged files added now, even though they weren't downloaded this attempt. Since they were in the past
+		// The flagged files need to be check in db everytime to see if person data was updated  and can now be imported
+		if(afterDownload){
+			for( int i = 0; i <  this.flaggedFileList.size(); i++){
+				String flaggedFileName =  this.flaggedFileList.get(i);
+				strBuild.append("\"");
+				String safeFileName = flaggedFileName.replaceAll(" ", "\\\\ ");
+
+				strBuild.append(safeFileName);
+				strBuild.append("\"");
+				if(hasNewLine) {
+					if(i < flaggedFileList.size() - 1) {
+						strBuild.append("\n");
+					}
+				}
+				else {
+					if(i < flaggedFileList.size() - 1) {
+						strBuild.append(" ");
+					}
+				}
+
+			}
+
+		}
+
+
 		return strBuild.toString();
 	}
 	
@@ -330,12 +413,6 @@ public class Downloader {
 			writer = new PrintWriter(fileName);
 			for (int i = 0; i < dataToWrite.size(); i++) {
 				writer.println(dataToWrite.get(i));
-				
-				/*if (dataToWrite.size() - 1 == i) {
-					writer.print(dataToWrite.get(i));
-				}else {
-					
-				}*/
 			}
 			
 			
