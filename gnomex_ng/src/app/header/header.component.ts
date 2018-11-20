@@ -241,6 +241,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 displayName: 'Experiments',
                 class: 'top-menu-item',
                 iconName: '../../assets/flask.png',
+                route: '/experiments',
             },
             {
                 displayName: 'Analysis',
@@ -263,8 +264,9 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
             },
             {
                 displayName: 'Protocols',
-                iconName: '../../assets/topic_tag.png',
-                class: 'problem'
+                iconName: '../../assets/brick.png',
+                class: 'top-menu-item',
+                route: '/manage-protocols'
             },
         ];
 

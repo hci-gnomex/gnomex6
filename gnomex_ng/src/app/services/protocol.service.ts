@@ -37,13 +37,11 @@ export class ProtocolService {
     }
 
     public getProtocolByIdAndClass(id: string, protocolClassName: string): void {
-        this.cookieUtilService.formatXSRFCookie();
-
         let params: HttpParams = new HttpParams()
             .set('id', id)
             .set('protocolClassName', protocolClassName);
 
-        this.httpClient.post('gnomex/GetProtocol.gx', null, {params: params})
+        this.httpClient.get('gnomex/GetProtocol.gx', {params: params})
             .pipe(catchError(this.handleError))
             .subscribe((result) => {
             this.protocolSubject.next(result);

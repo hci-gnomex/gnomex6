@@ -29,10 +29,10 @@
                     <div class="full-width flex-container-row">
                         <div>
                             <div>
-                                <button mat-button (click)="onNewProtocolButtonClicked()"><img src="../../assets/brick_add.png" alt="" /> New Protocol</button>
+                                <button mat-button [disabled]="this.disableNew" (click)="onNewProtocolButtonClicked()"><img src="../../assets/brick_add.png" alt="" /> New Protocol</button>
                             </div>
                             <div>
-                                <button mat-button (click)="onDeleteProtocolButtonClicked()"><img *ngIf="!disableDelete" src="../../assets/delete.png" alt="" /><img *ngIf="disableDelete"src="../../assets/delete_disable.png" alt="" /> Delete Protocol</button>
+                                <button mat-button [disabled]="this.disableDelete" (click)="onDeleteProtocolButtonClicked()"><img *ngIf="!disableDelete" src="../../assets/delete.png" alt="" /><img *ngIf="disableDelete"src="../../assets/delete_disable.png" alt="" /> Delete Protocol</button>
                             </div>
                         </div>
                         <div>

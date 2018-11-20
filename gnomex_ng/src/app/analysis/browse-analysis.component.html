@@ -44,13 +44,13 @@
                             <div class="t">
                                 <div class="tr">
                                     <div class="td">
-                                        <button mat-button [disabled]="disableNewAnalysis" (click)="createAnalysisClicked()">
+                                        <button mat-button [disabled]="disableNewAnalysis || this.disableAll" (click)="createAnalysisClicked()">
                                             <img src="../../assets/map.png" alt="">
                                             New Analysis
                                         </button>
                                     </div>
                                     <div class="td">
-                                        <button mat-button [disabled]="disableDelete" (click)="deleteAnalysisClicked()">
+                                        <button mat-button [disabled]="disableDelete || this.disableAll" (click)="deleteAnalysisClicked()">
                                             <img src="../../assets/delete.png" alt="">
                                             Delete
                                         </button>
@@ -58,7 +58,7 @@
                                 </div>
                                 <div class="tr">
                                     <div class="td">
-                                        <button mat-button [disabled]="disableNewAnalysisGroup" (click)="createAnalysisGroupClicked()">
+                                        <button mat-button [disabled]="disableNewAnalysisGroup || this.disableAll" (click)="createAnalysisGroupClicked()">
                                             <img src="../../assets/folder_add.png">
                                             New analysis group
                                         </button>
