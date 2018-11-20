@@ -37,53 +37,53 @@ import {GnomexService} from "../services/gnomex.service";
             </div>
         </div>
     `,
-    styles: [`
-        .container {
-            max-width: 400px;
-            margin-top: 20px;
-            padding-top: 15px;
-        }
-
-        .login-box {
-            border-radius: 10px;
-            box-shadow: 0 0 2px #ccc;
-            padding: 15px;
-        }
-
-        .login-box .login-heading h3 {
-            line-height: 1.5;
-            margin: 0 0 10px
-        }
-
-        .login-box .form-control {
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-
-        .login-box input[type="password"] {
-            margin-bottom: 10px;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-
-        .login-box input[type="text"] {
-            margin-bottom: -1px;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-
-        .login-box .alert-box {
-            margin: 10px 0 -5px 0
-        }
-
-        .login-box .alert-text {
-            font-size: small;
-        }
-
-        .login-box .btn-box {
-            margin: 10px 0 0px 0
-        }
-    `]
+  styles: [`
+    .container {
+      max-width: 400px;
+      margin-top: 20px;
+      padding-top: 15px;
+    }
+    
+    .login-box {
+      border-radius: 10px;
+      box-shadow: 0 0 2px #ccc;
+      padding: 15px;
+    }
+    
+    .login-box .login-heading h3 {
+      line-height:1.5;
+      margin: 0 0 10px
+    }
+    
+    .login-box .form-control {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    
+    .login-box input[type="password"] {
+      margin-bottom: 10px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+    
+    .login-box input[type="text"] {
+      margin-bottom: -1px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    
+    .login-box .alert-box {
+      margin: 10px 0 -5px 0
+    }
+    
+    .login-box .alert-text {
+      font-size: small;
+    }
+    
+    .login-box .btn-box {
+      margin: 10px 0 0 0
+    }
+  `]
 })
 export class DirectLoginComponent implements OnInit {
     public _loginForm: FormGroup;

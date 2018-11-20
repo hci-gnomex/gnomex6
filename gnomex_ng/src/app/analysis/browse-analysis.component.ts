@@ -8,11 +8,6 @@ import {
 
 import { URLSearchParams } from "@angular/http";
 
-import { jqxWindowComponent } from "jqwidgets-framework";
-import { jqxButtonComponent } from "jqwidgets-framework";
-import { jqxComboBoxComponent } from "jqwidgets-framework";
-import { jqxNotificationComponent  } from "jqwidgets-framework";
-import { jqxCheckBoxComponent } from "jqwidgets-framework";
 import {
     TreeComponent, ITreeOptions, TreeNode, TreeModel, IActionMapping,
     TREE_ACTIONS
@@ -97,9 +92,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         nodeClass: (node: TreeNode) => {
             return "icon-" + node.data.icon;
         },
-        allowDrop: (element, {parent, index}) => {
+        allowDrop: (element, item: {parent: any, index}) => {
             this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1 || parent.data.idAnalysis ||
+            if (item.parent.data.parentid === -1 || item.parent.data.idAnalysis ||
                 element.data.idAnalysisGroup) {
                 return false;
             } else {
@@ -107,7 +102,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             }
         },
 
-        allowDrag: (node) => node.isLeaf,
+        allowDrag: (node: any) => node.isLeaf,
         actionMapping
     };
 

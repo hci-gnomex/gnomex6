@@ -449,10 +449,10 @@ export class NewExperimentService {
         } else if (obj2 === null) {
             return -1;
         } else {
-            var order1: number = obj1.sortOrder;
-            var order2: number = obj2.sortOrder;
-            var disp1: string = obj1.display;
-            var disp2: string = obj2.display;
+            let order1: number = obj1.sortOrder;
+            let order2: number = obj2.sortOrder;
+            let disp1: string = obj1.display;
+            let disp2: string = obj2.display;
 
             if (obj1.value === '') {
                 return -1;
@@ -485,19 +485,19 @@ export class NewExperimentService {
             if (app.isActive === 'N') {
                 continue;
             }
-            var doesMatchRequestCategory: boolean = false;
+            let doesMatchRequestCategory: boolean = false;
             let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter(reqCatApp =>
 
                 reqCatApp.value != "" && reqCatApp.codeApplication === app.value
             );
-            for (var xref of theApplications) {
+            for (let xref of theApplications) {
                 if (xref.codeRequestCategory === requestCategory.codeRequestCategory) {
                     doesMatchRequestCategory = true;
                     break;
                 }
             }
 
-            var doesMatchSeqPrepByCore: boolean = false;
+            let doesMatchSeqPrepByCore: boolean = false;
             if (doesMatchRequestCategory) {
                 if (requestCategory.isIlluminaType !== 'Y' || !this.gnomexService.isInternalExperimentSubmission) {
                     doesMatchSeqPrepByCore = true;
@@ -526,12 +526,12 @@ export class NewExperimentService {
             } else if (obj2.value === '') {
                 return 1;
             } else {
-                var isCustom1:String = obj1.isCustom;
-                var isCustom2:String = obj2.isCustom
-                var numberCycles1:Number = obj1.numberSequencingCyclesDisplay;
-                var numberCycles2:Number = obj2.numberSequencingCyclesDisplay;
-                var sortOrder1:Number = obj1.sortOrder === '' ? -1 : obj1.sortOrder;
-                var sortOrder2:Number = obj2.sortOrder === '' ? -1 : obj2.sortOrder;
+                let isCustom1:String = obj1.isCustom;
+                let isCustom2:String = obj2.isCustom;
+                let numberCycles1:Number = obj1.numberSequencingCyclesDisplay;
+                let numberCycles2:Number = obj2.numberSequencingCyclesDisplay;
+                let sortOrder1:Number = obj1.sortOrder === '' ? -1 : obj1.sortOrder;
+                let sortOrder2:Number = obj2.sortOrder === '' ? -1 : obj2.sortOrder;
 
                 if (isCustom1 < isCustom2) {
                     return -1;
@@ -562,7 +562,7 @@ export class NewExperimentService {
         for (let cycle of cycles) {
             if (cycle.value) {
 
-                var doesMatch: Boolean = false;
+                let doesMatch: Boolean = false;
                 if (cycle.codeRequestCategory === requestCategory.codeRequestCategory && cycle.isActive.toString() === 'Y') {
                     seqCycles.push(cycle);
                 }
