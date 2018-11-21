@@ -831,6 +831,11 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
         this.currentCollaboratorsDisplay = '';
 
         if (this._experiment && this._experiment.collaborators) {
+
+            if (!Array.isArray(this._experiment.collaborators)) {
+                this._experiment.collaborators = [this._experiment.collaborators.ExperimentCollaborator];
+            }
+
             for (let collaborator of this._experiment.collaborators) {
                 if (this.currentCollaboratorsDisplay) {
                     this.currentCollaboratorsDisplay = this.currentCollaboratorsDisplay + '\n';
