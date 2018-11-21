@@ -70,7 +70,6 @@ import {AnnotationTabComponent} from "../../util/annotation-tab.component";
             padding-right: 0.7em;
         }
 
-        .small-font       { font-size: small; }
         .normal-size-font { font-size: medium; }
         
         .title {
@@ -95,12 +94,6 @@ import {AnnotationTabComponent} from "../../util/annotation-tab.component";
         
         
         /************************/
-        
-        
-        mat-form-field.formField {
-            width: 30%;
-            margin: 0 0.5em;
-        }
         
         /deep/ .mat-checkbox .mat-checkbox-layout {
             padding: 0;
@@ -156,17 +149,16 @@ export class TabSampleSetupViewComponent implements OnInit {
                 private fb: FormBuilder) {
 
         this.form = this.fb.group({
-                numSamples:      ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+                numSamples:      ['', [Validators.pattern(/^\d+$/)]],
                 selectedDna:     [''],
                 selectedRna:     [''],
                 sampleTypeNotes: [''],
-                organism:        ['', Validators.required],
-                reagent:         ['', [Validators.required, Validators.maxLength(100)]],
-                elution:         ['', [Validators.required, Validators.maxLength(100)]],
-                // elution:         ['', [this.validator_elution_requiredIfVisible, Validators.maxLength(100)]],
+                organism:        [''],
+                reagent:         ['', [Validators.maxLength(100)]],
+                elution:         ['', [Validators.maxLength(100)]],
                 dnaseBox:        [''],
                 rnaseBox:        [''],
-                keepSample:      ['', Validators.required],
+                keepSample:      [''],
                 acid:            [''],
                 coreNotes:       ['', [Validators.maxLength(5000)]]
             },

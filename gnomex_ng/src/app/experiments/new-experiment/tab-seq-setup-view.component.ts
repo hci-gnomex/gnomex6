@@ -9,6 +9,82 @@ import {BillingService} from "../../services/billing.service";
     selector: "tabSeqSetupView",
     templateUrl: "./tab-seq-setup-view.component.html",
     styles: [`
+
+        .heading {
+            width: 30%;
+            min-width: 20em;
+            padding-right: 2em;
+        }
+
+
+        ol.three-depth-numbering {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: section;
+        }
+        ol.three-depth-numbering li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li::before {
+            counter-increment: section;
+            content: "(" counter(section) ")";
+            padding-right: 0.7em;
+        }
+        ol.three-depth-numbering li ol {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: subsection;
+        }
+        ol.three-depth-numbering li ol li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li ol li::before {
+            counter-increment: subsection;
+            content: "(" counter(section) "." counter(subsection) ")";
+            padding-right: 0.7em;
+        }
+        ol.three-depth-numbering li ol li ol {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: subsubsection;
+        }
+        ol.three-depth-numbering li ol li ol li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li ol li ol li::before {
+            counter-increment: subsubsection;
+            content: "(" counter(section) "." counter(subsection) "." counter(subsubsection) ")";
+            padding-right: 0.7em;
+        }
+
+        .small-font       { font-size: small; }
+
+        
+        .short-width {
+            width: 20em;
+            min-width: 20em;
+        }
+        .moderate-width {
+            width: 40em;
+            min-width: 20em;
+        }
+        /*.long-width {*/
+            /*width: 80em;*/
+            /*min-width: 40em;*/
+        /*}*/
+        
+        /*****************************/
+        
+        
         .radio-group-container {
             display: inline-flex;
             flex-direction: row;
