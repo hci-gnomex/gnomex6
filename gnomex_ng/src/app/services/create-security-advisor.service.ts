@@ -209,8 +209,11 @@ export class CreateSecurityAdvisorService {
 
                 this.isGuestValue = true;
                 this.idAppUserValue = Number(this.result.idAppUser);
+                this.uIDValue = this.result.uID;
                 this.userNameValue = "guest user";
+                this.userEmailValue = this.result.userEmail;
                 this.loginDateTimeValue = this.result.loginDateTime;
+                this.isUserActiveValue = this.result.isUserActive == "Y";
                 this.versionValue = this.result.version;
                 this.isUniversityOnlyUserValue = this.result.isUniversityOnlyUser === 'Y';
                 this.isExternalUserValue = false;
