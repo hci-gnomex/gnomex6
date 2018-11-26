@@ -175,6 +175,10 @@ export class ExperimentsService {
         return this.httpClient.get("/gnomex/GetRequest.gx", {params: params});
     }
 
+    public getMultiplexLaneList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetMultiplexLaneList.gx", {params: params});
+    }
+
     getLab(params: URLSearchParams): Observable<any> {
         return this._http.get("/gnomex/GetLab.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {

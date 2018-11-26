@@ -12,6 +12,48 @@ import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 
 @Injectable()
 export class NewExperimentService {
+    get filteredApps(): any[] {
+        return this._filteredApps;
+    }
+
+    set filteredApps(value: any[]) {
+        this._filteredApps = value;
+    }
+    get lanes(): any[] {
+        return this._lanes;
+    }
+
+    set lanes(value: any[]) {
+        this._lanes = value;
+    }
+    get project(): any {
+        return this._project;
+    }
+
+    set project(value: any) {
+        this._project = value;
+    }
+    get expTypeLabel(): string {
+        return this._expTypeLabel;
+    }
+
+    set expTypeLabel(value: string) {
+        this._expTypeLabel = value;
+    }
+    get numTubes(): number {
+        return this._numTubes;
+    }
+
+    set numTubes(value: number) {
+        this._numTubes = value;
+    }
+    get barCodes(): any[] {
+        return this._barCodes;
+    }
+
+    set barCodes(value: any[]) {
+        this._barCodes = value;
+    }
     get preppedByClient(): boolean {
         return this._preppedByClient;
     }
@@ -115,6 +157,7 @@ export class NewExperimentService {
 
     set organism(value: any) {
         this._organism = value;
+        this.organismChanged.next(true);
     }
     get experimentOwner(): any {
         return this._experimentOwner;
@@ -145,6 +188,7 @@ export class NewExperimentService {
 
     set numSamples(value: any) {
         this._numSamples = value;
+        this.numSamplesChanged.next(true);
     }
     get propertyEntriesForUser(): any[] {
         return this._propertyEntriesForUser;
@@ -181,6 +225,7 @@ export class NewExperimentService {
 
     set codeApplication(value: string) {
         this._codeApplication = value;
+        this.codeChanged.next(true);
     }
     get lab(): any {
         return this._lab;
@@ -227,8 +272,18 @@ export class NewExperimentService {
     private _sampleOrganisms: Set<any> = new Set<any>();
     private _organisms: any[] = [];
     private _filteredGenomeBuildList: any[] = [];
+    private _barCodes: any[] = [];
+    private _numTubes: number;
+    private _expTypeLabel: string;
+    private _project: any;
+    private _lanes: any[] = [];
+    private _filteredApps: any[] = [];
     public samplesColumnApi: any;
     private hiSeqPrices: any[] = [];
+    public selectedIndex: number = 0;
+    public samplesView;
+    public hideSubmit: boolean = true;
+    public disableSubmit: boolean = true;
     public propEntriesChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public hiSeqPricesChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public sampleTypeChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -239,12 +294,16 @@ export class NewExperimentService {
     public accountChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public protoChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public preppedChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public codeChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public organismChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public Changed: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public onSamplesTab: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public onConfirmTab: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public samplesGridColumnDefs: any[] = [];
     public priceMap: Map<string, string> = new Map<string, string>();
     public filteredAppList: any[] = [];
     public genomeList: any[] = [];
-    public selectedIndex = new BehaviorSubject<number>(1);
+    // public selectedIndex = new BehaviorSubject<number>(1);
 
     public readonly TYPE_MICROARRAY: string = 'MICROARRAY';
     public readonly TYPE_HISEQ: string = 'HISEQ';
@@ -274,7 +333,7 @@ export class NewExperimentService {
                 private httpClient: HttpClient) {
         this.filteredAppList = this.dictionaryService.getEntries('hci.gnomex.model.Application').sort(this.sortApplication);
         this.genomeList = this.dictionaryService.getEntries('hci.gnomex.model.GenomeBuildLite');
-
+        this.buildBarCodes();
     }
 
 
@@ -299,9 +358,16 @@ export class NewExperimentService {
         }
     }
 
+    buildBarCodes () {
+        let codes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcode");
+        for (let code of codes) {
+            code.idOligoBarcodeB = code.idOligoBarcode;
+            this.barCodes.push(code);
+        }
+    }
 
     public filterSampleType(codeNucleotideType: string, currentState: string, requestCategory: any): any[] {
-        let doesMatchRequestCategory: boolean = false;
+        // let doesMatchRequestCategory: boolean = false;
         let types: any[] = [];
 
 
@@ -310,11 +376,11 @@ export class NewExperimentService {
                 continue;
             }
 
-            if (codeNucleotideType != null && category.codeNucleotideType != codeNucleotideType) {
+            if (codeNucleotideType != null && category.codeNucleotideType !== codeNucleotideType) {
                 continue;
             }
             let theRequestCategories = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleTypeRequestCategory").filter(category2 =>
-                category2.value != "" && category2.idSampleType === category.value
+                category2.value !== "" && category2.idSampleType === category.value
             );
             for (let category3 of theRequestCategories) {
                 if (category3.codeRequestCategory === requestCategory.codeRequestCategory) {
@@ -352,55 +418,41 @@ export class NewExperimentService {
     }
 
     public isEditState(currentState: string): boolean {
-        if (currentState == 'EditState' ||
-            currentState == 'GenericEditState' ||
-            currentState == 'SolexaEditState' ||
-            currentState == 'SeqExternalEditState' ||
-            currentState == 'QCEditState' ||
-            currentState == 'MicroarrayEditState' ||
-            currentState == 'CapSeqEditState' ||
-            currentState == 'CherryPickEditState' ||
-            currentState == 'FragAnalEditState' ||
-            currentState == 'MitSeqEditState' ||
-            currentState == 'IScanEditState' ||
-            currentState == 'SequenomEditState' ||
-            currentState == 'IsolationEditState' ||
-            currentState == 'ClinicalSequenomEditState' ||
-            currentState == 'NanoStringEditState') {
-            return true;
-        } else {
-            return false;
-        }
+        return (currentState === 'EditState'
+            || currentState === 'GenericEditState'
+            || currentState === 'SolexaEditState'
+            || currentState === 'SeqExternalEditState'
+            || currentState === 'QCEditState'
+            || currentState === 'MicroarrayEditState'
+            || currentState === 'CapSeqEditState'
+            || currentState === 'CherryPickEditState'
+            || currentState === 'FragAnalEditState'
+            || currentState === 'MitSeqEditState'
+            || currentState === 'IScanEditState'
+            || currentState === 'SequenomEditState'
+            || currentState === 'IsolationEditState'
+            || currentState === 'ClinicalSequenomEditState'
+            || currentState === 'NanoStringEditState');
     }
 
     public isSequenomState(currentState): boolean {
-        if (currentState == 'SequenomState' || currentState == 'SequenomEditState') {
-            return true;
-        } else {
-            return false;
-        }
+        return (currentState === 'SequenomState'
+            || currentState === 'SequenomEditState');
     }
 
     public isClinicalSequenomState(currentState): boolean {
-        if (currentState == 'ClinicalSequenomState' || currentState == 'ClinicalSequenomEditState') {
-            return true;
-        } else {
-            return false;
-        }
+        return (currentState === 'ClinicalSequenomState'
+            || currentState === 'ClinicalSequenomEditState');
     }
 
     public isQCState(currentState): boolean {
-        if (currentState == 'QCState' ||
-            currentState == 'QCExternalState' ||
-            currentState == 'QCEditState') {
-            return true;
-        } else {
-            return false;
-        }
+        return (currentState === 'QCState'
+            || currentState === 'QCExternalState'
+            || currentState === 'QCEditState');
     }
 
     public filterAnnotations(idOrganism): any[] {
-        let fAnnotations: any[] = this.filterPropertiesByUser(this.annotations);;
+        let fAnnotations: any[] = this.filterPropertiesByUser(this.annotations);
 
         return fAnnotations;
         // let fAnnotations: any[] = [];
@@ -413,6 +465,71 @@ export class NewExperimentService {
         // return fAnnotations;
     }
 
+    public getMultiplexLanes(): void {
+        if (this.isSolexaState() && this.gnomexService.isInternalExperimentSubmission) {
+            this.initializeRequest();
+
+            let stringifiedRequest = JSON.stringify(this.request);
+
+            let params: HttpParams = new HttpParams()
+                .set("requestXMLString", stringifiedRequest);
+
+            // this.experimentService.getMultiplexLaneList(params).subscribe((respose) => {
+            //
+            // });
+
+        }
+    }
+
+
+    public initializeRequest() {
+        this.request.isExternal = this.isExternalExperimentSubmission() ? "Y" : "N";
+
+        this.request.codeRequestCategory = this.requestCategory.codeRequestCategory.toString();
+        this.request.idCoreFacility = this.requestCategory.idCoreFacility;
+
+        this.request.idSubmitter = this.getIdAppUserOwner();
+        if (this.gnomexService.hasPermission("canSubmitForOtherCores")) {
+            this.request.idSubmitter = this.securityAdvisor.idAppUser;
+        }
+        this.request.idAppUser = this.getIdAppUserOwner();
+
+        this.request.idLab = this.lab.idLab;
+        if (this.request.isExternal === 'N') {
+            if (this.billingAccount != null) {
+                this.request.idBillingAccount = this.billingAccount.idBillingAccount;
+            }
+            // else if (setupView.selectedBillingTemplate != null) {
+            //     request.billingTemplate = <billingTemplate></billingTemplate>;
+            //     request.billingTemplate.appendChild(new XMLList(setupView.selectedBillingTemplate));
+            // }
+        }
+        this.request.idProject = this.project.idProject;
+        this.request.codeApplication = this.codeApplication;
+
+        // let requestCategory: any = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', this.request.codeRequestCategory);
+
+        this.request.samples = this.samplesGridRowData;
+
+        this.request.idSlideProduct = '';
+
+        // if (this.isSolexaState()) {
+        //     for (var lane of lanes) {
+        //         this.request.sequenceLanes.push(lane);
+        //     }
+        // }
+
+
+    }
+
+    public isExternalExperimentSubmission(): boolean {
+        return (this.setupView.currentState === "ExternalExperimentState"
+            || this.setupView.currentState === "ExternalMicroarrayState"
+            || this.setupView.currentState === "AdminExternalExperimentState"
+            || this.setupView.currentState === "AdminExternalMicroarrayState");
+    }
+
+
     public sortSampleTypes(obj1, obj2): number {
         if (obj1 == null && obj2 == null) {
             return 0;
@@ -424,9 +541,9 @@ export class NewExperimentService {
             let order1: number = Number(obj1.sortOrder);
             let order2: number = Number(obj2.sortOrder);
 
-            if (obj1.value == '') {
+            if (obj1.value === '') {
                 return -1;
-            } else if (obj2.value == '') {
+            } else if (obj2.value === '') {
                 return 1;
             } else {
                 if (order1 < order2) {
@@ -476,6 +593,159 @@ export class NewExperimentService {
         }
     }
 
+    updateRequestProperties():void {
+
+        let application: any = this.dictionaryService.getEntry('hci.gnomex.model.Application', this.request.codeApplication);
+
+        this.request.samples = this.samplesGridRowData;
+        this.request.hybridizations = {};
+        this.request.sequenceLanes = this.lanes;
+
+        // Visibility
+        // todo
+        // this.request.codeVisibility = visibilityView.visibilityRadioGroup.selectedValue;
+        // if (this.request.@codeVisibility != null && this.request.@codeVisibility == 'INST') {
+        //     // Only set the institution if the visibility view in initialized, meaning
+        //     // that the user has selected the visibility tab.  Otherwise, just leave
+        //     // the institution to is previously set value.
+        //     if (visibilityView.institutionCombo != null && visibilityView.institutionCombo.selectedItem != null) {
+        //         request.@idInstitution = visibilityView.institutionCombo.selectedItem.@idInstitution;
+        //     }
+        //     else if (parentApplication.getProperty(parentApplication.PROPERTY_ID_DEFAULT_INSTITUTION) != null) {
+        //         request.@idInstitution = parentApplication.getProperty(parentApplication.PROPERTY_ID_DEFAULT_INSTITUTION);
+        //     }
+        //     else {
+        //         request.@idInstitution = "";
+        //     }
+        // }
+
+        // Collaborators
+        // todo
+        // if (visibilityView != null && visibilityView.enabled) {
+        //     request.replace("collaborators", <collaborators></collaborators>);
+        //         for each(var collaborator:Object in visibilityView.getCollaborators()) {
+        //         request.collaborators.appendChild(collaborator);
+        //     }
+        // }
+        // request.@privacyExpirationDate = visibilityView.privacyExpirationPicker.text;
+
+        this.request.idAppUser = this.idAppUser;
+        this.request.idSubmitter = this.experimentOwner.idAppUser;
+        this.request.idLab = this.lab.idLab;
+        this.request.idProject = this.project.idProject;
+
+        //TODO
+        //Add new annotations to Sample that have not had data added to them in samples grid.
+        // if (request.samples.Sample.length() > 0) {
+        //     for each(var prop:XML in this.propertyEntries) {
+        //         if (prop.@isSelected == "true" && !(request.samples.Sample[0].hasOwnProperty("@ANNOT" + prop.@idProperty))) {
+        //             request.samples.Sample[0]["@ANNOT" + prop.@idProperty] = "";
+        //         }
+        //     }
+        // }
+    }
+
+    public checkSamplesCompleteness() {
+        let numberOfAdditionalLanes: number = 0;
+        for (let s2 of this.samplesGridRowData) {
+            if (this.isEntered(s2, "numberSequencingLanes")) {
+                numberOfAdditionalLanes += s2.numberSequencingLanes;
+            }
+        }
+        let completeCount: number = 0;
+        // let nameCompleteCount: number = 0;
+
+        for (let sample of this.samplesGridRowData) {
+
+            if (this.isEntered(sample, "name")
+                && this.isEntered(sample, "idSampleType")
+                && this.isEntered(sample, "idOrganism")
+                && this.isEntered(sample, "idSeqRunType")
+                && this.isEntered(sample, "idNumberSequencingCycles")
+                && this.isEntered(sample, "idNumberSequencingCyclesAllowed")
+                && this.isEntered(sample, "multiplexGroupNumber")
+                && (this.isEntered(sample, "numberSequencingLanes") && numberOfAdditionalLanes > 0)) {
+                completeCount++;
+            }
+
+        }
+        let isValidNumberSeqLanes: boolean = true;
+        if (isValidNumberSeqLanes) {
+            let lanesAdded:Boolean = false;
+
+            for (let theSample of this.samplesGridRowData) {
+                let numberLanesForSample: number = this.getLaneCount(theSample);
+                let numLanes: number = 1;
+                numLanes = theSample.numberSequencingLanes;
+                if (numberLanesForSample < numLanes) {
+                    let numberLanesToAdd: number = numLanes - numberLanesForSample;
+                    for (let x: number = 0; x < numberLanesToAdd; x++) {
+                        this.addSequencingLaneForSample(theSample);
+                        lanesAdded = true;
+                    }
+                } else if (numberLanesForSample > numLanes) {
+                    let numberLanesToRemove: number = numberLanesForSample - numLanes;
+                    for (let lane of this.getLanes(theSample, numberLanesToRemove)) {
+                        // TODO
+                        // parentDocument.lanes.removeItemAt(parentDocument.lanes.getItemIndex(lane));
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    getLanes(sample: any, numberOfLanes: number): any[] {
+        let theLanes: any[] = [];
+        if (theLanes != null) {
+            for (let sequenceLane of this.lanes) {
+                if (sequenceLane.idSample === sample.idSample) {
+                    theLanes.push(sequenceLane);
+                    if (numberOfLanes !== -1 && theLanes.length === numberOfLanes) {
+                        break;
+                    }
+                }
+            }
+        }
+        return theLanes;
+    }
+
+
+    addSequencingLaneForSample(sample: any):void {
+        let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
+        let laneStr: string = lanePlus.toString().substr(1);
+
+        let laneObj = {
+            idSequenceLane: 'SequenceLane' + laneStr,
+            notes: '',
+            idSeqRunType: sample.idSeqRunType,
+            idNumberSequencingCycles: sample.idNumberSequencingCycles,
+            idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
+            idSample: sample.idSample,
+            idGenomeBuildAlignTo: ''
+
+        };
+        this.lanes.push(laneObj);
+    }
+
+    getLaneCount(sample: any): number {
+        let count: number = 0;
+        if (this.lanes != null) {
+            for (let sequenceLane of this.lanes) {
+                if (sequenceLane.idSample === sample.idSample) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+
+    isEntered(sample: any, fieldName: string): boolean {
+        return (sample.hasOwnProperty(fieldName) && ('' + sample[fieldName]) !== '');
+    }
+
     public filterApplication(requestCategory, seqPrepByCore): any[] {
         let filteredApps: any[] = [];
         for (let app of this.filteredAppList) {
@@ -486,10 +756,10 @@ export class NewExperimentService {
                 continue;
             }
             let doesMatchRequestCategory: boolean = false;
-            let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter(reqCatApp =>
+            let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter((reqCatApp) => {
+                    return reqCatApp.value !== "" && reqCatApp.codeApplication === app.value;
+            });
 
-                reqCatApp.value != "" && reqCatApp.codeApplication === app.value
-            );
             for (let xref of theApplications) {
                 if (xref.codeRequestCategory === requestCategory.codeRequestCategory) {
                     doesMatchRequestCategory = true;
@@ -526,12 +796,12 @@ export class NewExperimentService {
             } else if (obj2.value === '') {
                 return 1;
             } else {
-                let isCustom1:String = obj1.isCustom;
-                let isCustom2:String = obj2.isCustom;
-                let numberCycles1:Number = obj1.numberSequencingCyclesDisplay;
-                let numberCycles2:Number = obj2.numberSequencingCyclesDisplay;
-                let sortOrder1:Number = obj1.sortOrder === '' ? -1 : obj1.sortOrder;
-                let sortOrder2:Number = obj2.sortOrder === '' ? -1 : obj2.sortOrder;
+                let isCustom1: String = obj1.isCustom;
+                let isCustom2: String = obj2.isCustom;
+                let numberCycles1: Number = obj1.numberSequencingCyclesDisplay;
+                let numberCycles2: Number = obj2.numberSequencingCyclesDisplay;
+                let sortOrder1: Number = obj1.sortOrder === '' ? -1 : obj1.sortOrder;
+                let sortOrder2: Number = obj2.sortOrder === '' ? -1 : obj2.sortOrder;
 
                 if (isCustom1 < isCustom2) {
                     return -1;
@@ -557,26 +827,27 @@ export class NewExperimentService {
     }
 
     public filterNumberSequencingCyclesAllowed(cycles: any[], requestCategory: any): any[] {
+        if (!cycles || !Array.isArray(cycles) || !requestCategory) {
+            return [];
+        }
+
         let seqCycles: any[] = [];
 
         for (let cycle of cycles) {
-            if (cycle.value) {
-
-                let doesMatch: Boolean = false;
-                if (cycle.codeRequestCategory === requestCategory.codeRequestCategory && cycle.isActive.toString() === 'Y') {
-                    seqCycles.push(cycle);
-                }
+            if (cycle.value && cycle.codeRequestCategory === requestCategory.codeRequestCategory && cycle.isActive.toString() === 'Y') {
+                seqCycles.push(cycle);
             }
         }
+
         return seqCycles;
     }
 
     public getOrganism(): any {
-        if (this.sampleSetupView && (this.isMicroarrayState() || this.isSolexaState()) && this.currentState.value != 'SolexaLaneAmendState') {
+        if (this.sampleSetupView && (this.isMicroarrayState() || this.isSolexaState()) && this.currentState.value !== 'SolexaLaneAmendState') {
             return this.sampleSetupView.form.get("organism").value;
         } else if (this.request != null) {
             let idOrganism = null;
-            if (this.request.idOrganismSampleDefault && this.request.idOrganismSampleDefault != '') {
+            if (this.request.idOrganismSampleDefault && this.request.idOrganismSampleDefault !== '') {
                 idOrganism = this.request.idOrganismSampleDefault;
             } else {
                 if (this.request.samples.length > 0) {
@@ -623,9 +894,11 @@ export class NewExperimentService {
             .set("idLab", this.lab.idLab);
         this.billingService.getHiSeqRunTypePriceList(appPriceListParams).subscribe((response: any) => {
             this.hiSeqPrices = response;
+            if (Array.isArray(response)) {
             for (let price of response) {
                 let key: string = price.idNumberSequencingCyclesAllowed;
                 this.priceMap.set(key, price.price);
+            }
             }
             this.hiSeqPricesChanged.next(true);
 
@@ -640,7 +913,7 @@ export class NewExperimentService {
             idOrganism = this.getOrganism().idOrganism;
         }
         if (AnnotationService.isApplicableProperty(property, this.requestCategory, idOrganism, this.codeApplication)) {
-            if (sce.isSelected == 'true' || property.isActive != 'N') {
+            if (sce.isSelected === 'true' || property.isActive !== 'N') {
                 keep = true;
             }
         }
@@ -748,9 +1021,11 @@ export class NewExperimentService {
 
     public getSubmitterName(): string {
         if (this.experimentOwner) {
-            return this.experimentOwner.display;
+            return this.experimentOwner.displayName;
         } else {
             return this.securityAdvisor.userName;
         }
     }
+
+    submit() { }
 }

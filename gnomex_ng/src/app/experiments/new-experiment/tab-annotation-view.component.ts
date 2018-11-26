@@ -18,7 +18,7 @@ import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 
 @Component({
     selector: "tabAnnotationView",
-    templateUrl: "./tab-annotation-view.html",
+    templateUrl: "./tab-annotation-view.component.html",
     styles: [`
     `]
 })

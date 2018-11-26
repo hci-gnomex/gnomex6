@@ -53,6 +53,7 @@ export class GnomexService {
     public readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
     public readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string = "request_bio_analysis_note";
     public readonly PROPERTY_HIDE_SAMPLETYPE_ON_EXTERNAL_EXPERIMENT: string = "hide_sampletype_on_external_experiment";
+    public readonly PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB: string = "request_props_on_confirm_tab";
 
 
     public readonly TYPE_MICROARRAY: string = "MICROARRAY";

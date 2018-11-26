@@ -73,6 +73,15 @@ export class BillingService {
         return this.httpClient.get("/gnomex/GetBillingRequestList.gx", {params: params});
     }
 
+    public createBillingItems(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/CreateBillingItems.gx", {params: params});
+    }
+
+    createBillingItems2(formData: string):Observable<any>{
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/CreateBillingItems.gx", formData.toString());
+    }
+
     public getBillingItemList(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetBillingItemList.gx", {params: params});
     }

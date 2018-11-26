@@ -37,6 +37,7 @@
                     <img class="icon" [src]="constService.ICON_DOWNLOAD">
                     Download Sample Sheet
                 </button>
+                <mat-checkbox (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
             </div>
             <div class="full-height full-width">
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"

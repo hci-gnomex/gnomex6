@@ -57,10 +57,10 @@ import {ExperimentDetailModule} from "./experiment-detail/experiment-detail-modu
 import {TabNotesViewComponent} from "./new-experiment/tab-notes-view.component";
 import {TabSampleSetupViewComponent} from "./new-experiment/tab-sample-setup-view.component";
 import {TabPropertiesViewComponent} from "./new-experiment/tab-properties-view.component";
-import {TabSeqSetupView} from "./new-experiment/tab-seq-setup-view";
+import {TabSeqSetupViewComponent} from "./new-experiment/tab-seq-setup-view.component";
 import {NewExperimentComponent} from "./new-experiment/new-experiment.component";
 import {AnnotationTabComponent} from "../util/annotation-tab.component";
-import {TabSeqProtoView} from "./new-experiment/tab-seq-proto-view";
+import {TabSeqProtoViewComponent} from "./new-experiment/tab-seq-proto-view.component";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
@@ -76,6 +76,8 @@ import {RouterModule} from "@angular/router";
 import {TabBioinformaticsViewComponent} from "./new-experiment/tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina.component";
 import {UploadModule} from "../upload/upload.module";
+import {VisibilityDetailTabComponent} from "../util/visibility-detail-tab.component";
+// import {V} from "@angular/core/src/render3";
 
 /**
  * @author mbyrne
@@ -113,8 +115,8 @@ import {UploadModule} from "../upload/upload.module";
         AgGridRendererModule,
         AngularSplitModule,
         DynamicModule,
-        DynamicModule.withComponents([TabNotesViewComponent, AnnotationTabComponent, TabSampleSetupViewComponent, TabSeqSetupView,
-            TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent]),
+        DynamicModule.withComponents([TabNotesViewComponent, AnnotationTabComponent, TabSampleSetupViewComponent, TabSeqSetupViewComponent,
+            TabSeqProtoViewComponent, TabAnnotationViewComponent, TabSamplesIlluminaComponent]),
         AgGridModule.withComponents([
             DateRenderer,
             IconTextRendererComponent,
@@ -149,18 +151,18 @@ import {UploadModule} from "../upload/upload.module";
                     TabNotesViewComponent,
                     TabSampleSetupViewComponent,
                     TabPropertiesViewComponent,
-                    TabSeqSetupView,
-                    TabSeqProtoView,
+        TabSeqSetupViewComponent,
+        TabSeqProtoViewComponent,
                     NewExperimentComponent,
                     TabAnnotationViewComponent,
                     TabSamplesIlluminaComponent,
                     TabBioinformaticsViewComponent,
                     TabConfirmIlluminaComponent
     ],
-    entryComponents:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupView, NewExperimentComponent,
-        TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent],
-    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupView, NewExperimentComponent,
-        TabSeqProtoView, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent]
+    entryComponents:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupViewComponent, NewExperimentComponent,
+        TabSeqProtoViewComponent, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent, VisibilityDetailTabComponent],
+    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupViewComponent, NewExperimentComponent,
+        TabSeqProtoViewComponent, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent, VisibilityDetailTabComponent]
 })
 export class ExperimentsModule {
 }

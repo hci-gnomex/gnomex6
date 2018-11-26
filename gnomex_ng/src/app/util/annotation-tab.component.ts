@@ -1,22 +1,24 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import { Component, Input,OnDestroy, OnInit} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "./interfaces/annotation.model";
 import {selectRequired} from "./validators/select-required.validator";
-import {MatDialog, MatDialogRef, MatOptionSelectionChange} from "@angular/material";
+import {
+    MatDialog, MatDialogConfig, MatDialogRef,
+    MatOptionSelectionChange
+} from "@angular/material";
 import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
 import {BrowseOrderValidateService} from "../services/browse-order-validate.service";
 import {IAnnotationOption} from "./interfaces/annotation-option.model";
 
-export enum OrderType{
+export enum OrderType {
     ANALYSIS = 'a',
     DATATRACK = 'dt',
     EXPERIMENT = 'e',
     NONE = ''
 }
-
 
 
 @Component({
@@ -26,48 +28,51 @@ export enum OrderType{
     styles: [`
 
 
-        .annot-control{
-            width:30%;
-            margin:0.25em;
-            font-size:small;
+        .annot-control {
+            width: 30%;
+            margin: 0.25em;
+            font-size: small;
         }
-        .mat-tab-group-border{
+
+        .mat-tab-group-border {
             border: 1px solid #e8e8e8;
         }
 
 
     `]
 })
-export class AnnotationTabComponent implements OnInit, OnDestroy{
+export class AnnotationTabComponent implements OnInit, OnDestroy {
+    private readonly TEXT: string = "TEXT";
+    private readonly CHECK: string = "CHECK";
+    private readonly OPTION: string = "OPTION";
+    private readonly MOPTION: string = "MOPTION";
+    private readonly URL: string = "URL";
+
     public form: FormGroup;
+
     private _annotations: IAnnotation[];
     private _disabled: boolean = false;
-    private urlAnnotations: any[] = [];
-    private types = OrderType;
-    private readonly TEXT:string = "TEXT";
-    private readonly CHECK:string = "CHECK";
-    private readonly OPTION:string = "OPTION";
-    private readonly MOPTION:string = "MOPTION";
-    private readonly URL:string = "URL";
-
 
     @Input() orderType = OrderType.NONE;
-    @Input() set disabled(value:boolean){
+
+    @Input()
+    set disabled(value: boolean) {
         this._disabled = value;
-        if(this.form){
-            if(this._disabled){
+        if (this.form) {
+            if (this._disabled) {
                 this.form.disable()
-            }else{
+            } else {
                 this.form.enable();
             }
         }
-
     }
 
-    @Input() set annotations( a: IAnnotation[]){
+    @Input()
+    set annotations(a: IAnnotation[]) {
         this._annotations = a;
-        if(!this.form){
-            this.form =  new FormGroup({});
+
+        if (!this.form) {
+            this.form = new FormGroup({});
         }
 
         if (this._annotations) {
@@ -80,16 +85,16 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
                     this.form.controls[annot.name].setValue(annot.value === 'Y');
                 } else if (annot.codePropertyType === this.MOPTION) {
                     let selectedOpts: IAnnotationOption[] = [];
+
                     for (let opt  of annot.PropertyOption) {
                         if (opt.selected === 'Y') {
                             selectedOpts.push(opt);
                         }
                     }
+
                     this.form.controls[annot.name].setValue(selectedOpts);
                 } else if (annot.codePropertyType === this.OPTION) {
                     this.form.controls[annot.name].setValue(annot.value ? annot.value : '');
-
-
                 } else if (annot.codePropertyType === this.URL) {
                     this.form.controls[annot.name].setValue(annot);
                 }
@@ -103,15 +108,13 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
                         this.form.controls[annot.name].setValidators(selectRequired());
                     }
                 }
-
             });
         }
+
         this.form.markAsPristine();
-
-
     }
 
-    get annotations(){
+    get annotations() {
         return this._annotations;
     }
 
@@ -131,13 +134,13 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
                 annotationToSave.push(annot);
 
             } else if (annot.codePropertyType === this.MOPTION) {
-                let mOptList =  <IAnnotationOption[]>this.form.controls[annot.name].value;
+                let mOptList = <IAnnotationOption[]>this.form.controls[annot.name].value;
                 annot.value = '';
-                for(let i = 0; i <  mOptList.length; i++  ){
-                    if( i  < mOptList.length - 1){
+                for (let i = 0; i < mOptList.length; i++) {
+                    if (i < mOptList.length - 1) {
                         annot.value += mOptList[i].name + ","
-                    }else{
-                        annot.value +=  mOptList[i].name;
+                    } else {
+                        annot.value += mOptList[i].name;
                     }
                 }
                 annotationToSave.push(annot);
@@ -151,56 +154,40 @@ export class AnnotationTabComponent implements OnInit, OnDestroy{
     };
 
 
-
-
-
-    constructor(private dialog: MatDialog, private orderValidateService: BrowseOrderValidateService){
+    constructor(private dialog: MatDialog,
+                private orderValidateService: BrowseOrderValidateService) {
     }
 
-    ngOnInit(){
-        if(this._disabled){
+    ngOnInit() {
+        if (this._disabled) {
             this.form.disable();
-        }else{
+        } else {
             this.form.enable();
         }
 
-        this.orderValidateService.getOrderValidateObservable()
-            .subscribe(this.prepAnnotationForSave);
+        this.orderValidateService.getOrderValidateObservable().subscribe(this.prepAnnotationForSave);
+    }
+
+    ngOnDestroy() { }
 
 
+    loadConfigAnnotations() {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.height = '980px';
+        configuration.data = {orderType: this.orderType};
 
-
+        let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.dialog.open(ConfigAnnotationDialogComponent, configuration);
     }
 
 
-    loadConfigAnnotations(){
-        let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.dialog.open(ConfigAnnotationDialogComponent, {
-            height: '980px',
-            data: {
-                orderType: this.orderType
-            }
-        });
-    }
-
-
-    selectOption(opt:any){
-        let selected:boolean = opt.selected;
+    selectOption(opt: any) {
+        let selected: boolean = opt.selected;
         opt.value.selected = selected ? 'Y' : 'N';
     }
-
-
-
 
 
     compareByID(itemOne, itemTwo) {
         return itemOne && itemTwo && itemOne.name == itemTwo.name;
     }
-
-
-    ngOnDestroy(){
-
-    }
-
-
 }
 

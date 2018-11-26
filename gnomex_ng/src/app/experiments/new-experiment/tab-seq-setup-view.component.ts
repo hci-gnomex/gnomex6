@@ -7,8 +7,84 @@ import {BillingService} from "../../services/billing.service";
 
 @Component({
     selector: "tabSeqSetupView",
-    templateUrl: "./tab-seq-setup-view.html",
+    templateUrl: "./tab-seq-setup-view.component.html",
     styles: [`
+
+        .heading {
+            width: 30%;
+            min-width: 20em;
+            padding-right: 2em;
+        }
+
+
+        ol.three-depth-numbering {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: section;
+        }
+        ol.three-depth-numbering li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li::before {
+            counter-increment: section;
+            content: "(" counter(section) ")";
+            padding-right: 0.7em;
+        }
+        ol.three-depth-numbering li ol {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: subsection;
+        }
+        ol.three-depth-numbering li ol li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li ol li::before {
+            counter-increment: subsection;
+            content: "(" counter(section) "." counter(subsection) ")";
+            padding-right: 0.7em;
+        }
+        ol.three-depth-numbering li ol li ol {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: subsubsection;
+        }
+        ol.three-depth-numbering li ol li ol li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li ol li ol li::before {
+            counter-increment: subsubsection;
+            content: "(" counter(section) "." counter(subsection) "." counter(subsubsection) ")";
+            padding-right: 0.7em;
+        }
+
+        .small-font       { font-size: small; }
+
+        
+        .short-width {
+            width: 20em;
+            min-width: 20em;
+        }
+        .moderate-width {
+            width: 40em;
+            min-width: 20em;
+        }
+        /*.long-width {*/
+            /*width: 80em;*/
+            /*min-width: 40em;*/
+        /*}*/
+        
+        /*****************************/
+        
+        
         .radio-group-container {
             display: inline-flex;
             flex-direction: row;
@@ -30,7 +106,7 @@ import {BillingService} from "../../services/billing.service";
     `]
 })
 
-export class TabSeqSetupView implements OnInit {
+export class TabSeqSetupViewComponent implements OnInit {
     public readonly YES: string = "yes";
     public readonly NO: string = "no";
     public readonly SEPARATE: string = "separate";
@@ -133,9 +209,11 @@ export class TabSeqSetupView implements OnInit {
         let appPriceListParams: HttpParams = new HttpParams().set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
             .set("idLab", this.newExperimentService.lab.idLab);
         this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
-            for (let price of response) {
-                let key: string = price.codeApplication;
-                this.priceMap[key] = price.price;
+            if (response) {
+                for (let price of response) {
+                    let key: string = price.codeApplication;
+                    this.priceMap[key] = price.price;
+                }
             }
             this.themes = [];
             this.appPrices = [];
@@ -211,6 +289,10 @@ export class TabSeqSetupView implements OnInit {
         }
     }
 
+    onNumTubesChanged(event) {
+        this.newExperimentService.numTubes = event
+    }
+
     onNumSamplesChanged(event) {
 
     }
@@ -241,8 +323,8 @@ export class TabSeqSetupView implements OnInit {
         } else if (obj2 == null) {
             return -1;
         } else {
-            var sortOrder1: number = obj1.sortOrder == "" ? 999 : obj1.sortOrder;
-            var sortOrder2: number = obj2.sortOrder == "" ? 999 : obj2.sortOrder;
+            let sortOrder1: number = obj1.sortOrder == "" ? 999 : obj1.sortOrder;
+            let sortOrder2: number = obj2.sortOrder == "" ? 999 : obj2.sortOrder;
             if (sortOrder1 < sortOrder2) {
                 return -1;
             } else if (sortOrder1 > sortOrder2) {

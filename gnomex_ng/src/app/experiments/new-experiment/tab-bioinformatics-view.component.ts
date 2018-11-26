@@ -7,7 +7,7 @@ import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
     selector: "tabBioinformaticsView",
-    templateUrl: "./tab-bioinformatics-view.html",
+    templateUrl: "./tab-bioinformatics-view.component.html",
     styles: [`
         button.link-button {
             background: none;
@@ -56,9 +56,9 @@ export class TabBioinformaticsViewComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.newExperimentService.samplesChanged.subscribe((value) => {
-            if (this.newExperimentService.samplesChanged.value === true) {
-                this.newExperimentService.samplesChanged.next(false);
+        this.newExperimentService.organismChanged.subscribe((value) => {
+            if (this.newExperimentService.organismChanged.value === true) {
+                this.newExperimentService.organismChanged.next(false);
             }
 
             let organismsFormArray: any[] = [];

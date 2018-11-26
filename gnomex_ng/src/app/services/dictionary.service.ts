@@ -294,6 +294,15 @@ export class DictionaryService {
         return this.getEntries(DictionaryService.CORE_FACILITY);
     }
 
+    // Given the code application function returns the first active protocol associated with the application.
+    // This is useful for Illumina applications which by process have only one active protocol associated with them.
+    public getProtocolFromApplication(codeApplication: string): any {
+        let returnProtocol: any = null;
+        let seqLibProtocolApplication = this.findEntryByField(DictionaryService.SEQ_LIB_PROTOCOL_APPLICATION, "codeApplication", codeApplication);
+
+        return seqLibProtocolApplication;
+    }
+
     public getApplicationForProtocol(idSeqLibProtocol: string): DictionaryEntry {
         let application: DictionaryEntry;
         let seqLibProtocolApplication: DictionaryEntry = this.findEntryByField(DictionaryService.SEQ_LIB_PROTOCOL_APPLICATION, "idSeqLibProtocol", idSeqLibProtocol);

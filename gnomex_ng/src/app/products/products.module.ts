@@ -47,6 +47,7 @@ import {DialogsModule} from "../util/popup/dialogs.module";
     exports: [
     ],
     entryComponents: [
+        ConfigureProductTypesComponent,
         AddLedgerEntryComponent,
         AddProductWindowComponent,
         ConfigureProductTypesComponent,

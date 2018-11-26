@@ -1,19 +1,28 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {map} from "rxjs/operators";
+import {first, map} from "rxjs/operators";
 
 @Injectable()
 export class GetLabService {
+
+    public get labSubmittersObservable(): Observable<any[]> {
+        return this._labSubmitters_subject.asObservable();
+    }
+
+    private _labSubmitters_subject: BehaviorSubject<any[]> = new BehaviorSubject([]);
+
+    public labMembersSubject: BehaviorSubject<any[]> = new BehaviorSubject([]);
+
 
     constructor(private http: Http,
                 private httpClient: HttpClient) {
 
     }
 
-    public labMembersSubject: BehaviorSubject<any[]> = new BehaviorSubject([]);
+
+
 
     public getLabCall(params: URLSearchParams): Observable<Response> {
         return this.http.get("/gnomex/GetLab.gx", {search: params});
@@ -42,21 +51,82 @@ export class GetLabService {
     };
 
 
+    getSubmittersForLab(idLab: string, includeBillingAccounts: string, includeProductCounts: string): Observable<any[]> {
+        // explicitly want to give them the observable (see end of function) before processing the http call
+        setTimeout(() => {
+
+            let params: HttpParams = new HttpParams()
+                .set("idLab", idLab)
+                .set("includeBillingAccounts", includeBillingAccounts)
+                .set("includeProductCounts", includeProductCounts);
+
+            this.httpClient.get("/gnomex/GetLab.gx", { params: params }).pipe(first()).subscribe((response: any) => {
+
+                if (!response) {
+                    return;
+                }
+
+                let lab: any = response.Lab;
+
+                if (lab) {
+                    let possibleSubmittersForLabDictionary = [];
+                    let temp: any[] = [];
+
+                    if (lab.members) {
+                        if (!Array.isArray(lab.members)) {
+                            temp = [lab.members.AppUser];
+                        } else {
+                            temp = lab.members;
+                        }
+                    }
+
+                    for (let member of temp) {
+                        possibleSubmittersForLabDictionary.push(member);
+                    }
+
+                    if (lab.managers) {
+                        if (!Array.isArray(lab.managers)) {
+                            temp = [lab.managers.AppUser];
+                        } else {
+                            temp = lab.managers;
+                        }
+                    }
+
+                    for (let manager of temp) {
+                        let managerFoundInAppUsers: boolean = false;
+
+                        for (let appUser of possibleSubmittersForLabDictionary) {
+                            if (appUser.idAppUser === manager.idAppUser) {
+                                managerFoundInAppUsers = true;
+                                break;
+                            }
+                        }
+
+                        if (!managerFoundInAppUsers) {
+                            possibleSubmittersForLabDictionary.push(manager);
+                        }
+                    }
+
+                    this._labSubmitters_subject.next(possibleSubmittersForLabDictionary);
+                }
+            });
+        });
+
+        return this.labSubmittersObservable;
+    }
+
+
     getLabMembers_fromBackend(params: URLSearchParams): void {
 
         this.http.get("/gnomex/GetLab.gx", { search: params}).subscribe((response: Response) => {
-            // console.log("GetRequestList called");
-
             if (response.status === 200) {
                 let lab: any = response.json().Lab;
-                if(lab){
-                    let members:Array<any> = Array.isArray(lab.members) ? lab.members : [lab.members];
+                if (lab) {
+                    let members: Array<any> = Array.isArray(lab.members) ? lab.members : [lab.members.AppUser];
                     let activeMembers:Array<any> = members.filter(appUser => appUser.isActive === 'Y');
                     let sortedActiveMembers = activeMembers.sort(this.sortLabMembersFn);
                     this.labMembersSubject.next(sortedActiveMembers);
                 }
-
-                //return response.json().Request;
             } else {
                 throw new Error("Error");
             }

@@ -7,7 +7,7 @@ import {BrowseOrderValidateService} from "../../services/browse-order-validate.s
 
 @Component({
     selector: "tabPropertiesView",
-    templateUrl: "./tab-properties-view.html",
+    templateUrl: "./tab-properties-view.component.html",
     styles: [`
     `]
 })

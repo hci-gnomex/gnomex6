@@ -11,8 +11,19 @@
     <mat-label>{{submitterName}}</mat-label>
     <mat-label>{{labName}}</mat-label>
     <mat-label>{{billingAccountName}}({{billingAccountNumber}})</mat-label>
+    <mat-label>{{newExperimentService.expTypeLabel}}</mat-label>
     <mat-label>{{newExperimentService.requestCategory.requestCategoryName}}</mat-label>
     <mat-label>{{newExperimentService.applicationName}}</mat-label>
     <mat-label>{{protoName}}</mat-label>
     <mat-label *ngIf="clientDidPrepare">Library Prepared By Client</mat-label>
+    <div class="flex-container-row full-height full-width">
+        <ag-grid-angular class="ag-fresh full-height full-width"
+                         (gridReady)="this.onGridReady($event)"
+                         (rowDataChanged)="this.onGridRowDataChanged()"
+                         [columnDefs]="this.gridColumnDefs"
+                         [enableColResize]="true">
+        </ag-grid-angular>
+    </div>
+
+    <mat-checkbox *ngIf="showAgreeBox" [checked]=isCheckboxChecked {change)="onCheckboxChanged($event)" formControlName="dnaseBox">{{agreeTextBoxLabel}}"</mat-checkbox>
 </form>
