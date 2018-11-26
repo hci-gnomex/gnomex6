@@ -1,8 +1,8 @@
 <div>
     <img src="../../../assets/topic_tag.png" style="margin: 0rem 0rem 0rem 0.5rem">
     <label style="width: 7rem">Topics</label>
-    <button mat-button (click)="makeNewTopic()"><img src="../../../assets/topic_tag_new.png">New Topic</button>
-    <button *ngIf="showDelete" mat-button (click)="doDelete()"><img src="../../../assets/crossout.png">Delete</button>
-    <button *ngIf="showRemoveLink" mat-button (click)="doDelete()"><img src="../../../assets/crossout.png">Remove link</button>
-    <button mat-button (click)="doLinkToData()"><img src="../../../assets/link.png">Link to Data</button>
+    <button mat-button [disabled]="this.disableAll" (click)="makeNewTopic()"><img src="../../../assets/topic_tag_new.png">New Topic</button>
+    <button *ngIf="showDelete" [disabled]="this.disableAll" mat-button (click)="doDelete()"><img src="../../../assets/crossout.png">Delete</button>
+    <button *ngIf="showRemoveLink" [disabled]="this.disableAll" mat-button (click)="doDelete()"><img src="../../../assets/crossout.png">Remove link</button>
+    <button mat-button [disabled]="this.disableAll" (click)="doLinkToData()"><img src="../../../assets/link.png">Link to Data</button>
 </div>

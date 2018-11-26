@@ -9,6 +9,7 @@ import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
 import {IRelatedObject} from "./interfaces/related-objects.model";
+import {DialogsService} from "./popup/dialogs.service";
 
 
 
@@ -69,7 +70,8 @@ export class RelatedDataTabComponent implements OnInit, AfterViewInit{
 
 
     constructor(private constService:ConstantsService,
-                private gnomexService:GnomexService){
+                private gnomexService:GnomexService,
+                private dialogsService: DialogsService,){
     }
 
 
@@ -89,9 +91,7 @@ export class RelatedDataTabComponent implements OnInit, AfterViewInit{
     }
 
     ngAfterViewInit():void{
-
     }
-
 
     buildTree(orderList:any[],pkey:string){
         let tempOrderList = orderList.slice();
@@ -116,10 +116,6 @@ export class RelatedDataTabComponent implements OnInit, AfterViewInit{
 
     }
 
-
-
-
-
     private navToItem(item:any){
         let number = item.number;
         if(number){
@@ -127,20 +123,17 @@ export class RelatedDataTabComponent implements OnInit, AfterViewInit{
         }else if(item.idTopic){
             this.gnomexService.navByNumber("T"+item.idTopic);
         }
-
-
-
     }
 
     onActivateTree($event){
         let selectedItem = $event.node;
         let itemData = selectedItem.data;
-        this.navToItem(itemData)
-
-
+        if ((itemData.label as string).endsWith("(Not authorized)")) {
+            this.dialogsService.alert("You do not have permission to view this");
+            return;
+        }
+        this.navToItem(itemData);
     }
-
-
 
 }
 

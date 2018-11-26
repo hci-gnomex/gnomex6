@@ -149,6 +149,28 @@ div.mainnav {
   background-color: deepskyblue !important;
 }
 
+.ag-theme-fresh {
+  font: 300 10px "Arial", sans-serif !important;
+}
+
+.ag-theme-fresh .ag-cell {
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+}
+
+.ag-theme-fresh .ag-header-cell-label {
+  width: 100% !important;
+}
+
+.ag-theme-fresh .ag-header {
+  font: 300 10px "Arial", sans-serif !important;
+}
+
+.ag-theme-fresh .ag-header-cell, .ag-theme-fresh .ag-header-group-cell {
+  padding-left:  4px !important;
+  padding-right: 4px !important;
+}
+
 .mat-tab-body-wrapper {
   height: 100%;
 }

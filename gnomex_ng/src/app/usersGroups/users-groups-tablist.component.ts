@@ -366,9 +366,10 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
                 this.groupsData = this.myManagingLabs;
             } else {
                 this.groupsData = this.secAdvisor.groupsToManage;
-                this.isGroupsTab = true;
-                this.isUserTab = false;
             }
+            this.isGroupsTab = true;
+            this.isUserTab = false;
+
             this.groupLabel = this.groupsData.length + " lab groups";
             this.createGroupForm();
             this.setPricing();
@@ -550,7 +551,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     /**
      *
      */
-    onSelectionChanged() {
+    onSelectionChanged(event?: any) {
         let params: URLSearchParams = new URLSearchParams();
         let selectedRows = this.gridOptions.api.getSelectedRows();
         this.idAppUser = selectedRows[0].idAppUser;
@@ -603,7 +604,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
     }
 
-    onGroupsSelectionChanged() {
+    onGroupsSelectionChanged(event?: any) {
+        this.dialogsService.startDefaultSpinnerDialog();
+
         let params: URLSearchParams = new URLSearchParams();
         let selectedRows = this.groupsGridOptions.api.getSelectedRows();
         this.idLab = selectedRows[0].idLab;
@@ -616,6 +619,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
             this.setLabPricing(this.selectedGroup);
             this.setGroupValues();
             this.changeRef.detectChanges();
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
         this.groupForm.markAsPristine();

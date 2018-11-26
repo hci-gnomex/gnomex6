@@ -54,13 +54,13 @@
                                 <div class="t">
                                     <div class="tr">
                                         <div class="td">
-                                            <button mat-button [disabled]="disableNewProject" (click)="newProjectClicked()">
+                                            <button mat-button [disabled]="disableNewProject || this.disableAll" (click)="newProjectClicked()">
                                                 <img src="../../assets/folder_add.png" alt="">
                                                 New Project
                                             </button>
                                         </div>
                                         <div class="td">
-                                            <button mat-button [disabled]="disableDeleteProject" (click)="deleteProjectClicked()">
+                                            <button mat-button [disabled]="disableDeleteProject || this.disableAll" (click)="deleteProjectClicked()">
                                                 <img src="../../assets/folder_delete.png">
                                                 Delete Project
                                             </button>
@@ -68,7 +68,7 @@
                                     </div>
                                     <div class="tr">
                                         <div class="td">
-                                            <button mat-button [disabled]="disableDeleteExperiment" (click)="deleteExperimentClicked()">
+                                            <button mat-button [disabled]="disableDeleteExperiment || this.disableAll" (click)="deleteExperimentClicked()">
                                                 <img src="../../assets/delete.png" alt="">
                                                 Delete Experiment
                                             </button>

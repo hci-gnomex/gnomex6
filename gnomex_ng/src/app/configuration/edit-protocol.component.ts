@@ -142,6 +142,24 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
                 this.ownerFormControl.markAsPristine();
                 this.analysisTypeFormControl.markAsPristine();
 
+                if (result.canUpdate === 'Y') {
+                    this.accountNameFormControl.enable();
+                    this.experimentPlatformFormControl.enable();
+                    this.activeFormControl.enable();
+                    this.urlFormControl.enable();
+                    this.protocolDescriptionFormControl.enable();
+                    this.ownerFormControl.enable();
+                    this.analysisTypeFormControl.enable();
+                } else {
+                    this.accountNameFormControl.disable();
+                    this.experimentPlatformFormControl.disable();
+                    this.activeFormControl.disable();
+                    this.urlFormControl.disable();
+                    this.protocolDescriptionFormControl.disable();
+                    this.ownerFormControl.disable();
+                    this.analysisTypeFormControl.disable();
+                }
+
                 this.protocolLoaded.emit(true);
 
                 this.dialogService.stopAllSpinnerDialogs();

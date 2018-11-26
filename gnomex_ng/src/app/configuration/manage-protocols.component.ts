@@ -12,6 +12,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {ProtocolService} from "../services/protocol.service";
 import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 
 @Component({
     selector: 'manage-protocols',
@@ -104,15 +105,24 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private mostRecentlyDisplayedProtocolId: string;
     private mostRecentlyDisplayedProtocolProtocolClassName: string;
 
+    public disableDelete: boolean = false;
+    public disableNew: boolean = false;
+
     constructor(private dialog: MatDialog,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private protocolService: ProtocolService,
                 private route: ActivatedRoute,
-                private router: Router) { }
+                private router: Router,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService) { }
 
     ngOnInit(): void {
         this.treeModel = this.treeComponent.treeModel;
+
+        if (this.createSecurityAdvisorService.isGuest) {
+            this.disableDelete = true;
+            this.disableNew = true;
+        }
 
         if (!this.protocolSubscription) {
             this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {

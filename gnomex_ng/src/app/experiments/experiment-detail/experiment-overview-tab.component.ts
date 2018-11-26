@@ -3,7 +3,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {LabListService} from "../../services/lab-list.service";
 import {GetLabService} from "../../services/get-lab.service";
-import {Subscription} from "rxjs";
+import {Subscription, throwError} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {PropertyService} from "../../services/property.service";
 import {ConstantsService} from "../../services/constants.service";
@@ -98,6 +98,8 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
         this._experiment = experiment;
 
         if (!experiment) {
+            this.dialogService.alert("Cannot load experiment data");
+            throwError(new Error("Cannot load experiment data"));
             return;
         }
 
@@ -440,6 +442,13 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 
                     this.compilePossibleOwners();
                     this.compilePossibleSubmittersForLabDictionary();
+                } else {
+                    this.projectsDictionary = [];
+                    this.isReady_projectsDictionary = true;
+                    this.possibleOwnersForLabDictionary = [];
+                    this.isReady_possibleOwnersForLabDictionary = true;
+                    this.possibleSubmittersForLabDictionary = [];
+                    this.isReady_possibleSubmittersForLabDictionary = true;
                 }
             });
         }
