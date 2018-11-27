@@ -10,9 +10,9 @@ import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {MatDialog, MatDialogConfig, MatDialogRef, MatTabChangeEvent} from "@angular/material";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {ConstantsService} from "../../services/constants.service";
-import {ImportSegmentsDialog} from "../../datatracks/datatracks-overview/genome-build/import-segments-dialog";
 import {LinkToExperimentDialogComponent} from "./index";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 
 
 @Component({
@@ -132,6 +132,17 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
 
 
 
+    }
+
+    public shareWebLink(): void {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '35em';
+        configuration.data = {
+            name:   this.analysis ? this.analysis.name : '',
+            number: this.analysis ? this.analysis.number : '',
+            type:   "analysisNumber"
+        };
+        this.dialog.open(ShareLinkDialogComponent, configuration);
     }
 
     save(){

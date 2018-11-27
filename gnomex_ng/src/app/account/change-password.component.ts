@@ -39,7 +39,7 @@ import {ActivatedRoute, ParamMap, Router} from "@angular/router";
                         </div>
                     </div>
                     <div class="text-body">
-                        If you have registered using your uNID (u00000000), your password is tied to the University Campus Information System. Please use the <a href='https://gate.acs.utah.edu/' target='_blank'>Campus Information System</a> to change or reset your password.
+                        If you have registered using your uNID (u0000000), your password is tied to the University Campus Information System. Please use the <a href='https://gate.acs.utah.edu/' target='_blank'>Campus Information System</a> to change or reset your password.
                     </div>
                 </div>
             </div>
