@@ -30,6 +30,7 @@ import {GnomexService} from "../services/gnomex.service";
                             <button class="btn btn-primary" id="hci-login-form-submit-button" (click)="this.login()"
                                     [disabled]="!_loginForm.valid">Login
                             </button>
+                            <button class="btn btn-secondary" (click)="this.resetPassword()">Reset Password</button>
                             <button class="btn btn-secondary" (click)="this.guestLogin()">Guest Login</button>
                         </div>
                     </form>
@@ -121,5 +122,9 @@ export class DirectLoginComponent implements OnInit {
     guestLogin(): void {
         this._authenticationService.guestLogin();
         this.router.navigateByUrl("home");
+    }
+
+    public resetPassword(): void {
+        this.router.navigateByUrl("reset-password");
     }
 }

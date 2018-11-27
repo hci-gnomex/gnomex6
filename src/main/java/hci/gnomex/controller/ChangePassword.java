@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.UUID;
 
+import javax.json.Json;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -118,8 +119,12 @@ public Command execute() throws RollBackCommandException {
 		if (isValid()) {
 			if (action.equals(ACTION_FINALIZE_PASSWORD_RESET) || action.equals(ACTION_CHANGE_EXPIRED_PASSWORD)) {
 				changePassword(sess);
+				this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").build().toString();
 			} else if (action.equals(ACTION_REQUEST_PASSWORD_RESET)) {
 				requestPasswordReset(sess);
+				if (isValid()) {
+					this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").build().toString();
+				}
 			} else {
 				addInvalidField("action", "An error occurred processing your request");
 				LOG.error("Request parameter 'action' had an unexpected value: '" + action + "'");
@@ -230,7 +235,7 @@ public void sendConfirmationEmail(AppUser appUser, String guid) throws NamingExc
 		content.append("<br><br>If you do not recall your CIS credentials you can reset them here: <a href=https://go.utah.edu/cas/login>https://go.utah.edu/cas/login</a><br>");
 
 	} else {
-		appURL += "/change_password.jsp?guid=" + guid;
+		appURL += "/change-password/" + guid;
 
 		// If they provided their email, give them their user name. It might cause them to remember their password.
 		// Still provide the link just in case
