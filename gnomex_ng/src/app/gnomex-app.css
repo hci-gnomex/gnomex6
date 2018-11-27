@@ -225,6 +225,13 @@ img.icon {
 
 .small-font { font-size: small; }
 
+.login-background {
+  background-color: #ececd9;
+}
+.border-subtle {
+  border: 1px solid #8B8970;
+}
+
 .padded { padding: 0.3em; }
 
 .padded-left   { padding-left:   0.3em; }

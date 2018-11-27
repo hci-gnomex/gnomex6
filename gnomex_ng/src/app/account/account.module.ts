@@ -7,6 +7,8 @@ import {UtilModule} from "../util/util.module";
 import {AgGridModule} from "ag-grid-angular/main";
 import {MyAccountComponent} from "./my-account.component";
 import {LabMembershipRequestComponent} from "./lab-membership-request.component";
+import {ResetPasswordComponent} from "./reset-password.component";
+import {ChangePasswordComponent} from "./change-password.component";
 
 @NgModule({
     imports: [
@@ -21,10 +23,14 @@ import {LabMembershipRequestComponent} from "./lab-membership-request.component"
     declarations: [
         MyAccountComponent,
         LabMembershipRequestComponent,
+        ResetPasswordComponent,
+        ChangePasswordComponent,
     ],
     exports: [
         MyAccountComponent,
         LabMembershipRequestComponent,
+        ResetPasswordComponent,
+        ChangePasswordComponent,
     ],
     entryComponents: [
         LabMembershipRequestComponent,

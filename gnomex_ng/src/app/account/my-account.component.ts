@@ -55,8 +55,8 @@ export class MyAccountComponent {
         this.urlFC = new FormControl("");
         this.unidFC = new FormControl("", [Validators.required, Validators.pattern("^u[0-9]{7}$")]);
         this.usernameFC = new FormControl("", Validators.required);
-        this.passwordFC = new FormControl("", MyAccountComponent.validatePassword);
-        this.passwordConfirmFC = new FormControl("", MyAccountComponent.validatePasswordConfirm);
+        this.passwordFC = new FormControl("", PasswordUtilService.validatePassword);
+        this.passwordConfirmFC = new FormControl("", PasswordUtilService.validatePasswordConfirm);
 
         this.allFG = new FormGroup({
             firstName: this.firstNameFC,
@@ -139,20 +139,6 @@ export class MyAccountComponent {
         } else if (event.value === this.USER_TYPE_EXTERNAL) {
             this.resetUserType(true);
         }
-    }
-
-    private static validatePassword(c: FormControl): any {
-        return PasswordUtilService.passwordMeetsRequirements(c.value) ? null : {'validatePassword': {value: c.value}};
-    }
-
-    private static validatePasswordConfirm(c: FormControl): any {
-        if (c.parent) {
-            let parent: FormGroup = c.parent as FormGroup;
-            if (c.value != '' && c.value === parent.controls['password'].value) {
-                return null;
-            }
-        }
-        return {'validatePasswordConfirm': {value: c.value}};
     }
 
     public onNotifyGridReady(params: any): void {
