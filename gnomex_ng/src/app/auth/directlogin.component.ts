@@ -8,11 +8,11 @@ import {GnomexService} from "../services/gnomex.service";
     selector: "hci-login-form",
     template: `
         <div class="container">
-            <div class="login-box" id="hci-login-form-box">
+            <div class="login-box login-background" id="hci-login-form-box">
                 <div class="login-heading" id="hci-login-form-heading">
                     <h3>Sign in</h3>
                 </div>
-                <div class="panel-body">
+                <div class="panel-body login-background">
                     <form [formGroup]="_loginForm">
                         <input formControlName="username" class="form-control" id="username" name="username"
                                placeholder="Username" type="text">
@@ -30,61 +30,65 @@ import {GnomexService} from "../services/gnomex.service";
                             <button class="btn btn-primary" id="hci-login-form-submit-button" (click)="this.login()"
                                     [disabled]="!_loginForm.valid">Login
                             </button>
-                            <button class="btn btn-secondary" (click)="this.resetPassword()">Reset Password</button>
-                            <button class="btn btn-secondary" (click)="this.guestLogin()">Guest Login</button>
                         </div>
+                        <div class="btn-box" >
+                            <a  (click)="this.guestLogin()"> Guest Login </a>
+                            <a [routerLink]="['/register-user']" > New Account </a>
+                        </div>
+                        
+                        
                     </form>
                 </div>
             </div>
         </div>
     `,
-  styles: [`
-    .container {
-      max-width: 400px;
-      margin-top: 20px;
-      padding-top: 15px;
-    }
-    
-    .login-box {
-      border-radius: 10px;
-      box-shadow: 0 0 2px #ccc;
-      padding: 15px;
-    }
-    
-    .login-box .login-heading h3 {
-      line-height:1.5;
-      margin: 0 0 10px
-    }
-    
-    .login-box .form-control {
-      padding: 10px;
-      border: 1px solid #ccc;
-    }
-    
-    .login-box input[type="password"] {
-      margin-bottom: 10px;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
-    
-    .login-box input[type="text"] {
-      margin-bottom: -1px;
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-    
-    .login-box .alert-box {
-      margin: 10px 0 -5px 0
-    }
-    
-    .login-box .alert-text {
-      font-size: small;
-    }
-    
-    .login-box .btn-box {
-      margin: 10px 0 0 0
-    }
-  `]
+    styles: [`
+        .container {
+            max-width: 400px;
+            margin-top: 20px;
+            padding-top: 15px;
+        }
+
+        .login-box {
+            border-radius: 10px;
+            box-shadow: 0 0 2px #ccc;
+            padding: 15px;
+        }
+
+        .login-box .login-heading h3 {
+            line-height: 1.5;
+            margin: 0 0 10px
+        }
+
+        .login-box .form-control {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .login-box input[type="password"] {
+            margin-bottom: 10px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .login-box input[type="text"] {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .login-box .alert-box {
+            margin: 10px 0 -5px 0
+        }
+
+        .login-box .alert-text {
+            font-size: small;
+        }
+
+        .login-box .btn-box {
+            margin: 10px 0 0px 0
+        }
+    `]
 })
 export class DirectLoginComponent implements OnInit {
     public _loginForm: FormGroup;
@@ -122,9 +126,5 @@ export class DirectLoginComponent implements OnInit {
     guestLogin(): void {
         this._authenticationService.guestLogin();
         this.router.navigateByUrl("home");
-    }
-
-    public resetPassword(): void {
-        this.router.navigateByUrl("reset-password");
     }
 }
