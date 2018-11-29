@@ -7,7 +7,6 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {SelectCoreComponent} from "./select-core.component";
 import {REGISTER_USER_ROUTES} from "./register-user.routes";
-import {RegisterUserComponent} from "./register-user.component";
 
 
 @NgModule({
@@ -20,7 +19,7 @@ import {RegisterUserComponent} from "./register-user.component";
         ReactiveFormsModule
 
     ],
-    declarations: [SelectCoreComponent, RegisterUserComponent],
+    declarations: [SelectCoreComponent],
     providers: []
 })
 export class RegisterUserModule {

@@ -56,7 +56,7 @@ export class MyAccountComponent {
         this.unidFC = new FormControl("", [Validators.required, Validators.pattern("^u[0-9]{7}$")]);
         this.usernameFC = new FormControl("", Validators.required);
         this.passwordFC = new FormControl("", PasswordUtilService.validatePassword);
-        this.passwordConfirmFC = new FormControl("", PasswordUtilService.validatePasswordConfirm);
+        this.passwordConfirmFC = new FormControl("", PasswordUtilService.validatePasswordConfirm());
 
         this.allFG = new FormGroup({
             firstName: this.firstNameFC,

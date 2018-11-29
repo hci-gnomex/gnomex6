@@ -1,5 +1,8 @@
 import {Injectable} from "@angular/core";
+import {Observable} from "rxjs";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {AbstractControl, FormGroup, ValidatorFn} from "@angular/forms";
+
 
 @Injectable()
 export class PasswordUtilService {
@@ -7,7 +10,7 @@ export class PasswordUtilService {
     public readonly PASSWORD_COMPLEXITY_ERROR: string = "Password Does Not Meet Requirements";
     public readonly PASSWORD_COMPLEXITY_REQUIREMENTS: string = "Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol";
 
-    constructor() {
+    constructor(private httpClient: HttpClient) {
     }
 
     public static passwordMeetsRequirements(password: string): boolean {
@@ -52,7 +55,7 @@ export class PasswordUtilService {
         return PasswordUtilService.passwordMeetsRequirements(c.value) ? null : {'validatePassword': {value: c.value}};
     }
 
-    public static validatePasswordConfirm(passwordKey?:string) : ValidatorFn {
+    public static validatePasswordConfirm(passwordKey?:string){
         return (c: AbstractControl): {[key: string]: any} | null => {
             if (c.parent) {
                 let parent: FormGroup = c.parent as FormGroup;
@@ -65,6 +68,25 @@ export class PasswordUtilService {
 
         }
 
+    }
+
+    public resetPassword(checkByUsername: boolean, value: string): Observable<any> {
+        // TODO this should be a POST but XSRF filter prevents that for now
+        let params: HttpParams = new HttpParams()
+            .set("action", "requestPasswordReset")
+            .set(checkByUsername ? "userName" : "email", value);
+        return this.httpClient.get("/gnomex/ChangePassword.gx", {params: params});
+    }
+
+    public changePassword(username: string, newPassword: string, newPasswordConfirm: string, guid: string): Observable<any> {
+        // TODO this should be a POST but XSRF filter prevents that for now
+        let params: HttpParams = new HttpParams()
+            .set("action", "finalizePasswordReset")
+            .set("userName", username)
+            .set("newPassword", newPassword)
+            .set("newPasswordConfirm", newPasswordConfirm)
+            .set("guid", guid);
+        return this.httpClient.get("/gnomex/ChangePassword.gx", {params: params});
     }
     
 }

@@ -2,12 +2,17 @@ import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {IRegisterUser} from "../util/interfaces/register-user.model";
+import {CookieUtilService} from "./cookie-util.service";
+
 
 
 @Injectable()
 export class UserService {
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private httpClient: HttpClient,
+                private cookieUtilService: CookieUtilService) {
     }
 
     saveAppUser(params: URLSearchParams):  Observable<any> {
@@ -30,4 +35,14 @@ export class UserService {
             }
         }));
     }
+
+    registerUser(params:HttpParams): Observable<IRegisterUser> {
+        return this.httpClient.get<IRegisterUser>("/gnomex/GetNewAccountServlet.gx", {params:params});
+    }
+    saveSelfRegisteredAppUser(params:HttpParams): Observable<any> {
+        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+        //this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.get("/gnomex/PublicSaveSelfRegisteredAppUser.gx",{ params : params})
+    }
+
 }

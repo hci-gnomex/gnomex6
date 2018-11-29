@@ -8,10 +8,12 @@ import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {DataTrackService} from "./data-track.service";
 import {DictionaryService} from "./dictionary.service";
 import {ExperimentViewService} from "./experiment-view.service";
-import {ExperimentResolverService,ProjectResolverService,AnalysisGroupResolverService,
-        AnalysisResolverService,GenomeBuildResolverService,AnalysisGroupListResolverService,
-        ProjectListResolverService,DatatrackListResolverService,DatatrackResolverService,
-        LabResolverService} from "./resolvers/index";
+import {
+    ExperimentResolverService, ProjectResolverService, AnalysisGroupResolverService,
+    AnalysisResolverService, GenomeBuildResolverService, AnalysisGroupListResolverService,
+    ProjectListResolverService, DatatrackListResolverService, DatatrackResolverService,
+    LabResolverService, RegisterUserResolverService
+} from "./resolvers/index";
 import {LaunchPropertiesService} from "./launch-properites.service";
 import {ConstantsService} from "./constants.service";
 import {ProjectService} from "./project.service";
@@ -106,7 +108,8 @@ import {ExperimentPlatformService} from "./experiment-platform.service";
         BrowseOrderValidateService,
         UniqueIdGeneratorService,
         SamplesService,
-        ExperimentPlatformService
+        ExperimentPlatformService,
+        RegisterUserResolverService
     ]})
 export class ServicesModule {
 }
