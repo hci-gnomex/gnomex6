@@ -41,8 +41,8 @@ export class UserService {
     }
     saveSelfRegisteredAppUser(params:HttpParams): Observable<any> {
         let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
-        //this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.get("/gnomex/PublicSaveSelfRegisteredAppUser.gx",{ params : params})
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/PublicSaveSelfRegisteredAppUser.gx",params.toString(), {headers:headers})
     }
 
 }
