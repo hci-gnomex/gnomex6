@@ -80,6 +80,7 @@ export class ConstantsService {
     public readonly ICON_TOPIC_OWNER:string = "assets/topic_tag_owner.png";
 
     public readonly ICON_DATATRACK:string = "assets/datatrack.png";
+    public readonly ICON_DATATRACK_NEW: string = "assets/datatrack_new.png";
     public readonly ICON_DATATRACK_PUBLIC:string = "assets/datatrack_world.png";
     public readonly ICON_DATATRACK_MEMBER:string = "assets/datatrack_member.png";
     public readonly ICON_DATATRACK_MEMBERCOLLAB:string = "assets/datatrack_member.png";
