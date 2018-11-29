@@ -91,7 +91,7 @@ export class ChangePasswordComponent implements OnInit {
         this.formGroup = this.fb.group({
             username: ['', Validators.required],
             password: ['', [Validators.required, PasswordUtilService.validatePassword]],
-            passwordConfirm: ['', [Validators.required, PasswordUtilService.validatePasswordConfirm]],
+            passwordConfirm: ['', [Validators.required, PasswordUtilService.validatePasswordConfirm()]],
         });
 
         this.route.paramMap.subscribe((params: ParamMap) => {
