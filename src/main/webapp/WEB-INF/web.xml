@@ -14,7 +14,7 @@
 
 	<context-param>
 		<param-name>public-paths</param-name>
-		<param-value>/api/user-session*</param-value>
+		<param-value>/api/user-session*,/ChangePassword.gx*,/PublicSaveSelfRegisteredAppUser.gx*,/ReportIssueServlet.gx*</param-value>
 	</context-param>
 
 	<context-param>
