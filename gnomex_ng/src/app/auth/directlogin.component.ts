@@ -34,6 +34,7 @@ import {GnomexService} from "../services/gnomex.service";
                         <div class="btn-box" >
                             <a  (click)="this.guestLogin()"> Guest Login </a>
                             <a [routerLink]="['/register-user']" > New Account </a>
+                            <a [routerLink]="['/reset-password']" > Reset Password </a>
                         </div>
                         
                         
