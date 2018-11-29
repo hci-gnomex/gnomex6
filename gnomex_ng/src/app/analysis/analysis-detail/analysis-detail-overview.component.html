@@ -4,6 +4,8 @@
             <img class="icon" [src]="analysisTreeNode?.icon">
             Analysis {{analysisTreeNode?.number}}
         </label>
+        <button mat-button *ngIf="this.showAutoDistributeDataTracks" (click)="this.autoDistributeDataTracks()"><img class="icon" [src]="constService.ICON_DATATRACK_NEW">Auto Distribute All Data Tracks</button>
+        <button mat-button (click)="this.shareWebLink()"><img class="icon" [src]="constService.GLOBE_LINK">Share Web Link</button>
         <button *ngIf="showLinkToExp"
                 mat-button
                 color="link"
@@ -11,7 +13,6 @@
             <img class="icon" [src]="constService.ICON_LINK">
             Link to Experiment
         </button>
-        <button mat-button (click)="this.shareWebLink()"><img class="icon" [src]="constService.GLOBE_LINK">Share Web Link</button>
     </div>
 
     <div style="display:flex; flex: 9">

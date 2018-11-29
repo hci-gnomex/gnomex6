@@ -13,6 +13,9 @@ import {ConstantsService} from "../../services/constants.service";
 import {LinkToExperimentDialogComponent} from "./index";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
+import {PropertyService} from "../../services/property.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {DataTrackService} from "../../services/data-track.service";
 
 
 @Component({
@@ -35,6 +38,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
     private showRelatedDataTab:boolean =false;
     private showExpAnalysisTab: boolean =false ;
     private showLinkToExp:boolean = false;
+    public showAutoDistributeDataTracks: boolean = false;
 
     public analysisTreeNode:any;
     private analysisTreeNodeSubscription: Subscription;
@@ -46,7 +50,10 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
                 private dialog: MatDialog,
                 private secAdvisor: CreateSecurityAdvisorService,
                 public constService: ConstantsService,
-                public orderValidateService: BrowseOrderValidateService) {
+                public orderValidateService: BrowseOrderValidateService,
+                private propertyService: PropertyService,
+                private dialogsService: DialogsService,
+                private dataTrackService: DataTrackService) {
     }
 
     ngOnInit():void{
@@ -79,6 +86,8 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
                 }
             }
 
+            this.showAutoDistributeDataTracks = this.analysis && !this.secAdvisor.isGuest && this.analysis.canRead === 'Y'
+                && this.propertyService.getProperty(PropertyService.PROPERTY_DATATRACK_SUPPORTED).propertyValue === 'Y';
         });
     }
 
@@ -143,6 +152,34 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
             type:   "analysisNumber"
         };
         this.dialog.open(ShareLinkDialogComponent, configuration);
+    }
+
+    public autoDistributeDataTracks(): void {
+        if (this.analysis && this.analysis.idAnalysis) {
+            let genomeBuilds: any[] = this.analysis.genomeBuilds ? (Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]) : [];
+            let genomeBuild: any = genomeBuilds.length > 0 ? genomeBuilds[0] : null;
+            if (!genomeBuild || !genomeBuild.isActive || genomeBuild.isActive !== 'Y') {
+                this.dialogsService.alert("An active genome build is required to create data tracks");
+                return;
+            }
+
+            // TODO check files tab does not have unregistered files. If so, save files and then call auto distribute data tracks
+
+            this.dataTrackService.createAllDataTracks(this.analysis.idAnalysis).subscribe((result: any) => {
+                if (result && result.result && result.result === 'SUCCESS') {
+
+                    // TODO refresh download list of analysis files
+
+                    this.dialogsService.alert("Data tracks created for all applicable files");
+                } else {
+                    let message: string = "";
+                    if (result && result.message) {
+                        message = ": " + result.message;
+                    }
+                    this.dialogsService.confirm("An error occurred while creating data tracks" + message, null);
+                }
+            });
+        }
     }
 
     save(){

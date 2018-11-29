@@ -4,7 +4,7 @@ import {Observable} from "rxjs";
 import {Subject} from "rxjs";
 import {BehaviorSubject} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {map} from "rxjs/operators";
 
 @Injectable()
@@ -305,6 +305,15 @@ export class DataTrackService {
     destroyLinks(): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/DestroyExistingLinks.gx",null);
+    }
+
+    public createAllDataTracks(idAnalysis: string): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        let params: HttpParams = new HttpParams()
+            .set("idAnalysis", idAnalysis);
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/CreateAllDataTracks.gx", params.toString(), {headers: headers});
     }
 
 
