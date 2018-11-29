@@ -30,7 +30,6 @@ dependencies {
 
     //All
     runtime group: 'hci', name: 'hci-servlet-filter-nocache', version: '1.+'
-    runtime group: 'hci', name: 'hci-servlet-filter-xsrf', version: '1.1+'
     runtime group: 'hci', name: 'hci-servlet-filter-cors', version: '1.+'
     runtime group: 'hci', name: 'hci-servlet-filter-pushstate', version: '1.+'
 
@@ -66,6 +65,7 @@ dependencies {
     compile fileTree(dir: 'libEnv', include: 'poi-3.10-FINAL.jar')
     compile fileTree(dir: 'libEnv', include: 'javax.json-api-jdk8-1.1.3.jar')
     compile fileTree(dir: 'libEnv', include: 'javax.json-jdk8-1.1.3.jar')
+    compile fileTree(dir: 'libEnv', include: 'hci-servlet-filter-xsrf-1.1.3.jar')
 
     //Realm stuff
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'

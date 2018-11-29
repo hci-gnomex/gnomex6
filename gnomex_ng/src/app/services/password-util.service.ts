@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {AbstractControl, FormGroup, ValidatorFn} from "@angular/forms";
 
 
@@ -71,22 +71,24 @@ export class PasswordUtilService {
     }
 
     public resetPassword(checkByUsername: boolean, value: string): Observable<any> {
-        // TODO this should be a POST but XSRF filter prevents that for now
         let params: HttpParams = new HttpParams()
             .set("action", "requestPasswordReset")
             .set(checkByUsername ? "userName" : "email", value);
-        return this.httpClient.get("/gnomex/ChangePassword.gx", {params: params});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/ChangePassword.gx", params.toString(), {headers: headers});
     }
 
     public changePassword(username: string, newPassword: string, newPasswordConfirm: string, guid: string): Observable<any> {
-        // TODO this should be a POST but XSRF filter prevents that for now
         let params: HttpParams = new HttpParams()
             .set("action", "finalizePasswordReset")
             .set("userName", username)
             .set("newPassword", newPassword)
             .set("newPasswordConfirm", newPasswordConfirm)
             .set("guid", guid);
-        return this.httpClient.get("/gnomex/ChangePassword.gx", {params: params});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/ChangePassword.gx", params.toString(), {headers: headers});
     }
     
 }
