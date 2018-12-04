@@ -1,4 +1,8 @@
 import {Injectable} from "@angular/core";
+import {Observable} from "rxjs";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {AbstractControl, FormGroup, ValidatorFn} from "@angular/forms";
+
 
 @Injectable()
 export class PasswordUtilService {
@@ -6,7 +10,7 @@ export class PasswordUtilService {
     public readonly PASSWORD_COMPLEXITY_ERROR: string = "Password Does Not Meet Requirements";
     public readonly PASSWORD_COMPLEXITY_REQUIREMENTS: string = "Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol";
 
-    constructor() {
+    constructor(private httpClient: HttpClient) {
     }
 
     public static passwordMeetsRequirements(password: string): boolean {
@@ -47,4 +51,44 @@ export class PasswordUtilService {
         }
     }
 
+    public static validatePassword(c: AbstractControl): {[key: string]: any} | null {
+        return PasswordUtilService.passwordMeetsRequirements(c.value) ? null : {'validatePassword': {value: c.value}};
+    }
+
+    public static validatePasswordConfirm(passwordKey?:string){
+        return (c: AbstractControl): {[key: string]: any} | null => {
+            if (c.parent) {
+                let parent: FormGroup = c.parent as FormGroup;
+                let passwordName = passwordKey ? passwordKey : 'password';
+                if (c.value != '' && c.value === parent.controls[passwordName].value) {
+                    return null;
+                }
+            }
+            return {'validatePasswordConfirm': {value: c.value}};
+
+        }
+
+    }
+
+    public resetPassword(checkByUsername: boolean, value: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("action", "requestPasswordReset")
+            .set(checkByUsername ? "userName" : "email", value);
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/ChangePassword.gx", params.toString(), {headers: headers});
+    }
+
+    public changePassword(username: string, newPassword: string, newPasswordConfirm: string, guid: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("action", "finalizePasswordReset")
+            .set("userName", username)
+            .set("newPassword", newPassword)
+            .set("newPasswordConfirm", newPasswordConfirm)
+            .set("guid", guid);
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/ChangePassword.gx", params.toString(), {headers: headers});
+    }
+    
 }

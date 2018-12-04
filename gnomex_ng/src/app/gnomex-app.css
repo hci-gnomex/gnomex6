@@ -148,43 +148,38 @@ div.mainnav {
 .ag-theme-fresh .workFlowSelectedColor {
   background-color: deepskyblue !important;
 }
-
 .ag-theme-fresh {
-  font: 300 10px "Arial", sans-serif !important;
+  font: 300 10px "Arial", sans-serif !important
 }
-
-.ag-theme-fresh .ag-cell {
+.ag-theme-fresh .ag-cell{
   padding-left: 2px !important;
   padding-right: 2px !important;
 }
-
-.ag-theme-fresh .ag-header-cell-label {
+.ag-theme-fresh .ag-header-cell-label{
   width: 100% !important;
 }
-
-.ag-theme-fresh .ag-header {
+.ag-theme-fresh .ag-header{
   font: 300 10px "Arial", sans-serif !important;
 }
-
 .ag-theme-fresh .ag-header-cell, .ag-theme-fresh .ag-header-group-cell {
-  padding-left:  4px !important;
+  padding-left: 4px !important;
   padding-right: 4px !important;
 }
 
 .mat-tab-body-wrapper {
   height: 100%;
 }
+.login-background{
+  background-color: #ececd9
+}
 
 .gx-label{
   font-size: small;
   font-style: italic;
 }
-
-.inline-block { display: inline-block; }
-
+.inline-block{ display: inline-block; }
 .full-height { height: 100%; }
-.full-width  { width:  100%; }
-
+.full-width { width: 100%; }
 .flex-container-row {
   display: flex;
 }
@@ -192,15 +187,15 @@ div.mainnav {
   display: flex;
   flex-direction: column;
 }
-.flex-grow { flex: 1; }
-.flex-wrap { flex-wrap: wrap; }
+.flex-grow { flex: 1;}
+.flex-wrap { flex-wrap: wrap;}
 
-.align-center   { align-items: center;   }
+.align-center { align-items: center; }
 .align-baseline { align-items: baseline; }
 
 .justify-space-between { justify-content: space-between; }
-.justify-flex-end      { justify-content: flex-end;      }
-
+.justify-flex-end { justify-content: flex-end; }
+.justify-center{ justify-content: center; }
 .underlined {
   text-decoration: underline !important;
 }
@@ -222,8 +217,7 @@ img.icon {
 .no-margin {
   margin: 0;
 }
-
-.small-font { font-size: small; }
+.small-font{ font-size: small; }
 
 .padded { padding: 0.3em; }
 
@@ -251,7 +245,6 @@ img.icon {
   padding-right:  0.3em;
   padding-bottom: 0.3em;
 }
-
 .double-padded { padding: 0.6em; }
 
 .double-left-padded { padding-left: 0.6em; }
@@ -268,8 +261,7 @@ img.icon {
   fontSize: 10;
 }
 
-
-button.mat-button.minimize      {
+button.mat-button.minimize {
   min-width: 0;
   line-height: 1rem;
   padding: 0.3em;
@@ -278,6 +270,14 @@ button.mat-button.minimize span {
   min-width: 0;
   padding: 0.3em;
 }
+
+.border-subtle{
+  border: 1px solid #8B8970;
+}
+
+
+button.mat-button.minimize      { min-width: 0; }
+button.mat-button.minimize span { min-width: 0; }
 
 .dialog-header-colors{
   background-color: #84b278;

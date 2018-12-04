@@ -14,7 +14,7 @@
 
 	<context-param>
 		<param-name>public-paths</param-name>
-		<param-value>/api/user-session*</param-value>
+		<param-value>/api/user-session*,/ChangePassword.gx*,/PublicSaveSelfRegisteredAppUser.gx*,/ReportIssueServlet.gx*</param-value>
 	</context-param>
 
 	<context-param>
@@ -224,9 +224,12 @@
 		</servlet-class>
 	</servlet>
 
-
-
-
+	<servlet>
+		<servlet-name>GetNewAccountServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.GetNewAccountServlet
+		</servlet-class>
+	</servlet>
 
 	<servlet>
 		<servlet-name>UploadSequenceURLServlet</servlet-name>
@@ -501,7 +504,10 @@
 		<servlet-name>GetGNomExOrderFromNumberServlet</servlet-name>
 		<url-pattern>/GetGNomExOrderFromNumberServlet.gx</url-pattern>
 	</servlet-mapping>
-
+	<servlet-mapping>
+		<servlet-name>GetNewAccountServlet</servlet-name>
+		<url-pattern>/GetNewAccountServlet.gx</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UploadSequenceURLServlet</servlet-name>
 		<url-pattern>/UploadSequenceURLServlet.gx</url-pattern>

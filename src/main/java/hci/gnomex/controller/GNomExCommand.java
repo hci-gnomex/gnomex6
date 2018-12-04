@@ -144,8 +144,13 @@ public abstract class GNomExCommand extends Command implements Serializable {
 
   public String getAppURL(HttpServletWrappedRequest request) throws Exception {
     String requestURL = request.getRequestURL().toString();
-    String appURL = requestURL.substring(0, requestURL.indexOf("/gnomex"));
-    appURL += ":" + request.getServerPort() + "/gnomex";
+    String appURL;
+    if (requestURL.contains("" + request.getServerPort())) {
+      appURL = requestURL.substring(0, requestURL.indexOf("/gnomex") + 7);
+    } else {
+      appURL = requestURL.substring(0, requestURL.indexOf("/gnomex"));
+      appURL += ":" + request.getServerPort() + "/gnomex";
+    }
 
     return appURL;    
   }
