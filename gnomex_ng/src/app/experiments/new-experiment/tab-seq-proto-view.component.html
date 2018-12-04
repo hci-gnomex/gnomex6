@@ -1,31 +1,35 @@
-<form [formGroup]="form" class="flex-container-col full-height full-width">
-    <div>
-        <div class="flex-container-col">
-            <ng-container>
-                <div class="flex-container-row">
-                    <div style="margin-right: 10em">
+<div class="full-height full-width double-padded small-font">
+    <form [formGroup]="form" class="full-height full-width">
+        <ol class="full-width three-depth-numbering">
+            <li class="full-width align-baseline">
+                <div class="full-width flex-container-row align-baseline">
+                    <div class="heading">
                         Select a Sequencing Protocol
                     </div>
-                    <div style="flex-grow: .3">
-                        <mat-list>
-                            <h3 mat-subheader style="color: black;font-weight:bold ">{{runTypeLabel}}
-                            </h3>
-                            <mat-radio-group placeholder="Select a Sequencing Protocol" class="cat-type-radio-group" (change)="onProtoChange($event)" formControlName="selectedProto">
-                                <div *ngFor="let proto of filteredNumberSequencingCyclesAllowedList">
-                                    <mat-radio-button [value]="proto">
-                                        <span class="inline-block">
-                                            {{proto.display}}
+                    <div class="flex-grow">
+                        <mat-radio-group class="long-width" formControlName="selectedProto" (change)="onProtoChange($event)">
+                            <div class="t">
+                                <div *ngFor="let proto of filteredNumberSequencingCyclesAllowedList; let index=index; let odd=odd; let even=even;"
+                                     class="tr"
+                                     [ngClass]="{ odd: odd, even: even }">
+                                    <div class="td padded">
+                                        <mat-radio-button [value]="proto">
+                                            <span>
+                                                {{ proto.display }}
+                                            </span>
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="td padded right-align major-padded-left">
+                                        <span>
+                                            {{ ('' + proto?.price).startsWith('$') ? proto?.price : ( proto?.price ? '$' + proto?.price : '') }}
                                         </span>
-                                        <span style="margin-left: 20em">
-                                            {{proto.price}}
-                                        </span>
-                                    </mat-radio-button>
+                                    </div>
                                 </div>
-                            </mat-radio-group>
-                        </mat-list>
+                            </div>
+                        </mat-radio-group>
                     </div>
                 </div>
-            </ng-container>
-        </div>
-    </div>
-</form>
+            </li>
+        </ol>
+    </form>
+</div>

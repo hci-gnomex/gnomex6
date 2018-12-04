@@ -23,6 +23,8 @@ import {Observable, Subscription} from "rxjs";
 import {TabBioinformaticsViewComponent} from "./tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
 import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {first} from "rxjs/internal/operators";
 
 @Component({
     selector: 'new-experiment',
@@ -140,6 +142,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     types = OrderType;
 
     public tabs: any[];
+    public selectedIndex: number = 0;
+    public currentComponent: any;
+
     private selectedCategory: any;
     public requestCategories: any[] = [];
     private filteredProjectList: any[] = [];
@@ -171,7 +176,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     private visibilityDetailObj: VisibilityDetailTabComponent;
     private showPool: boolean = false;
 
-
     public possibleSubmitters: any[] = [];
 
     private submittersSubscription: Subscription;
@@ -198,6 +202,27 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     private possibleSubmitters_loaded: boolean = false;
     private _showBilling_previousValue: boolean = false;
+
+
+    public get submitter(): any {
+        if (this.form && this.form.get('selectName')) {
+            return this.form.get('selectName').value;
+        }
+
+        return { };
+    }
+    public set submitter(value: any) {
+        if (this.form.get('selectName') && this.form.get('selectName').value) {
+            this.newExperimentService.experimentOwner = this.form.get('selectName').value;
+            this.newExperimentService.request.idAppUser = this.newExperimentService.idAppUser;
+            this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
+            this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
+            this.visibilityDetailObj.currentOrder = this.newExperimentService.request;
+            this.visibilityDetailObj.ngOnInit();
+        }
+
+        this.selectDefaultUserProject();
+    }
 
 
     public get showLab(): boolean {
@@ -247,7 +272,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
 
-    constructor(private dictionaryService: DictionaryService,
+    constructor(private dialogService: DialogsService,
+                private dictionaryService: DictionaryService,
                 private router: Router,
                 private fb: FormBuilder,
                 private billingService: BillingService,
@@ -306,7 +332,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.newExperimentService.organisms = [];
             this.newExperimentService.componentRefs = [];
             this.newExperimentService.samplesGridRowData = [];
-            this.newExperimentService.currentComponent = null;
+            this.currentComponent = null;
 
             if (params && params.idCoreFacility) {
                 this.newExperimentService.idCoreFacility = params.idCoreFacility;
@@ -318,13 +344,18 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
                 this.requestCategories = this.getFilteredRequestCategories().sort(this.sortRequestCategory);
 
-                this.experimentService.getNewRequest().subscribe((response: any) => {
+                setTimeout(() => {
+                    this.dialogService.startDefaultSpinnerDialog();
+                });
 
+                this.experimentService.getNewRequest().pipe(first()).subscribe((response: any) => {
                     if (!response) {
                         return;
                     }
 
                     this.newExperimentService.request = response.Request;
+
+                    this.dialogService.stopAllSpinnerDialogs();
 
                     if (!this.gnomexService.isInternalExperimentSubmission) {
                         this.addDescriptionFieldToAnnotations(this.newExperimentService.request.PropertyEntries);
@@ -357,7 +388,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 this.filteredProjectList = this.gnomexService.projectList;
                 this.checkSecurity();
                 this.nextButtonIndex = 1;
-                this.newExperimentService.currentComponent = this;
+                this.currentComponent = this;
                 this.newExperimentService.components.push(this);
                 this.newExperimentService.setupView = this;
             }
@@ -528,12 +559,15 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     onTabChange(event) {
-        event.tab.nextEnabled = true;
+        // event.tab.nextEnabled = true;
+
         if (this.newExperimentService.samplesGridApi) {
             this.newExperimentService.samplesGridApi.sizeColumnsToFit();
             this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
         }
-        this.newExperimentService.selectedIndex = event.index;
+
+        this.selectedIndex = event.index;
+
         if (event.tab.textLabel === "Confirm") {
             this.newExperimentService.onConfirmTab.next(true);
         }
@@ -581,6 +615,23 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                         if (submitters) {
                             this.possibleSubmitters = submitters.filter((a) => {
                                 return a && a.isActive && a.isActive === 'Y';
+                            });
+                            this.possibleSubmitters.sort((a, b) => {
+                                if (!a.displayName && !b.displayName) {
+                                    return 0;
+                                } else if (!a.displayName) {
+                                    return -1;
+                                } else if (!b.displayName) {
+                                    return 1;
+                                } else {
+                                    if (a.displayName === b.displayName) {
+                                        return 0;
+                                    } else if (a.displayName > b.displayName) {
+                                        return 1;
+                                    } else {
+                                        return -1;
+                                    }
+                                }
                             });
                             setTimeout(() => {
                                 this.possibleSubmitters_loaded = true;
@@ -642,17 +693,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         }
     }
 
-    public onUserSelection(event) {
-        if (this.form.get('selectName') && this.form.get('selectName').value) {
-            this.newExperimentService.experimentOwner = this.form.get('selectName').value;
-            this.newExperimentService.request.idAppUser = this.newExperimentService.idAppUser;
-            this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
-            this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
-            this.visibilityDetailObj.currentOrder = this.newExperimentService.request;
-            this.visibilityDetailObj.ngOnInit();
-        }
-    }
-
     refreshBillingAccounts() {
         this.checkForOtherAccounts();
         this.newExperimentService.idAppUser = this.securityAdvisor.idAppUser.toString();
@@ -665,7 +705,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             return account.overrideFilter === 'Y' || (cat.idCoreFacility && account.idCoreFacility === cat.idCoreFacility);
         });
 
-        this.selectDefaultUserProject();
+        // this.selectDefaultUserProject();
     }
 
     checkSecurity(): void {
@@ -679,18 +719,20 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             } else {
                 this.adminState = "AdminExternalExperimentState";
             }
-            this.newExperimentService.idAppUser = this.form.controls['selectName'].value != null && this.form.controls['selectName'].value.idAppUser != '' ? this.form.controls['selectName'].value.idAppUser : '';
+            this.newExperimentService.idAppUser = this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ? this.form.controls['selectName'].value.idAppUser : '';
 
         } else if (this.gnomexService.hasPermission('canSubmitForOtherCores') && iCanSubmitToThisCoreFacility) {
             this.adminState = "AdminState";
-            this.newExperimentService.idAppUser = this.form.controls['selectName'].value != null && this.form.controls['selectName'].value.idAppUser != '' ? this.form.controls['selectName'].value.idAppUser : '';
+            this.newExperimentService.idAppUser = this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ? this.form.controls['selectName'].value.idAppUser : '';
         } else {
             if (this.gnomexService.submitInternalExperiment()) {
                 this.adminState = "";
             } else {
                 this.adminState = "ExternalExperimentState";
             }
-            this.newExperimentService.idAppUser = this.securityAdvisor.idAppUser.toString();
+
+            // Not permissible?
+            // this.newExperimentService.idAppUser = this.securityAdvisor.idAppUser.toString();
         }
 
         this.checkForOtherAccounts();
@@ -733,23 +775,25 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);
     }
 
-    selectDefaultUserProject(): void {
+    public selectDefaultUserProject(): void {
         // Default the project dropdown to the the project owned by the user
-        if (!this.securityAdvisor.isAdmin && !this.securityAdvisor.isSuperAdmin) {
+        // if (!this.securityAdvisor.isAdmin && !this.securityAdvisor.isSuperAdmin) {
             this.form.controls['selectName'].setErrors(null);
             if (this.newExperimentService.idAppUser != null) {
                 for (let project of this.filteredProjectList) {
-                    if (project.idAppUser === this.newExperimentService.idAppUser) {
+                    if (this.form.controls['selectName'].value
+                        && this.form.controls['selectName'].value.idAppUser === project.idAppUser) {
+
                         this.form.get('selectProject').setValue(project);
                         this.newExperimentService.project = this.form.get('selectProject').value;
                         break;
                     }
                 }
             }
-        } else {
-            this.form.get('selectProject').setValue(this.filteredProjectList[0]);
-            this.newExperimentService.project = this.form.get('selectProject').value;
-        }
+        // } else {
+        //     this.form.get('selectProject').setValue(this.filteredProjectList[0]);
+        //     this.newExperimentService.project = this.form.get('selectProject').value;
+        // }
 
         if (this.newExperimentService.project) {
             this.newExperimentService.request.idProject = this.newExperimentService.project.idProject;
@@ -757,50 +801,50 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     goBack() {
-        this.newExperimentService.selectedIndex--;
-        this.newExperimentService.currentComponent = this.newExperimentService.components[this.newExperimentService.selectedIndex]
+        this.selectedIndex--;
+        this.currentComponent = this.newExperimentService.components[this.selectedIndex]
     }
 
     goNext() {
         switch (this.newExperimentService.currentState.value) {
             case 'SolexaBaseState' : {
-                if (this.newExperimentService.selectedIndex === 0) {
+                if (this.selectedIndex === 0) {
                     this.tabs[0].disabled = false;
                     this.tabs[1].disabled = false;
-                } else if (this.newExperimentService.selectedIndex === 1) {
+                } else if (this.selectedIndex === 1) {
                     this.tabs[2].disabled = false;
-                } else if (this.newExperimentService.selectedIndex === 2) {
+                } else if (this.selectedIndex === 2) {
                     this.tabs[3].disabled = false;
-                } else if (this.newExperimentService.selectedIndex === 3) {
+                } else if (this.selectedIndex === 3) {
                     this.tabs[4].disabled = false;
-                } else if (this.newExperimentService.selectedIndex === 4) {
+                } else if (this.selectedIndex === 4) {
                     this.tabs[5].disabled = false;
-                } else if (this.newExperimentService.selectedIndex === 5) {
+                } else if (this.selectedIndex === 5) {
                     this.tabs[6].disabled = false;
-                } else if (this.newExperimentService.selectedIndex === 6) {
+                } else if (this.selectedIndex === 6) {
                     this.tabs[7].disabled = false;
-                } else if (this.newExperimentService.selectedIndex === 7) {
+                } else if (this.selectedIndex === 7) {
                     this.tabs[8].disabled = false;
-                } else if (this.newExperimentService.selectedIndex === 8) {
+                } else if (this.selectedIndex === 8) {
                     this.newExperimentService.hideSubmit = false;
                     this.newExperimentService.disableSubmit = true;
                 }
                 break;
             }
             case 'QCState' : {
-                if (this.newExperimentService.selectedIndex === 0) {
+                if (this.selectedIndex === 0) {
                     this.tabs[0].disabled = false;
                 }
             }
 
         }
-        this.newExperimentService.selectedIndex++;
-        this.newExperimentService.currentComponent = this.newExperimentService.components[this.newExperimentService.selectedIndex];
+        this.selectedIndex++;
+        this.currentComponent = this.newExperimentService.components[this.selectedIndex];
 
         // TODO: revisit
         // was getting error
-        if (this.newExperimentService.currentComponent.form) {
-            this.newExperimentService.currentComponent.form.markAsPristine();
+        if (this.currentComponent.form) {
+            this.currentComponent.form.markAsPristine();
         }
 
         Object.keys(this.form.controls).forEach((key: string) => {

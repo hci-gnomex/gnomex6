@@ -1,29 +1,41 @@
-<div class="full-height full-width">
-    <form [formGroup]="form" class="full-height full-width">
-        <div class="flex-container-col full-height full-width">
-            <div class="flex-container-row full-height full-width">
-                <ag-grid-angular style="width: 30%"
-                                 class="ag-theme-fresh full-height"
-                                 (gridReady)="this.onAnnotGridReady($event)"
-                                 [gridOptions]="gridOpt"
-                                 (rowDataChanged)="this.onAnnotGridRowDataChanged()"
-                                 [rowSelection]="'multiple'"
-                                 (rowSelected)="this.onAnnotGridRowSelected($event)"
-                                 (cellClicked)="onCellClicked($event)"
-                                 [rowMultiSelectWithClick]="true"
-                                 [columnDefs]="this.annotGridColumnDefs">
-                </ag-grid-angular>
+<div class="full-height full-width double-padded small-font">
+    <form [formGroup]="form" class="full-height full-width flex-container-col">
+        <div class="flex-container-row flex-grow full-width">
+            <ag-grid-angular class="ag-theme-fresh full-height moderate-width"
+                             [rowSelection]="'multiple'"
+                             [rowMultiSelectWithClick]="true"
+                             (gridReady)="onAddAnnotationGridReady($event)"
+                             (gridSizeChanged)="onGridSizeChanged($event)"
+                             (rowSelected)="onAddAnnotationGridRowSelected($event)">
+            </ag-grid-angular>
+            <div class="short-width">
             </div>
-            <div class="flex-container-row">
-                <mat-form-field class="formField" [floatLabel]="auto">
-                    <input matInput formControlName="customAnnot" placeholder="Custom Annotation">
+            <ag-grid-angular class="ag-theme-fresh full-height moderate-width"
+                             [rowSelection]="'single'"
+                             (gridReady)="onRemoveAnnotationGridReady($event)"
+                             (gridSizeChanged)="onGridSizeChanged($event)"
+                             (rowSelected)="onRemoveAnnotationGridRowSelected($event)">
+            </ag-grid-angular>
+        </div>
+        <div class="flex-container-row padded-top">
+            <div class="padded-right">
+                <mat-form-field class="moderate-width" [floatLabel]="auto">
+                    <input matInput formControlName="customAnnot" placeholder="Add New Custom Annotation - Name">
                 </mat-form-field>
-                <button mat-button (click)="onCustomAnnot()">{{customAnnotLabel}}</button>
             </div>
-            <div>
-                <button mat-button class="link-button" (click)="editAnnotations()">{{editAnnotLabel}}</button>
-                <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+            <div class="padded-right">
+                <button mat-raised-button (click)="onCustomAnnot()">
+                    {{ customAnnotLabel }}
+                </button>
             </div>
+            <div class="padded-right">
+                <button mat-raised-button class="link-button" (click)="editAnnotations()">
+                    {{ editAnnotLabel }}
+                </button>
+            </div>
+
+
+
         </div>
     </form>
 </div>

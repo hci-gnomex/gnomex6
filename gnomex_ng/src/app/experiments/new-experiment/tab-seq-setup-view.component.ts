@@ -11,11 +11,16 @@ import {BillingService} from "../../services/billing.service";
     styles: [`
 
         .heading {
-            width: 30%;
-            min-width: 20em;
+            width: 15%;
+            min-width: 25em;
             padding-right: 2em;
+            margin-bottom: 2em;
         }
 
+        .bold { font-weight: bold; }
+        
+        .odd  { background-color: #edede9; }
+        .even { background-color: white; }
 
         ol.three-depth-numbering {
             padding: 0;
@@ -27,6 +32,10 @@ import {BillingService} from "../../services/billing.service";
             display: flex;
             flex-direction: row;
             padding-bottom: 0.3em;
+            margin-bottom: 2em;
+        }
+        ol.three-depth-numbering li li {
+            margin-bottom: 0;
         }
         ol.three-depth-numbering li::before {
             counter-increment: section;
@@ -66,8 +75,9 @@ import {BillingService} from "../../services/billing.service";
             padding-right: 0.7em;
         }
 
-        .small-font       { font-size: small; }
-
+        .significant-left-padding { padding-left: 3em; }
+        
+        .special-width { width: 6rem; }
         
         .short-width {
             width: 20em;
@@ -77,32 +87,18 @@ import {BillingService} from "../../services/billing.service";
             width: 40em;
             min-width: 20em;
         }
-        /*.long-width {*/
-            /*width: 80em;*/
-            /*min-width: 40em;*/
-        /*}*/
+        .long-width {
+            width: 60em;
+            min-width: 40em;
+        }
+
+        .right-align { text-align: right; }
         
-        /*****************************/
+        label.mat-radio-label {
+            margin-top:    0.15em !important;
+            margin-bottom: 0.15em !important;
+        }
         
-        
-        .radio-group-container {
-            display: inline-flex;
-            flex-direction: row;
-            vertical-align: middle;
-            width: fit-content;
-            margin-top: 1.1em;
-        }
-        .type-radio-button {
-            margin: 0 0.5%;
-        }
-        .app-price-radio-group {
-            display: inline-flex;
-            flex-direction: column;
-        }
-        .inline-block {
-            width: 20em;
-            display: inline-block;
-        }
     `]
 })
 
@@ -120,11 +116,66 @@ export class TabSeqSetupViewComponent implements OnInit {
     private priceMap: Map<string, string> = new Map<string, string>();
     private filteredApps: any[] = [];
     themeMap: Map<string, any> = new Map<string, any>();
-    themes: any[] = [];
+
+    public themes: any[] = [];
     public appPrices: any[] = [];
-    private showAppPrice: boolean = false;
-    private libraryDesign: boolean = false;
+
+    // private showAppPrice: boolean = false;
+    // private libraryDesign: boolean = false;
     private libToChange: boolean = false;
+
+    get showPoolingType(): boolean {
+        return this.form
+            && this.form.get('seqLibPrep')
+            && this.form.get('seqLibPrep').value
+            && this.form.get('seqLibPrep').value === this.NO;
+    }
+
+    get showLibraryDesign(): boolean {
+        return this.form
+            && this.form.get("appPrice")
+            && this.form.get("appPrice").value
+            && this.form.get("appPrice").value.hasCaptureLibDesign
+            && this.form.get("appPrice").value.hasCaptureLibDesign === 'Y';
+    }
+
+
+    get poolingType(): string {
+        if (this.form
+            && this.form.get("pooledLib")
+            && this.form.get("pooledLib").value) {
+
+            return this.form.get("pooledLib").value;
+        }
+    }
+    set poolingType(value: string) {
+        // do nothing, value should change in form automatically.  This function needs to be defined for ngModel
+    }
+
+    get sequenceType(): any {
+        if (this.form && this.form.get("seqType")) {
+            return this.form.get("seqType").value;
+        }
+
+        return {
+            display: '',
+            idApplicationTheme: ''
+        }
+    }
+    set sequenceType(value: any) {
+        this.appPrices =[];
+
+        if (value) {
+            for (let app of this.filteredApps) {
+                if (app.idApplicationTheme === value.idApplicationTheme) {
+                    this.appPrices.push(app);
+                }
+            }
+        }
+
+        this.newExperimentService.seqType = value;
+    }
+
 
     constructor(private dictionaryService: DictionaryService,
                 private newExperimentService: NewExperimentService,
@@ -135,14 +186,17 @@ export class TabSeqSetupViewComponent implements OnInit {
 
     ngOnInit() {
         this.form = this.fb.group({
-            seqLibPrep: ['', Validators.required],
-            pooledLib: [''],
-            numTubes: [''],
-            seqType: ['', Validators.required],
-            appPrice: ['', Validators.required],
+            seqLibPrep:    [''],
+            // seqLibPrep:    ['', Validators.required],
+            pooledLib:     [''],
+            numTubes:      [''],
+            seqType:       ['', Validators.required],
+            appPrice:      ['', Validators.required],
             libraryDesign: ['']
         });
 
+        this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
+        this.setupThemes();
     }
 
     ngAfterViewInit() {
@@ -162,6 +216,9 @@ export class TabSeqSetupViewComponent implements OnInit {
     }
 
     setupThemes() {
+        this.themes = [];
+        this.themeMap = new Map<string, any>();
+
         let preparedAppList: any[] = [];
         let themeSet: Set<any> = new Set();
         for (let item of this.filteredApps) {
@@ -206,8 +263,13 @@ export class TabSeqSetupViewComponent implements OnInit {
     }
 
     onLipPrepChange(event) {
-        let appPriceListParams: HttpParams = new HttpParams().set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
+        let appPriceListParams: HttpParams = new HttpParams()
+            .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
             .set("idLab", this.newExperimentService.lab.idLab);
+
+        this.themes = [];  // Clearing out themes early to improve visual look of the change.
+        this.sequenceType = null;
+
         this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
             if (response) {
                 for (let price of response) {
@@ -215,43 +277,47 @@ export class TabSeqSetupViewComponent implements OnInit {
                     this.priceMap[key] = price.price;
                 }
             }
-            this.themes = [];
+
             this.appPrices = [];
             this.form.get("seqType").setValue("");
+
             if (event.value === this.NO) {
                 this.showPool = true;
             } else {
                 this.showPool = false;
             }
+
             this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
-            this.showAppPrice = true;
+            // this.showAppPrice = true;
         });
+
         if (this.currState === "NanoStringState") {
             // Hide isPrepped
             this.isPreppedContainer = false;
         } else {
             this.isPreppedContainer = true;
         }
+
         this.libToChange = false;
     }
+    //
+    // onPooledChanged(event) {
+    //     this.showAppPrice = true;
+    //
+    // }
 
-    onPooledChanged(event) {
-        this.showAppPrice = true;
-
-    }
-
-    onSeqTypeChanged(event) {
-        this.appPrices =[];
-        for (let app of this.filteredApps) {
-            if (app.idApplicationTheme === event.value.idApplicationTheme) {
-                this.appPrices.push(app);
-            }
-
-        }
-        this.newExperimentService.seqType = this.form.get("seqType").value;
-
-    }
+    // onSeqTypeChanged(event) {
+    //     this.appPrices =[];
+    //     for (let app of this.filteredApps) {
+    //         if (app.idApplicationTheme === event.value.idApplicationTheme) {
+    //             this.appPrices.push(app);
+    //         }
+    //
+    //     }
+    //     this.newExperimentService.seqType = this.form.get("seqType").value;
+    //
+    // }
 
     selectApp(event) {
 
@@ -270,7 +336,7 @@ export class TabSeqSetupViewComponent implements OnInit {
                 this.libToChange = true;
             } else {
                 this.libToChange = false;
-                this.form.controls['libraryDesign'].setValidators([Validators.required]);
+                // this.form.controls['libraryDesign'].setValidators([Validators.required]);
                 // TODO Need to create new request
                 // this.newExperimentService.request.captureLibDesignId = "";
             }
@@ -278,15 +344,15 @@ export class TabSeqSetupViewComponent implements OnInit {
     }
 
     ngAfterViewChecked() {
-        let detectChanges: boolean = false;
-
-        if (this.libToChange !== this.libraryDesign) {
-            this.libraryDesign = this.libToChange;
-            detectChanges = true;
-        }
-        if (detectChanges) {
-            this.changeRef.detectChanges();
-        }
+        // let detectChanges: boolean = false;
+        //
+        // if (this.libToChange !== this.libraryDesign) {
+        //     this.libraryDesign = this.libToChange;
+        //     detectChanges = true;
+        // }
+        // if (detectChanges) {
+        //     this.changeRef.detectChanges();
+        // }
     }
 
     onNumTubesChanged(event) {

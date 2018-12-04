@@ -173,7 +173,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
 
     loadConfigAnnotations() {
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.height = '980px';
+        configuration.height = '90%';
         configuration.data = {orderType: this.orderType};
 
         let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.dialog.open(ConfigAnnotationDialogComponent, configuration);

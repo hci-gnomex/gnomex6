@@ -254,6 +254,8 @@ img.icon {
 
 .double-padded { padding: 0.6em; }
 
+.double-left-padded { padding-left: 0.6em; }
+
 .warningLabelMinor
 {
   color: #17871C;
@@ -280,6 +282,12 @@ button.mat-button.minimize span {
 .dialog-header-colors{
   background-color: #84b278;
   color: white;
+}
+
+
+label.mat-radio-label {
+  margin-top:    0.15em !important;
+  margin-bottom: 0.15em !important;
 }
 /******************************/
 /**** Primary Nav / Header ****/

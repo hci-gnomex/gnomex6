@@ -10,20 +10,81 @@ import {HttpParams} from "@angular/common/http";
     selector: "tabSeqProtoView",
     templateUrl: "./tab-seq-proto-view.component.html",
     styles: [`
-        .radio-group-container {
-            display: inline-flex;
+
+        .heading {
+            width: 15%;
+            min-width: 25em;
+            padding-right: 2em;
+            margin-bottom: 2em;
+        }
+
+        .odd  { background-color: #edede9; }
+        .even { background-color: white; }
+        
+        ol.three-depth-numbering {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: section;
+        }
+        ol.three-depth-numbering li {
+            display: flex;
             flex-direction: row;
-            vertical-align: middle;
-            width: fit-content;
-            margin-top: 1.1em;
+            padding-bottom: 0.3em;
+            margin-bottom: 2em;
         }
-        .type-radio-button {
-            margin: 0 0.5%;
+        ol.three-depth-numbering li li {
+            margin-bottom: 0;
         }
+        ol.three-depth-numbering li::before {
+            counter-increment: section;
+            content: "(" counter(section) ")";
+            padding-right: 0.7em;
+        }
+        ol.three-depth-numbering li ol {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: subsection;
+        }
+        ol.three-depth-numbering li ol li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li ol li::before {
+            counter-increment: subsection;
+            content: "(" counter(section) "." counter(subsection) ")";
+            padding-right: 0.7em;
+        }
+        ol.three-depth-numbering li ol li ol {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            counter-reset: subsubsection;
+        }
+        ol.three-depth-numbering li ol li ol li {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 0.3em;
+        }
+        ol.three-depth-numbering li ol li ol li::before {
+            counter-increment: subsubsection;
+            content: "(" counter(section) "." counter(subsection) "." counter(subsubsection) ")";
+            padding-right: 0.7em;
+        }
+        
+        .major-padded-left { padding-left: 3em; }
+        
+        .right-align { text-align: right; }
+        
+        
+        
         .inline-block {
             width: 20em;
             display: inline-block;
         }
+        
     `]
 })
 
