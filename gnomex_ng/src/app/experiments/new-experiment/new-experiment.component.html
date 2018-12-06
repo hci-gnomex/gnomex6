@@ -13,7 +13,7 @@
         <mat-tab-group #tabGroup
                        class="full-width full-height"
                        id="linkDataTabs"
-                       [selectedIndex]="this.newExperimentService.selectedIndex"
+                       [selectedIndex]="selectedIndex"
                        (selectedTabChange)="onTabChange($event)">
             <mat-tab label="Setup" class="full-width full-height">
                 <form [formGroup]="form" class="full-width full-height font-small extra-padded">
@@ -78,7 +78,7 @@
                                     Verify your name :
                                 </div>
                                 <mat-form-field *ngIf="adminState==='AdminState'" class="moderate-width">
-                                    <mat-select placeholder="Your name" formControlName="selectName" (change)="onUserSelection($event)">
+                                    <mat-select placeholder="Your name" [(ngModel)]="submitter" formControlName="selectName">
                                         <mat-option *ngFor="let mem of possibleSubmitters" [value]="mem">
                                             {{ mem.displayName }}
                                         </mat-option>
@@ -208,7 +208,7 @@
         <div class="full-width flex-container-row">
             <div class="padded-right">
                 <button mat-raised-button
-                        [disabled]="this.newExperimentService.selectedIndex === 0"
+                        [disabled]="selectedIndex === 0"
                         (click)="goBack()">
                     <mat-icon>arrow_left</mat-icon>
                     Back
@@ -216,7 +216,7 @@
             </div>
             <div class="padded-right">
                 <button mat-raised-button
-                        [disabled]="!this.newExperimentService?.currentComponent?.form?.valid || this.newExperimentService?.selectedIndex >= numTabs"
+                        [disabled]="currentComponent?.form?.invalid || selectedIndex >= (numTabs - 1)"
                         (click)="goNext()">
                     <mat-icon>arrow_right</mat-icon>
                     Next
@@ -225,9 +225,9 @@
             <div class="full-height flex-grow">
             </div>
             <div class="padded-left">
-                <button *ngIf="!newExperimentService.hideSubmit"
+                <button *ngIf="selectedIndex === (numTabs - 1)"
                         mat-raised-button
-                        [disabled]="!this.newExperimentService.disableSubmit||this.newExperimentService.selectedIndex===numTabs-1"
+                        [disabled]="!this.newExperimentService.disableSubmit || selectedIndex !== (numTabs - 1)"
                         (click)="newExperimentService.submit()">
                     <img src="../../../assets/accept.png">
                     Submit

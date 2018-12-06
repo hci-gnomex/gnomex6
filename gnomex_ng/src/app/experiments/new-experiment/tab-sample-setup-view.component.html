@@ -37,7 +37,7 @@
                             Which category best describes your samples?
                         </div>
                         <div>
-                            <div class="normal-size-font title">
+                            <div *ngIf="filteredSampleTypeListRna && filteredSampleTypeListRna?.length > 0 && filteredSampleTypeListDna && filteredSampleTypeListDna?.length > 0" class="normal-size-font title">
                                 DNA
                             </div>
                             <mat-radio-group class="flex-container-col"
@@ -53,7 +53,7 @@
                             </mat-radio-group>
                         </div>
                         <div>
-                            <div class="normal-size-font title">
+                            <div *ngIf="filteredSampleTypeListRna && filteredSampleTypeListRna?.length > 0 && filteredSampleTypeListDna && filteredSampleTypeListDna?.length > 0" class="normal-size-font title">
                                 RNA
                             </div>
                             <mat-radio-group class="flex-container-col"

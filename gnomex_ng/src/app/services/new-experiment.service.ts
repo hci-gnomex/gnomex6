@@ -9,212 +9,214 @@ import {AnnotationService} from "./annotation.service";
 import {BillingService} from "./billing.service";
 import {PropertyService} from "./property.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {first} from "rxjs/internal/operators";
 
 @Injectable()
 export class NewExperimentService {
+
     get filteredApps(): any[] {
         return this._filteredApps;
     }
-
     set filteredApps(value: any[]) {
         this._filteredApps = value;
     }
+
     get lanes(): any[] {
         return this._lanes;
     }
-
     set lanes(value: any[]) {
         this._lanes = value;
     }
+
     get project(): any {
         return this._project;
     }
-
     set project(value: any) {
         this._project = value;
     }
+
     get expTypeLabel(): string {
         return this._expTypeLabel;
     }
-
     set expTypeLabel(value: string) {
         this._expTypeLabel = value;
     }
+
     get numTubes(): number {
         return this._numTubes;
     }
-
     set numTubes(value: number) {
         this._numTubes = value;
     }
+
     get barCodes(): any[] {
         return this._barCodes;
     }
-
     set barCodes(value: any[]) {
         this._barCodes = value;
     }
+
     get preppedByClient(): boolean {
         return this._preppedByClient;
     }
-
     set preppedByClient(value: boolean) {
         this._preppedByClient = value;
         this.preppedChanged.next(true);
     }
+
     get selectedProto(): any {
         return this._selectedProto;
     }
-
     set selectedProto(value: any) {
         this._selectedProto = value;
         this.protoChanged.next(true);
     }
+
     get seqType(): any {
         return this._seqType;
     }
-
     set seqType(value: any) {
         this._seqType = value;
     }
+
     get billingAccount(): any {
         return this._billingAccount;
     }
-
     set billingAccount(value: any) {
         this._billingAccount = value;
         this.accountChanged.next(true);
     }
+
     get filteredGenomeBuildList(): any[] {
         return this._filteredGenomeBuildList;
     }
-
     set filteredGenomeBuildList(value: any[]) {
         this._filteredGenomeBuildList = value;
     }
+
     get organisms(): any[] {
         return this._organisms;
     }
-
     set organisms(value: any[]) {
         this._organisms = value;
     }
+
     get sampleOrganisms(): Set<any> {
         return this._sampleOrganisms;
     }
-
     set sampleOrganisms(value: Set<any>) {
         this._sampleOrganisms = value;
     }
+
     get componentRefs(): any[] {
         return this._componentRefs;
     }
-
     set componentRefs(value: any[]) {
         this._componentRefs = value;
     }
-    get currentComponent(): any {
-        return this._currentComponent;
-    }
 
-    set currentComponent(value: any) {
-        this._currentComponent = value;
-    }
+    // get currentComponent(): any {
+    //     return this._currentComponent;
+    // }
+    // set currentComponent(value: any) {
+    //     this._currentComponent = value;
+    // }
+
     get components(): any[] {
         return this._components;
     }
-
     set components(value: any[]) {
         this._components = value;
     }
+
     get samplesGridRowData(): any[] {
         return this._samplesGridRowData;
     }
-
     set samplesGridRowData(value: any[]) {
         this._samplesGridRowData = value;
     }
+
     get sampleTypes(): any[] {
         return this._sampleTypes;
     }
-
     set sampleTypes(value: any[]) {
         this._sampleTypes = value;
     }
+
     get sampleType(): any {
         return this._sampleType;
     }
-
     set sampleType(value: any) {
         this._sampleType = value;
         if (this.sampleTypeChanged) {
             this.sampleTypeChanged.next(true);
         }
     }
+
     get organism(): any {
         return this._organism;
     }
-
     set organism(value: any) {
         this._organism = value;
         this.organismChanged.next(true);
     }
+
     get experimentOwner(): any {
         return this._experimentOwner;
     }
-
     set experimentOwner(value: any) {
         this._experimentOwner = value;
         this.ownerChanged.next(true);
 
     }
+
     get idCoreFacility(): string {
         return this._idCoreFacility;
     }
-
     set idCoreFacility(value: string) {
         this._idCoreFacility = value;
     }
+
     get idAppUser(): string {
         return this._idAppUser;
     }
-
     set idAppUser(value: string) {
         this._idAppUser = value;
     }
+
     get numSamples(): any {
         return this._numSamples;
     }
-
     set numSamples(value: any) {
         this._numSamples = value;
         this.numSamplesChanged.next(true);
     }
+
     get propertyEntriesForUser(): any[] {
         return this._propertyEntriesForUser;
     }
-
     set propertyEntriesForUser(value: any[]) {
         this._propertyEntriesForUser = value;
     }
+
     get requestCategory(): any {
         return this._requestCategory;
     }
-
     set requestCategory(value: any) {
         this._requestCategory = value;
     }
+
     get propertyEntries(): any[] {
         return this._propertyEntries;
     }
-
     set propertyEntries(value: any[]) {
         this._propertyEntries = value;
     }
+
     get applicationName(): string {
         return this._applicationName;
     }
-
     set applicationName(value: string) {
         this._applicationName = value;
     }
@@ -222,26 +224,27 @@ export class NewExperimentService {
     get codeApplication(): string {
         return this._codeApplication;
     }
-
     set codeApplication(value: string) {
         this._codeApplication = value;
         this.codeChanged.next(true);
     }
+
     get lab(): any {
         return this._lab;
     }
-
     set lab(value: any) {
         this._lab = value;
         this.labChanged.next(true);
 
     }
+
     get samplesGridApi() {
         return this._samplesGridApi;
     }
     set samplesGridApi(value: any) {
         this._samplesGridApi = value;
     }
+
     public currentState = new BehaviorSubject("SolexaBaseState");
     private _request: any;
     private _annotations: any[];
@@ -264,7 +267,7 @@ export class NewExperimentService {
     private _idCoreFacility: string;
     private _components: any[] = [];
     private _componentRefs: any[] = [];
-    private _currentComponent: any;
+    // private _currentComponent: any;
     private _billingAccount: any;
     private _seqType: any;
     private _selectedProto: any;
@@ -280,7 +283,7 @@ export class NewExperimentService {
     private _filteredApps: any[] = [];
     public samplesColumnApi: any;
     private hiSeqPrices: any[] = [];
-    public selectedIndex: number = 0;
+    // public selectedIndex: number = 0;
     public samplesView;
     public hideSubmit: boolean = true;
     public disableSubmit: boolean = true;
@@ -323,6 +326,7 @@ export class NewExperimentService {
     public sampleSetupView: any;
     public setupView: any;
     constructor(private _http: Http,
+                private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private experimentService: ExperimentsService,
                 private propertyService: PropertyService,
@@ -591,6 +595,47 @@ export class NewExperimentService {
                 }
             }
         }
+    }
+
+    refreshNewExperimentAnnotations(): void {
+        this.dialogService.startDefaultSpinnerDialog();
+
+        this.experimentService.getNewRequest().pipe(first()).subscribe((response: any) => {
+            this.dialogService.stopAllSpinnerDialogs();
+
+            if (!response) {
+                return;
+            }
+
+            if (!this.gnomexService.isInternalExperimentSubmission) {
+                this.addDescriptionFieldToAnnotations(response.PropertyEntries);
+            }
+
+            this.propertyEntries = response.PropertyEntries;
+
+            if (response.RequestProperties && Array.isArray(response.RequestProperties)) {
+                this.annotations = response.RequestProperties.filter(annotation =>
+                    annotation.isActive === 'Y' && annotation.idCoreFacility === this.idCoreFacility
+                );
+            } else {
+                this.annotations = [];
+            }
+        });
+
+        this.propertyEntriesForUser = this.filterPropertiesByUser(this.propertyEntries);
+    }
+
+    private addDescriptionFieldToAnnotations(props: any[]): void {
+        let descNode: any = {
+            PropertyEntry: {
+                idProperty: "-1",
+                name: "Description",
+                otherLabel: "",
+                Description: "false",
+                isActive: "Y"
+            }
+        };
+        props.splice(1, 0, descNode);
     }
 
     updateRequestProperties():void {
@@ -934,42 +979,45 @@ export class NewExperimentService {
         // Get property with children (organisms, platforms, appusers).
         let properties: any[] = [];
 
-        for (let property of propsToFilter) {
-            if (property.name.startsWith("mSelect")) {
-                console.log("jj");
-            }
-            let entry = Object(this.gnomexService.getSampleProperty(property.idProperty));
-            let keep: boolean = this.filterPropertyEntryWithFullProperty(entry, property);
-            if (keep) {
-                keep = false;
-                let users: any;
-                if (entry.appUsers) {
-                     users = entry.appUsers.AppUserLite;
+        if (propsToFilter) {
+            for (let property of propsToFilter) {
+                if (property.name.startsWith("mSelect")) {
+                    console.log("jj");
                 }
-                if (!users) {
-                    keep = true;
-                } else {
-                    let allowedUsers: any[] = this.getAnnotationAllowedUserList();
-                    if (!Array.isArray(users)) {
-                        users = [users];
+                let entry = Object(this.gnomexService.getSampleProperty(property.idProperty));
+                let keep: boolean = this.filterPropertyEntryWithFullProperty(entry, property);
+                if (keep) {
+                    keep = false;
+                    let users: any;
+                    if (entry.appUsers) {
+                        users = entry.appUsers.AppUserLite;
                     }
-                    for (let user of users) {
-                        for (let u1 of allowedUsers) {
-                            if (u1 === user.idAppUser) {
-                                keep = true;
+                    if (!users) {
+                        keep = true;
+                    } else {
+                        let allowedUsers: any[] = this.getAnnotationAllowedUserList();
+                        if (!Array.isArray(users)) {
+                            users = [users];
+                        }
+                        for (let user of users) {
+                            for (let u1 of allowedUsers) {
+                                if (u1 === user.idAppUser) {
+                                    keep = true;
+                                    break;
+                                }
+                            }
+                            if (keep) {
                                 break;
                             }
                         }
-                        if (keep) {
-                            break;
-                        }
                     }
                 }
-            }
-            if (keep) {
-                properties.push(property);
+                if (keep) {
+                    properties.push(property);
+                }
             }
         }
+
         this.propEntriesChanged.next(true);
         return properties;
     }
