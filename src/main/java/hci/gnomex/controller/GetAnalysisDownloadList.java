@@ -58,11 +58,11 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
         HashMap errors = this.loadDetailObject(request, filter);
         this.addInvalidFields(errors);
 
-        if (Util.isParameterNonEmpty("includeUploadStagingDir")) {
+        if (Util.isParameterNonEmpty(request.getParameter("includeUploadStagingDir"))) {
             includeUploadStagingDir = request.getParameter("includeUploadStagingDir");
         }
 
-        if (Util.isParameterNonEmpty("skipUploadStagingDirFiles")) {
+        if (Util.isParameterNonEmpty(request.getParameter("skipUploadStagingDirFiles"))) {
             skipUploadStagingDirFiles = request.getParameter("skipUploadStagingDirFiles");
         }
 
@@ -70,9 +70,9 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
             idAnalysis = new Integer(request.getParameter("idAnalysis"));
         }
 
-        autoCreate = Util.isParameterTrue("autoCreate");
+        autoCreate = request.getParameter("autoCreate") != null && Util.isParameterTrue(request.getParameter("autoCreate"));
 
-        if (Util.isParameterNonEmpty("analysisNumber")) {
+        if (Util.isParameterNonEmpty(request.getParameter("analysisNumber"))) {
             analysisNumber = request.getParameter("analysisNumber");
         }
         if (idAnalysis == null && analysisNumber == null) {
