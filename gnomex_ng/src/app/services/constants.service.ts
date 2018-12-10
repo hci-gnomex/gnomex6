@@ -7,12 +7,12 @@ export class ConstantsService {
     public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_ORGANISM:string = "experiment_platform_hide_organism";
 
     public readonly ICON_CHECKED = "assets/tick.png";
-    public readonly SEGMENGT_NEW = "assets/segment_new.png";
-    public readonly SEGMENGT_REMOVE = "assets/segment_remove.png";
-    public readonly SEGMENGT_NEW_DISABLE = "assets/segment_new_disable.png";
-    public readonly SEGMENGT_REMOVE_DISABLE = "assets/segment_remove_disable.png";
-    public readonly SEGMENGT_IMPORT = "assets/segment_import.png";
-    public readonly SEGMENGT_IMPORT_DISABLE = "assets/segment_remove_disable.png";
+    public readonly SEGMENT_NEW = "assets/segment_new.png";
+    public readonly SEGMENT_REMOVE = "assets/segment_remove.png";
+    public readonly SEGMENT_NEW_DISABLE = "assets/segment_new_disable.png";
+    public readonly SEGMENT_REMOVE_DISABLE = "assets/segment_remove_disable.png";
+    public readonly SEGMENT_IMPORT = "assets/segment_import.png";
+    public readonly SEGMENT_IMPORT_DISABLE = "assets/segment_remove_disable.png";
     public readonly PAGE_ADD = "assets/page_add.png";
     public readonly PAGE_GO = "assets/page_go.png";
     public readonly PAGE_REMOVE = "assets/page_remove.png";
@@ -89,6 +89,7 @@ export class ConstantsService {
 
     public readonly ICON_GREEN_BULLET:string = "assets/bullet_green.png";
     public readonly ICON_FOLDER:string = "assets/folder.png";
+    public readonly ICON_FOLDER_ADD:string = "assets/folder_add.png";
     public readonly ICON_FLASK:string = "assets/flask.png";
     public readonly ICON_ADD:string = "assets/add.png";
     public readonly ICON_DELETE:string = "assets/delete.png";

@@ -161,8 +161,8 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
     }
 
     ngOnInit(){
-        this.newSegment = this.constService.SEGMENGT_NEW;
-        this.removeSegment = this.constService.SEGMENGT_REMOVE_DISABLE;
+        this.newSegment = this.constService.SEGMENT_NEW;
+        this.removeSegment = this.constService.SEGMENT_REMOVE_DISABLE;
 
         this.labListService.getLabList().subscribe((response: any[]) => {
             this.labList = response;
@@ -289,10 +289,10 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
 
         if(selectedRows.length === 0){
             this.enableRemoveAnalysis = false;
-            this.removeSegment = this.constService.SEGMENGT_REMOVE_DISABLE;
+            this.removeSegment = this.constService.SEGMENT_REMOVE_DISABLE;
         }else{
             this.enableRemoveAnalysis = true;
-            this.removeSegment = this.constService.SEGMENGT_REMOVE;
+            this.removeSegment = this.constService.SEGMENT_REMOVE;
         }
     }
 
