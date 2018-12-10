@@ -210,7 +210,7 @@ public class ShowAnalysisDownloadForm extends GNomExCommand implements Serializa
 		maindiv.addContent(br);
 
 		// Now get the files that exist on the file server for this experiment
-		Set folders = GetAnalysisDownloadList.getAnalysisDownloadFolders(baseDir, analysis.getNumber(), analysis.getCreateYear());
+		Set<String> folders = GetAnalysisDownloadList.getAnalysisDownloadFolders(baseDir, analysis.getNumber(), analysis.getCreateYear());
 		for (Iterator i = folders.iterator(); i.hasNext();) {
 			String folder = (String) i.next();
 

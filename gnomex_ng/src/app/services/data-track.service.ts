@@ -284,24 +284,38 @@ export class DataTrackService {
             }));
     }
 
-    makeUCSCLinks(params:HttpParams): Observable<any>{
+    makeUCSCLinks(params:HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/MakeDataTrackUCSCLinks.gx",null,{params:params});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/MakeDataTrackUCSCLinks.gx", params.toString(),{headers: headers});
     }
-    makeIGVLink(): Observable<any>{
-        //this.cookieUtilService.formatXSRFCookie();
-        //return this.httpClient.post("/gnomex/MakeDataTrackIGVLink.gx",null);
-        return this.httpClient.get("/gnomex/MakeDataTrackIGVLink.gx");
 
+    makeIGVLink(): Observable<any> {
+        return this.httpClient.get("/gnomex/MakeDataTrackIGVLink.gx");
     }
-    makeIOBIOLink(params:HttpParams): Observable<any>{
+
+    makeIOBIOLink(params:HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx",null,{params:params});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", params.toString(),{headers: headers});
     }
-    makeURLLink(params:HttpParams) : Observable<any> {
+
+    makeURLLink(params:HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", null, {params:params});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", params.toString(), {headers: headers});
     }
+
+    makeGENELink(params:HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/MakeGeneURL.gx", params.toString(), {headers: headers});
+    }
+
     destroyLinks(): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/DestroyExistingLinks.gx",null);

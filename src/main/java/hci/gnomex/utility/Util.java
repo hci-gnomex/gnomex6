@@ -1,12 +1,18 @@
 package hci.gnomex.utility;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.hibernate.Session;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -612,7 +618,98 @@ public class Util {
         return builder.build();
     }
 
+    private static void setElementIconRecursively(Element node) {
+        String icon = "";
+        if (node.getName().equals("Analysis")) {
+            icon = "assets/map.png";
+        } else if (node.getName().equals("FileDescriptor")) {
+            if (node.getAttributeValue("type") != null && node.getAttributeValue("type").equals("dir")) {
+                if (node.getAttributeValue("isEmpty") != null && node.getAttributeValue("isEmpty").equals("Y")) {
+                    icon = "assets/folder_disable.png";
+                } else {
+                    icon = "assets/folder.png";
+                }
+            } else if (node.getAttributeValue("isSupportedDataTrack") != null && node.getAttributeValue("isSupportedDataTrack").equals("Y")) {
+                icon = "assets/datatrack.png";
+            }
+        }
+        if (!icon.equals("")) {
+            node.setAttribute("icon", icon);
+        }
 
+        for (final Element contentElement : (List<Element>) node.getContent()) {
+            setElementIconRecursively(contentElement);
+        }
+    }
+
+    public static void setIcons(Document doc) {
+        setElementIconRecursively(doc.getRootElement());
+    }
+
+    private static void setFileDescriptorDisplayRecursively(Element node) {
+        if (node.getName().equals("FileDescriptor")) {
+            String color = "black";
+            if (isParameterNonEmpty(node.getAttributeValue("viewURL"))) {
+                color = "blue";
+                if (node.getAttributeValue("PROTECTED") != null && node.getAttributeValue("PROTECTED").equals("Y")) {
+                    color = "purple";
+                }
+            } else {
+                if (node.getAttributeValue("PROTECTED") != null && node.getAttributeValue("PROTECTED").equals("Y")) {
+                    color = "red";
+                }
+            }
+            node.setAttribute("displayColor", color);
+        }
+
+        for (final Element contentElement : (List<Element>) node.getContent()) {
+            setFileDescriptorDisplayRecursively(contentElement);
+        }
+    }
+
+    public static void setFileDescriptorDisplay(Document doc) {
+        setFileDescriptorDisplayRecursively(doc.getRootElement());
+    }
+
+    public static String convertXMLDocumentToJSONString(Document doc) throws JsonProcessingException {
+        final ObjectMapper mapper = new ObjectMapper();
+        ObjectNode docNode = mapper.createObjectNode();
+        final Element root = doc.getRootElement();
+        for (final Element rootContent : (List<Element>) root.getContent()) {
+            ObjectNode rootNode = docNode.putObject(rootContent.getName());
+            convertXMLElementToObjectNode(mapper, rootContent, rootNode);
+        }
+        return mapper.writeValueAsString(docNode);
+    }
+
+    private static ObjectNode convertXMLElementToObjectNode(final ObjectMapper mapper, final Element element, ObjectNode node) {
+        ObjectNode convertedNode = node;
+        if (convertedNode == null) {
+            convertedNode = mapper.createObjectNode();
+        }
+
+        for (final Attribute attribute : (List<Attribute>) element.getAttributes()) {
+            convertedNode.put(attribute.getName(), attribute.getValue());
+        }
+
+        Map<String, List<ObjectNode>> contentMap = new HashMap<>();
+        for (final Element contentElement : (List<Element>) element.getContent()) {
+            ObjectNode contentNode = convertXMLElementToObjectNode(mapper, contentElement, null);
+            if (!contentMap.containsKey(contentElement.getName())) {
+                contentMap.put(contentElement.getName(), new ArrayList<>());
+            }
+            contentMap.get(contentElement.getName()).add(contentNode);
+        }
+
+        for (Map.Entry<String, List<ObjectNode>> entry : contentMap.entrySet()) {
+            ArrayNode array = convertedNode.putArray(entry.getKey());
+            for (ObjectNode contentNode : entry.getValue()) {
+                array.add(contentNode);
+            }
+        }
+
+        return convertedNode;
+    }
 
 }
 
