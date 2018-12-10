@@ -8,7 +8,7 @@ import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer
 import {DataTrackService} from "../../services/data-track.service";
 import {HttpParams} from "@angular/common/http";
 import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
-import {MatDialog} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -221,7 +221,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         let config: MatDialogConfig = new MatDialogConfig();
         config.panelClass = 'no-padding-dialog';
         config.data = {
-            order: this.analysis,
+            order: this.getAnalysisDownloadListResult.Analysis,
             orderDownloadList: "",
         };
         config.height = "30em";
