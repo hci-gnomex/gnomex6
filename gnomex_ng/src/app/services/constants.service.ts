@@ -105,6 +105,8 @@ export class ConstantsService {
 
     public readonly ICON_INFORMATION:string= "assets/information.png";
     public readonly ICON_UPLOAD:string= "assets/upload.png";
+    public readonly ICON_UPLOAD_LARGE: string = "assets/upload_large.png";
+    public readonly ICON_CHART_ORGANIZATION: string = "assets/chart_organisation.png";
 
     public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
 

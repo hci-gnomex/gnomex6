@@ -254,7 +254,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.analysisService.startSearchSubject.subscribe((value) =>{
             if (value) {
                 // this.showSpinner = true;
-                this.dialogsService.startDefaultSpinnerDialog();
+                setTimeout(() => {
+                    this.dialogsService.startDefaultSpinnerDialog();
+                });
             }
         })
 

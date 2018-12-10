@@ -149,7 +149,7 @@ public Command execute() throws RollBackCommandException {
 		}
 
 		Analysis a = sess.get(Analysis.class, idAnalysis);
-		String analysisDirectory = GetAnalysisDownloadList.getAnalysisDirectory(analysisBaseDir, a);
+		String analysisDirectory = Util.getAnalysisDirectory(analysisBaseDir, a);
 
 		System.out.println ("[ManagePedFile] analysisDirectory:  " + analysisDirectory + "analysisBaseDir: " + analysisBaseDir );
 		if (VCFpathName != null) {
