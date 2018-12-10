@@ -1,0 +1,166 @@
+<div class="full-height full-width">
+    <form [formGroup]="form" class="full-width full-height font-small extra-padded">
+        <ol class="full-width three-depth-numbering">
+            <li>
+                <div class="flex-container-row">
+                    <div class="heading">
+                        Select a service category :
+                    </div>
+                    <mat-radio-group *ngIf="requestCategories.length > 0; else noPlatforms"
+                                     class="flex-container-col"
+                                     placeholder="Select a service category"
+                                     formControlName="selectedCategory"
+                                     (change)="onCategoryChange($event)">
+                        <div *ngFor="let category of requestCategories" class="full-width">
+                            <mat-radio-button [value]="category">
+                                <div class="full-width flex-container-row">
+                                    <div class="label-width">
+                                        <img src="{{ category.icon }}">
+                                        {{ category.display }}
+                                    </div>
+                                    <div>
+                                        {{ category.notes }}
+                                    </div>
+                                </div>
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                    <ng-template #noPlatforms>
+                        No experiment platforms are associated with this lab. Please contact customer support.
+                    </ng-template>
+                </div>
+            </li>
+            <li *ngIf="showLab" class="full-width align-baseline">
+                <div class="full-width flex-container-row align-baseline">
+                    <div class="heading">
+                        Verify your lab group :
+                    </div>
+                    <mat-form-field class="moderate-width">
+                        <input matInput
+                               placeholder="Select a Lab"
+                               aria-label="Lab"
+                               formControlName="selectLab"
+                               [matAutocomplete]="autoLab"
+                               (keyup.enter)="chooseFirstLabOption()">
+                        <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
+                            <mat-option *ngFor="let lab of filterLabList(form.get('selectLab').value)"
+                                        [value]="lab"
+                                        (onSelectionChange)="selectLabOption($event)">
+                                {{ lab.name }}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-error *ngIf="form?.get('selectLab')?.hasError('required')">
+                            Lab is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </li>
+            <li *ngIf="showName" class="full-width align-baseline">
+                <div class="full-width flex-container-row align-baseline">
+                    <div class="heading">
+                        Verify your name :
+                    </div>
+                    <mat-form-field *ngIf="adminState==='AdminState'" class="moderate-width">
+                        <mat-select placeholder="Your name" [(ngModel)]="submitter" formControlName="selectName">
+                            <mat-option *ngFor="let mem of possibleSubmitters" [value]="mem">
+                                {{ mem.displayName }}
+                            </mat-option>
+                            <mat-option [value]="">
+                                --
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form?.get('selectOwner')?.hasError('required')">Name is required</mat-error>
+                    </mat-form-field>
+                </div>
+            </li>
+            <li *ngIf="showBilling" class="full-width align-baseline">
+                <div class="full-width flex-container-row">
+                    <div class="flex-container-row align-baseline">
+                        <div class="heading">
+                            Select a payment method :
+                        </div>
+                        <mat-form-field class="moderate-width">
+                            <mat-select placeholder="Account" formControlName="selectAccount" (change)="onBillingSelection($event)">
+                                <mat-option *ngFor="let account of authorizedBillingAccounts" [value]="account">
+                                    {{ account.accountNameDisplay }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="form?.get('selectAccount')?.hasError('required')"> Account is required</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-column-container moderate-width major-padding-left">
+                        <div class="double-padded-left instructions">
+                            {{ workAuthInstructions }}
+                        </div>
+                        <div>
+                            <button mat-button class="link-button minimize" (click)="onNewAccount()">{{workButtonText}}</button>
+                        </div>
+                        <div *ngIf="showAccessAuthorizedAccountsLink" class="double-padded-left instructions">
+                            {{ accessAuthorizedBillingAccountInstructions }}
+                        </div>
+                        <div class="flex-container-row">
+                            <div class="padded-right">
+                                <button mat-button class="link-button minimize" (click)="onNewAccount()">Show Other Blling Accounts</button>
+                            </div>
+                            <div class="padded-right">
+                                <button mat-button class="link-button minimize" (click)="onNewAccount()">Split Billing</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li *ngIf="showProject" class="full-width align-baseline">
+                <div class="full-width flex-container-row align-baseline">
+                    <div class="heading word-wrap">
+                        {{ "Select a folder : \n (for organizing experiments)" }}
+                    </div>
+                    <mat-form-field class="moderate-width">
+                        <mat-select placeholder="Project" formControlName="selectProject">
+                            <mat-option *ngFor="let project of filteredProjectList" [value]="project">
+                                {{ project.name }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form?.get('selectProject')?.hasError('required')"> Project is required</mat-error>
+                    </mat-form-field>
+                    <div class="flex-container-row major-padding-left">
+                        <div class="padded-right">
+                            <button mat-button class="link-button minimize" (click)="onNewAccount()">Edit</button>
+                        </div>
+                        <div class="padded-right">
+                            <button mat-button class="link-button minimize" (click)="onNewAccount()">New</button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li *ngIf="showExperimentName" class="full-width align-baseline">
+                <div class="full-width flex-container-row align-baseline">
+                    <div class="heading word-wrap">
+                        {{ "Provide an experiment name \n for the data folder (optional)" }}
+                    </div>
+                    <mat-form-field class="moderate-width">
+                        <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder">
+                    </mat-form-field>
+                </div>
+            </li>
+            <li *ngIf="showExperimentTextbox" class="full-width align-baseline">
+                <div class="full-width">
+                    <div class="full-width flex-container-row align-baseline padding-bottom">
+                        <div class="heading word-wrap">
+                            Document experimental details in the text field below (optional)
+                        </div>
+                    </div>
+                    <mat-form-field class="long-width">
+                                    <textarea matInput
+                                              matTextareaAutosize
+                                              placeholder="Experimental Details"
+                                              formControlName="description"
+                                              matAutosizeMinRows="1"
+                                              matAutosizeMaxRows="5">
+                                    </textarea>
+                        <mat-error *ngIf="form?.get('description')?.hasError('maxlength')">Details can be at most 5000 characters</mat-error>
+                    </mat-form-field>
+                </div>
+            </li>
+        </ol>
+    </form>
+</div>

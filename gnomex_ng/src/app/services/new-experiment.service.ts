@@ -116,13 +116,6 @@ export class NewExperimentService {
         this._componentRefs = value;
     }
 
-    // get currentComponent(): any {
-    //     return this._currentComponent;
-    // }
-    // set currentComponent(value: any) {
-    //     this._currentComponent = value;
-    // }
-
     get components(): any[] {
         return this._components;
     }
@@ -250,7 +243,6 @@ export class NewExperimentService {
     private _annotations: any[];
     private _samplesGridApi: any;
     private _samplesGridRowData: any[] = [];
-    public sampleAnnotations: any[] = [];
     private _organism: any;
     private _category: any;
     private _lab: any;
@@ -267,7 +259,6 @@ export class NewExperimentService {
     private _idCoreFacility: string;
     private _components: any[] = [];
     private _componentRefs: any[] = [];
-    // private _currentComponent: any;
     private _billingAccount: any;
     private _seqType: any;
     private _selectedProto: any;
@@ -283,10 +274,8 @@ export class NewExperimentService {
     private _filteredApps: any[] = [];
     public samplesColumnApi: any;
     private hiSeqPrices: any[] = [];
-    // public selectedIndex: number = 0;
     public samplesView;
     public hideSubmit: boolean = true;
-    public disableSubmit: boolean = true;
     public propEntriesChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public hiSeqPricesChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public sampleTypeChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -306,7 +295,6 @@ export class NewExperimentService {
     public priceMap: Map<string, string> = new Map<string, string>();
     public filteredAppList: any[] = [];
     public genomeList: any[] = [];
-    // public selectedIndex = new BehaviorSubject<number>(1);
 
     public readonly TYPE_MICROARRAY: string = 'MICROARRAY';
     public readonly TYPE_HISEQ: string = 'HISEQ';

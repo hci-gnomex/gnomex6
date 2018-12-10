@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormsModule,ReactiveFormsModule} from "@angular/forms";
@@ -77,17 +74,8 @@ import {TabBioinformaticsViewComponent} from "./new-experiment/tab-bioinformatic
 import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina.component";
 import {UploadModule} from "../upload/upload.module";
 import {VisibilityDetailTabComponent} from "../util/visibility-detail-tab.component";
-// import {V} from "@angular/core/src/render3";
+import {NewExperimentSetupComponent} from "./new-experiment/new-experiment-setup.component";
 
-/**
- * @author mbyrne
- * @since 12/19/16
- */
-
-
-/**/
-                                // need add components that will be tabs here
-                                                                          // could be put in gnomexFlex as w
 @NgModule({
     imports: [
         EXPERIMENTS_ROUTING,
@@ -115,8 +103,15 @@ import {VisibilityDetailTabComponent} from "../util/visibility-detail-tab.compon
         AgGridRendererModule,
         AngularSplitModule,
         DynamicModule,
-        DynamicModule.withComponents([TabNotesViewComponent, AnnotationTabComponent, TabSampleSetupViewComponent, TabSeqSetupViewComponent,
-            TabSeqProtoViewComponent, TabAnnotationViewComponent, TabSamplesIlluminaComponent]),
+        DynamicModule.withComponents([
+            TabNotesViewComponent,
+            AnnotationTabComponent,
+            TabSampleSetupViewComponent,
+            TabSeqSetupViewComponent,
+            TabSeqProtoViewComponent,
+            TabAnnotationViewComponent,
+            TabSamplesIlluminaComponent
+        ]),
         AgGridModule.withComponents([
             DateRenderer,
             IconTextRendererComponent,
@@ -134,35 +129,69 @@ import {VisibilityDetailTabComponent} from "../util/visibility-detail-tab.compon
         UploadModule
     ],
     declarations: [
-                    BrowseExperimentsComponent,
-                    ExperimentOrdersComponent,
-                    ViewExperimentComponent,
-                    BrowsePanelComponent,
-                    BrowseOverviewComponent,
-                    ExperimentsBrowseTab,
-                    ProgressBrowseTab,
-                    ProjectBrowseTab,
-                    VisiblityBrowseTab,
-                    CreateProjectComponent,
-                    DeleteProjectComponent,
-                    ReassignExperimentComponent,
-                    DeleteExperimentComponent,
-                    CreateProjectLauncherComponent,
-                    TabNotesViewComponent,
-                    TabSampleSetupViewComponent,
-                    TabPropertiesViewComponent,
+        BrowseExperimentsComponent,
+        ExperimentOrdersComponent,
+        ViewExperimentComponent,
+        BrowsePanelComponent,
+        BrowseOverviewComponent,
+        ExperimentsBrowseTab,
+        ProgressBrowseTab,
+        ProjectBrowseTab,
+        VisiblityBrowseTab,
+        CreateProjectComponent,
+        DeleteProjectComponent,
+        ReassignExperimentComponent,
+        DeleteExperimentComponent,
+        CreateProjectLauncherComponent,
+        TabNotesViewComponent,
+        TabSampleSetupViewComponent,
+        TabPropertiesViewComponent,
         TabSeqSetupViewComponent,
         TabSeqProtoViewComponent,
-                    NewExperimentComponent,
-                    TabAnnotationViewComponent,
-                    TabSamplesIlluminaComponent,
-                    TabBioinformaticsViewComponent,
-                    TabConfirmIlluminaComponent
+        NewExperimentComponent,
+        NewExperimentSetupComponent,
+        TabAnnotationViewComponent,
+        TabSamplesIlluminaComponent,
+        TabBioinformaticsViewComponent,
+        TabConfirmIlluminaComponent
     ],
-    entryComponents:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupViewComponent, NewExperimentComponent,
-        TabSeqProtoViewComponent, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent, VisibilityDetailTabComponent],
-    exports:[CreateProjectComponent, DeleteProjectComponent, ReassignExperimentComponent, DeleteExperimentComponent, CreateProjectLauncherComponent, TabNotesViewComponent, TabSampleSetupViewComponent, TabPropertiesViewComponent, TabSeqSetupViewComponent, NewExperimentComponent,
-        TabSeqProtoViewComponent, TabAnnotationViewComponent, TabSamplesIlluminaComponent, TabBioinformaticsViewComponent, TabConfirmIlluminaComponent, VisibilityDetailTabComponent]
+    entryComponents: [
+        CreateProjectComponent,
+        DeleteProjectComponent,
+        ReassignExperimentComponent,
+        DeleteExperimentComponent,
+        CreateProjectLauncherComponent,
+        TabNotesViewComponent,
+        TabSampleSetupViewComponent,
+        TabPropertiesViewComponent,
+        TabSeqSetupViewComponent,
+        NewExperimentComponent,
+        NewExperimentSetupComponent,
+        TabSeqProtoViewComponent,
+        TabAnnotationViewComponent,
+        TabSamplesIlluminaComponent,
+        TabBioinformaticsViewComponent,
+        TabConfirmIlluminaComponent,
+        VisibilityDetailTabComponent
+    ],
+    exports:[
+        CreateProjectComponent,
+        DeleteProjectComponent,
+        ReassignExperimentComponent,
+        DeleteExperimentComponent,
+        CreateProjectLauncherComponent,
+        TabNotesViewComponent,
+        TabSampleSetupViewComponent,
+        TabPropertiesViewComponent,
+        TabSeqSetupViewComponent,
+        NewExperimentComponent,
+        NewExperimentSetupComponent,
+        TabSeqProtoViewComponent,
+        TabAnnotationViewComponent,
+        TabSamplesIlluminaComponent,
+        TabBioinformaticsViewComponent,
+        TabConfirmIlluminaComponent,
+        VisibilityDetailTabComponent
+    ]
 })
-export class ExperimentsModule {
-}
+export class ExperimentsModule { }
