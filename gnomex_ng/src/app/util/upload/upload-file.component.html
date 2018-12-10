@@ -1,0 +1,25 @@
+<input type="file" #file style="display: none" (change)="onFilesAdded()" multiple />
+<div class="full-height full-width flex-container-col">
+    <h1 mat-dialog-title>Upload Files</h1>
+    <!-- This is the content of the dialog, containing a list of the files to upload -->
+    <div class="flex-container-col">
+        <button mat-button color="primary" (click)="addFile()" > add</button>
+
+        <mat-list>
+            <mat-list-item *ngFor="let file of files">
+
+                <h4 mat-line>{{file.name}}</h4>
+
+                <mat-progress-bar *ngIf="progress" mode="determinate" [value]="progressGroup[file.name].progress | async">
+                </mat-progress-bar>
+
+            </mat-list-item>
+        </mat-list>
+    </div>
+
+    <!-- This are the actions of the dialog, containing the primary and the cancel button-->
+    <div class="justify-flex-end">
+        <button *ngIf="showCancelButton" mat-button mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="primary" [disabled]="!canBeClosed" (click)="closeDialog()">{{primaryButtonText}}</button>
+    </div>
+</div>

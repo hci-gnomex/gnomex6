@@ -167,8 +167,9 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
                     let id: string = "d" + this.gnomexService.orderInitObj.idDataTrack;
                     if (this.treeModel && id) {
-                        let dtNode = this.treeModel.getNodeById(id);
+                        let dtNode: ITreeNode = this.treeModel.getNodeById(id);
                         if(dtNode){
+                            dtNode.ensureVisible();
                             dtNode.setIsActive(true);
                             dtNode.scrollIntoView();
                         }
