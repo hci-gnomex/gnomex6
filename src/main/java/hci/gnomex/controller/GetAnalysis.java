@@ -201,7 +201,7 @@ public Command execute() throws RollBackCommandException {
 						String key = a.getKey(Constants.UPLOAD_STAGING_DIR);
 						Map<Integer, Integer> dataTrackMap = GetAnalysisDownloadList.getDataTrackMap(sess, idAnalysis);
 						GetAnalysisDownloadList.addExpandedFileNodes(false, baseDir, aNode, analysisUploadNode,
-								analysisNumber, key, dh, knownAnalysisFileMap, fileMap, dataTrackMap, sess);
+								analysisNumber, key, knownAnalysisFileMap, fileMap, dataTrackMap, sess);
 					}
 				}
 			}

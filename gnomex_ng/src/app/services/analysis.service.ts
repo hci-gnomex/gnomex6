@@ -250,6 +250,14 @@ export class AnalysisService {
         return this.httpClient.post("/gnomex/LinkExpToAnalysis.gx",null,{params:params});
     }
 
+    public getAnalysisDownloadList(idAnalysis: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idAnalysis", idAnalysis)
+            .set("autoCreate", "Y")
+            .set("includeUploadStagingDir", "N");
+        return this.httpClient.get("/gnomex/GetAnalysisDownloadList.gx", {params: params});
+    }
+
 
 
 

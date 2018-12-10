@@ -140,7 +140,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             ArrayList<String> bamList = new ArrayList<String>();
 
             Analysis a = (Analysis) sess.get(Analysis.class, idAnalysis);
-            analysisDirectory = GetAnalysisDownloadList.getAnalysisDirectory(baseDir, a);
+            analysisDirectory = Util.getAnalysisDirectory(baseDir, a);
             System.out.println ("[MakeGeneURL] baseDir: " + baseDir + " analysisDirectory: " + analysisDirectory);
 
             // genome build

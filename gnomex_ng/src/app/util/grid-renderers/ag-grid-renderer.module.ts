@@ -22,6 +22,7 @@ import { TwoButtonRenderer } from "./two-button.renderer";
 import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 import {MultiSelectRenderer} from "./multi-select.renderer";
 import {UrlAnnotRenderer} from "./url-annot-renderer";
+import {ViewerLinkRenderer} from "./viewer-link.renderer";
 
 @NgModule({
     imports: [
@@ -49,7 +50,8 @@ import {UrlAnnotRenderer} from "./url-annot-renderer";
 		TwoButtonRenderer,
 		UploadViewRemoveRenderer,
 		MultiSelectRenderer,
-		UrlAnnotRenderer
+		UrlAnnotRenderer,
+        ViewerLinkRenderer,
     ],
     exports: [
 		ApproveButtonRenderer,
@@ -70,7 +72,8 @@ import {UrlAnnotRenderer} from "./url-annot-renderer";
         TwoButtonRenderer,
 		UploadViewRemoveRenderer,
         MultiSelectRenderer,
-        UrlAnnotRenderer
+        UrlAnnotRenderer,
+        ViewerLinkRenderer,
     ]
 })
 export class AgGridRendererModule { }
