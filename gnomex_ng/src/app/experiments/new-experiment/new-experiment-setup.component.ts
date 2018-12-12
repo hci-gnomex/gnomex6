@@ -159,6 +159,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
     @Output("onChangeRequestCategory") onChangeRequestCategory = new EventEmitter<any>();
+    @Output("onChangeLab") onChangeLab= new EventEmitter<any>();
 
     public form: FormGroup;
 
@@ -396,15 +397,17 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
     public selectDefaultUserProject(): void {
-
         this.form.controls['selectName'].setErrors(null);
+
         if (this.newExperimentService.idAppUser != null) {
             for (let project of this.filteredProjectList) {
                 if (this.form.controls['selectName'].value
                     && this.form.controls['selectName'].value.idAppUser === project.idAppUser) {
 
-                    this.form.get('selectProject').setValue(project);
-                    this.newExperimentService.project = this.form.get('selectProject').value;
+                    setTimeout(() => {
+                        this.form.get('selectProject').setValue(project);
+                        this.newExperimentService.project = this.form.get('selectProject').value;
+                    });
                     break;
                 }
             }
@@ -494,8 +497,9 @@ export class NewExperimentSetupComponent implements OnDestroy {
             }
             if (this.currentIdLab !== value.idLab) {
                 this.currentIdLab = value.idLab;
+                this.onChangeLab.emit(value);
 
-                this.form.get("selectName").setValue("");
+                this.form.get("selectName").setValue(null);
                 this.form.markAsPristine();
 
                 this.possibleSubmitters = [];

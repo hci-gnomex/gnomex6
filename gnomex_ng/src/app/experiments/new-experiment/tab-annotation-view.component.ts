@@ -38,7 +38,6 @@ import {first} from "rxjs/internal/operators";
 })
 
 export class TabAnnotationViewComponent implements OnInit {
-    // @Output() navigate = new EventEmitter<string>();
 
     public addAnnotationGridApi: GridApi;
     public removeAnnotationGridApi: GridApi;
@@ -51,6 +50,8 @@ export class TabAnnotationViewComponent implements OnInit {
     public currentUsers: any[] = [];
 
     private currentAnnotColumn: number = 5;
+
+    public annotations: any[] = [];
 
 
     private get addAnnotationColumnDefs(): any[] {
@@ -72,7 +73,6 @@ export class TabAnnotationViewComponent implements OnInit {
         ];
     }
 
-
     constructor(private dictionaryService: DictionaryService,
                 private fb: FormBuilder,
                 private propertyService: PropertyService,
@@ -87,44 +87,14 @@ export class TabAnnotationViewComponent implements OnInit {
         });
     }
 
-    private first: boolean = true;
-
     ngOnInit() {
         this.newExperimentService.propEntriesChanged.subscribe((value) =>{
             if (value && this.addAnnotationGridApi) {
-                let previouslySelectedAnnotations = this.addAnnotationGridApi.getSelectedRows();
+                this.annotations = this.newExperimentService.propertyEntriesForUser;
+                this.addAnnotationGridApi.setRowData(this.annotations);
+                // this.addAnnotationGridApi.setRowData(this.newExperimentService.propertyEntriesForUser);
 
-                this.addAnnotationGridApi.setRowData(this.newExperimentService.propertyEntriesForUser);
                 this.removeAnnotationGridApi.setRowData([]);
-
-                // let notFoundPreviouslySelectedAnnotations: any[] = [];
-                //
-                // this.addAnnotationGridApi.forEachNode((node: any) => {
-                //     if (node.data.name === this.form.get("customAnnot").value) {
-                //         node.setSelected(true);
-                //     }
-                //
-                //     previouslySelectedAnnotations.forEach((row) => {
-                //         if (node.data.idProperty === row.idProperty) {
-                //             node.setSelected(true);
-                //             row.wasFound = true;
-                //         }
-                //     });
-                // });
-                //
-                // previouslySelectedAnnotations.forEach((row) => {
-                //     if (row.wasFound !== true) {
-                //         notFoundPreviouslySelectedAnnotations.push(row);
-                //     }
-                // });
-                //
-                // if (notFoundPreviouslySelectedAnnotations.length > 0) {
-                //     let message: string = 'The following annotations were removed from the selected list because they have been removed :\n';
-                //     notFoundPreviouslySelectedAnnotations.forEach((row) => {
-                //         message = message + '\t' + row.name + '\n';
-                //     });
-                //     this.dialogsService.alert('message', 'Warning!');
-                // }
 
                 if (this.newExperimentService.propEntriesChanged.value === true) {
                     this.newExperimentService.propEntriesChanged.next(false);

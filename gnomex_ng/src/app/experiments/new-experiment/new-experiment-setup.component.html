@@ -65,7 +65,7 @@
                             <mat-option *ngFor="let mem of possibleSubmitters" [value]="mem">
                                 {{ mem.displayName }}
                             </mat-option>
-                            <mat-option [value]="">
+                            <mat-option [value]="null">
                                 --
                             </mat-option>
                         </mat-select>

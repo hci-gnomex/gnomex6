@@ -21,6 +21,7 @@
             <mat-tab label="Setup" class="full-width full-height">
                 <new-experiment-setup #setupTab
                                       [idCoreFacility]="inputs?.idCoreFacility"
+                                      (onChangeLab)="onChangeLab($event)"
                                       (onChangeRequestCategory)="outputs?.onChangeRequestCategory()">
                 </new-experiment-setup>
             </mat-tab>

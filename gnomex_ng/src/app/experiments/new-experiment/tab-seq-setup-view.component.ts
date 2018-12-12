@@ -103,12 +103,43 @@ import {BillingService} from "../../services/billing.service";
 })
 
 export class TabSeqSetupViewComponent implements OnInit {
+
+    @Input("lab") set lab(value: any) {
+        if (!value || !this.requestCategory) {
+            console.error("Unable to obtain prices on Library Prep screen!");
+            return;
+        }
+
+        let appPriceListParams: HttpParams = new HttpParams()
+            .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
+            .set("idLab", value.idLab);
+
+        this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
+            for (let price of response) {
+                let key: string = price.codeApplication;
+                this.priceMap[key] = price.price;
+            }
+
+            this.appPrices = [];
+            this.form.get("seqType").setValue("");
+
+            if (this.form && this.form.get("seqLibPrep") && this.form.get("seqLibPrep").value === this.NO) {
+                this.showPool = true;
+            } else {
+                this.showPool = false;
+            }
+
+            this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
+            this.setupThemes();
+        });
+    };
+
     public readonly YES: string = "yes";
     public readonly NO: string = "no";
     public readonly SEPARATE: string = "separate";
     public readonly POOLED: string = "pooled";
     public currState: string;
-    @Input() requestCategory: any;
+    @Input("requestCategory") requestCategory: any;
 
     private form: FormGroup;
     private isPreppedContainer: boolean = true;
@@ -163,7 +194,7 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
     set sequenceType(value: any) {
-        this.appPrices =[];
+        this.appPrices = [];
 
         if (value) {
             for (let app of this.filteredApps) {
@@ -202,18 +233,6 @@ export class TabSeqSetupViewComponent implements OnInit {
     ngAfterViewInit() {
     }
 
-    getPriceList() {
-        let appPriceListParams: HttpParams = new HttpParams().set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
-            .set("idLab", this.newExperimentService.lab.idLab);
-        this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
-            for (let price of response) {
-                let key: string = price.codeApplication;
-                this.priceMap[key] = price.price;
-            }
-
-        });
-
-    }
 
     setupThemes() {
         this.themes = [];
@@ -281,7 +300,7 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.appPrices = [];
             this.form.get("seqType").setValue("");
 
-            if (event.value === this.NO) {
+            if (this.form && this.form.get("seqLibPrep") && this.form.get("seqLibPrep").value === this.NO) {
                 this.showPool = true;
             } else {
                 this.showPool = false;

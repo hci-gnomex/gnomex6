@@ -61,6 +61,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     private navigationSubscription: Subscription;
 
     inputs = {
+        lab: null,
         requestCategory: null,
         idCoreFacility: ''
     };
@@ -450,6 +451,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 }
             }
         }
+    }
+
+    public onChangeLab(event: any): void {
+        this.inputs.lab = event;
     }
 
 

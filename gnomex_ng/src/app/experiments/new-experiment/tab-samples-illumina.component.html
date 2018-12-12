@@ -1,56 +1,57 @@
-<div class="full-height full-width">
-    <form [formGroup]="form" class="full-height full-width">
-            <textarea class="sample-instructions" rows="9" cols="50">
-1.  Assign a multiplex group number for each sample in the table below. Samples that are to be sequenced in the same lane should be assigned the same multiplex group number.
-2.  Provide a name for each sample.
-3.  Provide the concentration for each sample if available.
-4.  Type the volume (ul) that will be provided for each sample.
-5.  Specify the number of sequence lanes required for each multiplex group.
-6.  Optional: Annotate the samples using the characteristics that you selected from the Annotations tab.
-7.  Optional: Edit other fields as appropriate.
-            </textarea>
-
-        <div class="flex-container-col" style="height: 100%">
-            <div style="display:flex; font-size:small; " >
-                <button mat-button color="link"
-                        (click)="showInstructions()"
-                        matTooltip="Instructions&#13;
-                                    1. Mandatory: Fill in the following highlighted fields: Multiplex Group #, Sample Name(Max 30 characters)&#13;
-                                    2. Optional: Any annotation characteristic that you selected from the previous screen appears on this screen&#13;
-                                    as a highlighted column. Please type desired information under the highlighted field with the annotation header.&#13;
-                                    3. After completing all line items, click the 'Next' button at the bottom of the the page to proceed.&#13;
-                                    You may also upload a sample sheet. Please see the 'Sample sheet help' for more help.">
-                    <img class="icon" [src]="constService.ICON_INFORMATION">
+<div class="full-height full-width small-font">
+    <form [formGroup]="form" class="full-height full-width flex-container-col">
+        <div *ngIf="showInstructions === true" class="sample-instructions allow-line-breaks">{{ BASIC_INSTRUCTIONS }}
+        </div>
+        <div class="full-width flex-grow flex-container-col">
+            <div class="full-width flex-container-row align-center padded">
+                <button mat-button
+                        class="padded-right"
+                        color="link"
+                        matTooltip="{{ TOOLTIP_TEXT }}"
+                        (click)="onClickShowInstructions()">
+                    <img class="icon" [src]="constService.ICON_INFORMATION" alt="">
                     Instructions
                 </button>
-
-                <button mat-button color="link"
-                        (click)="upload()"
-                        matTooltip="Upload Sample Sheet&#13;tab delimited txt file">
+                <button mat-button
+                        class="padded-right"
+                        color="link"
+                        matTooltip="Upload Sample Sheet&#13;tab delimited txt file"
+                        (click)="upload()">
                     <img class="icon" [src]="constService.ICON_UPLOAD">
                     Upload Sample Sheet
                 </button>
-
-                <button mat-button color="link"
+                <button mat-button
+                        class="padded-right"
+                        color="link"
                         matTooltip=""
                         (click)="download()">
                     <img class="icon" [src]="constService.ICON_DOWNLOAD">
                     Download Sample Sheet
                 </button>
-                <mat-checkbox (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
+                <mat-checkbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
             </div>
-            <div class="full-height full-width">
+            <div class="full-width flex-grow">
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                                 [rowSelection]="'single'"
+                                 [rowClassRules]="this.samplesGridRowClassRules"
+                                 [enableColResize]="true"
+                                 (cellValueChanged) = "onCellValueChanged($event)"
+                                 (columnEverythingChanged)="this.onEverythingChanged()"
                                  (gridReady)="this.onSamplesGridReady($event)"
                                  (rowDataChanged)="this.onSamplesGridRowDataChanged()"
-                                 (columnEverythingChanged)="this.onEverythingChanged()"
-                                 [rowSelection]="'single'"
-                                 (rowSelected)="this.onSamplesGridRowSelected($event)"
-                                 [rowClassRules]="this.samplesGridRowClassRules"
-                                 [columnDefs]="this.samplesGridColumnDefs"
-                                 (cellValueChanged) = "onCellValueChanged($event)"
-                                 [enableColResize]="true">
+                                 (rowSelected)="this.onSamplesGridRowSelected($event)">
                 </ag-grid-angular>
+                <!--<ag-grid-angular class="ag-theme-fresh full-height full-width"-->
+                                 <!--(gridReady)="this.onSamplesGridReady($event)"-->
+                                 <!--(rowDataChanged)="this.onSamplesGridRowDataChanged()"-->
+                                 <!--(columnEverythingChanged)="this.onEverythingChanged()"-->
+                                 <!--[rowSelection]="'single'"-->
+                                 <!--(rowSelected)="this.onSamplesGridRowSelected($event)"-->
+                                 <!--[rowClassRules]="this.samplesGridRowClassRules"-->
+                                 <!--[columnDefs]="this.samplesGridColumnDefs"-->
+                                 <!--(cellValueChanged) = "onCellValueChanged($event)"-->
+                                 <!--[enableColResize]="true">-->
+                <!--</ag-grid-angular>-->
             </div>
         </div>
     </form>
