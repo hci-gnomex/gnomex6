@@ -7,6 +7,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer";
 import {DataTrackService} from "../../services/data-track.service";
 import {HttpParams} from "@angular/common/http";
+import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -34,6 +36,9 @@ import {HttpParams} from "@angular/common/http";
         </div>
     `,
     styles: [`
+        .no-padding-dialog {
+            padding: 0;
+        }
     `]
 })
 export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
@@ -50,7 +55,8 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 private analysisService: AnalysisService,
                 private route: ActivatedRoute,
                 private dialogsService: DialogsService,
-                private dataTrackService: DataTrackService) {
+                private dataTrackService: DataTrackService,
+                private dialog:MatDialog) {
     }
 
     ngOnInit() {
@@ -87,7 +93,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             this.gridData = [];
             this.fileCount = 0;
             this.getAnalysisDownloadListResult = null;
-            if (data && data.analysis && data.analysis.Analysis) {
+            if(data && data.analysis && data.analysis.Analysis){
                 this.analysisService.getAnalysisDownloadList(data.analysis.Analysis.idAnalysis).subscribe((result: any) => {
                     if (result && result.Analysis) {
                         this.getAnalysisDownloadListResult = result;
@@ -212,7 +218,16 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleManageFiles(): void {
-        // TODO Manage Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.getAnalysisDownloadListResult.Analysis,
+            orderDownloadList: "",
+        };
+        config.height = "30em";
+        config.width = "50em";
+        this.dialog.open(ManageFilesDialogComponent,config);
+
     }
 
     public handleDownloadFiles(): void {

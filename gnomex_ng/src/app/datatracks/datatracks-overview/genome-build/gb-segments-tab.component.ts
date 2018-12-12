@@ -132,9 +132,9 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
             this.gbValidateService.resetValidation();
             let canWrite: boolean = this.datatracksService.datatrackListTreeNode.canWrite === 'Y';
 
-            this.newSegment = !this.secAdvisor.isGuest && canWrite ? this.constService.SEGMENGT_NEW : this.constService.SEGMENGT_NEW_DISABLE; // need to add check for canWrite
-            this.removeSegment = this.constService.SEGMENGT_REMOVE_DISABLE; // need to add check for canWrite below
-            this.importSegment = !this.secAdvisor.isGuest ? this.constService.SEGMENGT_IMPORT : this.constService.SEGMENGT_IMPORT_DISABLE; // need to add check for canWrite
+            this.newSegment = !this.secAdvisor.isGuest && canWrite ? this.constService.SEGMENT_NEW : this.constService.SEGMENT_NEW_DISABLE; // need to add check for canWrite
+            this.removeSegment = this.constService.SEGMENT_REMOVE_DISABLE; // need to add check for canWrite below
+            this.importSegment = !this.secAdvisor.isGuest ? this.constService.SEGMENT_IMPORT : this.constService.SEGMENT_IMPORT_DISABLE; // need to add check for canWrite
 
             this.enableNew = canWrite;
             this.enableImport = canWrite;
@@ -193,10 +193,10 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
 
         if (selectedRows.length === 0 || this.secAdvisor.isGuest || !canWrite) {
             this.enableRemove = false;
-            this.removeSegment = this.constService.SEGMENGT_REMOVE_DISABLE;
+            this.removeSegment = this.constService.SEGMENT_REMOVE_DISABLE;
         } else {
             this.enableRemove = true;
-            this.removeSegment = this.constService.SEGMENGT_REMOVE;
+            this.removeSegment = this.constService.SEGMENT_REMOVE;
         }
     }
 
