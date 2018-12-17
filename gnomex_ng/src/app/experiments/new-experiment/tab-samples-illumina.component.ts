@@ -19,13 +19,24 @@ import {BehaviorSubject} from "rxjs";
     selector: "tabSamplesView",
     templateUrl: "./tab-samples-illumina.component.html",
     styles: [`
-        .tooltip-line-break {
+        
+        
+        .horizontal-spacer {
+            height: 80%;
+            width: 2px;
+            background-color: lightgrey;
+        }
+        
+        .allow-line-breaks {
             white-space: pre-line;
         }
         .sample-instructions {
             background-color: lightyellow;
-            width: 45%;
-            font-size: 80%;
+            
+            width: 40rem;
+            
+            min-width:  45%;
+            max-width: 100%;
         }
         /*For achieving wrap around column header*/
         ::ng-deep .ag-header-cell-text {
@@ -33,13 +44,33 @@ import {BehaviorSubject} from "rxjs";
             overflow: visible !important;
             white-space: normal !important;
         }
+        
 
     `]
 })
 
 export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
-    public samplesGridColumnDefs: any[];
-    public samplesGridApi: any;
+
+    public readonly BASIC_INSTRUCTIONS: string = ''
+        + '1.  Assign a multiplex group number for each sample in the table below. Samples that are to be sequenced in the same lane should be assigned the same multiplex group number.\n'
+        + '2.  Provide a name for each sample.\n'
+        + '3.  Provide the concentration for each sample if available.\n'
+        + '4.  Type the volume (ul) that will be provided for each sample.\n'
+        + '5.  Specify the number of sequence lanes required for each multiplex group.\n'
+        + '6.  Optional: Annotate the samples using the characteristics that you selected from the Annotations tab.\n'
+        + '7.  Optional: Edit other fields as appropriate.';
+
+    public readonly TOOLTIP_TEXT: string = ''
+        + 'Instructions&#13;\n'
+        + '1. Mandatory: Fill in the following highlighted fields: Multiplex Group #, Sample Name(Max 30 characters)&#13;\n'
+        + '2. Optional: Any annotation characteristic that you selected from the previous screen appears on this screen&#13;\n'
+        + 'as a highlighted column. Please type desired information under the highlighted field with the annotation header.&#13;\n'
+        + '3. After completing all line items, click the \'Next\' button at the bottom of the the page to proceed.&#13;\n'
+        + 'You may also upload a sample sheet. Please see the \'Sample sheet help\' for more help.';
+
+
+    // public samplesGridColumnDefs: any[];
+    // public samplesGridApi: any;
     // public samplesGridRowData: any[] = [];
     public sampleTypes: any[] = [];
     public organisms: any[] = [];
@@ -47,8 +78,11 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
     private isExternal: boolean;
     private hideCCNum: boolean = true;
     private gridColumnApi;
-    private protocol: any;
-    private formControlSet: boolean = false;
+    // private protocol: any;
+    // private formControlSet: boolean = false;
+
+    public showInstructions: boolean = false;
+
 
     constructor(private dictionaryService: DictionaryService,
                 private constService: ConstantsService,
@@ -437,10 +471,10 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
         this.gridColumnApi.setColumnVisible("ccNum", event.checked);
     }
 
-    onSamplesGridReady(params) {
-        this.newExperimentService.samplesGridApi = params.api;
-        this.gridColumnApi = params.columnApi;
-        params.api.setHeaderHeight(50);
+    onSamplesGridReady(event: any) {
+        this.newExperimentService.samplesGridApi = event.api;
+        this.gridColumnApi = event.columnApi;
+        event.api.setHeaderHeight(50);
     }
 
     onSamplesGridRowDataChanged() {
@@ -474,7 +508,6 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 this.newExperimentService.samplesGridApi.redrawRows();
             }
         }
-
     }
 
     upload(): void {
@@ -516,5 +549,10 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
             //
             // callLater(tabSamplesView.checkSamplesCompleteness);
         });
+    }
+
+
+    public onClickShowInstructions(): void {
+        this.showInstructions = !this.showInstructions;
     }
 }

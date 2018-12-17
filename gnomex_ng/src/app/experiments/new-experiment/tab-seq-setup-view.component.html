@@ -79,7 +79,7 @@
                                         </mat-radio-button>
                                     </div>
                                     <div class="td padded right-align">
-                                        <span *ngIf="this.form.get('seqLibPrep').value === 'yes'">
+                                        <span *ngIf="!this.form.get('seqLibPrep').value || this.form.get('seqLibPrep').value !== 'no'">
                                             {{ ('' + appPrice?.price).startsWith('$') ? appPrice?.price : ( appPrice?.price ? '$' + appPrice?.price : '') }}
                                         </span>
                                     </div>

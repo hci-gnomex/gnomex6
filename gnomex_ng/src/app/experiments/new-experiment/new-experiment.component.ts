@@ -1,187 +1,69 @@
 import {
-    Component, ViewChild, ComponentRef, OnDestroy, OnInit, Output, EventEmitter
+    Component, ComponentRef, OnDestroy, OnInit, Output, EventEmitter, ViewChild
 } from '@angular/core';
-import {Form, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {BillingService} from "../../services/billing.service";
-import {GetLabService} from "../../services/get-lab.service";
-import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {ExperimentsService} from "../experiments.service";
-import {URLSearchParams} from "@angular/http";
-import {HttpParams} from "@angular/common/http";
-import {MatAutocomplete} from "@angular/material";
 import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
 import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
 import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
-import {Observable, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import {TabBioinformaticsViewComponent} from "./tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
 import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/internal/operators";
+import {FormGroup} from "@angular/forms";
+import {NewExperimentSetupComponent} from "./new-experiment-setup.component";
 
 @Component({
     selector: 'new-experiment',
     templateUrl: "./new-experiment.component.html",
     styles: [`
-                
-        li { margin-bottom: 0.7em; }
-        
-        ol.three-depth-numbering {
-            padding: 0;
-            margin: 0;
-            list-style-type: none;
-            counter-reset: section; 
-        }
-        ol.three-depth-numbering li {
-            display: flex;
-            flex-direction: row;
-        }
-        ol.three-depth-numbering li::before {
-            counter-increment: section;
-            content: "(" counter(section) ")";
-            padding-right: 0.3em;
-        }
-        ol.three-depth-numbering li ol {
-            padding: 0;
-            margin: 0;
-            list-style-type: none;
-            counter-reset: subsection; 
-        }
-        ol.three-depth-numbering li ol li {
-            display: flex;
-            flex-direction: row;
-        }
-        ol.three-depth-numbering li ol li::before { 
-            counter-increment: subsection;
-            content: "(" counter(section) "." counter(subsection) ")";
-            padding-right: 0.3em;
-        }
-        ol.three-depth-numbering li ol li ol {
-            padding: 0;
-            margin: 0;
-            list-style-type: none;
-            counter-reset: subsubsection; 
-        }
-        ol.three-depth-numbering li ol li ol li {
-            display: flex;
-            flex-direction: row;
-        }
-        ol.three-depth-numbering li ol li ol li::before { 
-            counter-increment: subsubsection;
-            content: "(" counter(section) "." counter(subsection) "." counter(subsubsection) ")";
-            padding-right: 0.3em;
-        }
-        
 
-        .heading {
-            min-width: 20em;
-            padding-right: 2em;
-        }
-        
-        .label-width { 
-            width: 20em;
-            min-width: 20em;
-        }
-        .moderate-width {
-            width: 40em;
-            min-width: 20em;
-        }
-        .long-width {
-            width: 80em;
-            min-width: 40em;
-        }
-
+        .overflow { overflow: auto; }
         
         .bordered { border: 1px solid silver; }
-        
-        .extra-padded { padding: 1em;}
-        
-        .double-padded-left { padding-left: 0.6em; }
-        .major-padding-left { padding-left: 1.0em; }
-        
-        .font-small { font-size: small; }
-        
-        .word-wrap { white-space: pre-line; }
-        
-        .overflow { overflow: auto; }
-
-
-        .mat-radio-container {
-            height: 1em !important;
-            width:  1em !important;
-            padding-top: 0.3em !important;
-            margin-right: 0.3em !important;
-        }
-        
-
-        .instructions {
-            font-style: italic;
-        }
-
-        .link-button {
-            font-size: small;
-            text-decoration: underline;
-            color: blue
-        }
 
     `]
 
 })
 
 export class NewExperimentComponent implements OnDestroy, OnInit {
-    @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
+    @ViewChild("setupTab") setupTab: NewExperimentSetupComponent;
+
     @Output() properties = new EventEmitter<any[]>();
 
     types = OrderType;
 
     public tabs: any[];
     public selectedIndex: number = 0;
-    public currentComponent: any;
+    public currentTabComponent: any;
 
-    private selectedCategory: any;
-    public requestCategories: any[] = [];
-    private filteredProjectList: any[] = [];
-    private authorizedBillingAccounts: any;
-    public appPrices: any[] = [];
     private coreFacility: any;
     private sub: any;
 
-    public label: string = "New Experiment Order for ";
-
     public icon: any;
+    public label: string = "New Experiment Order for ";
+    public numTabs: number;
 
-    private form: FormGroup;
-    private currentIdLab: string;
-    private labList: Array<any>;
-
-    private showAccessAuthorizedAccountsLink: boolean = false;
-    private defaultCodeRequestCategory: any = null;
     private nextButtonIndex: number = -1;
-    private adminState: string;
-    private workAuthInstructions: string;
-    private accessAuthorizedBillingAccountInstructions: string;
-    private workAuthLabel: string;
-    private accessAuthLabel: string;
     private annotations: any;
-    private disableNext: boolean = true;
-    private navigationSubscription: Subscription;
-    private numTabs: number;
     private visibilityDetailObj: VisibilityDetailTabComponent;
-    private showPool: boolean = false;
 
-    public possibleSubmitters: any[] = [];
+    public disableSubmit: boolean = true;
 
-    private submittersSubscription: Subscription;
+    private navigationSubscription: Subscription;
 
     inputs = {
+        lab: null,
         requestCategory: null,
+        idCoreFacility: ''
     };
 
     outputs = {
@@ -191,6 +73,16 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             } else {
                 this.goBack();
             }
+        },
+        onChangeRequestCategory: (value: any) => {
+            if (value) {
+                this.icon = value.icon;
+            }
+
+            if (this.newExperimentService.requestCategory) {
+                this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
+            }
+            this.showTabs();
         }
     };
     annotationInputs = {
@@ -200,90 +92,74 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     };
 
 
-    private possibleSubmitters_loaded: boolean = false;
-    private _showBilling_previousValue: boolean = false;
-
-
-    public get submitter(): any {
-        if (this.form && this.form.get('selectName')) {
-            return this.form.get('selectName').value;
+    public get formOfCurrentlySelectedTab(): FormGroup {
+        if (!this.selectedIndex && this.selectedIndex !== 0) {
+            return null;
         }
 
-        return { };
+        if (this.selectedIndex === 0) {
+            return this.setupTab.form;
+        } else if (this.tabs
+            && Array.isArray(this.tabs)
+            && this.selectedIndex > 0
+            && this.selectedIndex <= this.tabs.length) {
+            if (!this.tabs[this.selectedIndex - 1] || !this.tabs[this.selectedIndex - 1].component) {
+                return null;
+            } else {
+                return this.tabs[this.selectedIndex - 1].instance.form;
+            }
+        } else {
+            return null;
+        }
     }
-    public set submitter(value: any) {
-        if (this.form.get('selectName') && this.form.get('selectName').value) {
-            this.newExperimentService.experimentOwner = this.form.get('selectName').value;
-            this.newExperimentService.request.idAppUser = this.newExperimentService.idAppUser;
-            this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
-            this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
-            this.visibilityDetailObj.currentOrder = this.newExperimentService.request;
-            this.visibilityDetailObj.ngOnInit();
+    public getFormOfTab(index?: number): FormGroup {
+        if (!index && index !== 0) {
+            return this.formOfCurrentlySelectedTab;
         }
 
-        this.selectDefaultUserProject();
+        if (index === 0) {
+            return this.setupTab.form;
+        } else if (this.tabs
+            && Array.isArray(this.tabs)
+            && index >  0
+            && index <= this.tabs.length) {
+            if (!this.tabs[index - 1] || !this.tabs[index - 1].component) {
+                return null;
+            } else {
+                return this.tabs[index - 1].instance.form;
+            }
+        } else {
+            return null;
+        }
     }
 
-
-    public get showLab(): boolean {
-        return !!(this.form && this.form.get("selectedCategory").value)
-            || !this.gnomexService.submitInternalExperiment();
-    }
-    public get showName(): boolean {
-        return this.showLab
-            && this.form
-            && this.form.get('selectLab')
-            && this.form.get('selectLab').valid
-            && !!this.possibleSubmitters
-            && this.possibleSubmitters_loaded === true;
-    }
-    public get showBilling(): boolean {
-
-        let newValue: boolean = this.showName
-            && this.form
-            && this.form.get('selectName')
-            && this.form.get('selectName').valid;
-
-        // If there is only one choice for billing account, automatically select it for the user.
-        if (this.authorizedBillingAccounts
-            && Array.isArray(this.authorizedBillingAccounts)
-            && this.authorizedBillingAccounts.length === 1
-            && this.form.get("selectAccount")
-            && (this._showBilling_previousValue === false && newValue === true)) {
-
-            this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
+    public get index_firstInvalidTab(): number {
+        if (!this.setupTab || !this.setupTab.form) {
+            return -1;
+        }
+        if (this.setupTab.form.invalid) {
+            return 0;
         }
 
-        this._showBilling_previousValue = newValue;
+        let i: number = 1;
+        for (let tab of this.tabs) {
+            if (!tab.instance || !tab.instance.form || tab.instance.form.invalid) {
+                return i;
+            }
+            i++;
+        }
 
-        return newValue;
-    }
-    public get showProject(): boolean {
-        return this.showBilling
-            && this.form
-            && this.form.get('selectAccount')
-            && this.form.get('selectAccount').valid;
-    }
-    public get showExperimentName(): boolean {
-        return this.showProject;
-    }
-    public get showExperimentTextbox(): boolean {
-        return this.showExperimentName;
+        return i; // if all valid returns higher index than in the grid (by one)
     }
 
 
     constructor(private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private router: Router,
-                private fb: FormBuilder,
-                private billingService: BillingService,
-                private getLabService: GetLabService,
-                private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
                 private newExperimentService: NewExperimentService,
                 private experimentService: ExperimentsService,
                 private route: ActivatedRoute,) {
-        // this.router.routeReuseStrategy.shouldReuseRoute = () => false;
         this.navigationSubscription = this.router.events.subscribe((e: any) => {
             // If it is a NavigationEnd event re-initalise the component
             if (e instanceof NavigationEnd) {
@@ -293,56 +169,23 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     reinitialize(): void {
-        if (this.form) {
-            if (this.form.get("selectedCategory")) {
-                this.form.get("selectedCategory").setValue(null);
-            }
-            if (this.form.get("selectLab")) {
-                this.form.get("selectLab").setValue(null);
-            }
-            if (this.form.get("selectName")) {
-                this.form.get("selectName").setValue(null);
-            }
-            if (this.form.get("selectProject")) {
-                this.form.get("selectProject").setValue(null);
-            }
-            if (this.form.get("selectAccount")) {
-                this.form.get("selectAccount").setValue(null);
-            }
-            if (this.form.get("experimentName")) {
-                this.form.get("experimentName").setValue(null);
-            }
-            if (this.form.get("description")) {
-                this.form.get("description").setValue(null);
-            }
-        }
-
-        this.requestCategories = [];
-        this.labList = [];
-        this.possibleSubmitters = [];
-        this.authorizedBillingAccounts = [];
-        this.filteredProjectList = [];
+        // should probably tell all tabs to clear their data!
     }
 
     ngOnInit() {
         this.sub = this.route.params.subscribe((params: any) => {
 
-            this.requestCategories = [];
-            this.newExperimentService.components = [];
-            this.newExperimentService.organisms = [];
-            this.newExperimentService.componentRefs = [];
-            this.newExperimentService.samplesGridRowData = [];
-            this.currentComponent = null;
+            this.currentTabComponent = null;
 
             if (params && params.idCoreFacility) {
                 this.newExperimentService.idCoreFacility = params.idCoreFacility;
+                this.inputs.idCoreFacility = this.newExperimentService.idCoreFacility;
+
                 this.coreFacility = this.dictionaryService.getEntry('hci.gnomex.model.CoreFacility', this.newExperimentService.idCoreFacility);
 
                 if (!!this.coreFacility) {
                     this.label = "New Experiment for " + this.coreFacility.display;
                 }
-
-                this.requestCategories = this.getFilteredRequestCategories().sort(this.sortRequestCategory);
 
                 setTimeout(() => {
                     this.dialogService.startDefaultSpinnerDialog();
@@ -361,36 +204,18 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                         this.addDescriptionFieldToAnnotations(this.newExperimentService.request.PropertyEntries);
                     }
 
-                    // this.newExperimentService.buildPropertiesByUser();
                     this.newExperimentService.propertyEntries = this.newExperimentService.request.PropertyEntries;
-                    this.annotations = this.newExperimentService.request.RequestProperties;
-                    this.annotations = this.annotations.filter(annotation =>
+
+                    this.annotations = this.newExperimentService.request.RequestProperties.filter(annotation =>
                         annotation.isActive === 'Y' && annotation.idCoreFacility === this.newExperimentService.idCoreFacility
                     );
+
                     this.newExperimentService.annotations = this.annotations;
                     this.annotationInputs.annotations = this.annotations;
                 });
 
-                this.labList = this.gnomexService.labList.filter((lab) => {
-                    return lab.canGuestSubmit === 'Y' || lab.canSubmitRequests === 'Y';
-                });
-
-                this.form = this.fb.group({
-                    selectedCategory: ['', Validators.required],
-                    selectLab:        ['', Validators.required],
-                    selectName:       ['', Validators.required],
-                    selectProject:    ['', Validators.required],
-                    selectAccount:    ['', Validators.required],
-                    experimentName:   [''],
-                    description:      ["", Validators.maxLength(5000)]
-                });
-
-                this.filteredProjectList = this.gnomexService.projectList;
-                this.checkSecurity();
                 this.nextButtonIndex = 1;
-                this.currentComponent = this;
-                this.newExperimentService.components.push(this);
-                this.newExperimentService.setupView = this;
+                // this.currentTabComponent = this;
             }
         });
     }
@@ -398,9 +223,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     ngOnDestroy() {
         if (this.navigationSubscription) {
             this.navigationSubscription.unsubscribe();
-        }
-        if (this.submittersSubscription) {
-            this.submittersSubscription.unsubscribe();
         }
     }
 
@@ -418,36 +240,17 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         props.splice(1, 0, descNode);
     }
 
-    onCategoryChange(event) {
-        this.icon = event.value.icon;
-
-        if (this.form && this.form.get("selectedCategory")) {
-            this.newExperimentService.category = this.form.get("selectedCategory").value;
-
-            let code = this.form.get("selectedCategory").value;
-
-            // Special code for CLINSEQ request from BST.
-            if (code == null && this.defaultCodeRequestCategory != null) {
-                code = this.defaultCodeRequestCategory;
-            }
-
-            this.newExperimentService.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', code.value);
-
-            if (this.newExperimentService.requestCategory) {
-                this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
-
-                this.workAuthLabel   = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
-                this.accessAuthLabel = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT);
-            }
-        }
-
-        this.showTabs();
-    }
 
     showTabs() {
         this.tabs = [];
+
         let category = this.newExperimentService.requestCategory;
         this.inputs.requestCategory = category;
+
+        if (!this.newExperimentService.request) {
+            return;
+        }
+
         this.newExperimentService.request.applicationNotes = '';
         this.newExperimentService.request.codeApplication = '';
         this.newExperimentService.request.codeIsolationPrepType = '';
@@ -559,8 +362,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     onTabChange(event) {
-        // event.tab.nextEnabled = true;
-
         if (this.newExperimentService.samplesGridApi) {
             this.newExperimentService.samplesGridApi.sizeColumnsToFit();
             this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
@@ -573,236 +374,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         }
     }
 
-    getFilteredRequestCategories(): any[] {
-        let categories: any[] = [];
-
-        for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-            categories.push(category);
-        }
-
-        categories = categories.filter((category: any) => {
-            return category.isActive === 'Y'
-                && category.isInternal === 'Y'
-                && this.coreFacility
-                && ((category.codeRequestCategory === this.coreFacility.codeRequestCategory)
-                    || ((!!category.isClinicalResearch || category.isClinicalResearch === '')
-                        && category.isClinicalResearch !== 'Y'
-                        && category.idCoreFacility
-                        && category.idCoreFacility === this.coreFacility.idCoreFacility));
-        });
-
-        return categories;
-    }
-
-    public selectLabOption(event: any) {
-        if (event && event.source && event.source.selected == true) {
-            let value = event.source.value;
-            this.filteredProjectList = this.gnomexService.projectList;
-
-            if (!value.idLab) {
-                return;
-            }
-            if (this.currentIdLab !== value.idLab) {
-                this.currentIdLab = value.idLab;
-
-                this.form.get("selectName").setValue("");
-                this.form.markAsPristine();
-
-                this.possibleSubmitters = [];
-                this.possibleSubmitters_loaded = false;
-                if (!this.submittersSubscription) {
-                    this.submittersSubscription = this.getLabService.getSubmittersForLab(value.idLab, 'Y', 'N').subscribe((submitters: any[]) => {
-                        if (submitters) {
-                            this.possibleSubmitters = submitters.filter((a) => {
-                                return a && a.isActive && a.isActive === 'Y';
-                            });
-                            this.possibleSubmitters.sort((a, b) => {
-                                if (!a.displayName && !b.displayName) {
-                                    return 0;
-                                } else if (!a.displayName) {
-                                    return -1;
-                                } else if (!b.displayName) {
-                                    return 1;
-                                } else {
-                                    if (a.displayName === b.displayName) {
-                                        return 0;
-                                    } else if (a.displayName > b.displayName) {
-                                        return 1;
-                                    } else {
-                                        return -1;
-                                    }
-                                }
-                            });
-                            setTimeout(() => {
-                                this.possibleSubmitters_loaded = true;
-                            });
-                        } else {
-                            this.possibleSubmitters = [];
-                            this.possibleSubmitters_loaded = false;
-                        }
-                    });
-                } else {
-                    this.getLabService.getSubmittersForLab(value.idLab, 'Y', 'N');
-                }
-
-                let params: URLSearchParams = new URLSearchParams();
-                params.set("idLab", value.idLab);
-                params.set("includeBillingAccounts", "Y");
-                params.set("includeProductCounts", "N");
-                this.getLabService.getLab(params).subscribe((response: any) => {
-                    if (response && response.Lab && response.Lab.activeSubmitters) {
-                        this.authorizedBillingAccounts = response.Lab.authorizedBillingAccounts;
-                    }
-                    this.filteredProjectList = this.filteredProjectList.filter(project =>
-                        project.idLab === value.idLab
-                    );
-
-                    this.refreshBillingAccounts();
-                });
-            }
-
-            this.newExperimentService.lab = event.source.value;
-            this.newExperimentService.getHiSeqPriceList();
-            this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
-        }
-    }
-
-
-    public displayLab(lab: any) {
-        return lab ? lab.name : lab;
-    }
-
-    public filterLabList(selectedLab: any) {
-        let fLabs: any[];
-
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                fLabs = this.labList.filter((lab) => {
-                    return (lab
-                        && lab.name
-                        && ('' + lab.name).toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                });
-                return fLabs;
-            } else {
-                fLabs = this.labList.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.labList;
-        }
-    }
-
-    refreshBillingAccounts() {
-        this.checkForOtherAccounts();
-        this.newExperimentService.idAppUser = this.securityAdvisor.idAppUser.toString();
-
-        let cat = this.newExperimentService.requestCategory;
-        if (!Array.isArray(this.authorizedBillingAccounts)) {
-            this.authorizedBillingAccounts = [this.authorizedBillingAccounts.BillingAccount];
-        }
-        this.authorizedBillingAccounts = this.authorizedBillingAccounts.filter(account => {
-            return account.overrideFilter === 'Y' || (cat.idCoreFacility && account.idCoreFacility === cat.idCoreFacility);
-        });
-
-        // this.selectDefaultUserProject();
-    }
-
-    checkSecurity(): void {
-        let iCanSubmitToThisCoreFacility: boolean = !!this.gnomexService.coreFacilitiesICanSubmitTo.find((a) => {
-            return this.coreFacility && a.idCoreFacility === this.coreFacility.idCoreFacility;
-        });
-
-        if (this.gnomexService.hasPermission("canWriteAnyObject")) {
-            if (this.gnomexService.submitInternalExperiment()) {
-                this.adminState = "AdminState";
-            } else {
-                this.adminState = "AdminExternalExperimentState";
-            }
-            this.newExperimentService.idAppUser = this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ? this.form.controls['selectName'].value.idAppUser : '';
-
-        } else if (this.gnomexService.hasPermission('canSubmitForOtherCores') && iCanSubmitToThisCoreFacility) {
-            this.adminState = "AdminState";
-            this.newExperimentService.idAppUser = this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ? this.form.controls['selectName'].value.idAppUser : '';
-        } else {
-            if (this.gnomexService.submitInternalExperiment()) {
-                this.adminState = "";
-            } else {
-                this.adminState = "ExternalExperimentState";
-            }
-
-            // Not permissible?
-            // this.newExperimentService.idAppUser = this.securityAdvisor.idAppUser.toString();
-        }
-
-        this.checkForOtherAccounts();
-
-        this.workAuthInstructions = this.gnomexService.getProperty(this.gnomexService.PROPERTY_WORKAUTH_INSTRUCTIONS);
-        this.accessAuthorizedBillingAccountInstructions = this.gnomexService.getProperty(this.gnomexService.PROPERTY_AUTH_ACCOUNTS_DESCRIPTION);
-
-    }
-
-    checkForOtherAccounts(): void {
-        if (this.securityAdvisor.isAdmin || this.securityAdvisor.isBillingAdmin || this.securityAdvisor.isSuperAdmin) {
-            this.showAccessAuthorizedAccountsLink = true;
-            let authorizedBillingAccountsParams: HttpParams = new HttpParams().set("idCoreFacility", this.newExperimentService.idCoreFacility);
-
-            this.billingService.getAuthorizedBillingAccounts(authorizedBillingAccountsParams).subscribe((response: any) => {
-                this.showAccessAuthorizedAccountsLink = response && response.hasAccountsWithinCore && response.hasAccountsWithinCore === 'Y';
-            });
-        } else if (this.newExperimentService.idAppUser != null && this.newExperimentService.idAppUser != '') {
-            let idCoreFacility: string = this.newExperimentService.idCoreFacility;
-        }
-
-    }
-
-
-    chooseFirstLabOption(): void {
-        this.autoLabComplete.options.first.select();
-    }
-
-    onProjectSelection(event) {
-    }
-
-    onBillingSelection(event) {
-        this.newExperimentService.billingAccount = this.form.get("selectAccount").value;
-        this.disableNext = false;
-        this.getFilteredApps();
-    }
-
-    getFilteredApps() {
-        // this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
-        this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);
-    }
-
-    public selectDefaultUserProject(): void {
-        // Default the project dropdown to the the project owned by the user
-        // if (!this.securityAdvisor.isAdmin && !this.securityAdvisor.isSuperAdmin) {
-            this.form.controls['selectName'].setErrors(null);
-            if (this.newExperimentService.idAppUser != null) {
-                for (let project of this.filteredProjectList) {
-                    if (this.form.controls['selectName'].value
-                        && this.form.controls['selectName'].value.idAppUser === project.idAppUser) {
-
-                        this.form.get('selectProject').setValue(project);
-                        this.newExperimentService.project = this.form.get('selectProject').value;
-                        break;
-                    }
-                }
-            }
-        // } else {
-        //     this.form.get('selectProject').setValue(this.filteredProjectList[0]);
-        //     this.newExperimentService.project = this.form.get('selectProject').value;
-        // }
-
-        if (this.newExperimentService.project) {
-            this.newExperimentService.request.idProject = this.newExperimentService.project.idProject;
-        }
-    }
-
     goBack() {
         this.selectedIndex--;
-        this.currentComponent = this.newExperimentService.components[this.selectedIndex]
+        this.currentTabComponent = this.newExperimentService.components[this.selectedIndex]
     }
 
     goNext() {
@@ -827,7 +401,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     this.tabs[8].disabled = false;
                 } else if (this.selectedIndex === 8) {
                     this.newExperimentService.hideSubmit = false;
-                    this.newExperimentService.disableSubmit = true;
+                    this.disableSubmit = true;
                 }
                 break;
             }
@@ -839,17 +413,17 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
         }
         this.selectedIndex++;
-        this.currentComponent = this.newExperimentService.components[this.selectedIndex];
+        this.currentTabComponent = this.newExperimentService.components[this.selectedIndex];
 
-        // TODO: revisit
-        // was getting error
-        if (this.currentComponent.form) {
-            this.currentComponent.form.markAsPristine();
-        }
-
-        Object.keys(this.form.controls).forEach((key: string) => {
-            this.form.controls[key].markAsPristine();
-        });
+        // // TODO: revisit
+        // // was getting error
+        // if (this.currentTabComponent.form) {
+        //     this.currentTabComponent.form.markAsPristine();
+        // }
+        //
+        // Object.keys(this.form.controls).forEach((key: string) => {
+        //     this.form.controls[key].markAsPristine();
+        // });
     }
 
     destroyComponents() {
@@ -870,50 +444,25 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             } else if (compRef.instance instanceof TabSampleSetupViewComponent) {
             }
             this.newExperimentService.componentRefs.push(compRef);
-        }
-    }
 
-    sortRequestCategory(obj1: any, obj2: any): number {
-        if (obj1 === null && obj2 === null) {
-            return 0;
-        } else if (obj1 == null) {
-            return 1;
-        } else if (obj2 == null) {
-            return -1;
-        } else {
-            let idCore1: number = obj1.idCoreFacility === "" ? 999 : obj1.idCoreFacility;
-            let idCore2: number = obj2.idCoreFacility === "" ? 999 : obj2.idCoreFacility;
-
-            let sortOrder1: number = obj1.sortOrder === "" ? 999 : obj1.sortOrder;
-            let sortOrder2: number = obj2.sortOrder === "" ? 999 : obj2.sortOrder;
-
-            let display1: string = obj1.display;
-            let display2: string = obj2.display;
-
-            if (idCore1 < idCore2) {
-                return -1;
-            } else if (idCore1 > idCore2) {
-                return 1;
-            } else {
-                if (sortOrder1 < sortOrder2) {
-                    return -1;
-                } else if (sortOrder1 > sortOrder2) {
-                    return 1;
-                } else {
-                    if (display1 < display2) {
-                        return -1;
-                    } else if (display1 > display2) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
+            for (let tab of this.tabs) {
+                if (compRef.instance instanceof tab.component) {
+                    tab.instance = compRef.instance;
                 }
             }
-
         }
     }
 
+    public onChangeLab(event: any): void {
+        this.inputs.lab = event;
+    }
+
+
     public clickCancel(): void {
+        console.log("Cancel clicked!");
+    }
+
+    public onClickDebug() {
         console.log("Cancel clicked!");
     }
 }
