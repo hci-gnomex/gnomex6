@@ -50,6 +50,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 
     public fileCount: number = 0;
     public getAnalysisDownloadListResult: any;
+    private analysis:any;
 
     constructor(public constantsService: ConstantsService,
                 private analysisService: AnalysisService,
@@ -94,6 +95,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             this.fileCount = 0;
             this.getAnalysisDownloadListResult = null;
             if(data && data.analysis && data.analysis.Analysis){
+                this.analysis = data.analysis.Analysis;
                 this.analysisService.getAnalysisDownloadList(data.analysis.Analysis.idAnalysis).subscribe((result: any) => {
                     if (result && result.Analysis) {
                         this.getAnalysisDownloadListResult = result;
@@ -221,11 +223,10 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         let config: MatDialogConfig = new MatDialogConfig();
         config.panelClass = 'no-padding-dialog';
         config.data = {
-            order: this.getAnalysisDownloadListResult.Analysis,
-            orderDownloadList: "",
+            order: this.analysis,
         };
-        config.height = "30em";
-        config.width = "50em";
+        config.height = "40em";
+        config.width = "55em";
         this.dialog.open(ManageFilesDialogComponent,config);
 
     }

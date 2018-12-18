@@ -50,6 +50,7 @@ import {BrowseOrderValidateService} from "./browse-order-validate.service";
 import {UniqueIdGeneratorService} from "./unique-id-generator.service";
 import {SamplesService} from "./samples.service";
 import {ExperimentPlatformService} from "./experiment-platform.service";
+import {FileService} from "./file.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -109,7 +110,8 @@ import {ExperimentPlatformService} from "./experiment-platform.service";
         UniqueIdGeneratorService,
         SamplesService,
         ExperimentPlatformService,
-        RegisterUserResolverService
+        RegisterUserResolverService,
+        FileService
     ]})
 export class ServicesModule {
 }

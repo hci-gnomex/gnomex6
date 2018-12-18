@@ -211,6 +211,7 @@ public Command execute() throws RollBackCommandException {
 			aNode.addContent(pNode);
 
 			doc.getRootElement().addContent(aNode);
+			Util.setIcons(doc);
 
 			// Append related nodes
 			this.appendRelatedNodes(this.getSecAdvisor(), sess, a, aNode);

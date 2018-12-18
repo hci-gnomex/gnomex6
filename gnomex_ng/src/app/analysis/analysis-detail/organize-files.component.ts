@@ -1,11 +1,8 @@
 
 import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input} from "@angular/core";
 import {Subscription} from "rxjs";
-import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {ActivatedRoute} from "@angular/router";
-import {GridOptions} from "ag-grid-community/main";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
 import {ITreeOptions, TreeComponent} from "angular-tree-component";
@@ -14,10 +11,15 @@ import {ConstantsService} from "../../services/constants.service";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {first} from "rxjs/operators";
 import * as _ from "lodash";
-import {Tree} from "@angular/router/src/utils/tree";
 import {IDTypeDictionary, ITreeNode} from "angular-tree-component/dist/defs/api";
 import {FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../../util/tabs";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
+import {SpinnerDialogComponent} from "../../util/popup/spinner-dialog.component";
+import {NameFileDialogComponent} from "./name-file-dialog.component";
+import {FileService} from "../../services/file.service";
+import {IFileParams} from "../../util/interfaces/file-params.model";
 
 
 
@@ -26,57 +28,25 @@ import {TabChangeEvent} from "../../util/tabs";
     templateUrl:"./organize-files.component.html",
     styles: [`
 
-        mat-radio-group.filter {
-            display: inline-flex;
-            flex-direction: row;
-            margin: 1em;
-            padding-top: 1em;
-        }
-        mat-radio-button.filterOption{
-            margin: 0 5px
-        }
-
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 100%;
-        }
-
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .br-exp-item {
-            flex: 1 1 auto;
-            font-size: small;
-        }
-
-
-
-        .datatracks-panel {
-            height:100%;
-            width:100%;
-            border: #C8C8C8 solid thin;
-            padding: 1em;
+        .no-padding-dialog {
+            padding: 0;
         }
         .truncate{
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .no-overflow  { overflow: hidden; }
 
 
     `]
 })
 export class OrganizeFilesComponent implements OnInit, AfterViewInit{
-    private selectedTreeNodeSubscript: Subscription;
+    private manageFileSubscript: Subscription;
     public currentLab:any;
     public showSpinner:boolean = false;
     public labList:any[] = [];
     public analysis:any;
-    public analysisTreeNode:any;
     public organizeOpts:ITreeOptions;
     public uploadOpts:ITreeOptions;
     public organizeFiles: any[];
@@ -84,7 +54,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     public organizeSelectedNode:ITreeNode;
     public uploadSelectedNode:ITreeNode;
     public formGroup: FormGroup;
-    private defaultOrgOpts: ITreeOptions;
+    public removedChildren:any[] = [];
+    public orgAnalysisFileParams:any;
+    public orgExperimentFileParams:any;
 
 
     private _tabVisible: boolean = false;
@@ -108,39 +80,45 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     private uploadTree: TreeComponent;
 
     @Output() closeDialog = new EventEmitter<TabChangeEvent>();
+    @Input('manageData') data: IFileParams;
 
     public readonly organizeHelp :string =  "Drag uploaded file into one of the folders on the right." +
         "Protected files (red) cannot be moved or deleted.";
 
 
-
-
-
-
-    constructor(private analysisService:AnalysisService, private gnomexService: GnomexService,
-                private orderValidateService: BrowseOrderValidateService,
+    constructor(private analysisService:AnalysisService,
+                private gnomexService: GnomexService,
                 private secAdvisor: CreateSecurityAdvisorService,
+                private fileService: FileService,
                 public constService:ConstantsService,
                 private dialogService: DialogsService,
-                private route:ActivatedRoute, private dictionaryService: DictionaryService ) {
+                private dialog:MatDialog) {
     }
 
     ngOnInit(){
 
-        // rowdata  changes based off of grid selected. default is illumnia or longest array size?
+        this.formGroup = new FormGroup({});
+        this.orgAnalysisFileParams = {
+            idAnalysis:this.data.id.idAnalysis,
+            showUploads:'Y',
+            includeUploadStagingDir:'N',
+            skipUploadStagingDirFiles: 'Y'
+        };
+
 
 
         this.labList = this.gnomexService.labList;
         this.uploadOpts = {
             displayField: 'displayName',
-            allowDrag: (node: any) =>{return node.level === 1},
+            idField:'idTreeNode',
+            allowDrag: (node: any) =>{return node.level === 1 && node.data.PROTECTED === 'N'},
             allowDrop: (element, item: {parent: any, index}) => {
                 return false;
             }
 
         };
 
-        this.defaultOrgOpts = {
+        this.organizeOpts = {
             displayField: 'displayName',
             childrenField: "FileDescriptor",
             useVirtualScroll: true,
@@ -152,100 +130,71 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 return node.level > 1
             },
             allowDrop: (element, item: {parent: any, index}) => {
-                return (item.parent.isRoot || item.parent.data.type === 'dir');
+                let parent = <ITreeNode>item.parent;
+                if((this.organizeTree.treeModel.roots[0].id === parent.id) || parent.data.type === 'dir' ) {
+                    return true;
+                }else{
+                    return false;
+                }
+
+
             }
         };
 
-        this.organizeOpts = _.cloneDeep(this.defaultOrgOpts);
 
-        this.organizeFiles = [
-            {
-                type: "dir",
-                displayName: "is the root",
-                FileDescriptor: [
-                    {
-                        type: "dir",
-                        displayName: "The folder 1",
-                        FileDescriptor : [
-                            {
-                                type: "file",
-                                displayName: "file1a",
-                            },
-                            {
-                                type: "file",
-                                displayName: "file1b",
-                            },
-                            {
-                                type: "dir",
-                                displayName: " folder1 subFolder1",
-                                FileDescriptor : [
-                                    {
-                                        type: "file",
-                                        displayName: "Folder1 SubFolder1 file1a",
-                                        PROTECTED: 'Y'
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        type: "dir",
-                        displayName: "The folder 2",
-                        FileDescriptor : [
-                            {
-                                type: "file",
-                                displayName: "file2a"
-                            },
-                            {
-                                type: "file",
-                                displayName: "file2b"
-                            }
-                        ]
+        this.manageFileSubscript = this.fileService.getAnalysisOrganizeFilesObservable().subscribe( (resp) => {
+            if(resp && Array.isArray(resp)){
+                let respList = (<any[]>resp);
+                respList.map(r =>{
+                    if(r && !r.message){
+                        return r;
+                    }else if(r && r.message ){
+                        return r.message;
                     }
-                ]
+                });
+
+
+                if( (typeof(respList[0]) !== 'string'  && typeof(respList[1]) !== 'string')){
+                    let analysis = respList[0].Analysis;
+                    let analysisDownloadList = respList[1].Analysis;
+
+                    if(analysis && analysisDownloadList){
+                       this.uploadFiles = this.getAnalysisUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
+                       this.organizeFiles = [analysisDownloadList];
+                    }
+                }else{
+                    //this.dialogService.alert()
+                }
+
             }
-        ];
-
-        this.uploadFiles = [
-            {displayName:'test1.txt'},{displayName:'test2.txt'},{displayName:'test3.txt'},{displayName:'test4.txt'},{displayName:'test5.txt'},{displayName:'test6.txt'},{displayName:'test7.txt'},{displayName:'test8.txt'},{displayName:'test9.txt'},{displayName:'test10.txt'},
-            {displayName:'test11.txt'},{displayName:'test12.txt'},{displayName:'test13.txt'},{displayName:'test14.txt'},{displayName:'test15.txt'},{displayName:'test16.txt'},{displayName:'test17.txt'},{displayName:'test18.txt'},{displayNamebel:'test19.txt'},{displayName:'test20.txt'},{displayName:'test21.txt'}
-        ];
-        //this.uploadFiles = [{label:'test1.txt'},{label:'test2.txt'},{label:'test3.txt'},{label:'test4.txt'},{label:'test5.txt'},{label:'test6.txt'},{label:'test7.txt'},{label:'test8.txt'},{label:'test9.txt'},{label:'test10.txt'},{label:'test11.txt'},{label:'test12.txt'},{label:'test13.txt'},{label:'test14.txt'},{label:'test15.txt'},{label:'test16.txt'},{label:'test17.txt'},{label:'test18.txt'},{label:'test19.txt'},{label:'test20.txt'},{label:'test21.txt'}];
-        //console.log("This is value: " + this.isProtected(this.organizeFiles) + "This is the expected value: true ");
-        this.setFileProtected(this.organizeFiles[0]);
-
-        this.buildTree(this.organizeFiles);
-        //let something = this.gnomexService.getTargetNodeList( "FileDescriptor", this.organizeFiles);
-        //console.log(something);
-
-
-
-        this.selectedTreeNodeSubscript = this.analysisService.getAnalysisOverviewListSubject()
-            .subscribe(data =>{
-                this.analysisTreeNode = data;
-            });
-
-
-
-
+        });
+        this.fileService.emitAnalysisOrganizeFiles(this.orgAnalysisFileParams);
 
     }
 
     ngAfterViewInit() {
     }
 
+
+    getAnalysisUploadFiles(analysisUpload:any):any[]{
+        if(analysisUpload && analysisUpload.FileDescriptor){
+            return Array.isArray(analysisUpload.FileDescriptor) ? analysisUpload.FileDescriptor : [analysisUpload.FileDescriptor];
+        }
+        return [];
+    }
+
     onMove(event){
         let nodeEvent = <ITreeNode> event.node;
         let node = this.organizeTree.treeModel.getNodeById(nodeEvent.id);
         let parentNode = this.organizeTree.treeModel.getNodeById(event.to.parent.id);
+        node.data.dirty = 'Y';
         node.focus();
         parentNode.expand();
+        this.formGroup.markAsDirty();
     }
-
 
     // tree methods
     isProtected(root:any, showMessage:boolean = false) : boolean{
-
         let action = false;
         if(root.type == 'dir' && root.PROTECTED === 'Y'){
             if(showMessage){
@@ -259,80 +208,46 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                     + "\' is protected ");
 
             }
-
             action = true;
         }
-
 
         return action;
 
     }
 
-    recurseIsProtected(files:any[]) : boolean {
-        let isProtected: boolean = false;
-        if(files){
-            for(let fObj of files ){
-                let currentProtected = !!(fObj.PROTECTED  && fObj.PROTECTED === 'Y');
-                isProtected = this.recurseIsProtected(fObj.FileDescriptor) || currentProtected;
-                if(isProtected && fObj.type === 'dir'){
-                    fObj.PROTECTED = 'Y';
-                }
+
+    public getChildrenToRemove(file: any): boolean {
+        if (file.PROTECTED && file.type !== "dir") {
+
+            let p = file.PROTECTED === 'Y';
+            if(!p){
+                this.removedChildren.push(file)
             }
-
-
-        }
-
-        return isProtected
-
-
-    }
-
-    public setFileProtected(file: any): boolean {
-        if (file.PROTECTED) {
-            return file.PROTECTED === 'Y';
+            return p;
         }
 
         let isProtected: boolean = false;
         if (file.FileDescriptor) {
             for (let child of file.FileDescriptor) {
-                if (this.setFileProtected(child)) {
+                if (this.getChildrenToRemove(child)) {
                     isProtected = true;
                 }
             }
         }
-        file.PROTECTED = isProtected ? 'Y' : 'N';
+
+        if(file.PROTECTED || file.PROTECTED === 'N') {
+            this.removedChildren.push(file);
+        }
         return isProtected;
     }
 
 
-
-    // tree methods
-    buildTree(root:any){
-        this.recurseBuildTree(root);
-        this.showSpinner = false;
-
-    }
-
-    recurseBuildTree(files:any[]){
-        if(files){
-            for(let fObj of files ){
-
-                if(fObj.type === 'dir'){
-                    fObj.icon = this.constService.ICON_FOLDER;
-                }else{
-                    this.constService.getTreeIcon(fObj,"Request")
-                }
-
-                this.recurseBuildTree(fObj.FileDescriptor);
-            }
-
-
+    uploadTreeOnSelect(event:any){
+        let otherTreeFocusedNode =  this.organizeTree.treeModel.getFocusedNode();
+        if(otherTreeFocusedNode){
+            otherTreeFocusedNode.setIsActive(false);
         }
 
-
-    }
-
-    uploadTreeOnSelect(event:any){
         this.uploadSelectedNode = <ITreeNode>event.node;
     }
     uploadTreeOnUnselect(event:any){
@@ -340,52 +255,160 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
 
     organizeTreeOnSelect(event:any){
+        let otherTreeFocusedNode =  this.uploadTree.treeModel.getFocusedNode();
+        if(otherTreeFocusedNode){
+            otherTreeFocusedNode.setIsActive(false);
+        }
         this.organizeSelectedNode = <ITreeNode>event.node;
 
     }
     organizeTreeOnUnselect(event:any){
         this.organizeSelectedNode = null;
     }
+
+    private renameCallBack = (data) => {
+        if(data){
+            this.organizeSelectedNode.data.displayName = data;
+            this.organizeSelectedNode.data.dirty = 'Y';
+            this.organizeTree.treeModel.update();
+            this.formGroup.markAsDirty()
+        }
+    };
+
+
     addNewFolder(){
         let targetNode = null;
-        if(this.organizeSelectedNode){
+        if(this.organizeSelectedNode){ // selected file
             if(this.organizeSelectedNode.isLeaf && !(this.organizeSelectedNode.data.type === 'dir' )){
                 targetNode = this.organizeSelectedNode.parent.data;
-            }else{
-                targetNode = this.organizeSelectedNode.data
+            }else{ // selected folder
+                targetNode = this.organizeSelectedNode.data;
+                this.organizeSelectedNode.expand();
             }
 
-            let files:any[] = targetNode.FileDescriptor;
-            if(files){
-                files.push({
-                    dirty: 'Y',
-                    key: "X-X-New Folder",
-                    displayName: "New-Folder",
-                    type: "dir",
-                    qualifiedFilePath: "",
-                    isEmpty: 'Y',
-                    PROTECTED: this.isProtected(targetNode) ? 'Y' : 'N',
-                    info: ""
+            this.openRenameDialog("Add Folder", "FolderName",(data) =>{
+                if(data){
+                    let displayName = data;
+                    let files:any[] = targetNode.FileDescriptor;
+                    if(files){
+                        files.push({
+                            dirty: 'Y',
+                            key: "X-X-"+displayName,
+                            displayName: displayName,
+                            type: "dir",
+                            qualifiedFilePath: "",
+                            isEmpty: 'Y',
+                            icon: this.constService.ICON_FOLDER_DISABLE,
+                            PROTECTED: this.isProtected(targetNode) ? 'Y' : 'N',
+                            info: ""
 
-                });
-                this.organizeTree.treeModel.update();
-            }
+                        });
+                        this.organizeTree.treeModel.update();
+                        this.formGroup.markAsDirty();
+                    }
+                }
+            }, this.constService.ICON_FOLDER_ADD);
+        }
+    }
+
+    remove(treeRemovedFrom:string, node:ITreeNode){
+        let id:any = '';
+        let parentNode: ITreeNode = node.parent;
+        let tree:TreeComponent = null;
+        let children: any[] = [];
+
+        if(treeRemovedFrom === 'organize'){
+            id = this.organizeSelectedNode.id;
+            tree = this.organizeTree;
+            children = <any[]>parentNode.data.FileDescriptor;
+        }else {
+            id = this.uploadSelectedNode.id;
+            tree = this.uploadTree;
+            children = <any[]>parentNode.data.children
         }
 
-    }
-    remove(){
-        if(this.organizeSelectedNode){
-            let id = this.organizeSelectedNode.id;
-            let parentNode = this.organizeSelectedNode.parent;
-            let children: any[] = <any[]>parentNode.data.FileDescriptor;
 
-            if(!this.isProtected(this.organizeSelectedNode.data,true)){
+        if(!this.isProtected(node.data,true)){
+            this.getChildrenToRemove(node.data);
+
+            if(treeRemovedFrom === 'organize'){
                 parentNode.data.FileDescriptor =  children.filter(c => c.id !== id);
-                this.organizeTree.treeModel.update();
+            }else{
+                this.uploadFiles = children.filter(c => c.idTreeNode !== id);
+            }
+            tree.treeModel.update();
+        }
+        this.uploadSelectedNode = null;
+        this.organizeSelectedNode = null;
+    }
+
+    attemptRemove(){
+        let treeRemovedFrom:string = '';
+        let node:ITreeNode = null;
+
+        if(this.organizeSelectedNode){
+            treeRemovedFrom = 'organize';
+            node = this.organizeSelectedNode;
+        }else if(this.uploadSelectedNode){
+            treeRemovedFrom = 'upload';
+            node = this.uploadSelectedNode;
+        }else{
+            return;
+        }
+
+        if(node.data.hasDataTrack === 'Y'){
+            this.dialogService.confirm("Warning","This file is linked to a data track.  Do you want to remove the file and delete the associated data track?")
+                .pipe(first()).subscribe(answer =>{
+                if(answer) {
+                    this.remove(treeRemovedFrom, node);
+                }
+            });
+        }else{
+            this.remove(treeRemovedFrom, node);
+        }
+
+    }
+
+    openRenameDialog(title:string,placeHolder:string,onClose,imgIcon?:string){
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            imgIcon: imgIcon ? imgIcon : '',
+            title: title,
+            placeHolder: placeHolder
+        };
+
+        config.width = "20em";
+        let dialogRef: MatDialogRef<NameFileDialogComponent>  = this.dialog.open(NameFileDialogComponent,config);
+        if(onClose){
+            dialogRef.afterClosed().subscribe(onClose);
+        }
+
+    }
+
+
+    rename(){
+        if(this.organizeSelectedNode){
+            let p = this.organizeSelectedNode.data.PROTECTED;
+            if( p && p === 'Y'){
+                this.dialogService.alert("Warning: Protected files cannot be renamed.");
+                return;
             }
 
+            let title ="Rename " + this.organizeSelectedNode.data.displayName;
+            this.openRenameDialog(title,'To',this.renameCallBack);
         }
+
     }
+    refresh(){
+        if(this.data.type === 'a'){
+            this.fileService.emitAnalysisOrganizeFiles(this.orgAnalysisFileParams);
+        }else if(this.data.type === 'e'){
+            //TODO
+        }
+
+    }
+
 
     showHelp(){
         this.dialogService.alert(this.organizeHelp);
@@ -396,12 +419,54 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         this.closeDialog.emit();
     }
 
+    disableRename():boolean{
+        let treeSelected: boolean = !!(!this.organizeSelectedNode );
+        let isOrganizeRoot:boolean =  this.organizeSelectedNode ? this.organizeSelectedNode.isRoot : false;
+        return treeSelected || isOrganizeRoot;
+    }
+
+    disableRemove():boolean{
+        let treeSelected: boolean = !!(!this.organizeSelectedNode && !this.uploadSelectedNode);
+        let isOrganizeRoot:boolean =  this.organizeSelectedNode ? this.organizeSelectedNode.isRoot : false;
+        return treeSelected || isOrganizeRoot;
+    }
+    expandFolders(){
+        if(this.organizeSelectedNode){
+            this.organizeSelectedNode.expandAll();
+        }else{
+            this.organizeTree.treeModel.expandAll();
+        }
+    }
+    collapseFolders(){
+        if(this.organizeSelectedNode){
+            this.organizeSelectedNode.collapseAll();
+        }else{
+            this.organizeTree.treeModel.collapseAll();
+        }
+    }
+
+
+
+
+
+
+    save(){
+        this.dialogService.startDefaultSpinnerDialog();
+
+        let params:HttpParams = new HttpParams();
+        params = params.set("filesToRemoveJSONString", JSON.stringify( this.removedChildren));
+        params = params.set("filesJSONString", JSON.stringify(this.organizeFiles));
+
+        //this.fileService.organizeAnalysisUploadFiles("filesXMLString" this.fi);
+
+    }
+
 
 
 
 
     ngOnDestroy():void{
-        this.selectedTreeNodeSubscript.unsubscribe();
+        this.manageFileSubscript.unsubscribe();
     }
 
 }
