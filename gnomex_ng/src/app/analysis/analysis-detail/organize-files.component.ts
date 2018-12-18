@@ -331,10 +331,10 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         if(!this.isProtected(node.data,true)){
             this.getChildrenToRemove(node.data);
 
-            if(parentNode.data.FileDescriptor){
+            if(treeRemovedFrom === 'organize'){
                 parentNode.data.FileDescriptor =  children.filter(c => c.id !== id);
             }else{
-                this.uploadFiles = children.filter(c => c.id !== id);
+                this.uploadFiles = children.filter(c => c.idTreeNode !== id);
             }
             tree.treeModel.update();
         }
