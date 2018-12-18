@@ -20,6 +20,7 @@ import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer
 import {UploadFileModule} from "../../util/upload/upload-file.module";
 import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
 import {OrganizeFilesComponent} from "./organize-files.component";
+import {NameFileDialogComponent} from "./name-file-dialog.component";
 
 
 
@@ -47,10 +48,16 @@ import {OrganizeFilesComponent} from "./organize-files.component";
         AnalysisInfoTabComponent,
         AnalysisFilesTabComponent,
         ManageFilesDialogComponent,
-        OrganizeFilesComponent
+        OrganizeFilesComponent,
+        NameFileDialogComponent
     ],
     providers: [],
-    entryComponents: [LinkToExperimentDialogComponent, ManageFilesDialogComponent, OrganizeFilesComponent],
+    entryComponents: [
+        LinkToExperimentDialogComponent,
+        ManageFilesDialogComponent,
+        OrganizeFilesComponent,
+        NameFileDialogComponent
+    ],
     exports: []
 })
 export class AnalysisDetailModule { }

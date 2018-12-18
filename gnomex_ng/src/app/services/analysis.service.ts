@@ -257,7 +257,9 @@ export class AnalysisService {
             .set("includeUploadStagingDir", "N");
         return this.httpClient.get("/gnomex/GetAnalysisDownloadList.gx", {params: params});
     }
-
+    public getAnalysisDownloadListWithParams(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetAnalysisDownloadList.gx", {params: params});
+    }
 
 
 
