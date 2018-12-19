@@ -20,7 +20,7 @@ public class RequestDownloadFilter extends DetailObject {
   private Integer               idLab;
   private Date                  createDateFrom;
   private Date                  createDateTo;
-  private List                  idRequests;
+  private List<Integer>         idRequests;
   private String                publicExperimentsInOtherGroups;
   private String                isComplete;
   private String                isNotComplete;
@@ -340,9 +340,8 @@ public class RequestDownloadFilter extends DetailObject {
     if (idRequests != null && idRequests.size() > 0) {
       this.addWhereOrAnd();
       queryBuf.append(" req.idRequest in (");
-      for(Iterator i = idRequests.iterator(); i.hasNext();) {
-        Integer idRequest = (Integer)i.next();
-        queryBuf.append(idRequest);
+      for(Iterator<Integer> i = idRequests.iterator(); i.hasNext();) {
+        queryBuf.append(i.next());
         if (i.hasNext()) {
           queryBuf.append(", ");
         }
@@ -562,13 +561,13 @@ public class RequestDownloadFilter extends DetailObject {
 
 
 
-  public List getIdRequests() {
+  public List<Integer> getIdRequests() {
     return idRequests;
   }
 
 
 
-  public void setIdRequests(List idRequests) {
+  public void setIdRequests(List<Integer> idRequests) {
     this.idRequests = idRequests;
   }
 

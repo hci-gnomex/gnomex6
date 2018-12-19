@@ -78,11 +78,22 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 cellRendererFramework: ViewerLinkRenderer, cellRendererParams: {icon: this.constantsService.ICON_IOBIO, clickFunction: this.makeGENELink}},
         ];
         this.getNodeChildDetails = function getItemNodeChildDetails(rowItem) {
+            let children: any[] = [];
             if (rowItem.FileDescriptor) {
+                for (let fd of rowItem.FileDescriptor) {
+                    children.push(fd);
+                }
+            }
+            if (rowItem.AnalysisDownload) {
+                for (let ad of rowItem.AnalysisDownload) {
+                    children.push(ad);
+                }
+            }
+            if (children.length > 0) {
                 return {
                     group: true,
                     expanded: false,
-                    children: rowItem.FileDescriptor,
+                    children: children,
                     key: rowItem.displayName
                 };
             } else {
@@ -129,7 +140,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         this.fileCount = 0;
         if (this.gridApi) {
             this.gridApi.forEachNode((node: RowNode) => {
-                if (node.data.type && node.data.type !== 'dir') {
+                if (node.data.fileSize && node.data.type !== 'dir') {
                     this.fileCount++;
                 }
             });

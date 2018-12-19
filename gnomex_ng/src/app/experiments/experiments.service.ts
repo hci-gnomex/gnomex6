@@ -352,6 +352,12 @@ export class ExperimentsService {
         return this.saveManagerSubject.asObservable();
     }
 
+    public getRequestDownloadList(idRequest: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idRequest", idRequest);
+        return this.httpClient.get("/gnomex/GetRequestDownloadList.gx", {params: params});
+    }
+
 
 
 

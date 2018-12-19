@@ -7,7 +7,6 @@ import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-ren
 import {AgGridModule} from "ag-grid-angular";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {UtilModule} from "../../util/util.module";
-import {TreeModule} from "angular-tree-component";
 import {RelatedDataModule} from "../../util/related-data.module";
 import {
     ExperimentDetailOverviewComponent,
@@ -21,6 +20,7 @@ import {
 import {ExperimentOverviewTabComponent} from "./experiment-overview-tab.component";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-tab.component";
+import {ExperimentFilesTabComponent} from "./experiment-files-tab.component";
 
 
 
@@ -41,7 +41,8 @@ import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-
         ExperimentBioinformaticsTabComponent,
         ExperimentOverviewTabComponent,
         ExperimentDetailOverviewComponent,
-        DescriptionTab
+        DescriptionTab,
+        ExperimentFilesTabComponent,
     ],
     providers: [],
     entryComponents: [
