@@ -923,18 +923,21 @@ export class NewExperimentService {
     }
 
     getHiSeqPriceList() {
-        let appPriceListParams: HttpParams = new HttpParams().set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
+        let appPriceListParams: HttpParams = new HttpParams()
+            .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
             .set("idLab", this.lab.idLab);
+
         this.billingService.getHiSeqRunTypePriceList(appPriceListParams).subscribe((response: any) => {
             this.hiSeqPrices = response;
-            if (Array.isArray(response)) {
-            for (let price of response) {
-                let key: string = price.idNumberSequencingCyclesAllowed;
-                this.priceMap.set(key, price.price);
-            }
-            }
-            this.hiSeqPricesChanged.next(true);
 
+            if (Array.isArray(response)) {
+                for (let price of response) {
+                    let key: string = price.idNumberSequencingCyclesAllowed;
+                    this.priceMap.set(key, price.price);
+                }
+            }
+
+            this.hiSeqPricesChanged.next(true);
         });
 
     }
@@ -942,13 +945,15 @@ export class NewExperimentService {
     public filterPropertiesWithFullProperty(property, sce): boolean {
         let keep: boolean = false;
         let idOrganism: string = null;
+
         if (this.getOrganism() != null) {
             idOrganism = this.getOrganism().idOrganism;
         }
-        if (AnnotationService.isApplicableProperty(property, this.requestCategory, idOrganism, this.codeApplication)) {
-            if (sce.isSelected === 'true' || property.isActive !== 'N') {
-                keep = true;
-            }
+
+        if (AnnotationService.isApplicableProperty(property, this.requestCategory, idOrganism, this.codeApplication)
+            && (sce.isSelected === 'true' || property.isActive !== 'N')) {
+
+            keep = true;
         }
 
         return keep;

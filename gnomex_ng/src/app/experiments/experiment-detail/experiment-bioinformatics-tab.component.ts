@@ -2,6 +2,7 @@ import {Component, Input} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {FormBuilder, FormGroup} from "@angular/forms";
 
 @Component({
     selector: 'experiment-bioinformatics-tab',
@@ -200,6 +201,7 @@ export class ExperimentBioinformaticsTabComponent {
     }
 
     public masterDisabled: boolean = false;
+    public form: FormGroup;
 
     public organismName: string = '';
     public alignToGenomeBuild: string = 'N';
@@ -229,10 +231,12 @@ export class ExperimentBioinformaticsTabComponent {
 
 
     constructor(private dictionaryService: DictionaryService,
+                private formBuilder: FormBuilder,
                 private propertyService: PropertyService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService) {
 
         this.cachedGenomeBuilds =  this.dictionaryService.getEntries('hci.gnomex.model.GenomeBuildLite');
+        this.form = this.formBuilder.group({});
     }
 
 

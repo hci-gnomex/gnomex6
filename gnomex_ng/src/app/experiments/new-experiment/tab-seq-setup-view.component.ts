@@ -106,7 +106,6 @@ export class TabSeqSetupViewComponent implements OnInit {
 
     @Input("lab") set lab(value: any) {
         if (!value || !this.requestCategory) {
-            console.error("Unable to obtain prices on Library Prep screen!");
             return;
         }
 

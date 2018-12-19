@@ -75,6 +75,7 @@ import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina
 import {UploadModule} from "../upload/upload.module";
 import {VisibilityDetailTabComponent} from "../util/visibility-detail-tab.component";
 import {NewExperimentSetupComponent} from "./new-experiment/new-experiment-setup.component";
+import {ExperimentBioinformaticsTabComponent} from "./experiment-detail/experiment-bioinformatics-tab.component";
 
 @NgModule({
     imports: [
@@ -85,6 +86,7 @@ import {NewExperimentSetupComponent} from "./new-experiment/new-experiment-setup
         CommonModule,
         EmailRelatedUsersPopupModule,
         ExpanderModule,
+        ExperimentDetailModule,
         FormsModule,
         InputModule,
         LoaderModule,
@@ -161,6 +163,7 @@ import {NewExperimentSetupComponent} from "./new-experiment/new-experiment-setup
         ReassignExperimentComponent,
         DeleteExperimentComponent,
         CreateProjectLauncherComponent,
+        ExperimentBioinformaticsTabComponent,
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
         TabPropertiesViewComponent,

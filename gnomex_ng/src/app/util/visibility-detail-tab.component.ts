@@ -114,6 +114,12 @@ import {first} from "rxjs/operators";
     `]
 })
 export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
+
+    // This getter is needed by the New Experiments process.
+    public get form(): FormGroup {
+        return this.visibilityForm;
+    }
+
     //Override
     public edit = false;
     public visibilityForm: FormGroup;

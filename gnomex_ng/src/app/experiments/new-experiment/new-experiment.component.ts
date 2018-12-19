@@ -20,6 +20,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/internal/operators";
 import {FormGroup} from "@angular/forms";
 import {NewExperimentSetupComponent} from "./new-experiment-setup.component";
+import {ExperimentBioinformaticsTabComponent} from "../experiment-detail/experiment-bioinformatics-tab.component";
 
 @Component({
     selector: 'new-experiment',
@@ -63,7 +64,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     inputs = {
         lab: null,
         requestCategory: null,
-        idCoreFacility: ''
+        idCoreFacility: '',
+        experiment: {}
     };
 
     outputs = {
@@ -301,7 +303,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             let bioTab = {
                 label: "Bioinformatics",
                 disabled: true,
-                component: TabBioinformaticsViewComponent
+                // component: TabBioinformaticsViewComponent
+                component: ExperimentBioinformaticsTabComponent
             };
             let confirmTab = {
                 label: "Confirm",

@@ -3,7 +3,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {OrderType} from "../../util/annotation-tab.component";
 import {ConstantsService} from "../../services/constants.service";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {SamplesService} from "../../services/samples.service";
@@ -68,18 +68,11 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
         + '3. After completing all line items, click the \'Next\' button at the bottom of the the page to proceed.&#13;\n'
         + 'You may also upload a sample sheet. Please see the \'Sample sheet help\' for more help.';
 
-
-    // public samplesGridColumnDefs: any[];
-    // public samplesGridApi: any;
-    // public samplesGridRowData: any[] = [];
     public sampleTypes: any[] = [];
     public organisms: any[] = [];
     public form: FormGroup;
-    private isExternal: boolean;
     private hideCCNum: boolean = true;
     private gridColumnApi;
-    // private protocol: any;
-    // private formControlSet: boolean = false;
 
     public showInstructions: boolean = false;
 
@@ -91,11 +84,32 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 private dialog: MatDialog,
                 private samplesService: SamplesService,
                 private newExperimentService: NewExperimentService) {
+
         this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
 
-        this.isExternal = !this.gnomexService.isInternalExperimentSubmission;
+        this.form = this.fb.group({});
+
+        this.form.addControl(
+            'invalidateWithoutSamples',
+            new FormControl('', (control: AbstractControl) => {
+                if (control
+                && control.parent
+                && control.parent.controls
+                && control.parent.controls['gridFormGroup']
+                && control.parent.controls['gridFormGroup'].controls) {
+                    return null;
+                } else {
+                    return { message: 'Grid is not populated yet' };
+                }
+            })
+        );
+
         this.newExperimentService.samplesGridColumnDefs = [
-            {headerName: "", field: "index", width: 50},
+            {
+                headerName: "",
+                field: "index",
+                width: 50
+            },
             {
                 headerName: "Multiplex Group",
                 editable: true,
@@ -104,61 +118,70 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 showFillButton: true,
-                fillGroupAttribute: 'idSample',
-                validators: [Validators.required],
-                errorNameErrorMessageMap: [
-                    {errorName: 'required', errorMessage: 'Multiplex Group required'}
+                fillGroupAttribute: 'frontEndGridGroup',
+                validators: [
+                    Validators.required,
+                    Validators.pattern(/^\d*$/)
                 ],
+                errorNameErrorMessageMap: [
+                    { errorName: 'required', errorMessage: 'Multiplex Group required' },
+                    { errorName: 'pattern',  errorMessage: 'Multiplex Group must be numeric' }
+                ],
+                outerForm: this.form,
+                formName:  "gridFormGroup",
             },
-
-            {headerName: "Sample Name",
+            {
+                headerName: "Sample Name",
                 field: "name",
                 width: 100,
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
-                validators: [Validators.required],
+                validators: [ Validators.required ],
                 errorNameErrorMessageMap: [
-                    {errorName: 'required', errorMessage: 'Sample Name required'}
+                    { errorName: 'required', errorMessage: 'Sample Name required' }
                 ],
-
             },
-            {headerName: "Conc. (ng/ul)",
+            {
+                headerName: "Conc. (ng/ul)",
                 field: "concentration",
                 width: 100,
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 showFillButton: true,
-                fillGroupAttribute: 'idSample'
+                fillGroupAttribute: 'frontEndGridGroup'
             },
-            {headerName: "Vol. (ul)",
+            {
+                headerName: "Vol. (ul)",
                 field: "volumne",
                 width: 100,
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 showFillButton: true,
-                fillGroupAttribute: 'idSample'
+                fillGroupAttribute: 'frontEndGridGroup'
             },
-            {headerName: "CC Number",
+            {
+                headerName: "CC Number",
                 field: "ccNum",
                 width: 50,
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 showFillButton: true,
-                fillGroupAttribute: 'idSample',
+                fillGroupAttribute: 'frontEndGridGroup',
                 hide: this.hideCCNum
             },
-            {headerName: "# Seq Lanes",
+            {
+                headerName: "# Seq Lanes",
                 field: "numberSequencingLanes",
                 width: 100,
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 showFillButton: true,
-                fillGroupAttribute: 'idSample',
+                fillGroupAttribute: 'frontEndGridGroup',
                 headerTooltip: "This is the number of times(1 or greater) that you want to sequence this sample.",
                 cellStyle: {color: 'black', 'background-color': 'LightGreen'}
             },
@@ -190,8 +213,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 validators: [Validators.required],
                 errorNameErrorMessageMap: [
                     {errorName: 'required', errorMessage: 'Multiplex Group required'}
-                ],
-
+                ]
             },
             {
                 headerName: "Seq Lib Protocol",
@@ -202,8 +224,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 cellEditorFramework: SelectEditor,
                 selectOptions: this.gnomexService.seqLibProtocolsWithAppFilters,
                 selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idSeqLibProtocol",
-
+                selectOptionsValueField: "idSeqLibProtocol"
             },
             {
                 headerName: "Index Tag A",
@@ -221,7 +242,8 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                     {errorName: 'required', errorMessage: 'Index Tag A required'}
                 ],
             },
-            {headerName: "Index Tag Sequence A",
+            {
+                headerName: "Index Tag Sequence A",
                 field: "barcodeSequence",
                 width: 100,
                 editable: false,
@@ -238,15 +260,13 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 selectOptionsValueField: "idOligoBarcodeB",
                 indexTagLetter: 'B'
             },
-            {headerName: "Index Tag Sequence B",
+            {
+                headerName: "Index Tag Sequence B",
                 field: "barcodeSequenceB",
                 width: 100,
                 editable: false,
-            },
-
+            }
         ];
-        this.form = this.fb.group({})
-
     }
 
     ngOnInit() {
@@ -257,7 +277,6 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 }
                 if (this.newExperimentService.numSamples > 0) {
                     this.buildInitialRows();
-                    this.newExperimentService.samplesGridApi.formGroup = this.form;
                 }
             }
             if (this.newExperimentService.samplesGridApi && this.newExperimentService.numSamples) {
@@ -306,9 +325,8 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
     }
 
     showHideColumns() {
-        this.isExternal = !this.gnomexService.isInternalExperimentSubmission;
         let hideSampleTypeOnExternalExperiment: boolean = false;
-        if (this.isExternal && this.gnomexService.getProperty(this.gnomexService.PROPERTY_HIDE_SAMPLETYPE_ON_EXTERNAL_EXPERIMENT) === "Y") {
+        if (!this.gnomexService.isInternalExperimentSubmission && this.gnomexService.getProperty(this.gnomexService.PROPERTY_HIDE_SAMPLETYPE_ON_EXTERNAL_EXPERIMENT) === "Y") {
             hideSampleTypeOnExternalExperiment = true;
         }
     }
@@ -323,12 +341,6 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 node.data.idOrganism = this.newExperimentService.organism.idOrganism;
             });
             this.newExperimentService.samplesGridApi.redrawRows();
-            // if (!this.formControlSet) {
-            //     setTimeout(() => {
-            //         this.form.addControl("sample form", this.newExperimentService.samplesGridApi.formGroup);
-            //         this.formControlSet = true;
-            //     });
-            // }
         }
         this.newExperimentService.sampleOrganisms.add(this.newExperimentService.organism);
     }
@@ -425,19 +437,18 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                         idOrganism: idOrganism,
                         prepInstructions: '',
                         otherOrganism: '',
-                        treatment: ''
-
+                        treatment: '',
+                        frontEndGridGroup: 0
                     };
                     this.newExperimentService.samplesGridRowData.push(obj);
                 }
             } else if (index < 0) {
                 this.newExperimentService.samplesGridRowData.splice(-1, Math.abs(index));
             }
-            // this.newExperimentService.sampleOrganisms.add(this.newExperimentService.organism);
+
             this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
             this.newExperimentService.samplesGridApi.setRowData(this.newExperimentService.samplesGridRowData);
             this.newExperimentService.samplesGridApi.sizeColumnsToFit();
-            // this.newExperimentService.samplesChanged.next(true);
             this.newExperimentService.samplesView = this;
         }
     }
@@ -469,23 +480,13 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
 
     toggleCC(event) {
         this.gridColumnApi.setColumnVisible("ccNum", event.checked);
+        this.form.get('invalidateWithoutSamples').setValue(true);
     }
 
     onSamplesGridReady(event: any) {
         this.newExperimentService.samplesGridApi = event.api;
         this.gridColumnApi = event.columnApi;
         event.api.setHeaderHeight(50);
-    }
-
-    onSamplesGridRowDataChanged() {
-    }
-
-    onEverythingChanged(event) {
-        // this.newExperimentService.samplesGridApi.sizeColumnsToFit();
-        // this.newExperimentService.samplesGridApi.setRowData(this.newExperimentService.samplesGridRowData);
-    }
-
-    onSamplesGridRowSelected() {
     }
 
     onCellValueChanged(event) {
@@ -525,29 +526,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
         let dialogRef = this.dialog.open(UploadSampleSheetComponent, config);
 
         dialogRef.afterClosed().subscribe((result) => {
-
-            // finish putting the new data into the grid
             this.newExperimentService.samplesGridApi.refreshCells();
-            // this.newExperimentService.samplesGridApi.setRowData(result);
-
-            // TODO
-            //// This stuff needs to be handled when the result comes back.
-            //// Compare to UploadSampleSheetsView.mxml end of clickPopulateFieldsButtonAfterWarning()
-
-            // if (tabSamplesView.hasPlates() && samplesViewState != 'IScanState') {
-            //     tabSamplesView.fillPlates();
-            // }
-            // if ( samplesViewState == 'IScanState'){
-            //     tabSamplesView.initializeSamplesGrid();
-            // }
-            //
-            // tabSamplesView.propagateBarcode();
-            // sampleGridDataRows.refresh();
-            // if(sampleGroupingCollection != null) {
-            //     sampleGroupingCollection.refresh(false);
-            // }
-            //
-            // callLater(tabSamplesView.checkSamplesCompleteness);
         });
     }
 
