@@ -6,7 +6,7 @@ import * as _ from "lodash";
 import {ConstantsService} from "../../services/constants.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {PropertyService} from "../../services/property.service";
-import {IFileParams} from "../../util/interfaces/file-params.model";
+import {IFileParams} from "../interfaces/file-params.model";
 
 
 

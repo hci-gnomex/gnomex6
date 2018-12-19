@@ -6,18 +6,21 @@ import hci.framework.model.DetailObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import hci.gnomex.constants.Constants;
-import org.jdom.Document;
-import org.jdom.Element;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 
 public class AnalysisFileDescriptorUploadParser extends DetailObject implements Serializable {
 
-    protected Document doc;
+    protected JsonArray filesToRemove;
+    protected JsonObject files;
+
     protected Map fileNameMap = new LinkedHashMap();
     protected List newDirectoryNames = new ArrayList();
     protected Map fileIdMap = new LinkedHashMap();
@@ -25,37 +28,31 @@ public class AnalysisFileDescriptorUploadParser extends DetailObject implements 
     protected Map filesToRename = new LinkedHashMap();
     protected Map childrenToMoveMap = new LinkedHashMap();
 
-    public AnalysisFileDescriptorUploadParser(Document doc) {
-        this.doc = doc;
+    public AnalysisFileDescriptorUploadParser(JsonArray filesToRemove) {
+        this.filesToRemove = filesToRemove;
 
     }
+    public AnalysisFileDescriptorUploadParser(JsonObject files) {
+        this.files = files;
+
+    }
+
 
     public void parse() throws Exception {
 
-        Element root = this.doc.getRootElement();
-
-        if (root.getName().equals("Analysis")) {
-            recurseDirectories(root, null);
-        } else {
-            // ignore the outermost tags
-            for (Iterator i = root.getChildren("Analysis").iterator(); i.hasNext(); ) {
-                Element node = (Element) i.next();
-                recurseDirectories(node, null);
-            }
-        }
+        JsonObject root = this.files;
+        recurseDirectories(root, null);
     }
 
-    private void recurseDirectories(Element folderNode, String parentDir) {
+    private void recurseDirectories(JsonObject folderNode, String parentDir) {
 
         String directoryName = null;
 
-        if (folderNode.getName().equals("Analysis")) {
-            String[] fileParts = folderNode.getAttributeValue("key").split("-");
+        if (parentDir == null && folderNode.get("key") != null) {
+            String[] fileParts = folderNode.getString("key").split("-");
             directoryName = fileParts[2];
-        } else {
-            if (folderNode.getAttributeValue("type") != null && folderNode.getAttributeValue("type").equals("dir")) {
-                directoryName = folderNode.getAttributeValue("displayName");
-            }
+        } else if(folderNode.get("type") != null && folderNode.getString("type").equals("dir")) {
+                directoryName = folderNode.getString("displayName");
         }
 
         if (directoryName == null) {
@@ -65,23 +62,24 @@ public class AnalysisFileDescriptorUploadParser extends DetailObject implements 
         // Create the folderNode's folder if needed
         String qualifiedDir = parentDir != null ? parentDir + Constants.FILE_SEPARATOR + directoryName : directoryName;
 
-        if (folderNode.getAttributeValue("isNew") != null && folderNode.getAttributeValue("isNew").equals("Y")) {
+        if (folderNode.get("isNew") != null && folderNode.getString("isNew").equals("Y")) {
                 newDirectoryNames.add(qualifiedDir);
         }
 
+        JsonArray fileDescriptors = folderNode.get("FileDescriptor") != null ? folderNode.getJsonArray("FileDescriptor") : Json.createArrayBuilder().build();
 
-        for (Iterator i1 = folderNode.getChildren("FileDescriptor").iterator(); i1.hasNext(); ) {
-            Element childFileNode = (Element) i1.next();
-            String fileName = childFileNode.getAttributeValue("fileName");
-            String displayName = childFileNode.getAttributeValue("displayName");
+        for (int i = 0; i < fileDescriptors.size(); i++ ) {
+            JsonObject childFile =  fileDescriptors.getJsonObject(i);
+            String fileName = childFile.get("fileName") != null ? childFile.getString("fileName") : "" ;
+            String displayName = childFile.get("displayName") != null ? childFile.getString("displayName") : "" ;
             if (fileName == null) {
                 continue;
             }
             fileName = fileName.replace("\\", Constants.FILE_SEPARATOR);
             String newFileName = fileName.replace(fileName.substring(fileName.lastIndexOf(Constants.FILE_SEPARATOR) + 1), displayName);
-            String fileIdString = childFileNode.getAttributeValue("idAnalysisFileString");
-            String qualifiedFilePath = childFileNode.getAttributeValue("qualifiedFilePath");
-            String isProtected = childFileNode.getAttributeValue("PROTECTED");
+            String fileIdString = childFile.get("idAnalysisFileString") != null ? childFile.getString("idAnalysisFileString") : "" ;
+            String qualifiedFilePath = childFile.get("qualifiedFilePath") != null ? childFile.getString("qualifiedFilePath") : "" ;
+            String isProtected = childFile.get("PROTECTED") != null ? childFile.getString("PROTECTED") : "" ;
 
             // just in case the front end let something through it shouldn't have
             if (isProtected == null || isProtected.equalsIgnoreCase("Y")) {
@@ -92,28 +90,28 @@ public class AnalysisFileDescriptorUploadParser extends DetailObject implements 
             if (!newFileName.equals(fileName) && !fileName.equals("")) {
                 // these are files that were explicitly renamed
                 filesToRename.put(fileName, contents);
-                if (childFileNode.getAttributeValue("type").equals("dir")) {
-                    renameDirectoryChildren(childFileNode, newFileName);
+                if (childFile.get("type") != null && childFile.getString("type").equals("dir")) {
+                    renameDirectoryChildren(childFile, newFileName);
                 }
             }
 
-            String childFileIdString = childFileNode.getAttributeValue("idAnalysisFileString");
+            String childFileIdString = childFile.get("idAnalysisFileString") != null ? childFile.getString("idAnalysisFileString") : "" ;
 
             // Ignore new directories here.
-            if (childFileNode.getAttributeValue("isNew") != null && childFileNode.getAttributeValue("isNew").equals("Y")) {
+            if (childFile.get("isNew") != null && childFile.getString("isNew").equals("Y")) {
                 continue;
             }
 
-            String childFileName = childFileNode.getAttributeValue("fileName");
+            String childFileName = childFile.get("fileName") != null ? childFile.getString("fileName") : "" ;
             if (childFileName.equals("")) {
-                newDirectoryNames.add(qualifiedDir + Constants.FILE_SEPARATOR + childFileNode.getAttributeValue("displayName"));
+                newDirectoryNames.add(qualifiedDir + Constants.FILE_SEPARATOR + displayName);
                 continue;
             }
 
             // 03/22/2017 tim -- I see no need to add anything to fileIdMap or fileNameMap if there isn't any changes to the file
             //                   If it wasn't renamed or moved somewhere we are just wasting time
 
-            if (childFileNode.getAttributeValue("type") != null && !childFileNode.getAttributeValue("type").equals("dir")) {
+            if (childFile.get("type") != null && !childFile.getString("type").equals("dir")) {
                 fileIdMap.put(childFileName, childFileIdString);
             }
 
@@ -130,8 +128,8 @@ public class AnalysisFileDescriptorUploadParser extends DetailObject implements 
         } // end of for
 
 
-        for (Iterator i = folderNode.getChildren("FileDescriptor").iterator(); i.hasNext(); ) {
-            Element childFolderNode = (Element) i.next();
+        for (int i = 0; i < fileDescriptors.size(); i++  ) {
+            JsonObject childFolderNode = fileDescriptors.getJsonObject(i);
             recurseDirectories(childFolderNode, qualifiedDir);
         }
 
@@ -142,14 +140,17 @@ public class AnalysisFileDescriptorUploadParser extends DetailObject implements 
         return newDirectoryNames;
     }
 
-    private void renameDirectoryChildren(Element childFileNode, String newName) {
-        for (Element e : (List<Element>) childFileNode.getChildren()) {
-            String displayName = e.getAttributeValue("displayName");
-            String fileName = e.getAttributeValue("fileName").replace("\\", Constants.FILE_SEPARATOR);
+    private void renameDirectoryChildren(JsonObject fileNode, String newName) {
+        JsonArray childrenFiles =  fileNode.get("FileDescriptor") != null ? fileNode.getJsonArray("FileDescriptor") : Json.createArrayBuilder().build();
+        for (int i = 0; i < childrenFiles.size(); i++) {
+            JsonObject cf = childrenFiles.getJsonObject(i);
+
+            String displayName = cf.get("displayName") != null ? cf.getString("displayName") : "";
+            String fileName = (cf.get("fileName") != null ? cf.getString("fileName") : "").replace("\\", Constants.FILE_SEPARATOR);
             String newFileName = newName + Constants.FILE_SEPARATOR + displayName;
-            String fileIdString = e.getAttributeValue("idAnalysisFileString");
+            String fileIdString = cf.get("idAnalysisFileString") != null ? cf.getString("idAnalysisFileString") : "";
             String qualifiedFilePath = newName.substring(newName.lastIndexOf(Constants.FILE_SEPARATOR) + 1);
-            String isProtected = e.getAttributeValue("PROTECTED");
+            String isProtected =  cf.get("PROTECTED") != null ? cf.getString("PROTECTED") : "";
             if (isProtected == null || isProtected.equalsIgnoreCase("Y")) {
                 continue;
             }
@@ -158,8 +159,10 @@ public class AnalysisFileDescriptorUploadParser extends DetailObject implements 
 
             childrenToMoveMap.put(fileName, contents);
 
-            if (e.hasChildren()) {
-                renameDirectoryChildren(e, newFileName);
+            JsonArray grandCF = cf.get("FileDescriptor") != null ? cf.getJsonArray("FileDescriptor") : Json.createArrayBuilder().build();
+
+            if (grandCF.size() > 0) {
+                renameDirectoryChildren(cf, newFileName);
             }
         }
 
@@ -167,14 +170,13 @@ public class AnalysisFileDescriptorUploadParser extends DetailObject implements 
 
     public void parseFilesToRemove() throws Exception {
 
-        Element root = this.doc.getRootElement();
-        for (Iterator i = root.getChildren().iterator(); i.hasNext(); ) {
-            Element node = (Element) i.next();
+        for (int i = 0; i < filesToRemove.size(); i++ ) {
+            JsonObject rmFile = filesToRemove.getJsonObject(i);
 
-            String fileIdString = node.getAttributeValue("idAnalysisFileString");
-            String fileName = node.getAttributeValue("fileName");
+            String fileIdString = rmFile.get("idAnalysisFileString") != null ?  rmFile.getString("idAnalysisFileString") : "";
+            String fileName = rmFile.get("fileName") != null ?  rmFile.getString("fileName") : "";
 
-            String isProtected = node.getAttributeValue("PROTECTED");
+            String isProtected = rmFile.get("PROTECTED") != null ?  rmFile.getString("PROTECTED") : "";
             if (isProtected == null || isProtected.equalsIgnoreCase("Y")) {
                 continue;
             }

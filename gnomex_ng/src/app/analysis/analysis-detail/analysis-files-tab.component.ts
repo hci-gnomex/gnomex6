@@ -7,7 +7,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer";
 import {DataTrackService} from "../../services/data-track.service";
 import {HttpParams} from "@angular/common/http";
-import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
+import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 
 @Component({
@@ -238,6 +238,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         };
         config.height = "40em";
         config.width = "55em";
+        config.disableClose = true;
         this.dialog.open(ManageFilesDialogComponent,config);
 
     }
