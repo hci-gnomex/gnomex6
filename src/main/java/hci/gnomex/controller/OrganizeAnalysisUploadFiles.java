@@ -20,15 +20,12 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.*;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serializable {
 
@@ -36,10 +33,8 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
     private static Logger LOG = Logger.getLogger(OrganizeAnalysisUploadFiles.class);
 
     private Integer idAnalysis;
-    private String filesXMLString;
-    private Document filesDoc;
-    private String filesToRemoveXMLString;
-    private Document filesToRemoveDoc;
+    private JsonArray fileToRemoveList;
+    private JsonObject files;
     private AnalysisFileDescriptorUploadParser parser;
     private AnalysisFileDescriptorUploadParser filesToRemoveParser;
 
@@ -56,37 +51,35 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
             this.addInvalidField("idAnalysis", "idAnalysis is required");
         }
 
-        if (request.getParameter("filesXMLString") != null && !request.getParameter("filesXMLString").equals("")) {
-            filesXMLString = "<Files>" + request.getParameter("filesXMLString") + "</Files>";
-//            System.out.println ("[OAUF] filesXMLString: " + filesXMLString);
+        if (request.getParameter("filesJSONString") != null && !request.getParameter("filesJSONString").equals("")) {
+            String fileJSONString = request.getParameter("filesJSONString");
+            if(Util.isParameterNonEmpty(fileJSONString)){
+                try(JsonReader jsonReader = Json.createReader(new StringReader(fileJSONString))){
+                    this.files = jsonReader.readObject();
+                    parser = new AnalysisFileDescriptorUploadParser(this.files);
 
-            StringReader reader = new StringReader(filesXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                filesDoc = sax.build(reader);
-                parser = new AnalysisFileDescriptorUploadParser(filesDoc);
-            } catch (JDOMException je) {
-                this.addInvalidField("FilesLXMLString", "Invalid files xml");
-                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesXMLString", je);
+                }catch (Exception e) {
+                    this.addInvalidField("FilesJSONString", "Invalid files json");
+                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesJSONString", e);
+                }
             }
         }
 
-        if (request.getParameter("filesToRemoveXMLString") != null
-                && !request.getParameter("filesToRemoveXMLString").equals("")) {
-            filesToRemoveXMLString = "<FilesToRemove>" + request.getParameter("filesToRemoveXMLString")
-                    + "</FilesToRemove>";
-//            System.out.println ("[OAUF] filesXMLString: " + filesXMLString);
+        if (request.getParameter("filesToRemoveJSONString") != null
+                && !request.getParameter("filesToRemoveJSONString").equals("")) {
+            String filesToRemoveJSONString =  request.getParameter("filesToRemoveJSONString");
+            if(Util.isParameterNonEmpty(filesToRemoveJSONString)){
+                try(JsonReader jsonReader = Json.createReader(new StringReader(filesToRemoveJSONString))){
+                    this.fileToRemoveList = jsonReader.readArray();
+                    filesToRemoveParser = new AnalysisFileDescriptorUploadParser(this.fileToRemoveList);
 
-            StringReader reader = new StringReader(filesToRemoveXMLString);
+                }catch (Exception e) {
+                    this.addInvalidField("FilesToRemoveJSONString", "Invalid filesToRemove json");
+                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveJSONString", e);
+                }
 
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                filesToRemoveDoc = sax.build(reader);
-                filesToRemoveParser = new AnalysisFileDescriptorUploadParser(filesToRemoveDoc);
-            } catch (JDOMException je) {
-                this.addInvalidField("FilesToRemoveXMLString", "Invalid filesToRemove xml");
-                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveXMLString", je);
             }
+
         }
 
         serverName = request.getServerName();
@@ -97,7 +90,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
 
         List<String> problemFiles = new ArrayList<String>();
         Session sess = null;
-        if (filesXMLString != null) {
+        if (files != null) {
             try {
                 sess = this.getSecAdvisor().getHibernateSession(this.getUsername());
 
@@ -457,12 +450,17 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                     String stagingDirectory = baseDir + Constants.FILE_SEPARATOR + analysis.getNumber() + Constants.FILE_SEPARATOR + Constants.UPLOAD_STAGING_DIR;
                     FileUtil.pruneEmptyDirectories(stagingDirectory);
 
-                    this.xmlResult = "<SUCCESS";
+                    String problemFileWarning = "";
                     if (problemFiles.size() > 0) {
-                        String problemFileWarning = "Warning: Unable to move some files:\n" + Util.listToString(problemFiles, "\n", 5);
-                        this.xmlResult += " warning=" + '"' + problemFileWarning + '"';
+                        problemFileWarning = "Warning: Unable to move some files:\n" + Util.listToString(problemFiles, "\n", 5);
                     }
-                        this.xmlResult += "/>";
+
+                    JsonObjectBuilder valueBuilder = Json.createObjectBuilder().add("result", "SUCCESS");
+                    if(!problemFileWarning.equals("")){
+                        valueBuilder.add("warning", problemFileWarning);
+                    }
+
+                    this.jsonResult = valueBuilder.build().toString();
 //                    System.out.println ("[OAULF] this.xmlResult: " + this.xmlResult);
                     setResponsePage(this.SUCCESS_JSP);
 
@@ -482,7 +480,8 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
 
         } else {
             // only get here if filesXMLString is null
-            this.xmlResult = "<SUCCESS/>";
+            JsonObject value = Json.createObjectBuilder().add("result", "ERROR").build();
+            this.jsonResult = value.toString();
             setResponsePage(this.SUCCESS_JSP);
         }
 

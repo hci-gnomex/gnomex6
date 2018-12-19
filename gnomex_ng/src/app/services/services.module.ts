@@ -51,6 +51,7 @@ import {UniqueIdGeneratorService} from "./unique-id-generator.service";
 import {SamplesService} from "./samples.service";
 import {ExperimentPlatformService} from "./experiment-platform.service";
 import {FileService} from "./file.service";
+import {UploadFileService} from "./upload-file.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -111,7 +112,8 @@ import {FileService} from "./file.service";
         SamplesService,
         ExperimentPlatformService,
         RegisterUserResolverService,
-        FileService
+        FileService,
+        UploadFileService
     ]})
 export class ServicesModule {
 }

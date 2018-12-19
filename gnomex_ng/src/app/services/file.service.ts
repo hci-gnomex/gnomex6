@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {forkJoin, Observable, of} from "rxjs";
 import {Subject} from "rxjs";
 import {URLSearchParams} from "@angular/http";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {flatMap, map} from "rxjs/operators";
 import {ExperimentsService} from "../experiments/experiments.service";
@@ -25,7 +25,7 @@ export class FileService {
 
 
 
-    emitAnalysisOrganizeFiles(params:any): void {
+    emitGetAnalysisOrganizeFiles(params:any): void {
         this.organizeFilesSubject.next(params);
     }
     getAnalysisOrganizeFilesObservable(): Observable<any>{
@@ -45,7 +45,8 @@ export class FileService {
     }
 
     organizeAnalysisUploadFiles(params:HttpParams): Observable<any>{
-        return this.httpClient.post("/gnomex/OrganizeAnalysisUploadFiles",params.toString());
+        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+        return this.httpClient.post("/gnomex/OrganizeAnalysisUploadFiles.gx",params.toString(),{headers: headers});
     }
 
 

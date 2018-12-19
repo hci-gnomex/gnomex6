@@ -2,24 +2,20 @@
 import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input} from "@angular/core";
 import {Subscription} from "rxjs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
 import {ITreeOptions, TreeComponent} from "angular-tree-component";
 import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
-import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {first} from "rxjs/operators";
-import * as _ from "lodash";
-import {IDTypeDictionary, ITreeNode} from "angular-tree-component/dist/defs/api";
+import { ITreeNode} from "angular-tree-component/dist/defs/api";
 import {FormGroup} from "@angular/forms";
-import {TabChangeEvent} from "../../util/tabs";
+import {TabChangeEvent} from "../tabs/index";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
-import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
-import {SpinnerDialogComponent} from "../../util/popup/spinner-dialog.component";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
-import {IFileParams} from "../../util/interfaces/file-params.model";
+import {IFileParams} from "../interfaces/file-params.model";
 
 
 
@@ -143,6 +139,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
 
         this.manageFileSubscript = this.fileService.getAnalysisOrganizeFilesObservable().subscribe( (resp) => {
+            this.dialogService.stopAllSpinnerDialogs();
             if(resp && Array.isArray(resp)){
                 let respList = (<any[]>resp);
                 respList.map(r =>{
@@ -159,8 +156,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                     let analysisDownloadList = respList[1].Analysis;
 
                     if(analysis && analysisDownloadList){
-                       this.uploadFiles = this.getAnalysisUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
-                       this.organizeFiles = [analysisDownloadList];
+                        this.uploadFiles = this.getAnalysisUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
+                        this.organizeFiles = [analysisDownloadList];
                     }
                 }else{
                     //this.dialogService.alert()
@@ -168,7 +165,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
             }
         });
-        this.fileService.emitAnalysisOrganizeFiles(this.orgAnalysisFileParams);
+        this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
 
     }
 
@@ -402,7 +399,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
     refresh(){
         if(this.data.type === 'a'){
-            this.fileService.emitAnalysisOrganizeFiles(this.orgAnalysisFileParams);
+            this.dialogService.startDefaultSpinnerDialog();
+            this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
         }else if(this.data.type === 'e'){
             //TODO
         }
@@ -453,11 +451,32 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     save(){
         this.dialogService.startDefaultSpinnerDialog();
 
-        let params:HttpParams = new HttpParams();
-        params = params.set("filesToRemoveJSONString", JSON.stringify( this.removedChildren));
-        params = params.set("filesJSONString", JSON.stringify(this.organizeFiles));
+        if(this.data.type === 'a'){
+            let params:HttpParams = new HttpParams()
+                .set("filesToRemoveJSONString", JSON.stringify( this.removedChildren))
+                .set("filesJSONString", JSON.stringify(this.organizeFiles[0]))
+                .set("idAnalysis",  this.data.id.idAnalysis)
+                .set("noJSONToXMLConversionNeeded", "Y");
 
-        //this.fileService.organizeAnalysisUploadFiles("filesXMLString" this.fi);
+            this.fileService.organizeAnalysisUploadFiles(params).subscribe(resp => {
+                this.dialogService.stopAllSpinnerDialogs();
+                if(resp && resp.result && resp.result === "SUCCESS"){
+                    if(resp.warning){
+                        this.dialogService.alert(resp.warning);
+                    }
+                    this.formGroup.markAsPristine();
+                    this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
+
+                }else if(resp.message){
+                    this.dialogService.alert(resp.message)
+                }
+            });
+
+        }else{
+            //TODO logic for experiment save
+        }
+
+
 
     }
 

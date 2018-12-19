@@ -39,9 +39,9 @@
                                        [nodes]="uploadFiles"
                                        [options]="uploadOpts">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate">
-                                        <img class="icon" src="{{ node.data.icon }}" height="16" width="16">
-                                        <span [matTooltip]="node.data.displayName"
+                                    <div class="truncate" >
+                                        <img *ngIf="node.data.icon" class="icon" src="{{ node.data.icon }}" height="16" width="16">
+                                        <span  [matTooltip]="node.data.displayName"
                                                 [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }">
                                             {{ node.data.displayName }}
                                         </span>
@@ -68,7 +68,7 @@
                                        [options]="organizeOpts">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
                                     <div class="truncate">
-                                        <img class="icon" src="{{ node.data.icon }}" height="16" width="16">
+                                        <img *ngIf="node.data.icon" class="icon" src="{{ node.data.icon }}" height="16" width="16">
                                         <span [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }" >
                                     {{ node.data.displayName }}
                                 </span>
