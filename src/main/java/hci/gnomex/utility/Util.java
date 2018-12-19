@@ -35,6 +35,34 @@ import static java.lang.Integer.parseInt;
 
 public class Util {
 
+    private static Map<String, String> iconLookupMap = new HashMap<>();
+    static {
+        iconLookupMap.put("Analysis", "assets/map.png");
+        iconLookupMap.put("AnalysisGroup", "assets/folder.png");
+        iconLookupMap.put("AnalysisGroupList", "assets/folder.png");
+        iconLookupMap.put("AnalysisNode", "assets/map.png");
+        iconLookupMap.put("BillingItem", "assets/money.png");
+        iconLookupMap.put("BillingLab", "assets/group.png");
+        iconLookupMap.put("Hybridization", "assets/bullet_red.png");
+        iconLookupMap.put("Item", "assets/bullet_green.png");
+        iconLookupMap.put("Lab", "assets/group.png");
+        iconLookupMap.put("PriceCategory", "assets/folder_money.png");
+        iconLookupMap.put("PriceCriteria", "assets/attach.png");
+        iconLookupMap.put("PriceSheet", "assets/pricesheet.png");
+        iconLookupMap.put("Product", "assets/bullet_green.png");
+        iconLookupMap.put("ProductOrder", "assets/basket.png");
+        iconLookupMap.put("Project", "assets/folder.png");
+        iconLookupMap.put("ProjectRequestList", "assets/folder.png");
+        iconLookupMap.put("Protocol", "assets/brick.png");
+        iconLookupMap.put("Protocols", "assets/folder.png");
+        iconLookupMap.put("ProtocolList", "assets/folder.png");
+        iconLookupMap.put("Request", "assets/flask.png");
+        iconLookupMap.put("RequestCategory", "assets/basket.png");
+        iconLookupMap.put("RequestNode", "assets/flask.png");
+        iconLookupMap.put("SequenceLane", "assets/bullet_green.png");
+        iconLookupMap.put("Status", "assets/folder.png");
+    }
+
     // Parses a comma delimited string where commas are ignored if between quotes.
     public static String[] parseCommaDelimited(String s) {
         if (s == null) {
@@ -619,25 +647,44 @@ public class Util {
     }
 
     private static void setElementIconRecursively(Element node) {
-        String icon = "";
-        if (node.getName().equals("Analysis")) {
-            icon = "assets/map.png";
-        } else if (node.getName().equals("FileDescriptor")) {
-            if (node.getAttributeValue("type") != null && node.getAttributeValue("type").equals("dir")) {
-                if (node.getAttributeValue("isEmpty") != null && node.getAttributeValue("isEmpty").equals("Y")) {
-                    icon = "assets/folder_disable.png";
-                } else {
-                    icon = "assets/folder.png";
+        if (node.getAttributeValue("icon") == null) {
+            String icon = "";
+            if (iconLookupMap.containsKey(node.getName())) {
+                icon = iconLookupMap.get(node.getName());
+            } else {
+                if (node.getName().equals("FileDescriptor")) {
+                    if (node.getAttributeValue("type") != null && node.getAttributeValue("type").equals("dir")) {
+                        if (node.getAttributeValue("isEmpty") != null && node.getAttributeValue("isEmpty").equals("Y")) {
+                            icon = "assets/folder_disable.png";
+                        } else {
+                            icon = "assets/folder.png";
+                        }
+                    } else if (node.getAttributeValue("isSupportedDataTrack") != null && node.getAttributeValue("isSupportedDataTrack").equals("Y")) {
+                        icon = "assets/datatrack.png";
+                    }
+                } else if (node.getName().equals("RequestDownload")) {
+                    if (node.getAttributeValue("isEmpty") != null && node.getAttributeValue("isEmpty").equals("Y")) {
+                        icon = "assets/folder_disable.png";
+                    } else {
+                        icon = "assets/folder.png";
+                    }
+                } else if (node.getName().equals("AnalysisDownload")) {
+                    if (node.getAttributeValue("type") != null && node.getAttributeValue("type").equals("dir")) {
+                        if (node.getAttributeValue("isEmpty") != null && node.getAttributeValue("isEmpty").equals("Y")) {
+                            icon = "assets/folder_disable.png";
+                        } else {
+                            icon = "assets/folder.png";
+                        }
+                    }
                 }
-            } else if (node.getAttributeValue("isSupportedDataTrack") != null && node.getAttributeValue("isSupportedDataTrack").equals("Y")) {
-                icon = "assets/datatrack.png";
+            }
+
+            if (!icon.equals("")) {
+                node.setAttribute("icon", icon);
             }
         }
-        if (!icon.equals("")) {
-            node.setAttribute("icon", icon);
-        }
 
-        for (final Element contentElement : (List<Element>) node.getContent()) {
+        for (final Element contentElement : (List<Element>) node.getChildren()) {
             setElementIconRecursively(contentElement);
         }
     }
@@ -662,7 +709,7 @@ public class Util {
             node.setAttribute("displayColor", color);
         }
 
-        for (final Element contentElement : (List<Element>) node.getContent()) {
+        for (final Element contentElement : (List<Element>) node.getChildren("FileDescriptor")) {
             setFileDescriptorDisplayRecursively(contentElement);
         }
     }
@@ -675,7 +722,7 @@ public class Util {
         final ObjectMapper mapper = new ObjectMapper();
         ObjectNode docNode = mapper.createObjectNode();
         final Element root = doc.getRootElement();
-        for (final Element rootContent : (List<Element>) root.getContent()) {
+        for (final Element rootContent : (List<Element>) root.getChildren()) {
             ObjectNode rootNode = docNode.putObject(rootContent.getName());
             convertXMLElementToObjectNode(mapper, rootContent, rootNode);
         }
@@ -693,7 +740,7 @@ public class Util {
         }
 
         Map<String, List<ObjectNode>> contentMap = new HashMap<>();
-        for (final Element contentElement : (List<Element>) element.getContent()) {
+        for (final Element contentElement : (List<Element>) element.getChildren()) {
             ObjectNode contentNode = convertXMLElementToObjectNode(mapper, contentElement, null);
             if (!contentMap.containsKey(contentElement.getName())) {
                 contentMap.put(contentElement.getName(), new ArrayList<>());
