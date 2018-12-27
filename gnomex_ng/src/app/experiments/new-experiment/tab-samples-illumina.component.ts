@@ -449,7 +449,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
             this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
             this.newExperimentService.samplesGridApi.setRowData(this.newExperimentService.samplesGridRowData);
             this.newExperimentService.samplesGridApi.sizeColumnsToFit();
-            this.newExperimentService.samplesView = this;
+            // this.newExperimentService.samplesView = this;
         }
     }
 

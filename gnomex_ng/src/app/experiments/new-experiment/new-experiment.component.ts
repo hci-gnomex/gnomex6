@@ -262,8 +262,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
         if (category.isIlluminaType === 'Y') {
             this.gnomexService.submitInternalExperiment()
-                ? this.newExperimentService.currentState.next('SolexaBaseState')
-                : this.newExperimentService.currentState.next('SolexaBaseExternalState');
+                ? this.newExperimentService.currentState = 'SolexaBaseState'
+                : this.newExperimentService.currentState = 'SolexaBaseExternalState';
 
             let propertyTab = {
                 label: "Other Details",
@@ -322,8 +322,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.tabs.push(confirmTab);
             this.numTabs = 10;
         } else if (category.type === this.newExperimentService.TYPE_QC) {
-            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('QCState') :
-                this.newExperimentService.currentState.next('QCExternalState');
+            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'QCState' :
+                this.newExperimentService.currentState = 'QCExternalState';
+
             let sampleSetupTab = {
                 label: "Sample Details",
                 disabled: true,
@@ -334,33 +335,34 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 disabled: true,
                 component: VisibilityDetailTabComponent
             };
+
             this.tabs.push(sampleSetupTab);
             this.tabs.push(visibilityTab);
         } else if (category.type === this.newExperimentService.TYPE_GENERIC) {
-            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('GenericState') :
-                this.newExperimentService.currentState.next('GenericExternalState');
+            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'GenericState' :
+                this.newExperimentService.currentState = 'GenericExternalState';
         } else if (category.type === this.newExperimentService.TYPE_CAP_SEQ) {
-            this.newExperimentService.currentState.next("CapSeqState");
+            this.newExperimentService.currentState = "CapSeqState";
         } else if (category.type === this.newExperimentService.TYPE_FRAG_ANAL) {
-            this.newExperimentService.currentState.next("FragAnalState");
+            this.newExperimentService.currentState = "FragAnalState";
         } else if (category.type === this.newExperimentService.TYPE_MIT_SEQ) {
-            this.newExperimentService.currentState.next("MitSeqState");
+            this.newExperimentService.currentState = "MitSeqState";
         } else if (category.type === this.newExperimentService.TYPE_CHERRY_PICK) {
-            this.newExperimentService.currentState.next("CherryPickState");
+            this.newExperimentService.currentState = "CherryPickState";
         } else if (category.type === this.newExperimentService.TYPE_ISCAN) {
-            this.newExperimentService.currentState.next("IScanState");
+            this.newExperimentService.currentState = "IScanState";
         } else if (category.type === this.newExperimentService.TYPE_SEQUENOM) {
-            this.newExperimentService.currentState.next("SequenomState");
+            this.newExperimentService.currentState = "SequenomState";
         } else if (category.type === this.newExperimentService.TYPE_ISOLATION) {
-            this.newExperimentService.currentState.next("IsolationState");
+            this.newExperimentService.currentState = "IsolationState";
         } else if (category.type === this.newExperimentService.TYPE_NANOSTRING) {
-            this.newExperimentService.currentState.next("NanoStringState");
+            this.newExperimentService.currentState = "NanoStringState";
         } else if (category.type === this.newExperimentService.TYPE_CLINICAL_SEQUENOM) {
-            this.newExperimentService.currentState.next("ClinicalSequenomState");
+            this.newExperimentService.currentState = "ClinicalSequenomState";
         } else if (category.type === this.newExperimentService.TYPE_MICROARRAY) {
             this.gnomexService.submitInternalExperiment()
-                ? this.newExperimentService.currentState.next('MicroarrayState')
-                : this.newExperimentService.currentState.next('MicroarrayExternalState');
+                ? this.newExperimentService.currentState = 'MicroarrayState'
+                : this.newExperimentService.currentState = 'MicroarrayExternalState';
         }
     }
 
@@ -383,7 +385,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     goNext() {
-        switch (this.newExperimentService.currentState.value) {
+        switch (this.newExperimentService.currentState) {
             case 'SolexaBaseState' : {
                 if (this.selectedIndex === 0) {
                     this.tabs[0].disabled = false;
@@ -403,7 +405,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 } else if (this.selectedIndex === 7) {
                     this.tabs[8].disabled = false;
                 } else if (this.selectedIndex === 8) {
-                    this.newExperimentService.hideSubmit = false;
+                    // this.newExperimentService.hideSubmit = false;
                     this.disableSubmit = true;
                 }
                 break;
@@ -466,7 +468,15 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     public onClickDebug() {
-        console.log("Cancel clicked!");
+        console.log("Debug clicked!");
+        console.log("Spoofing new experiment!");
+
+        let spoofedExperiment: any = this.newExperimentService.spoofNewExperimentObject();
+        let spoofedProperties: any = { requestProperties: [] };
+
+        this.newExperimentService.saveNewRequest(62962, '$580.00', '', spoofedExperiment, spoofedProperties).subscribe((response: any) => {
+            console.log("SaveRequest returned");
+        });
     }
 }
 

@@ -1,10 +1,8 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {GnomexService} from "../../services/gnomex.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {BillingService} from "../../services/billing.service";
-import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: "tabSeqProtoView",
@@ -91,20 +89,17 @@ import {HttpParams} from "@angular/common/http";
 export class TabSeqProtoViewComponent implements OnInit {
     @Input() requestCategory: any;
 
-    private filteredNumberSequencingCyclesAllowedList: any[] = [];
     private form: FormGroup;
-    private runTypeLabel: string;
-    private priceMap: Map<string, string> = new Map<string, string>();
+    private filteredNumberSequencingCyclesAllowedList: any[] = [];
+    // private runTypeLabel: string;
+    // private priceMap: Map<string, string> = new Map<string, string>();
 
     constructor(private dictionaryService: DictionaryService,
                 private newExperimentService: NewExperimentService,
-                private billingService: BillingService,
-                private gnomexService: GnomexService,
-                private changeRef: ChangeDetectorRef,
-                private fb: FormBuilder) {
-    }
+                // private gnomexService: GnomexService,
+                private fb: FormBuilder) { }
 
-    ngOnInit() {
+    public ngOnInit() {
         this.form = this.fb.group({
             selectedProto: ['', Validators.required],
         });
@@ -115,26 +110,83 @@ export class TabSeqProtoViewComponent implements OnInit {
                 }
 
                 if (this.requestCategory) {
-                    this.filteredNumberSequencingCyclesAllowedList = this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed')
-                        .sort(this.newExperimentService.sortNumberSequencingCyclesAllowed);
-                    this.filteredNumberSequencingCyclesAllowedList = this.newExperimentService.filterNumberSequencingCyclesAllowed(this.filteredNumberSequencingCyclesAllowedList, this.requestCategory);
-                    this.runTypeLabel = this.gnomexService.getRequestCategoryProperty(this.requestCategory.idCoreFacility, this.requestCategory.codeRequestCategory, this.gnomexService.PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD);
+                    // this.filteredNumberSequencingCyclesAllowedList = this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed')
+                    //     .sort(TabSeqProtoViewComponent.sortNumberSequencingCyclesAllowed);
+                    // this.filteredNumberSequencingCyclesAllowedList = TabSeqProtoViewComponent.filterNumberSequencingCyclesAllowed(this.filteredNumberSequencingCyclesAllowedList, this.requestCategory);
+                    this.filteredNumberSequencingCyclesAllowedList = TabSeqProtoViewComponent.filterNumberSequencingCyclesAllowed(
+                        this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed'),
+                        this.requestCategory
+                    ).sort(TabSeqProtoViewComponent.sortNumberSequencingCyclesAllowed);
+
+                    // this.runTypeLabel = this.gnomexService.getRequestCategoryProperty(this.requestCategory.idCoreFacility, this.requestCategory.codeRequestCategory, this.gnomexService.PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD);
                     for (let proto of this.filteredNumberSequencingCyclesAllowedList) {
-                        let price = this.newExperimentService.priceMap.get(proto.idNumberSequencingCyclesAllowed);
-                        proto.price = price;
+                        proto.price = this.newExperimentService.priceMap.get(proto.idNumberSequencingCyclesAllowed);
                     }
                 }
             }
         });
     }
 
-    onProtoChange(event) {
+    public static sortNumberSequencingCyclesAllowed(obj1: any, obj2: any): number {
+        if (obj1 == null && obj2 == null) {
+            return 0;
+        } else if (obj1 == null) {
+            return 1;
+        } else if (obj2 == null) {
+            return -1;
+        } else {
+            if (obj1.value === '') {
+                return -1;
+            } else if (obj2.value === '') {
+                return 1;
+            } else {
+                let isCustom1: String = obj1.isCustom;
+                let isCustom2: String = obj2.isCustom;
+                let numberCycles1: Number = obj1.numberSequencingCyclesDisplay;
+                let numberCycles2: Number = obj2.numberSequencingCyclesDisplay;
+                let sortOrder1: Number = obj1.sortOrder === '' ? -1 : obj1.sortOrder;
+                let sortOrder2: Number = obj2.sortOrder === '' ? -1 : obj2.sortOrder;
+
+                if (isCustom1 < isCustom2) {
+                    return -1;
+                } else if (isCustom1 > isCustom2) {
+                    return 1;
+                } else {
+                    if (sortOrder1 < sortOrder2) {
+                        return -1;
+                    } else if (sortOrder1 > sortOrder2) {
+                        return 1;
+                    } else {
+                        if (numberCycles1 < numberCycles2) {
+                            return -1;
+                        } else if (numberCycles1 > numberCycles2) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static filterNumberSequencingCyclesAllowed(cycles: any[], requestCategory: any): any[] {
+        if (!cycles || !Array.isArray(cycles) || !requestCategory) {
+            return [];
+        }
+
+        let seqCycles: any[] = [];
+
+        for (let cycle of cycles) {
+            if (cycle.value && cycle.codeRequestCategory === requestCategory.codeRequestCategory && cycle.isActive.toString() === 'Y') {
+                seqCycles.push(cycle);
+            }
+        }
+
+        return seqCycles;
+    }
+
+    public onProtoChange() {
         this.newExperimentService.selectedProto = this.form.get("selectedProto").value;
-
     }
-
-    onAppPriceChanged(event) {
-
-    }
-
 }

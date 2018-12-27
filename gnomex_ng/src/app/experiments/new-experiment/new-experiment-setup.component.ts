@@ -563,7 +563,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     onBillingSelection(event) {
         this.newExperimentService.billingAccount = this.form.get("selectAccount").value;
-        this.getFilteredApps();
+        // this.getFilteredApps();
     }
 
     chooseFirstLabOption(): void {
@@ -571,9 +571,9 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
 
-    getFilteredApps() {
-        this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);
-    }
+    // getFilteredApps() {
+    //     this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);
+    // }
 
 
     sortRequestCategory(obj1: any, obj2: any): number {

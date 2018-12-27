@@ -108,7 +108,7 @@ import {AnnotationTabComponent} from "../../util/annotation-tab.component";
 })
 
 export class TabSampleSetupViewComponent implements OnInit {
-    public currentState: string;
+    // public currentState: string;
     @Input() requestCategory: any;
 
     @Output() indexEvent = new EventEmitter<string>();
@@ -139,7 +139,7 @@ export class TabSampleSetupViewComponent implements OnInit {
 
 
     public get showElution(): boolean {
-        return this.newExperimentService.currentState.value !== 'QCState';
+        return this.newExperimentService.currentState !== 'QCState';
     }
 
     constructor(private dictionaryService: DictionaryService,
@@ -176,9 +176,9 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     ngOnInit() {
         this.newExperimentService.organisms = this.gnomexService.activeOrganismList;
-        this.newExperimentService.currentState.subscribe((value) =>{
+        this.newExperimentService.currentState_onChangeObservable.subscribe((value) =>{
             if (value) {
-                this.currentState = value;
+                // this.currentState = value;
                 this.buildSampleTypes();
             }
         });
@@ -186,23 +186,22 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.form.markAsPristine();
     }
 
-    oneCategoryRequired(group: FormGroup): {[s:string ]: boolean} {
-        if (group) {
-            if(group.controls['selectedDna'].value || group.controls['selectedRna'].value) {
-                return null;
-            }
+    oneCategoryRequired(group: FormGroup): { [s:string]: boolean } {
+        if (group && (group.controls['selectedDna'].value || group.controls['selectedRna'].value)) {
+            return null;
         }
-        return {'error': true};
+
+        return { 'error': true };
     }
 
     ngOnChanges() {
         if (this.filteredSampleTypeListDna.length === 0 && this.requestCategory) {
-            this.filteredSampleTypeListDna = this.newExperimentService.filterSampleType("DNA", this.currentState, this.requestCategory)
-                .sort(this.newExperimentService.sortSampleTypes);
+            this.filteredSampleTypeListDna = this.filterSampleType("DNA")
+                .sort(TabSampleSetupViewComponent.sortSampleTypes);
         }
         if (this.filteredSampleTypeListRna.length === 0 && this.requestCategory) {
-            this.filteredSampleTypeListRna = this.newExperimentService.filterSampleType("RNA", this.currentState, this.requestCategory)
-                .sort(this.newExperimentService.sortSampleTypes);
+            this.filteredSampleTypeListRna = this.filterSampleType("RNA")
+                .sort(TabSampleSetupViewComponent.sortSampleTypes);
         }
         if (this.newExperimentService.sampleTypes.length === 0) {
             this.newExperimentService.sampleTypes = this.newExperimentService.sampleTypes.concat(this.filteredSampleTypeListDna);
@@ -210,17 +209,69 @@ export class TabSampleSetupViewComponent implements OnInit {
         }
     }
 
+    public filterSampleType(codeNucleotideType: string): any[] {
+        let types: any[] = [];
+
+        for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+            if (!this.newExperimentService.isEditState() && category.isActive === 'N') {
+                continue;
+            }
+            if (codeNucleotideType != null && category.codeNucleotideType !== codeNucleotideType) {
+                continue;
+            }
+
+            let theRequestCategories = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleTypeRequestCategory").filter(category2 =>
+                category2.value !== "" && category2.idSampleType === category.value
+            );
+
+            for (let category3 of theRequestCategories) {
+                if (this.requestCategory && category3.codeRequestCategory === this.requestCategory.codeRequestCategory) {
+                    types.push(category);
+                }
+            }
+        }
+
+        return types;
+    }
+
+    public static sortSampleTypes(obj1, obj2): number {
+        if (obj1 == null && obj2 == null) {
+            return 0;
+        } else if (obj1 == null) {
+            return 1;
+        } else if (obj2 == null) {
+            return -1;
+        } else {
+            let order1: number = Number(obj1.sortOrder);
+            let order2: number = Number(obj2.sortOrder);
+
+            if (obj1.value === '') {
+                return -1;
+            } else if (obj2.value === '') {
+                return 1;
+            } else {
+                if (order1 < order2) {
+                    return -1;
+                } else if (order1 > order2) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+    }
+
 
     buildSampleTypes() {
         if (this.filteredSampleTypeListDna.length === 0 && this.requestCategory) {
-            this.filteredSampleTypeListDna = this.newExperimentService.filterSampleType("DNA", this.currentState, this.requestCategory)
-                .sort(this.newExperimentService.sortSampleTypes);
-        }
-        if (this.filteredSampleTypeListRna.length === 0 && this.requestCategory) {
-            this.filteredSampleTypeListRna = this.newExperimentService.filterSampleType("RNA", this.currentState, this.requestCategory)
-                .sort(this.newExperimentService.sortSampleTypes);
+            this.filteredSampleTypeListDna = this.filterSampleType("DNA")
+                .sort(TabSampleSetupViewComponent.sortSampleTypes);
         }
 
+        if (this.filteredSampleTypeListRna.length === 0 && this.requestCategory) {
+            this.filteredSampleTypeListRna = this.filterSampleType("RNA")
+                .sort(TabSampleSetupViewComponent.sortSampleTypes);
+        }
     }
 
     onDnaChange(event) {
@@ -256,7 +307,8 @@ export class TabSampleSetupViewComponent implements OnInit {
                 //TODO this.sampleSetupView.currentState = 'MDMiSeqState';
             }
             if (this.gnomexService.submitInternalExperiment()) {
-                this.currentState = "SolexaSetupState";
+                // this.currentState = "SolexaSetupState";
+                this.newExperimentService.currentState = "SolexaSetupState";
                 this.showSamplePrepContatainer = false;
             }
         }
@@ -284,11 +336,11 @@ export class TabSampleSetupViewComponent implements OnInit {
 
         // TODO parentDocument.samplesView.initializeSamplesGrid();
 
-        if (this.newExperimentService.isSequenomState(this.currentState) || this.newExperimentService.isClinicalSequenomState(this.currentState)) {
+        if (this.newExperimentService.isSequenomState() || this.newExperimentService.isClinicalSequenomState()) {
             return;
         }
         // Select the default organism on sample setup if the request category specifies one
-        if (!this.newExperimentService.isQCState(this.currentState)) {
+        if (!this.newExperimentService.isQCState()) {
             if (!this.form.get("organism")) {
                 if (this.requestCategory && this.requestCategory.idOrganism) {
                     let organism = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite',this.requestCategory.idOrganism);
@@ -344,7 +396,7 @@ export class TabSampleSetupViewComponent implements OnInit {
     }
 
     selectOrgOption(event) {
-        if (event != undefined && event.source.value && event.source.value.idLab !== "0") {
+        if (event !== undefined && event.source && event.source.value && event.source.value.idLab !== "0") {
             this.form.get("organism").setValue(event.source.value);
             this.newExperimentService.annotations = this.newExperimentService.filterAnnotations(event.source.value.idOrganism);
             this.indexEvent.emit('+');

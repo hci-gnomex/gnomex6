@@ -1,17 +1,6 @@
 <div class="full-width full-height padded small-font">
     <form [formGroup]="form" class="full-width full-height">
         <div class="full-width full-height">
-            <!--<div>Select a sample quality experiment type.</div>-->
-            <!--<mat-radio-group *ngIf="this.newExperimentService.currentState.value==='QCState'" placeholder="Select a sample quality experiment type." (change)="onTypeChange($event)" formControlName="selectedType">-->
-            <!--<div *ngFor="let type of this.newExperimentService.filteredApps">-->
-            <!--<mat-radio-button (click)="selectType($event)" [value]="type">-->
-            <!--<span class="inline-span">-->
-            <!--{{type.display}}-->
-            <!--</span>-->
-            <!--</mat-radio-button>-->
-            <!--</div>-->
-            <!--</mat-radio-group>-->
-
             <ol class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
@@ -131,7 +120,7 @@
                                     </mat-form-field>
                                 </div>
                             </li>
-                            <li *ngIf="this.newExperimentService.currentState.value!=='QCState' && (showDnaseBox || showRnaseBox)" class="full-width align-baseline">
+                            <li *ngIf="this.newExperimentService.currentState !== 'QCState' && (showDnaseBox || showRnaseBox)" class="full-width align-baseline">
                                 <div class="full-width align-baseline">
                                     <mat-checkbox *ngIf="showDnaseBox" formControlName="dnaseBox" (change)="onDnaseChanged($event)">Click if RNA samples were treated with DNase</mat-checkbox>
                                     <mat-checkbox *ngIf="showRnaseBox" formControlName="rnaseBox" (change)="onRnaseChanged($event)">Click if DNA samples were treated with RNase</mat-checkbox>

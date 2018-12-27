@@ -93,6 +93,6 @@ export class TabBioinformaticsViewComponent implements OnInit {
 
     onIsAlignChange(event, i) {
         let org = [...this.newExperimentService.sampleOrganisms][i];
-        this.genomeBuilds[i] = this.newExperimentService.getFilteredGenomeBuildList(org.idOrganism);
+        this.genomeBuilds[i] = this.newExperimentService.filterBySampleOrganism(org.idOrganism);
     }
 }

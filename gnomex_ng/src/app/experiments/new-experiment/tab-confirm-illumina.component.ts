@@ -1,34 +1,37 @@
 import {Component, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
-import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
-import {MatDialog} from "@angular/material";
-import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
-import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {BarcodeSelectEditor} from "../../util/grid-editors/barcode-select.editor";
 import {BillingService} from "../../services/billing.service";
 import {HttpParams} from "@angular/common/http";
-import {URLSearchParams} from "@angular/http";
 
 @Component({
     selector: "tabConfirmIllumina",
     templateUrl: "./tab-confirm-illumina.component.html",
     styles: [`
+        
+        
         .confirm-instructions {
             background-color: lightyellow;
             width: 25%;
             font-size: 80%;
         }
+        
+        
     `]
 })
 
 export class TabConfirmIlluminaComponent implements OnInit {
+
+    public get showAgreeBox(): boolean {
+        return true;
+    }
+
     private form: FormGroup;
     private submitterName: string;
     private labName: string;
@@ -36,10 +39,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
     private billingAccountNumber: string;
     private preppedByClient: boolean = false;
     private clientPrepString: string = "Library Prepared By Client";
-    private protoName: string;
     private clientPrepLib: boolean;
-    private agreeCheckBox: boolean;
-    private agreeCheckBoxLabel: string;
     private seqLaneTypeLabel: string;
     private requestPropsGridApi: any;
     private requestPropsColumnApi: any;
@@ -52,53 +52,57 @@ export class TabConfirmIlluminaComponent implements OnInit {
     private requestPropBox: boolean;
     private billingItems: any[] = [];
 
+    public protocolName: string;
+
     constructor(private dictionaryService: DictionaryService,
                 private newExperimentService: NewExperimentService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
                 private billingService: BillingService,
-                private fb: FormBuilder
-    ) {
+                private fb: FormBuilder) {
+
         this.requestPropsColumnDefs = [
             {
                 headerName: "",
                 field: "name",
                 width: 100,
             },
-
-            {headerName: "",
+            {
+                headerName: "",
                 field: "value",
                 width: 100,
-            },
-        ]
+            }
+        ];
         this.samplesGridConfirmColumnDefs = [
             {
                 headerName: "Multiplex Group",
                 editable: false,
                 field: "multiplexGroupNumber",
-                width: 100,
+                width: 100
             },
-
-            {headerName: "Sample Name",
+            {
+                headerName: "Sample Name",
                 field: "name",
                 width: 100,
-                editable: false,
+                editable: false
             },
-            {headerName: "Conc. (ng/ul)",
+            {
+                headerName: "Conc. (ng/ul)",
                 field: "concentration",
                 width: 100,
-                editable: false,
+                editable: false
             },
-            {headerName: "Vol. (ul)",
+            {
+                headerName: "Vol. (ul)",
                 field: "sampleVolumne",
                 width: 100,
-                editable: false,
+                editable: false
             },
             {
                 headerName: "Index Tag A",
                 editable: false,
                 width: 125,
-                field: "idOligoBarcode",
+                field: "idOligoBarcode"
             },
             {
                 headerName: "Index Tag B",
@@ -133,13 +137,13 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 cellEditorFramework: SelectEditor,
                 selectOptions: this.gnomexService.seqLibProtocolsWithAppFilters,
                 selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idSeqLibProtocol",
-
+                selectOptionsValueField: "idSeqLibProtocol"
             },
-            {headerName: "# Seq Lanes",
+            {
+                headerName: "# Seq Lanes",
                 field: "numberSequencingLanes",
                 width: 100,
-                editable: false,
+                editable: false
             },
             {
                 headerName: "Sample Type",
@@ -150,7 +154,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 cellEditorFramework: SelectEditor,
                 selectOptions: this.newExperimentService.sampleTypes,
                 selectOptionsDisplayField: "sampleType",
-                selectOptionsValueField: "idSampleType",
+                selectOptionsValueField: "idSampleType"
             },
             {
                 headerName: "Organism",
@@ -161,12 +165,11 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 cellEditorFramework: SelectEditor,
                 selectOptions: this.organisms,
                 selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOrganism",
-            },
-
+                selectOptionsValueField: "idOrganism"
+            }
         ];
-        this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
 
+        this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
     }
 
     ngOnInit() {
@@ -187,7 +190,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
             if (this.newExperimentService.protoChanged.value === true) {
                 this.newExperimentService.protoChanged.next(false);
                 if (this.newExperimentService.selectedProto) {
-                    this.protoName = this.newExperimentService.selectedProto.display;
+                    this.protocolName = this.newExperimentService.selectedProto.display;
                 }
             }
         });
@@ -214,8 +217,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
             }
         });
 
-        this.form = this.fb.group({
-        });
+        this.form = this.fb.group({});
     }
 
     setUpView() {
@@ -243,8 +245,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
             break;
         }
 
-        this.requestPropBox = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.request.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB) == 'Y';
-
+        this.requestPropBox = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.request.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB) === 'Y';
     }
 
     onGridReady(params: any) {
@@ -252,18 +253,10 @@ export class TabConfirmIlluminaComponent implements OnInit {
         this.requestPropsColumnApi = params.columnApi;
     }
 
-    onGridRowDataChanged() {
-
-    }
-
     setClientPrepString() {
         if (this.preppedByClient) {
 
         }
-    }
-
-    onCheckboxChanged(event) {
-
     }
 
     public getEstimatedBilling(): void {
@@ -275,7 +268,8 @@ export class TabConfirmIlluminaComponent implements OnInit {
         if (this.newExperimentService.request.isExternal == 'Y') {
             // This is an external experiment submission.  Don't
             // attempt to get estimated charges.
-            this.newExperimentService.hideSubmit = false;
+
+            // this.newExperimentService.hideSubmit = false;
         } else {
 
             var accountName:String = "";
@@ -298,10 +292,9 @@ export class TabConfirmIlluminaComponent implements OnInit {
 
             this.agreeCheckboxLabel = "I authorize all charges to be billed to account(s): " + accountName;
 
-            // This is a new experiment request. Get the estimated
-            // charnges for this request.
+            // This is a new experiment request. Get the estimated charges for this request.
             // this.newExperimentService.request.PropertyEntries=[];
-            this.newExperimentService.request.billingItems=[];
+            this.newExperimentService.request.billingItems = [];
             let stringifiedRequest: any = JSON.stringify(this.newExperimentService.request);
             // let params: HttpParams = new HttpParams()
             //     .set("requestXMLString", stringifiedRequest);
