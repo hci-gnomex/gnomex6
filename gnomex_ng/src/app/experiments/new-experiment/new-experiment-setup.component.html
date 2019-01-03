@@ -93,17 +93,17 @@
                             {{ workAuthInstructions }}
                         </div>
                         <div>
-                            <button mat-button class="link-button minimize" (click)="onNewAccount()">{{workButtonText}}</button>
+                            <button mat-button class="link-button minimize" (click)="onClickNewAccount()">{{ workButtonText }}</button>
                         </div>
                         <div *ngIf="showAccessAuthorizedAccountsLink" class="double-padded-left instructions">
                             {{ accessAuthorizedBillingAccountInstructions }}
                         </div>
                         <div class="flex-container-row">
                             <div class="padded-right">
-                                <button mat-button class="link-button minimize" (click)="onNewAccount()">Show Other Blling Accounts</button>
+                                <button mat-button class="link-button minimize" (click)="onClickShowMoreAccounts()">Show Other Billing Accounts</button>
                             </div>
                             <div class="padded-right">
-                                <button mat-button class="link-button minimize" (click)="onNewAccount()">Split Billing</button>
+                                <button mat-button class="link-button minimize" (click)="onClickSplitBilling()">Split Billing</button>
                             </div>
                         </div>
                     </div>
@@ -124,10 +124,10 @@
                     </mat-form-field>
                     <div class="flex-container-row major-padding-left">
                         <div class="padded-right">
-                            <button mat-button class="link-button minimize" (click)="onNewAccount()">Edit</button>
+                            <button mat-button class="link-button minimize" (click)="onClickEditProject()">Edit</button>
                         </div>
                         <div class="padded-right">
-                            <button mat-button class="link-button minimize" (click)="onNewAccount()">New</button>
+                            <button mat-button class="link-button minimize" (click)="onClickNewProject()">New</button>
                         </div>
                     </div>
                 </div>

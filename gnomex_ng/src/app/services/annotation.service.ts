@@ -24,28 +24,37 @@ export class AnnotationService {
     }
 
     public static isApplicableProperty(property, reqCategory, idOrganism: string, codeApplication: string): boolean {
-        if (property == null) {
+        if (!property) {
             return false;
         }
 
         let filterByOrganism: boolean = false;
-        if (property.organisms && property.organisms.length > 0) {
-            filterByOrganism = true;
+        if (property.organisms) {
+            if (!Array.isArray(property.organisms)) {
+                property.organisms = [property.organisms.Organism];
+            }
+
+            if (property.organisms.length > 0) {
+                filterByOrganism = true;
+            }
         }
 
         let filterByPlatformApplication: boolean = false;
-        if (reqCategory != null) {
-            if (!Array.isArray(property.platformApplications)) {
-                if (property.platformApplications) {
-                    property.platformApplications.PropertyPlatformApplication = [property.platformApplications.PropertyPlatformApplication];
-                } else {
-                    console.log("no propery.platformApplication");
+        if (reqCategory != null && property) {
+            if (property.platformApplications) {
+                if (!Array.isArray(property.platformApplications)) {
+                    property.platformApplications = [property.platformApplications.PropertyPlatformApplication];
                 }
+            } else {
+                console.log("no property.platformApplication");
             }
 
-            if (( property.forRequest != null && property.forRequest == 'Y' ) ||
-                (property.platformApplications && property.platformApplications.PropertyPlatformApplication && property.platformApplications.PropertyPlatformApplication.length > 0) ||
-                reqCategory.type == 'ISCAN' || reqCategory.type == 'CAPSEQ' || reqCategory.type == 'FRAGANAL') {
+            if ((property.forRequest && property.forRequest === 'Y' )
+                || property.platformApplications.length > 0
+                || reqCategory.type === 'ISCAN'
+                || reqCategory.type === 'CAPSEQ'
+                || reqCategory.type === 'FRAGANAL') {
+
                 filterByPlatformApplication = true;
             }
         }
@@ -54,12 +63,12 @@ export class AnnotationService {
         if (!filterByOrganism) {
             keep = true;
         } else {
-            if (idOrganism != null) {
+            if (idOrganism) {
                 if (!Array.isArray(property.organisms)) {
-                    property.organisms.Organisms = [property.organisms.Organism];
+                    property.organisms = [property.organisms.Organism];
                 }
                 for (let org of property.organisms) {
-                    if (idOrganism == org.idOrganism) {
+                    if (idOrganism === org.idOrganism) {
                         keep = true;
                         break;
                     }
@@ -72,10 +81,11 @@ export class AnnotationService {
                 keep = true;
             } else {
                 keep = false;
-                if (reqCategory != null) {
+                if (reqCategory && property) {
                     if (!Array.isArray(property.platformApplications)) {
-                        property.platformApplications = property.platformApplications.PropertyPlatformApplication;
+                        property.platformApplications = [property.platformApplications.PropertyPlatformApplication];
                     }
+
                     for (let pa of property.platformApplications) {
                         if (reqCategory.codeRequestCategory === pa.codeRequestCategory) {
                             if(pa.codeApplication === "" || codeApplication === pa.codeApplication) {
@@ -89,7 +99,7 @@ export class AnnotationService {
         }
 
         if (keep) {
-            if (reqCategory.idCoreFacility != property.idCoreFacility) {
+            if (reqCategory.idCoreFacility !== property.idCoreFacility) {
                 keep = false;
             }
         }

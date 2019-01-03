@@ -148,7 +148,18 @@ export class TabSeqSetupViewComponent implements OnInit {
     themeMap: Map<string, any> = new Map<string, any>();
 
     public themes: any[] = [];
-    public appPrices: any[] = [];
+
+    get appPrices(): any[] {
+        return this._appPrices;
+    }
+    set appPrices(value: any[]) {
+        if (!value) {
+           this._appPrices = [];
+        } else {
+            this._appPrices = value.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
+        }
+    }
+    private _appPrices: any[] = [];
 
     // private showAppPrice: boolean = false;
     // private libraryDesign: boolean = false;
@@ -193,15 +204,17 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
     set sequenceType(value: any) {
-        this.appPrices = [];
+        let tempAppPrices = [];
 
         if (value) {
             for (let app of this.filteredApps) {
                 if (app.idApplicationTheme === value.idApplicationTheme) {
-                    this.appPrices.push(app);
+                    tempAppPrices.push(app);
                 }
             }
         }
+
+        this.appPrices = tempAppPrices;
 
         this.newExperimentService.seqType = value;
     }
@@ -415,6 +428,36 @@ export class TabSeqSetupViewComponent implements OnInit {
                 return 1;
             } else {
                 return 0;
+            }
+        }
+    }
+
+    private static sortBySortOrderThenDisplay(obj1, obj2): number{
+        if ((obj1 === null || obj1 === undefined) && (obj2 === null || obj2 === undefined)) {
+            return 0;
+        } else if (obj1 === null || obj1 === undefined) {
+            return 1;
+        } else if (obj2 === null || obj2 === undefined) {
+            return -1;
+        } else {
+            let sortOrder1: number = obj1.sortOrder === "" ? 999 : +obj1.sortOrder;
+            let sortOrder2: number = obj2.sortOrder === "" ? 999 : +obj2.sortOrder;
+
+            if (sortOrder1 < sortOrder2) {
+                return -1;
+            } else if (sortOrder1 > sortOrder2) {
+                return 1;
+            } else {
+                if ((obj1.display === null || obj1.display === undefined)
+                    && (obj2.display === null || obj2.display === undefined)) {
+                    return 0;
+                } else if (obj1.display === null || obj1.display === undefined) {
+                    return 1;
+                } else if (obj2.display === null || obj2.display === undefined) {
+                    return -1;
+                } else {
+                    return obj1.display.toUpperCase().localeCompare(obj2.display.toUpperCase());
+                }
             }
         }
     }

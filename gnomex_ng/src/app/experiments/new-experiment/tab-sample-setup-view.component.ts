@@ -112,8 +112,8 @@ export class TabSampleSetupViewComponent implements OnInit {
     @Input() requestCategory: any;
 
     @Output() indexEvent = new EventEmitter<string>();
-    @Output() goBack = new EventEmitter<string>();
-    @Output() goNext = new EventEmitter<string>();
+    // @Output() goBack = new EventEmitter<string>();
+    // @Output() goNext = new EventEmitter<string>();
 
     @ViewChild("autoOrg") orgAutocomplete: MatAutocomplete;
 
@@ -308,7 +308,8 @@ export class TabSampleSetupViewComponent implements OnInit {
             }
             if (this.gnomexService.submitInternalExperiment()) {
                 // this.currentState = "SolexaSetupState";
-                this.newExperimentService.currentState = "SolexaSetupState";
+                // this.newExperimentService.currentState = "SolexaSetupState";
+                this.newExperimentService.currentState = "SolexaBaseState";
                 this.showSamplePrepContatainer = false;
             }
         }

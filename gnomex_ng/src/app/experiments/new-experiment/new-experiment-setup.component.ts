@@ -12,7 +12,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments.service";
 import {first} from "rxjs/internal/operators";
 import {URLSearchParams} from "@angular/http";
-import {MatAutocomplete} from "@angular/material";
+import {MatAutocomplete, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {WorkAuthorizationTypeSelectorDialogComponent} from "../../products/work-authorization-type-selector-dialog.component";
 
 @Component({
     selector: "new-experiment-setup",
@@ -269,6 +270,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     constructor(private billingService: BillingService,
                 private createSecurityAdvisor: CreateSecurityAdvisorService,
+                private dialog: MatDialog,
+                private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private formBuilder: FormBuilder,
                 private getLabService: GetLabService,
@@ -570,6 +573,35 @@ export class NewExperimentSetupComponent implements OnDestroy {
         this.autoLabComplete.options.first.select();
     }
 
+    public onClickNewAccount(): void {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width  = "40em";
+        configuration.height = "30em";
+        configuration.panelClass = 'no-padding-dialog';
+        configuration.data = { idLab: "" + this.currentIdLab };
+
+        let dialogRef: MatDialogRef<WorkAuthorizationTypeSelectorDialogComponent> = this.dialog.open(WorkAuthorizationTypeSelectorDialogComponent, configuration);
+
+        dialogRef.afterClosed().pipe(first()).subscribe(() => {
+            this.dialogService.confirm('Confirmation', 'New accounts will require approval from billing administrator before use.');
+        });
+    }
+
+    public onClickShowMoreAccounts(): void {
+        //TODO: create dialog
+    }
+
+    public onClickSplitBilling(): void {
+        //TODO: create dialog
+    }
+
+    public onClickEditProject(): void {
+        //TODO: create dialog
+    }
+
+    public onClickNewProject(): void {
+        //TODO: create dialog
+    }
 
     // getFilteredApps() {
     //     this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);

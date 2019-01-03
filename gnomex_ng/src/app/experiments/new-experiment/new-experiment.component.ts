@@ -437,10 +437,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         }
     }
 
-    onNewAccount() {
-
-    }
-
     componentCreated(compRef: ComponentRef<any>) {
         if (compRef) {
             this.newExperimentService.components.push(compRef.instance);

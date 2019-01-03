@@ -76,13 +76,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonReader;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.persistence.PersistenceException;
 
@@ -103,7 +103,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	// the static field for logging in Log4J
 	private static Logger LOG = Logger.getLogger(SaveRequest.class);
 
-	private String        requestXMLString;
+	private String        requestJSONString;
 	private String        description;
 	private Document      requestDoc;
 	private RequestParser requestParser;
@@ -1095,15 +1095,15 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
-		if (request.getParameter("requestXMLString") != null && !request.getParameter("requestXMLString").equals("")) {
-			requestXMLString = request.getParameter("requestXMLString");
+		if (Util.isParameterNonEmpty("requestJSONString")) {
+			requestJSONString = request.getParameter("requestJSONString");
 		}
 
 		if (request.getParameter("description") != null) {
 			description = request.getParameter("description");
 		}
 
-		if (request.getParameter("filesToRemoveXMLString") != null && !request.getParameter("filesToRemoveXMLString").equals("")) {
+		if (Util.isParameterNonEmpty("filesToRemoveXMLString")) {
 			filesToRemoveXMLString = "<FilesToRemove>" + request.getParameter("filesToRemoveXMLString") + "</FilesToRemove>";
 
 			StringReader reader = new StringReader(filesToRemoveXMLString);
@@ -1118,9 +1118,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			}
 		}
 
-		if (request.getParameter("propertiesXML") != null && !request.getParameter("propertiesXML").equals("")) {
+		if (Util.isParameterNonEmpty("propertiesXML")) {
 			propertiesXML = request.getParameter("propertiesXML");
-
 		}
 
 		invoicePrice = "";
@@ -1130,15 +1129,17 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			invoicePrice = request.getParameter("invoicePrice");
 		}
 
-		StringReader reader = new StringReader(requestXMLString);
+		StringReader reader = new StringReader(requestJSONString);
 		try {
-			SAXBuilder sax = new SAXBuilder();
-			requestDoc = sax.build(reader);
-			requestParser = new RequestParser(requestDoc, this.getSecAdvisor());
+//			SAXBuilder sax = new SAXBuilder();
+//			requestDoc = sax.build(reader);
+//			requestParser = new RequestParser(requestDoc, this.getSecAdvisor());
+			JsonReader jsonReader = Json.createReader(new StringReader(requestJSONString));
+			requestParser = new RequestParser(jsonReader, this.getSecAdvisor());
 		}
-		catch (JDOMException je) {
-			this.addInvalidField("RequestXMLString", "Invalid request xml");
-			this.errorDetails = Util.GNLOG(LOG, "Cannot parse requestXMLString", je);
+		catch (Exception e) {
+			this.addInvalidField("requestJSONString", "Invalid request JSON");
+			this.errorDetails = Util.GNLOG(LOG, "Cannot parse requestJSONString", e);
 		}
 
 
@@ -1208,7 +1209,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			if (this.isValid()) {
 				// Get the current billing period
 				billingPeriod = dictionaryHelper.getCurrentBillingPeriod();
-				if (billingPeriod == null && requestXMLString.contains("isExternal=\"N\"")) {
+				if (billingPeriod == null && requestJSONString.contains("isExternal:\"N\"")) {
 					throw new Exception("Cannot find current billing period to create billing items");
 				}
 

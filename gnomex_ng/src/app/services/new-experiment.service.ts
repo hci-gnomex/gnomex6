@@ -268,7 +268,7 @@ export class NewExperimentService {
 
     get currentState(): string {
         if (this._currentState_subject) {
-            return this._currentState_subject.value
+            return this._currentState_subject.getValue();
         } else {
             return '';
         }
@@ -684,7 +684,7 @@ export class NewExperimentService {
             seqPrepByCore:                      "",
             adminNotes:                         "",
             archived:                           "",
-            codeRequestCategory:                "NOSEQ",
+            codeRequestCategory:                "HISEQ",
             privacyExpirationDate:              "",
             targetClassIdentifier:              "0",
             targetClassName:                    "hci.gnomex.model.Request",
@@ -5062,7 +5062,7 @@ export class NewExperimentService {
 
     getLanes(sample: any, numberOfLanes: number): any[] {
         let theLanes: any[] = [];
-        if (theLanes != null) {
+        if (theLanes !== null) {
             for (let sequenceLane of this.lanes) {
                 if (sequenceLane.idSample === sample.idSample) {
                     theLanes.push(sequenceLane);
@@ -5194,7 +5194,7 @@ export class NewExperimentService {
         let keep: boolean = false;
         let idOrganism: string = null;
 
-        if (this.getOrganism() != null) {
+        if (this.getOrganism() !== null) {
             idOrganism = this.getOrganism().idOrganism;
         }
 
@@ -5230,22 +5230,22 @@ export class NewExperimentService {
         });
     }
 
-    public filterPropertiesWithFullProperty(property, sce): boolean {
-        let keep: boolean = false;
-        let idOrganism: string = null;
-
-        if (this.getOrganism() != null) {
-            idOrganism = this.getOrganism().idOrganism;
-        }
-
-        if (AnnotationService.isApplicableProperty(property, this.requestCategory, idOrganism, this.codeApplication)
-            && (sce.isSelected === 'true' || property.isActive !== 'N')) {
-
-            keep = true;
-        }
-
-        return keep;
-    }
+    // public filterPropertiesWithFullProperty(property, sce): boolean {
+    //     let keep: boolean = false;
+    //     let idOrganism: string = null;
+    //
+    //     if (this.getOrganism() != null) {
+    //         idOrganism = this.getOrganism().idOrganism;
+    //     }
+    //
+    //     if (AnnotationService.isApplicableProperty(property, this.requestCategory, idOrganism, this.codeApplication)
+    //         && (sce.isSelected === 'true' || property.isActive !== 'N')) {
+    //
+    //         keep = true;
+    //     }
+    //
+    //     return keep;
+    // }
 
     public buildPropertiesByUser() {
         this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
@@ -5262,24 +5262,28 @@ export class NewExperimentService {
 
         if (propsToFilter) {
             for (let property of propsToFilter) {
-                if (property.name.startsWith("mSelect")) {
+                if (property.name.startsWith("Human_5hmC")) {
                     console.log("jj");
                 }
                 let entry: any = this.gnomexService.getSampleProperty(property.idProperty);
                 let keep: boolean = this.filterPropertyEntryWithFullProperty(entry, property);
                 if (keep) {
                     keep = false;
-                    let users: any;
+                    let users: any[];
                     if (entry.appUsers) {
-                        users = entry.appUsers.AppUserLite;
+                        if (!Array.isArray(entry.appUsers)) {
+                            users = [entry.appUsers.AppUserLite];
+                        } else {
+                            users = entry.appUsers;
+                        }
                     }
-                    if (!users) {
+                    if (!users || users.length === 0) {
                         keep = true;
                     } else {
                         let allowedUsers: any[] = this.getAnnotationAllowedUserList();
-                        if (!Array.isArray(users)) {
-                            users = [users];
-                        }
+                        // if (!Array.isArray(users)) {
+                        //     users = [users];
+                        // }
                         for (let user of users) {
                             for (let u1 of allowedUsers) {
                                 if (u1 === user.idAppUser) {

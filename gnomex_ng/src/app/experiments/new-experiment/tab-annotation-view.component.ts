@@ -19,6 +19,7 @@ import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {OrderType} from "../../util/annotation-tab.component";
 import {first} from "rxjs/internal/operators";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 
 @Component({
     selector: "tabAnnotationView",
@@ -58,6 +59,7 @@ export class TabAnnotationViewComponent implements OnInit {
         return [
             {
                 headerName: "Available Annotations",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "name",
                 width: 500
             }
@@ -67,6 +69,7 @@ export class TabAnnotationViewComponent implements OnInit {
         return [
             {
                 headerName: "Sample Annotations to use",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "name",
                 width: 500
             }
@@ -92,7 +95,14 @@ export class TabAnnotationViewComponent implements OnInit {
             if (value && this.addAnnotationGridApi) {
                 this.annotations = this.newExperimentService.propertyEntriesForUser;
                 this.addAnnotationGridApi.setRowData(this.annotations);
-                // this.addAnnotationGridApi.setRowData(this.newExperimentService.propertyEntriesForUser);
+
+                for (let i = 0; i < this.annotations.length; i++) {
+                    if (this.addAnnotationGridApi.getRowNode('' + i).data.isSelected
+                        && this.addAnnotationGridApi.getRowNode('' + i).data.isSelected === "true") {
+                        this.addAnnotationGridApi.getRowNode('' + i).setSelected(true);
+                        this.addAnnotationGridApi.getRowNode('' + i).data.boldDisplay = 'Y';
+                    }
+                }
 
                 this.removeAnnotationGridApi.setRowData([]);
 
