@@ -19,6 +19,9 @@
             <mat-tab *ngIf="showBioinformaticsTab" label="Bioinformatics">
                 <experiment-bioinformatics-tab [experiment]="experiment"></experiment-bioinformatics-tab>
             </mat-tab>
+            <mat-tab label="Files">
+                <experiment-files-tab></experiment-files-tab>
+            </mat-tab>
         </mat-tab-group>
     </div>
     <div class="full-width">

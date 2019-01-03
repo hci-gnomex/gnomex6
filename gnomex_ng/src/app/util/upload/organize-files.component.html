@@ -1,0 +1,102 @@
+<div class="full-width full-height flex-container-col max-height">
+    <div class="full-width padded">
+        <button mat-button color="primary"  (click)="addNewFolder()" >
+            <img [src]="constService.ICON_FOLDER_ADD" > New Folder
+        </button>
+        <button mat-button
+                color="primary"
+                [disabled]="disableRemove()"
+                (click)="attemptRemove()" >
+            <img [src]="constService.ICON_DELETE" >
+            Remove (from file system)
+        </button>
+        <button mat-button color="primary"
+                [disabled]="disableRename()"
+                (click)="rename()"  >
+            <img [src]="constService.SEGMENT_IMPORT" >
+            Rename file </button>
+        <button mat-button color="primary" (click)="refresh()" >
+            <img [src]="constService.ICON_REFRESH" >
+            Refresh
+        </button>
+        <button mat-button [matTooltip]="this.organizeHelp" (click)="showHelp()">
+            <img [src]="constService.ICON_INFORMATION">
+        </button>
+    </div>
+
+    <div class="full-width flex-row-container flex-grow overflow-auto">
+        <as-split *ngIf="tabVisible" > <!-- split  mat-tabs have issues -->
+            <as-split-area  size="40">
+                <div class="full-width full-height max-height flex-container-col border-subtle">
+                    <div class="full-width padded">
+                        Upload Files
+                    </div>
+                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <div class="full-height full-width border-subtle">
+                            <tree-root #uploadTree
+                                       (activate)="uploadTreeOnSelect($event)"
+                                       (deactivate)="uploadTreeOnUnselect($event)"
+                                       [nodes]="uploadFiles"
+                                       [options]="uploadOpts">
+                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                    <div class="truncate" >
+                                        <img *ngIf="node.data.icon" class="icon" src="{{ node.data.icon }}" height="16" width="16">
+                                        <span  [matTooltip]="node.data.displayName"
+                                                [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }">
+                                            {{ node.data.displayName }}
+                                        </span>
+                                    </div>
+
+                                </ng-template>
+                            </tree-root>
+                        </div>
+                    </div>
+                </div>
+            </as-split-area>
+            <as-split-area size="60">
+                <div class="full-width full-height max-height flex-container-col border-subtle"><!-- start tree container -->
+                    <div class="full-width padded">
+                        Folder
+                    </div>
+                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <div  class="full-height full-width border-subtle">
+                            <tree-root #organizeTree
+                                       (activate)="organizeTreeOnSelect($event)"
+                                       (deactivate)="organizeTreeOnUnselect($event)"
+                                       (moveNode)="onMove($event)"
+                                       [nodes]="organizeFiles"
+                                       [options]="organizeOpts">
+                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                    <div class="truncate">
+                                        <img *ngIf="node.data.icon" class="icon" src="{{ node.data.icon }}" height="16" width="16">
+                                        <span [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }" >
+                                    {{ node.data.displayName }}
+                                </span>
+                                    </div>
+
+                                </ng-template>
+                            </tree-root>
+                        </div>
+                    </div>
+                    <div class="full-width padded">
+                        <div class="flex-container-row full-height small-font" >
+                            <button mat-button (click)="expandFolders()" > Expand Folders </button>
+                            <button mat-button (click)="collapseFolders()" > Collapse Folders </button>
+                        </div>
+                    </div>
+
+                </div> <!-- end tree container are you working-->
+
+            </as-split-area>
+        </as-split>
+    </div>
+    <div class="flex-container-row align-center">
+        <div class="flex-grow">
+            <save-footer (saveClicked)="save()" [dirty]="formGroup.dirty"></save-footer>
+        </div>
+        <button mat-button color="primary" (click)="requestToCloseDialog()" >  Close </button>
+
+    </div>
+</div>
+
+

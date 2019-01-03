@@ -17,9 +17,8 @@ import {TreeModule} from "angular-tree-component";
 import {AnalysisInfoTabComponent} from "./analysis-info-tab.component";
 import {AnalysisFilesTabComponent} from "./analysis-files-tab.component";
 import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer";
-import {UploadFileModule} from "../../util/upload/upload-file.module";
-import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
-import {OrganizeFilesComponent} from "./organize-files.component";
+import {ManageFilesModule} from "../../util/upload/manage-files.module";
+import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 
 
 
@@ -37,7 +36,7 @@ import {OrganizeFilesComponent} from "./organize-files.component";
         UtilModule,
         RelatedDataModule,
         AngularSplitModule,
-        UploadFileModule
+        ManageFilesModule
     ],
 
     declarations: [
@@ -45,12 +44,13 @@ import {OrganizeFilesComponent} from "./organize-files.component";
         AnalysisExperimentTabComponent,
         LinkToExperimentDialogComponent,
         AnalysisInfoTabComponent,
-        AnalysisFilesTabComponent,
-        ManageFilesDialogComponent,
-        OrganizeFilesComponent
+        AnalysisFilesTabComponent
     ],
     providers: [],
-    entryComponents: [LinkToExperimentDialogComponent, ManageFilesDialogComponent, OrganizeFilesComponent],
+    entryComponents: [
+        LinkToExperimentDialogComponent,
+        ManageFilesDialogComponent
+    ],
     exports: []
 })
 export class AnalysisDetailModule { }

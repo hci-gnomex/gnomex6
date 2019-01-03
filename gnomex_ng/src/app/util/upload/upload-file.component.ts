@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 import { forkJoin } from 'rxjs';
-import {UploadFileService} from "./upload-file.service";
+import {UploadFileService} from "../../services/upload-file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 
 @Component({

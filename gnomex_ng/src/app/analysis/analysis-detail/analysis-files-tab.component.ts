@@ -7,7 +7,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer";
 import {DataTrackService} from "../../services/data-track.service";
 import {HttpParams} from "@angular/common/http";
-import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
+import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 
 @Component({
@@ -50,6 +50,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 
     public fileCount: number = 0;
     public getAnalysisDownloadListResult: any;
+    private analysis:any;
 
     constructor(public constantsService: ConstantsService,
                 private analysisService: AnalysisService,
@@ -77,11 +78,22 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 cellRendererFramework: ViewerLinkRenderer, cellRendererParams: {icon: this.constantsService.ICON_IOBIO, clickFunction: this.makeGENELink}},
         ];
         this.getNodeChildDetails = function getItemNodeChildDetails(rowItem) {
+            let children: any[] = [];
             if (rowItem.FileDescriptor) {
+                for (let fd of rowItem.FileDescriptor) {
+                    children.push(fd);
+                }
+            }
+            if (rowItem.AnalysisDownload) {
+                for (let ad of rowItem.AnalysisDownload) {
+                    children.push(ad);
+                }
+            }
+            if (children.length > 0) {
                 return {
                     group: true,
                     expanded: false,
-                    children: rowItem.FileDescriptor,
+                    children: children,
                     key: rowItem.displayName
                 };
             } else {
@@ -94,6 +106,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             this.fileCount = 0;
             this.getAnalysisDownloadListResult = null;
             if(data && data.analysis && data.analysis.Analysis){
+                this.analysis = data.analysis.Analysis;
                 this.analysisService.getAnalysisDownloadList(data.analysis.Analysis.idAnalysis).subscribe((result: any) => {
                     if (result && result.Analysis) {
                         this.getAnalysisDownloadListResult = result;
@@ -127,7 +140,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         this.fileCount = 0;
         if (this.gridApi) {
             this.gridApi.forEachNode((node: RowNode) => {
-                if (node.data.type && node.data.type !== 'dir') {
+                if (node.data.fileSize && node.data.type !== 'dir') {
                     this.fileCount++;
                 }
             });
@@ -221,11 +234,11 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         let config: MatDialogConfig = new MatDialogConfig();
         config.panelClass = 'no-padding-dialog';
         config.data = {
-            order: this.getAnalysisDownloadListResult.Analysis,
-            orderDownloadList: "",
+            order: this.analysis,
         };
-        config.height = "30em";
-        config.width = "50em";
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
         this.dialog.open(ManageFilesDialogComponent,config);
 
     }
