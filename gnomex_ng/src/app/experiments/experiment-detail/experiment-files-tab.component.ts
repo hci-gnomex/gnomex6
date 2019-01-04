@@ -4,6 +4,10 @@ import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode} from "ag-grid-co
 import {ActivatedRoute} from "@angular/router";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments.service";
+import {HttpParams} from "@angular/common/http";
+import {FileService} from "../../services/file.service";
+import {MatDialog, MatDialogConfig} from "@angular/material";
+import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 
 @Component({
     selector: 'experiment-files-tab',
@@ -32,6 +36,9 @@ import {ExperimentsService} from "../experiments.service";
         </div>
     `,
     styles: [`
+        .no-padding-dialog {
+            padding: 0;
+        }
     `]
 })
 export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
@@ -43,11 +50,14 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
     public fileCount: number = 0;
     public getRequestDownloadListResult: any;
+    private request:any;
 
     constructor(public constantsService: ConstantsService,
                 private route: ActivatedRoute,
+                private fileService: FileService,
                 private dialogsService: DialogsService,
-                private experimentsService: ExperimentsService) {
+                private experimentsService: ExperimentsService,
+                private dialog:MatDialog) {
     }
 
     ngOnInit() {
@@ -88,6 +98,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             this.fileCount = 0;
             this.getRequestDownloadListResult = null;
             if (data && data.experiment && data.experiment.Request) {
+                this.request = data.experiment.Request;
                 this.experimentsService.getRequestDownloadList(data.experiment.Request.idRequest).subscribe((result: any) => {
                     if (result && result.Request) {
                         this.getRequestDownloadListResult = result;
@@ -145,7 +156,15 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleManageFiles(): void {
-        // TODO Manage Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.request,
+        };
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
+        this.dialog.open(ManageFilesDialogComponent,config);
     }
 
     public handleDownloadFiles(): void {

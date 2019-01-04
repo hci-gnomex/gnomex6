@@ -1018,6 +1018,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
           }
 
           doc.getRootElement().addContent(requestNode);
+          Util.setIcons(doc);
 
           XMLOutputter out = new org.jdom.output.XMLOutputter();
           this.xmlResult = out.outputString(doc);
