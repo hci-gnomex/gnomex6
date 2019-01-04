@@ -3,7 +3,7 @@ import {LocationStrategy} from "@angular/common";
 import {Router} from "@angular/router";
 import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from "@angular/common/http";
 
-import {Observable, BehaviorSubject, Subscription, interval, of} from "rxjs";
+import {Observable, BehaviorSubject, Subscription, interval, of, throwError} from "rxjs";
 import {CoolLocalStorage} from "angular2-cool-storage";
 import {JwtHelperService} from "@auth0/angular-jwt";
 
@@ -410,6 +410,6 @@ export class AuthenticationService {
 
     private handleError(error: any) {
         let errMsg = (error.message) ? error.message : AuthenticationService.GENERIC_ERR_MSG;
-        return Observable.throw(errMsg);
+        return throwError(errMsg);
     }
 }

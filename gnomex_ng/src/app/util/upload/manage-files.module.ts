@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
     MatButtonModule,
     MatDialogModule,
-    MatFormFieldModule,
+    MatFormFieldModule, MatInputModule,
     MatListModule,
     MatProgressBarModule,
     MatTabsModule,
@@ -27,6 +27,7 @@ import {UtilModule} from "../util.module";
         MatDialogModule,
         MatListModule,
         MatTabsModule,
+        MatInputModule,
         HttpClientModule,
         MatTooltipModule,
         TreeModule.forRoot(),

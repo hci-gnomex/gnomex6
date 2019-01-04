@@ -92,18 +92,6 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
 
     ngOnInit(){
-
-        this.formGroup = new FormGroup({});
-        this.orgAnalysisFileParams = {
-            idAnalysis:this.data.id.idAnalysis,
-            showUploads:'Y',
-            includeUploadStagingDir:'N',
-            skipUploadStagingDirFiles: 'Y'
-        };
-
-
-
-        this.labList = this.gnomexService.labList;
         this.uploadOpts = {
             displayField: 'displayName',
             idField:'idTreeNode',
@@ -118,6 +106,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             displayField: 'displayName',
             childrenField: "FileDescriptor",
             useVirtualScroll: true,
+            idField:'idTreeNode',
             nodeHeight: 22,
             allowDrag: (node: any) =>{
                 if(node.data.PROTECTED && node.data.PROTECTED === 'Y'){
@@ -133,39 +122,75 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                     return false;
                 }
 
-
             }
         };
 
 
-        this.manageFileSubscript = this.fileService.getAnalysisOrganizeFilesObservable().subscribe( (resp) => {
-            this.dialogService.stopAllSpinnerDialogs();
-            if(resp && Array.isArray(resp)){
-                let respList = (<any[]>resp);
-                respList.map(r =>{
-                    if(r && !r.message){
-                        return r;
-                    }else if(r && r.message ){
-                        return r.message;
+
+
+        this.formGroup = new FormGroup({});
+        if(this.data.type === 'a'){
+            this.orgAnalysisFileParams = {
+                idAnalysis:this.data.id.idAnalysis,
+                showUploads:'Y',
+                includeUploadStagingDir:'N',
+                skipUploadStagingDirFiles: 'Y'
+            };
+
+            this.manageFileSubscript = this.fileService.getAnalysisOrganizeFilesObservable().subscribe( (resp) => {
+                this.dialogService.stopAllSpinnerDialogs();
+                if(resp && Array.isArray(resp)){
+                    let respList = (<any[]>resp);
+                    respList.map(r =>{
+                        if(r && !r.message){
+                            return r;
+                        }else if(r && r.message ){
+                            return r.message;
+                        }
+                    });
+
+
+                    if( (typeof(respList[0]) !== 'string'  && typeof(respList[1]) !== 'string')){
+                        let analysis = respList[0].Analysis;
+                        let analysisDownloadList = respList[1].Analysis;
+
+                        if(analysis && analysisDownloadList){
+                            this.uploadFiles = this.getAnalysisUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
+                            this.organizeFiles = [analysisDownloadList];
+                        }
+                    }else{
+                        //this.dialogService.alert()
                     }
-                });
 
-
-                if( (typeof(respList[0]) !== 'string'  && typeof(respList[1]) !== 'string')){
-                    let analysis = respList[0].Analysis;
-                    let analysisDownloadList = respList[1].Analysis;
-
-                    if(analysis && analysisDownloadList){
-                        this.uploadFiles = this.getAnalysisUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
-                        this.organizeFiles = [analysisDownloadList];
-                    }
-                }else{
-                    //this.dialogService.alert()
                 }
+            });
+            this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
 
-            }
-        });
-        this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
+        }else{
+            this.orgExperimentFileParams = {
+                idRequest: this.data.id.idRequest,
+                includeUploadStagingDir: 'N',
+                showUploads: 'Y'
+            };
+            this.manageFileSubscript = this.fileService.getRequestOrganizeFilesObservable().subscribe(resp =>{
+                this.dialogService.stopAllSpinnerDialogs();
+                this.uploadFiles = resp[0];
+                this.organizeFiles = resp[1];
+
+
+            },error =>{
+                this.dialogService.stopAllSpinnerDialogs();
+                this.dialogService.alert(error);
+            });
+            this.fileService.emitGetRequestOrganizeFiles(this.orgExperimentFileParams);
+
+
+        }
+
+
+        this.labList = this.gnomexService.labList;
+
+
 
     }
 
@@ -181,9 +206,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
 
     onMove(event){
-        let nodeEvent = <ITreeNode> event.node;
-        let node = this.organizeTree.treeModel.getNodeById(nodeEvent.id);
-        let parentNode = this.organizeTree.treeModel.getNodeById(event.to.parent.id);
+        let nodeEvent = event.node;
+        let node = this.organizeTree.treeModel.getNodeById(nodeEvent.idTreeNode);
+        let parentNode = this.organizeTree.treeModel.getNodeById(event.to.parent.idTreeNode);
         node.data.dirty = 'Y';
         node.focus();
         parentNode.expand();
@@ -283,12 +308,13 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 this.organizeSelectedNode.expand();
             }
 
-            this.openRenameDialog("Add Folder", "FolderName",(data) =>{
+            this.openRenameDialog("Add Folder", "Folder Name",(data) =>{
                 if(data){
                     let displayName = data;
                     let files:any[] = targetNode.FileDescriptor;
                     if(files){
                         files.push({
+                            isNew: 'Y',
                             dirty: 'Y',
                             key: "X-X-"+displayName,
                             displayName: displayName,
@@ -329,7 +355,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             this.getChildrenToRemove(node.data);
 
             if(treeRemovedFrom === 'organize'){
-                parentNode.data.FileDescriptor =  children.filter(c => c.id !== id);
+                parentNode.data.FileDescriptor =  children.filter(c => c.idTreeNode !== id);
             }else{
                 this.uploadFiles = children.filter(c => c.idTreeNode !== id);
             }
@@ -402,8 +428,10 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             this.dialogService.startDefaultSpinnerDialog();
             this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
         }else if(this.data.type === 'e'){
-            //TODO
+            this.dialogService.startDefaultSpinnerDialog();
+            this.fileService.emitGetRequestOrganizeFiles(this.orgExperimentFileParams);
         }
+        this.formGroup.markAsPristine();
 
     }
 
@@ -473,7 +501,25 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             });
 
         }else{
-            //TODO logic for experiment save
+            let params:HttpParams = new HttpParams()
+                .set("filesToRemoveJSONString", JSON.stringify( this.removedChildren))
+                .set("filesJSONString", JSON.stringify(this.organizeFiles[0]))
+                .set("idRequest",  this.data.id.idRequest)
+                .set("noJSONToXMLConversionNeeded", "Y");
+
+            this.fileService.organizeExperimentFiles(params).subscribe( resp => {
+                this.dialogService.stopAllSpinnerDialogs();
+                if(resp && resp.result && resp.result === "SUCCESS"){
+                    if(resp.warning){
+                        this.dialogService.alert(resp.warning);
+                    }
+                    this.formGroup.markAsPristine();
+                    this.fileService.emitGetAnalysisOrganizeFiles(this.orgExperimentFileParams);
+
+                }else if(resp.message){
+                    this.dialogService.alert(resp.message)
+                }
+            });
         }
 
 

@@ -21,6 +21,8 @@ import {ExperimentOverviewTabComponent} from "./experiment-overview-tab.componen
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-tab.component";
 import {ExperimentFilesTabComponent} from "./experiment-files-tab.component";
+import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
+import {ManageFilesModule} from "../../util/upload/manage-files.module";
 
 
 
@@ -33,7 +35,8 @@ import {ExperimentFilesTabComponent} from "./experiment-files-tab.component";
         ReactiveFormsModule,
         UtilModule,
         RelatedDataModule,
-        RichEditorModule
+        RichEditorModule,
+        ManageFilesModule
     ],
 
     declarations: [
@@ -46,7 +49,8 @@ import {ExperimentFilesTabComponent} from "./experiment-files-tab.component";
     ],
     providers: [],
     entryComponents: [
-        CollaboratorsDialogComponent
+        CollaboratorsDialogComponent,
+        ManageFilesDialogComponent
     ],
     exports: []
 })

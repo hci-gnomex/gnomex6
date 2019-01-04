@@ -359,8 +359,11 @@ export class ExperimentsService {
     }
 
 
+    getExperimentWithParams(params: HttpParams) {
+        return this.httpClient.get("/gnomex/GetRequest.gx",{params:params})
+    }
 
-
-
-
+    getRequestDownloadListWithParams(params: HttpParams) {
+        return this.httpClient.get("/gnomex/GetRequestDownloadList.gx", {params: params});
+    }
 }
