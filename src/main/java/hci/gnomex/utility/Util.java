@@ -14,10 +14,7 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
+import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -709,7 +706,7 @@ public class Util {
             node.setAttribute("displayColor", color);
         }
 
-        for (final Element contentElement : (List<Element>) node.getChildren("FileDescriptor")) {
+        for (final Element contentElement : (List<Element>) node.getChildren()) {
             setFileDescriptorDisplayRecursively(contentElement);
         }
     }
@@ -756,6 +753,17 @@ public class Util {
         }
 
         return convertedNode;
+    }
+
+    public static JsonArray readJSONArray(HttpServletWrappedRequest request, String parameterName) {
+        String JSONString = request.getParameter(parameterName);
+        if (isParameterNonEmpty(JSONString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(JSONString))) {
+                return jsonReader.readArray();
+            }
+        } else {
+            return Json.createArrayBuilder().build();
+        }
     }
 
 }

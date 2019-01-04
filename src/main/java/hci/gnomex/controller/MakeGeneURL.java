@@ -11,46 +11,39 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.DataTrackUtil;
 import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.Util;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 
 public class MakeGeneURL extends GNomExCommand implements Serializable {
 
     private static Logger LOG = Logger.getLogger(MakeGeneURL.class);
-    private static int PEDFILE_MAXLENGTH = 1000;
     private String serverName;
     private String pedpath;
     private String geneiobioviewerURL;
-    private String baseDir;
     private String dataTrackFileServerWebContext;
     private String baseURL;
     private File dir;
     private int idAnalysis;
 
     private String theProband = null;
-    private String VCFInfoXMLString = null;
-    private String BAMInfoXMLString = null;
-    private String PEDFileXMLString = null;
-    private String PEDInfoXMLString = null;
+    private JsonArray VCFInfoArray;
+    private JsonArray BAMInfoArray;
+    private JsonArray PEDFileArray;
     private String analysisDirectory = null;
     protected String errorDetails = "";
 
@@ -77,30 +70,37 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
         // the proband, needed if .ped file has more than one
         if (request.getParameter("proband") != null && !request.getParameter("proband").equals("")) {
-            String theProbandXML = request.getParameter("proband");
-            System.out.println("[MakeGeneURL] theProbandXML: " + theProbandXML);
-            theProband = getProband(theProbandXML);
+            String theProbandJSON = request.getParameter("proband");
+            System.out.println("[MakeGeneURL] theProbandJSON: " + theProbandJSON);
+            theProband = getProband(theProbandJSON);
             System.out.println("[MakeGeneURL] theProband: " + theProband);
         }
 
-        // Get the VCFInfo XML string
-        if (request.getParameter("VCFInfo") != null && !request.getParameter("VCFInfo").equals("")) {
-            VCFInfoXMLString = request.getParameter("VCFInfo");
+        // Get the VCFInfo JSON string
+        try {
+            this.VCFInfoArray = Util.readJSONArray(request, "VCFInfo");
+        } catch (Exception e) {
+            this.addInvalidField("VCFInfoJSONString", "Invalid VCFInfoJSONString");
+            this.errorDetails = Util.GNLOG(LOG, "Cannot parse VCFInfoJSONString", e);
         }
 
-        // Get the BAMInfo XML string
-        if (request.getParameter("BAMInfo") != null && !request.getParameter("BAMInfo").equals("")) {
-            BAMInfoXMLString = request.getParameter("BAMInfo");
+        // Get the BAMInfo JSON string
+        try {
+            this.BAMInfoArray = Util.readJSONArray(request, "BAMInfo");
+        } catch (Exception e) {
+            this.addInvalidField("BAMInfoJSONString", "Invalid BAMInfoJSONString");
+            this.errorDetails = Util.GNLOG(LOG, "Cannot parse BAMInfoJSONString", e);
         }
 
-        // Get the PedFile XML string
-        if (request.getParameter("PEDFile") != null && !request.getParameter("PEDFile").equals("")) {
-            PEDFileXMLString = request.getParameter("PEDFile");
-            System.out.println("[MakeGeneURL] PEDFileXMLString: " + PEDFileXMLString);
+        // Get the PedFile JSON string
+        try {
+            this.PEDFileArray = Util.readJSONArray(request, "PEDFile");
+        } catch (Exception e) {
+            this.addInvalidField("PEDFileJSONString", "Invalid PEDFileJSONString");
+            this.errorDetails = Util.GNLOG(LOG, "Cannot parse PEDFileJSONString", e);
         }
 
         serverName = request.getServerName();
-
     }
 
     public Command execute() throws RollBackCommandException {
@@ -109,45 +109,31 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
             Session sess = HibernateSession.currentSession(this.getSecAdvisor().getUsername());
 
-            String portNumber = PropertyDictionaryHelper.getInstance(sess).getQualifiedProperty(
-                    PropertyDictionary.HTTP_PORT, serverName);
-            if (portNumber == null) {
-                portNumber = "";
-            } else {
-                portNumber = ":" + portNumber;
-            }
-
-            geneiobioviewerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(
-                    PropertyDictionary.GENE_IOBIO_VIEWER_URL);
-            dataTrackFileServerWebContext = PropertyDictionaryHelper.getInstance(sess).getProperty(
-                    PropertyDictionary.DATATRACK_FILESERVER_WEB_CONTEXT);
+            geneiobioviewerURL = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.GENE_IOBIO_VIEWER_URL);
+            dataTrackFileServerWebContext = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.DATATRACK_FILESERVER_WEB_CONTEXT);
             baseURL = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.DATATRACK_FILESERVER_URL);
 
-            baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
-                    PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+            String baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
             String use_altstr = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
             if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
-                baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
-                        PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,this.getUsername());
+                baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT, this.getUsername());
             }
 
+            Map<Integer, String> headerMap = new HashMap<>();
+            Map<String, String[]> peopleMap = new HashMap<>();
 
-            Map<Integer, String> headerMap = new HashMap<Integer, String>();
-            Map<String, String[]> peopleMap = new HashMap<String, String[]>();
+            Map<String, String> vcfMap = new HashMap<>();
+            ArrayList<String> bamList = new ArrayList<>();
 
-            Map<String, String> vcfMap = new HashMap<String, String>();
-            String vcfPathName = "";
-            ArrayList<String> bamList = new ArrayList<String>();
-
-            Analysis a = (Analysis) sess.get(Analysis.class, idAnalysis);
+            Analysis a = sess.get(Analysis.class, idAnalysis);
             analysisDirectory = Util.getAnalysisDirectory(baseDir, a);
-            System.out.println ("[MakeGeneURL] baseDir: " + baseDir + " analysisDirectory: " + analysisDirectory);
+            System.out.println("[MakeGeneURL] baseDir: " + baseDir + " analysisDirectory: " + analysisDirectory);
 
             // genome build
             String gBN = null;
             if (a != null) {
                 Set<GenomeBuild> gbs = a.getGenomeBuilds();
-                if (gbs != null) {
+                if (gbs != null && gbs.iterator().hasNext()) {
                     GenomeBuild gb = gbs.iterator().next();
                     if (gb != null) {
                         String genomeBuildName = gb.getGenomeBuildName(); //Just pull the first one, should only be one.
@@ -156,20 +142,20 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                     }
                 }
             }
-            String[] theProbands = null;
+            String[] theProbands;
 
-            String status = null;
+            String status;
             if (theProband != null && !theProband.equals("")) {
                 // process the ped file xml
-                status = setupPedFileFromXML(PEDFileXMLString, headerMap, peopleMap);
-                System.out.println("[MakeGeneURL] after launch setupPedFileFromXML status: " + status);
+                status = setupPedFileFromJSON(PEDFileArray, headerMap, peopleMap);
+                System.out.println("[MakeGeneURL] after launch setupPedFileFromJSON status: " + status);
 
                 // get the vcf info so we can validate
-                vcfInfoParser(VCFInfoXMLString, analysisDirectory, vcfMap);
+                vcfInfoParser(VCFInfoArray, analysisDirectory, vcfMap);
 
                 // validate the pedfile
                 status = validatePedFile(theProband, headerMap, peopleMap, vcfMap);
-                System.out.println ("[MakeGeneURL] after validatePedFile status: -->" + status + "<---");
+                System.out.println("[MakeGeneURL] after validatePedFile status: -->" + status + "<---");
 
                 // are we ok?
                 if (status == null) {
@@ -177,14 +163,18 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                     ArrayList<String> urlsToLink = processTrio(theProband, headerMap, peopleMap, gBN);
                     System.out.println("[MakeGeneURL] the url: " + urlsToLink.get(0));
 
-                    this.xmlResult = "<SUCCESS urlsToLink=\"" + urlsToLink.get(0) + "\"" + "/>";
+                    this.jsonResult = Json.createObjectBuilder()
+                            .add("result", "SUCCESS")
+                            .add("urlsToLink", urlsToLink.get(0))
+                            .build().toString();
                 } else {
                     // nope, something is not right
-                    this.xmlResult = "<PROBLEM status=\"" + status + "\"" + "/>";
+                    this.jsonResult = Json.createObjectBuilder()
+                            .add("result", "ERROR")
+                            .add("status", status)
+                            .build().toString();
 
-                    System.out.println("[MakeGeneURL] xmlResult: \n" + this.xmlResult);
                     setResponsePage(this.SUCCESS_JSP);
-
                 }
                 setResponsePage(this.SUCCESS_JSP);
             } else {
@@ -195,11 +185,11 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                 if (status != null && status.equals("extend")) {
 
                     // get the vcf info
-                    vcfInfoParser(VCFInfoXMLString, analysisDirectory, vcfMap);
+                    vcfInfoParser(VCFInfoArray, analysisDirectory, vcfMap);
                     System.out.println("[MakeGeneURL] vcfMap.size: " + vcfMap.size());
 
                     // get the bam info
-                    bamInfoParser(BAMInfoXMLString, analysisDirectory, bamList);
+                    bamInfoParser(BAMInfoArray, bamList);
                     System.out.println("[MakeGeneURL] bamList.size: " + bamList.size());
 
                     // add bam and vcf information to everyone we can
@@ -224,7 +214,6 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                 }
 
                 if (status == null) {
-
                     // if no proband specified, find the 1st trio
                     if (theProband == null) {
                         theProbands = findTrio(headerMap, peopleMap);
@@ -241,33 +230,28 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                             theProband = theProbands[0];
                             status = null;
                         }
-
                     }
                 }
 
-                System.out.println("[MakeGeneURL] before final processTrio status: " + status + " theProband: "
-                        + theProband);
+                System.out.println("[MakeGeneURL] before final processTrio status: " + status + " theProband: " + theProband);
 
                 if (status == null) {
                     // construct the URL
                     ArrayList<String> urlsToLink = processTrio(theProband, headerMap, peopleMap, gBN);
                     System.out.println("[MakeGeneURL] the url: " + urlsToLink.get(0));
 
-                    this.xmlResult = "<SUCCESS urlsToLink=\"" + urlsToLink.get(0) + "\"" + "/>";
+                    this.jsonResult = Json.createObjectBuilder()
+                            .add("result", "SUCCESS")
+                            .add("urlsToLink", urlsToLink.get(0))
+                            .build().toString();
                 } else {
                     // build the xml needed for the UI to call ManagePedFile
-                    Document ManagePedFile = buildManagePedFileXML(pedpath, PEDInfoXMLString, VCFInfoXMLString, BAMInfoXMLString, headerMap,
-                            peopleMap, status);
+                    Document ManagePedFile = buildManagePedFileXML(pedpath, null, VCFInfoArray, BAMInfoArray, headerMap, peopleMap, status);
 
-                    XMLOutputter out = new org.jdom.output.XMLOutputter();
-                    this.xmlResult = out.outputString(ManagePedFile);
-
-                    System.out.println("[MakeGeneURL] xmlResult: \n" + this.xmlResult);
-
+                    this.jsonResult = Util.convertXMLDocumentToJSONString(ManagePedFile);
                 }
                 setResponsePage(this.SUCCESS_JSP);
             }
-
         } catch (Exception e) {
             this.errorDetails = Util.GNLOG(LOG, "An exception has occurred in MakeGeneURL ", e);
             throw new RollBackCommandException(e.getMessage());
@@ -276,104 +260,93 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return this;
     }
 
-    public String getProband(String probandXML) {
-        String theProband = null;
-
-        int spos = probandXML.indexOf("sample_id=\"");
+    private String getProband(String probandJSON) {
+        int spos = probandJSON.indexOf("sample_id=\"");
         System.out.println("[getProband] spos: " + spos);
         if (spos == -1) {
-            return theProband;
+            return null;
         }
 
-        int epos = probandXML.indexOf("\"", spos + 11);
+        int epos = probandJSON.indexOf("\"", spos + 11);
         System.out.println("[getProband] epos: " + epos);
         if (epos == -1) {
-            return theProband;
+            return null;
         }
 
-        theProband = probandXML.substring(spos + 11, epos);
-        return theProband;
+        return probandJSON.substring(spos + 11, epos);
     }
 
-
     /*
-     * Process PEDFileXMLString and setup headerMap and peopleMap
+     * Process PEDFileArray and setup headerMap and peopleMap
      */
-    public String setupPedFileFromXML(String PEDFileXMLString, Map<Integer, String> headerMap,
-                                      Map<String, String[]> peopleMap) {
+    private String setupPedFileFromJSON(JsonArray pedFileArray, Map<Integer, String> headerMap, Map<String, String[]> peopleMap) {
         String status = null;
-        String separator = "";
-        ArrayList<String> columnNames = new ArrayList<String>();
+        ArrayList<String> columnNames = new ArrayList<>();
 
-        StringReader reader = new StringReader(PEDFileXMLString);
-        try {
-            SAXBuilder sax = new SAXBuilder();
-            Document doc = sax.build(reader);
-
-            Element root = doc.getRootElement();
-
-            int sample_id = -1;
-            int numnames = 0;
-            for (Iterator i = root.getChildren("PEDHeader").iterator(); i.hasNext(); ) {
-                Element node = (Element) i.next();
-
-                String columnName = node.getAttributeValue("name");
-                if (columnName == null) {
-                    status = "Error: ped file has incorrect format.";
-                    return status;
-                }
-
-                if (columnName.toLowerCase().equals("sample_id")) {
-                    sample_id = numnames;
-                }
-
-                columnNames.add(columnName);
-
-                headerMap.put(numnames, columnName);
-                numnames++;
+        int sample_id = -1;
+        int numnames = 0;
+        for (int index = 0; index < pedFileArray.size(); index++) {
+            JsonObject node = pedFileArray.getJsonObject(index);
+            if (node.get("pedFileType") == null || !node.getString("pedFileType").equals("header")) {
+                continue;
             }
 
-            separator = "";
-            String[] theEntry = new String[numnames];
-            int numcols = 0;
-            int numentry = 0;
+            if (node.get("name") == null) {
+                status = "Error: ped file has incorrect format.";
+                return status;
+            }
+            String columnName = node.getString("name");
 
-            for (Iterator i = root.getChildren("PEDEntry").iterator(); i.hasNext(); ) {
-                Element node = (Element) i.next();
-
-                theEntry = new String[numnames];
-                numcols = 0;
-                for (String theColumn : columnNames) {
-                    String value = node.getAttributeValue(theColumn);
-                    theEntry[numcols] = value;
-                    numcols++;
-                }
-
-                peopleMap.put(theEntry[sample_id], theEntry);
-                System.out.println("[setupPedFileFromXML] numentry: " + numentry + " sample_id: " + sample_id + " theEntry[sample_id]: " + theEntry[sample_id] + " theEntry: " + theEntry[1] + " " + theEntry[2] + " " + theEntry[3]);
-                numentry++;
+            if (columnName.toLowerCase().equals("sample_id")) {
+                sample_id = numnames;
             }
 
-        } catch (JDOMException je) {
-            LOG.error("Cannot parse PEDFileXMLString", je);
-            this.addInvalidField("MakeGeneURL", "Invalid PEDFileXMLString");
-            status = "Error: Unable to parse ped file XML.";
+            columnNames.add(columnName);
+
+            headerMap.put(numnames, columnName);
+            numnames++;
+        }
+
+        String[] theEntry;
+        int numcols;
+        int numentry = 0;
+
+        for (int index = 0; index < pedFileArray.size(); index++) {
+            JsonObject node = pedFileArray.getJsonObject(index);
+            if (node.get("pedFileType") == null || !node.getString("pedFileType").equals("entry")) {
+                continue;
+            }
+
+            theEntry = new String[numnames];
+            numcols = 0;
+            for (String theColumn : columnNames) {
+                String value = node.getString(theColumn);
+                theEntry[numcols] = value;
+                numcols++;
+            }
+
+            peopleMap.put(theEntry[sample_id], theEntry);
+            System.out.println("[setupPedFileFromJSON] numentry: " + numentry + " sample_id: " + sample_id + " theEntry[sample_id]: " + theEntry[sample_id] + " theEntry: " + theEntry[1] + " " + theEntry[2] + " " + theEntry[3]);
+            numentry++;
         }
 
         return status;
     }
 
-    public static String setupPedFile(String pedpath, Map<Integer, String> headerMap, Map<String, String[]> peopleMap) {
+    static String setupPedFile(String pedpath, Map<Integer, String> headerMap, Map<String, String[]> peopleMap) {
         String status = null;
-        int numlines = -1;
         boolean sawOne = false;
 
         System.out.println("[setupPedFile] pedpath: " + pedpath);
 
+        if (pedpath == null) {
+            return null;
+        }
+
         try {
             BufferedReader br = new BufferedReader(new FileReader(pedpath));
 
-            String line = null;
+            String line;
             boolean sawHeader = false;
             boolean sawbam = false;
             boolean sawvcf = false;
@@ -383,7 +356,6 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             int sampleId = -1;
 
             while ((line = br.readLine()) != null) {
-                numlines++;
                 if (line.equals("")) {
                     continue;
                 }
@@ -396,16 +368,16 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                     sawHeader = true;
 
                     line = line.toLowerCase();
-                    if (line.indexOf("\tbam") >= 0) {
+                    if (line.contains("\tbam")) {
                         sawbam = true;
                     }
-                    if (line.indexOf("\tvcf") >= 0) {
+                    if (line.contains("\tvcf")) {
                         sawvcf = true;
                     }
-                    if (line.indexOf("\tsex") >= 0) {
+                    if (line.contains("\tsex")) {
                         sawsex = true;
                     }
-                    if (line.indexOf("\taffect") >= 0) {
+                    if (line.contains("\taffect")) {
                         sawaffected = true;
                     }
 
@@ -465,8 +437,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
                 // debug
                 if (!sawOne) {
-                    System.out.println("[setupPedFile] sampleid: " + sampleid + " thePerson.length: " + thePerson.length
-                            + " headerMap.size: " + headerMap.size());
+                    System.out.println("[setupPedFile] sampleid: " + sampleid + " thePerson.length: " + thePerson.length + " headerMap.size: " + headerMap.size());
                     for (int ii = 0; ii < thePerson.length; ii++) {
                         System.out.println("[setupPedFile] thePerson ii: " + ii + " value: " + thePerson[ii]);
                     }
@@ -485,7 +456,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return status;
     }
 
-    public static int mapColumn(String colName, Map<Integer, String> headerMap) {
+    private static int mapColumn(String colName, Map<Integer, String> headerMap) {
         int column = -1;
 
         for (Map.Entry<Integer, String> entry : headerMap.entrySet()) {
@@ -502,8 +473,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
     /*
      * Add bam and vcf file information to everyone we can
      */
-    public static String augmentPedFile(Map<Integer, String> headerMap, Map<String, String[]> peopleMap,
-                                        Map<String, String> vcfMap, ArrayList<String> bamList) {
+    static String augmentPedFile(Map<Integer, String> headerMap, Map<String, String[]> peopleMap, Map<String, String> vcfMap, ArrayList<String> bamList) {
 
         String status = null;
 
@@ -556,8 +526,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             peopleMap.put(key, value);
         }
 
-        System.out.println("[augmentPedFile] numsaw: " + numsaw + " numvcf: " + numvcf + " numbam: " + numbam
-                + " numboth: " + numboth);
+        System.out.println("[augmentPedFile] numsaw: " + numsaw + " numvcf: " + numvcf + " numbam: " + numbam + " numboth: " + numboth);
 
         if (numboth == 0) {
             status = "Error: no overlapping bam and vcf files.";
@@ -566,7 +535,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return status;
     }
 
-    public static String findBAM(String sampleId, ArrayList<String> bamList) {
+    static String findBAM(String sampleId, ArrayList<String> bamList) {
         String theBamFile = null;
 
         for (String aBamFile : bamList) {
@@ -579,8 +548,8 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return theBamFile;
     }
 
-    public ArrayList<String> processTrio(String theProband, Map<Integer, String> headerMap, Map<String, String[]> peopleMap, String gBN) {
-        ArrayList<String> theURLS = new ArrayList<String>();
+    private ArrayList<String> processTrio(String theProband, Map<Integer, String> headerMap, Map<String, String[]> peopleMap, String gBN) {
+        ArrayList<String> theURLS = new ArrayList<>();
 
         System.out.println("[processTrio] theProband: " + theProband);
 
@@ -667,7 +636,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
     // validate the pedfile, vcf.gz must exist and contain sample id
     // bam file must exist
 
-    public String validatePedFile(String theProband, Map<Integer, String> headerMap, Map<String, String[]> peopleMap, Map<String, String> vcfMap) {
+    private String validatePedFile(String theProband, Map<Integer, String> headerMap, Map<String, String[]> peopleMap, Map<String, String> vcfMap) {
         String status = null;
         String statusStart = "Error: wrong vcf file or vcf file not found: ";
         boolean firstError = true;
@@ -796,7 +765,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                 }
             } // check father vcf file
 
-            bamPath =  father[BAM];
+            bamPath = father[BAM];
 
             bamFile = null;
             if (bamPath != null && !bamPath.equals("")) {
@@ -831,19 +800,18 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return theStatus;
     }
 
-
     /*
      * Returns the sample_id of everyone with a mother, father, bam and vcf info for them and their parents
      */
-    public static String[] findTrio(Map<Integer, String> headerMap, Map<String, String[]> peopleMap) {
-        String[] theProbands = null;
-        ArrayList<String> probands = new ArrayList<String>();
+    static String[] findTrio(Map<Integer, String> headerMap, Map<String, String[]> peopleMap) {
+        String[] theProbands;
+        ArrayList<String> probands = new ArrayList<>();
 
         // column numbers
         int FATHER = mapColumn("paternal_id", headerMap);
         int MOTHER = mapColumn("maternal_id", headerMap);
         if (FATHER == -1 || MOTHER == -1) {
-            return theProbands;
+            return null;
         }
 
         int BAM = mapColumn("bam", headerMap);
@@ -865,12 +833,12 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             }
 
             // must have a bam file
-            if (value.length < BAM+1 || value[BAM] == null || value[BAM].equals("")) {
+            if (value.length < BAM + 1 || value[BAM] == null || value[BAM].equals("")) {
                 continue;
             }
 
             // must have a vcf file
-            if (value.length < VCF+1 || value[VCF] == null || value[VCF].equals("")) {
+            if (value.length < VCF + 1 || value[VCF] == null || value[VCF].equals("")) {
                 continue;
             }
 
@@ -892,7 +860,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         }
 
         if (probands.size() == 0) {
-            return theProbands;
+            return null;
         }
 
         theProbands = new String[probands.size()];
@@ -905,98 +873,70 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return theProbands;
     }
 
-    public static boolean hasBAMVCF(int BAM, int VCF, String sampleId, Map<String, String[]> peopleMap) {
+    private static boolean hasBAMVCF(int BAM, int VCF, String sampleId, Map<String, String[]> peopleMap) {
         boolean hasBAMVCF = false;
 
         String[] value = peopleMap.get(sampleId);
 
-        if (value == null || value.length < BAM+1 || value.length < VCF+1) {
-            return hasBAMVCF;
+        if (value == null || value.length < BAM + 1 || value.length < VCF + 1) {
+            return false;
         }
 
-        if (value != null && value[BAM] != null && !value[BAM].equals("") && value[VCF] != null && !value[VCF].equals("")) {
+        if (value[BAM] != null && !value[BAM].equals("") && value[VCF] != null && !value[VCF].equals("")) {
             hasBAMVCF = true;
         }
 
         return hasBAMVCF;
     }
 
-    public static void vcfInfoParser(String VCFInfoXMLString, String analysisDirectory, Map<String, String> vcfMap) {
+    static void vcfInfoParser(JsonArray vcfInfoArray, String analysisDirectory, Map<String, String> vcfMap) {
 
-        if (VCFInfoXMLString == null || VCFInfoXMLString.equals("")) {
+        if (vcfInfoArray == null || vcfInfoArray.size() == 0) {
             return;
         }
 
-        StringReader reader = new StringReader(VCFInfoXMLString);
-        try {
-            SAXBuilder sax = new SAXBuilder();
-            Document doc = sax.build(reader);
-
-            Element root = doc.getRootElement();
-
-            // prefer vcf.gz files in /VCF/Complete/
-            for (Iterator i = root.getChildren("VCFPath").iterator(); i.hasNext(); ) {
-                Element node = (Element) i.next();
+        // prefer vcf.gz files in /VCF/Complete/
+        for (int arrayIndex = 0; arrayIndex < vcfInfoArray.size(); arrayIndex++) {
+            JsonObject node = vcfInfoArray.getJsonObject(arrayIndex);
 
 //			String pathName = analysisDirectory + "/" + node.getAttributeValue("path");
-                String pathName = node.getAttributeValue("path");
-                pathName = pathName.replace("\\", "/");
+            String pathName = node.getString("path");
+            pathName = pathName.replace("\\", "/");
 
-                if (pathName.contains("/VCF/Complete/")) {
-                    addVCFIds(pathName, analysisDirectory, vcfMap);
-                }
+            if (pathName.contains("/VCF/Complete/")) {
+                addVCFIds(pathName, analysisDirectory, vcfMap);
             }
+        }
 
-            // now do everyone else
-            for (Iterator i = root.getChildren("VCFPath").iterator(); i.hasNext(); ) {
-                Element node = (Element) i.next();
+        // now do everyone else
+        for (int arrayIndex = 0; arrayIndex < vcfInfoArray.size(); arrayIndex++) {
+            JsonObject node = vcfInfoArray.getJsonObject(arrayIndex);
 
-                String pathName = node.getAttributeValue("path");
-                pathName = pathName.replace("\\", "/");
+            String pathName = node.getString("path");
+            pathName = pathName.replace("\\", "/");
 
-                if (!pathName.contains("/VCF/Complete/")) {
-                    addVCFIds(pathName, analysisDirectory, vcfMap);
-                }
+            if (!pathName.contains("/VCF/Complete/")) {
+                addVCFIds(pathName, analysisDirectory, vcfMap);
             }
-
-        } catch (JDOMException je) {
-            LOG.error("MakeGeneURL Cannot parse VCFInfoXMLString", je);
         }
     }
 
-    public static void bamInfoParser(String BAMInfoXMLString, String analysisDirectory, ArrayList<String> bamList) {
-
-        if (BAMInfoXMLString == null || BAMInfoXMLString.equals("")) {
+    static void bamInfoParser(JsonArray bamInfoArray, ArrayList<String> bamList) {
+        if (bamInfoArray == null || bamInfoArray.size() == 0) {
             return;
         }
 
-        StringReader reader = new StringReader(BAMInfoXMLString);
-        try {
-            SAXBuilder sax = new SAXBuilder();
-            Document doc = sax.build(reader);
+        for (int arrayIndex = 0; arrayIndex < bamInfoArray.size(); arrayIndex++) {
+            JsonObject node = bamInfoArray.getJsonObject(arrayIndex);
 
-            Element root = doc.getRootElement();
+            String pathName = node.getString("path");
+            pathName = pathName.replace("\\", "/");
 
-            for (Iterator i = root.getChildren("BAMPath").iterator(); i.hasNext(); ) {
-                Element node = (Element) i.next();
-
-//			String pathName = analysisDirectory + "/" + node.getAttributeValue("path");
-                String pathName = node.getAttributeValue("path");
-                pathName = pathName.replace("\\", "/");
-
-                bamList.add(pathName);
-            }
-
-        } catch (JDOMException je) {
-            LOG.error("MakeGeneURL Cannot parse BAMInfoXMLString", je);
-//            errorDetails = Util.GNLOG(LOG,"Cannot parse selectedSampleXMLString ", je);
+            bamList.add(pathName);
         }
     }
 
-    public static void addVCFIds(String VCFpathName, String analysisDirectory, Map<String, String> vcfMap) {
-
-        // System.out.println("[addVCFIds] VCFpathName: " + VCFpathName);
-
+    private static void addVCFIds(String VCFpathName, String analysisDirectory, Map<String, String> vcfMap) {
         if (VCFpathName == null) {
             return;
         }
@@ -1007,10 +947,8 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         String VCFpathName1 = analysisDirectory + "/" + VCFpathName;
         if (!File.separator.equals("/")) {
             VCFpathName1 = VCFpathName1.replace("/", "\\");
-            // System.out.println("[addVCFIds] VCFpathName: " + VCFpathName);
         }
 
-        ArrayList theIds = new ArrayList();
         String lastline = Util.getVCFHeader(VCFpathName1);
 /*
         String[] cmd = {"tabix", "-H", ""};
@@ -1040,112 +978,65 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         int numids = 0;
 
         boolean sawFormat = false;
-        for (int ii = 0; ii < pieces.length; ii++) {
+        for (String s : pieces) {
             if (sawFormat) {
                 numids++;
 
                 // only add it if it's not present
-                if (vcfMap.get(pieces[ii]) == null) {
-                    vcfMap.put(pieces[ii], VCFpathName);
-                    // System.out.println("[addVCFIds] ii: " + ii + " pieces[ii]: " + pieces[ii]);
-                }
+                vcfMap.putIfAbsent(s, VCFpathName);
                 continue;
             }
 
-            if (pieces[ii].equals("FORMAT")) {
+            if (s.equals("FORMAT")) {
                 sawFormat = true;
             }
         }
 
         System.out.println("[MakeGeneURL:addVCFIds] numids: " + numids);
-
     }
 
-    public static Document buildManagePedFileXML(String pedpath, String PEDInfoXMLString, String VCFInfoXMLString, String BAMInfoXMLString,
-                                                 Map<Integer, String> headerMap, Map<String, String[]> peopleMap, String status) {
-        Document ManagePedFile = null;
+    static Document buildManagePedFileXML(String pedpath, JsonArray pedInfoArray, JsonArray vcfInfoArray, JsonArray bamInfoArray, Map<Integer, String> headerMap, Map<String, String[]> peopleMap, String status) {
+        Document ManagePedFile;
 
         ManagePedFile = new Document(new Element("ManagePedFile"));
 
         Element vcfInfo = new Element("VCFInfo");
         Element bamInfo = new Element("BAMInfo");
         Element pedInfo = new Element("PEDInfo");
-        Element pedFile = new Element("PEDFile");
+        Element pedFile;
         Element pedAction = new Element("PEDAction");
 
         int numPedFiles = 0;
 
-        StringReader reader = null;
-
-        if (PEDInfoXMLString != null) {
-            reader = new StringReader(PEDInfoXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                Document doc = sax.build(reader);
-                Element root = doc.getRootElement();
-
-                if (!root.getChildren("PEDPath").isEmpty()) {
-                    Element vcfPath = new Element("PEDPath");
-                    for (Iterator i = root.getChildren("PEDPath").iterator(); i.hasNext(); ) {
-                        Element node = (Element) i.next();
-                        Element node1 = ((Element) node.clone()).detach();
-
-                        pedInfo.addContent(node1);
-                        numPedFiles++;
-                    }
-                }
-
-            } catch (JDOMException je) {
-                LOG.error("MakeGeneURL Cannot parse PEDInfoXMLString", je);
+        if (pedInfoArray != null) {
+            for (int arrayIndex = 0; arrayIndex < pedInfoArray.size(); arrayIndex++) {
+                JsonObject node = pedInfoArray.getJsonObject(arrayIndex);
+                Element pedInfoNode = new Element("PEDPath");
+                pedInfoNode.setAttribute("path", node.getString("path"));
+                pedInfo.addContent(pedInfoNode);
+                numPedFiles++;
             }
         }
 
-
-        if (VCFInfoXMLString != null) {
-            reader = new StringReader(VCFInfoXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                Document doc = sax.build(reader);
-                Element root = doc.getRootElement();
-
-                if (!root.getChildren("VCFPath").isEmpty()) {
-                    Element vcfPath = new Element("VCFPath");
-                    for (Iterator i = root.getChildren("VCFPath").iterator(); i.hasNext(); ) {
-                        Element node = (Element) i.next();
-                        Element node1 = ((Element) node.clone()).detach();
-
-                        vcfInfo.addContent(node1);
-                    }
-                }
-
-            } catch (JDOMException je) {
-                LOG.error("MakeGeneURL Cannot parse VCFInfoXMLString", je);
+        if (vcfInfoArray != null) {
+            for (int arrayIndex = 0; arrayIndex < vcfInfoArray.size(); arrayIndex++) {
+                JsonObject node = vcfInfoArray.getJsonObject(arrayIndex);
+                Element vcfInfoNode = new Element("VCFPath");
+                vcfInfoNode.setAttribute("path", node.getString("path"));
+                vcfInfo.addContent(vcfInfoNode);
             }
         }
 
-        if (BAMInfoXMLString != null) {
-            reader = new StringReader(BAMInfoXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                Document doc = sax.build(reader);
-                Element root = doc.getRootElement();
-
-                if (!root.getChildren("BAMPath").isEmpty()) {
-                    Element bamPath = new Element("BAMPath");
-                    for (Iterator i = root.getChildren("BAMPath").iterator(); i.hasNext(); ) {
-                        Element node = (Element) i.next();
-                        Element node1 = ((Element) node.clone()).detach();
-
-                        bamInfo.addContent(node1);
-                    }
-                }
-
-            } catch (JDOMException je) {
-                LOG.error("MakeGeneURL Cannot parse BAMInfoXMLString", je);
+        if (bamInfoArray != null) {
+            for (int arrayIndex = 0; arrayIndex < bamInfoArray.size(); arrayIndex++) {
+                JsonObject node = bamInfoArray.getJsonObject(arrayIndex);
+                Element bamInfoNode = new Element("BAMPath");
+                bamInfoNode.setAttribute("path", node.getString("path"));
+                bamInfo.addContent(bamInfoNode);
             }
         }
 
-        if (pedpath != null && (PEDInfoXMLString == null || numPedFiles == 0)) {
+        if (pedpath != null && (pedInfoArray == null || numPedFiles == 0)) {
             Element piPath = new Element("PEDPath");
             pedpath = pedpath.replace("\\", "/");
             piPath.setAttribute("path", pedpath);
@@ -1172,7 +1063,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return ManagePedFile;
     }
 
-    public static Element buildPedFileXML(Map<Integer, String> headerMap, Map<String, String[]> peopleMap) {
+    private static Element buildPedFileXML(Map<Integer, String> headerMap, Map<String, String[]> peopleMap) {
         Element pedFile = new Element("PEDFile");
 
         // get the column names
@@ -1185,11 +1076,11 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
             Element pedHeader = new Element("PEDHeader");
             pedHeader.setAttribute("name", value);
+            pedHeader.setAttribute("pedFileType", "header");
             pedFile.addContent(pedHeader);
         }
 
         for (Map.Entry<String, String[]> entry : peopleMap.entrySet()) {
-            String key = entry.getKey();
             String[] value = entry.getValue();
 
             Element pedEntry = new Element("PEDEntry");
@@ -1208,19 +1099,18 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                         pvalue = mapAffected(1, pvalue);
                     }
 
-
                     pedEntry.setAttribute(columnNames[ii], pvalue);
                 }
             }
+            pedEntry.setAttribute("pedFileType", "entry");
             pedFile.addContent(pedEntry);
-
         }
 
         return pedFile;
     }
 
-    public static String mapSex(int mode, String value) {
-        String sex = null;
+    static String mapSex(int mode, String value) {
+        String sex;
         if (mode == 1) {
             sex = "Unknown";
             if (value.equals("1")) {
@@ -1243,11 +1133,11 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             return sex;
         }
 
-        return sex;
+        return null;
     }
 
-    public static String mapAffected(int mode, String value) {
-        String affected = null;
+    static String mapAffected(int mode, String value) {
+        String affected;
         if (mode == 1) {
             affected = "Unknown";
             if (value.equals("1")) {
@@ -1270,9 +1160,10 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             return affected;
         }
 
-        return affected;
+        return null;
     }
 
+    /*
     private ArrayList<String> processTrioFile(String pedpath) {
 
         ArrayList<String> theURL = new ArrayList<String>();
@@ -1373,7 +1264,9 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return theURL;
 
     }
+    */
 
+    /*
     private String buildURL(String genename, HashMap<String, String[]> samples) {
         String url = geneiobioviewerURL + "/?rel0=proband";
 
@@ -1433,9 +1326,10 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
         return url;
     }
+    */
 
+    /*
     private String[] parseElement(String element) {
-        // System.out.println ("[parseElement] element: " + element);
         String[] result = new String[2];
 
         String[] pieces = element.split(":");
@@ -1452,10 +1346,11 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             result[i] = pieces[i].replace('"', ' ').trim();
         } // end of for
 
-        // System.out.println ("[parseElement] result: " + result[0] + " " + result[1]);
         return result;
     }
+    */
 
+    /*
     private String[] parseSample(String sample) {
         // System.out.println ("[parseSample] sample: " + sample);
 
@@ -1508,11 +1403,11 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
         return result;
     }
+    */
 
     private String makeURLLink(String pathName) {
-
         String theLink = "";
-        ArrayList<String> urlsToLoad = new ArrayList<String>();
+        ArrayList<String> urlsToLoad = new ArrayList<>();
 
         String cpath = pathName.replace("\\", "/").toLowerCase();
         String canaldir = analysisDirectory.replace("\\", "/").toLowerCase();
@@ -1545,9 +1440,6 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             File annoFile = new File(dir, DataTrackUtil.stripBadURLChars(f.getName(), "_"));
             String dataTrackString = annoFile.toString().replace("\\", Constants.FILE_SEPARATOR);
 
-            // System.out.println ("[makeURLLink] f.getName(): " + f.getName());
-            // System.out.println ("[makeURLLink] dataTrackString: " + dataTrackString);
-
             // make soft link
             DataTrackUtil.makeSoftLinkViaUNIXCommandLine(f, annoFile);
 
@@ -1561,23 +1453,18 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
                 dataTrackString = dataTrackString.substring(0, dataTrackString.length() - 4) + ".bam.bai";
 
                 // make the soft link
-                // System.out.println ("[makeURLLink] index f.getName(): " + f.getName());
-                // System.out.println ("[makeURLLink] index dataTrackString: " + dataTrackString);
-
                 DataTrackUtil.makeSoftLinkViaUNIXCommandLine(f, dataTrackString);
 
                 continue;
             }
 
             // make URL to link
-            // System.out.println ("[MakeGeneURL] dataTrackString: " + dataTrackString);
             String dataTrackPartialPath = dataTrackString;
             int index = dataTrackString.indexOf(Constants.URL_LINK_DIR_NAME);
             if (index != -1) {
                 dataTrackPartialPath = dataTrackString.substring(index);
             }
 
-            // System.out.println ("[MakeURLLink] adding to urlsToLoad: " + baseURL + dataTrackPartialPath);
             urlsToLoad.add(baseURL + dataTrackPartialPath);
         }
 
@@ -1586,7 +1473,6 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
             theLink = urlsToLoad.get(0);
         }
 
-        // System.out.println ("[makeURLLink] theLink: " + theLink);
         return theLink;
     }
 
@@ -1594,24 +1480,17 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         File dir = null;
 
         try {
-
             // look and or make directory to hold soft links to data
-            // System.out.println ("[setupDirectories] baseURL: " + baseURL + " dataTrackFileServerWebContext: " + dataTrackFileServerWebContext);
             File urlLinkDir = DataTrackUtil.checkUCSCLinkDirectory(baseURL, dataTrackFileServerWebContext);
-            // System.out.println ("[setupDirectories] urlLinkDir: " + urlLinkDir.getName());
 
             String linkPath = this.checkForUserFolderExistence(urlLinkDir, username);
-            // System.out.println ("[setupDirectories] linkPath: " + linkPath);
 
             if (linkPath == null) {
                 linkPath = UUID.randomUUID().toString() + username;
             }
 
             // Create the users' data directory
-//		  System.out.println ("[setupDirectories] urlLinkDir.getAbsoluteFile().replace("\\", Constants.FILE_SEPARATOR): " + urlLinkDir.getAbsoluteFile().replace("\\", Constants.FILE_SEPARATOR));
-            // System.out.println ("[setupDirectories] linkPath: " + linkPath);
             dir = new File(urlLinkDir.getAbsoluteFile(), linkPath);
-//		  System.out.println ("[setupDirectories] dir.getPath().replace("\\", Constants.FILE_SEPARATOR): " + dir.getPath().replace("\\", Constants.FILE_SEPARATOR));
 
             if (!dir.exists())
                 dir.mkdir();
@@ -1639,6 +1518,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
         return desiredDirectory;
     }
 
+    /*
     private String getGRCName(String genomeBuildName) {
         String theName = null;
 
@@ -1659,4 +1539,5 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
 
         return theName;
     }
+    */
 }
