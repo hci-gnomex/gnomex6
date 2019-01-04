@@ -16,6 +16,7 @@ import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {PropertyService} from "../../services/property.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {DataTrackService} from "../../services/data-track.service";
+import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
 
 
 @Component({
@@ -39,6 +40,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
     private showExpAnalysisTab: boolean =false ;
     private showLinkToExp:boolean = false;
     public showAutoDistributeDataTracks: boolean = false;
+    public showManagePEDFile: boolean = false;
 
     public analysisTreeNode:any;
     private analysisTreeNodeSubscription: Subscription;
@@ -86,8 +88,20 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
                 }
             }
 
+            let collaborators: any[] = this.analysis && this.analysis.collaborators
+                ? (Array.isArray(this.analysis.collaborators) ? this.analysis.collaborators : [this.analysis.collaborators.AnalysisCollaborator])
+                : [];
+            let isCollaborator: boolean = false;
+            for (let c of collaborators) {
+                if (c.idAppUser === ("" + this.secAdvisor.idAppUser)) {
+                    isCollaborator = true;
+                    break;
+                }
+            }
+
             this.showAutoDistributeDataTracks = this.analysis && !this.secAdvisor.isGuest && this.analysis.canRead === 'Y'
                 && this.propertyService.getProperty(PropertyService.PROPERTY_DATATRACK_SUPPORTED).propertyValue === 'Y';
+            this.showManagePEDFile = this.showAutoDistributeDataTracks && !isCollaborator;
         });
     }
 
@@ -180,6 +194,14 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
                 }
             });
         }
+    }
+
+    public showManagePEDFileWindow(): void {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = {
+            idAnalysis: this.analysis && this.analysis.idAnalysis ? this.analysis.idAnalysis : ''
+        };
+        this.dialog.open(ManagePedFileWindowComponent, configuration);
     }
 
     save(){

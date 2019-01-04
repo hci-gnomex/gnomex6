@@ -19,6 +19,7 @@ import {AnalysisFilesTabComponent} from "./analysis-files-tab.component";
 import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer";
 import {ManageFilesModule} from "../../util/upload/manage-files.module";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
+import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
 
 
 
@@ -44,12 +45,14 @@ import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.
         AnalysisExperimentTabComponent,
         LinkToExperimentDialogComponent,
         AnalysisInfoTabComponent,
-        AnalysisFilesTabComponent
+        AnalysisFilesTabComponent,
+        ManagePedFileWindowComponent,
     ],
     providers: [],
     entryComponents: [
         LinkToExperimentDialogComponent,
-        ManageFilesDialogComponent
+        ManageFilesDialogComponent,
+        ManagePedFileWindowComponent,
     ],
     exports: []
 })

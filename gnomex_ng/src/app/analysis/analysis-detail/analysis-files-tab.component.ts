@@ -200,7 +200,8 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             .set("idAnalysis", data.idAnalysis)
             .set("fileName", data.fileName)
             .set("VCFInfo", JSON.stringify(this.getAnalysisDownloadListResult.VCFInfo))
-            .set("BAMInfo", JSON.stringify(this.getAnalysisDownloadListResult.BAMInfo));
+            .set("BAMInfo", JSON.stringify(this.getAnalysisDownloadListResult.BAMInfo))
+            .set("noJSONToXMLConversionNeeded", "Y");
         this.dataTrackService.makeGENELink(params).subscribe((result: any) => {
             if (result && result.urlsToLink) {
                 window.open(result.urlsToLink, "_blank");

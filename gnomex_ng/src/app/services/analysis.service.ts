@@ -3,7 +3,7 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {Subject} from "rxjs";
 import {BehaviorSubject} from "rxjs";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
 
@@ -259,6 +259,12 @@ export class AnalysisService {
     }
     public getAnalysisDownloadListWithParams(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysisDownloadList.gx", {params: params});
+    }
+
+    public managePedFile(params: HttpParams): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/ManagePedFile.gx", params.toString(), {headers: headers});
     }
 
 
