@@ -281,6 +281,10 @@ button.mat-button.minimize span {
 button.mat-button.minimize      { min-width: 0; }
 button.mat-button.minimize span { min-width: 0; }
 
+button.mat-button.link-button {
+  color: #0000ff;
+}
+
 .dialog-header-colors{
   background-color: #84b278;
   color: white;

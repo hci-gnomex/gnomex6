@@ -1,6 +1,4 @@
-
-import {Component, OnInit, ViewChild, AfterViewInit, OnDestroy} from "@angular/core";
-import {AnalysisService} from "../../services/analysis.service";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
@@ -14,25 +12,26 @@ import {Subscription} from "rxjs";
 
 
 @Component({
-    templateUrl:'./experiment-detail-overview.component.html',
-    styles:[`
-        
-        .bordered{ border: 1px solid #e8e8e8; }
-        
-    `]
+    templateUrl: "./experiment-detail-overview.component.html",
+    styles: [`
+
+        .bordered {
+            border: 1px solid #e8e8e8;
+        }
+
+    `],
 })
-export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
-    public annotations:any = [];
-    public experiment:any;
+export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
+    public annotations: any = [];
+    public experiment: any;
     types = OrderType;
-    private overviewListSubscription : Subscription;
-    private experimentOverviewNode:any;
-    private relatedObjects:IRelatedObject = {};
-    private showRelatedDataTab:boolean =false;
+    public showMaterialsMethodsTab: boolean = false;
     public initDescriptionTab = false;
-
     public showBioinformaticsTab: boolean = false;
-
+    private overviewListSubscription: Subscription;
+    private experimentOverviewNode: any;
+    private relatedObjects: IRelatedObject = {};
+    private showRelatedDataTab: boolean = false;
     private requestCategory: any;
 
 
@@ -57,14 +56,26 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
 
             if (this.experiment) {
                 if (!this.requestCategory || this.requestCategory.codeRequestCategory !== this.experiment.codeRequestCategory) {
-                    this.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', this.experiment.codeRequestCategory);
+                    this.requestCategory = this.dictionaryService.getEntry("hci.gnomex.model.RequestCategory", this.experiment.codeRequestCategory);
 
                     this.showBioinformaticsTab = this.requestCategory
                         && this.requestCategory.type !== this.gnomexService.TYPE_MICROARRAY
                         && (this.requestCategory.type === this.gnomexService.TYPE_NANOSTRING
-                            || (this.requestCategory.isIlluminaType === 'Y' && this.gnomexService.submitInternalExperiment())
-                            || (this.requestCategory.isIlluminaType === 'Y' && this.experiment && this.experiment.isExternal !== 'Y'));
+                            || (this.requestCategory.isIlluminaType === "Y" && this.gnomexService.submitInternalExperiment())
+                            || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"));
                 }
+
+                let protocols: any[] = [];
+                if (this.experiment.protocols) {
+                    if (Array.isArray(this.experiment.protocols)) {
+                        protocols = this.experiment.protocols;
+                    } else {
+                        protocols = [this.experiment.protocols.Protocol];
+                    }
+                }
+                this.showMaterialsMethodsTab = ((this.experiment.captureLibDesignId && this.experiment.captureLibDesignId !== "")
+                    || (this.experiment.codeIsolationPrepType && this.experiment.codeIsolationPrepType !== "")
+                    || protocols.length > 0);
 
                 let annots = this.experiment.RequestProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.experiment);
@@ -74,7 +85,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
                     for (let i = 0; i < this.annotations.length; i++) {
                         let propertyOptions = this.annotations[i].PropertyOption;
                         if (propertyOptions) {
-                            this.annotations[i].PropertyOption =  Array.isArray(propertyOptions)? propertyOptions :  <IAnnotationOption[]>[propertyOptions];
+                            this.annotations[i].PropertyOption = Array.isArray(propertyOptions) ? propertyOptions : <IAnnotationOption[]>[propertyOptions];
                         }
                     }
                 } else {
@@ -84,7 +95,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
         });
     }
 
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.overviewListSubscription.unsubscribe();
     }
 
@@ -94,22 +105,22 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
         let rObjects = experiment ? experiment.relatedObjects : null;
         let relatedTopics = experiment ? experiment.relatedTopics : null;
 
-        if(rObjects){
+        if (rObjects) {
 
             if (rObjects.Analysis) {
-                let order:Array<any> =  rObjects.Analysis;
+                let order: Array<any> = rObjects.Analysis;
                 this.relatedObjects.Analysis = Array.isArray(order) ? order : [order];
             }
             if (rObjects.DataTrack) {
-                let order:Array<any> =   rObjects.DataTrack;
+                let order: Array<any> = rObjects.DataTrack;
                 this.relatedObjects.DataTrack = Array.isArray(order) ? order : [order];
             }
             if (rObjects.Request) {
-                let order:Array<any> =   rObjects.Request;
+                let order: Array<any> = rObjects.Request;
                 this.relatedObjects.Request = Array.isArray(order) ? order : [order];
             }
             if (relatedTopics) {
-                let topics:Array<any> = relatedTopics.Topic;
+                let topics: Array<any> = relatedTopics.Topic;
                 if (topics) {
                     this.relatedObjects.Topic = Array.isArray(topics) ? topics : [topics];
                 }
@@ -121,7 +132,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy{
         }
     }
 
-    tabChanged(event:MatTabChangeEvent){
+    tabChanged(event: MatTabChangeEvent) {
         if (event.tab.textLabel === "Description") {
             this.initDescriptionTab = true;
         } else {
