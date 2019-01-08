@@ -1,6 +1,6 @@
-import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import {NgModule} from "@angular/core";
+import {CommonModule} from "@angular/common";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
@@ -8,22 +8,18 @@ import {AgGridModule} from "ag-grid-angular";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {UtilModule} from "../../util/util.module";
 import {RelatedDataModule} from "../../util/related-data.module";
-import {
-    ExperimentDetailOverviewComponent,
-    DescriptionTab
-} from './index'
+import {DescriptionTab, ExperimentDetailOverviewComponent} from "./index";
 
 
-import {
-    RichEditorModule,
-} from '../../../modules/index';
+import {RichEditorModule} from "../../../modules/index";
 import {ExperimentOverviewTabComponent} from "./experiment-overview-tab.component";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-tab.component";
 import {ExperimentFilesTabComponent} from "./experiment-files-tab.component";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {ManageFilesModule} from "../../util/upload/manage-files.module";
-
+import {MaterialsMethodsTabComponent} from "./materials-methods-tab.component";
+import {ProtocolDialogComponent} from "./protocol-dialog.component";
 
 
 @NgModule({
@@ -36,7 +32,7 @@ import {ManageFilesModule} from "../../util/upload/manage-files.module";
         UtilModule,
         RelatedDataModule,
         RichEditorModule,
-        ManageFilesModule
+        ManageFilesModule,
     ],
 
     declarations: [
@@ -46,12 +42,16 @@ import {ManageFilesModule} from "../../util/upload/manage-files.module";
         ExperimentDetailOverviewComponent,
         DescriptionTab,
         ExperimentFilesTabComponent,
+        MaterialsMethodsTabComponent,
+        ProtocolDialogComponent,
     ],
     providers: [],
     entryComponents: [
         CollaboratorsDialogComponent,
-        ManageFilesDialogComponent
+        ManageFilesDialogComponent,
+        ProtocolDialogComponent,
     ],
-    exports: []
+    exports: [],
 })
-export class ExperimentDetailModule { }
+export class ExperimentDetailModule {
+}

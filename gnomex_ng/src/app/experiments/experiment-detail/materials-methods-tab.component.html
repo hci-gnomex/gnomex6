@@ -1,0 +1,76 @@
+<div class="full-height full-width padded small-font">
+    <div class="full-width flex-container-col">
+
+        <div class="full-width flex-container-row align-center padded">
+            <div class="gx-label label-width">
+                Experiment
+            </div>
+            <div class="flex-grow">
+                {{requestCategoryName}}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center padded"
+             *ngIf="experimentCategoryName">
+            <div class="gx-label label-width"></div>
+            <div class="flex-grow">
+                {{experimentCategoryName}}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center minor-padded"
+             *ngIf="libDesignAndInsertBoxVisible">
+            <div class="gx-label label-width">
+                {{designAndInsertLabel}}
+            </div>
+            <div class="flex-grow">
+                {{designAndInsertText}}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center minor-padded"
+             *ngIf="codeIsolationPrepType">
+            <div class="gx-label label-width">
+                Isolation prep type
+            </div>
+            <div class="flex-grow">
+                {{codeIsolationPrepType}}
+            </div>
+        </div>
+        <div class="full-width flex-container-row minor-padded" *ngIf="protocols.length > 0">
+            <div class="flex-container-col">
+                <div class="flex-container-row" *ngFor="let protocol of protocols">
+                    <div class="flex-container-col">
+                        <div class="gx-label label-width">
+                            {{protocol.label}}
+                        </div>
+                    </div>
+                    <div class="flex-container-col">
+                        <div class="flex-grow">
+                            <button mat-button
+                                    class="link-button underlined minimize limit-width"
+                                    style="padding: 0;"
+                                    (click)="showProtocol(protocol)">
+                                {{protocol.name}}
+                            </button>
+                        </div>
+                        <div class="flex-container-row padded" *ngIf="protocol.Adapter3Prime">
+                            <div class="gx-label minor-label-width">Adapter Read 1</div>
+                            <div class="flex-grow">
+                                {{protocol.Adapter3Prime}}
+                            </div>
+
+                        </div>
+                        <div class="flex-container-row padded" *ngIf="protocol.Adapter5Prime">
+                            <div class="gx-label minor-label-width">Adapter Read 2</div>
+                            <div class="flex-grow">
+                                {{protocol.Adapter5Prime}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
