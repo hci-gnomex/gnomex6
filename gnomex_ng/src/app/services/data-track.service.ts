@@ -330,7 +330,9 @@ export class DataTrackService {
         return this.httpClient.post("/gnomex/CreateAllDataTracks.gx", params.toString(), {headers: headers});
     }
 
-
-
+    public getDownloadEstimatedSize(keys: string): Observable<any> {
+        let params: HttpParams = new HttpParams().set("keys", keys);
+        return this.httpClient.get("/gnomex/GetEstimatedDownloadDataTrackSize.gx", {params: params});
+    }
 
 }

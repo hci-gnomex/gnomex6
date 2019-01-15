@@ -36,6 +36,8 @@ import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
 import {ContextHelpComponent} from "./context-help.component";
 import {ContextHelpPopupComponent} from "./context-help-popup.component";
 import {RichEditorModule} from "../../modules/rich-editor.module";
+import {DownloadPickerComponent} from "./download-picker.component";
+import {DownloadProgressComponent} from "./download-progress.component";
 
 @NgModule({
     imports: [
@@ -79,6 +81,8 @@ import {RichEditorModule} from "../../modules/rich-editor.module";
         VisibilityDetailTabComponent,
         ContextHelpComponent,
         ContextHelpPopupComponent,
+        DownloadPickerComponent,
+        DownloadProgressComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -92,6 +96,8 @@ import {RichEditorModule} from "../../modules/rich-editor.module";
         NewTopicComponent,
         BillingPeriodSelectorPopupComponent,
         ContextHelpPopupComponent,
+        DownloadPickerComponent,
+        DownloadProgressComponent,
     ],
     exports: [
         BrowseFilterComponent,
@@ -119,6 +125,8 @@ import {RichEditorModule} from "../../modules/rich-editor.module";
         VisibilityDetailTabComponent,
         ContextHelpComponent,
         ContextHelpPopupComponent,
+        DownloadPickerComponent,
+        DownloadProgressComponent,
     ]
 })
 export class UtilModule {

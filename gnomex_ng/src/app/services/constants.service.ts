@@ -111,6 +111,7 @@ export class ConstantsService {
     public readonly ICON_CHART_ORGANIZATION: string = "assets/chart_organisation.png";
     public readonly ICON_ARROW_LEFT: string = "assets/arrow_left.gif";
     public readonly ICON_ARROW_RIGHT: string = "assets/arrow_right.gif";
+    public readonly ICON_DATABASE_LIGHTNING: string = "assets/database_lightning.png";
 
     public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
 

@@ -20,6 +20,7 @@ import {BrowseOrderValidateService} from "../../services/browse-order-validate.s
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {URLSearchParams} from "@angular/http";
 import {first} from "rxjs/operators";
+import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 
 
 
@@ -68,6 +69,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     @ViewChild(DatatracksSummaryTabComponent) summaryComponet:DatatracksSummaryTabComponent;
     @ViewChild(AnnotationTabComponent) annotationComponent:AnnotationTabComponent;
     @ViewChild(DatatracksVisibilityTabComponent) visibilityComponent: DatatracksVisibilityTabComponent;
+    @ViewChild(DatatracksFilesTabComponent) filesComponent: DatatracksFilesTabComponent;
 
 
     constructor(private dataTrackService:DataTrackService,private route:ActivatedRoute,
@@ -92,6 +94,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dtOverviewForm.addControl("summaryForm", this.summaryComponet.summaryFormGroup);
                 this.dtOverviewForm.addControl("form", this.annotationComponent.form);
                 this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
+                this.dtOverviewForm.addControl("filesForm", this.filesComponent.filesToRemove);
                 this.dtOverviewForm.markAsPristine();
             });
             if(this.datatrack){
@@ -110,6 +113,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                     this.dtOverviewForm.addControl("summaryForm", this.summaryComponet.summaryFormGroup);
                     this.dtOverviewForm.addControl("annotationForm", this.annotationComponent.form);
                     this.dtOverviewForm.addControl("visibilityForm", this.visibilityComponent.visibilityForm);
+                    this.dtOverviewForm.addControl("filesForm", this.filesComponent.filesToRemove);
                     this.dtOverviewForm.markAsPristine();
                 });
 
@@ -350,7 +354,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
 
         let dataTrackProperties:string = JSON.stringify(this.orderValidateService.annotationsToSave);
-        let filesToRemove:string = null; // needs to be implemented by download tab
+        let filesToRemove:string = JSON.stringify(this.dtOverviewForm.get("filesForm").value);
 
 
 

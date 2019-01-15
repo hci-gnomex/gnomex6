@@ -114,6 +114,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     public labMembers: any;
     private billingAccounts: any;
     private selectedItem: ITreeNode;
+    private allActiveNodes: ITreeNode[] = [];
     public datatracksCount: number = 0;
     private dataTracksListSubscription: Subscription;
     private labList: any[] = [];
@@ -438,6 +439,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
      */
     treeOnSelect(event: any) {
         this.selectedItem = event.node;
+        this.allActiveNodes = this.treeModel.getActiveNodes();
         this.selItem.emit(this.selectedItem);
 
         let datatrackListNode =  _.cloneDeep(this.selectedItem.data);

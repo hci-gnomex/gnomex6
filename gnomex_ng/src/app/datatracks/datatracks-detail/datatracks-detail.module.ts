@@ -1,4 +1,3 @@
-
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormsModule,ReactiveFormsModule} from "@angular/forms";
@@ -16,13 +15,12 @@ import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dial
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
 import {RichEditorModule} from "../../../modules/rich-editor.module";
 import {RelatedDataModule} from "../../util/related-data.module";
-
-
+import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
+import {AgGridModule} from "ag-grid-angular";
 
 /**
  * @author Erik Rasmussen
  */
-
 
 @NgModule({
     imports: [
@@ -36,14 +34,15 @@ import {RelatedDataModule} from "../../util/related-data.module";
         UtilModule,
         ReactiveFormsModule,
         ConfigureAnnotationsModule,
-        RelatedDataModule
-
+        RelatedDataModule,
+        AgGridModule.withComponents([
+        ]),
     ],
     declarations: [
         DatatracksDetailOverviewComponent,
         DatatracksSummaryTabComponent,
-        DatatracksVisibilityTabComponent
-
+        DatatracksVisibilityTabComponent,
+        DatatracksFilesTabComponent,
     ],
     entryComponents: [ConfigAnnotationDialogComponent]
 })
