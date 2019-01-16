@@ -1,25 +1,38 @@
 <input type="file" #file style="display: none" (change)="onFilesAdded()" multiple />
 <div class="full-height full-width flex-container-col">
-    <h1 mat-dialog-title>Upload Files</h1>
     <!-- This is the content of the dialog, containing a list of the files to upload -->
-    <div class="flex-container-col">
-        <button mat-button color="primary" (click)="addFile()" > add</button>
+    <div class="flex-container-row  spaced-children-margin " style="padding: 0.5em" >
+        <button mat-button color="primary" (click)="addFile()" > <img [src]="constService.ICON_ADD"> Choose files </button>
+        <button mat-button color="primary" (click)="removeFile()" >
+            <img [src]="constService.ICON_DELETE"> Remove
+        </button>
+        <button mat-button color="primary" (click)="removeAllFiles()" > <img [src]="constService.ICON_CROSS"> Clear All </button>
+        <context-help class="align-items-end" name="uploadhelp" title="Upload Help" label="Upload Help" [isEditMode]="this.secAdvisor.isAdmin" >
+        </context-help>
 
-        <mat-list>
-            <mat-list-item *ngFor="let file of files">
 
-                <h4 mat-line>{{file.name}}</h4>
-
-                <mat-progress-bar *ngIf="progress" mode="determinate" [value]="progressGroup[file.name].progress | async">
-                </mat-progress-bar>
-
-            </mat-list-item>
-        </mat-list>
     </div>
 
+
+    <div class="flex-grow full-width">
+        <ag-grid-angular class="ag-theme-balham full-width full-height"
+                         [columnDefs]="columnDefs"
+                         [rowSelection]="'single'"
+                         [enableSorting]="true"
+                         [enableColResize]="true"
+                         [rowDeselection]="true"
+                         (rowSelected)="selectedRow($event)"
+                         (gridReady)="onGridReady($event)">
+        </ag-grid-angular>
+    </div>
     <!-- This are the actions of the dialog, containing the primary and the cancel button-->
-    <div class="justify-flex-end">
-        <button *ngIf="showCancelButton" mat-button mat-dialog-close>Cancel</button>
-        <button mat-raised-button color="primary" [disabled]="!canBeClosed" (click)="closeDialog()">{{primaryButtonText}}</button>
+    <div class="flex-container-row spaced-children-margin align-center" style="padding: 0.5em">
+        <div class="flex-grow ">
+            <mat-progress-bar  mode="determinate" [value]="progressVal"> </mat-progress-bar>
+        </div>
+        <button mat-raised-button color="primary" [disabled]="rowData.length === 0" (click)="upload()">
+            <img [src]="constService.ICON_UPLOAD" >
+            {{primaryButtonText}}
+        </button>
     </div>
 </div>

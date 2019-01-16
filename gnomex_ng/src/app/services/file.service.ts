@@ -22,6 +22,12 @@ export class FileService {
 
 
 
+    getUploadOrderUrl(call:string):Observable<any>{
+        return this.httpClient.get(call);
+    }
+
+
+
 
 
 
@@ -74,9 +80,9 @@ export class FileService {
                         let hasError = false;
                         let errorMessage = "";
                         if(resp[0] && resp[0].Request){
-                            let reqUpload = resp[0].Request;
-                            if(reqUpload.RequestUpload && reqUpload.RequestUpload.FileDescriptor){
-                                resp[0] = Array.isArray(reqUpload.FileDescriptor) ? reqUpload.RequestUpload.FileDescriptor : [reqUpload.RequestUpload.FileDescriptor]
+                            if(resp[0].Request.RequestUpload && resp[0].Request.RequestUpload.FileDescriptor){
+                                let reqUpload = resp[0].Request.RequestUpload;
+                                resp[0] = Array.isArray(reqUpload.FileDescriptor) ? reqUpload.FileDescriptor : [reqUpload.FileDescriptor];
                             }else{
                                 resp[0] = [];
                             }

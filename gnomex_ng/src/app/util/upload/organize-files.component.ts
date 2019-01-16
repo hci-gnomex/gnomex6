@@ -59,12 +59,12 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
     @Input() set tabVisible(val:boolean){
         this._tabVisible = val;
-        if(this._tabVisible){
-            setTimeout(()=>{
-                this.organizeTree.treeModel.roots[0].expand();
-            });
-        }
 
+        setTimeout(()=>{
+            if(this._tabVisible && this.organizeTree.treeModel.roots ) {
+                this.organizeTree.treeModel.roots[0].expand();
+            }
+        });
     }
     get tabVisible():boolean{
         return this._tabVisible;
@@ -400,8 +400,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             title: title,
             placeHolder: placeHolder
         };
+        config.maxWidth='35em';
 
-        config.width = "20em";
         let dialogRef: MatDialogRef<NameFileDialogComponent>  = this.dialog.open(NameFileDialogComponent,config);
         if(onClose){
             dialogRef.afterClosed().subscribe(onClose);

@@ -1,8 +1,15 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import { MatDialogRef } from '@angular/material';
-import { forkJoin } from 'rxjs';
+import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowSelectedEvent} from "ag-grid-community";
 import {UploadFileService} from "../../services/upload-file.service";
 import {IFileParams} from "../interfaces/file-params.model";
+import {ConstantsService} from "../../services/constants.service";
+import {concat, of, Subscription} from "rxjs";
+import {FileService} from "../../services/file.service";
+import {DialogsService} from "../popup/dialogs.service";
+import {last, take} from "rxjs/operators";
+import {TabChangeEvent} from "../tabs";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 @Component({
     selector: 'upload-file',
@@ -18,94 +25,172 @@ import {IFileParams} from "../interfaces/file-params.model";
             flex: 1;
             flex-direction: column;
         }
-    
+
     `]
 })
 export class UploadFileComponent implements OnInit {
     @ViewChild('file') file;
     @Input('manageData') manageData: IFileParams;
-    progressGroup:any;
-    canBeClosed = true;
+    @Output() navToTab = new EventEmitter();
+    public progressVal = 0;
+    private pCount:number = 0;
+    gridApi: GridApi;
     primaryButtonText = 'Upload';
-    showCancelButton = true;
-    uploading = false;
-    uploadSuccessful = false;
-
-
+    rowData:any[] = [];
     public files: Set<File> = new Set();
+    selectedIndex:number = -1;
+    selectedRowList:any[] = [];
+    url:string = '';
+    private uploadSubscription: Subscription;
+    private orgExperimentFileParams:any;
+    private orgAnalysisFileParams:any;
 
-    constructor(public dialogRef: MatDialogRef<UploadFileComponent>, public uploadService: UploadFileService) {}
+
+
+
+    public columnDefs = [
+        {
+            headerName: "File",
+            field: "name",
+            width: 155
+
+        },
+        {
+            headerName: "File Type",
+            field: "type",
+            width: 155
+        },
+        {
+            headerName: "File Size",
+            field: "size",
+            //cellEditorFramework: NumericEditorComponent,
+            width: 155
+        }
+
+    ];
+
+
+
+    constructor(public dialogRef: MatDialogRef<UploadFileComponent>,
+                public uploadService: UploadFileService,
+                private dialogService: DialogsService,
+                public constService:ConstantsService,
+                public secAdvisor: CreateSecurityAdvisorService,
+                private fileService: FileService) {}
 
     ngOnInit() {
-        if(!this.manageData){
-            this.canBeClosed = false;
+        if(this.manageData){
+            if(this.manageData.type === 'e'){
+                this.orgExperimentFileParams = {
+                    idRequest: this.manageData.id.idRequest,
+                    includeUploadStagingDir: 'N',
+                    showUploads: 'Y'
+                };
+            }else{
+                this.orgAnalysisFileParams = {
+                    idAnalysis:this.manageData.id.idAnalysis,
+                    showUploads:'Y',
+                    includeUploadStagingDir:'N',
+                    skipUploadStagingDirFiles: 'Y'
+                };
+            }
+
+
+
+        }
+
+        this.uploadSubscription =  this.fileService.getUploadOrderUrl(this.manageData.uploadURL).subscribe(resp =>{
+            if(resp && resp.url){
+                this.url = resp.url;
+            }else if(resp && resp.message){
+                this.dialogService.alert(resp.message)
+            }
+        });
+
+
+    }
+
+    onGridReady(event:GridReadyEvent){
+
+        this.gridApi = event.api;
+        this.gridApi.sizeColumnsToFit();
+        this.gridApi.setRowData(this.rowData);
+
+    }
+
+    selectedRow(event:any){
+        this.selectedRowList = this.gridApi.getSelectedRows();
+        if(event.node.selected){
+            this.selectedIndex = event.rowIndex;
         }
     }
 
 
 
     onFilesAdded() {
+        this.progressVal = 0;
         const files: { [key: string]: File } = this.file.nativeElement.files;
         for (let key in files) {
             if (!isNaN(parseInt(key))) {
-                this.files.add(files[key]);
+                let file:File = files[key];
+                this.files.add(file);
+
+                let name = file.name;
+                let type:string = "";
+                let size:number =  file.size;
+                let bytesToKilo = Math.trunc(size/1024).toLocaleString() + " kb";
+                type = (name.split("."))[1];
+                this.rowData.push({'file':file,'name':name,'type':type,'size':bytesToKilo});
             }
         }
+
+
+        this.gridApi.setRowData( this.rowData );
     }
 
     addFile() {
         this.file.nativeElement.click();
     }
-
-    closeDialog() {
-
-        // if everything was uploaded already, just close the dialog
-
-        if (this.uploadSuccessful) {
-            return this.dialogRef.close();
+    removeFile(){
+        if(this.selectedRowList && this.selectedRowList.length > 0){
+            this.rowData.splice(this.selectedIndex,1);
+            this.gridApi.setRowData(this.rowData);
         }
+    }
+    removeAllFiles(){
+        this.rowData = [];
+        this.gridApi.setRowData(this.rowData);
+        this.selectedRowList = [];
+    }
 
-        // set the component state to "uploading"
-        this.uploading = true;
+    upload() {
+            this.progressVal = 0;
+            this.pCount = 0;
 
-        // start the upload and save the progress map
+            this.uploadService.uploadFromBrowse(this.rowData,this.url,this.manageData.id)
+                .pipe(take(this.rowData.length)).subscribe( resp =>{
+                this.pCount++;
+                this.progressVal = ((this.pCount) / this.rowData.length) * 100;
+                if(this.pCount === this.rowData.length){
+                    this.rowData = [];
+                    this.gridApi.setRowData(this.rowData = []);
+                    if(this.manageData.type === 'e'){
+                        this.fileService.emitGetRequestOrganizeFiles(this.orgExperimentFileParams)
+                    }else{
+                        this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams)
+                    }
+                    this.navToTab.emit(1);
 
+                }
+            },error =>{
+                this.rowData = [];
+                this.gridApi.setRowData(this.rowData = []);
+                this.dialogService.alert(error);
+            });
 
-        this.progressGroup = this.uploadService.upload(this.files,this.manageData.uploadURL, this.manageData.id );
-        console.log(this.progressGroup);
-        for (const key in this.progressGroup) {
-            this.progressGroup[key].progress.subscribe(val => console.log(val));
-        }
+    }
 
-        // convert the progress map into an array
-        let allProgressObservables = [];
-        for (let key in this.progressGroup) {
-            allProgressObservables.push(this.progressGroup[key].progress);
-        }
-
-        // Adjust the state variables
-
-        // The OK-button should have the text "Finish" now
-        this.primaryButtonText = 'Finish';
-
-        // The dialog should not be closed while uploading
-        this.canBeClosed = false;
-        this.dialogRef.disableClose = true;
-
-        // Hide the cancel-button
-        this.showCancelButton = false;
-
-        // When all progress-observables are completed...
-        forkJoin(allProgressObservables).subscribe(end => {
-            // ... the dialog can be closed again...
-            this.canBeClosed = true;
-            this.dialogRef.disableClose = false;
-
-            // ... the upload was successful...
-            this.uploadSuccessful = true;
-
-            // ... and the component is no longer uploading
-            this.uploading = false;
-        });
+    ngOnDestroy(){
+        this.uploadSubscription.unsubscribe();
     }
 }

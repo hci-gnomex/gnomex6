@@ -10,6 +10,7 @@ import {
     MatTooltipModule
 } from '@angular/material';
 import { UploadFileComponent } from './upload-file.component';
+import { AgGridModule } from "ag-grid-angular";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
@@ -31,6 +32,7 @@ import {UtilModule} from "../util.module";
         HttpClientModule,
         MatTooltipModule,
         TreeModule.forRoot(),
+        AgGridModule,
         AngularSplitModule,
         MatFormFieldModule,
         UtilModule,
