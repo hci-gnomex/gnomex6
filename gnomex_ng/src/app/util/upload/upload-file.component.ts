@@ -7,9 +7,10 @@ import {ConstantsService} from "../../services/constants.service";
 import {concat, of, Subscription} from "rxjs";
 import {FileService} from "../../services/file.service";
 import {DialogsService} from "../popup/dialogs.service";
-import {last, take} from "rxjs/operators";
+import {flatMap, last, take} from "rxjs/operators";
 import {TabChangeEvent} from "../tabs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {saveAs} from 'file-saver';
 
 @Component({
     selector: 'upload-file',
@@ -41,9 +42,11 @@ export class UploadFileComponent implements OnInit {
     selectedIndex:number = -1;
     selectedRowList:any[] = [];
     url:string = '';
+    allowFDTButton:boolean;
     private uploadSubscription: Subscription;
     private orgExperimentFileParams:any;
     private orgAnalysisFileParams:any;
+
 
 
 
@@ -94,8 +97,10 @@ export class UploadFileComponent implements OnInit {
                     skipUploadStagingDirFiles: 'Y'
                 };
             }
-
-
+            if(this.manageData.isFDT){
+                this.primaryButtonText = "Start";
+                this.allowFDTButton = true;
+            }
 
         }
 
@@ -164,6 +169,7 @@ export class UploadFileComponent implements OnInit {
     }
 
     upload() {
+        if(!this.manageData.isFDT){
             this.progressVal = 0;
             this.pCount = 0;
 
@@ -187,7 +193,12 @@ export class UploadFileComponent implements OnInit {
                 this.gridApi.setRowData(this.rowData = []);
                 this.dialogService.alert(error);
             });
-
+        }else{
+            this.allowFDTButton = false;
+            this.uploadService.startFDTUpload(this.manageData.id).subscribe(fileBlob =>{
+                saveAs(fileBlob,"gnomex.jnlp" );
+            });
+        }
     }
 
     ngOnDestroy(){

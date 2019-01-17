@@ -140,7 +140,17 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleUploadFiles(): void {
-        // TODO Upload Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.request,
+            startTabIndex: 0,
+            isFDT: false
+        };
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
+        this.dialog.open(ManageFilesDialogComponent,config);
     }
 
     public handleFDTUploadCommandLine(): void {
@@ -148,7 +158,17 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleFDTUploadFiles(): void {
-        // TODO FDT Upload Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.request,
+            startTabIndex: 0,
+            isFDT: true
+        };
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
+        this.dialog.open(ManageFilesDialogComponent,config);
     }
 
     public handleSFTPUploadFiles(): void {
@@ -160,6 +180,8 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
         config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.request,
+            startTabIndex: 1,
+            isFDT: false
         };
         config.height = "40em";
         config.width = "55em";

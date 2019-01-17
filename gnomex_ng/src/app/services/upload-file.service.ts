@@ -5,17 +5,19 @@ import {
     HttpEventType,
     HttpResponse,
     HttpHeaders,
-    HttpErrorResponse
+    HttpErrorResponse, HttpParams
 } from '@angular/common/http';
-import {BehaviorSubject, concat, Observable, ObservableInput, throwError,} from 'rxjs';
+import {BehaviorSubject, concat, Observable, ObservableInput, of, throwError,} from 'rxjs';
 import {Http,URLSearchParams,Response} from "@angular/http";
-import {catchError, concatMap, first, map} from "rxjs/operators";
+import {catchError, concatMap, first, flatMap, map} from "rxjs/operators";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 //const url = 'http://localhost:3000/upload';
 
 @Injectable()
 export class UploadFileService {
-    constructor(private http: Http) {}
+    constructor(private http: Http, private httpClient:HttpClient,
+                private dialogService:DialogsService) {}
 
 
 
@@ -54,5 +56,24 @@ export class UploadFileService {
         }
         return throwError("An error occured please contact GNomEx Support.");
     }
+    public startFDTUpload(idObj:any): Observable<any> {
+        let key:string = (Object.keys(idObj))[0];
+        let params:HttpParams = new HttpParams().set(key, idObj[key]);
+        return this.httpClient.get("/gnomex/FastDataTransferUploadStart.gx",{params:params})
+            .pipe(flatMap((resp:any) =>{
+                if(resp && resp.uuid ){
+                    let uuid = resp.uuid;
+                    return this.getFDTJnlpServlet(new HttpParams().set('uuid', uuid))
+                }else if(resp.message){
+                    this.dialogService.alert(resp.message);
+                }
+                return of(false);
+            }));
+    }
+
+    private getFDTJnlpServlet(params:HttpParams): Observable<any>{
+        return this.httpClient.post("/gnomex/FastDataTransferUploadGetJnlpServlet.gx",null,{responseType: 'blob', params: params});
+    }
+
 
 }

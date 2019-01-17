@@ -1,7 +1,7 @@
 <input type="file" #file style="display: none" (change)="onFilesAdded()" multiple />
 <div class="full-height full-width flex-container-col">
     <!-- This is the content of the dialog, containing a list of the files to upload -->
-    <div class="flex-container-row  spaced-children-margin " style="padding: 0.5em" >
+    <div class="flex-container-row  spaced-children-margin " style="padding: 0.5em" *ngIf="!this.manageData.isFDT">
         <button mat-button color="primary" (click)="addFile()" > <img [src]="constService.ICON_ADD"> Choose files </button>
         <button mat-button color="primary" (click)="removeFile()" >
             <img [src]="constService.ICON_DELETE"> Remove
@@ -14,7 +14,7 @@
     </div>
 
 
-    <div class="flex-grow full-width">
+    <div class="flex-grow full-width" *ngIf="!manageData.isFDT; else fdtInstructions">
         <ag-grid-angular class="ag-theme-balham full-width full-height"
                          [columnDefs]="columnDefs"
                          [rowSelection]="'single'"
@@ -25,12 +25,16 @@
                          (gridReady)="onGridReady($event)">
         </ag-grid-angular>
     </div>
-    <!-- This are the actions of the dialog, containing the primary and the cancel button-->
-    <div class="flex-container-row spaced-children-margin align-center" style="padding: 0.5em">
-        <div class="flex-grow ">
+    <ng-template #fdtInstructions>
+        <div class="flex-grow full-width  padded" [innerHTML]="this.constService.UPLOAD_FILE_FDT_INFO"> </div>
+    </ng-template>
+
+    <div class="flex-container-row spaced-children-margin align-center" style="padding: 0.5em; justify-content: flex-end;">
+        <div class="flex-grow" *ngIf="!this.manageData.isFDT">
             <mat-progress-bar  mode="determinate" [value]="progressVal"> </mat-progress-bar>
         </div>
-        <button mat-raised-button color="primary" [disabled]="rowData.length === 0" (click)="upload()">
+        <button mat-raised-button
+                color="primary" [disabled]="this.manageData.isFDT ? !allowFDTButton : rowData.length === 0" (click)="upload()">
             <img [src]="constService.ICON_UPLOAD" >
             {{primaryButtonText}}
         </button>
