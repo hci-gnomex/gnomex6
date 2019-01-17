@@ -228,7 +228,17 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleFDTUploadFiles(): void {
-        // TODO FDT Upload Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.analysis,
+            startTabIndex: 0,
+            isFDT: true
+        };
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
+        this.dialog.open(ManageFilesDialogComponent,config);
     }
 
     public handleManageFiles(): void {
@@ -236,6 +246,8 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.analysis,
+            startTabIndex: 1,
+            isFDT: false
         };
         config.height = "40em";
         config.width = "55em";

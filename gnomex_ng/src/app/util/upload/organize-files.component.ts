@@ -5,7 +5,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {DialogsService} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
-import {ITreeOptions, TreeComponent} from "angular-tree-component";
+import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent} from "angular-tree-component";
 import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
@@ -17,7 +17,15 @@ import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 
-
+const actionMapping:IActionMapping = {
+    mouse: {
+        click: (tree, node, $event) => {
+            $event.ctrlKey
+                ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
+                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+        }
+    }
+};
 
 @Component({
     selector: "organize-file",
@@ -50,25 +58,10 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     public organizeSelectedNode:ITreeNode;
     public uploadSelectedNode:ITreeNode;
     public formGroup: FormGroup;
-    public removedChildren:any[] = [];
+    public removedChildren: Set<string> = new Set();
     public orgAnalysisFileParams:any;
     public orgExperimentFileParams:any;
 
-
-    private _tabVisible: boolean = false;
-
-    @Input() set tabVisible(val:boolean){
-        this._tabVisible = val;
-
-        setTimeout(()=>{
-            if(this._tabVisible && this.organizeTree.treeModel.roots ) {
-                this.organizeTree.treeModel.roots[0].expand();
-            }
-        });
-    }
-    get tabVisible():boolean{
-        return this._tabVisible;
-    }
 
     @ViewChild('organizeTree')
     private organizeTree: TreeComponent;
@@ -98,8 +91,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             allowDrag: (node: any) =>{return node.level === 1 && node.data.PROTECTED === 'N'},
             allowDrop: (element, item: {parent: any, index}) => {
                 return false;
-            }
-
+            },
+            actionMapping
         };
 
         this.organizeOpts = {
@@ -122,7 +115,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                     return false;
                 }
 
-            }
+            },
+            actionMapping
         };
 
 
@@ -243,7 +237,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
             let p = file.PROTECTED === 'Y';
             if(!p){
-                this.removedChildren.push(file)
+                this.removedChildren.add(file)
             }
             return p;
         }
@@ -258,7 +252,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         }
 
         if(file.PROTECTED || file.PROTECTED === 'N') {
-            this.removedChildren.push(file);
+            this.removedChildren.add(file);
         }
         return isProtected;
     }
@@ -297,6 +291,16 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         }
     };
 
+    datatrackSelectedFile(nodes:ITreeNode[]):boolean{
+        let hasDataTrack:boolean = false;
+        for(let n of nodes){
+            if(n.data.hasDataTrack === 'Y'){
+                hasDataTrack = true;
+            }
+        }
+        return hasDataTrack;
+    }
+
 
     addNewFolder(){
         let targetNode = null;
@@ -334,60 +338,71 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         }
     }
 
-    remove(treeRemovedFrom:string, node:ITreeNode){
-        let id:any = '';
-        let parentNode: ITreeNode = node.parent;
-        let tree:TreeComponent = null;
-        let children: any[] = [];
+    remove(treeRemovedFrom:string, nodes:ITreeNode[]){
+        for(let node of nodes){
+            if(node.isRoot){
+                continue;
+            }
 
-        if(treeRemovedFrom === 'organize'){
-            id = this.organizeSelectedNode.id;
-            tree = this.organizeTree;
-            children = <any[]>parentNode.data.FileDescriptor;
-        }else {
-            id = this.uploadSelectedNode.id;
-            tree = this.uploadTree;
-            children = <any[]>parentNode.data.children
-        }
-
-
-        if(!this.isProtected(node.data,true)){
-            this.getChildrenToRemove(node.data);
+            let id:any = '';
+            let parentNode: ITreeNode = node.parent;
+            let tree:TreeComponent = null;
+            let children: any[] = [];
 
             if(treeRemovedFrom === 'organize'){
-                parentNode.data.FileDescriptor =  children.filter(c => c.idTreeNode !== id);
-            }else{
-                this.uploadFiles = children.filter(c => c.idTreeNode !== id);
+                id = node.id;
+                tree = this.organizeTree;
+                children = <any[]>parentNode.data.FileDescriptor;
+            }else {
+                id = node.id;
+                tree = this.uploadTree;
+                children = <any[]>parentNode.data.children
             }
-            tree.treeModel.update();
+
+
+            if(!this.isProtected(node.data,true)){
+                this.getChildrenToRemove(node.data);
+
+                if(treeRemovedFrom === 'organize'){
+                    parentNode.data.FileDescriptor =  children.filter(c => c.idTreeNode !== id);
+                }else{
+                    this.uploadFiles = children.filter(c => c.idTreeNode !== id);
+                }
+                tree.treeModel.update();
+                this.formGroup.markAsDirty();
+            }
+            this.uploadSelectedNode = null;
+            this.organizeSelectedNode = null;
+
         }
-        this.uploadSelectedNode = null;
-        this.organizeSelectedNode = null;
     }
 
     attemptRemove(){
         let treeRemovedFrom:string = '';
-        let node:ITreeNode = null;
+        let nodes:ITreeNode[] = null;
+
 
         if(this.organizeSelectedNode){
             treeRemovedFrom = 'organize';
-            node = this.organizeSelectedNode;
+            nodes = this.organizeTree.treeModel.getActiveNodes();
         }else if(this.uploadSelectedNode){
             treeRemovedFrom = 'upload';
-            node = this.uploadSelectedNode;
+            nodes = this.uploadTree.treeModel.getActiveNodes();
         }else{
             return;
         }
 
-        if(node.data.hasDataTrack === 'Y'){
-            this.dialogService.confirm("Warning","This file is linked to a data track.  Do you want to remove the file and delete the associated data track?")
+
+
+        if(this.datatrackSelectedFile(nodes)){
+            this.dialogService.confirm("Warning","At lease one selected file is linked to a data track.  Do you want to remove the files and delete any associated data tracks?")
                 .pipe(first()).subscribe(answer =>{
                 if(answer) {
-                    this.remove(treeRemovedFrom, node);
+                    this.remove(treeRemovedFrom, nodes);
                 }
             });
         }else{
-            this.remove(treeRemovedFrom, node);
+            this.remove(treeRemovedFrom, nodes);
         }
 
     }
@@ -400,7 +415,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             title: title,
             placeHolder: placeHolder
         };
-        config.maxWidth='35em';
+        config.minWidth='35em';
 
         let dialogRef: MatDialogRef<NameFileDialogComponent>  = this.dialog.open(NameFileDialogComponent,config);
         if(onClose){
@@ -502,7 +517,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
         }else{
             let params:HttpParams = new HttpParams()
-                .set("filesToRemoveJSONString", JSON.stringify( this.removedChildren))
+                .set("filesToRemoveJSONString", JSON.stringify( Array.from(this.removedChildren)))
                 .set("filesJSONString", JSON.stringify(this.organizeFiles[0]))
                 .set("idRequest",  this.data.id.idRequest)
                 .set("noJSONToXMLConversionNeeded", "Y");
@@ -521,6 +536,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 }
             });
         }
+        this.removedChildren.clear();
 
 
 

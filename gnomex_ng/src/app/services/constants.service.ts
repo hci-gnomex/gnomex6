@@ -5,6 +5,12 @@ export class ConstantsService {
     public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_NOTES:string = "experiment_platform_hide_notes";
     public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_VENDOR:string = "experiment_platform_hide_vendor";
     public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_ORGANISM:string = "experiment_platform_hide_organism";
+    public readonly UPLOAD_FILE_FDT_INFO:string =
+        "This method of uploading files uses a Fast Data Transfer (FDT) server. To upload files:<br><br>" +
+        "     1. Select the \"Start\" button below.<br><br>" +
+        "     2. This will download a special \"jnlp\" file that can be opened using Java Web Start (either directly or after first saving<br>         the file to your desktop).<br><br>" +
+        "     3. Use the window launched by Java Web Start to select and upload the files to the server.<br><br> " +
+        "    4. After all of the files have been uploaded (% Completed column indicates 100 for all files), click the<br>        \"Organize files\" link on Experiment Detail to move the uploaded files to the appropriate folders.<br>         button."
 
     public readonly ICON_CHECKED = "assets/tick.png";
     public readonly SEGMENT_NEW = "assets/segment_new.png";

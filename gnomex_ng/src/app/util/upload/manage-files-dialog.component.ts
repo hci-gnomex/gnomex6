@@ -27,10 +27,13 @@ import {IFileParams} from "../interfaces/file-params.model";
                            <upload-file (navToTab)="tabNavigateTo($event)" [manageData]="this.manageData"> </upload-file> 
                         </mat-tab>
                         <mat-tab class="full-height" label="Organize Files">
-                            <organize-file  (closeDialog)="onCloseDialog()" 
-                                            [manageData]="this.manageData"
-                                            [tabVisible]="isOrganizeVisible">
-                            </organize-file>
+                            <ng-template matTabContent>
+                                <organize-file  (closeDialog)="onCloseDialog()"
+                                                [manageData]="this.manageData">
+                                </organize-file>
+                                
+                            </ng-template>
+                            
                         </mat-tab>
                     </mat-tab-group>
                 </div>
@@ -66,11 +69,8 @@ import {IFileParams} from "../interfaces/file-params.model";
 export class ManageFilesDialogComponent implements OnInit{
 
     order:any;
-    orderDownloadList:any;
     formGroup:FormGroup;
-    uploadURL: string;
     manageData:IFileParams;
-    isOrganizeVisible:boolean = false;
     selectedTabIndex:number = 0;
 
 
@@ -86,6 +86,13 @@ export class ManageFilesDialogComponent implements OnInit{
         let uploadURL = '';
         let idObj:any = null;
         if(this.data){
+            let isFDT: boolean = this.data.isFDT;
+            if(this.data.startTabIndex){
+                this.selectedTabIndex = this.data.startTabIndex;
+            }else{
+                this.selectedTabIndex = 0;
+            }
+
             if(this.data.order.idRequest){
                 type= 'e';
                 uploadURL = "/gnomex/UploadExperimentURLServlet.gx";
@@ -100,11 +107,11 @@ export class ManageFilesDialogComponent implements OnInit{
                 type:type,
                 uploadURL: uploadURL,
                 id: idObj,
+                isFDT: this.data.isFDT
             });
         }
     }
     tabChanged(event:MatTabChangeEvent){
-        this.isOrganizeVisible = event.tab.textLabel === "Organize Files"
     }
     tabNavigateTo(index){
         this.selectedTabIndex = index;
