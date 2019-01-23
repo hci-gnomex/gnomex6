@@ -232,7 +232,10 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         this.protocolListSubscription = this.protocolService.getProtocolListObservable().subscribe((result: any[]) => {
             let protocols: any[] = [];
             for (let parent of result) {
-                protocols = protocols.concat(Array.isArray(parent.Protocol) ? parent.Protocol : [parent.Protocol.Protocol]);
+                if(parent.Protocol){
+                    protocols = protocols.concat(Array.isArray(parent.Protocol) ? parent.Protocol : [parent.Protocol.Protocol]);
+                }
+
             }
             this.protocolList = protocols;
         });

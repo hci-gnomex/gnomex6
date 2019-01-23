@@ -745,7 +745,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
             })
         }
         if (this.secAdvisor.isSuperAdmin) {
-            this.coreFacilitiesIManage = getAppUser.managingCoreFacilities;
+            this.coreFacilitiesIManage = Array.isArray(getAppUser.managingCoreFacilities) ? getAppUser.managingCoreFacilities : [getAppUser.managingCoreFacilities.coreFacility];
             for (let core of this.coreFacilitiesIManage) {
                 if (core.selected ==='Y') {
                     core.isSelected = true;
@@ -759,7 +759,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
             }
 
         } else if (this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind === 'ADMIN') {
-            this.coreFacilitiesIManage = getAppUser.managingCoreFacilities;
+            this.coreFacilitiesIManage = Array.isArray(getAppUser.managingCoreFacilities) ? getAppUser.managingCoreFacilities : [getAppUser.managingCoreFacilities.coreFacility];
             for (let core of this.coreFacilitiesIManage) {
                 if (core.selected ==='Y') {
                     core.isSelected = true;

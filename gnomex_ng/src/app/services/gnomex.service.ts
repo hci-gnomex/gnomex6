@@ -229,10 +229,10 @@ export class GnomexService {
             this.propertyList = response;
         });
 
-        this.labListService.getLabList().subscribe((response: any[]) => {
+        this.labListService.getLabList().subscribe((response: any) => {
             this.onGetLabList(response);
         });
-        this.labListService.getOrganismList().subscribe((response: any[]) => {
+        this.labListService.getOrganismList().subscribe((response: any) => {
             this.onGetOrganismList(response);
         });
         return new Promise((resolve) => {
@@ -547,8 +547,8 @@ export class GnomexService {
         return myCoresThatUseProducts;
     }
 
-    private onGetLabList(labs: any[]):void {
-        let labsNonNull: any[] = labs ? labs : [];
+    private onGetLabList(labs: any):void {
+        let labsNonNull: any[] = Array.isArray(labs) ? labs : [labs.Lab];
         this.labList = labsNonNull;
 
         this.submitRequestLabList = this.labList.filter(lab => {
@@ -577,7 +577,9 @@ export class GnomexService {
         }
     }
 
-    public onGetOrganismList(orgs: any[]) {
+    public onGetOrganismList(orgs: any){
+        let orgList:any[] = Array.isArray(orgs) ? orgs : [orgs.Organism];
+
         for (let organism of orgs) {
             if (organism.das2Name != '' && organism.bionomialName != '' && organism.isActive == 'Y') {
                 this.das2OrganismList.push(organism);
