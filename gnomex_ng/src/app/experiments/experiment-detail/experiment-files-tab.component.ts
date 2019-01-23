@@ -4,7 +4,6 @@ import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode} from "ag-grid-co
 import {ActivatedRoute} from "@angular/router";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments.service";
-import {HttpParams} from "@angular/common/http";
 import {FileService} from "../../services/file.service";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";

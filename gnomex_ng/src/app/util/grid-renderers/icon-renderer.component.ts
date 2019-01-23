@@ -1,50 +1,43 @@
-
-import {AfterViewInit, Component, OnInit, ViewChild} from "@angular/core";
-import {MatSelect,MatSelectChange} from '@angular/material/select';
+import {Component, OnInit} from "@angular/core";
 import {ICellRendererAngularComp} from "ag-grid-angular";
-import {DictionaryService} from "../../services/dictionary.service";
-
+import {ICellRendererParams} from "ag-grid-community";
 
 @Component({
-
     template: `
-        <div >
+        <div>
             <img [src]="iconSource" alt=""/>
         </div>
-    
     `,
-    styles: [`
-        
+    styles: [`        
     `]
 })
 export class IconRendererComponent implements ICellRendererAngularComp, OnInit {
 
-    private params;
-    private text = "";
-    public iconSource = "";
+    public iconSource: string = "";
 
-
-    constructor(private dictionaryService:DictionaryService){
-    }
-    ngOnInit(){
+    constructor() {
     }
 
+    ngOnInit() {
+    }
 
-    agInit(params: any): void {
-        this.params = params;
+    agInit(params: ICellRendererParams): void {
         this.setIcon(params);
     }
 
-    refresh(params: any): boolean {
-        this.params = params;
+    refresh(params: ICellRendererParams): boolean {
         this.setIcon(params);
         return true;
     }
 
-    private setIcon(params) {
-        this.iconSource =  params.value ? params.value: '';
+    private setIcon(params: ICellRendererParams): void {
+        if (params.value) {
+            this.iconSource = params.value;
+        } else if (params.data && params.data.icon) {
+            this.iconSource = params.data.icon;
+        } else {
+            this.iconSource = "";
+        }
     };
-
-
 
 }
