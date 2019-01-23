@@ -142,12 +142,12 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
         this.analysisService.getExperimentPickList(params).pipe(first())
             .subscribe(resp =>{
-                if(resp){
+                this.items = [];
+                if(resp && resp.Project){
                     let projects:any[] = Array.isArray(resp) ? resp : resp.Project ? [resp.Project] : [];
                     this.buildTree(projects)
-                }else{
-                    this.items = [];
                 }
+                this.showSpinner = false;
 
             })
 
@@ -172,7 +172,6 @@ export class AnalysisExperimentTabComponent implements OnInit{
             }
         }
         this.items = projects;
-        this.showSpinner = false;
     }
 
     treeOnSelect(event:any){

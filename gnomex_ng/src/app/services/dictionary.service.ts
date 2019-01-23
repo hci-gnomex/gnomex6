@@ -212,7 +212,7 @@ export class DictionaryService {
     }
 
     private cacheDictionary(dictionary: Dictionary, isRefresh: boolean = false): void {
-        this.cachedEntries[dictionary.className] = Array.isArray(dictionary.DictionaryEntry) ? dictionary.DictionaryEntry : [dictionary.DictionaryEntry.DictionaryEntry];
+        this.cachedEntries[dictionary.className] = Array.isArray(dictionary.DictionaryEntry) ? dictionary.DictionaryEntry : [dictionary.DictionaryEntry];
         delete dictionary.DictionaryEntry;
         dictionary.Filters = Array.isArray(dictionary.Filters) ? dictionary.Filters : [(dictionary.Filters as any).filter];
 

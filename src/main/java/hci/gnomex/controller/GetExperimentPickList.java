@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
+import javax.json.*;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -197,8 +198,14 @@ public class GetExperimentPickList extends GNomExCommand implements Serializable
         prevProjectName = projectName;
       }
 
-      XMLOutputter out = new org.jdom.output.XMLOutputter();
-      this.xmlResult = out.outputString(doc);
+      if(!doc.getRootElement().hasChildren()){
+          JsonArray projectList = Json.createArrayBuilder().build();
+          JsonObject val = Json.createObjectBuilder().add("Project", projectList).build();
+          this.jsonResult = val.toString();
+      }else{
+          XMLOutputter out = new org.jdom.output.XMLOutputter();
+          this.xmlResult = out.outputString(doc);
+      }
 
       setResponsePage(this.SUCCESS_JSP);
     }catch (Exception e) {
