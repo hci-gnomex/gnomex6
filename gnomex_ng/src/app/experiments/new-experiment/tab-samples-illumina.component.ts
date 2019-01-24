@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {OrderType} from "../../util/annotation-tab.component";
@@ -49,7 +49,7 @@ import {BehaviorSubject} from "rxjs";
     `]
 })
 
-export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
+export class TabSamplesIlluminaComponent implements OnInit {
 
     public readonly BASIC_INSTRUCTIONS: string = ''
         + '1.  Assign a multiplex group number for each sample in the table below. Samples that are to be sequenced in the same lane should be assigned the same multiplex group number.\n'
@@ -76,6 +76,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
 
     public showInstructions: boolean = false;
 
+    private samplesGridApi: any;
 
     constructor(private dictionaryService: DictionaryService,
                 private constService: ConstantsService,
@@ -271,7 +272,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.newExperimentService.numSamplesChanged.subscribe((value) =>{
-            if (value && this.newExperimentService.samplesGridApi) {
+            if (value && this.samplesGridApi) {
                 if (this.newExperimentService.numSamplesChanged.value === true) {
                     this.newExperimentService.numSamplesChanged.next(false);
                 }
@@ -279,8 +280,8 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                     this.buildInitialRows();
                 }
             }
-            if (this.newExperimentService.samplesGridApi && this.newExperimentService.numSamples) {
-                this.newExperimentService.samplesGridApi.forEachNode((node: any) => {
+            if (this.samplesGridApi && this.newExperimentService.numSamples) {
+                this.samplesGridApi.forEachNode((node: any) => {
                     if (node.data.name === this.newExperimentService.sampleType) {
                         node.setSelected(true);
                     }
@@ -288,7 +289,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
             }
         });
         this.newExperimentService.sampleTypeChanged.subscribe((value) => {
-            if (value && this.newExperimentService.samplesGridApi) {
+            if (value && this.samplesGridApi) {
                 this.changeSampleType();
                 if (this.newExperimentService.sampleTypeChanged.value === true) {
                     this.newExperimentService.sampleTypeChanged.next(false);
@@ -296,7 +297,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
             }
         });
         this.newExperimentService.organismChanged.subscribe((value) => {
-            if (value && this.newExperimentService.samplesGridApi) {
+            if (value && this.samplesGridApi) {
                 this.changeOrganism();
                 if (this.newExperimentService.organismChanged.value === true) {
                     this.newExperimentService.organismChanged.next(false);
@@ -304,7 +305,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
             }
         });
         this.newExperimentService.codeChanged.subscribe((value) => {
-            if (value && this.newExperimentService.samplesGridApi) {
+            if (value && this.samplesGridApi) {
                 this.changeCode();
                 if (this.newExperimentService.codeChanged.value === true) {
                     this.newExperimentService.codeChanged.next(false);
@@ -312,7 +313,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
             }
         });
         this.newExperimentService.protoChanged.subscribe((value) => {
-            if (value && this.newExperimentService.samplesGridApi) {
+            if (value && this.samplesGridApi) {
                 this.updateRows();
                 if (this.newExperimentService.protoChanged.value === true) {
                     this.newExperimentService.protoChanged.next(false);
@@ -324,6 +325,30 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
         this.showHideColumns();
     }
 
+    public requireReconfirmation(): void {
+        if (this.form && !this.form.contains('invalidateWithoutConfirmation')) {
+            this.form.addControl(
+                'invalidateWithoutConfirmation',
+                new FormControl('', (control: AbstractControl) => {
+                    return { message: 'Samples have changed. They require review.' };
+                })
+            );
+        }
+    }
+
+    public confirm(): void {
+        if (this.form && this.form.contains('invalidateWithoutConfirmation')) {
+            this.form.removeControl('invalidateWithoutConfirmation');
+        }
+    }
+
+    public tabDisplayed(): void {
+        this.confirm();
+
+        this.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
+        this.samplesGridApi.sizeColumnsToFit();
+    }
+
     showHideColumns() {
         let hideSampleTypeOnExternalExperiment: boolean = false;
         if (!this.gnomexService.isInternalExperimentSubmission && this.gnomexService.getProperty(this.gnomexService.PROPERTY_HIDE_SAMPLETYPE_ON_EXTERNAL_EXPERIMENT) === "Y") {
@@ -331,27 +356,23 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
         }
     }
 
-    ngAfterViewInit() {
-
-    }
-
     changeOrganism() {
-        if (this.newExperimentService.samplesGridApi) {
-            this.newExperimentService.samplesGridApi.forEachNode((node: any) => {
+        if (this.samplesGridApi) {
+            this.samplesGridApi.forEachNode((node: any) => {
                 node.data.idOrganism = this.newExperimentService.organism.idOrganism;
             });
-            this.newExperimentService.samplesGridApi.redrawRows();
+            this.samplesGridApi.redrawRows();
         }
         this.newExperimentService.sampleOrganisms.add(this.newExperimentService.organism);
     }
 
     changeCode() {
-        if (this.newExperimentService.samplesGridApi) {
+        if (this.samplesGridApi) {
             let protocol = this.newExperimentService.codeApplication ? this.dictionaryService.getProtocolFromApplication(this.newExperimentService.codeApplication) : '';
-            this.newExperimentService.samplesGridApi.forEachNode((node: any) => {
+            this.samplesGridApi.forEachNode((node: any) => {
                 node.data.idSeqLibProtocol = protocol.idSeqLibProtocol;
             });
-            this.newExperimentService.samplesGridApi.redrawRows();
+            this.samplesGridApi.redrawRows();
         }
     }
 
@@ -373,13 +394,13 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
         let numberSequencingLanes: string = this.newExperimentService.request.isRapidMode === 'Y' ? '2' : '1';
 
         for (let sample of this.newExperimentService.samplesGridRowData) {
-                sample.idNumberSequencingCycles = idNumberSequencingCycles,
-                sample.idNumberSequencingCyclesAllowed = idNumberSequencingCyclesAllowed,
-                sample.idSeqRunType = idSeqRunType,
-                sample.numberSequencingLanes = numberSequencingLanes,
-                sample.idSampleType = idSampleType,
-                sample.idSeqLibProtocol = protocol.idSeqLibProtocol,
-                sample.idOrganism = idOrganism
+            sample.idNumberSequencingCycles = idNumberSequencingCycles;
+            sample.idNumberSequencingCyclesAllowed = idNumberSequencingCyclesAllowed;
+            sample.idSeqRunType = idSeqRunType;
+            sample.numberSequencingLanes = numberSequencingLanes;
+            sample.idSampleType = idSampleType;
+            sample.idSeqLibProtocol = protocol.idSeqLibProtocol;
+            sample.idOrganism = idOrganism;
         }
 
     }
@@ -387,8 +408,6 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
     buildInitialRows() {
 
         if (this.newExperimentService.numSamples) {
-            let isValid: boolean = true;
-            let prepInstructions: string = '';
 
             let idSampleType: string = this.gnomexService.submitInternalExperiment() && this.newExperimentService.sampleType ?
                 this.newExperimentService.sampleType.idSampleType :
@@ -446,9 +465,9 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
                 this.newExperimentService.samplesGridRowData.splice(-1, Math.abs(index));
             }
 
-            this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
-            this.newExperimentService.samplesGridApi.setRowData(this.newExperimentService.samplesGridRowData);
-            this.newExperimentService.samplesGridApi.sizeColumnsToFit();
+            this.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
+            this.samplesGridApi.setRowData(this.newExperimentService.samplesGridRowData);
+            this.samplesGridApi.sizeColumnsToFit();
             // this.newExperimentService.samplesView = this;
         }
     }
@@ -456,7 +475,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
     protected getNextSampleId(): number {
         let lastId: number = -1;
 
-        for (var sample of this.newExperimentService.samplesGridRowData) {
+        for (let sample of this.newExperimentService.samplesGridRowData) {
             if (sample.idSample.indexOf("Sample") === 0) {
                 let id: number = sample.idSample.toString().substr(6);
                 if (id > lastId) {
@@ -470,11 +489,11 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
     }
 
     changeSampleType() {
-        if (this.newExperimentService.samplesGridApi) {
-            this.newExperimentService.samplesGridApi.forEachNode((node: any) => {
+        if (this.samplesGridApi) {
+            this.samplesGridApi.forEachNode((node: any) => {
                 node.data.idSampleType = this.newExperimentService.sampleType.idSampleType;
             });
-            this.newExperimentService.samplesGridApi.redrawRows();
+            this.samplesGridApi.redrawRows();
         }
     }
 
@@ -484,7 +503,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
     }
 
     onSamplesGridReady(event: any) {
-        this.newExperimentService.samplesGridApi = event.api;
+        this.samplesGridApi = event.api;
         this.gridColumnApi = event.columnApi;
         event.api.setHeaderHeight(50);
     }
@@ -500,13 +519,13 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
             let barcode = this.newExperimentService.barCodes.filter(barcode => barcode.idOligoBarcode === event.data.idOligoBarcode);
             if (barcode) {
                 this.newExperimentService.samplesGridRowData[event.rowIndex].barcodeSequence = barcode[0].barcodeSequence;
-                this.newExperimentService.samplesGridApi.redrawRows();
+                this.samplesGridApi.redrawRows();
             }
         } else if (event.colDef.headerName === "Index Tag B") {
             let barcode = this.newExperimentService.barCodes.filter(barcode => barcode.idOligoBarcodeB === event.data.idOligoBarcodeB);
             if (barcode) {
                 this.newExperimentService.samplesGridRowData[event.rowIndex].barcodeSequenceB = barcode[0].barcodeSequenceB;
-                this.newExperimentService.samplesGridApi.redrawRows();
+                this.samplesGridApi.redrawRows();
             }
         }
     }
@@ -526,7 +545,7 @@ export class TabSamplesIlluminaComponent implements OnInit, AfterViewInit {
         let dialogRef = this.dialog.open(UploadSampleSheetComponent, config);
 
         dialogRef.afterClosed().subscribe((result) => {
-            this.newExperimentService.samplesGridApi.refreshCells();
+            this.samplesGridApi.refreshCells();
         });
     }
 

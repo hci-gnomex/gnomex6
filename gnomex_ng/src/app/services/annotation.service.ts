@@ -108,8 +108,8 @@ export class AnnotationService {
     }
 
     /*
- * Sort annotations by sort order then name
- */
+     * Sort annotations by sort order then name
+     */
     public static sortProperties(obj1, obj2): number {
         if (obj1 === null && obj2 === null) {
             return 0;
@@ -120,8 +120,8 @@ export class AnnotationService {
         } else {
             let so1: Number = (obj1.sortOrder === '' || obj1.sortOrder === null) ? Number(999999) : new Number(obj1.sortOrder);
             let so2: Number = (obj2.sortOrder === '' || obj2.sortOrder === null) ? Number(999999) : new Number(obj2.sortOrder);
-            let sc1: string = obj1.name;
-            let sc2: string = obj2.name;
+            let sc1: string = '' + obj1.name;
+            let sc2: string = '' + obj2.name;
 
             if (so1 < so2) {
                 return -1;
@@ -145,6 +145,4 @@ export class AnnotationService {
 
         }
     }
-
-
 }

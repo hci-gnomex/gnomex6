@@ -1,6 +1,6 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
-import {NewExperimentService} from "../../services/new-experiment.service";
+import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
 import {MatDialog} from "@angular/material";
 import {GnomexService} from "../../services/gnomex.service";
 import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
@@ -33,6 +33,12 @@ import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
 })
 
 export class TabBioinformaticsViewComponent implements OnInit {
+    @Input("experiment") set experiment(value: Experiment) {
+        this._experiment = value;
+    }
+
+    private _experiment: any;
+
     private questionsLabel: string = "Questions? Please Contact the ";
     private atLabel: string  = " at:   ";
     private alignToLabel: string = "Do you want the sequence data to be aligned?";
@@ -76,10 +82,10 @@ export class TabBioinformaticsViewComponent implements OnInit {
                 orgList: this.fb.array(organismsFormArray),
             });
         });
-        this.analysisAssistanceGroup = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.idCoreFacility, this.gnomexService.PROPERTY_ANALYSIS_ASSISTANCE_GROUP);
-        this.analysisAssistanceHeader = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.idCoreFacility, this.gnomexService.PROPERTY_ANALYSIS_ASSISTANCE_HEADER);
-        this.bioEmail = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.idCoreFacility, this.gnomexService.PROPERTY_CONTACT_EMAIL_BIOINFORMATICS);
-        this.bioAnalysisNote = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_BIO_ANALYSIS_NOTE);
+        this.analysisAssistanceGroup = this.gnomexService.getCoreFacilityProperty(this._experiment.idCoreFacility, this.gnomexService.PROPERTY_ANALYSIS_ASSISTANCE_GROUP);
+        this.analysisAssistanceHeader = this.gnomexService.getCoreFacilityProperty(this._experiment.idCoreFacility, this.gnomexService.PROPERTY_ANALYSIS_ASSISTANCE_HEADER);
+        this.bioEmail = this.gnomexService.getCoreFacilityProperty(this._experiment.idCoreFacility, this.gnomexService.PROPERTY_CONTACT_EMAIL_BIOINFORMATICS);
+        this.bioAnalysisNote = this.gnomexService.getCoreFacilityProperty(this._experiment.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_BIO_ANALYSIS_NOTE);
     }
 
     get orgList(): FormArray {

@@ -12,6 +12,7 @@ import {
 import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
 import {BrowseOrderValidateService} from "../services/browse-order-validate.service";
 import {IAnnotationOption} from "./interfaces/annotation-option.model";
+import {AnnotationService} from "../services/annotation.service";
 
 export enum OrderType {
     ANALYSIS = 'a',
@@ -76,6 +77,8 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         }
 
         if (this._annotations) {
+            this._annotations = this._annotations.sort(AnnotationService.sortProperties);
+
             this._annotations.forEach(annot => {
                 this.form.addControl(annot.name, new FormControl());
 

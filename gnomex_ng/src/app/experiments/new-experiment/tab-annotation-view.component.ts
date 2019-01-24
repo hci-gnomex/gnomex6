@@ -1,6 +1,9 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, SimpleChanges} from "@angular/core";
+import {
+    AfterViewInit, Component, EventEmitter, Input, OnDestroy, Output,
+    SimpleChanges
+} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
-import {NewExperimentService} from "../../services/new-experiment.service";
+import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
 import {annotType, PropertyService} from "../../services/property.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Response, URLSearchParams} from "@angular/http";
@@ -20,6 +23,7 @@ import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dial
 import {OrderType} from "../../util/annotation-tab.component";
 import {first} from "rxjs/internal/operators";
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {Subscription} from "rxjs/index";
 
 @Component({
     selector: "tabAnnotationView",
@@ -38,7 +42,41 @@ import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-
     `]
 })
 
-export class TabAnnotationViewComponent implements OnInit {
+export class TabAnnotationViewComponent implements OnDestroy {
+
+    @Input("experiment") set experiment(value: Experiment) {
+        this._experiment = value;
+
+        if (this._experiment && !this.experimentSubscription) {
+            this.experimentSubscription = value.onChange_PropertyEntries.subscribe((value) =>{
+                if (value && this.addAnnotationGridApi) {
+                    // this.annotations = this.newExperimentService.propertyEntriesForUser;
+                    this.annotations = this._experiment.PropertyEntries;
+                    this.addAnnotationGridApi.setRowData(this.annotations);
+
+                    for (let i = 0; i < this.annotations.length; i++) {
+                        // "Required" annotations are selected by default. (? States?)
+                        if (this.addAnnotationGridApi.getRowNode('' + i).data.isSelected
+                            && this.addAnnotationGridApi.getRowNode('' + i).data.isSelected === "true") {
+
+                            this.addAnnotationGridApi.getRowNode('' + i).setSelected(true);
+                            this.addAnnotationGridApi.getRowNode('' + i).data.boldDisplay = 'Y';
+                        }
+                    }
+
+                    this.removeAnnotationGridApi.setRowData([]);
+
+                    if (this.newExperimentService.propEntriesChanged.value === true) {
+                        this.newExperimentService.propEntriesChanged.next(false);
+                    }
+                }
+            });
+        }
+    }
+
+    private _experiment: Experiment;
+
+    private experimentSubscription: Subscription;
 
     public addAnnotationGridApi: GridApi;
     public removeAnnotationGridApi: GridApi;
@@ -53,7 +91,6 @@ export class TabAnnotationViewComponent implements OnInit {
     private currentAnnotColumn: number = 5;
 
     public annotations: any[] = [];
-
 
     private get addAnnotationColumnDefs(): any[] {
         return [
@@ -90,27 +127,10 @@ export class TabAnnotationViewComponent implements OnInit {
         });
     }
 
-    ngOnInit() {
-        this.newExperimentService.propEntriesChanged.subscribe((value) =>{
-            if (value && this.addAnnotationGridApi) {
-                this.annotations = this.newExperimentService.propertyEntriesForUser;
-                this.addAnnotationGridApi.setRowData(this.annotations);
-
-                for (let i = 0; i < this.annotations.length; i++) {
-                    if (this.addAnnotationGridApi.getRowNode('' + i).data.isSelected
-                        && this.addAnnotationGridApi.getRowNode('' + i).data.isSelected === "true") {
-                        this.addAnnotationGridApi.getRowNode('' + i).setSelected(true);
-                        this.addAnnotationGridApi.getRowNode('' + i).data.boldDisplay = 'Y';
-                    }
-                }
-
-                this.removeAnnotationGridApi.setRowData([]);
-
-                if (this.newExperimentService.propEntriesChanged.value === true) {
-                    this.newExperimentService.propEntriesChanged.next(false);
-                }
-            }
-        });
+    ngOnDestroy() {
+        if (this.experimentSubscription) {
+            this.experimentSubscription.unsubscribe();
+        }
     }
 
     public onGridSizeChanged(event: any) {
@@ -172,7 +192,7 @@ export class TabAnnotationViewComponent implements OnInit {
         let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.matDialog.open(ConfigAnnotationDialogComponent, configuration);
 
         dialogRef.afterClosed().subscribe(() => {
-            this.newExperimentService.refreshNewExperimentAnnotations();
+            this._experiment.refreshSampleAnnotationList();
         });
     }
 
@@ -218,7 +238,7 @@ export class TabAnnotationViewComponent implements OnInit {
         }
         annot.currentAnnotColumn = this.currentAnnotColumn;
         this.newExperimentService.samplesGridColumnDefs.splice(this.currentAnnotColumn, 0, column);
-        this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
+        // this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
         this.currentAnnotColumn++;
     }
 
@@ -301,7 +321,7 @@ export class TabAnnotationViewComponent implements OnInit {
         params.set("forDataTrack", "N");
         params.set("forAnalysis", "N");
         params.set("forRequest", "N");
-        params.set("idCoreFacility", this.newExperimentService.idCoreFacility);
+        params.set("idCoreFacility", this._experiment.idCoreFacility);
         params.set("idAppUser", this.newExperimentService.idAppUser);
         params.set("codePropertyType", "TEXT");
         params.set("noJSONToXMLConversionNeeded", "Y");
@@ -331,11 +351,12 @@ export class TabAnnotationViewComponent implements OnInit {
                 this.dialogsService.confirm("An error occurred while saving the annotation", null);
             }
 
-            this.newExperimentService.refreshNewExperimentAnnotations();
+            this._experiment.refreshSampleAnnotationList();
 
             this.propertyService.getPropertyList(false).pipe(first()).subscribe((response: any[]) => {
                 this.gnomexService.propertyList = response;
-                this.newExperimentService.buildPropertiesByUser();
+                // this.newExperimentService.buildPropertiesByUser();
+                this._experiment.refreshSampleAnnotationList();
                 this.dialogsService.stopAllSpinnerDialogs();
             });
 

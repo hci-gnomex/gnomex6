@@ -2,7 +2,10 @@ import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from "@angula
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {GnomexService} from "../../services/gnomex.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {NewExperimentService} from "../../services/new-experiment.service";
+import {
+    Experiment, NewExperimentService, Organism,
+    Sample
+} from "../../services/new-experiment.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {MatOption, MatAutocomplete} from "@angular/material";
 import {Subscription} from "rxjs";
@@ -110,14 +113,23 @@ import {AnnotationTabComponent} from "../../util/annotation-tab.component";
 export class TabSampleSetupViewComponent implements OnInit {
     // public currentState: string;
     @Input() requestCategory: any;
+    @Input("experiment") set experiment(value: Experiment) {
+        this._experiment = value;
+    };
 
-    @Output() indexEvent = new EventEmitter<string>();
-    // @Output() goBack = new EventEmitter<string>();
-    // @Output() goNext = new EventEmitter<string>();
+    @Input("organism") set organism(value: Organism) {
+        this._organism = value;
+    };
+
+    @Output() onChangeSampleData = new EventEmitter<any>();
 
     @ViewChild("autoOrg") orgAutocomplete: MatAutocomplete;
 
     public form: FormGroup;
+
+    private _experiment: Experiment;
+    private _organism: Organism;
+
     private sampleType: any;
     private filteredSampleTypeListDna: any[] = [];
     private filteredSampleTypeListRna: any[] = [];
@@ -130,11 +142,26 @@ export class TabSampleSetupViewComponent implements OnInit {
 
 
     get numberOfSamples(): number|string {
-        return this.newExperimentService.numSamples;
+        return this._experiment.numberOfSamples;
+
+        // return this.newExperimentService.numSamples;
     }
 
     set numberOfSamples(value: number|string) {
-        this.newExperimentService.numSamples = this.form.get("numSamples").value;
+        this._experiment.numberOfSamples = '' + value;
+
+        this.newExperimentService.numSamples = '' + value;
+
+        if (!this._experiment.samples) {
+            this._experiment.samples = [];
+        }
+
+        // while (this._experiment.samples.length < +value) {
+        //     let newSample = new Sample();
+        //     newSample.idOrganism = this._organism ? this._organism.idOrganism : '';
+        //
+        //     this._experiment.samples.push();
+        // }
     }
 
 
@@ -162,17 +189,17 @@ export class TabSampleSetupViewComponent implements OnInit {
                 acid:            [''],
                 coreNotes:       ['', [Validators.maxLength(5000)]]
             },
-            { validator: this.oneCategoryRequired }
+            { validator: TabSampleSetupViewComponent.oneCategoryRequired }
         );
     }
 
-    private validator_elution_requiredIfVisible(formControl: FormControl): any {
-        if (this.showElution && (!formControl || !formControl.value)) {
-            return { message: 'field is required' };
-        } else {
-            return null;
-        }
-    }
+    // private validator_elution_requiredIfVisible(formControl: FormControl): any {
+    //     if (this.showElution && (!formControl || !formControl.value)) {
+    //         return { 'requiredIfVisible': true };
+    //     } else {
+    //         return null;
+    //     }
+    // }
 
     ngOnInit() {
         this.newExperimentService.organisms = this.gnomexService.activeOrganismList;
@@ -186,7 +213,7 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.form.markAsPristine();
     }
 
-    oneCategoryRequired(group: FormGroup): { [s:string]: boolean } {
+    private static oneCategoryRequired(group: FormGroup): { [s:string]: boolean } {
         if (group && (group.controls['selectedDna'].value || group.controls['selectedRna'].value)) {
             return null;
         }
@@ -272,6 +299,10 @@ export class TabSampleSetupViewComponent implements OnInit {
             this.filteredSampleTypeListRna = this.filterSampleType("RNA")
                 .sort(TabSampleSetupViewComponent.sortSampleTypes);
         }
+    }
+
+    public onChange_numberOfSamples(event: any): void {
+        this.numberOfSamples = this.form.get("numSamples").value;
     }
 
     onDnaChange(event) {
@@ -362,7 +393,7 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.orgAutocomplete.options.first.select();
     }
 
-    displayOrg(org: any) {
+    public displayOrg(org: any) {
         return org ? org.combinedName : org;
     }
 
@@ -396,52 +427,70 @@ export class TabSampleSetupViewComponent implements OnInit {
         }
     }
 
-    selectOrgOption(event) {
+    public selectOrganism(event): void {
         if (event !== undefined && event.source && event.source.value && event.source.value.idLab !== "0") {
+            // needed for an input with autocomplete instead of a matselect.
             this.form.get("organism").setValue(event.source.value);
-            this.newExperimentService.annotations = this.newExperimentService.filterAnnotations(event.source.value.idOrganism);
-            this.indexEvent.emit('+');
+
+            this._experiment.organism = this.form.get("organism").value;
+
+            this.onChangeSampleData.emit({});
+
+            // this._experiment.RequestProperties = this._experiment.filterExperimentAnnotations();
+
             this.newExperimentService.organism = this.form.get("organism").value;
-            this.newExperimentService.propertyEntriesForUser = this.newExperimentService.filterPropertiesByUser(this.newExperimentService.propertyEntries);
-            this.setAnnotations(this.newExperimentService.annotations);
-            this.newExperimentService.propertyEntriesForUser.sort(AnnotationService.sortProperties);
-            this.newExperimentService.propEntriesChanged.next(true);
+            // this.newExperimentService.propertyEntriesForUser = this.newExperimentService.filterPropertiesByUser(this.newExperimentService.propertyEntries);
+            this.newExperimentService.propertyEntriesForUser = this._experiment.filterPropertiesByUser(this._experiment.RequestProperties);
+
+            // this.setAnnotations(this.newExperimentService.annotations);
+            // this.setAnnotations(this._experiment.RequestProperties);
+            // this.newExperimentService.propertyEntriesForUser.sort(AnnotationService.sortProperties);
+
+            // this._experiment.RequestProperties.sort(AnnotationService.sortProperties);
+
+            // this.newExperimentService.propEntriesChanged.next(true);
+            // this._experiment.onChange_propertyEntries.next(true);
         }
     }
 
-    setAnnotations(annotations: any) {
-        for (let component of this.newExperimentService.components) {
-            if (component instanceof AnnotationTabComponent) {
-                component.annotations = annotations;
-            }
-        }
-    }
+    // setAnnotations(annotations: any) {
+    //     for (let component of this.newExperimentService.components) {
+    //         if (component instanceof AnnotationTabComponent) {
+    //             component.annotations = annotations;
+    //         }
+    //     }
+    // }
 
     onReagentChanged(event) {
+        this._experiment.reagent                  = this.form.get("reagent").value;
         this.newExperimentService.request.reagent = this.form.get("reagent").value;
     }
 
     onElutionChanged(event) {
+        this._experiment.elutionBuffer                  = this.form.get("elution").value;
         this.newExperimentService.request.elutionBuffer = this.form.get("elution").value;
-
     }
 
     onDnaseChanged(event) {
         if (event.checked) {
+            this._experiment.usedDnase                  = 'Y';
             this.newExperimentService.request.usedDnase = 'Y';
         }
     }
 
     onRnaseChanged(event) {
         if (event.checked) {
+            this._experiment.usedRnase                  = 'Y';
             this.newExperimentService.request.usedRnase = 'Y';
         }
     }
 
     onKeepChange(event) {
         if (event.value === 1) {
+            this._experiment.keepSamples                  = 'Y';
             this.newExperimentService.request.keepSamples = 'Y';
         } else {
+            this._experiment.keepSamples                  = 'N';
             this.newExperimentService.request.keepSamples = 'N';
         }
     }

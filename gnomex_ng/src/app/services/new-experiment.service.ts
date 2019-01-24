@@ -1,26 +1,31 @@
 import {Injectable} from "@angular/core";
-import {ExperimentsService} from "../experiments/experiments.service";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {GnomexService} from "./gnomex.service";
 import {AnnotationService} from "./annotation.service";
 import {BillingService} from "./billing.service";
 import {PropertyService} from "./property.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
-import {DialogsService} from "../util/popup/dialogs.service";
-import {first} from "rxjs/internal/operators";
 import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class NewExperimentService {
 
-    // get filteredApps(): any[] {
-    //     return this._filteredApps;
-    // }
-    // set filteredApps(value: any[]) {
-    //     this._filteredApps = value;
-    // }
+    /*
+     * The parameter list needed to save a new experiment is currently:
+     *
+     * description :        This is the rtf format experiment description.  It was originally sent separately
+     *                      from the requestXMLString due to potential problems separating XML and RTF strings.
+     *                      However, the request also has a description field.
+     * idProject :          I am not sure why this is sent separately from the request - it is included
+     *                      there as well.
+     * invoicePrice :       A string with the total cost of the request (?).  Example : $580.00
+     * propertiesXML :      An array of request properties, which I think correspond to annotation values.
+     * requestXMLString :   The main parameter, the Experiment object stringified.
+     */
+
+    public description: string;
 
     get lanes(): any[] {
         return this._lanes;
@@ -93,17 +98,10 @@ export class NewExperimentService {
         this.accountChanged.next(true);
     }
 
-    // get filteredGenomeBuildList(): any[] {
-    //     return this._filteredGenomeBuildList;
-    // }
-    // set filteredGenomeBuildList(value: any[]) {
-    //     this._filteredGenomeBuildList = value;
-    // }
-
-    get organisms(): any[] {
+    public get organisms(): any[] {
         return this._organisms;
     }
-    set organisms(value: any[]) {
+    public set organisms(value: any[]) {
         this._organisms = value;
     }
 
@@ -112,13 +110,6 @@ export class NewExperimentService {
     }
     set sampleOrganisms(value: Set<any>) {
         this._sampleOrganisms = value;
-    }
-
-    get componentRefs(): any[] {
-        return this._componentRefs;
-    }
-    set componentRefs(value: any[]) {
-        this._componentRefs = value;
     }
 
     get components(): any[] {
@@ -152,6 +143,7 @@ export class NewExperimentService {
         }
     }
 
+    // TODO : get rid of next!!!  Effecting Sample annotations? (not filtering)
     get organism(): any {
         return this._organism;
     }
@@ -166,14 +158,6 @@ export class NewExperimentService {
     set experimentOwner(value: any) {
         this._experimentOwner = value;
         this.ownerChanged.next(true);
-
-    }
-
-    get idCoreFacility(): string {
-        return this._idCoreFacility;
-    }
-    set idCoreFacility(value: string) {
-        this._idCoreFacility = value;
     }
 
     get idAppUser(): string {
@@ -205,13 +189,6 @@ export class NewExperimentService {
         this._requestCategory = value;
     }
 
-    get propertyEntries(): any[] {
-        return this._propertyEntries;
-    }
-    set propertyEntries(value: any[]) {
-        this._propertyEntries = value;
-    }
-
     get applicationName(): string {
         return this._applicationName;
     }
@@ -236,35 +213,12 @@ export class NewExperimentService {
 
     }
 
-    get samplesGridApi() {
-        return this._samplesGridApi;
-    }
-    set samplesGridApi(value: any) {
-        this._samplesGridApi = value;
-    }
-
-
     get request(): any {
         return this._request;
     }
     set request(value: any) {
         this._request = value;
     }
-
-    get category(): any {
-        return this._category;
-    }
-    set category(value: any) {
-        this._category = value;
-    }
-
-    get annotations(): any[] {
-        return this._annotations;
-    }
-    set annotations(value: any[]) {
-        this._annotations = value;
-    }
-
 
     get currentState(): string {
         if (this._currentState_subject) {
@@ -283,15 +237,11 @@ export class NewExperimentService {
     public _currentState_subject = new BehaviorSubject("SolexaBaseState");
 
     private _request: any;
-    private _annotations: any[];
-    private _samplesGridApi: any;
     private _samplesGridRowData: any[] = [];
     private _organism: any;
-    private _category: any;
     private _lab: any;
     private _applicationName: string;
     private _codeApplication: string;
-    private _propertyEntries: any[] = [];
     private _propertyEntriesForUser: any[] = [];
     private _requestCategory: any;
     private _sampleType: any;
@@ -299,26 +249,18 @@ export class NewExperimentService {
     private _numSamples: any;
     private _idAppUser: string;
     private _experimentOwner: any;
-    private _idCoreFacility: string;
     private _components: any[] = [];
-    private _componentRefs: any[] = [];
     private _billingAccount: any;
     private _seqType: any;
     private _selectedProto: any;
     private _preppedByClient: boolean;
     private _sampleOrganisms: Set<any> = new Set<any>();
     private _organisms: any[] = [];
-    // private _filteredGenomeBuildList: any[] = [];
     private _barCodes: any[] = [];
     private _numTubes: number;
     private _expTypeLabel: string;
     private _project: any;
     private _lanes: any[] = [];
-    // private _filteredApps: any[] = [];
-    // public samplesColumnApi: any;
-    // private hiSeqPrices: any[] = [];
-    // public samplesView;
-    // public hideSubmit: boolean = true;
     public propEntriesChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public hiSeqPricesChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public sampleTypeChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -331,8 +273,6 @@ export class NewExperimentService {
     public preppedChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public codeChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public organismChanged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    // public Changed: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    // public onSamplesTab: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public onConfirmTab: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public samplesGridColumnDefs: any[] = [];
     public priceMap: Map<string, string> = new Map<string, string>();
@@ -340,8 +280,8 @@ export class NewExperimentService {
     public genomeList: any[] = [];
 
     public readonly TYPE_MICROARRAY: string = 'MICROARRAY';
-    public readonly TYPE_HISEQ: string = 'HISEQ';
-    public readonly TYPE_MISEQ: string = 'MISEQ';
+    public readonly TYPE_HISEQ: string = 'HISEQ';  // I think these were wrapped into an ILLSEQ state?
+    public readonly TYPE_MISEQ: string = 'MISEQ';  // I think these were wrapped into an ILLSEQ state?
     public readonly TYPE_QC: string = 'QC';
     public readonly TYPE_CAP_SEQ: string = "CAPSEQ";
     public readonly TYPE_FRAG_ANAL: string = "FRAGANAL";
@@ -359,13 +299,10 @@ export class NewExperimentService {
 
     constructor(private billingService: BillingService,
                 private cookieUtilService: CookieUtilService,
-                private securityAdvisor: CreateSecurityAdvisorService,
-                private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
-                private experimentService: ExperimentsService,
                 private gnomexService: GnomexService,
                 private httpClient: HttpClient,
-                private propertyService: PropertyService) {
+                private securityAdvisor: CreateSecurityAdvisorService) {
 
         this.refreshDictionaries();
     }
@@ -378,10 +315,10 @@ export class NewExperimentService {
 
 
     public isExternalExperimentSubmission(): boolean {
-        return this.setupView.currentState === "ExternalExperimentState"
-            || this.setupView.currentState === "ExternalMicroarrayState"
-            || this.setupView.currentState === "AdminExternalExperimentState"
-            || this.setupView.currentState === "AdminExternalMicroarrayState";
+        return this.currentState === "ExternalExperimentState"
+            || this.currentState === "ExternalMicroarrayState"
+            || this.currentState === "AdminExternalExperimentState"
+            || this.currentState === "AdminExternalMicroarrayState";
     }
 
 
@@ -433,59 +370,32 @@ export class NewExperimentService {
             || this.currentState === 'ClinicalSequenomEditState';
     }
 
-
-    public filterAnnotations(idOrganism): any[] {
-        let fAnnotations: any[] = this.filterPropertiesByUser(this.annotations);
-
-        return fAnnotations;
-        // let fAnnotations: any[] = [];
-        // for (let annot of this.annotations) {
-        //     annot = this.gnomexService.getSampleProperty(annot.idProperty);
-        //     if (AnnotationService.isApplicableProperty(annot, this.category, idOrganism, this.requestCategory.codeRequestCategory)) {
-        //         fAnnotations.push(annot);
-        //     }
-        // }
-        // return fAnnotations;
-    }
-
-    public getMultiplexLanes(): void {
-        if (this.isSolexaState() && this.gnomexService.isInternalExperimentSubmission) {
-            this.initializeRequest();
-
-            let stringifiedRequest = JSON.stringify(this.request);
-
-            let params: HttpParams = new HttpParams()
-                .set("requestXMLString", stringifiedRequest);
-
-            // this.experimentService.getMultiplexLaneList(params).subscribe((respose) => {
-            //
-            // });
-
-        }
-    }
-
-
     public initializeRequest() {
         this.request.isExternal = this.isExternalExperimentSubmission() ? "Y" : "N";
 
         this.request.codeRequestCategory = this.requestCategory.codeRequestCategory.toString();
         this.request.idCoreFacility = this.requestCategory.idCoreFacility;
 
-        this.request.idSubmitter = this.getIdAppUserOwner();
         if (this.gnomexService.hasPermission("canSubmitForOtherCores")) {
             this.request.idSubmitter = this.securityAdvisor.idAppUser;
+        } else if (this._experimentOwner && this._experimentOwner.idAppUser) {
+            this.request.idSubmitter = this._experimentOwner.idAppUser;
+        } else {
+            this.request.idSubmitter = "";
         }
-        this.request.idAppUser = this.getIdAppUserOwner();
+
+        if (this._experimentOwner && this._experimentOwner.idAppUser) {
+            this.request.idAppUser = this._experimentOwner.idAppUser;
+        } else {
+            this.request.idAppUser = "";
+        }
 
         this.request.idLab = this.lab.idLab;
+
         if (this.request.isExternal === 'N') {
             if (this.billingAccount != null) {
                 this.request.idBillingAccount = this.billingAccount.idBillingAccount;
             }
-            // else if (setupView.selectedBillingTemplate != null) {
-            //     request.billingTemplate = <billingTemplate></billingTemplate>;
-            //     request.billingTemplate.appendChild(new XMLList(setupView.selectedBillingTemplate));
-            // }
         }
         this.request.idProject = this.project.idProject;
         this.request.codeApplication = this.codeApplication;
@@ -505,121 +415,929 @@ export class NewExperimentService {
 
     }
 
+    public saveNewRequest(idProject: number, invoicePrice: string, description: string, experiment: any, properties: any[]): Observable<any> {
 
-    private createNewExperimentObject(): any {
+        let idProject_param:    string = '';
+        let invoicePrice_param: string = '';
+        let description_param:  string = '';
+        let experiment_param:   string = '';
+        let properties_param:   string = '';
 
-        let experiment: any = {
-            name:                               "",
-            number:                             "",
-            description:                        "",
-            codeProtocolType:                   "",
-            corePrepInstructions:               "",
-            analysisInstructions:               "",
-            captureLibDesignId:                 "",
-            avgInsertSizeFrom:                  "",
-            avgInsertSizeTo:                    "",
-            idSlideProduct:                     "",
-            protocolNumber:                     "",
-            numberOfSamples:                    '', // "0",
-            idSampleTypeDefault:                '', // "1"
-            bioinformaticsAssist:               "",
-            idOrganismSampleDefault:            '', // "204"
-            isArrayINFORequest:                 "",
-            canDeleteSample:                    "Y",
-            canUpdateSamples:                   "Y",
-            isVisibleToMembers:                 '', // "Y",
-            isVisibleToPublic:                  '', // "N"
-            truncatedLabName:                   "",
-            billingAccountName:                 "",
-            billingAccountNumber:               "",
-            lastModifyDate:                     "",
-            codeRequestStatus:                  "",
-            idSampleDropOffLocation:            "",
-            submitterEmail:                     "",
-            submitterPhone:                     "",
-            submitterInstitution:               "",
-            isDNASeqExperiment:                 '', // "N"
-            applicationNotes:                   "",
-            coreToExtractDNA:                   '', // "N"
-            processingDate:                     "",
-            codeIsolationPrepType:              "",
-            hasPrePooledLibraries:              "",
-            numPrePooledTubes:                  "",
-            includeBisulfideConversion:         '', // "N",
-            includeQubitConcentration:          '', // "N"
-            turnAroundTime:                     "",
-            idCoreFacility:                     '', // "1"
-            idProductOrder:                     "",
-            idLab:                              '', // "1125",
-            idRequest:                          "0", // idRequest === 0 indicates to the backend that this is a new Request.
-            idAppUser:                          '', // "4777", // I believe this is the idAppUser of the submitter, which may not be the same as the user
-            createDate:                         "",
-            completedDate:                      "",
-            notes:                              "",
-            application:                        "",
-            projectName:                        "",
-            idProject:                          '', // "62962"
-            project:                            "",
-            slideProduct:                       "",
-            isExternal:                         '', // "N",
-            requestStatus:                      "",
-            reagent:                            '', // "asdf"
-            elutionBuffer:                      '', // "fdsa",
-            usedDnase:                          "",
-            usedRnase:                          "",
-            keepSamples:                        '', // "Y"
-            seqPrepByCore:                      "",
-            adminNotes:                         "",
-            archived:                           "",
-            codeRequestCategory:                '', // "NOSEQ",
-            privacyExpirationDate:              "",
-            targetClassIdentifier:              "0",
-            targetClassName:                    "hci.gnomex.model.Request",
-            idBillingAccount:                   '', // "9246",
-            codeApplication:                    '', // "APP198",
-            codeBioanalyzerChipType:            "",
-            codeVisibility:                     '', // "MEM",
-            canUpdateVisibility:                '', // "N",
-            isVisibleToMembersAndCollaborators: '', // "N",
-            idProduct:                          "",
-            canRead:                            '', // "Y",
-            canUploadData:                      '', // "N",
-            canDelete:                          '', // "Y",
-            ownerName:                          "",
-            idInstitution:                      "",
-            idSubmitter:                        '', // "4777",
-            canUpdate:                          '', // "Y",
-            submitterName:                      "",
-            labName:                            "",
-            projectDescription:                 "",
-            accountNumberDisplay:               "",
-            idOrganism:                         "",
-            organismName:                       "",
-            otherOrganism:                      "",
-            hasCCNumber:                        '', // "N",
-            hasSampleDescription:               '', // "N",
-            hasPlates:                          '', // "N",
-            isOpeningNewBillingTemplate:        '', // "N"
-            hybridizations:          [],
-            labeledSamples:          [],
-            analysisExperimentItems: [],
-            seqLibTreatments:        [],
-            files:                   [],
-            collaborators:           [],
-            workItems:               [],
-            billingItems:            [],
-            SeqLibTreatmentEntries:  [],
-            protocols:               [],
-            samples:                 [],
-            sequenceLanes:           [],
-            PropertyEntries:         [],
-            RequestProperties:       [],
+        if (idProject !== undefined && idProject !== null) {
+            idProject_param = '' + idProject;
+        }
+        if (invoicePrice !== undefined && invoicePrice !== null) {
+            invoicePrice_param = '' + invoicePrice;
+        }
+        if (description !== undefined && description !== null) {
+            description_param = '' + description;
+        }
+        if (experiment !== undefined && experiment !== null) {
+            experiment_param = '' + JSON.stringify(experiment);
+        }
+        if (properties !== undefined && properties !== null) {
+            properties_param = '' + JSON.stringify(properties);
+        }
+
+        let headers: HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+
+        let params: HttpParams = new HttpParams()
+            .set('description',       description_param)
+            .set('idProject',         idProject_param)
+            .set('invoicePrice',      invoicePrice_param)
+            .set('propertiesXML',     properties_param)
+            .set('requestJSONString', experiment_param);
+
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/SaveRequest.gx", params.toString(), { headers:headers })
+    }
+
+
+    // Sort application by sortOrder field
+    private static sortApplication(obj1, obj2): number {
+        if (obj1 === null && obj2 === null) {
+            return 0;
+        } else if (obj1 === null) {
+            return 1;
+        } else if (obj2 === null) {
+            return -1;
+        } else {
+            let order1: number = obj1.sortOrder;
+            let order2: number = obj2.sortOrder;
+            let disp1: string = obj1.display;
+            let disp2: string = obj2.display;
+
+            if (obj1.value === '') {
+                return -1;
+            } else if (obj2.value === '') {
+                return 1;
+            } else {
+                if (order1 < order2) {
+                    return -1;
+                } else if (order1 > order2) {
+                    return 1;
+                } else {
+                    if (disp1 < disp2) {
+                        return -1;
+                    } else if (disp1 > disp2) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
+
+    updateRequestProperties():void {
+
+        let application: any = this.dictionaryService.getEntry('hci.gnomex.model.Application', this.request.codeApplication);
+
+        this.request.samples = this.samplesGridRowData;
+        this.request.hybridizations = {};
+        this.request.sequenceLanes = this.lanes;
+
+        // Visibility
+        // todo
+        // this.request.codeVisibility = visibilityView.visibilityRadioGroup.selectedValue;
+        // if (this.request.@codeVisibility != null && this.request.@codeVisibility == 'INST') {
+        //     // Only set the institution if the visibility view in initialized, meaning
+        //     // that the user has selected the visibility tab.  Otherwise, just leave
+        //     // the institution to is previously set value.
+        //     if (visibilityView.institutionCombo != null && visibilityView.institutionCombo.selectedItem != null) {
+        //         request.@idInstitution = visibilityView.institutionCombo.selectedItem.@idInstitution;
+        //     }
+        //     else if (parentApplication.getProperty(parentApplication.PROPERTY_ID_DEFAULT_INSTITUTION) != null) {
+        //         request.@idInstitution = parentApplication.getProperty(parentApplication.PROPERTY_ID_DEFAULT_INSTITUTION);
+        //     }
+        //     else {
+        //         request.@idInstitution = "";
+        //     }
+        // }
+
+        // Collaborators
+        // todo
+        // if (visibilityView != null && visibilityView.enabled) {
+        //     request.replace("collaborators", <collaborators></collaborators>);
+        //         for each(var collaborator:Object in visibilityView.getCollaborators()) {
+        //         request.collaborators.appendChild(collaborator);
+        //     }
+        // }
+        // request.@privacyExpirationDate = visibilityView.privacyExpirationPicker.text;
+
+        this.request.idAppUser = this.idAppUser;
+        this.request.idSubmitter = this.experimentOwner.idAppUser;
+        this.request.idLab = this.lab.idLab;
+        this.request.idProject = this.project.idProject;
+
+        //TODO
+        //Add new annotations to Sample that have not had data added to them in samples grid.
+        // if (request.samples.Sample.length() > 0) {
+        //     for each(var prop:XML in this.propertyEntries) {
+        //         if (prop.@isSelected == "true" && !(request.samples.Sample[0].hasOwnProperty("@ANNOT" + prop.@idProperty))) {
+        //             request.samples.Sample[0]["@ANNOT" + prop.@idProperty] = "";
+        //         }
+        //     }
+        // }
+    }
+
+    public checkSamplesCompleteness() {
+        let numberOfAdditionalLanes: number = 0;
+        for (let s2 of this.samplesGridRowData) {
+            if (NewExperimentService.isEntered(s2, "numberSequencingLanes")) {
+                numberOfAdditionalLanes += s2.numberSequencingLanes;
+            }
+        }
+        let completeCount: number = 0;
+        // let nameCompleteCount: number = 0;
+
+        for (let sample of this.samplesGridRowData) {
+
+            if (NewExperimentService.isEntered(sample, "name")
+                && NewExperimentService.isEntered(sample, "idSampleType")
+                && NewExperimentService.isEntered(sample, "idOrganism")
+                && NewExperimentService.isEntered(sample, "idSeqRunType")
+                && NewExperimentService.isEntered(sample, "idNumberSequencingCycles")
+                && NewExperimentService.isEntered(sample, "idNumberSequencingCyclesAllowed")
+                && NewExperimentService.isEntered(sample, "multiplexGroupNumber")
+                && NewExperimentService.isEntered(sample, "numberSequencingLanes")
+                && numberOfAdditionalLanes > 0) {
+                completeCount++;
+            }
+
+        }
+        let isValidNumberSeqLanes: boolean = true;
+        if (isValidNumberSeqLanes) {
+            let lanesAdded:Boolean = false;
+
+            for (let theSample of this.samplesGridRowData) {
+                let numberLanesForSample: number = this.getLaneCount(theSample);
+                let numLanes: number = 1;
+                numLanes = theSample.numberSequencingLanes;
+                if (numberLanesForSample < numLanes) {
+                    let numberLanesToAdd: number = numLanes - numberLanesForSample;
+                    for (let x: number = 0; x < numberLanesToAdd; x++) {
+                        this.addSequencingLaneForSample(theSample);
+                        lanesAdded = true;
+                    }
+                } else if (numberLanesForSample > numLanes) {
+                    let numberLanesToRemove: number = numberLanesForSample - numLanes;
+                    for (let lane of this.getLanes(theSample, numberLanesToRemove)) {
+                        // TODO
+                        // parentDocument.lanes.removeItemAt(parentDocument.lanes.getItemIndex(lane));
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    getLanes(sample: any, numberOfLanes: number): any[] {
+        let theLanes: any[] = [];
+        if (theLanes !== null) {
+            for (let sequenceLane of this.lanes) {
+                if (sequenceLane.idSample === sample.idSample) {
+                    theLanes.push(sequenceLane);
+                    if (numberOfLanes !== -1 && theLanes.length === numberOfLanes) {
+                        break;
+                    }
+                }
+            }
+        }
+        return theLanes;
+    }
+
+
+    addSequencingLaneForSample(sample: any):void {
+        let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
+        let laneStr: string = lanePlus.toString().substr(1);
+
+        let laneObj = {
+            idSequenceLane: 'SequenceLane' + laneStr,
+            notes: '',
+            idSeqRunType: sample.idSeqRunType,
+            idNumberSequencingCycles: sample.idNumberSequencingCycles,
+            idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
+            idSample: sample.idSample,
+            idGenomeBuildAlignTo: ''
         };
+        this.lanes.push(laneObj);
+    }
+
+    getLaneCount(sample: any): number {
+        let count: number = 0;
+        if (this.lanes != null) {
+            for (let sequenceLane of this.lanes) {
+                if (sequenceLane.idSample === sample.idSample) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+
+    private static isEntered(sample: any, fieldName: string): boolean {
+        return sample && (sample.hasOwnProperty(fieldName) && ('' + sample[fieldName]) !== '');
+    }
+
+    public filterApplication(requestCategory, seqPrepByCore): any[] {
+        let filteredApps: any[] = [];
+        for (let app of this.filteredAppList) {
+            if (!app.value) {
+                continue;
+            }
+            if (app.isActive === 'N') {
+                continue;
+            }
+            let doesMatchRequestCategory: boolean = false;
+            let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter((reqCatApp) => {
+                    return reqCatApp.value !== "" && reqCatApp.codeApplication === app.value;
+            });
+
+            for (let xref of theApplications) {
+                if (xref.codeRequestCategory === requestCategory.codeRequestCategory) {
+                    doesMatchRequestCategory = true;
+                    break;
+                }
+            }
+
+            let doesMatchSeqPrepByCore: boolean = false;
+            if (doesMatchRequestCategory) {
+                if (requestCategory.isIlluminaType !== 'Y' || !this.gnomexService.isInternalExperimentSubmission) {
+                    doesMatchSeqPrepByCore = true;
+                } else {
+                    doesMatchSeqPrepByCore = (app.onlyForLabPrepped === "N" || !seqPrepByCore);
+                }
+            }
+            if (doesMatchRequestCategory && doesMatchSeqPrepByCore) {
+                filteredApps.push(app);
+            }
+        }
+        return filteredApps;
+    }
+
+    public getOrganism(): any {
+        if (this.sampleSetupView && (this.isMicroarrayState() || this.isSolexaState()) && this.currentState !== 'SolexaLaneAmendState') {
+            return this.sampleSetupView.form.get("organism").value;
+        } else if (this.request != null) {
+            let idOrganism = null;
+            if (this.request.idOrganismSampleDefault && this.request.idOrganismSampleDefault !== '') {
+                idOrganism = this.request.idOrganismSampleDefault;
+            } else {
+                if (this.request.samples.length > 0) {
+                    for (let sample of this.request.samples.Sample) {
+                        if (sample.idOrganism) {
+                            idOrganism = sample.idOrganism;
+                            break;
+                        }
+                    }
+                }
+            }
+            let organismList = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite', idOrganism);
+            if (organismList && organismList.length() > 0) {
+                return organismList[0];
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    getHiSeqPriceList() {
+        let appPriceListParams: HttpParams = new HttpParams()
+            .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
+            .set("idLab", this.lab.idLab);
+
+        this.billingService.getHiSeqRunTypePriceList(appPriceListParams).subscribe((response: any) => {
+            // this.hiSeqPrices = response;
+
+            if (Array.isArray(response)) {
+                for (let price of response) {
+                    let key: string = price.idNumberSequencingCyclesAllowed;
+                    this.priceMap.set(key, price.price);
+                }
+            }
+
+            this.hiSeqPricesChanged.next(true);
+        });
+    }
+
+    public filterBySampleOrganism(genomeBuildOrganism: any): any[] {
+        let genomeBuilds: any[] = [];
+        for (let genomeBuild of this.genomeList) {
+            if (genomeBuild.idOrganism === genomeBuildOrganism) {
+                genomeBuilds.push(genomeBuild);
+            }
+        }
+        return genomeBuilds;
+    }
+
+    public getSubmitterName(): string {
+        if (this.experimentOwner) {
+            return this.experimentOwner.displayName;
+        } else {
+            return this.securityAdvisor.userName;
+        }
+    }
+}
+
+export class Experiment {
+
+    public name:                               string = "";
+    public number:                             string = "";
+    public description:                        string = "";
+    public codeProtocolType:                   string = "";
+    public corePrepInstructions:               string = "";
+    public analysisInstructions:               string = "";
+    public captureLibDesignId:                 string = "";
+    public avgInsertSizeFrom:                  string = "";
+    public avgInsertSizeTo:                    string = "";
+    public idSlideProduct:                     string = "";
+    public protocolNumber:                     string = "";
+
+    public get numberOfSamples(): string {
+        return this._numberOfSamples;
+    }
+    public set numberOfSamples(value: string) {
+        this._numberOfSamples = value;
+        this.numberOfSamples_changed.next(value);
+    }
+    private _numberOfSamples:                    string = ''; // "0",
+    public numberOfSamples_changed: Subject<string> = new Subject<string>();
+
+    public idSampleTypeDefault:                string = ''; // "1"
+
+    public get sampleType(): any {
+        return this._sampleType;
+    }
+    public set sampleType(value: any) {
+
+        for (let sample of this.samples) {
+            sample.sampleType = value;
+        }
+
+        this._sampleType = value;
+    }
+    private _sampleType: any;
+    private sampleType_changed: Subject<string> = new Subject<string>();
+
+    public bioinformaticsAssist:               string = "";
+    public idOrganismSampleDefault:            string = ''; // "204"
+    public isArrayINFORequest:                 string = "";
+    public canDeleteSample:                    string = "Y";
+    public canUpdateSamples:                   string = "Y";
+    public isVisibleToMembers:                 string = ''; // "Y",
+    public isVisibleToPublic:                  string = ''; // "N"
+    public truncatedLabName:                   string = "";
+    public billingAccountName:                 string = "";
+    public billingAccountNumber:               string = "";
+    public lastModifyDate:                     string = "";
+    public codeRequestStatus:                  string = "";
+    public idSampleDropOffLocation:            string = "";
+    public submitterEmail:                     string = "";
+    public submitterPhone:                     string = "";
+    public submitterInstitution:               string = "";
+    public isDNASeqExperiment:                 string = ''; // "N"
+    public applicationNotes:                   string = "";
+    public coreToExtractDNA:                   string = ''; // "N"
+    public processingDate:                     string = "";
+    public codeIsolationPrepType:              string = "";
+    public hasPrePooledLibraries:              string = "";
+    public numPrePooledTubes:                  string = "";
+    public includeBisulfideConversion:         string = ''; // "N",
+    public includeQubitConcentration:          string = ''; // "N"
+    public turnAroundTime:                     string = "";
+    public _idCoreFacility:                     string = ''; // "1"
+    public get idCoreFacility(): string {
+        return this._idCoreFacility;
+    }
+    public set idCoreFacility(value: string) {
+        this._idCoreFacility = value;
+
+        if (this.RequestProperties) {
+            this.filterRequestProperties();
+        }
+    }
+
+    public idProductOrder:                     string = "";
+    public idLab:                              string = ''; // "1125",
+    public idRequest:                          string = "0"; // idRequest === 0 indicates to the backend that this is a new Request.
+
+    private _experimentOwner: any;
+
+    public get experimentOwner() {
+        return this._experimentOwner;
+    }
+    public set experimentOwner(value: any) {
+        if (value && value.idAppUser) {
+            this._experimentOwner = value;
+            this.idAppUser = value.idAppUser;
+        } else {
+            // TODO replace check with typing
+            throw { message: 'Bad experiment owner!!!' };
+            this._experimentOwner = null;
+            this.idAppUser = null;
+        }
+    }
+
+    public idAppUser:                          string = ''; // "4777", // I believe this is the idAppUser of the submitter, which may not be the same as the user
+    public idOwner:                            string = ''; // ??? Inserted by new experiment?
+    public createDate:                         string = "";
+    public completedDate:                      string = "";
+    public notes:                              string = "";
+    public application:                        string = "";
+    public projectName:                        string = "";
+    public idProject:                          string = ''; // "62962"
+    public project:                            string = "";
+    public slideProduct:                       string = "";
+    public isExternal:                         string = ''; // "N",
+    public requestStatus:                      string = "";
+    public reagent:                            string = ''; // "asdf"
+    public elutionBuffer:                      string = ''; // "fdsa",
+    public usedDnase:                          string = "";
+    public usedRnase:                          string = "";
+    public keepSamples:                        string = ''; // "Y"
+    public seqPrepByCore:                      string = "";
+    public adminNotes:                         string = "";
+    public archived:                           string = "";
+
+    private _codeRequestCategory:                string = ''; // "NOSEQ",
+    public get codeRequestCategory() {
+        return this._codeRequestCategory;
+    }
+    public set codeRequestCategory(value: string) {
+        this._codeRequestCategory = value;
+
+        if (value) {
+            this.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', value);
+        } else {
+            this.requestCategory = null;
+        }
+    }
+
+    private _requestCategory: any;
+    public get requestCategory(): any {
+        return this._requestCategory;
+    }
+    public set requestCategory(value: any) {
+        this._requestCategory = value;
+        this._codeRequestCategory = null;
+
+        if (value && value.codeRequestCategory) {
+            this._codeRequestCategory = value.codeRequestCategory;
+        }
+
+        this.onChange_codeRequestCategory.next(this._codeRequestCategory);
+        this.onChange_requestCategory.next(this._requestCategory);
+    }
+    public onChange_codeRequestCategory: BehaviorSubject<string> = new BehaviorSubject<string>(this.codeRequestCategory);
+    public onChange_requestCategory: BehaviorSubject<any>        = new BehaviorSubject<any>(this.requestCategory);
+
+    public privacyExpirationDate:              string = "";
+    public targetClassIdentifier:              string = "0";
+    public targetClassName:                    string = "hci.gnomex.model.Request";
+    public idBillingAccount:                   string = ''; // "9246",
+    public codeApplication:                    string = ''; // "APP198",
+
+    private _application: any;
+    public get application_object(): any {
+        return this._application;
+    }
+    public set application_object(value: any) {
+        this._application = value;
+
+        if (value) {
+            this.codeApplication = value.codeApplication;
+            this.application = value.display;
+        }
+
+        for (let sample of this.samples) {
+            sample.application_object = value;
+        }
+
+        this.application_object_changed.next(value);
+    }
+    public application_object_changed: Subject<any> = new Subject<any>();
+
+    public codeBioanalyzerChipType:            string = "";
+    public codeVisibility:                     string = ''; // "MEM",
+    public canUpdateVisibility:                string = ''; // "N",
+    public isVisibleToMembersAndCollaborators: string = ''; // "N",
+    public idProduct:                          string = "";
+    public canRead:                            string = ''; // "Y",
+    public canUploadData:                      string = ''; // "N",
+    public canDelete:                          string = ''; // "Y",
+    public ownerName:                          string = "";
+    public idInstitution:                      string = "";
+    public idSubmitter:                        string = ''; // "4777",
+    public canUpdate:                          string = ''; // "Y",
+    public submitterName:                      string = "";
+    public labName:                            string = "";
+    public projectDescription:                 string = "";
+    public accountNumberDisplay:               string = "";
+    public idOrganism:                         string = "";
+    public organismName:                       string = "";
+    public otherOrganism:                      string = "";
+    public hasCCNumber:                        string = ''; // "N",
+    public hasSampleDescription:               string = ''; // "N",
+    public hasPlates:                          string = ''; // "N",
+    public isOpeningNewBillingTemplate:        string = ''; // "N"
+
+    private _isRapidMode:                        string = ''; // "N"
+    public get isRapidMode(): string {
+        return this._isRapidMode;
+    }
+    public set isRapidMode(value: string) {
+        this._isRapidMode = value;
+
+        let result: string = value && value === 'Y' ? '2' : '1';
+
+        for (let sample of this.samples) {
+            sample.numberSequencingLanes = result;
+        }
+    }
+
+    public samples:                 Sample[] = [];
+
+    public hybridizations:          any[] = [];
+    public labeledSamples:          any[] = [];
+    public analysisExperimentItems: any[] = [];
+    public seqLibTreatments:        any[] = [];
+    public files:                   any[] = [];
+    public collaborators:           any[] = [];
+    public workItems:               any[] = [];
+    public billingItems:            any[] = [];
+    public SeqLibTreatmentEntries:  any[] = [];
+    public protocols:               any[] = [];
+    public sequenceLanes:           any[] = [];
+
+    // PropertyEntries should probably be named something more like "SampleAnnotationTemplates".
+    public _PropertyEntries:         any[] = [];
+    public get PropertyEntries(): any[] {
+        return this._PropertyEntries;
+    };
+    // setting PropertyEntries is not recommended, it should be loaded from the backend via refreshSampleAnnotationList
+    public set PropertyEntries(value: any[]) {
+        this._PropertyEntries = value;
+
+        if (this._PropertyEntries) {
+            this._PropertyEntries = this._PropertyEntries.sort(AnnotationService.sortProperties);
+        }
+
+        this.onChange_PropertyEntries.next(this.PropertyEntries);
+    }
+    public onChange_PropertyEntries: BehaviorSubject<any[]> = new BehaviorSubject<any[]>(this.PropertyEntries);
+
+    private _PropertyEntries_original: any[];
+
+
+    private _RequestProperties:       any[] = [];
+    public get RequestProperties(): any[] {
+        return this._RequestProperties;
+    }
+    public set RequestProperties(value: any[]) {
+        this._RequestProperties = value;
+
+        if (this.idCoreFacility) {
+            this.filterRequestProperties();
+        }
+
+        this.onChange_RequestProperties.next(this.RequestProperties);
+    }
+    public onChange_RequestProperties: BehaviorSubject<any[]> = new BehaviorSubject<any[]>(this.RequestProperties);
+
+    private _organism: any = {};
+    public get organism(): any {
+        return this._organism;
+    }
+    public set organism(value: any) {
+        if (value && value.idOrganism && value.display) {
+            this._organism = value;
+            this.idOrganism = value.idOrganism;
+            this.organismName = value.display;
+
+            for (let sample of this.samples) {
+                sample.organism = value;
+            }
+
+            this.filterRequestProperties();
+            this.refreshSampleAnnotationList();
+
+            this.organism_changed.next(value);
+        }
+    }
+    public organism_changed: Subject<any> = new Subject<any>();
+
+    private _sequencingOption: any;
+    public get sequencingOption(): any {
+        return this._sequencingOption;
+    }
+    public set sequencingOption(value: any) {
+        if (value && value.idNumberSequencingCycles && value.idNumberSequencingCyclesAllowed) {
+            this._sequencingOption = value;
+
+            for (let sample of this.samples) {
+                sample.sequencingOption = value;
+            }
+
+            this.sequencingOption_changed.next(value);
+        }
+    }
+    public sequencingOption_changed: Subject<any> = new Subject<any>();
+
+
+    constructor(private dictionaryService: DictionaryService,
+                private gnomexService: GnomexService,
+                private propertyService: PropertyService,
+                private securityAdvisor: CreateSecurityAdvisorService) { }
+
+
+    public static createExperimentObjectFromAny(dictionaryService: DictionaryService,
+                                                gnomexService: GnomexService,
+                                                propertyService: PropertyService,
+                                                securityAdvisor: CreateSecurityAdvisorService,
+                                                value: any): Experiment {
+
+        let experiment = new Experiment(dictionaryService, gnomexService, propertyService, securityAdvisor);
+
+        experiment.clonePropertyOnlyIfExists("name", value);
+        experiment.clonePropertyOnlyIfExists("number", value);
+        experiment.clonePropertyOnlyIfExists("description", value);
+        experiment.clonePropertyOnlyIfExists("codeProtocolType", value);
+        experiment.clonePropertyOnlyIfExists("corePrepInstructions", value);
+        experiment.clonePropertyOnlyIfExists("analysisInstructions", value);
+        experiment.clonePropertyOnlyIfExists("captureLibDesignId", value);
+        experiment.clonePropertyOnlyIfExists("avgInsertSizeFrom", value);
+        experiment.clonePropertyOnlyIfExists("avgInsertSizeTo", value);
+        experiment.clonePropertyOnlyIfExists("idSlideProduct", value);
+        experiment.clonePropertyOnlyIfExists("protocolNumber", value);
+        experiment.clonePropertyOnlyIfExists("numberOfSamples", value);
+        experiment.clonePropertyOnlyIfExists("idSampleTypeDefault", value);
+        experiment.clonePropertyOnlyIfExists("sampleType", value);
+        experiment.clonePropertyOnlyIfExists("bioinformaticsAssist", value);
+        experiment.clonePropertyOnlyIfExists("idOrganismSampleDefault", value);
+        experiment.clonePropertyOnlyIfExists("isArrayINFORequest", value);
+        experiment.clonePropertyOnlyIfExists("canDeleteSample", value);
+        experiment.clonePropertyOnlyIfExists("canUpdateSamples", value);
+        experiment.clonePropertyOnlyIfExists("isVisibleToMembers", value);
+        experiment.clonePropertyOnlyIfExists("isVisibleToPublic", value);
+        experiment.clonePropertyOnlyIfExists("truncatedLabName", value);
+        experiment.clonePropertyOnlyIfExists("billingAccountName", value);
+        experiment.clonePropertyOnlyIfExists("billingAccountNumber", value);
+        experiment.clonePropertyOnlyIfExists("lastModifyDate", value);
+        experiment.clonePropertyOnlyIfExists("codeRequestStatus", value);
+        experiment.clonePropertyOnlyIfExists("idSampleDropOffLocation", value);
+        experiment.clonePropertyOnlyIfExists("submitterEmail", value);
+        experiment.clonePropertyOnlyIfExists("submitterPhone", value);
+        experiment.clonePropertyOnlyIfExists("submitterInstitution", value);
+        experiment.clonePropertyOnlyIfExists("isDNASeqExperiment", value);
+        experiment.clonePropertyOnlyIfExists("applicationNotes", value);
+        experiment.clonePropertyOnlyIfExists("coreToExtractDNA", value);
+        experiment.clonePropertyOnlyIfExists("processingDate", value);
+        experiment.clonePropertyOnlyIfExists("codeIsolationPrepType", value);
+        experiment.clonePropertyOnlyIfExists("hasPrePooledLibraries", value);
+        experiment.clonePropertyOnlyIfExists("numPrePooledTubes", value);
+        experiment.clonePropertyOnlyIfExists("includeBisulfideConversion", value);
+        experiment.clonePropertyOnlyIfExists("includeQubitConcentration", value);
+        experiment.clonePropertyOnlyIfExists("turnAroundTime", value);
+        experiment.clonePropertyOnlyIfExists("idCoreFacility", value);
+        experiment.clonePropertyOnlyIfExists("idProductOrder", value);
+        experiment.clonePropertyOnlyIfExists("idLab", value);
+        experiment.clonePropertyOnlyIfExists("idRequest", value);
+        experiment.clonePropertyOnlyIfExists("experimentOwner", value);
+        experiment.clonePropertyOnlyIfExists("idAppUser", value);
+        experiment.clonePropertyOnlyIfExists("idOwner", value);
+        experiment.clonePropertyOnlyIfExists("createDate", value);
+        experiment.clonePropertyOnlyIfExists("completedDate", value);
+        experiment.clonePropertyOnlyIfExists("notes", value);
+        experiment.clonePropertyOnlyIfExists("application", value);
+        experiment.clonePropertyOnlyIfExists("projectName", value);
+        experiment.clonePropertyOnlyIfExists("idProject", value);
+        experiment.clonePropertyOnlyIfExists("project", value);
+        experiment.clonePropertyOnlyIfExists("slideProduct", value);
+        experiment.clonePropertyOnlyIfExists("isExternal", value);
+        experiment.clonePropertyOnlyIfExists("requestStatus", value);
+        experiment.clonePropertyOnlyIfExists("reagent", value);
+        experiment.clonePropertyOnlyIfExists("elutionBuffer", value);
+        experiment.clonePropertyOnlyIfExists("usedDnase", value);
+        experiment.clonePropertyOnlyIfExists("usedRnase", value);
+        experiment.clonePropertyOnlyIfExists("keepSamples", value);
+        experiment.clonePropertyOnlyIfExists("seqPrepByCore", value);
+        experiment.clonePropertyOnlyIfExists("adminNotes", value);
+        experiment.clonePropertyOnlyIfExists("archived", value);
+        experiment.clonePropertyOnlyIfExists("codeRequestCategory", value);
+        experiment.clonePropertyOnlyIfExists("requestCategory", value);
+        experiment.clonePropertyOnlyIfExists("privacyExpirationDate", value);
+        experiment.clonePropertyOnlyIfExists("targetClassIdentifier", value);
+        experiment.clonePropertyOnlyIfExists("targetClassName", value);
+        experiment.clonePropertyOnlyIfExists("idBillingAccount", value);
+        experiment.clonePropertyOnlyIfExists("codeApplication", value);
+        experiment.clonePropertyOnlyIfExists("application_object", value);
+        experiment.clonePropertyOnlyIfExists("codeBioanalyzerChipType", value);
+        experiment.clonePropertyOnlyIfExists("codeVisibility", value);
+        experiment.clonePropertyOnlyIfExists("canUpdateVisibility", value);
+        experiment.clonePropertyOnlyIfExists("isVisibleToMembersAndCollaborators", value);
+        experiment.clonePropertyOnlyIfExists("idProduct", value);
+        experiment.clonePropertyOnlyIfExists("canRead", value);
+        experiment.clonePropertyOnlyIfExists("canUploadData", value);
+        experiment.clonePropertyOnlyIfExists("canDelete", value);
+        experiment.clonePropertyOnlyIfExists("ownerName", value);
+        experiment.clonePropertyOnlyIfExists("idInstitution", value);
+        experiment.clonePropertyOnlyIfExists("idSubmitter", value);
+        experiment.clonePropertyOnlyIfExists("canUpdate", value);
+        experiment.clonePropertyOnlyIfExists("submitterName", value);
+        experiment.clonePropertyOnlyIfExists("labName", value);
+        experiment.clonePropertyOnlyIfExists("projectDescription", value);
+        experiment.clonePropertyOnlyIfExists("accountNumberDisplay", value);
+        experiment.clonePropertyOnlyIfExists("idOrganism", value);
+        experiment.clonePropertyOnlyIfExists("organismName", value);
+        experiment.clonePropertyOnlyIfExists("otherOrganism", value);
+        experiment.clonePropertyOnlyIfExists("hasCCNumber", value);
+        experiment.clonePropertyOnlyIfExists("hasSampleDescription", value);
+        experiment.clonePropertyOnlyIfExists("hasPlates", value);
+        experiment.clonePropertyOnlyIfExists("isOpeningNewBillingTemplate", value);
+        experiment.clonePropertyOnlyIfExists("isRapidMode", value);
+        experiment.clonePropertyOnlyIfExists("samples", value);
+        experiment.clonePropertyOnlyIfExists("hybridizations", value);
+        experiment.clonePropertyOnlyIfExists("labeledSamples", value);
+        experiment.clonePropertyOnlyIfExists("analysisExperimentItems", value);
+        experiment.clonePropertyOnlyIfExists("seqLibTreatments", value);
+        experiment.clonePropertyOnlyIfExists("files", value);
+        experiment.clonePropertyOnlyIfExists("collaborators", value);
+        experiment.clonePropertyOnlyIfExists("workItems", value);
+        experiment.clonePropertyOnlyIfExists("billingItems", value);
+        experiment.clonePropertyOnlyIfExists("SeqLibTreatmentEntries", value);
+        experiment.clonePropertyOnlyIfExists("protocols", value);
+        experiment.clonePropertyOnlyIfExists("sequenceLanes", value);
+        experiment.clonePropertyOnlyIfExists("PropertyEntries", value);
+        experiment.clonePropertyOnlyIfExists("organism", value);
+        experiment.clonePropertyOnlyIfExists("sequencingOption", value);
+        experiment.clonePropertyOnlyIfExists("RequestProperties", value);
+
+        experiment._PropertyEntries_original = experiment.PropertyEntries;
 
         return experiment;
     }
 
-    public spoofNewExperimentObject(): any {
+    private clonePropertyOnlyIfExists(propertyName: string, source: any) {
+        if (this[propertyName] && source[propertyName]) {
+            this[propertyName] = source[propertyName];
+        }
+    }
+
+    private filterRequestProperties(): any[] {
+        if (this.idCoreFacility && this.requestCategory && this.requestCategory.codeRequestCategory) {
+            return this.filterPropertiesByUser(this.RequestProperties);
+        } else {
+            return [];
+        }
+    }
+
+    public filterPropertiesByUser(propsToFilter: any[]): any[] {
+        // Get property with children (organisms, platforms, appusers).
+        let properties: any[] = [];
+
+        if (propsToFilter) {
+            for (let property of propsToFilter) {
+                // if (property.name && property.name.startsWith("Human_5hmC")) {
+                //     console.log("jj");
+                // }
+                let entry: any = this.gnomexService.getSampleProperty(property.idProperty);
+                let keep: boolean = this.filterPropertyEntryWithFullProperty(entry, property);
+                if (keep) {
+                    keep = false;
+                    let users: any[];
+                    if (entry.appUsers) {
+                        if (!Array.isArray(entry.appUsers)) {
+                            users = [entry.appUsers.AppUserLite];
+                        } else {
+                            users = entry.appUsers;
+                        }
+                    }
+                    if (!users || users.length === 0) {
+                        keep = true;
+                    } else {
+                        let allowedUsers: any[] = this.getPermissionsList_idAppUsers();
+                        for (let user of users) {
+                            for (let u1 of allowedUsers) {
+                                if (u1 === user.idAppUser) {
+                                    keep = true;
+                                    break;
+                                }
+                            }
+                            if (keep) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (keep) {
+                    properties.push(property);
+                }
+            }
+        }
+
+        return properties;
+    }
+
+    public filterPropertyEntryWithFullProperty(property, sce): boolean {
+        let keep: boolean = false;
+
+        if (AnnotationService.isApplicableProperty(property, this.requestCategory, this.idOrganism, this.codeApplication)) {
+            if (sce.isSelected === 'true' || property.isActive !== 'N') {
+                keep = true;
+            }
+        }
+
+        return keep;
+    }
+
+    // formerly getAnnotationAllowedUserList(): any[] { ... }
+    private getPermissionsList_idAppUsers(): any[] {
+
+        let userList: any[] = [];
+        // Owner of the experiment
+        Experiment.pushUnique(userList, this.idSubmitter);
+
+        // Submitter -- if different and not null
+        Experiment.pushUnique(userList, this.idAppUser);
+
+        // Actually, it is really strange to me that like, Brian, would see a different list
+        // when setting up an experiment for someone else than they themselves would see.  Not sure
+        // if this really should be implemented this way.  Maybe this should be removed?
+        // current user -- if different
+        Experiment.pushUnique(userList, '' + this.securityAdvisor.idAppUser);
+
+        return userList;
+    }
+
+    private static pushUnique(a: any[], v: string):void {
+        if (v !== null && v !== '') {
+            for (let v1 of a) {
+                if (v1 === v) {
+                    return;
+                }
+            }
+            a.push(v);
+        }
+    }
+
+    // Formerly refreshNewExperimentAnnotations and/or buildPropertiesByUser
+    public refreshSampleAnnotationList(): void {
+
+        this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
+            response = Experiment.filterOnlyPropertiesForSamples(response);
+            response = this.filterPropertiesByUser(response);
+
+            if (this._PropertyEntries_original && Array.isArray(this._PropertyEntries_original)) {
+                let originalPropertiesThatAreSelected: any[] = this._PropertyEntries_original.filter((value) => {
+                    return value.isSelected && value.isSelected === 'true';
+                });
+
+                for (let propertyEntry of response) {
+                    for (let originalPropertyEntries of originalPropertiesThatAreSelected) {
+                        if (propertyEntry.idProperty
+                            && originalPropertyEntries.idProperty
+                            && propertyEntry.idProperty === originalPropertyEntries.idProperty) {
+
+                            propertyEntry.isSelected = originalPropertyEntries.isSelected;
+                        }
+                    }
+                }
+            }
+
+            this.addDescriptionFieldToAnnotations(response);
+            this.PropertyEntries = response;
+        });
+    }
+
+    private static filterOnlyPropertiesForSamples(properties: any[]): any[] {
+        if (properties && Array.isArray(properties)) {
+            properties = properties.filter((value:any) => {
+                return value.forSample && value.forSample === 'Y';
+            });
+        }
+        return properties;
+    }
+
+    private addDescriptionFieldToAnnotations(props: any[]): void {
+        let descNode: any = {
+            PropertyEntry: {
+                idProperty: "-1",
+                name: "Description",
+                otherLabel: "",
+                Description: "false",
+                isActive: "Y"
+            }
+        };
+        props.splice(1, 0, descNode);
+    }
+
+
+    public static spoofNewExperimentObject(): any {
 
         let experiment: any = {
             name:                               "",
@@ -4840,517 +5558,99 @@ export class NewExperimentService {
 
         return experiment;
     }
+}
 
-    public saveNewRequest(idProject: number, invoicePrice: string, description: string, experiment: any, properties: any[]): Observable<any> {
+export class Sample {
+    public idSample:                        string = ''; // "Sample0";
+    public name:                            string = ''; // "asdffdsa";
+    public description:                     string = ''; // "";
+    public canChangeSampleName:             string = 'Y'; // "Y";
+    public canChangeSampleType:             string = 'Y'; // "Y";
+    public canChangeSampleConcentration:    string = 'Y'; // "Y";
+    public canChangeSampleSource:           string = 'Y'; // "Y";
+    public canChangeNumberSequencingCycles: string = 'Y'; // "Y";
+    public canChangeNumberSequencingLanes:  string = 'Y'; // "Y";
+    public concentration:                   string = ''; // "";
+    public label:                           string = ''; // "";
+    public idOligoBarcode:                  string = ''; // "";
+    public barcodeSequence:                 string = ''; // "";
+    public idOligoBarcodeB:                 string = ''; // "";
+    public barcodeSequenceB:                string = ''; // "";
+    public idNumberSequencingCycles:        string = ''; // "5";
+    public idNumberSequencingCyclesAllowed: string = ''; // "69";
+    public idSeqRunType:                    string = ''; // "4";
+    public numberSequencingLanes:           string = ''; // "1";
+    public codeConcentrationUnit:           string = ''; // "ng/ul";
+    public idSampleType:                    string = ''; // "1";
 
-        let idProject_param:    string = '';
-        let invoicePrice_param: string = '';
-        let description_param:  string = '';
-        let experiment_param:   string = '';
-        let properties_param:   string = '';
-
-        if (idProject !== undefined && idProject !== null) {
-            idProject_param = '' + idProject;
+    public get sampleType(): any {
+        return this._sampleType;
+    }
+    public set sampleType(value: any) {
+        if (value && value.idSampleType) {
+            this._sampleType = value;
+            this.idSampleType = value.idSampleType
         }
-        if (invoicePrice !== undefined && invoicePrice !== null) {
-            invoicePrice_param = '' + invoicePrice;
-        }
-        if (description !== undefined && description !== null) {
-            description_param = '' + description;
-        }
-        if (experiment !== undefined && experiment !== null) {
-            experiment_param = '' + JSON.stringify(experiment);
-        }
-        if (properties !== undefined && properties !== null) {
-            properties_param = '' + JSON.stringify(properties);
-        }
+    }
+    private _sampleType: any;
 
-        let headers: HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+    public idSeqLibProtocol:                string = ''; // "361";
+    public seqPrepByCore:                   string = ''; // "Y";
+    public idOrganism:                      string = ''; // "204";
+    public otherOrganism:                   string = ''; // "";
+    public treatment:                       string = ''; // "";
+    public customColor:                     string = ''; // "0xFFFFFF";
+    public multiplexGroupNumber:            string = ''; // "10";
+    public isDirty:                         string = ''; // "Y";
 
-        let params: HttpParams = new HttpParams()
-            .set('description',       description_param)
-            .set('idProject',         idProject_param)
-            .set('invoicePrice',      invoicePrice_param)
-            .set('propertiesXML',     properties_param)
-            .set('requestJSONString', experiment_param);
-
-        this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/SaveRequest.gx", params.toString(), { headers:headers })
+    private _organism: any = {};
+    public get organism(): any {
+        return this._organism;
+    }
+    public set organism(value: any) {
+        if (value && value.idOrganism && value.organismName) {
+            this._organism = value;
+            this.idOrganism = value.idOrganism;
+        }
     }
 
+    private _sequencingOption: any;
+    public get sequencingOption(): any {
+        return this._sequencingOption;
+    }
+    public set sequencingOption(value: any) {
+        if (value && value.idNumberSequencingCycles && value.idNumberSequencingCyclesAllowed) {
+            this._sequencingOption = value;
+            this.idNumberSequencingCycles = value.idNumberSequencingCycles;
+            this.idNumberSequencingCyclesAllowed = value.idNumberSequencingCyclesAllowed;
+            this.idSeqRunType = value.idSeqRunType;
+        }
+    }
 
-    // Sort application by sortOrder field
-    private static sortApplication(obj1, obj2): number {
-        if (obj1 === null && obj2 === null) {
-            return 0;
-        } else if (obj1 === null) {
-            return 1;
-        } else if (obj2 === null) {
-            return -1;
-        } else {
-            let order1: number = obj1.sortOrder;
-            let order2: number = obj2.sortOrder;
-            let disp1: string = obj1.display;
-            let disp2: string = obj2.display;
+    private _application: any;
+    public get application_object(): any {
+        return this._application;
+    }
+    public set application_object(value: any) {
+        this._application = value;
 
-            if (obj1.value === '') {
-                return -1;
-            } else if (obj2.value === '') {
-                return 1;
+        if (value && value.codeApplication) {
+            let lookup = this.dictionaryService.getProtocolFromApplication(value.codeApplication);
+
+            if (lookup && lookup.idSeqLibProtocol) {
+                this.idSeqLibProtocol = lookup.idSeqLibProtocol;
             } else {
-                if (order1 < order2) {
-                    return -1;
-                } else if (order1 > order2) {
-                    return 1;
-                } else {
-                    if (disp1 < disp2) {
-                        return -1;
-                    } else if (disp1 > disp2) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
-            }
-        }
-    }
-
-    refreshNewExperimentAnnotations(): void {
-        this.dialogService.startDefaultSpinnerDialog();
-
-        this.experimentService.getNewRequest().pipe(first()).subscribe((response: any) => {
-            this.dialogService.stopAllSpinnerDialogs();
-
-            if (!response) {
-                return;
-            }
-
-            if (!this.gnomexService.isInternalExperimentSubmission) {
-                this.addDescriptionFieldToAnnotations(response.PropertyEntries);
-            }
-
-            this.propertyEntries = response.PropertyEntries;
-
-            if (response.RequestProperties && Array.isArray(response.RequestProperties)) {
-                this.annotations = response.RequestProperties.filter(annotation =>
-                    annotation.isActive === 'Y' && annotation.idCoreFacility === this.idCoreFacility
-                );
-            } else {
-                this.annotations = [];
-            }
-        });
-
-        this.propertyEntriesForUser = this.filterPropertiesByUser(this.propertyEntries);
-    }
-
-    private addDescriptionFieldToAnnotations(props: any[]): void {
-        let descNode: any = {
-            PropertyEntry: {
-                idProperty: "-1",
-                name: "Description",
-                otherLabel: "",
-                Description: "false",
-                isActive: "Y"
-            }
-        };
-        props.splice(1, 0, descNode);
-    }
-
-    updateRequestProperties():void {
-
-        let application: any = this.dictionaryService.getEntry('hci.gnomex.model.Application', this.request.codeApplication);
-
-        this.request.samples = this.samplesGridRowData;
-        this.request.hybridizations = {};
-        this.request.sequenceLanes = this.lanes;
-
-        // Visibility
-        // todo
-        // this.request.codeVisibility = visibilityView.visibilityRadioGroup.selectedValue;
-        // if (this.request.@codeVisibility != null && this.request.@codeVisibility == 'INST') {
-        //     // Only set the institution if the visibility view in initialized, meaning
-        //     // that the user has selected the visibility tab.  Otherwise, just leave
-        //     // the institution to is previously set value.
-        //     if (visibilityView.institutionCombo != null && visibilityView.institutionCombo.selectedItem != null) {
-        //         request.@idInstitution = visibilityView.institutionCombo.selectedItem.@idInstitution;
-        //     }
-        //     else if (parentApplication.getProperty(parentApplication.PROPERTY_ID_DEFAULT_INSTITUTION) != null) {
-        //         request.@idInstitution = parentApplication.getProperty(parentApplication.PROPERTY_ID_DEFAULT_INSTITUTION);
-        //     }
-        //     else {
-        //         request.@idInstitution = "";
-        //     }
-        // }
-
-        // Collaborators
-        // todo
-        // if (visibilityView != null && visibilityView.enabled) {
-        //     request.replace("collaborators", <collaborators></collaborators>);
-        //         for each(var collaborator:Object in visibilityView.getCollaborators()) {
-        //         request.collaborators.appendChild(collaborator);
-        //     }
-        // }
-        // request.@privacyExpirationDate = visibilityView.privacyExpirationPicker.text;
-
-        this.request.idAppUser = this.idAppUser;
-        this.request.idSubmitter = this.experimentOwner.idAppUser;
-        this.request.idLab = this.lab.idLab;
-        this.request.idProject = this.project.idProject;
-
-        //TODO
-        //Add new annotations to Sample that have not had data added to them in samples grid.
-        // if (request.samples.Sample.length() > 0) {
-        //     for each(var prop:XML in this.propertyEntries) {
-        //         if (prop.@isSelected == "true" && !(request.samples.Sample[0].hasOwnProperty("@ANNOT" + prop.@idProperty))) {
-        //             request.samples.Sample[0]["@ANNOT" + prop.@idProperty] = "";
-        //         }
-        //     }
-        // }
-    }
-
-    public checkSamplesCompleteness() {
-        let numberOfAdditionalLanes: number = 0;
-        for (let s2 of this.samplesGridRowData) {
-            if (NewExperimentService.isEntered(s2, "numberSequencingLanes")) {
-                numberOfAdditionalLanes += s2.numberSequencingLanes;
-            }
-        }
-        let completeCount: number = 0;
-        // let nameCompleteCount: number = 0;
-
-        for (let sample of this.samplesGridRowData) {
-
-            if (NewExperimentService.isEntered(sample, "name")
-                && NewExperimentService.isEntered(sample, "idSampleType")
-                && NewExperimentService.isEntered(sample, "idOrganism")
-                && NewExperimentService.isEntered(sample, "idSeqRunType")
-                && NewExperimentService.isEntered(sample, "idNumberSequencingCycles")
-                && NewExperimentService.isEntered(sample, "idNumberSequencingCyclesAllowed")
-                && NewExperimentService.isEntered(sample, "multiplexGroupNumber")
-                && NewExperimentService.isEntered(sample, "numberSequencingLanes")
-                && numberOfAdditionalLanes > 0) {
-                completeCount++;
-            }
-
-        }
-        let isValidNumberSeqLanes: boolean = true;
-        if (isValidNumberSeqLanes) {
-            let lanesAdded:Boolean = false;
-
-            for (let theSample of this.samplesGridRowData) {
-                let numberLanesForSample: number = this.getLaneCount(theSample);
-                let numLanes: number = 1;
-                numLanes = theSample.numberSequencingLanes;
-                if (numberLanesForSample < numLanes) {
-                    let numberLanesToAdd: number = numLanes - numberLanesForSample;
-                    for (let x: number = 0; x < numberLanesToAdd; x++) {
-                        this.addSequencingLaneForSample(theSample);
-                        lanesAdded = true;
-                    }
-                } else if (numberLanesForSample > numLanes) {
-                    let numberLanesToRemove: number = numberLanesForSample - numLanes;
-                    for (let lane of this.getLanes(theSample, numberLanesToRemove)) {
-                        // TODO
-                        // parentDocument.lanes.removeItemAt(parentDocument.lanes.getItemIndex(lane));
-                    }
-                }
-
-            }
-        }
-
-    }
-
-    getLanes(sample: any, numberOfLanes: number): any[] {
-        let theLanes: any[] = [];
-        if (theLanes !== null) {
-            for (let sequenceLane of this.lanes) {
-                if (sequenceLane.idSample === sample.idSample) {
-                    theLanes.push(sequenceLane);
-                    if (numberOfLanes !== -1 && theLanes.length === numberOfLanes) {
-                        break;
-                    }
-                }
-            }
-        }
-        return theLanes;
-    }
-
-
-    addSequencingLaneForSample(sample: any):void {
-        let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
-        let laneStr: string = lanePlus.toString().substr(1);
-
-        let laneObj = {
-            idSequenceLane: 'SequenceLane' + laneStr,
-            notes: '',
-            idSeqRunType: sample.idSeqRunType,
-            idNumberSequencingCycles: sample.idNumberSequencingCycles,
-            idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
-            idSample: sample.idSample,
-            idGenomeBuildAlignTo: ''
-        };
-        this.lanes.push(laneObj);
-    }
-
-    getLaneCount(sample: any): number {
-        let count: number = 0;
-        if (this.lanes != null) {
-            for (let sequenceLane of this.lanes) {
-                if (sequenceLane.idSample === sample.idSample) {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
-
-    private static isEntered(sample: any, fieldName: string): boolean {
-        return sample && (sample.hasOwnProperty(fieldName) && ('' + sample[fieldName]) !== '');
-    }
-
-    public filterApplication(requestCategory, seqPrepByCore): any[] {
-        let filteredApps: any[] = [];
-        for (let app of this.filteredAppList) {
-            if (!app.value) {
-                continue;
-            }
-            if (app.isActive === 'N') {
-                continue;
-            }
-            let doesMatchRequestCategory: boolean = false;
-            let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter((reqCatApp) => {
-                    return reqCatApp.value !== "" && reqCatApp.codeApplication === app.value;
-            });
-
-            for (let xref of theApplications) {
-                if (xref.codeRequestCategory === requestCategory.codeRequestCategory) {
-                    doesMatchRequestCategory = true;
-                    break;
-                }
-            }
-
-            let doesMatchSeqPrepByCore: boolean = false;
-            if (doesMatchRequestCategory) {
-                if (requestCategory.isIlluminaType !== 'Y' || !this.gnomexService.isInternalExperimentSubmission) {
-                    doesMatchSeqPrepByCore = true;
-                } else {
-                    doesMatchSeqPrepByCore = (app.onlyForLabPrepped === "N" || !seqPrepByCore);
-                }
-            }
-            if (doesMatchRequestCategory && doesMatchSeqPrepByCore) {
-                filteredApps.push(app);
-            }
-        }
-        return filteredApps;
-    }
-
-
-    // public filterNumberSequencingCyclesAllowed(cycles: any[], requestCategory: any): any[] {
-    //     if (!cycles || !Array.isArray(cycles) || !requestCategory) {
-    //         return [];
-    //     }
-    //
-    //     let seqCycles: any[] = [];
-    //
-    //     for (let cycle of cycles) {
-    //         if (cycle.value && cycle.codeRequestCategory === requestCategory.codeRequestCategory && cycle.isActive.toString() === 'Y') {
-    //             seqCycles.push(cycle);
-    //         }
-    //     }
-    //
-    //     return seqCycles;
-    // }
-
-    public getOrganism(): any {
-        if (this.sampleSetupView && (this.isMicroarrayState() || this.isSolexaState()) && this.currentState !== 'SolexaLaneAmendState') {
-            return this.sampleSetupView.form.get("organism").value;
-        } else if (this.request != null) {
-            let idOrganism = null;
-            if (this.request.idOrganismSampleDefault && this.request.idOrganismSampleDefault !== '') {
-                idOrganism = this.request.idOrganismSampleDefault;
-            } else {
-                if (this.request.samples.length > 0) {
-                    for (let sample of this.request.samples.Sample) {
-                        if (sample.idOrganism) {
-                            idOrganism = sample.idOrganism;
-                            break;
-                        }
-                    }
-                }
-            }
-            let organismList = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite', idOrganism);
-            if (organismList && organismList.length() > 0) {
-                return organismList[0];
-            } else {
-                return null;
+                this.idSeqLibProtocol = '';
             }
         } else {
-            return null;
+            this.idSeqLibProtocol = '';
         }
     }
 
-    public filterPropertyEntryWithFullProperty(property, sce): boolean {
-        let keep: boolean = false;
-        let idOrganism: string = null;
+    constructor(private dictionaryService: DictionaryService) { }
+}
 
-        if (this.getOrganism() !== null) {
-            idOrganism = this.getOrganism().idOrganism;
-        }
-
-        if (AnnotationService.isApplicableProperty(property, this.requestCategory, idOrganism, this.codeApplication)) {
-            if (sce.isSelected === 'true' || property.isActive !== 'N') {
-                keep = true;
-            }
-        }
-
-        return keep;
-    }
-
-    public getIdAppUserOwner(): any {
-        return this.setupView.idAppUser;
-    }
-
-    getHiSeqPriceList() {
-        let appPriceListParams: HttpParams = new HttpParams()
-            .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
-            .set("idLab", this.lab.idLab);
-
-        this.billingService.getHiSeqRunTypePriceList(appPriceListParams).subscribe((response: any) => {
-            // this.hiSeqPrices = response;
-
-            if (Array.isArray(response)) {
-                for (let price of response) {
-                    let key: string = price.idNumberSequencingCyclesAllowed;
-                    this.priceMap.set(key, price.price);
-                }
-            }
-
-            this.hiSeqPricesChanged.next(true);
-        });
-    }
-
-    // public filterPropertiesWithFullProperty(property, sce): boolean {
-    //     let keep: boolean = false;
-    //     let idOrganism: string = null;
-    //
-    //     if (this.getOrganism() != null) {
-    //         idOrganism = this.getOrganism().idOrganism;
-    //     }
-    //
-    //     if (AnnotationService.isApplicableProperty(property, this.requestCategory, idOrganism, this.codeApplication)
-    //         && (sce.isSelected === 'true' || property.isActive !== 'N')) {
-    //
-    //         keep = true;
-    //     }
-    //
-    //     return keep;
-    // }
-
-    public buildPropertiesByUser() {
-        this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
-            this.propertyEntries = response;
-            this.propertyEntriesForUser = this.filterPropertiesByUser(this.propertyEntries);
-            this.propertyEntriesForUser.sort(AnnotationService.sortProperties);
-        });
-
-    }
-
-    public filterPropertiesByUser(propsToFilter: any[]): any[] {
-        // Get property with children (organisms, platforms, appusers).
-        let properties: any[] = [];
-
-        if (propsToFilter) {
-            for (let property of propsToFilter) {
-                if (property.name.startsWith("Human_5hmC")) {
-                    console.log("jj");
-                }
-                let entry: any = this.gnomexService.getSampleProperty(property.idProperty);
-                let keep: boolean = this.filterPropertyEntryWithFullProperty(entry, property);
-                if (keep) {
-                    keep = false;
-                    let users: any[];
-                    if (entry.appUsers) {
-                        if (!Array.isArray(entry.appUsers)) {
-                            users = [entry.appUsers.AppUserLite];
-                        } else {
-                            users = entry.appUsers;
-                        }
-                    }
-                    if (!users || users.length === 0) {
-                        keep = true;
-                    } else {
-                        let allowedUsers: any[] = this.getAnnotationAllowedUserList();
-                        // if (!Array.isArray(users)) {
-                        //     users = [users];
-                        // }
-                        for (let user of users) {
-                            for (let u1 of allowedUsers) {
-                                if (u1 === user.idAppUser) {
-                                    keep = true;
-                                    break;
-                                }
-                            }
-                            if (keep) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (keep) {
-                    properties.push(property);
-                }
-            }
-        }
-
-        this.propEntriesChanged.next(true);
-        return properties;
-    }
-
-    public filterBySampleOrganism(genomeBuildOrganism: any): any[] {
-        let genomeBuilds: any[] = [];
-        for (let genomeBuild of this.genomeList) {
-            if (genomeBuild.idOrganism === genomeBuildOrganism) {
-                genomeBuilds.push(genomeBuild);
-            }
-        }
-        return genomeBuilds;
-    }
-
-    private getAnnotationAllowedUserList(): any[] {
-
-        let userList: any[] = [];
-        // Owner of the experiment
-        this.pushUnique(userList, this.experimentOwner);
-
-        // Submitter -- if different and not null
-        //TODO
-        this.pushUnique(userList, this.idAppUser);
-
-        // current user -- if different
-        //TODO
-        // pushUnique(userList, parentApplication.getIdAppUser());
-
-        return userList;
-    }
-
-
-    private pushUnique(a: any[], v: string):void {
-        if (v !== null && v !== '') {
-            for (let v1 of a) {
-                if (v1 === v) {
-                    return;
-                }
-            }
-            a.push(v);
-        }
-    }
-
-    public getSubmitterName(): string {
-        if (this.experimentOwner) {
-            return this.experimentOwner.displayName;
-        } else {
-            return this.securityAdvisor.userName;
-        }
-    }
+export class Organism {
+    public idOrganism: string = '';
+    public organism: string   = '';
 }

@@ -1,9 +1,10 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
-import {NewExperimentService} from "../../services/new-experiment.service";
+import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
+import {Subscription} from "rxjs/index";
 
 @Component({
     selector: "tabSeqSetupView",
@@ -104,6 +105,12 @@ import {BillingService} from "../../services/billing.service";
 
 export class TabSeqSetupViewComponent implements OnInit {
 
+    @Input("requestCategory") requestCategory: any;
+
+    @Input("experiment") set experiment(value: Experiment) {
+        this._experiment = value;
+    };
+
     @Input("lab") set lab(value: any) {
         if (!value || !this.requestCategory) {
             return;
@@ -113,7 +120,7 @@ export class TabSeqSetupViewComponent implements OnInit {
             .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
             .set("idLab", value.idLab);
 
-        this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
+        this.themesSubscription = this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
             for (let price of response) {
                 let key: string = price.codeApplication;
                 this.priceMap[key] = price.price;
@@ -138,9 +145,11 @@ export class TabSeqSetupViewComponent implements OnInit {
     public readonly SEPARATE: string = "separate";
     public readonly POOLED: string = "pooled";
     public currState: string;
-    @Input("requestCategory") requestCategory: any;
 
     private form: FormGroup;
+
+    private _experiment: Experiment;
+
     private isPreppedContainer: boolean = true;
     private showPool: boolean = false;
     private priceMap: Map<string, string> = new Map<string, string>();
@@ -218,6 +227,9 @@ export class TabSeqSetupViewComponent implements OnInit {
 
         this.newExperimentService.seqType = value;
     }
+
+
+    private themesSubscription: Subscription;
 
 
     constructor(private dictionaryService: DictionaryService,

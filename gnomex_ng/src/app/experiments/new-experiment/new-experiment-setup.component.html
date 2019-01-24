@@ -10,7 +10,7 @@
                                      class="flex-container-col"
                                      placeholder="Select a service category"
                                      formControlName="selectedCategory"
-                                     (change)="onCategoryChange($event)">
+                                     (change)="onCategoryChange()">
                         <div *ngFor="let category of requestCategories" class="full-width">
                             <mat-radio-button [value]="category">
                                 <div class="full-width flex-container-row">
@@ -80,7 +80,7 @@
                             Select a payment method :
                         </div>
                         <mat-form-field class="moderate-width">
-                            <mat-select placeholder="Account" formControlName="selectAccount" (change)="onBillingSelection($event)">
+                            <mat-select placeholder="Account" formControlName="selectAccount" (selectionChange)="onBillingSelection($event)">
                                 <mat-option *ngFor="let account of authorizedBillingAccounts" [value]="account">
                                     {{ account.accountNameDisplay }}
                                 </mat-option>
@@ -115,7 +115,7 @@
                         {{ "Select a folder : \n (for organizing experiments)" }}
                     </div>
                     <mat-form-field class="moderate-width">
-                        <mat-select placeholder="Project" formControlName="selectProject">
+                        <mat-select placeholder="Project" formControlName="selectProject" (selectionChange)="onProjectSelection($event)">
                             <mat-option *ngFor="let project of filteredProjectList" [value]="project">
                                 {{ project.name }}
                             </mat-option>
@@ -138,7 +138,7 @@
                         {{ "Provide an experiment name \n for the data folder (optional)" }}
                     </div>
                     <mat-form-field class="moderate-width">
-                        <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder">
+                        <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder" (input)="onChangeExperimentName($event)">
                     </mat-form-field>
                 </div>
             </li>
@@ -155,7 +155,8 @@
                                               placeholder="Experimental Details"
                                               formControlName="description"
                                               matAutosizeMinRows="1"
-                                              matAutosizeMaxRows="5">
+                                              matAutosizeMaxRows="5"
+                                              (input)="onInputExperimentalDetails($event)">
                                     </textarea>
                         <mat-error *ngIf="form?.get('description')?.hasError('maxlength')">Details can be at most 5000 characters</mat-error>
                     </mat-form-field>

@@ -8,12 +8,18 @@
                             How many samples will be sequenced in this experiment order?
                         </div>
                         <mat-form-field>
+                            <!--<input matInput-->
+                                   <!--[(ngModel)]="numberOfSamples"-->
+                                   <!--placeholder="Number of samples."-->
+                                   <!--formControlName="numSamples"-->
+                                   <!--maxlength="4"-->
+                                   <!--required>-->
                             <input matInput
-                                   [(ngModel)]="numberOfSamples"
                                    placeholder="Number of samples."
                                    formControlName="numSamples"
                                    maxlength="4"
-                                   required>
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
                             <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
                                 Please check number of samples
                             </mat-error>
@@ -85,7 +91,7 @@
                                    (keyup.enter)="chooseFirstOrgOption()"
                                    required>
                             <mat-autocomplete [displayWith]="displayOrg" #autoOrg="matAutocomplete">
-                                <mat-option (onSelectionChange)="selectOrgOption($event)" *ngFor="let org of filterOrganism(form.get('organism').value)" [value]="org">{{org.combinedName}}</mat-option>
+                                <mat-option (onSelectionChange)="selectOrganism($event)" *ngFor="let org of filterOrganism(form.get('organism').value)" [value]="org">{{org.combinedName}}</mat-option>
                             </mat-autocomplete>
                         </mat-form-field>
                     </div>
