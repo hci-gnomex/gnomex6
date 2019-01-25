@@ -2,7 +2,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
@@ -51,7 +50,6 @@ import {UploadModule} from "../upload/upload.module";
         HEADER_ROUTING,
         CommonModule,
         BrowserModule,
-        NgbModule.forRoot(),
         FormsModule,
         CommonModule,
         FormsModule,
