@@ -335,6 +335,12 @@ export class BrowseFilterComponent implements OnInit {
                 }
             }
         }
+
+        if (isGuestState) {
+            setTimeout(() => {
+                this.search();
+            });
+        }
     }
 
     resetFields(): void {

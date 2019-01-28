@@ -14,6 +14,7 @@ import {AnalysisService} from "../../services/analysis.service";
 import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
 import {AnalysisGroupComponent} from "./analysis-group.component";
 import {AnalysisVisibleTabComponent} from "./analysis-visible-tab.component";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -53,7 +54,7 @@ import {AnalysisVisibleTabComponent} from "./analysis-visible-tab.component";
                     <save-footer (saveClicked)="saveManager()"
                                  [dirty]="this.analysisService.dirty"
                                  [showSpinner]="this.showSpinner"
-                                 [disableSave]="this.analysisService.invalid || this.noSave">
+                                 [disableSave]="this.analysisService.invalid || this.noSave || this.createSecurityAdvisorService.isGuest">
                     </save-footer>
                 </div>
             </div>
@@ -98,7 +99,8 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
     tabNames:Array<string>;
     constructor(private appConstants:ConstantsService,private route:ActivatedRoute,
                 public analysisService:AnalysisService, private router:Router,
-                public dictionary:DictionaryService){
+                public dictionary:DictionaryService,
+                public createSecurityAdvisorService: CreateSecurityAdvisorService){
     }
 
     ngOnInit(){

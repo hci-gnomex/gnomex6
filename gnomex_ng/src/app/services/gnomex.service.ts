@@ -548,7 +548,7 @@ export class GnomexService {
     }
 
     private onGetLabList(labs: any):void {
-        let labsNonNull: any[] = Array.isArray(labs) ? labs : [labs.Lab];
+        let labsNonNull: any[] = labs ? (Array.isArray(labs) ? labs : [labs.Lab]) : [];
         this.labList = labsNonNull;
 
         this.submitRequestLabList = this.labList.filter(lab => {

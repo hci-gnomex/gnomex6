@@ -13,11 +13,11 @@ import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.
     template: `
         <div class="padded flex-container-col full-height">
             <div class="flex-container-row">
-                <button mat-button (click)="this.handleUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
-                <button mat-button (click)="this.handleSFTPUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">SFTP Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadCommandLine()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
-                <button mat-button (click)="this.handleManageFiles()"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
+                <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
+                <button mat-button (click)="this.handleSFTPUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">SFTP Upload Files</button>
+                <button mat-button (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
+                <button mat-button (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
+                <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
                 <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
             </div>
             <div class="flex-grow">
@@ -50,6 +50,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     public fileCount: number = 0;
     public getRequestDownloadListResult: any;
     private request:any;
+    public canUpdate: boolean = false;
 
     constructor(public constantsService: ConstantsService,
                 private route: ActivatedRoute,
@@ -98,6 +99,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             this.getRequestDownloadListResult = null;
             if (data && data.experiment && data.experiment.Request) {
                 this.request = data.experiment.Request;
+                this.canUpdate = this.request.canUpdate && this.request.canUpdate === 'Y';
                 this.experimentsService.getRequestDownloadList(data.experiment.Request.idRequest).subscribe((result: any) => {
                     if (result && result.Request) {
                         this.getRequestDownloadListResult = result;
