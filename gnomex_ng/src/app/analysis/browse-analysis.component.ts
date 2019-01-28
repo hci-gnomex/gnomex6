@@ -92,17 +92,12 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         nodeClass: (node: TreeNode) => {
             return "icon-" + node.data.icon;
         },
-        allowDrop: (element, item: {parent: any, index}) => {
+        allowDrop: (element: any, to: {parent: TreeNode, index: number}) => {
             this.dragEndItems = _.cloneDeep(this.items);
-            if (item.parent.data.parentid === -1 || item.parent.data.idAnalysis ||
-                element.data.idAnalysisGroup) {
-                return false;
-            } else {
-                return true;
-            }
+            return to.parent.data.idAnalysis || to.parent.data.idAnalysisGroup || to.parent.data.idLab;
         },
 
-        allowDrag: (node: any) => node.isLeaf,
+        allowDrag: (node: any) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
         actionMapping
     };
 

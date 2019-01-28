@@ -496,7 +496,7 @@ export class AnalysisExperimentTabComponent implements OnInit{
         this.labList = this.gnomexService.labList;
         this.options = {
             displayField: 'label',
-            allowDrag: (node: any) =>{return node.level > 1}
+            allowDrag: (node: any) =>{return !this.secAdvisor.isGuest && node.level > 1}
         };
 
 

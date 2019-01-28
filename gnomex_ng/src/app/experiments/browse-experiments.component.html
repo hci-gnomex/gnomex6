@@ -18,7 +18,7 @@
                                         {{experimentCount}} experiments
                                     </div>
                                     <div class="full-height">
-                                        <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()">
+                                        <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()" [disabled]="this.createSecurityAdvisorService.isGuest">
                                             <img src="../../assets/information.png" alt="" class="padding">
                                             Drag-and-drop hint
                                         </button>

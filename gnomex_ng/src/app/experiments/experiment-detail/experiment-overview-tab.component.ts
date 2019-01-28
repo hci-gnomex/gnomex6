@@ -542,7 +542,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             this._experiment.truncatedLabName = '';
 
              this.getLabService.getLabById(this._experiment.idLab).subscribe((result: any) => {
-                 this.lab = result.json();
+                 this.lab = result.Lab;
             });
         }
     }
