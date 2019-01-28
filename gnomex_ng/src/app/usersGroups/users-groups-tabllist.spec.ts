@@ -1,5 +1,4 @@
 import {TestBed, async, ComponentFixture} from '@angular/core/testing';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {
     MatTabGroup, MatTab
@@ -673,7 +672,6 @@ describe('Users Groups', () => {
                 RouterTestingModule,
                 ReactiveFormsModule,
                 HttpModule,
-                NgbModule.forRoot(),
                 AngularMaterialModule,
                 AngularSplitModule,
                 BrowserAnimationsModule,

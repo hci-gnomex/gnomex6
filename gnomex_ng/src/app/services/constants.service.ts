@@ -119,6 +119,13 @@ export class ConstantsService {
     public readonly ICON_ARROW_LEFT: string = "assets/arrow_left.gif";
     public readonly ICON_ARROW_RIGHT: string = "assets/arrow_right.gif";
     public readonly ICON_DATABASE_LIGHTNING: string = "assets/database_lightning.png";
+    public readonly ICON_TABLE_MULTIPLE: string = "assets/table_multiple.png";
+
+    public readonly STATUS_IN_PROGRESS: string = "In Progress";
+    public readonly STATUS_COMPLETED: string = "Completed";
+    public readonly STATUS_TERMINATED: string = "Terminated";
+    public readonly STATUS_BYPASSED: string = "Bypassed";
+    public readonly STATUS_ON_HOLD: string = "On Hold";
 
     public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
 

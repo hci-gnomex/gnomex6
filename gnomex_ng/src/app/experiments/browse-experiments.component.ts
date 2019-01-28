@@ -98,7 +98,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     /*
     angular2-tree options
      */
-    private options: ITreeOptions = {
+    public options: ITreeOptions = {
         displayField: "label",
         childrenField: "items",
         useVirtualScroll: true,
@@ -115,7 +115,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
         },
 
-        allowDrag: (node) => node.isLeaf,
+        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
     };
 
     private items: any;

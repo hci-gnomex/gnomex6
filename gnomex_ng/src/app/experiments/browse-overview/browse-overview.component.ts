@@ -12,6 +12,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Subscription} from "rxjs";
 import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -50,7 +51,7 @@ import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
             <save-footer (saveClicked)="saveManager()"
                          [dirty]="this.experimentsService.dirty"
                          [showSpinner]="this.showSpinner"
-                         [disableSave]="this.experimentsService.invalid || this.noSave">
+                         [disableSave]="this.experimentsService.invalid || this.noSave || this.createSecurityAdvisorService.isGuest">
             </save-footer>
         </div>
 `,
@@ -99,7 +100,8 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
     tabNames:Array<string>;
     constructor(private appConstants:ConstantsService,private route:ActivatedRoute,
                 public experimentsService:ExperimentsService, private router:Router,
-                public dictionary:DictionaryService){
+                public dictionary:DictionaryService,
+                public createSecurityAdvisorService: CreateSecurityAdvisorService){
     }
 
     ngOnInit(){

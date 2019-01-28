@@ -97,7 +97,7 @@ export class IconLinkButtonRenderer implements ICellRendererAngularComp {
 	}
 
 	checkIfActive(): void {
-		if (this.params && this.params.data && this.params.data.isActive && this.params.data.isActive.toLowerCase() != 'y') {
+		if (this.params && this.params.data && this.params.data.isActive && this.params.data.isActive.toLowerCase() !== 'y') {
 			this.classes = this.classes + " " + IconLinkButtonRenderer.INACTIVE;
 		} else {
 			this.classes = this.classes + " " + IconLinkButtonRenderer.ACTIVE;

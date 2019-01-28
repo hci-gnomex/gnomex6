@@ -20,12 +20,18 @@ import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.
 import {ManageFilesModule} from "../../util/upload/manage-files.module";
 import {MaterialsMethodsTabComponent} from "./materials-methods-tab.component";
 import {ProtocolDialogComponent} from "./protocol-dialog.component";
+import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
+import {AngularSplitModule} from "angular-split";
+import {IconRendererComponent} from "../../util/grid-renderers";
 
 
 @NgModule({
     imports: [
         CommonModule,
-        AgGridModule.withComponents([IconTextRendererComponent]),
+        AgGridModule.withComponents([
+            IconTextRendererComponent,
+            IconRendererComponent,
+        ]),
         AngularMaterialModule,
         FormsModule,
         ReactiveFormsModule,
@@ -33,6 +39,7 @@ import {ProtocolDialogComponent} from "./protocol-dialog.component";
         RelatedDataModule,
         RichEditorModule,
         ManageFilesModule,
+        AngularSplitModule,
     ],
 
     declarations: [
@@ -44,6 +51,7 @@ import {ProtocolDialogComponent} from "./protocol-dialog.component";
         ExperimentFilesTabComponent,
         MaterialsMethodsTabComponent,
         ProtocolDialogComponent,
+        ExperimentSequenceLanesTab,
     ],
     providers: [],
     entryComponents: [

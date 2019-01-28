@@ -542,7 +542,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             this._experiment.truncatedLabName = '';
 
              this.getLabService.getLabById(this._experiment.idLab).subscribe((result: any) => {
-                 this.lab = result;
+                 this.lab = result.Lab;
             });
         }
     }
@@ -555,7 +555,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 
             this._experiment.application.Application = temp && temp.length === 1 ? temp[0] : null;
         }
-    };
+    }
 
     public onChange_project(event: any): void {
         if (event && event.value) {

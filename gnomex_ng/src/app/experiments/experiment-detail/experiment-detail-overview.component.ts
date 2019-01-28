@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from "@angular/core";
+import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
@@ -9,6 +9,7 @@ import {MatTabChangeEvent} from "@angular/material";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {Subscription} from "rxjs";
+import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
 
 
 @Component({
@@ -28,12 +29,14 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public showMaterialsMethodsTab: boolean = false;
     public initDescriptionTab = false;
     public showBioinformaticsTab: boolean = false;
+    public showSequenceLanesTab: boolean = false;
     private overviewListSubscription: Subscription;
     private experimentOverviewNode: any;
     private relatedObjects: IRelatedObject = {};
     private showRelatedDataTab: boolean = false;
     private requestCategory: any;
 
+    @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
     constructor(private dictionaryService: DictionaryService,
                 private experimentService: ExperimentsService,
@@ -49,6 +52,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
 
         this.route.data.forEach((data: any) => {
             this.experiment = null;
+            this.showSequenceLanesTab = false;
 
             if (data && data.experiment && data.experiment.Request) {
                 this.experiment = data.experiment.Request;
@@ -64,6 +68,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                             || (this.requestCategory.isIlluminaType === "Y" && this.gnomexService.submitInternalExperiment())
                             || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"));
                 }
+
+                this.showSequenceLanesTab = this.requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
 
                 let protocols: any[] = [];
                 if (this.experiment.protocols) {
@@ -137,6 +143,9 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             this.initDescriptionTab = true;
         } else {
             this.initDescriptionTab = false;
+        }
+        if (event.tab.textLabel === "Sequence Lanes" && this.sequenceLanesTab) {
+            this.sequenceLanesTab.prepareView();
         }
     }
 

@@ -18,10 +18,10 @@ import {Subscription} from "rxjs";
     template: `
         <div class="padded flex-container-col full-height">
             <div class="flex-container-row">
-                <button mat-button (click)="this.handleUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadCommandLine()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
-                <button mat-button (click)="this.handleFDTUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
-                <button mat-button (click)="this.handleManageFiles()"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
+                <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
+                <button mat-button (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
+                <button mat-button (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
+                <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
                 <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
             </div>
             <div class="flex-grow">
@@ -54,6 +54,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     public fileCount: number = 0;
     public getAnalysisDownloadListResult: any;
     private analysis:any;
+    public canUpdate: boolean = false;
     private formGroup: FormGroup;
     private updateFileSubscription: Subscription;
 
@@ -114,6 +115,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             this.getAnalysisDownloadListResult = null;
             if(data && data.analysis && data.analysis.Analysis){
                 this.analysis = data.analysis.Analysis;
+                this.canUpdate = this.analysis.canUpdate && this.analysis.canUpdate === 'Y';
                 this.analysisService.getAnalysisDownloadList(data.analysis.Analysis.idAnalysis).subscribe((result: any) => {
                     if (result && result.Analysis) {
                         this.getAnalysisDownloadListResult = result;

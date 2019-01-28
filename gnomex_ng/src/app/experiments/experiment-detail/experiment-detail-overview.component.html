@@ -19,6 +19,9 @@
             <mat-tab label="Materials & Methods" *ngIf="showMaterialsMethodsTab">
                 <materials-methods-tab></materials-methods-tab>
             </mat-tab>
+            <mat-tab *ngIf="showSequenceLanesTab" label="Sequence Lanes">
+                <experiment-sequence-lanes-tab></experiment-sequence-lanes-tab>
+            </mat-tab>
             <mat-tab *ngIf="showBioinformaticsTab" label="Bioinformatics">
                 <experiment-bioinformatics-tab [experiment]="experiment"></experiment-bioinformatics-tab>
             </mat-tab>

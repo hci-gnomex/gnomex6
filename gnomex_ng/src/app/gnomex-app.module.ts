@@ -18,7 +18,6 @@ import {FormsModule} from "@angular/forms";
 import {LocalStorageModule, ILocalStorageServiceConfig} from "angular-2-local-storage";
 
 import "./gnomex-app.css";
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {ServicesModule } from './services/services.module';
@@ -75,7 +74,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         NewBillingAccountModule,
         ServicesModule,
         LocalStorageModule.withConfig(localStorageServiceConfig),
-        NgbModule.forRoot(),
         AuthenticationModule.forRoot(),
         CommonModule,
         BrowserAnimationsModule,
