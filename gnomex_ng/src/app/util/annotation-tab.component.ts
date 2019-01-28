@@ -6,12 +6,13 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "./interfaces/annotation.model";
 import {selectRequired} from "./validators/select-required.validator";
 import {
-    MatDialog, MatDialogConfig, MatDialogRef,
-    MatOptionSelectionChange
+    MatDialog, MatDialogConfig,
+    MatDialogRef, MatSelectChange
 } from "@angular/material";
 import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
 import {BrowseOrderValidateService} from "../services/browse-order-validate.service";
 import {IAnnotationOption} from "./interfaces/annotation-option.model";
+import {Subscription} from "rxjs";
 
 export enum OrderType {
     ANALYSIS = 'a',
@@ -54,6 +55,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
     private _disabled: boolean = false;
 
     @Input() orderType = OrderType.NONE;
+    private orderValidateSubscription: Subscription;
 
     @Input()
     set disabled(value: boolean) {
@@ -165,29 +167,41 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
             this.form.enable();
         }
 
-        this.orderValidateService.getOrderValidateObservable().subscribe(this.prepAnnotationForSave);
+        this.orderValidateSubscription = this.orderValidateService.getOrderValidateObservable().subscribe(this.prepAnnotationForSave);
     }
 
-    ngOnDestroy() { }
+   
 
 
     loadConfigAnnotations() {
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.height = '90%';
+        configuration.maxHeight = '80%';
         configuration.data = {orderType: this.orderType};
 
         let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.dialog.open(ConfigAnnotationDialogComponent, configuration);
     }
 
 
-    selectOption(opt: any) {
+    selectOpt(opt: any) { // on mat option
         let selected: boolean = opt.selected;
         opt.value.selected = selected ? 'Y' : 'N';
+    }
+
+    selectChanged(opt: MatSelectChange, annot:IAnnotation) { // on mat select
+        for(let opt of annot.PropertyOption){
+            opt.selected = 'N';
+        }
+        opt.value.selected = 'Y';
     }
 
 
     compareByID(itemOne, itemTwo) {
         return itemOne && itemTwo && itemOne.name == itemTwo.name;
     }
+    
+    ngOnDestroy(): void {
+        this.orderValidateSubscription.unsubscribe;
+    }
+
 }
 

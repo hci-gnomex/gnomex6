@@ -14,6 +14,7 @@ import {BrowseDictionaryComponent} from "../../configuration/browse-dictionary.c
 import {ConfigureOrganismsComponent} from "../../configuration/configure-organisms.component";
 import {PropertyService} from "../../services/property.service";
 import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/collaborators-dialog.component";
+import {AnalysisService} from "../../services/analysis.service";
 
 @Component({
     selector: 'analysis-info-tab',
@@ -25,7 +26,7 @@ import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/
                 </mat-form-field>
                 <span></span>
                 <mat-form-field>
-                    <mat-select placeholder="Owner" [formControlName]="'owner'">
+                    <mat-select placeholder="Owner" [formControlName]="'idAppUser'">
                         <mat-option>None</mat-option>
                         <mat-option *ngFor="let user of this.labUsers" [value]="user.idAppUser">{{user.displayName}}</mat-option>
                     </mat-select>
@@ -43,12 +44,12 @@ import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
                     <mat-form-field>
-                        <mat-select placeholder="Analysis Type" [formControlName]="'analysisType'">
+                        <mat-select placeholder="Analysis Type" [formControlName]="'idAnalysisType'">
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let analysisType of this.analysisTypes" [value]="analysisType.value">{{analysisType.display}}</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <button mat-button color="accent" [disabled]="this.form.controls['analysisType'].disabled" (click)="this.openEditAnalysisType()">New/Edit</button>
+                    <button mat-button color="accent" [disabled]="this.form.controls['idAnalysisType'].disabled" (click)="this.openEditAnalysisType()">New/Edit</button>
                 </div>
                 <span></span>
                 <mat-form-field>
@@ -58,15 +59,15 @@ import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
                     <mat-form-field>
-                        <mat-select placeholder="Analysis Protocol" [formControlName]="'analysisProtocol'">
+                        <mat-select placeholder="Analysis Protocol" [formControlName]="'idAnalysisProtocol'">
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let protocol of this.protocolList" [value]="protocol.id">{{protocol.label}}</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <button mat-button color="accent" [disabled]="this.form.controls['analysisProtocol'].disabled" (click)="this.openEditAnalysisProtocol()">New/Edit</button>
+                    <button mat-button color="accent" [disabled]="this.form.controls['idAnalysisProtocol'].disabled" (click)="this.openEditAnalysisProtocol()">New/Edit</button>
                 </div>
                 <span></span>
-                <mat-radio-group class="flex-container-col" [formControlName]="'visibility'">
+                <mat-radio-group class="flex-container-col" [formControlName]="'codeVisibility'">
                     <mat-radio-button *ngFor="let vis of this.visibilityList" [value]="vis.codeVisibility" matTooltip="{{vis.tooltip}}" [matTooltipPosition]="'left'">{{vis.display}}</mat-radio-button>
                 </mat-radio-group>
             </div>
@@ -74,24 +75,24 @@ import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/
                 <span class="flex-two"></span>
                 <span class="flex-one"></span>
                 <mat-form-field matTooltip="Public visibility date (visibility automatically changes to public on this date)" [matTooltipPosition]="'left'" class="flex-two">
-                    <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" [formControlName]="'privacyExp'" [min]="this.today">
+                    <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" [formControlName]="'privacyExpirationDate'" [min]="this.today">
                     <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
-                    <mat-datepicker #privacyPicker [disabled]="this.form.controls['visibility'].disabled"></mat-datepicker>
+                    <mat-datepicker #privacyPicker [disabled]="this.form.controls['codeVisibility'].disabled"></mat-datepicker>
                 </mat-form-field>
             </div>
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
                     <mat-form-field>
-                        <mat-select placeholder="Organism" [formControlName]="'organism'">
+                        <mat-select placeholder="Organism" [formControlName]="'idOrganism'">
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let organism of this.organismList" [value]="organism.value">{{organism.display}}</mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <button mat-button color="accent" [disabled]="this.form.controls['organism'].disabled" (click)="this.openEditOrganism()">New/Edit</button>
+                    <button mat-button color="accent" [disabled]="this.form.controls['idOrganism'].disabled" (click)="this.openEditOrganism()">New/Edit</button>
                 </div>
                 <span></span>
                 <div>
-                    <button mat-button color="accent" [disabled]="this.form.controls['visibility'].disabled" (click)="this.openCollaboratorsWindow()">Collaborators</button>
+                    <button mat-button color="accent" [disabled]="this.form.controls['codeVisibility'].disabled" (click)="this.openCollaboratorsWindow()">Collaborators</button>
                 </div>
             </div>
             <div class="form-row-children">
@@ -117,14 +118,14 @@ import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/
                                          (gridSizeChanged)="this.onGridSizeChanged($event)"
                                          (rowClicked)="this.onGenomeBuildGridSelection($event)"
                                          [rowSelection]="'single'"
-                                         [rowData]="this.form.controls['genomeBuilds'].value">
+                                         [rowData]="this.form.controls['genomeBuildsJSONString'].value">
                         </ag-grid-angular>
                     </div>
                 </div>
                 <span></span>
                 <div class="flex-container-col">
                     <mat-form-field>
-                        <mat-select placeholder="Institution" [formControlName]="'institution'">
+                        <mat-select placeholder="Institution" [formControlName]="'idInstitution'">
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let inst of this.institutionList" [value]="inst.idInstitution">{{inst.display}}</mat-option>
                         </mat-select>
@@ -203,23 +204,24 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
                 private protocolService: ProtocolService,
                 private dialog: MatDialog,
                 private router: Router,
+                private analysisService: AnalysisService,
                 public propertyService: PropertyService){
         this.form = this.formBuilder.group({
             lab: "",
             name: ["", Validators.required],
-            analysisType: "",
-            analysisProtocol: "",
-            organism: ["", Validators.required],
-            genomeBuilds: [],
+            idAnalysisType: "",
+            idAnalysisProtocol: "",
+            idOrganism: ["", Validators.required],
+            genomeBuildsJSONString: [],
             analysisGroups: [],
-            owner: ["", Validators.required],
+            idAppUser: ["", Validators.required],
             submitter: "",
             submitDate: "",
-            visibility: ["", Validators.required],
-            institution: "",
-            collaborators: [],
+            codeVisibility: ["", Validators.required],
+            idInstitution: "",
+            collaboratorsJSONString: [],
             genomeBuildToAdd: null,
-            privacyExp: "",
+            privacyExpirationDate: "",
         });
 
         this.genomeBuildGridColDefs = [
@@ -228,6 +230,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.analysisService.addAnalysisOverviewFormMember(this.form, this.constructor.name);
         this.analysisTypes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
         this.protocolListSubscription = this.protocolService.getProtocolListObservable().subscribe((result: any[]) => {
             let protocols: any[] = [];
@@ -268,16 +271,16 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         this.form.controls['submitter'].disable();
         this.form.controls['submitDate'].disable();
         this.form.controls['analysisGroups'].disable();
-        this.form.controls['privacyExp'].disable();
+        this.form.controls['privacyExpirationDate'].disable();
 
-        this.form.controls['organism'].valueChanges.subscribe(() => {
+        this.form.controls['idOrganism'].valueChanges.subscribe(() => {
             this.refreshGenomeBuilds();
         });
-        this.form.controls['visibility'].valueChanges.subscribe(() => {
-            if (this.form.controls['visibility'].value === 'INST' && this.form.controls['visibility'].enabled) {
-                this.form.controls['institution'].enable();
+        this.form.controls['codeVisibility'].valueChanges.subscribe(() => {
+            if (this.form.controls['codeVisibility'].value === 'INST' && this.form.controls['codeVisibility'].enabled) {
+                this.form.controls['idInstitution'].enable();
             } else {
-                this.form.controls['institution'].disable();
+                this.form.controls['idInstitution'].disable();
             }
         });
 
@@ -286,47 +289,48 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
 
             this.form.controls['lab'].setValue(this.analysis.labName);
             this.form.controls['name'].setValue(this.analysis.name);
-            this.form.controls['analysisType'].setValue(this.analysis.idAnalysisType);
-            this.form.controls['analysisProtocol'].setValue(this.analysis.idAnalysisProtocol);
-            this.form.controls['organism'].setValue(this.analysis.idOrganism);
-            this.form.controls['genomeBuilds'].setValue(Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]);
+            this.form.controls['idAnalysisType'].setValue(this.analysis.idAnalysisType);
+            this.form.controls['idAnalysisProtocol'].setValue(this.analysis.idAnalysisProtocol);
+            this.form.controls['idOrganism'].setValue(this.analysis.idOrganism);
+            this.form.controls['genomeBuildsJSONString'].setValue(Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]);
             this.form.controls['analysisGroups'].setValue(Array.isArray(this.analysis.analysisGroups) ? this.analysis.analysisGroups : [this.analysis.analysisGroups.AnalysisGroup]);
-            this.form.controls['owner'].setValue(this.analysis.idAppUser);
+            this.form.controls['idAppUser'].setValue(this.analysis.idAppUser);
             this.form.controls['submitter'].setValue(this.analysis.submitterName);
             this.form.controls['submitDate'].setValue(this.analysis.createDate);
-            this.form.controls['visibility'].setValue(this.analysis.codeVisibility);
-            this.form.controls['institution'].setValue(this.analysis.idInstitution ? this.analysis.idInstitution : "");
-            this.form.controls['collaborators'].setValue(this.analysis.collaborators ? (Array.isArray(this.analysis.collaborators) ? this.analysis.collaborators : [this.analysis.collaborators.AnalysisCollaborator]) : []);
+            this.form.controls['codeVisibility'].setValue(this.analysis.codeVisibility);
+            this.form.controls['idInstitution'].setValue(this.analysis.idInstitution ? this.analysis.idInstitution : "");
+            this.form.controls['collaboratorsJSONString'].setValue(this.analysis.collaborators ? (Array.isArray(this.analysis.collaborators) ? this.analysis.collaborators : [this.analysis.collaborators.AnalysisCollaborator]) : []);
             this.form.controls['genomeBuildToAdd'].setValue(null);
-            this.form.controls['privacyExp'].setValue(this.analysis.privacyExpirationDate ? this.analysis.privacyExpirationDate : "");
+            this.form.controls['privacyExpirationDate'].setValue(this.analysis.privacyExpirationDate ? this.analysis.privacyExpirationDate : "");
             this.genomeBuildToRemove = null;
 
             let canUpdate: boolean = this.analysis.canUpdate === 'Y';
             let canWriteAnyObject: boolean = this.createSecurityAdvisorService.hasPermission(CreateSecurityAdvisorService.CAN_WRITE_ANY_OBJECT);
-            this.form.controls['owner'].disable();
+            this.form.controls['idAppUser'].disable();
             if (canUpdate) {
                 this.form.controls['name'].enable();
-                this.form.controls['analysisType'].enable();
-                this.form.controls['analysisProtocol'].enable();
-                this.form.controls['organism'].enable();
-                this.form.controls['genomeBuilds'].enable();
-                this.form.controls['visibility'].enable();
-                this.form.controls['institution'].enable();
-                this.form.controls['collaborators'].enable();
+                this.form.controls['idAnalysisType'].enable();
+                this.form.controls['idAnalysisProtocol'].enable();
+                this.form.controls['idOrganism'].enable();
+                this.form.controls['genomeBuildsJSONString'].enable();
+                this.form.controls['codeVisibility'].enable();
+                this.form.controls['idInstitution'].enable();
+                this.form.controls['collaboratorsJSONString'].enable();
                 this.form.controls['genomeBuildToAdd'].enable();
                 if (canWriteAnyObject) {
-                    this.form.controls['owner'].enable();
+                    this.form.controls['idAppUser'].enable();
                 }
             } else {
                 this.form.controls['name'].disable();
-                this.form.controls['analysisType'].disable();
-                this.form.controls['analysisProtocol'].disable();
-                this.form.controls['organism'].disable();
-                this.form.controls['genomeBuilds'].disable();
-                this.form.controls['visibility'].disable();
-                this.form.controls['institution'].disable();
-                this.form.controls['collaborators'].disable();
+                this.form.controls['idAnalysisType'].disable();
+                this.form.controls['idAnalysisProtocol'].disable();
+                this.form.controls['idOrganism'].disable();
+                this.form.controls['genomeBuildsJSONString'].disable();
+                this.form.controls['codeVisibility'].disable();
+                this.form.controls['idInstitution'].disable();
+                this.form.controls['collaboratorsJSONString'].disable();
                 this.form.controls['genomeBuildToAdd'].disable();
+
             }
 
             this.lab = null;
@@ -377,7 +381,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
 
     private refreshGenomeBuilds(): void {
         this.genomeBuildList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD).filter((build: any) => {
-            return build.isActive === 'Y' && build.idOrganism === this.form.controls['organism'].value;
+            return build.isActive === 'Y' && build.idOrganism === this.form.controls['idOrganism'].value;
         });
     }
 
@@ -399,13 +403,13 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
 
     public addGenomeBuild(): void {
         if (this.form.controls['genomeBuildToAdd'].enabled && this.form.controls['genomeBuildToAdd'].value) {
-            if (this.form.controls['genomeBuilds'].value.filter((build: any) => {return build.idGenomeBuild === this.form.controls['genomeBuildToAdd'].value.idGenomeBuild}).length === 0) {
+            if (this.form.controls['genomeBuildsJSONString'].value.filter((build: any) => {return build.idGenomeBuild === this.form.controls['genomeBuildToAdd'].value.idGenomeBuild}).length === 0) {
                 let newGenomeBuild: any = {
                     idGenomeBuild: this.form.controls['genomeBuildToAdd'].value.idGenomeBuild,
                     display: this.form.controls['genomeBuildToAdd'].value.display,
                 };
-                this.form.controls['genomeBuilds'].value.push(newGenomeBuild);
-                this.genomeBuildGridApi.setRowData(this.form.controls['genomeBuilds'].value);
+                this.form.controls['genomeBuildsJSONString'].value.push(newGenomeBuild);
+                this.genomeBuildGridApi.setRowData(this.form.controls['genomeBuildsJSONString'].value);
                 this.form.markAsDirty();
             }
             this.form.controls['genomeBuildToAdd'].setValue(null);
@@ -414,9 +418,9 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
 
     public removeGenomeBuild(): void {
         if (this.form.controls['genomeBuildToAdd'].enabled && this.genomeBuildToRemove) {
-            this.form.controls['genomeBuilds'].value.splice(this.genomeBuildToRemove.rowIndex, 1);
+            this.form.controls['genomeBuildsJSONString'].value.splice(this.genomeBuildToRemove.rowIndex, 1);
             this.genomeBuildToRemove = null;
-            this.genomeBuildGridApi.setRowData(this.form.controls['genomeBuilds'].value);
+            this.genomeBuildGridApi.setRowData(this.form.controls['genomeBuildsJSONString'].value);
             this.form.markAsDirty();
         }
     }
@@ -460,7 +464,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
     }
 
     public openCollaboratorsWindow(): void {
-        if (this.form.controls['visibility'].disabled || this.form.controls['visibility'].value === 'PUBLIC') {
+        if (this.form.controls['codeVisibility'].disabled || this.form.controls['codeVisibility'].value === 'PUBLIC') {
             return;
         }
         if (!this.lab) {
@@ -484,9 +488,9 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         }
 
         let possibleCollaborators: any[] = [];
-        if (this.form.controls['visibility'].value === 'MEM') {
+        if (this.form.controls['codeVisibility'].value === 'MEM') {
             possibleCollaborators = this.lab.membersCollaborators ? (Array.isArray(this.lab.membersCollaborators) ? this.lab.membersCollaborators : [this.lab.membersCollaborators.AppUser]) : [];
-        } else if (this.form.controls['visibility'].value === 'OWNER') {
+        } else if (this.form.controls['codeVisibility'].value === 'OWNER') {
             possibleCollaborators = this.lab.possibleCollaborators ? (Array.isArray(this.lab.possibleCollaborators) ? this.lab.possibleCollaborators : [this.lab.possibleCollaborators.AppUser]) : [];
         }
 
@@ -496,7 +500,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         config.panelClass = 'no-padding-dialog';
 
         config.data = {
-            currentCollaborators:  this.form.controls['collaborators'].value,
+            currentCollaborators:  this.form.controls['collaboratorsJSONString'].value,
             possibleCollaborators:  possibleCollaborators,
             idField: 'idAnalysis',
             idFieldValue: this.analysis.idAnalysis
@@ -505,7 +509,8 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         let dialogRef: MatDialogRef<CollaboratorsDialogComponent> = this.dialog.open(CollaboratorsDialogComponent, config);
         dialogRef.afterClosed().subscribe((result: any[]) => {
             if (result) {
-                this.form.controls['collaborators'].setValue(result);
+                this.form.controls['collaboratorsJSONString'].setValue(result);
+                this.form.markAsDirty();
             }
         });
     }
