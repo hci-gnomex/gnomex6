@@ -12,6 +12,7 @@ import {AnalysisService} from "./analysis.service";
 export class FileService {
     public analysisGroupList: any[];
     private organizeFilesSubject: Subject<any> = new Subject();
+    private updateFileTabSubject : Subject<any> = new Subject();
 
 
     constructor(private httpClient:HttpClient,
@@ -27,9 +28,12 @@ export class FileService {
     }
 
 
-
-
-
+    emitUpdateFileTab(data:any):void{
+        this.updateFileTabSubject.next(data);
+    }
+    getUpdateFileTabObservable(): Observable<any>{
+        return this.updateFileTabSubject.asObservable();
+    }
 
     emitGetAnalysisOrganizeFiles(params:any): void {
         this.organizeFilesSubject.next(params);

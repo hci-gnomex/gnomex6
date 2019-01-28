@@ -8,6 +8,7 @@ import {HttpParams} from "@angular/common/http";
 import {FileService} from "../../services/file.service";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'experiment-files-tab',
@@ -51,6 +52,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     public fileCount: number = 0;
     public getRequestDownloadListResult: any;
     private request:any;
+    private updateFileSubscription:Subscription;
 
     constructor(public constantsService: ConstantsService,
                 private route: ActivatedRoute,
@@ -115,6 +117,9 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
                     }
                 });
             }
+        });
+        this.updateFileSubscription = this.fileService.getUpdateFileTabObservable().subscribe(data =>{
+           this.gridData = data;
         });
     }
 
@@ -194,6 +199,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.updateFileSubscription.unsubscribe();
     }
 
 }

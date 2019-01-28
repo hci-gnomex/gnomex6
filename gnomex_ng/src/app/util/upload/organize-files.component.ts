@@ -151,6 +151,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                         if(analysis && analysisDownloadList){
                             this.uploadFiles = this.getAnalysisUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
                             this.organizeFiles = [analysisDownloadList];
+                            this.fileService.emitUpdateFileTab(this.organizeFiles);
                         }
                     }else{
                         //this.dialogService.alert()
@@ -170,6 +171,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 this.dialogService.stopAllSpinnerDialogs();
                 this.uploadFiles = resp[0];
                 this.organizeFiles = resp[1];
+                this.fileService.emitUpdateFileTab(this.organizeFiles);
 
 
             },error =>{
@@ -495,8 +497,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         this.dialogService.startDefaultSpinnerDialog();
 
         if(this.data.type === 'a'){
+            let removedChildrenList:any[] = this.removedChildren.size > 0  ? Array.from(this.removedChildren) : [];
             let params:HttpParams = new HttpParams()
-                .set("filesToRemoveJSONString", JSON.stringify( this.removedChildren))
+                .set("filesToRemoveJSONString", JSON.stringify(removedChildrenList))
                 .set("filesJSONString", JSON.stringify(this.organizeFiles[0]))
                 .set("idAnalysis",  this.data.id.idAnalysis)
                 .set("noJSONToXMLConversionNeeded", "Y");
@@ -516,8 +519,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             });
 
         }else{
+            let removedChildrenList:any[] = this.removedChildren.size > 0  ? Array.from(this.removedChildren) : [];
             let params:HttpParams = new HttpParams()
-                .set("filesToRemoveJSONString", JSON.stringify( Array.from(this.removedChildren)))
+                .set("filesToRemoveJSONString", JSON.stringify(removedChildrenList))
                 .set("filesJSONString", JSON.stringify(this.organizeFiles[0]))
                 .set("idRequest",  this.data.id.idRequest)
                 .set("noJSONToXMLConversionNeeded", "Y");

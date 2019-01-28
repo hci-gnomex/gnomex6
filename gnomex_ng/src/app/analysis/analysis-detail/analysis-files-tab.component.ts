@@ -9,6 +9,9 @@ import {DataTrackService} from "../../services/data-track.service";
 import {HttpParams} from "@angular/common/http";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {MatDialog, MatDialogConfig} from "@angular/material";
+import {FormGroup} from "@angular/forms";
+import {FileService} from "../../services/file.service";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -51,9 +54,13 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     public fileCount: number = 0;
     public getAnalysisDownloadListResult: any;
     private analysis:any;
+    private formGroup: FormGroup;
+    private updateFileSubscription: Subscription;
+
 
     constructor(public constantsService: ConstantsService,
                 private analysisService: AnalysisService,
+                private fileService: FileService,
                 private route: ActivatedRoute,
                 private dialogsService: DialogsService,
                 private dataTrackService: DataTrackService,
@@ -124,6 +131,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 });
             }
         });
+        this.updateFileSubscription =  this.fileService.getUpdateFileTabObservable().subscribe(data => {
+            this.gridData = data;
+        })
     }
 
     public onGridReady(event: GridReadyEvent): void {
@@ -261,6 +271,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.updateFileSubscription.unsubscribe();
     }
 
 }

@@ -4,7 +4,7 @@ import {AnalysisService} from "../../services/analysis.service";
 import {ActivatedRoute} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
-import {OrderType} from "../../util/annotation-tab.component";
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {Subscription} from "rxjs";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {MatDialog, MatDialogConfig, MatDialogRef, MatTabChangeEvent} from "@angular/material";
@@ -17,6 +17,9 @@ import {PropertyService} from "../../services/property.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {DataTrackService} from "../../services/data-track.service";
 import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
+import {FormGroup} from "@angular/forms";
+import {HttpParams} from "@angular/common/http";
+import {first} from "rxjs/operators";
 
 
 @Component({
@@ -30,7 +33,7 @@ import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
         }
     `]
 })
-export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
+export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, OnDestroy{
     public annotations:any = [];
     public analysis:any;
     public lab: any;
@@ -45,6 +48,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
     public analysisTreeNode:any;
     private analysisTreeNodeSubscription: Subscription;
     private linkExpDialogRef: MatDialogRef<LinkToExperimentDialogComponent>;
+    @ViewChild(AnnotationTabComponent) annotTab: AnnotationTabComponent;
 
 
     constructor(private analysisService: AnalysisService,
@@ -59,15 +63,14 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
     }
 
     ngOnInit():void{
+        this.analysisService.clearAnalysisOverviewForm();
+
         this.analysisTreeNodeSubscription = this.analysisService.getAnalysisOverviewListSubject().subscribe(node =>{
             this.analysisTreeNode = node;
-
-
         });
 
         this.route.data.forEach((data: any) => {
-            this.orderValidateService.dirtyNote = false;
-
+            this.analysisService.analysisOverviewForm.reset();
             this.analysis = data.analysis.Analysis;
             this.lab = data.analysis.Lab;
             if(this.analysis){
@@ -104,6 +107,10 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
             this.showManagePEDFile = this.showAutoDistributeDataTracks && !isCollaborator;
         });
     }
+    ngAfterViewInit(): void {
+        this.analysisService.addAnalysisOverviewFormMember(this.annotTab.form,"AnnotationTabComponent");
+    }
+
 
     initRelatedData(analysis:any):boolean {
 
@@ -205,11 +212,37 @@ export class AnalysisDetailOverviewComponent  implements OnInit, OnDestroy{
     }
 
     save(){
+        let analysisOverviewForm: FormGroup = this.analysisService.analysisOverviewForm;
+        this.dialogsService.startDefaultSpinnerDialog();
+
+        let params:HttpParams = new HttpParams()
+            .set("idAnalysis",this.analysis.idAnalysis)
+            .set("idLab", this.analysis.idLab);
+
+        Object.keys(analysisOverviewForm.controls).forEach(key =>{
+            if(key === "AnnotationTabComponent"){
+                this.orderValidateService.emitOrderValidateSubject();
+                params = params.set("propertiesJSON", JSON.stringify(this.orderValidateService.annotationsToSave));
+            }else{
+                let analysisTabForm:FormGroup = <FormGroup>analysisOverviewForm.get(key);
+                Object.keys(analysisTabForm.controls).forEach(k =>{
+                    if(k.includes("JSONString")){
+                        params = params.set(k ,JSON.stringify(analysisTabForm.get(k).value));
+                    }else{
+                        params = params.set(k, analysisTabForm.get(k).value);
+                    }
+                })
+            }
+        });
+       this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp =>{
+            //TODO once backend is implemented
+        });
 
     }
 
     ngOnDestroy(){
         this.analysisTreeNodeSubscription.unsubscribe();
+        this.analysisService.clearAnalysisOverviewForm();
     }
 
 
