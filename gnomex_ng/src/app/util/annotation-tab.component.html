@@ -28,11 +28,13 @@
                 </mat-error>
             </mat-form-field>
             <mat-form-field  *ngSwitchCase="'OPTION'" class="annot-control">
-                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" [formControl]="this.form.controls[annot.name]">
+                <mat-select (selectionChange)="selectChanged($event,annot)"
+                            [compareWith]="compareByID"
+                            [placeholder]="annot.name"
+                            [formControl]="this.form.controls[annot.name]">
                     <mat-option
                             *ngFor="let opt of annot.PropertyOption"
                             #optRef
-                            (onSelectionChange)="selectOption(optRef)"
                             [value]="opt" >{{opt.name}}
                     </mat-option>
                 </mat-select>

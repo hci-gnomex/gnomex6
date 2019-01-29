@@ -3,9 +3,10 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {Subject} from "rxjs";
 import {BehaviorSubject} from "rxjs";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
+import {AbstractControl, FormGroup} from "@angular/forms";
 
 @Injectable()
 export class AnalysisService {
@@ -23,10 +24,12 @@ export class AnalysisService {
     // for the save button on right pane
     public invalid:boolean = false;
     public dirty:boolean = false;
+    private _analysisOverviewForm: FormGroup;
 
 
     constructor(private http: Http, private httpClient:HttpClient,
                 private cookieUtilService:CookieUtilService) {
+        this._analysisOverviewForm = new FormGroup({});
     }
 
 
@@ -54,14 +57,9 @@ export class AnalysisService {
         }));
     }
 
-    saveAnalysis(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveAnalysis.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    saveAnalysis(params: HttpParams): Observable<any> {
+        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+        return this.httpClient.post("/gnomex/SaveAnalysis.gx", params.toString(),{headers: headers});
     }
 
     getAnalysisGroup(params: URLSearchParams): Observable<any> {
@@ -260,6 +258,28 @@ export class AnalysisService {
     public getAnalysisDownloadListWithParams(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysisDownloadList.gx", {params: params});
     }
+
+    public managePedFile(params: HttpParams): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/ManagePedFile.gx", params.toString(), {headers: headers});
+    }
+    get analysisOverviewForm():FormGroup{
+        return this._analysisOverviewForm;
+    }
+
+    public addAnalysisOverviewFormMember(control: AbstractControl, name:string,afterControlAddedfn?:any):void{
+        setTimeout(() =>{
+            this._analysisOverviewForm.addControl(name, control);
+            if(afterControlAddedfn){
+                afterControlAddedfn();
+            }
+        });
+    }
+    public clearAnalysisOverviewForm():void{
+        this._analysisOverviewForm = new FormGroup({});
+    }
+
 
 
 

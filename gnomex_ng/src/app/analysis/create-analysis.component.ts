@@ -18,6 +18,8 @@ import {DialogsService} from '../util/popup/dialogs.service';
 import {NewOrganismComponent} from "../util/new-organism.component";
 import {NewGenomeBuildComponent} from '../util/new-genome-build.component';
 import * as _ from "lodash";
+import {HttpParams} from "@angular/common/http";
+import {first} from "rxjs/operators";
 
 @Component({
     selector: 'create-analysis-dialog',
@@ -235,7 +237,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
     saveAnalysis() {
         this.showSpinner = true;
         var idAnalysis: any = 0;
-        var params: URLSearchParams = new URLSearchParams();
+        var params: HttpParams = new HttpParams();
         var stringifiedGenomBuild;
         var analysisGroupListObject: any = {};
         if (this.genomBuilds.length > 0) {
@@ -245,30 +247,31 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         if (this.analysisGroup.length > 0) {
             stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
         }
-        params.set("lanesXMLString", "");
-        params.set("samplesXMLString", "");
-        params.set("collaboratorsXMLString", "");
-        params.set("analysisFilesXMLString", "");
-        params.set("hybsXMLString", "");
-        params.set("idInstitution", "");
-        params.set("analysisFilesToDeleteXMLString", "");
-        params.set("idOrganism", this.idOrganism);
-        params.set("idAppUser", this.idAppUser);
-        params.set("idLab", this.idLabString);
-        params.set("idAnalysis", idAnalysis);
-        params.set("codeVisibility", this.codeVisibility);
-        params.set("name", this.createAnalysisForm.controls['analysisName'].value);
+        params = params.set("lanesXMLString", "")
+            .set("samplesXMLString", "")
+            .set("collaboratorsXMLString", "")
+            .set("analysisFilesXMLString", "")
+            .set("hybsXMLString", "")
+            .set("idInstitution", "")
+            .set("analysisFilesToDeleteXMLString", "")
+            .set("idOrganism", this.idOrganism)
+            .set("idAppUser", this.idAppUser)
+            .set("idLab", this.idLabString)
+            .set("idAnalysis", idAnalysis)
+            .set("codeVisibility", this.codeVisibility)
+            .set("name", this.createAnalysisForm.controls['analysisName'].value);
+
         this.newAnalysisName = this.createAnalysisForm.controls['analysisName'].value;
         if (this.createAnalysisForm.controls['analysisGroupName']) {
-            params.set("newAnalysisGroupName", this.createAnalysisForm.controls['analysisGroupName'].value);
+            params = params.set("newAnalysisGroupName", this.createAnalysisForm.controls['analysisGroupName'].value);
         }
         var genomeBuilds = {genomeBuilds};
-        params.set("genomeBuildsXMLString", stringifiedGenomBuild);
-        params.set("analysisGroupsXMLString", stringifiedAnalysisGroup);
-        var aPromise = this.analysisService.saveAnalysis(params).toPromise();
-        aPromise.then(response => {
+        params =  params.set("genomeBuildsXMLString", stringifiedGenomBuild)
+                        .set("analysisGroupsXMLString", stringifiedAnalysisGroup);
+        this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp =>{
             this.analysisService.refreshAnalysisGroupList_fromBackend();
-        })
+        });
+
     }
 
     /**

@@ -15,7 +15,6 @@ module.exports = function (options) {
     return {
         entry: {
             polyfills: "./src/polyfills.ts",
-            twbs: "bootstrap-loader",
             vendor: "./src/vendor.ts",
             app: "./src/main.ts"
         },

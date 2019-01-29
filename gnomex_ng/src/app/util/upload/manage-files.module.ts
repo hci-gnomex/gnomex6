@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import {
     MatButtonModule,
     MatDialogModule,
-    MatFormFieldModule,
+    MatFormFieldModule, MatInputModule,
     MatListModule,
     MatProgressBarModule,
     MatTabsModule,
     MatTooltipModule
 } from '@angular/material';
 import { UploadFileComponent } from './upload-file.component';
+import { AgGridModule } from "ag-grid-angular";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
@@ -27,9 +28,11 @@ import {UtilModule} from "../util.module";
         MatDialogModule,
         MatListModule,
         MatTabsModule,
+        MatInputModule,
         HttpClientModule,
         MatTooltipModule,
         TreeModule.forRoot(),
+        AgGridModule,
         AngularSplitModule,
         MatFormFieldModule,
         UtilModule,

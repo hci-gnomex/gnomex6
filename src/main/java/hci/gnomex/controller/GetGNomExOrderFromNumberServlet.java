@@ -212,13 +212,10 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             }
 
-            JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
-            res.setContentType("application/json");
-            jsonWriter.writeObject(value);
-            jsonWriter.close();
-
-
-
+            try(JsonWriter jsonWriter = Json.createWriter(res.getOutputStream())){
+                res.setContentType("application/json");
+                jsonWriter.writeObject(value);
+            }
 
         } catch (Exception e) {
             LOG.error("An error occurred in GetGNomExOrderFromNumberServlet", e);

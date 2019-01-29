@@ -25,6 +25,7 @@ import * as _ from "lodash";
 import {GnomexService} from "../services/gnomex.service";
 import {URLSearchParams} from "@angular/http";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -103,7 +104,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             }
         },
 
-        allowDrag: (node) => node.data.isDataTrackFolder || node.data.idDataTrack,
+        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.isDataTrackFolder || node.data.idDataTrack),
         actionMapping
     };
     public items: any;
@@ -114,6 +115,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     public labMembers: any;
     private billingAccounts: any;
     private selectedItem: ITreeNode;
+    private allActiveNodes: ITreeNode[] = [];
     public datatracksCount: number = 0;
     private dataTracksListSubscription: Subscription;
     private labList: any[] = [];
@@ -140,7 +142,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 private labListService: LabListService,
                 private dialog: MatDialog,
                 private gnomexService:GnomexService,
-                private changeDetectorRef: ChangeDetectorRef) {
+                private changeDetectorRef: ChangeDetectorRef,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService) {
 
 
         this.items = [];
@@ -438,6 +441,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
      */
     treeOnSelect(event: any) {
         this.selectedItem = event.node;
+        this.allActiveNodes = this.treeModel.getActiveNodes();
         this.selItem.emit(this.selectedItem);
 
         let datatrackListNode =  _.cloneDeep(this.selectedItem.data);

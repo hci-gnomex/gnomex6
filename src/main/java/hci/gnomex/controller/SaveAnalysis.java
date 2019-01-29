@@ -801,9 +801,12 @@ public static String removeDataTrackFiles(Session sess, SecurityAdvisor secAd, A
 			// Analysis files that are on the file system but not yet saved
 			// should
 			// be ignored.
-			if (idAnalysisFile == null || idAnalysisFile.startsWith("AnalysisFile") || idAnalysisFile.equals("0")) {
+			if (idAnalysisFile == null ||  idAnalysisFile.startsWith("AnalysisFile") || idAnalysisFile.equals("0")) {
+				continue;
+			}else if(idAnalysisFile.equals("")){
 				continue;
 			}
+
 			inCount++;
 			if (!firstTime) {
 				queryBuf.append(",");

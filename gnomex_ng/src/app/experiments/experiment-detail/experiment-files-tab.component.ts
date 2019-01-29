@@ -4,17 +4,21 @@ import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode} from "ag-grid-co
 import {ActivatedRoute} from "@angular/router";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments.service";
+import {FileService} from "../../services/file.service";
+import {MatDialog, MatDialogConfig} from "@angular/material";
+import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'experiment-files-tab',
     template: `
         <div class="padded flex-container-col full-height">
             <div class="flex-container-row">
-                <button mat-button (click)="this.handleUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
-                <button mat-button (click)="this.handleSFTPUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">SFTP Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadCommandLine()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
-                <button mat-button (click)="this.handleManageFiles()"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
+                <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
+                <button mat-button (click)="this.handleSFTPUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">SFTP Upload Files</button>
+                <button mat-button (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
+                <button mat-button (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
+                <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
                 <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
             </div>
             <div class="flex-grow">
@@ -32,6 +36,9 @@ import {ExperimentsService} from "../experiments.service";
         </div>
     `,
     styles: [`
+        .no-padding-dialog {
+            padding: 0;
+        }
     `]
 })
 export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
@@ -43,11 +50,17 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
     public fileCount: number = 0;
     public getRequestDownloadListResult: any;
+    private request:any;
+    public canUpdate: boolean = false;
+    private updateFileSubscription:Subscription;
+
 
     constructor(public constantsService: ConstantsService,
                 private route: ActivatedRoute,
+                private fileService: FileService,
                 private dialogsService: DialogsService,
-                private experimentsService: ExperimentsService) {
+                private experimentsService: ExperimentsService,
+                private dialog:MatDialog) {
     }
 
     ngOnInit() {
@@ -88,6 +101,8 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             this.fileCount = 0;
             this.getRequestDownloadListResult = null;
             if (data && data.experiment && data.experiment.Request) {
+                this.request = data.experiment.Request;
+                this.canUpdate = this.request.canUpdate && this.request.canUpdate === 'Y';
                 this.experimentsService.getRequestDownloadList(data.experiment.Request.idRequest).subscribe((result: any) => {
                     if (result && result.Request) {
                         this.getRequestDownloadListResult = result;
@@ -104,6 +119,9 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
                     }
                 });
             }
+        });
+        this.updateFileSubscription = this.fileService.getUpdateFileTabObservable().subscribe(data =>{
+           this.gridData = data;
         });
     }
 
@@ -129,7 +147,17 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleUploadFiles(): void {
-        // TODO Upload Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.request,
+            startTabIndex: 0,
+            isFDT: false
+        };
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
+        this.dialog.open(ManageFilesDialogComponent,config);
     }
 
     public handleFDTUploadCommandLine(): void {
@@ -137,7 +165,17 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleFDTUploadFiles(): void {
-        // TODO FDT Upload Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.request,
+            startTabIndex: 0,
+            isFDT: true
+        };
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
+        this.dialog.open(ManageFilesDialogComponent,config);
     }
 
     public handleSFTPUploadFiles(): void {
@@ -145,7 +183,17 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleManageFiles(): void {
-        // TODO Manage Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.request,
+            startTabIndex: 1,
+            isFDT: false
+        };
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
+        this.dialog.open(ManageFilesDialogComponent,config);
     }
 
     public handleDownloadFiles(): void {
@@ -153,6 +201,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.updateFileSubscription.unsubscribe();
     }
 
 }

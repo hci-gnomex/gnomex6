@@ -4,7 +4,6 @@ import {URLSearchParams} from "@angular/http";
 import {LabListService} from "../services/lab-list.service";
 import {GetLabService} from "../services/get-lab.service";
 import {jqxComboBox} from "jqwidgets-framework";
-import {jqxCalendar} from "jqwidgets-framework";
 import {AppUserListService} from "../services/app-user-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ExperimentsService} from "../experiments/experiments.service";
@@ -13,11 +12,88 @@ import {DictionaryService} from "../services/dictionary.service";
 import {DataTrackService} from "../services/data-track.service";
 import {BillingService} from "../services/billing.service";
 import {DialogsService} from "./popup/dialogs.service";
+import {DateRange} from "./date-range-filter.component";
 
 @Component({
     selector: 'browse-filter',
     templateUrl: "./browse-filter.component.html",
-    styles: [require("./browse-filter.component.less").toString()]
+    styles: [`
+        input.filterTextInput {
+            background: gainsboro;
+        }
+
+        div.filter {
+            font-size: 12px;
+            float: left;
+            width: 100%;
+            vertical-align: center;
+            border: 1px solid grey;
+            background-color: white;
+        }
+
+        button.showHideButton {
+            border: none;
+            background: none;
+            border-radius: 5px;
+        }
+
+        button.showHideButton:hover {
+            background: deepskyblue;
+        }
+
+        button.searchButton {
+            border: 1px solid grey;
+            border-radius: 5px;
+            background: gainsboro;
+        }
+
+        button.searchButton:hover {
+            background: deepskyblue;
+        }
+
+        div.inlineDiv {
+            display: flex;
+            align-items: center;
+        }
+
+        div.labelAndIcon {
+            display: flex;
+            align-items: center;
+            width: 11em;
+            padding-left: 0.5em;
+        }
+
+        jqxComboBox.inlineComboBox {
+            display: inline-block;
+        }
+
+        div.divider {
+            display: inline;
+            border-left: 1px solid lightgrey;
+            height: 1.5em;
+        }
+
+        .children-spaced > *:not(:last-child) {
+            margin-right: 1em;
+        }
+
+        div.filter-row-top {
+            margin: 0.5em 0;
+        }
+
+        div.filter-row-bottom {
+            padding-left: 12em;
+            margin: 0 0 0.5em 0;
+        }
+
+        label.leading-label {
+            margin-right: 0.3em;
+        }
+
+        label.following-label {
+            margin-left: 0.3em;
+        }
+    `]
 })
 
 export class BrowseFilterComponent implements OnInit {
@@ -259,6 +335,12 @@ export class BrowseFilterComponent implements OnInit {
                 }
             }
         }
+
+        if (isGuestState) {
+            setTimeout(() => {
+                this.search();
+            });
+        }
     }
 
     resetFields(): void {
@@ -479,6 +561,16 @@ export class BrowseFilterComponent implements OnInit {
     onExperimentsRadioGroupChange(): void {
         if (this.showExperimentsRadioGroup && this.showLabMembersComboBox && !(this.experimentsRadioString === "myLab")) {
             this.idAppUserString = "";
+        }
+    }
+
+    public onDateRangePickerChange(event: DateRange): void {
+        if (event.from && event.to) {
+            this.dateFromString = event.from.toLocaleDateString();
+            this.dateToString = event.to.toLocaleDateString();
+        } else {
+            this.dateFromString = "";
+            this.dateToString = "";
         }
     }
 

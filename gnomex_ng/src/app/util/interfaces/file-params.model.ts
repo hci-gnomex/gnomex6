@@ -4,6 +4,6 @@
 export interface IFileParams {
     type: string,
     uploadURL:string,
-    id:any
-
+    id:any,
+    isFDT:boolean
 }

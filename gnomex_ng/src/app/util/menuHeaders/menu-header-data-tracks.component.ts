@@ -1,8 +1,8 @@
-import {Component, Input, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, Inject, Input, OnInit, SimpleChanges} from '@angular/core';
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewGenomeBuildComponent} from "../new-genome-build.component";
-import {MatDialogRef, MatDialog} from '@angular/material';
+import {MatDialogRef, MatDialog, MatDialogConfig} from '@angular/material';
 import {NewOrganismComponent} from "../new-organism.component";
 import {NewDataTrackFolderComponent} from "../../datatracks/new-datatrackfolder.component";
 import {DialogsService} from "../popup/dialogs.service";
@@ -10,6 +10,12 @@ import {DataTrackService} from "../../services/data-track.service";
 import {Response, URLSearchParams} from "@angular/http";
 import {NewDataTrackComponent} from "../../datatracks/new-datatrack.component";
 import {DeleteDataTrackComponent} from "../../datatracks/delete-datatrack.component";
+import {ConstantsService} from "../../services/constants.service";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {DownloadPickerComponent} from "../download-picker.component";
+import {DOCUMENT} from "@angular/common";
+import {DownloadProgressComponent} from "../download-progress.component";
+import {HttpParams} from "@angular/common/http";
 
 const DATATRACK = "DATATRACK";
 const GENOMEBUILD = "GENOMEBUILD";
@@ -23,6 +29,7 @@ const ORGANISM = "ORGANISM";
 
 export class MenuHeaderDataTracksComponent implements OnInit {
     @Input() selectedNode: any;
+    @Input() allActiveNodes: ITreeNode[];
     private _showMenuItemNewGenomeBuild: boolean = false;
     private _showMenuItemRemove: boolean = false;
     public get showMenuItemNewGenomeBuild(): boolean {
@@ -40,7 +47,9 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     constructor(private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
                 private dataTrackService: DataTrackService,
-                private dialog: MatDialog) {
+                private dialog: MatDialog,
+                public constantsService: ConstantsService,
+                @Inject(DOCUMENT) private document: Document) {
     }
 
     ngOnInit() {
@@ -218,6 +227,98 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             height: '430px',
             width: '300px',
         });
+    }
+
+    public doDownload(): void {
+        let itemsToDownload: any[] = [];
+        let downloadKeys: string = "";
+        for (let node of this.allActiveNodes) {
+            let item: any = node.data;
+            let dataTracks: any[] = [];
+            if (item.idDataTrack) {
+                dataTracks.push(item);
+            } else {
+                this.getChildDataTracks(item, dataTracks);
+            }
+
+            for (let dataTrack of dataTracks) {
+                // Filter out duplicates
+                let keep: boolean = true;
+                for (let itemToDownload of itemsToDownload) {
+                    if (itemToDownload.idDataTrack === dataTrack.idDataTrack) {
+                        keep = false;
+                        break;
+                    }
+                }
+                if (keep) {
+                    itemsToDownload.push(dataTrack);
+                    let idDataTrackFolder: any = dataTrack.idDataTrackFolder ? dataTrack.idDataTrackFolder : "-99";
+                    downloadKeys += dataTrack.idDataTrack + "," + idDataTrackFolder + ":";
+                }
+            }
+        }
+
+        if (itemsToDownload.length < 1) {
+            this.dialogsService.alert("Please select the data tracks or folders to download");
+            return;
+        }
+
+        this.dataTrackService.getDownloadEstimatedSize(downloadKeys).subscribe((result: any) => {
+            if (result && result.size) {
+                if (result.size === "0") {
+                    this.dialogsService.alert("No data files exist for the selected item(s)");
+                } else {
+                    let config: MatDialogConfig = new MatDialogConfig();
+                    config.data = {
+                        estimatedDownloadSize: result.size,
+                        uncompressedDownloadSize: result.uncompressedSize
+                    };
+                    let dialogRef: MatDialogRef<DownloadPickerComponent> = this.dialog.open(DownloadPickerComponent, config);
+                    dialogRef.afterClosed().subscribe((choice: any) => {
+                        if (choice) {
+                            if (choice === DownloadPickerComponent.DOWNLOAD_NORMAL) {
+                                let downloadParams: HttpParams = new HttpParams()
+                                    .set("mode", "zip");
+                                let progressWindowConfig: MatDialogConfig = new MatDialogConfig();
+                                progressWindowConfig.data = {
+                                    url: "DownloadDataTrackFileServlet.gx",
+                                    estimatedDownloadSize: parseInt(result.size),
+                                    params: downloadParams,
+                                    suggestedFilename: "gnomex-datatracks",
+                                    fileType: ".zip"
+                                };
+                                this.dialog.open(DownloadProgressComponent, progressWindowConfig);
+                            } else if (choice === DownloadPickerComponent.DOWNLOAD_FDT) {
+                                let url: string = this.document.location.href;
+                                url = url.substring(0, url.indexOf("/gnomex") + 7);
+                                url += "/FastDataTransferDownloadDataTrackServlet.gx";
+                                window.open(url, "_blank");
+                            }
+                        }
+                    });
+                }
+            } else {
+                this.handleControllerError(result, "getting estimated size of download");
+            }
+        });
+    }
+
+    private handleControllerError(result: any, action: string): void {
+        let message: string = "";
+        if (result && result.message) {
+            message = ": " + result.message;
+        }
+        this.dialogsService.alert("An error occurred while " + action + message, null);
+    }
+
+    private getChildDataTracks(item: any, children: any[]): void {
+        for (let child of item.items) {
+            if (child.idDataTrack) {
+                children.push(child)
+            } else {
+                this.getChildDataTracks(child, children);
+            }
+        }
     }
 
 }

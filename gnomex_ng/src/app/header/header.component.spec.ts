@@ -1,6 +1,5 @@
 import { TestBed, async } from '@angular/core/testing';
 import { HeaderComponent } from './header.component';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {
     MatGridListModule,
@@ -49,7 +48,6 @@ describe('Header Component...', () => {
                 RouterTestingModule,
                 ReactiveFormsModule,
                 HttpModule,
-                NgbModule.forRoot(),
                 MatButtonModule,
                 MatInputModule,
                 MatListModule,

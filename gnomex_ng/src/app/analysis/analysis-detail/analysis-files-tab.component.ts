@@ -9,16 +9,19 @@ import {DataTrackService} from "../../services/data-track.service";
 import {HttpParams} from "@angular/common/http";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {MatDialog, MatDialogConfig} from "@angular/material";
+import {FormGroup} from "@angular/forms";
+import {FileService} from "../../services/file.service";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'analysis-files-tab',
     template: `
         <div class="padded flex-container-col full-height">
             <div class="flex-container-row">
-                <button mat-button (click)="this.handleUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadCommandLine()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
-                <button mat-button (click)="this.handleFDTUploadFiles()"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
-                <button mat-button (click)="this.handleManageFiles()"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
+                <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
+                <button mat-button (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
+                <button mat-button (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
+                <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
                 <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
             </div>
             <div class="flex-grow">
@@ -51,9 +54,14 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     public fileCount: number = 0;
     public getAnalysisDownloadListResult: any;
     private analysis:any;
+    public canUpdate: boolean = false;
+    private formGroup: FormGroup;
+    private updateFileSubscription: Subscription;
+
 
     constructor(public constantsService: ConstantsService,
                 private analysisService: AnalysisService,
+                private fileService: FileService,
                 private route: ActivatedRoute,
                 private dialogsService: DialogsService,
                 private dataTrackService: DataTrackService,
@@ -107,6 +115,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             this.getAnalysisDownloadListResult = null;
             if(data && data.analysis && data.analysis.Analysis){
                 this.analysis = data.analysis.Analysis;
+                this.canUpdate = this.analysis.canUpdate && this.analysis.canUpdate === 'Y';
                 this.analysisService.getAnalysisDownloadList(data.analysis.Analysis.idAnalysis).subscribe((result: any) => {
                     if (result && result.Analysis) {
                         this.getAnalysisDownloadListResult = result;
@@ -124,6 +133,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 });
             }
         });
+        this.updateFileSubscription =  this.fileService.getUpdateFileTabObservable().subscribe(data => {
+            this.gridData = data;
+        })
     }
 
     public onGridReady(event: GridReadyEvent): void {
@@ -200,7 +212,8 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             .set("idAnalysis", data.idAnalysis)
             .set("fileName", data.fileName)
             .set("VCFInfo", JSON.stringify(this.getAnalysisDownloadListResult.VCFInfo))
-            .set("BAMInfo", JSON.stringify(this.getAnalysisDownloadListResult.BAMInfo));
+            .set("BAMInfo", JSON.stringify(this.getAnalysisDownloadListResult.BAMInfo))
+            .set("noJSONToXMLConversionNeeded", "Y");
         this.dataTrackService.makeGENELink(params).subscribe((result: any) => {
             if (result && result.urlsToLink) {
                 window.open(result.urlsToLink, "_blank");
@@ -227,7 +240,17 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleFDTUploadFiles(): void {
-        // TODO FDT Upload Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            order: this.analysis,
+            startTabIndex: 0,
+            isFDT: true
+        };
+        config.height = "40em";
+        config.width = "55em";
+        config.disableClose = true;
+        this.dialog.open(ManageFilesDialogComponent,config);
     }
 
     public handleManageFiles(): void {
@@ -235,6 +258,8 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.analysis,
+            startTabIndex: 1,
+            isFDT: false
         };
         config.height = "40em";
         config.width = "55em";
@@ -248,6 +273,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.updateFileSubscription.unsubscribe();
     }
 
 }

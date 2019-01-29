@@ -28,13 +28,13 @@ import {ConstantsService} from "../../services/constants.service";
             <div class="full-height full-width flex-container-col">
                 <div class="full-width flex-container-row">
                     <div class="padded">
-                        <button mat-button [disabled]="!enableCreateAnalysis" (click)="create()">
+                        <button mat-button [disabled]="!enableCreateAnalysis || this.createSecurityAdvisorService.isGuest" (click)="create()">
                             <img [src]="this.newSegment" alt="">
                             New
                         </button>
                     </div>
                     <div class="padded">
-                        <button mat-button [disabled]="!enableRemoveAnalysis" (click)="remove()">
+                        <button mat-button [disabled]="!enableRemoveAnalysis || this.createSecurityAdvisorService.isGuest" (click)="remove()">
                             <img [src]="this.removeSegment" alt="">
                             Remove
                         </button>

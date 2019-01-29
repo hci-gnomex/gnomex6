@@ -5,6 +5,12 @@ export class ConstantsService {
     public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_NOTES:string = "experiment_platform_hide_notes";
     public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_VENDOR:string = "experiment_platform_hide_vendor";
     public readonly PROPERTY_EXPERIMENT_PLATFORM_HIDE_ORGANISM:string = "experiment_platform_hide_organism";
+    public readonly UPLOAD_FILE_FDT_INFO:string =
+        "This method of uploading files uses a Fast Data Transfer (FDT) server. To upload files:<br><br>" +
+        "     1. Select the \"Start\" button below.<br><br>" +
+        "     2. This will download a special \"jnlp\" file that can be opened using Java Web Start (either directly or after first saving<br>         the file to your desktop).<br><br>" +
+        "     3. Use the window launched by Java Web Start to select and upload the files to the server.<br><br> " +
+        "    4. After all of the files have been uploaded (% Completed column indicates 100 for all files), click the<br>        \"Organize files\" link on Experiment Detail to move the uploaded files to the appropriate folders.<br>         button."
 
     public readonly ICON_CHECKED = "assets/tick.png";
     public readonly SEGMENT_NEW = "assets/segment_new.png";
@@ -93,6 +99,7 @@ export class ConstantsService {
     public readonly ICON_FLASK:string = "assets/flask.png";
     public readonly ICON_ADD:string = "assets/add.png";
     public readonly ICON_DELETE:string = "assets/delete.png";
+    public readonly ICON_CROSS:string = "assets/cross.png";
     public readonly ICON_FOLDER_DELETE:string= "assets/folder_delete.png";
     public readonly ICON_FOLDER_DISABLE:string= "assets/folder_disable.png";
     public readonly ICON_BASKET:string ="assets/basket.png";
@@ -109,6 +116,16 @@ export class ConstantsService {
     public readonly ICON_UPLOAD:string= "assets/upload.png";
     public readonly ICON_UPLOAD_LARGE: string = "assets/upload_large.png";
     public readonly ICON_CHART_ORGANIZATION: string = "assets/chart_organisation.png";
+    public readonly ICON_ARROW_LEFT: string = "assets/arrow_left.gif";
+    public readonly ICON_ARROW_RIGHT: string = "assets/arrow_right.gif";
+    public readonly ICON_DATABASE_LIGHTNING: string = "assets/database_lightning.png";
+    public readonly ICON_TABLE_MULTIPLE: string = "assets/table_multiple.png";
+
+    public readonly STATUS_IN_PROGRESS: string = "In Progress";
+    public readonly STATUS_COMPLETED: string = "Completed";
+    public readonly STATUS_TERMINATED: string = "Terminated";
+    public readonly STATUS_BYPASSED: string = "Bypassed";
+    public readonly STATUS_ON_HOLD: string = "On Hold";
 
     public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
 

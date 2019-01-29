@@ -1,8 +1,10 @@
 <div>
-    <button mat-button [disabled]="newDTisDisabled || this.disableAll" (click)="makeNewDataTrack()"><img src="../../../assets/datatrack_new.png">New Data Track</button>
-    <button mat-button [disabled]="newGenomeBuildisDisabled || this.disableAll" (click)="makeNewFolder()"><img src="../../../assets/folder_new.png">New Folder</button>
-    <button *ngIf="showMenuItemNewGenomeBuild" [disabled]="this.disableAll" mat-button (click)="makeNewGenomeBuild()"><img src="../../../assets/genome_build_new.png">New Genome Build</button>
-    <button *ngIf="showMenuItemNewOrganism" [disabled]="this.disableAll" mat-button (click)="makeNewOrganism()"><img src="../../../assets/organism_new.png">New Organism</button>
-    <button mat-button [disabled]="this.disableAll" (click)="doDuplicate()"><img src="../../../assets/duplicate.png">Duplicate</button>
-    <button mat-button [disabled]="this.disableAll" (click)="doRemove()"><img src="../../../assets/crossout.png">Remove</button>
+    <button mat-button [disabled]="newDTisDisabled || this.disableAll" (click)="makeNewDataTrack()"><img class="icon" src="../../../assets/datatrack_new.png">New Data Track</button>
+    <button mat-button [disabled]="newGenomeBuildisDisabled || this.disableAll" (click)="makeNewFolder()"><img class="icon" src="../../../assets/folder_new.png">New Folder</button>
+    <button *ngIf="showMenuItemNewGenomeBuild" [disabled]="this.disableAll" mat-button (click)="makeNewGenomeBuild()"><img class="icon" src="../../../assets/genome_build_new.png">New Genome Build</button>
+    <button *ngIf="showMenuItemNewOrganism" [disabled]="this.disableAll" mat-button (click)="makeNewOrganism()"><img class="icon" src="../../../assets/organism_new.png">New Organism</button>
+    <button mat-button [disabled]="this.disableAll" (click)="doDuplicate()"><img class="icon" src="../../../assets/duplicate.png">Duplicate</button>
+    <button mat-button [disabled]="this.disableAll" (click)="doRemove()"><img class="icon" src="../../../assets/crossout.png">Remove</button>
+    <button mat-button [disabled]="this.disableAll" (click)="this.doDownload()">
+        <img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download</button>
 </div>

@@ -80,6 +80,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonReader;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
@@ -108,8 +109,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	private Document      requestDoc;
 	private RequestParser requestParser;
 
-	private String                     filesToRemoveXMLString;
-	private Document                   filesToRemoveDoc;
+	private JsonArray filesToRemove;
 	private FileDescriptorUploadParser filesToRemoveParser;
 
 	private String propertiesXML;
@@ -1103,19 +1103,19 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			description = request.getParameter("description");
 		}
 
-		if (Util.isParameterNonEmpty("filesToRemoveXMLString")) {
-			filesToRemoveXMLString = "<FilesToRemove>" + request.getParameter("filesToRemoveXMLString") + "</FilesToRemove>";
+		if (request.getParameter("filesToRemoveJSONString") != null && !request.getParameter("filesToRemoveJSONString").equals("")) {
+			String filesToRemoveJSONString =  request.getParameter("filesToRemoveXMLString");
+			if(Util.isParameterNonEmpty(filesToRemoveJSONString)){
+				try(JsonReader jsonReader = Json.createReader(new StringReader(filesToRemoveJSONString))) {
+					filesToRemove = jsonReader.readArray();
+					filesToRemoveParser = new FileDescriptorUploadParser(filesToRemove);
+				} catch (Exception e) {
+					this.addInvalidField("FilesToRemoveJSONString", "Invalid filesToRemove json");
+					this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveJSONString", e);
+				}
+			}
 
-			StringReader reader = new StringReader(filesToRemoveXMLString);
-			try {
-				SAXBuilder sax = new SAXBuilder();
-				filesToRemoveDoc = sax.build(reader);
-				filesToRemoveParser = new FileDescriptorUploadParser(filesToRemoveDoc);
-			}
-			catch (JDOMException je) {
-				this.addInvalidField("FilesToRemoveXMLString", "Invalid filesToRemove xml");
-				this.errorDetails = Util.GNLOG(LOG, "Cannot parse filesToRemoveXMLString", je);
-			}
+
 		}
 
 		if (Util.isParameterNonEmpty("propertiesXML")) {

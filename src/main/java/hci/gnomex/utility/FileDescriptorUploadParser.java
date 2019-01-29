@@ -15,57 +15,69 @@ import java.util.Map;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+
 
 public class FileDescriptorUploadParser extends DetailObject implements Serializable {
   
-  protected Document   doc;
+  protected JsonObject files;
+  protected JsonArray  filesToRemove;
   protected Map        fileNameMap = new LinkedHashMap();
   protected List       newDirectoryNames = new ArrayList();
   protected Map        filesToRename = new LinkedHashMap();
   protected Map        foldersToRename = new LinkedHashMap();
   
-  public FileDescriptorUploadParser(Document doc) {
-    this.doc = doc;
- 
+  public FileDescriptorUploadParser(JsonObject files) {
+    this.files = files;
   }
+  public FileDescriptorUploadParser(JsonArray filesToRemoveList){
+    this.filesToRemove = filesToRemoveList;
+  }
+
   
   public void parse() throws Exception{
     fileNameMap = new LinkedHashMap();
     newDirectoryNames = new ArrayList();
     
-    Element root = this.doc.getRootElement();
+    JsonObject root = this.files;
+
+
+    JsonArray requestDownloadList = root.get("RequestDownload") != null ? root.getJsonArray("RequestDownload") : Json.createArrayBuilder().build();
     
-    
-    for(Iterator i = root.getChildren("RequestDownload").iterator(); i.hasNext();) {
-      Element folderNode = (Element)i.next();      
-      String requestNumber = folderNode.getAttributeValue("requestNumber");
-      String []keyTokens = folderNode.getAttributeValue("key").split(Constants.DOWNLOAD_KEY_SEPARATOR);
+    for(int i = 0; i < requestDownloadList.size(); i++) {
+      JsonObject folderObj = requestDownloadList.getJsonObject(i);
+      String requestNumber = folderObj.get("requestNumber") != null ? folderObj.getString("requestNumber") : "";
+      String []keyTokens = (folderObj.get("key") != null ? folderObj.getString("key") : "").split(Constants.DOWNLOAD_KEY_SEPARATOR);
       String directoryName = keyTokens[3];
-      if(folderNode.getAttribute("newName") != null && !folderNode.getAttribute("newName").equals("")){
-        foldersToRename.put(directoryName, folderNode.getAttributeValue("newName"));
+      String newName = folderObj.get("newName") != null ? folderObj.getString("newName") : "";
+      if(!newName.equals("")){
+        foldersToRename.put(directoryName, newName);
       }
 
       // Keep track of all new folders
-      recurseDirectories(folderNode, null);
+      recurseDirectories(folderObj, null, "RequestDownload");
     }
-   
-    if(root.getChildren("FileDescriptor").iterator().hasNext()){
-      recurseDirectories(root, null);
+
+    JsonArray fileDescriptorList = root.get("FileDescriptor") != null ? root.getJsonArray("FileDescriptor") : Json.createArrayBuilder().build();
+    if(fileDescriptorList.size() > 0){
+      recurseDirectories(root , null, "Request");
     }
 
  }
   
-  private void recurseDirectories(Element folderNode, String parentDir) {
+  private void recurseDirectories(JsonObject folderObj, String parentDir, String objName) {
     String directoryName = null;
-    if (folderNode.getName().equals("RequestDownload")) {
-      String []keyTokens = folderNode.getAttributeValue("key").split(Constants.DOWNLOAD_KEY_SEPARATOR);
+    if (objName.equals("RequestDownload")) {
+      String []keyTokens = (folderObj.get("key") != null ? folderObj.getString("key") : "" ).split(Constants.DOWNLOAD_KEY_SEPARATOR);
       directoryName = keyTokens[3];
       
-    } else if (folderNode.getAttributeValue("type") != null && folderNode.getAttributeValue("type").equals("dir")) {
-      directoryName = folderNode.getAttributeValue("displayName");
+    } else if (folderObj.get("type") != null && folderObj.getString("type").equals("dir")) {
+      directoryName = folderObj.get("displayName") != null ? folderObj.getString("displayName") : "";
     }
-    else if(folderNode.getName().equals("Request")){
-      directoryName = folderNode.getAttributeValue("displayName");
+    else if(objName.equals("Request")){
+      directoryName = folderObj.get("displayName") != null ? folderObj.getString("displayName") : "";
       directoryName = directoryName.substring(0, directoryName.indexOf("R") + 1); //Strip any revision number off
     }
     
@@ -74,27 +86,28 @@ public class FileDescriptorUploadParser extends DetailObject implements Serializ
     }
 
     String qualifiedDir = parentDir != null ? parentDir  + File.separator + directoryName : directoryName;
-    if (folderNode.getAttributeValue("isNew") != null && folderNode.getAttributeValue("isNew").equals("Y")) {
+    if (folderObj.get("isNew") != null && folderObj.getString("isNew").equals("Y")) {
       newDirectoryNames.add(qualifiedDir);
     }
     
     // Get the files to be moved
-    for(Iterator i1 = folderNode.getChildren("FileDescriptor").iterator(); i1.hasNext();) {
-      Element fileNode = (Element)i1.next();
+    JsonArray fileDescriptorList = folderObj.get("FileDescriptor") != null ? folderObj.getJsonArray("FileDescriptor") : Json.createArrayBuilder().build();
+    for(int i = 0; i < fileDescriptorList.size(); i++) {
+      JsonObject fileObj = fileDescriptorList.getJsonObject(i);
       //Check to see if we need to rename anything
-      String fileName = fileNode.getAttributeValue("fileName").replaceAll("\\\\", Constants.FILE_SEPARATOR);
-      String displayName = fileNode.getAttributeValue("displayName");
+      String fileName = (fileObj.get("fileName") != null ? fileObj.getString("fileName") : "") .replaceAll("\\\\", Constants.FILE_SEPARATOR);
+      String displayName = fileObj.get("displayName") != null ? fileObj.getString("displayName") : "";
       String newFileName = fileName.replace(fileName.substring(fileName.lastIndexOf(Constants.FILE_SEPARATOR) + 1), displayName);
       if(!newFileName.equals(fileName) && !fileName.equals("")){
         filesToRename.put(fileName, newFileName);
       }
 
       // Ignore new directories here.
-      if (fileNode.getAttributeValue("isNew") != null && fileNode.getAttributeValue("isNew").equals("Y")) {
+      if (fileObj.get("isNew") != null && fileObj.getString("isNew").equals("Y")) {
         continue;
       }
       
-      fileName = fileNode.getAttributeValue("fileName");
+      fileName = fileObj.get("fileName") != null ? fileObj.getString("fileName") : "";
       
       List fileNames = (List)fileNameMap.get(qualifiedDir);
       if (fileNames == null) {
@@ -105,19 +118,20 @@ public class FileDescriptorUploadParser extends DetailObject implements Serializ
       fileNames.add(fileName);
     }
 
-    if(!folderNode.getName().equals("Request")){
-      for(Iterator i = folderNode.getChildren("RequestDownload").iterator(); i.hasNext();) {
-        Element childFolderNode = (Element)i.next();
-        if(childFolderNode.getAttribute("newName") != null && !childFolderNode.getAttribute("newName").equals("")){
-          foldersToRename.put(directoryName, childFolderNode.getAttributeValue("newName"));
+    if(!objName.equals("Request")){
+      JsonArray requestDownloadList = folderObj.get("RequestDownload") != null ? folderObj.getJsonArray("RequestDownload") : Json.createArrayBuilder().build();
+      for(int i = 0; i < requestDownloadList.size(); i++) {
+        JsonObject childFolderObj = requestDownloadList.getJsonObject(i);
+        if(childFolderObj.get("newName") != null && !childFolderObj.getString("newName").equals("")){
+          foldersToRename.put(directoryName, childFolderObj.get("newName"));
         }
-        recurseDirectories(childFolderNode, qualifiedDir);
+        recurseDirectories(childFolderObj, qualifiedDir, "RequestDownload");
       }
     }
     
-    for(Iterator i = folderNode.getChildren("FileDescriptor").iterator(); i.hasNext();) {
-      Element childFolderNode = (Element)i.next();
-      recurseDirectories(childFolderNode, qualifiedDir);
+    for(int i = 0; i < fileDescriptorList.size(); i++) {
+      JsonObject childFolderObj = fileDescriptorList.getJsonObject(i);
+      recurseDirectories(childFolderObj, qualifiedDir, "FileDescriptor");
     }
     
   }
@@ -129,11 +143,11 @@ public class FileDescriptorUploadParser extends DetailObject implements Serializ
   public List parseFilesToRemove() throws Exception {
     ArrayList fileNames = new ArrayList();
     
-    Element root = this.doc.getRootElement();
-    for(Iterator i = root.getChildren().iterator(); i.hasNext();) {
-      Element node = (Element)i.next();
+
+    for(int i = 0; i < this.filesToRemove.size();  i++) {
+       JsonObject fileObj = filesToRemove.getJsonObject(i);
 //      System.out.println("ready to remove  fileName" + node.getAttributeValue("fileName"));
-      fileNames.add(node.getAttributeValue("fileName"));
+      fileNames.add(fileObj.get("fileName") != null ? fileObj.getString("fileName") : "");
     }
 
     return fileNames;

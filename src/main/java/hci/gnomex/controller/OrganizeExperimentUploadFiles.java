@@ -28,18 +28,15 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.*;
 import javax.servlet.http.HttpSession;
 
 import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 
 public class OrganizeExperimentUploadFiles extends GNomExCommand implements Serializable {
 
@@ -47,18 +44,13 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
     private static Logger LOG = Logger.getLogger(OrganizeExperimentUploadFiles.class);
 
     private Integer idRequest;
-    private String filesXMLString;
-    private String experimentFileXMLString;
-    private Document experimentFileDoc;
-    private Document filesDoc;
-    private String filesToRemoveXMLString;
-    private String linkedSampleFileXMLString;
-    private Document linkedSampleFileDoc;
-    private Document filesToRemoveDoc;
+    private JsonArray experimentFileList;
+    private JsonObject files;
+    private JsonArray filesToRemoveList;
+    private JsonArray filesToUnlink;
+    private JsonArray linkedSampleFileList;
     private FileDescriptorUploadParser parser;
     private FileDescriptorUploadParser filesToRemoveParser;
-    private Document filesToUnlinkDoc;
-    private String filesToUnlinkXMLString;
     private List directoryFilesToUnlink = new ArrayList();
     private List deletedSefEntries = new ArrayList();
 
@@ -79,84 +71,86 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
             this.addInvalidField("idRequest", "idRequest is required");
         }
 
-        if (request.getParameter("filesXMLString") != null && !request.getParameter("filesXMLString").equals("")) {
-            filesXMLString = request.getParameter("filesXMLString");
+        if (request.getParameter("filesJSONString") != null && !request.getParameter("filesJSONString").equals("")) {
+            String filesJSONString = request.getParameter("filesJSONString");
 //            System.out.println("[OEUF] filesXMLString:\n" + filesXMLString + "\n");
 
-            StringReader reader = new StringReader(filesXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                filesDoc = sax.build(reader);
-                parser = new FileDescriptorUploadParser(filesDoc);
-            } catch (JDOMException je) {
-                this.addInvalidField("FilesLXMLString", "Invalid files xml");
-                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesXMLString", je);
+            if(Util.isParameterNonEmpty(filesJSONString)){
+                try(JsonReader jsonReader = Json.createReader(new StringReader(filesJSONString))) {
+                    this.files = jsonReader.readObject();
+                    parser = new FileDescriptorUploadParser(files);
+                } catch (Exception e) {
+                    this.addInvalidField("FilesJSONString", "Invalid files json");
+                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesJSONString", e);
+                }
+
             }
+
         }
 
-        if (request.getParameter("experimentFileXMLString") != null
-                && !request.getParameter("experimentFileXMLString").equals("")) {
-            experimentFileXMLString = "<experimentFiles>" + request.getParameter("experimentFileXMLString")
-                    + "</experimentFiles>";
+        if (request.getParameter("experimentFileJSONString") != null
+                && !request.getParameter("experimentFileJSONString").equals("")) {
+            String experimentFileJSONString =  request.getParameter("experimentFileJSONString");
 //            System.out.println("[OEUF] experimentFileXMLString:\n" + experimentFileXMLString + "\n");
+            if(Util.isParameterNonEmpty(experimentFileJSONString)){
+                try(JsonReader jsonReader = Json.createReader( new StringReader(experimentFileJSONString))) {
+                    experimentFileList = jsonReader.readArray();
+                } catch (Exception e) {
+                    this.addInvalidField("experimentFileJSONString", "Invalid experiment File json");
+                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse experimentFileJSONString", e);
+                }
 
-            StringReader reader = new StringReader(experimentFileXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                experimentFileDoc = sax.build(reader);
-            } catch (JDOMException je) {
-                this.addInvalidField("experimentFileXMLString", "Invalid experimentFileXMLString xml");
-                this.errorDetails = Util.GNLOG(LOG,"Cannot parse experimentFileXMLString", je);
             }
+
         }
 
-        if (request.getParameter("filesToRemoveXMLString") != null
-                && !request.getParameter("filesToRemoveXMLString").equals("")) {
-            filesToRemoveXMLString = "<FilesToRemove>" + request.getParameter("filesToRemoveXMLString")
-                    + "</FilesToRemove>";
+        if (request.getParameter("filesToRemoveJSONString") != null
+                && !request.getParameter("filesToRemoveJSONString").equals("")) {
+            String filesToRemoveJSONString = request.getParameter("filesToRemoveJSONString");
 //            System.out.println("[OEUF] filesToRemoveXMLString:\n" + filesToRemoveXMLString + "\n");
 
-            StringReader reader = new StringReader(filesToRemoveXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                filesToRemoveDoc = sax.build(reader);
-                filesToRemoveParser = new FileDescriptorUploadParser(filesToRemoveDoc);
-            } catch (JDOMException je) {
-                this.addInvalidField("FilesToRemoveXMLString", "Invalid filesToRemove xml");
-                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveXMLString", je);
+            if(Util.isParameterNonEmpty(filesToRemoveJSONString)){
+                try(JsonReader jsonReader = Json.createReader(new StringReader(filesToRemoveJSONString))) {
+                    filesToRemoveList = jsonReader.readArray();
+                    filesToRemoveParser = new FileDescriptorUploadParser(filesToRemoveList);
+                } catch (Exception e) {
+                    this.addInvalidField("FilesToRemoveJSONString", "Invalid filesToRemove json");
+                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveJSONString", e);
+                }
             }
         }
 
-        if (request.getParameter("filesToUnlinkXMLString") != null
-                && !request.getParameter("filesToUnlinkXMLString").equals("")) {
-            filesToUnlinkXMLString = "<FilesToUnlink>" + request.getParameter("filesToUnlinkXMLString")
-                    + "</FilesToUnlink>";
+        if (request.getParameter("filesToUnlinkJSONString") != null
+                && !request.getParameter("filesToUnlinkJSONString").equals("")) {
+            String filesToUnlinkJSONString = request.getParameter("filesToUnlinkJSONString");
 //            System.out.println("[OEUF] filesToRemoveXMLString:\n" + filesToRemoveXMLString + "\n");
 
-            StringReader reader = new StringReader(filesToUnlinkXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                filesToUnlinkDoc = sax.build(reader);
-            } catch (JDOMException je) {
-                this.addInvalidField("FilesToUnlinkXMLString", "Invalid filesToUnlink xml");
-                this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToUnlinkXMLString", je);
+            if(Util.isParameterNonEmpty(filesToUnlinkJSONString)){
+                try(JsonReader jsonReader = Json.createReader(new StringReader(filesToUnlinkJSONString))) {
+                    filesToUnlink = jsonReader.readArray();
+                } catch (Exception e) {
+                    this.addInvalidField("FilesToUnlinkXMLString", "Invalid filesToUnlink json");
+                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToUnlinkJSONString", e);
+                }
             }
         }
 
-        if (request.getParameter("linkedSampleFileXMLString") != null
-                && !request.getParameter("linkedSampleFileXMLString").equals("")) {
-            linkedSampleFileXMLString = "<linkedSampleFiles>" + request.getParameter("linkedSampleFileXMLString")
-                    + "</linkedSampleFiles>";
+        if (request.getParameter("linkedSampleFileJSONString") != null
+                && !request.getParameter("linkedSampleFileJSONString").equals("")) {
+            String linkedSampleFileJsonString = request.getParameter("linkedSampleFileJSONString");
 //            System.out.println("[OEUF] linkedSampleFileXMLString:\n" + linkedSampleFileXMLString + "\n");
 
-            StringReader reader = new StringReader(linkedSampleFileXMLString);
-            try {
-                SAXBuilder sax = new SAXBuilder();
-                linkedSampleFileDoc = sax.build(reader);
-            } catch (JDOMException je) {
-                this.addInvalidField("linkedSampleFileXMLString", "Invalid linkedSampleFiles xml");
-                this.errorDetails = Util.GNLOG(LOG,"Cannot parse linkedSampleFileXMLString", je);
+            if(Util.isParameterNonEmpty(linkedSampleFileJsonString)){
+                try(JsonReader jsonReader = Json.createReader(new StringReader(linkedSampleFileJsonString))) {
+                    linkedSampleFileList = jsonReader.readArray();
+                } catch (Exception je) {
+                    this.addInvalidField("linkedSampleFileJSONString", "Invalid linkedSample json");
+                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse linkedSampleFileJSONString", je);
+                }
+
             }
+
+
         }
 
         serverName = request.getServerName();
@@ -167,7 +161,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
         List<String> problemFiles = new ArrayList<String>();
         Session sess = null;
-        if (filesXMLString != null) {
+        if (files != null) {
             try {
                 sess = this.getSecAdvisor().getHibernateSession(this.getUsername());
 
@@ -487,15 +481,14 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                     }
 
                     // Unlink experiment files from Samples
-                    if (filesToUnlinkDoc != null) {
-                        Element root = this.filesToUnlinkDoc.getRootElement();
-                        for (Iterator i = root.getChildren().iterator(); i.hasNext(); ) {
-                            Element fileDescriptor = (Element) i.next();
+                    if (filesToUnlink != null) {
+                        JsonArray root = this.filesToUnlink;
+                        for (int i = 0; i < filesToUnlink.size(); i++ ) {
+                            JsonObject fileDescriptor = filesToUnlink.getJsonObject(i);
 
-                            if (fileDescriptor.getAttributeValue("idExperimentFile") != null
-                                    && !fileDescriptor.getAttributeValue("idExperimentFile").equals("")) {
-                                Integer idExperimentFile = Integer.parseInt(fileDescriptor
-                                        .getAttributeValue("idExperimentFile"));
+                            if (fileDescriptor.get("idExperimentFile") != null
+                                    && !fileDescriptor.getString("idExperimentFile").equals("")) {
+                                Integer idExperimentFile = Integer.parseInt(fileDescriptor.getString("idExperimentFile"));
                                 String queryBuf = "SELECT DISTINCT sef from SampleExperimentFile sef where sef.idExpFileRead1 = :idExperimentFile1 OR sef.idExpFileRead2 = :idExperimentFile2";
                                 Query query = sess.createQuery(queryBuf);
                                 query.setParameter("idExperimentFile1", idExperimentFile);
@@ -526,11 +519,11 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                     // Map existing experiment files to file names that are coming in so
                     // we don't create duplicate experiment files
                     HashMap expFileDictionary = new HashMap();
-                    if (experimentFileDoc != null) {
-                        Element root = this.experimentFileDoc.getRootElement();
-                        for (Iterator i = root.getChildren("FileDescriptor").iterator(); i.hasNext(); ) {
-                            Element fd = (Element) i.next();
-                            String fileName = fd.getAttributeValue("zipEntryName");
+                    if (experimentFileList != null) {
+                        JsonArray root = this.experimentFileList;
+                        for (int i = 0 ; i < root.size(); i++) {
+                            JsonObject fd = root.getJsonObject(i);
+                            String fileName = fd.get("zipEntryName") != null ? fd.getString("zipEntryName") : "";
                             fileName = fileName.replace("\\", Constants.FILE_SEPARATOR);
                             String queryBuf = "Select expFile from ExperimentFile expFile where fileName = :fileName";
                             Query query = sess.createQuery(queryBuf);
@@ -544,11 +537,11 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                     }
 
                     Map<String, List<Element>> sampleGroup = new TreeMap<String, List<Element>>();
-                    if (linkedSampleFileDoc != null) {
-                        Element root = this.linkedSampleFileDoc.getRootElement();
+                    if (linkedSampleFileList != null) {
+                        /*JsonArray root = this.linkedSampleFileList;
 
-                        for (Iterator i = root.getChildren().iterator(); i.hasNext(); ) {
-                            Element child = (Element) i.next();
+                        for (int i =0; i < root.size(); i++) {
+                            JsonObject child = root.getJsonObject(i);
                             if (child.getName().equals("Sample")) {
                                 if (sampleGroup.containsKey("*||*")) {
                                     List<Element> samples = sampleGroup.get("*||*");
@@ -562,7 +555,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                             } else if (child.getName().equals("SampleGroup")) {
                                 recurseAddSamples(child, sampleGroup, child.getAttributeValue("displayName"));
                             }
-                        }
+                        }*/
                     }
 
                     for (Iterator i = sampleGroup.keySet().iterator(); i.hasNext(); ) {
@@ -656,15 +649,19 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
                         }
                     }
-                    sess.flush();
-
-                    this.xmlResult = "<SUCCESS";
-                    if (problemFiles.size() > 0) {
-                        String problemFileWarning = "Warning: Unable to move some files:\n" + Util.listToString(problemFiles, "\n", 5);
-                        this.xmlResult += " warning=" + '"' + problemFileWarning + '"';
-                    }
-                    this.xmlResult += "/>";
 //				System.out.println ("[OEULF] this.xmlResult: " + this.xmlResult);
+
+                    String problemFileWarning = "";
+                    if (problemFiles.size() > 0) {
+                        problemFileWarning = "Warning: Unable to move some files:\n" + Util.listToString(problemFiles, "\n", 5);
+                    }
+
+                    JsonObjectBuilder valueBuilder = Json.createObjectBuilder().add("result", "SUCCESS");
+                    if(!problemFileWarning.equals("")){
+                        valueBuilder.add("warning", problemFileWarning);
+                    }
+
+                    this.jsonResult = valueBuilder.build().toString();
 
                     setResponsePage(this.SUCCESS_JSP);
 
@@ -679,7 +676,11 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                 throw new RollBackCommandException(e.getMessage());
             }
         } else {
-            this.xmlResult = "<SUCCESS/>";
+
+            JsonObjectBuilder valueBuilder = Json.createObjectBuilder()
+                    .add("result", "INVALID")
+                    .add("message", "The organize  Files JSON is missing.");
+            this.jsonResult = valueBuilder.build().toString();
             setResponsePage(this.SUCCESS_JSP);
         }
 

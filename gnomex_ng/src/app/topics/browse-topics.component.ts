@@ -188,7 +188,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             }
         },
 
-        allowDrag: (node) => node.data.idDataTrack || node.data.idRequest || node.data.idAnalysis || node.data.idParentTopic,
+        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.idDataTrack || node.data.idRequest || node.data.idAnalysis || node.data.idParentTopic),
         actionMapping
     };
 
@@ -209,7 +209,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             }
         },
 
-        allowDrag: (node) => node.isLeaf,
+        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
         actionMapping
     };
 
@@ -230,7 +230,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             }
         },
 
-        allowDrag: (node) => node.isLeaf,
+        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
         actionMapping
     };
 
@@ -250,7 +250,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             }
         },
 
-        allowDrag: (node) => node.data.isDataTrackFolder || node.data.idDataTrack,
+        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.isDataTrackFolder || node.data.idDataTrack),
         actionMapping
     };
 

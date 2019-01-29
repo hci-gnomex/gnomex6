@@ -16,7 +16,7 @@
                                 {{ "" + analysisCount + " " + ((analysisCount && analysisCount != 1) ? 'analyses' : 'analysis')}}
                             </div>
                             <div>
-                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()">
+                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()" [disabled]="this.createSecurityAdvisorService.isGuest">
                                     <img src="../../assets/information.png">
                                     Drag-and-drop hint
                                 </button>
