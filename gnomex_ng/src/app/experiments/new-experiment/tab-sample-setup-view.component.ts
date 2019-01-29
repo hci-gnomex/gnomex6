@@ -150,7 +150,7 @@ export class TabSampleSetupViewComponent implements OnInit {
     set numberOfSamples(value: number|string) {
         this._experiment.numberOfSamples = '' + value;
 
-        this.newExperimentService.numSamples = '' + value;
+        // this.newExperimentService.numSamples = '' + value;
 
         if (!this._experiment.samples) {
             this._experiment.samples = [];
@@ -230,11 +230,13 @@ export class TabSampleSetupViewComponent implements OnInit {
             this.filteredSampleTypeListRna = this.filterSampleType("RNA")
                 .sort(TabSampleSetupViewComponent.sortSampleTypes);
         }
-        if (this.newExperimentService.sampleTypes.length === 0) {
-            this.newExperimentService.sampleTypes = this.newExperimentService.sampleTypes.concat(this.filteredSampleTypeListDna);
-            this.newExperimentService.sampleTypes = this.newExperimentService.sampleTypes.concat(this.filteredSampleTypeListRna);
+        if (this.sampleTypes.length === 0) {
+            this.sampleTypes = this.sampleTypes.concat(this.filteredSampleTypeListDna);
+            this.sampleTypes = this.sampleTypes.concat(this.filteredSampleTypeListRna);
         }
     }
+
+    private sampleTypes: any[] = [];
 
     public filterSampleType(codeNucleotideType: string): any[] {
         let types: any[] = [];
@@ -316,7 +318,7 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.setState();
         this.showSampleNotes = !!(this.form.get("selectedDna").value.notes);
         this.sampleType = this.form.get("selectedDna").value;
-        this.newExperimentService.sampleType = this.sampleType;
+        this._experiment.sampleType = this.sampleType;
         this.pickSampleType();
     }
 
@@ -327,8 +329,8 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.setState();
         this.showSampleNotes = !!(this.form.get("selectedRna").value.notes);
         this.sampleType = this.form.get("selectedRna").value;
-        this.newExperimentService.sampleTypes = this.filteredSampleTypeListRna;
-        this.newExperimentService.sampleType = this.sampleType;
+        // this.newExperimentService.sampleTypes = this.filteredSampleTypeListRna;
+        this._experiment.sampleType = this.sampleType;
         this.pickSampleType();
     }
 

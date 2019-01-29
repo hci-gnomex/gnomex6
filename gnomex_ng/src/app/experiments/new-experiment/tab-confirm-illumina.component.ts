@@ -1,6 +1,6 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
-import {NewExperimentService} from "../../services/new-experiment.service";
+import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {GnomexService} from "../../services/gnomex.service";
@@ -8,7 +8,6 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {BarcodeSelectEditor} from "../../util/grid-editors/barcode-select.editor";
 import {BillingService} from "../../services/billing.service";
-import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -16,11 +15,20 @@ import {HttpParams} from "@angular/common/http";
     styles: [`
         
         
-        .confirm-instructions {
+        .bordered { border: solid silver 1px; }
+        
+        .heavily-left-padded { padding-left: 1.5em; }
+        
+        
+        .top-margin { margin-top: 0.3em; }
+        
+        .minimal { width: fit-content; }
+        
+        .instructions-background {
             background-color: lightyellow;
-            width: 25%;
-            font-size: 80%;
         }
+        
+        .font-bold { font-weight: bold; }
         
         
     `]
@@ -28,16 +36,20 @@ import {HttpParams} from "@angular/common/http";
 
 export class TabConfirmIlluminaComponent implements OnInit {
 
-    public get showAgreeBox(): boolean {
-        return true;
+    @Input("experiment") public set experiment(value: Experiment) {
+        this._experiment = value;
     }
+    public get experiment(): Experiment {
+        return this._experiment;
+    }
+
+    private _experiment: Experiment;
 
     private form: FormGroup;
     private submitterName: string;
-    private labName: string;
+
     private billingAccountName: string;
     private billingAccountNumber: string;
-    private preppedByClient: boolean = false;
     private clientPrepString: string = "Library Prepared By Client";
     private clientPrepLib: boolean;
     private seqLaneTypeLabel: string;
@@ -46,17 +58,32 @@ export class TabConfirmIlluminaComponent implements OnInit {
     private samplesGridConfirmColumnDefs: any;
     private requestPropsColumnDefs: any;
     private organisms: any[] = [];
+
     private isCheckboxChecked: boolean;
-    private agreeCheckbox: boolean;
-    private agreeCheckboxLabel: string;
+    private disable_agreeCheckbox: boolean;
+
     private requestPropBox: boolean;
     private billingItems: any[] = [];
 
-    public protocolName: string;
+    // public protocolName: string;
+    public agreeCheckboxLabel: string;
+
+    private _barCodes: any[] = [];
+
+    private sampleTypes: any[] = [];
+
+
+    public get labName(): string {
+        if (this._experiment && this._experiment._labName_notReturned) {
+            return this._experiment._labName_notReturned;
+        } else {
+            return '';
+        }
+    }
+
 
     constructor(private dictionaryService: DictionaryService,
                 private newExperimentService: NewExperimentService,
-                private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
                 private billingService: BillingService,
                 private fb: FormBuilder) {
@@ -111,7 +138,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 field: "idOligoBarcodeB",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
-                selectOptions: this.newExperimentService.barCodes,
+                selectOptions: this._barCodes,
                 selectOptionsDisplayField: "display",
                 selectOptionsValueField: "idOligoBarcodeB",
                 indexTagLetter: 'B'
@@ -123,7 +150,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 field: "idOligoBarcodeB",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
-                selectOptions: this.newExperimentService.barCodes,
+                selectOptions: this._barCodes,
                 selectOptionsDisplayField: "display",
                 selectOptionsValueField: "idOligoBarcodeB",
                 indexTagLetter: 'B'
@@ -152,7 +179,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 field: "idSampleType",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor,
-                selectOptions: this.newExperimentService.sampleTypes,
+                selectOptions: this.sampleTypes,
                 selectOptionsDisplayField: "sampleType",
                 selectOptionsValueField: "idSampleType"
             },
@@ -173,34 +200,33 @@ export class TabConfirmIlluminaComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.newExperimentService.ownerChanged.subscribe((value) => {
-            if (this.newExperimentService.ownerChanged.value === true) {
-                this.newExperimentService.ownerChanged.next(false);
-            }
-        });
-        this.newExperimentService.labChanged.subscribe((value) => {
-            if (this.newExperimentService.labChanged.value === true) {
-                this.newExperimentService.labChanged.next(false);
-                if (this.newExperimentService.lab) {
-                    this.labName = this.newExperimentService.lab.nameFirstLast;
-                }
-            }
-        });
-        this.newExperimentService.protoChanged.subscribe((value) => {
-            if (this.newExperimentService.protoChanged.value === true) {
-                this.newExperimentService.protoChanged.next(false);
-                if (this.newExperimentService.selectedProto) {
-                    this.protocolName = this.newExperimentService.selectedProto.display;
-                }
-            }
-        });
-        this.newExperimentService.preppedChanged.subscribe((value) => {
-            if (this.newExperimentService.preppedChanged.value === true) {
-                this.newExperimentService.preppedChanged.next(false);
-                this.preppedByClient = this.newExperimentService.preppedByClient;
-                this.setClientPrepString();
-            }
-        });
+        // this.newExperimentService.ownerChanged.subscribe((value) => {
+        //     if (this.newExperimentService.ownerChanged.value === true) {
+        //         this.newExperimentService.ownerChanged.next(false);
+        //     }
+        // });
+        // this.newExperimentService.labChanged.subscribe((value) => {
+        //     if (this.newExperimentService.labChanged.value === true) {
+        //         this.newExperimentService.labChanged.next(false);
+        //         if (this.newExperimentService.lab) {
+        //             this.labName = this.newExperimentService.lab.nameFirstLast;
+        //         }
+        //     }
+        // });
+        // this._experiment.onChange_selectedProtocol.subscribe((value) => {
+        //     if (this._experiment.selectedProtocol && this._experiment.selectedProtocol.value === true) {
+        //         if (this._experiment.selectedProtocol) {
+        //             this.protocolName = this._experiment.selectedProtocol.display;
+        //         }
+        //     }
+        // });
+        // this.newExperimentService.preppedChanged.subscribe((value) => {
+        //     if (this.newExperimentService.preppedChanged.value === true) {
+        //         this.newExperimentService.preppedChanged.next(false);
+        //         this.preppedByClient = this.newExperimentService.preppedByClient;
+        //         this.setClientPrepString();
+        //     }
+        // });
         this.newExperimentService.onConfirmTab.subscribe((value) => {
             if (this.newExperimentService.onConfirmTab.value === true) {
                 this.newExperimentService.onConfirmTab.next(false);
@@ -217,7 +243,19 @@ export class TabConfirmIlluminaComponent implements OnInit {
             }
         });
 
+        this.loadBarcodes();
+
         this.form = this.fb.group({});
+    }
+
+    private loadBarcodes(): void {
+        this._barCodes = [];
+
+        let allBarcodes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcode");
+        for (let code of allBarcodes) {
+            code.idOligoBarcodeB = code.idOligoBarcode;
+            this._barCodes.push(code);
+        }
     }
 
     setUpView() {
@@ -248,34 +286,23 @@ export class TabConfirmIlluminaComponent implements OnInit {
         this.requestPropBox = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.request.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB) === 'Y';
     }
 
-    onGridReady(params: any) {
-        this.requestPropsGridApi = params.api;
-        this.requestPropsColumnApi = params.columnApi;
-    }
-
-    setClientPrepString() {
-        if (this.preppedByClient) {
-
-        }
-    }
-
     public getEstimatedBilling(): void {
-        this.newExperimentService.initializeRequest();
-        this.agreeCheckbox = false;
+        // this.newExperimentService.initializeRequest();
+        this.disable_agreeCheckbox = true;
         this.agreeCheckboxLabel = "";
         this.isCheckboxChecked = false;
 
-        if (this.newExperimentService.request.isExternal == 'Y') {
+        // if (this.newExperimentService.request.isExternal == 'Y') {
+        if (this._experiment.isExternal === 'Y') {
             // This is an external experiment submission.  Don't
             // attempt to get estimated charges.
-
-            // this.newExperimentService.hideSubmit = false;
         } else {
+            let accountName:String = "";
 
-            var accountName:String = "";
             if (this.newExperimentService.billingAccount != null) {
                 accountName = this.newExperimentService.billingAccount.accountNumberDisplay;
             }
+
             // else if (this.newExperimentService.selectedBillingTemplate != null) {
             //     var template: any = this.newExperimentService.setupView.selectedBillingTemplate;
             //     var items: any[] = template.BillingTemplateItem;
@@ -291,6 +318,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
             // }
 
             this.agreeCheckboxLabel = "I authorize all charges to be billed to account(s): " + accountName;
+            this.disable_agreeCheckbox = false;
 
             // This is a new experiment request. Get the estimated charges for this request.
             // this.newExperimentService.request.PropertyEntries=[];
@@ -302,9 +330,12 @@ export class TabConfirmIlluminaComponent implements OnInit {
             formData.append("requestXMLString", stringifiedRequest);
             this.billingService.createBillingItems2(stringifiedRequest).subscribe((response: any) => {
                 this.billingItems = response.BillingItem;
-            })
+            });
         }
-
     }
 
+    public onGridReady(params: any): void {
+        this.requestPropsGridApi = params.api;
+        this.requestPropsColumnApi = params.columnApi;
+    }
 }

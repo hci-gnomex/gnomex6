@@ -1,43 +1,61 @@
-<form [formGroup]="form" class="flex-container-col">
-    <textarea class="confirm-instructions" rows="7" cols="50">
-1.  Please confirm the information below. Click the
-     Back button or a tab to modify the request.
-2.  Agree to estimated charges by clicking the
-     "I authorize" checkbox.
-3.  Approve the work request by clicking the
-     Submit button.
-    </textarea>
-    <mat-label style="font-weight: bold">Experiment Details</mat-label>
-    <mat-label>
-        {{ submitterName }}
-    </mat-label>
-    <mat-label>
-        {{ labName }}
-    </mat-label>
-    <mat-label>
-        {{ billingAccountName }}({{ billingAccountNumber }})
-    </mat-label>
-    <mat-label>
-        {{ newExperimentService?.expTypeLabel }}
-    </mat-label>
-    <mat-label>
-        {{ newExperimentService?.requestCategory?.requestCategoryName }}
-    </mat-label>
-    <mat-label>
-        {{ newExperimentService?.applicationName }}
-    </mat-label>
-    <mat-label>
-        {{ protocolName }}
-    </mat-label>
-    <mat-label *ngIf="clientDidPrepare">Library Prepared By Client</mat-label>
-    <div class="flex-container-row full-height full-width">
-        <ag-grid-angular class="ag-fresh full-height full-width"
-                         (gridReady)="this.onGridReady($event)"
-                         [columnDefs]="this.gridColumnDefs"
-                         [enableColResize]="true">
-        </ag-grid-angular>
-    </div>
-    <mat-checkbox *ngIf="showAgreeBox" [checked]="isCheckboxChecked">
-        {{ agreeTextBoxLabel }}
-    </mat-checkbox>
-</form>
+<div class="full-height full-width padded">
+    <form [formGroup]="form" class="full-height full-width flex-container-col small-font">
+        <div class="full-width">
+            <div class="instructions-background bordered padded minimal">
+                <ol class="no-margin">
+                    <li>
+                        Please confirm the information below. Click the "Back" button or a tab to modify the request.
+                    </li>
+                    <li>
+                        Agree to estimated charges by clicking the "I authorize" checkbox.
+                    </li>
+                    <li>
+                        Approve the work request by clicking the "Submit" button.
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <div class="top-margin font-bold">
+            Experiment Details
+        </div>
+        <div class="padded heavily-left-padded">
+            <div class="padded">
+                {{ submitterName }}
+            </div>
+            <div class="padded">
+                {{ labName }}
+            </div>
+            <div class="padded">
+                {{ billingAccountName }}({{ billingAccountNumber }})
+            </div>
+            <div class="padded">
+                {{ experiment?.requestCategory?.display }}
+            </div>
+            <div class="padded">
+                {{ experiment?.application }}
+            </div>
+            <div class="padded">
+                {{ experiment?.selectedProtocol?.display }}
+            </div>
+            <div *ngIf="experiment?.seqPrepByCore_forSamples === 'Y'" class="padded">
+                Library Prepared By Client
+            </div>
+        </div>
+        <div class="top-margin font-bold">
+            Estimated Charges :
+        </div>
+        <!--Requires conversion of CreateBillingItems (which is oddly called before confirmation/submitting the form.-->
+
+        <div class="flex-container-row full-height full-width small-font">
+            <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                             [columnDefs]="this.samplesGridConfirmColumnDefs"
+                             [enableColResize]="true"
+                             (gridReady)="this.onGridReady($event)">
+            </ag-grid-angular>
+        </div>
+        <mat-checkbox [checked]="isCheckboxChecked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}">
+            {{ agreeCheckboxLabel }}
+        </mat-checkbox>
+    </form>
+</div>
+

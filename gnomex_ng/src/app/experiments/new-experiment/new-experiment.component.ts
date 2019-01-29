@@ -1,28 +1,29 @@
 import {
     Component, ComponentRef, OnDestroy, OnInit, Output, EventEmitter, ViewChild
 } from '@angular/core';
-import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
-import {DictionaryService} from "../../services/dictionary.service";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {GnomexService} from "../../services/gnomex.service";
-import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
-import {ExperimentsService} from "../experiments.service";
-import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
-import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
-import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
-import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
-import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
-import {Subscription} from "rxjs";
-import {TabBioinformaticsViewComponent} from "./tab-bioinformatics-view.component";
-import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
-import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
-import {DialogsService} from "../../util/popup/dialogs.service";
-import {first} from "rxjs/internal/operators";
 import {FormGroup} from "@angular/forms";
-import {NewExperimentSetupComponent} from "./new-experiment-setup.component";
-import {ExperimentBioinformaticsTabComponent} from "../experiment-detail/experiment-bioinformatics-tab.component";
+
+import {Subscription} from "rxjs";
+import {first} from "rxjs/internal/operators";
+
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {DictionaryService} from "../../services/dictionary.service";
+import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
+import {ExperimentBioinformaticsTabComponent} from "../experiment-detail/experiment-bioinformatics-tab.component";
+import {ExperimentsService} from "../experiments.service";
+import {GnomexService} from "../../services/gnomex.service";
+import {NewExperimentSetupComponent} from "./new-experiment-setup.component";
 import {PropertyService} from "../../services/property.service";
+import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
+import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
+import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
+import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
+import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
+import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
+import {TabVisibilityComponent} from "./tab-visibility.component";
 
 @Component({
     selector: 'new-experiment',
@@ -55,7 +56,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     // private nextButtonIndex: number = -1;
     private annotations: any;
-    private visibilityDetailObj: VisibilityDetailTabComponent;
+    private visibilityDetailObj: TabVisibilityComponent;
 
     public disableSubmit: boolean = true;
 
@@ -344,7 +345,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             let visibilityTab = {
                 label: "Visibility",
                 disabled: true,
-                component: VisibilityDetailTabComponent
+                component: TabVisibilityComponent
             };
             let bioTab = {
                 label: "Bioinformatics",
@@ -379,7 +380,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             let visibilityTab = {
                 label: "Visibility",
                 disabled: true,
-                component: VisibilityDetailTabComponent
+                component: TabVisibilityComponent
             };
 
             this.tabs.push(sampleSetupTab);
@@ -493,8 +494,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     componentCreated(compRef: ComponentRef<any>) {
         if (compRef) {
             this.newExperimentService.components.push(compRef.instance);
-            if (compRef.instance instanceof VisibilityDetailTabComponent) {
-                this.visibilityDetailObj = compRef.instance as VisibilityDetailTabComponent;
+            if (compRef.instance instanceof TabVisibilityComponent) {
+                this.visibilityDetailObj = compRef.instance as TabVisibilityComponent;
             } else if (compRef.instance instanceof TabSampleSetupViewComponent) {
             }
             // this.newExperimentService.componentRefs.push(compRef);

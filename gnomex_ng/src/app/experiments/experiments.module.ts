@@ -70,12 +70,11 @@ import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer"
 import {UrlAnnotRenderer} from "../util/grid-renderers/url-annot-renderer";
 import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
 import {RouterModule} from "@angular/router";
-import {TabBioinformaticsViewComponent} from "./new-experiment/tab-bioinformatics-view.component";
 import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina.component";
 import {UploadModule} from "../upload/upload.module";
-import {VisibilityDetailTabComponent} from "../util/visibility-detail-tab.component";
 import {NewExperimentSetupComponent} from "./new-experiment/new-experiment-setup.component";
 import {ExperimentBioinformaticsTabComponent} from "./experiment-detail/experiment-bioinformatics-tab.component";
+import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component";
 
 @NgModule({
     imports: [
@@ -154,8 +153,9 @@ import {ExperimentBioinformaticsTabComponent} from "./experiment-detail/experime
         NewExperimentSetupComponent,
         TabAnnotationViewComponent,
         TabSamplesIlluminaComponent,
-        TabBioinformaticsViewComponent,
-        TabConfirmIlluminaComponent
+        // TabBioinformaticsViewComponent,
+        TabConfirmIlluminaComponent,
+        TabVisibilityComponent
     ],
     entryComponents: [
         CreateProjectComponent,
@@ -173,9 +173,9 @@ import {ExperimentBioinformaticsTabComponent} from "./experiment-detail/experime
         TabSeqProtoViewComponent,
         TabAnnotationViewComponent,
         TabSamplesIlluminaComponent,
-        TabBioinformaticsViewComponent,
+        // TabBioinformaticsViewComponent,
         TabConfirmIlluminaComponent,
-        VisibilityDetailTabComponent
+        TabVisibilityComponent
     ],
     exports:[
         CreateProjectComponent,
@@ -192,9 +192,9 @@ import {ExperimentBioinformaticsTabComponent} from "./experiment-detail/experime
         TabSeqProtoViewComponent,
         TabAnnotationViewComponent,
         TabSamplesIlluminaComponent,
-        TabBioinformaticsViewComponent,
+        // TabBioinformaticsViewComponent,
         TabConfirmIlluminaComponent,
-        VisibilityDetailTabComponent
+        TabVisibilityComponent
     ]
 })
 export class ExperimentsModule { }

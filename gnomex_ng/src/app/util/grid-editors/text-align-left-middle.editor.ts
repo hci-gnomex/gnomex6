@@ -93,6 +93,7 @@ export class TextAlignLeftMiddleEditor implements ICellEditorAngularComp {
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
                     && rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
                     rowNode.setDataValue(this.gridFieldName, this.value);
+                    rowNode.setDataValue(this.gridFieldName + "_1", this.value);  // Sometimes, but seemingly not always, the grid puts a _1 on the end of a column's key. We'll just try them both I guess.
                 }
             });
 

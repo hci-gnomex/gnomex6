@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {GnomexService} from "../../services/gnomex.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {NewExperimentService} from "../../services/new-experiment.service";
+import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
@@ -88,6 +88,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 export class TabSeqProtoViewComponent implements OnInit {
     @Input() requestCategory: any;
+    @Input("experiment") experiment: Experiment;
 
     private form: FormGroup;
     private filteredNumberSequencingCyclesAllowedList: any[] = [];
@@ -187,6 +188,7 @@ export class TabSeqProtoViewComponent implements OnInit {
     }
 
     public onProtoChange() {
-        this.newExperimentService.selectedProto = this.form.get("selectedProto").value;
+        // this.newExperimentService.selectedProto = this.form.get("selectedProto").value;
+        this.experiment.selectedProtocol = this.form.get("selectedProto").value;
     }
 }

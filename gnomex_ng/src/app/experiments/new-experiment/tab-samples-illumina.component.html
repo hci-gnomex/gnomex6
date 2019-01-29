@@ -11,7 +11,7 @@
                         color="link"
                         matTooltip="{{ TOOLTIP_TEXT }}"
                         (click)="onClickShowInstructions()">
-                    <img class="icon" [src]="constService.ICON_INFORMATION" alt="">
+                    <img class="icon" [src]="this.constService.ICON_INFORMATION" alt="">
                     Instructions
                 </button>
                 <button mat-button
@@ -37,6 +37,7 @@
                                  [enableColResize]="true"
                                  [rowSelection]="'single'"
                                  [singleClickEdit]="true"
+                                 stopEditingWhenGridLosesFocus="true"
                                  (cellValueChanged) = "onCellValueChanged($event)"
                                  (gridReady)="this.onSamplesGridReady($event)">
                 </ag-grid-angular>

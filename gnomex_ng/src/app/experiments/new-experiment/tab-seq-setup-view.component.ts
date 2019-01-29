@@ -5,6 +5,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
 import {Subscription} from "rxjs/index";
+import {GnomexService} from "../../services/gnomex.service";
 
 @Component({
     selector: "tabSeqSetupView",
@@ -129,19 +130,19 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.appPrices = [];
             this.form.get("seqType").setValue("");
 
-            if (this.form && this.form.get("seqLibPrep") && this.form.get("seqLibPrep").value === this.NO) {
+            if (this.form && this.form.get("seqPrepByCore") && this.form.get("seqPrepByCore").value === this.NO) {
                 this.showPool = true;
             } else {
                 this.showPool = false;
             }
 
-            this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
+            this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
         });
     };
 
-    public readonly YES: string = "yes";
-    public readonly NO: string = "no";
+    public readonly YES: string = "Y";
+    public readonly NO: string = "N";
     public readonly SEPARATE: string = "separate";
     public readonly POOLED: string = "pooled";
     public currState: string;
@@ -176,9 +177,9 @@ export class TabSeqSetupViewComponent implements OnInit {
 
     get showPoolingType(): boolean {
         return this.form
-            && this.form.get('seqLibPrep')
-            && this.form.get('seqLibPrep').value
-            && this.form.get('seqLibPrep').value === this.NO;
+            && this.form.get('seqPrepByCore')
+            && this.form.get('seqPrepByCore').value
+            && this.form.get('seqPrepByCore').value === this.YES;
     }
 
     get showLibraryDesign(): boolean {
@@ -186,7 +187,7 @@ export class TabSeqSetupViewComponent implements OnInit {
             && this.form.get("appPrice")
             && this.form.get("appPrice").value
             && this.form.get("appPrice").value.hasCaptureLibDesign
-            && this.form.get("appPrice").value.hasCaptureLibDesign === 'Y';
+            && this.form.get("appPrice").value.hasCaptureLibDesign === this.YES;
     }
 
 
@@ -233,16 +234,16 @@ export class TabSeqSetupViewComponent implements OnInit {
 
 
     constructor(private dictionaryService: DictionaryService,
+                private gnomexService: GnomexService,
                 private newExperimentService: NewExperimentService,
                 private billingService: BillingService,
-                private changeRef: ChangeDetectorRef,
-                private fb: FormBuilder) {
-    }
+                // private changeRef: ChangeDetectorRef,
+                private fb: FormBuilder) { }
 
     ngOnInit() {
         this.form = this.fb.group({
-            seqLibPrep:    [''],
-            // seqLibPrep:    ['', Validators.required],
+            // seqPrepByCore:    [''],
+            seqPrepByCore:    ['', Validators.required],
             pooledLib:     [''],
             numTubes:      [''],
             seqType:       ['', Validators.required],
@@ -250,13 +251,11 @@ export class TabSeqSetupViewComponent implements OnInit {
             libraryDesign: ['']
         });
 
-        this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
+        this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
         this.setupThemes();
     }
 
-    ngAfterViewInit() {
-    }
-
+    ngAfterViewInit() { }
 
     setupThemes() {
         this.themes = [];
@@ -289,12 +288,12 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.themes.push(thm);
         }
 
-        if (this.form.get("seqLibPrep").value === "yes") {
-            preparedAppList.sort(this.sortApplicationsAlphabetically);
+        if (this.form.get("seqPrepByCore").value === this.YES) {
+            preparedAppList.sort(TabSeqSetupViewComponent.sortApplicationsAlphabetically);
         }
 
 
-        this.themes.sort(this.sortApplicationsOnOrder);
+        this.themes.sort(TabSeqSetupViewComponent.sortApplicationsOnOrder);
 
         // this.applicationRepeater.dataProvider = preparedAppList;
         // preparedAppList.refresh();
@@ -324,13 +323,18 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.appPrices = [];
             this.form.get("seqType").setValue("");
 
-            if (this.form && this.form.get("seqLibPrep") && this.form.get("seqLibPrep").value === this.NO) {
-                this.showPool = true;
-            } else {
-                this.showPool = false;
+            if (this.form && this.form.get("seqPrepByCore")) {
+                if (this.form.get("seqPrepByCore").value) {
+                    this._experiment.seqPrepByCore = this.form.get("seqPrepByCore").value;
+                } else {
+                    this._experiment.seqPrepByCore = '';
+                }
+
+                this.showPool = this.form.get("seqPrepByCore").value === this.NO;
             }
 
-            this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
+
+            this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
             // this.showAppPrice = true;
         });
@@ -373,9 +377,8 @@ export class TabSeqSetupViewComponent implements OnInit {
     onAppPriceChanged(event) {
         let application = this.dictionaryService.getEntry('hci.gnomex.model.Application', this.form.get("appPrice").value.value);
         if (application) {
-            this.newExperimentService.applicationName = application.display;
-            this.newExperimentService.codeApplication = application.codeApplication;
-            if(application.hasCaptureLibDesign === 'Y'){ //If it is sure select we need to show the library capture id input box
+            this._experiment.application_object = application;
+            if (application.hasCaptureLibDesign === 'Y'){ //If it is sure select we need to show the library capture id input box
                 this.libToChange = true;
             } else {
                 this.libToChange = false;
@@ -406,7 +409,7 @@ export class TabSeqSetupViewComponent implements OnInit {
 
     }
 
-    private sortApplicationsAlphabetically(obj1, obj2): number{
+    private static sortApplicationsAlphabetically(obj1, obj2): number{
         if (obj1 == null && obj2 == null) {
             return 0;
         }else if (obj1 == null) {
@@ -424,7 +427,7 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
 
-    private sortApplicationsOnOrder(obj1, obj2): number{
+    private static sortApplicationsOnOrder(obj1, obj2): number{
         if (obj1 == null && obj2 == null) {
             return 0;
         } else if (obj1 == null) {
@@ -474,5 +477,41 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
 
+    public filterApplication(requestCategory, seqPrepByCore): any[] {
+        let filteredApps: any[] = [];
+        let filteredAppList: any[] = this.dictionaryService.getEntries('hci.gnomex.model.Application').sort(NewExperimentService.sortApplication);
+        for (let app of filteredAppList) {
+            if (!app.value) {
+                continue;
+            }
+            if (app.isActive === 'N') {
+                continue;
+            }
+            let doesMatchRequestCategory: boolean = false;
+            let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter((reqCatApp) => {
+                return reqCatApp.value !== "" && reqCatApp.codeApplication === app.value;
+            });
+
+            for (let xref of theApplications) {
+                if (xref.codeRequestCategory === requestCategory.codeRequestCategory) {
+                    doesMatchRequestCategory = true;
+                    break;
+                }
+            }
+
+            let doesMatchSeqPrepByCore: boolean = false;
+            if (doesMatchRequestCategory) {
+                if (requestCategory.isIlluminaType !== 'Y' || !this.gnomexService.isInternalExperimentSubmission) {
+                    doesMatchSeqPrepByCore = true;
+                } else {
+                    doesMatchSeqPrepByCore = (app.onlyForLabPrepped === "N" || !seqPrepByCore);
+                }
+            }
+            if (doesMatchRequestCategory && doesMatchSeqPrepByCore) {
+                filteredApps.push(app);
+            }
+        }
+        return filteredApps;
+    }
 
 }
