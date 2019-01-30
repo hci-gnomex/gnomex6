@@ -1,30 +1,65 @@
-<form class="flex-container-col" style="margin:1em;font-size:small;" [formGroup]="descriptionForm">
-
-    <mat-form-field style="width:calc(100% - 2em);margin-top:0.5em; margin-bottom:0.5em; " *ngIf="edit" >
-        <input matInput type="text" placeholder="Experiment Name" formControlName="expName"/>
-    </mat-form-field>
-
-
-    <div style="width:calc(100% - 2em)">
-        <label style="margin-bottom:0.5em;" for="experimentDescriptionId" >Experiment Description </label>
-        <jqxEditor *ngIf="this.showEditor"
-                   #editorReference
-                   id="experimentDescriptionId"
-                   width="100%"
-                   [height]="300"
-                   [editable]="edit"
-                   [tools]="toolbarSettings"
-                   [toolbarPosition]="'bottom'">
-        </jqxEditor>
-
+<form class="full-height full-width small-font double-padded" [formGroup]="descriptionForm">
+    <div class="flex-container-row align-center padded" *ngIf="editMode">
+        <div class="gx-label label-width">
+            Experiment Name
+        </div>
+        <div class="flex-grow">
+            <mat-form-field class="field-width">
+                <input matInput type="text" formControlName="expName" disabled="false"/>
+                <mat-error *ngIf="descriptionForm.get('expName').hasError('maxlength')">
+                    Experiment Name can be at most 200 characters
+                </mat-error>
+            </mat-form-field>
+        </div>
     </div>
 
+    <div class="full-width flex-container-col padded">
+        <label class="gx-label" for="descEditor" >Experiment Description</label>
+        <angular-editor #descEditorRef id="descEditor"
+                        formControlName="description"
+                        [config]="descEditorConfig">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('description').hasError('maxlength')">
+            Description can be at most 5000 characters
+        </mat-error>
+    </div>
 
-    <mat-form-field style="width:calc(100% - 2em);margin-top:0.5em; margin-bottom:0.5em;font-size:small;">
-        <textarea matInput placeholder="Notes for Core" formControlName="notesForCore" matTextareaAutosize matAutosizeMinRows="4" matAutosizeMaxRows="8"></textarea>
-        <mat-error *ngIf="descriptionForm.get('notesForCore').hasError('maxlength')"> Summary can be at most 5000 characters</mat-error>
-    </mat-form-field>
+    <div class="full-width flex-container-col padded" *ngIf="showProjectDesc">
+        <label class="gx-label" style="margin-top: 1.5rem;" for="projectDescEditor">
+            Project Description
+        </label>
+        <angular-editor #projectDescEditorRef id="projectDescEditor"
+                        formControlName="projectDesc"
+                        [config]="projectDescEditorConfig">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('projectDesc').hasError('maxlength')">
+            Project Description can be at most 5000 characters
+        </mat-error>
+    </div>
 
+    <div class="full-width flex-container-col padded" *ngIf="showNotesForCoreFacility">
+        <label class="gx-label" style="margin-top: 1.5rem;" for="notesEditor">
+            Notes for Core Facility
+        </label>
+        <angular-editor #notesEditorRef id="notesEditor"
+                        formControlName="notesForCoreFacility"
+                        [config]="notesEditorConfig">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('notesForCoreFacility').hasError('maxlength')">
+            Summary can be at most 5000 characters
+        </mat-error>
+    </div>
 
+    <div class="full-width flex-container-col padded" *ngIf="showAdminNotes">
+        <label class="gx-label" style="margin-top: 1.5rem;" for="adminNotesEditor" >
+            Administration Notes
+        </label>
+        <angular-editor #adminNotesEditorRef id="adminNotesEditor"
+                        formControlName="adminNotes"
+                        [config]="adminNotesEditorConfig">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('adminNotes').hasError('maxlength')">
+            Administration Notes can be at most 5000 characters
+        </mat-error>
+    </div>
 </form>
-<!--[tools]="toolbarSettings"> -->

@@ -18,7 +18,7 @@
                         <div [matTooltip]="_experiment?.labName">
                             <mat-form-field class="full-width">
                                 <mat-select [(value)]="_experiment.idLab"
-                                            [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"
+                                            [disabled]="!isEditMode ? true : (!(isAdmin || _experiment.canUpdate === 'Y'))"
                                             (selectionChange)="onChange_lab($event)">
                                     <mat-option [value]="">
                                         {{ '' }}
@@ -39,7 +39,7 @@
                         <div [matTooltip]="_experiment?.project?.Project?.name">
                             <mat-form-field class="full-width">
                                 <mat-select [(value)]="_experiment.idProject"
-                                            [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"
+                                            [disabled]="!isEditMode ? true : (!(isAdmin || _experiment.canUpdate === 'Y'))"
                                             (selectionChange)="onChange_project($event)">
                                     <mat-option *ngFor="let project of projectsDictionary" [value]="project.idProject">
                                         {{ project.name }}
@@ -77,7 +77,7 @@
                                 <mat-form-field class="full-width">
                                     <mat-select
                                             [(value)]="_experiment.codeApplication"
-                                            [disabled]="!(isAdmin || (_experiment.canUpdate === 'Y' && _experiment.isExternal =='Y'))"
+                                            [disabled]="!isEditMode ? true : (!(isAdmin || (_experiment.canUpdate === 'Y' && _experiment.isExternal =='Y')))"
                                             (selectionChange)="onChange_application($event)" >
                                         <mat-option [value]="">
                                             {{ '' }}
@@ -137,7 +137,7 @@
                                 <mat-select
                                         [(value)]="_experiment.idAppUser"
                                         (selectionChange)="onChange_owner($event)"
-                                        [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')">
+                                        [disabled]="!isEditMode ? true : (!(isAdmin || _experiment.canUpdate === 'Y'))">
                                     <mat-option [value]="">
                                         {{ '' }}
                                     </mat-option>
@@ -159,7 +159,7 @@
                                 <mat-select
                                         [(value)]="_experiment.idSubmitter"
                                         (selectionChange)="onChange_submitter($event)"
-                                        [disabled]="!isAdmin">
+                                        [disabled]="!isEditMode || !isAdmin">
                                     <mat-option [value]="">
                                         {{ '' }}
                                     </mat-option>
@@ -198,7 +198,7 @@
                 <div class="field-width flex-container-row padded">
                     <div class="label label-width flex-container-col">
                         Visibility
-                        <context-help name="visibilityLevel" [isEditMode]="this.secAdvisor.isAdmin"
+                        <context-help name="visibilityLevel" [isEditMode]="isAdmin && isEditMode"
                                       popupTitle="Visibility Level Help"
                                       [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
                     </div>
@@ -207,6 +207,7 @@
                             <mat-radio-button
                                     *ngFor="let rad of visibilityOptions"
                                     [value]="rad.value"
+                                    [disabled]="!isEditMode || !isAdmin"
                                     [matTooltip]="rad.tooltip">
                                 <img [src]="rad.icon">
                                 {{ rad.display }}
@@ -225,7 +226,7 @@
                                 <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
                                 <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
                             </mat-form-field>
-                            <context-help name="visibilityPrivacyExpiration" [isEditMode]="this.secAdvisor.isAdmin"
+                            <context-help name="visibilityPrivacyExpiration" [isEditMode]="isAdmin && isEditMode"
                                           popupTitle="Visibility Privacy Expiration Help"
                                           [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
                         </div>
@@ -241,7 +242,7 @@
                             Collaborators
                         </button>
                     </div>
-                    <context-help name="visibilityCollaborators" [isEditMode]="this.secAdvisor.isAdmin"
+                    <context-help name="visibilityCollaborators" [isEditMode]="isAdmin && isEditMode"
                                   popupTitle="Visibility Collaborator Help"
                                   [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
                     <div class="flex-grow flex-container-col multi-line max-height padded">

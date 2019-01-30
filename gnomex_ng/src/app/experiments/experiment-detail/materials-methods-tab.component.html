@@ -34,9 +34,9 @@
                 {{codeIsolationPrepType}}
             </div>
         </div>
-        <div class="full-width flex-container-row minor-padded" *ngIf="protocols.length > 0">
+        <div class="full-width flex-container-row padded" *ngIf="protocols.length > 0">
             <div class="flex-container-col">
-                <div class="flex-container-row" *ngFor="let protocol of protocols">
+                <div class="flex-container-row padded" *ngFor="let protocol of protocols">
                     <div class="flex-container-col">
                         <div class="gx-label label-width">
                             {{protocol.label}}

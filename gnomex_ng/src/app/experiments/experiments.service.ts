@@ -43,6 +43,7 @@ export class ExperimentsService {
 
     public invalid:boolean = false;
     public dirty:boolean = false;
+    private editMode: boolean = false;
 
 
     constructor(private _http: Http,
@@ -365,5 +366,13 @@ export class ExperimentsService {
 
     getRequestDownloadListWithParams(params: HttpParams) {
         return this.httpClient.get("/gnomex/GetRequestDownloadList.gx", {params: params});
+    }
+    
+    public setEditMode(editMode: boolean): void {
+        this.editMode = editMode;
+    }
+    
+    public getEditMode(): boolean {
+        return this.editMode;
     }
 }

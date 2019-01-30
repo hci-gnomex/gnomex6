@@ -19,6 +19,7 @@ export class ConstantsService {
     public readonly SEGMENT_REMOVE_DISABLE = "assets/segment_remove_disable.png";
     public readonly SEGMENT_IMPORT = "assets/segment_import.png";
     public readonly SEGMENT_IMPORT_DISABLE = "assets/segment_remove_disable.png";
+    public readonly PAGE = "assets/page.png";
     public readonly PAGE_ADD = "assets/page_add.png";
     public readonly PAGE_GO = "assets/page_go.png";
     public readonly PAGE_REMOVE = "assets/page_remove.png";
@@ -120,13 +121,16 @@ export class ConstantsService {
     public readonly ICON_ARROW_RIGHT: string = "assets/arrow_right.gif";
     public readonly ICON_DATABASE_LIGHTNING: string = "assets/database_lightning.png";
     public readonly ICON_TABLE_MULTIPLE: string = "assets/table_multiple.png";
+    public readonly ICON_TAG_BLUE_EDIT: string = "assets/tag_blue_edit.png";
 
     public readonly STATUS_IN_PROGRESS: string = "In Progress";
     public readonly STATUS_COMPLETED: string = "Completed";
     public readonly STATUS_TERMINATED: string = "Terminated";
     public readonly STATUS_BYPASSED: string = "Bypassed";
     public readonly STATUS_ON_HOLD: string = "On Hold";
-
+    
+    public readonly MAX_CHARS: number = 5000;
+    
     public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
 
 
