@@ -1,7 +1,4 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {Component,Input, OnDestroy, OnInit} from "@angular/core";
+import {Component,Input, OnDestroy} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -12,10 +9,10 @@ import {ConstantsService} from "../../services/constants.service";
 import {PropertyService} from "../../services/property.service";
 import {GridApi} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
-import {MatSelectChange} from "@angular/material";
 import {first} from "rxjs/operators";
-import {Experiment} from "../../services/new-experiment.service";
 import {Subscription} from "rxjs/index";
+
+import {Experiment} from "../../util/models/experiment.model";
 
 @Component({
     selector: 'tab-visibility',

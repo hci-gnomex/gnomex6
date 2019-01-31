@@ -11,7 +11,7 @@ import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.compo
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
+import {NewExperimentService} from "../../services/new-experiment.service";
 import {ExperimentBioinformaticsTabComponent} from "../experiment-detail/experiment-bioinformatics-tab.component";
 import {ExperimentsService} from "../experiments.service";
 import {GnomexService} from "../../services/gnomex.service";
@@ -24,6 +24,8 @@ import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
 import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
 import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
 import {TabVisibilityComponent} from "./tab-visibility.component";
+
+import {Experiment} from "../../util/models/experiment.model";
 
 @Component({
     selector: 'new-experiment',
@@ -73,7 +75,18 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         experiment: {
             idCoreFacility: '',
             PropertyEntries: [],
-            RequestProperties: []
+            requestCategory: {
+                display: '',
+                isIlluminaType: '',
+                type: ''
+            },
+            RequestProperties: [],
+            applicationNotes: '',
+            codeApplication: '',
+            codeIsolationPrepType: '',
+            coreToExtractDNA: '',
+            includeBisulfideConversion: '',
+            includeQubitConcentration: ''
         }
     };
 
@@ -90,19 +103,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 this.icon = value.icon;
             }
 
-            if (this.newExperimentService.requestCategory) {
-                this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
+            if (this.inputs.experiment.requestCategory) {
+                this.label = "New " + this.inputs.experiment.requestCategory.display + " Experiment for " + this.coreFacility.display;
             }
             this.showTabs();
-        },
-        onChangeSampleData: (value: any) => {
-            if (this.sampleDataActuallyChanged()) {
-                for (let tab of this.tabs) {
-                    if (tab.instance && tab.instance instanceof TabSamplesIlluminaComponent) {
-                        tab.instance.requireReconfirmation();
-                    }
-                }
-            }
         }
     };
     annotationInputs = {
@@ -110,12 +114,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         orderType: this.types.EXPERIMENT,
         disabled: false
     };
-
-    public sampleDataActuallyChanged(): boolean {
-        // TODO : Maybe figure out a way to tell if we actually need to re-check samples' data.  Not critical
-        return true;
-    }
-
 
     public get formOfCurrentlySelectedTab(): FormGroup {
         if (!this.selectedIndex && this.selectedIndex !== 0) {
@@ -194,9 +192,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 this.reinitialize();
             }
         });
-
-        // this.inputs.experiment = this.newExperimentService.createNewExperimentObject();
-        //
     }
 
     reinitialize(): void {
@@ -231,39 +226,15 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     let experiment: Experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService, this.gnomexService, this.propertyService, this.securityAdvisor, response.Request);
                     experiment.idCoreFacility = this.inputs.idCoreFacility;
 
-                    //this.newExperimentService.propertyEntries = this.inputs.experiment.PropertyEntries;
-
                     this.annotations = experiment.RequestProperties.filter((annotation: any) => {
                         return annotation
                             && annotation.isActive === 'Y'
-                            && annotation.idCoreFacility === params.idCoreFacility; //.idCoreFacility;
+                            && annotation.idCoreFacility === params.idCoreFacility;
                     });
 
-                    // experiment.RequestProperties = this.annotations;
                     this.annotationInputs.annotations = this.annotations;
 
                     this.inputs.experiment = experiment;
-
-
-                    /////////////////////////////////////
-
-
-                    this.newExperimentService.request = response.Request;
-
-                    // this.dialogService.stopAllSpinnerDialogs();
-
-                    // if (!this.gnomexService.isInternalExperimentSubmission) {
-                    //     this.addDescriptionFieldToAnnotations(this.newExperimentService.request.PropertyEntries);
-                    // }
-
-                    // this.newExperimentService.propertyEntries = this.newExperimentService.request.PropertyEntries;
-
-                    // this.annotations = this.newExperimentService.request.RequestProperties.filter(annotation =>
-                    //     annotation.isActive === 'Y' && annotation.idCoreFacility === params.idCoreFacility
-                    // );
-
-                    // this.newExperimentService.annotations = this.annotations;
-                    // this.annotationInputs.annotations = this.annotations;
                 });
             }
         });
@@ -276,36 +247,22 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
 
-    // private addDescriptionFieldToAnnotations(props: any[]): void {
-    //     let descNode: any = {
-    //         PropertyEntry: {
-    //             idProperty: "-1",
-    //             name: "Description",
-    //             otherLabel: "",
-    //             Description: "false",
-    //             isActive: "Y"
-    //         }
-    //     };
-    //     props.splice(1, 0, descNode);
-    // }
-
-
     showTabs() {
         this.tabs = [];
 
-        let category = this.newExperimentService.requestCategory;
+        let category = this.inputs.experiment.requestCategory;
         this.inputs.requestCategory = category;
 
-        if (!this.newExperimentService.request) {
+        if (!this.inputs.experiment) {
             return;
         }
 
-        this.newExperimentService.request.applicationNotes = '';
-        this.newExperimentService.request.codeApplication = '';
-        this.newExperimentService.request.codeIsolationPrepType = '';
-        this.newExperimentService.request.coreToExtractDNA = 'N';
-        this.newExperimentService.request.includeBisulfideConversion = 'N';
-        this.newExperimentService.request.includeQubitConcentration = 'N';
+        this.inputs.experiment.applicationNotes = '';
+        this.inputs.experiment.codeApplication = '';
+        this.inputs.experiment.codeIsolationPrepType = '';
+        this.inputs.experiment.coreToExtractDNA = 'N';
+        this.inputs.experiment.includeBisulfideConversion = 'N';
+        this.inputs.experiment.includeQubitConcentration = 'N';
 
         if (category.isIlluminaType === 'Y') {
             this.gnomexService.submitInternalExperiment()
@@ -350,7 +307,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             let bioTab = {
                 label: "Bioinformatics",
                 disabled: true,
-                // component: TabBioinformaticsViewComponent
                 component: ExperimentBioinformaticsTabComponent
             };
             let confirmTab = {
@@ -416,10 +372,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     onTabChange(event) {
         this.selectedIndex = event.index;
 
-        if (event.tab.textLabel === "Confirm") {
-            this.newExperimentService.onConfirmTab.next(true);
-        }
-
         if (this.tabs
             && event
             && event.index
@@ -459,7 +411,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 } else if (this.selectedIndex === 7) {
                     this.tabs[8].disabled = false;
                 } else if (this.selectedIndex === 8) {
-                    // this.newExperimentService.hideSubmit = false;
                     this.disableSubmit = true;
                 }
                 break;
@@ -471,34 +422,19 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             }
 
         }
+
         this.selectedIndex++;
         this.currentTabComponent = this.newExperimentService.components[this.selectedIndex];
-
-        // // TODO: revisit
-        // // was getting error
-        // if (this.currentTabComponent.form) {
-        //     this.currentTabComponent.form.markAsPristine();
-        // }
-        //
-        // Object.keys(this.form.controls).forEach((key: string) => {
-        //     this.form.controls[key].markAsPristine();
-        // });
     }
 
-    // destroyComponents() {
-    //     for (let component of this.newExperimentService.componentRefs) {
-    //         component.destroy();
-    //     }
-    // }
 
     componentCreated(compRef: ComponentRef<any>) {
         if (compRef) {
             this.newExperimentService.components.push(compRef.instance);
+
             if (compRef.instance instanceof TabVisibilityComponent) {
                 this.visibilityDetailObj = compRef.instance as TabVisibilityComponent;
-            } else if (compRef.instance instanceof TabSampleSetupViewComponent) {
             }
-            // this.newExperimentService.componentRefs.push(compRef);
 
             for (let tab of this.tabs) {
                 if (compRef.instance instanceof tab.component) {

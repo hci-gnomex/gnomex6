@@ -61,119 +61,17 @@ export class ExperimentBioinformaticsTabComponent {
     @Input('experiment') set experiment(experiment: any) {
         this._experiment = experiment;
 
-        if (this._experiment
-            && this._experiment.sequenceLanes) {
+        if (this._experiment && this._experiment.sequenceLanes) {
 
             if (!Array.isArray(this._experiment.sequenceLanes)) {
                 this._experiment.sequenceLanes = [this._experiment.sequenceLanes.SequenceLane];
             }
 
-
-            let consolidatedGenomeBuildIds: Set<string> = new Set();
-            let consolidatedOrganismIds: Set<string> = new Set();
-            this.consolidatedGenomeInformation = [];
-
-            for (let sequenceLane of this._experiment.sequenceLanes) {
-                let idGenomeBuildAlignTo: string = '';
-                let idOrganism: string = '';
-
-                if (sequenceLane && sequenceLane.idGenomeBuildAlignTo) {
-                    consolidatedGenomeBuildIds.add(sequenceLane.idGenomeBuildAlignTo);
-                    idGenomeBuildAlignTo = sequenceLane.idGenomeBuildAlignTo;
-                }
-                if (sequenceLane && sequenceLane.idOrganism) {
-                    consolidatedOrganismIds.add(sequenceLane.idOrganism);
-                    idOrganism = sequenceLane.idOrganism;
-                }
-
-                let temp: any = {
-                    idGenomeBuildAlignTo: idGenomeBuildAlignTo,
-                    idOrganism: idOrganism,
-                    organismName: '',
-                    alignToGenomeBuild: (!!idGenomeBuildAlignTo ? true : false),
-                    dictionary: [],
-                    sequenceLane: sequenceLane
-                };
-
-                for (let info of this.consolidatedGenomeInformation) {
-                    if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
-                        info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
-                        info.idOrganism           = temp.idOrganism;
-                        info.organismName         = temp.organismName;
-                        info.alignToGenomeBuild   = temp.alignToGenomeBuild;
-                        info.dictionary           = temp.dictionary;
-                        info.sequenceLane         = temp.sequenceLane;
-                    }
-                }
-
-                let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
-                    return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
-                        && temp.idOrganism           === a.idOrganism
-                        && temp.organismName         === a.organismName
-                        && temp.alignToGenomeBuild   === a.alignToGenomeBuild;
-                });
-
-                if (checkForExisting.length === 0) {
-                    let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
-                        return temp.idOrganism === a.idOrganism
-                            && !temp.alignToGenomeBuild
-                            && a.alignToGenomeBuild;
-                    });
-
-                    if (checkForOrganism.length === 0) {
-                        this.consolidatedGenomeInformation.push(temp);
-                    }
-                }
+            if (this._experiment.sequenceLanes.length === 0) {
+                this.flag_isANewExperiment = true;
             }
 
-            this.genomeBuild = '';
-            this.sampleGenomeBuilds = [];
-
-            for (let id of consolidatedGenomeBuildIds) {
-                if (this.genomeBuild) {
-                    this.genomeBuild = this.genomeBuild + ' --- ';
-                }
-
-                let entry: any = this.dictionaryService.getEntry('hci.gnomex.model.GenomeBuildLite', id);
-
-                if (entry) {
-                    this.genomeBuild = this.genomeBuild + entry.display;
-                    this.sampleGenomeBuilds.push(entry);
-                }
-            }
-
-            if (this.genomeBuild) {
-                this.alignToGenomeBuild = 'Y';
-            } else {
-                this.alignToGenomeBuild = 'N';
-            }
-
-            this.organismName = '';
-            this.sampleOrganisms = [];
-
-            for (let id of consolidatedOrganismIds) {
-                if (this.organismName) {
-                    this.organismName = this.organismName + ', ';
-                }
-
-                let entry: any = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite', id);
-
-                if (entry) {
-                    this.organismName = this.organismName + entry.display;
-                    this.sampleOrganisms.push(entry);
-
-                    let tempDictionary: any[] = this.cachedGenomeBuilds.filter((a) => {
-                        return a.idOrganism === id;
-                    });
-
-                    for (let data of this.consolidatedGenomeInformation) {
-                        if (data.idOrganism === id) {
-                            data.organismName = entry.display;
-                            data.dictionary = tempDictionary;
-                        }
-                    }
-                }
-            }
+            this.prepareComponent();
 
             this.header        = this.getStringValuedProperty(PropertyService.PROPERTY_ANALYSIS_ASSISTANCE_HEADER,   this._experiment.idCoreFacility);
             this.groupName     = this.getStringValuedProperty(PropertyService.PROPERTY_ANALYSIS_ASSISTANCE_GROUP,    this._experiment.idCoreFacility);
@@ -211,6 +109,8 @@ export class ExperimentBioinformaticsTabComponent {
     public sampleGenomeBuilds: any[] = [];
 
     private _experiment: any;
+
+    private flag_isANewExperiment: boolean = false;
 
     private cachedGenomeBuilds: any[] = [];
 
@@ -287,5 +187,188 @@ export class ExperimentBioinformaticsTabComponent {
         }
 
         return result;
+    }
+
+    private prepareComponent(): void {
+
+        this.genomeBuild = '';
+        this.sampleGenomeBuilds = [];
+
+        let consolidatedGenomeBuildIds: Set<string> = new Set();
+        let consolidatedOrganismIds: Set<string> = new Set();
+        this.consolidatedGenomeInformation = [];
+
+        if (this._experiment.sequenceLanes
+            && Array.isArray(this._experiment.sequenceLanes)
+            && !this.flag_isANewExperiment) {
+
+            for (let sequenceLane of this._experiment.sequenceLanes) {
+                let idGenomeBuildAlignTo: string = '';
+                let idOrganism: string = '';
+
+                if (sequenceLane && sequenceLane.idGenomeBuildAlignTo) {
+                    consolidatedGenomeBuildIds.add(sequenceLane.idGenomeBuildAlignTo);
+                    idGenomeBuildAlignTo = sequenceLane.idGenomeBuildAlignTo;
+                }
+                if (sequenceLane && sequenceLane.idOrganism) {
+                    consolidatedOrganismIds.add(sequenceLane.idOrganism);
+                    idOrganism = sequenceLane.idOrganism;
+                }
+
+                let temp: any = {
+                    idGenomeBuildAlignTo: idGenomeBuildAlignTo,
+                    idOrganism: idOrganism,
+                    organismName: '',
+                    alignToGenomeBuild: (!!idGenomeBuildAlignTo ? true : false),
+                    dictionary: [],
+                    sequenceLane: sequenceLane
+                };
+
+                for (let info of this.consolidatedGenomeInformation) {
+                    if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
+                        info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
+                        info.idOrganism           = temp.idOrganism;
+                        info.organismName         = temp.organismName;
+                        info.alignToGenomeBuild   = temp.alignToGenomeBuild;
+                        info.dictionary           = temp.dictionary;
+                        info.sequenceLane         = temp.sequenceLane;
+                    }
+                }
+
+                let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
+                    return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
+                        && temp.idOrganism           === a.idOrganism
+                        && temp.organismName         === a.organismName
+                        && temp.alignToGenomeBuild   === a.alignToGenomeBuild;
+                });
+
+                if (checkForExisting.length === 0) {
+                    let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
+                        return temp.idOrganism === a.idOrganism
+                            && !temp.alignToGenomeBuild
+                            && a.alignToGenomeBuild;
+                    });
+
+                    if (checkForOrganism.length === 0) {
+                        this.consolidatedGenomeInformation.push(temp);
+                    }
+                }
+            }
+
+            for (let id of consolidatedGenomeBuildIds) {
+                if (this.genomeBuild) {
+                    this.genomeBuild = this.genomeBuild + ' --- ';
+                }
+
+                let entry: any = this.dictionaryService.getEntry('hci.gnomex.model.GenomeBuildLite', id);
+
+                if (entry) {
+                    this.genomeBuild = this.genomeBuild + entry.display;
+                    this.sampleGenomeBuilds.push(entry);
+                }
+            }
+        } else {
+            this._experiment.sequenceLanes = [];
+
+            for (let sample of this._experiment.samples) {
+                let idOrganism: string = '';
+
+                if (sample.idOrganism) {
+                    consolidatedOrganismIds.add(sample.idOrganism);
+                    idOrganism = sample.idOrganism;
+                }
+
+                let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
+                let laneStr: string = lanePlus.toString().substr(1);
+
+                let laneObj = {
+                    idSequenceLane: 'SequenceLane' + laneStr,
+                    notes: '',
+                    idSeqRunType: sample.idSeqRunType,
+                    idNumberSequencingCycles: sample.idNumberSequencingCycles,
+                    idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
+                    idSample: sample.idSample,
+                    idOrganism: sample.idOrganism,
+                    idGenomeBuildAlignTo: ''
+                };
+                this._experiment.sequenceLanes.push(laneObj);
+
+
+                let temp: any = {
+                    alignToGenomeBuild: false,
+                    dictionary: [],
+                    idGenomeBuildAlignTo: '',
+                    idOrganism: idOrganism,
+                    organismName: ''
+                };
+
+                for (let info of this.consolidatedGenomeInformation) {
+                    if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
+                        info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
+                        info.idOrganism           = temp.idOrganism;
+                        info.organismName         = temp.organismName;
+                        info.alignToGenomeBuild   = temp.alignToGenomeBuild;
+                        info.dictionary           = temp.dictionary;
+                        info.sequenceLane         = temp.sequenceLane;
+                    }
+                }
+
+                let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
+                    return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
+                        && temp.idOrganism           === a.idOrganism
+                        && temp.organismName         === a.organismName
+                        && temp.alignToGenomeBuild   === a.alignToGenomeBuild;
+                });
+
+                if (checkForExisting.length === 0) {
+                    let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
+                        return temp.idOrganism === a.idOrganism
+                            && !temp.alignToGenomeBuild
+                            && a.alignToGenomeBuild;
+                    });
+
+                    if (checkForOrganism.length === 0) {
+                        this.consolidatedGenomeInformation.push(temp);
+                    }
+                }
+            }
+        }
+
+        if (this.genomeBuild) {
+            this.alignToGenomeBuild = 'Y';
+        } else {
+            this.alignToGenomeBuild = 'N';
+        }
+
+        this.organismName = '';
+        this.sampleOrganisms = [];
+
+        for (let id of consolidatedOrganismIds) {
+            if (this.organismName) {
+                this.organismName = this.organismName + ', ';
+            }
+
+            let entry: any = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite', id);
+
+            if (entry) {
+                this.organismName = this.organismName + entry.display;
+                this.sampleOrganisms.push(entry);
+
+                let tempDictionary: any[] = this.cachedGenomeBuilds.filter((a) => {
+                    return a.idOrganism === id;
+                });
+
+                for (let data of this.consolidatedGenomeInformation) {
+                    if (data.idOrganism === id) {
+                        data.organismName = entry.display;
+                        data.dictionary = tempDictionary;
+                    }
+                }
+            }
+        }
+    }
+
+    public tabDisplayed(): void {
+        this.prepareComponent();
     }
 }

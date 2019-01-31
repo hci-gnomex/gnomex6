@@ -1,19 +1,18 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {DictionaryService} from "../../services/dictionary.service";
-import {Experiment, NewExperimentService, Sample} from "../../services/new-experiment.service";
-import {OrderType} from "../../util/annotation-tab.component";
-import {ConstantsService} from "../../services/constants.service";
+import {Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+
+import {Subscription} from "rxjs";
+
+import {DictionaryService} from "../../services/dictionary.service";
+import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
-import {SamplesService} from "../../services/samples.service";
 import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {GnomexService} from "../../services/gnomex.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
 import {UploadSampleSheetComponent} from "../../upload/upload-sample-sheet.component";
 import {BarcodeSelectEditor} from "../../util/grid-editors/barcode-select.editor";
-import {BehaviorSubject, Subscription} from "rxjs";
 import {annotType} from "../../services/property.service";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {UrlAnnotEditor} from "../../util/grid-editors/url-annot-editor";
@@ -21,12 +20,18 @@ import {UrlAnnotRenderer} from "../../util/grid-renderers/url-annot-renderer";
 import {MultiSelectRenderer} from "../../util/grid-renderers/multi-select.renderer";
 import {MultiSelectEditor} from "../../util/grid-editors/multi-select.editor";
 import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
+import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
+import {Experiment} from "../../util/models/experiment.model";
+import {Sample} from "../../util/models/sample.model";
 
 @Component({
     selector: "tabSamplesView",
     templateUrl: "./tab-samples-illumina.component.html",
     styles: [`
-        
+
+
+        .no-height { height: 0;  }
+        .single-em { width: 1em; }
         
         .horizontal-spacer {
             height: 80%;
@@ -57,6 +62,10 @@ import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
 })
 
 export class TabSamplesIlluminaComponent implements OnInit {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
+    private emToPxConversionRate: number = 16;
 
     @Input('experiment') set experiment(value: Experiment) {
         this._experiment = value;
@@ -90,6 +99,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.onChange_organismSubscription = this._experiment.onChange_organism.subscribe((value) => {
                 if (value && this.samplesGridApi) {
                     this.changeOrganism();
+                    this.requireReconfirmation();
                 }
             });
         }
@@ -109,9 +119,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
             });
         }
-
-
-
     }
 
     private _experiment: Experiment;
@@ -136,16 +143,17 @@ export class TabSamplesIlluminaComponent implements OnInit {
         + '7.  Optional: Edit other fields as appropriate.';
 
     public readonly TOOLTIP_TEXT: string = ''
-        + 'Instructions&#13;\n'
-        + '1. Mandatory: Fill in the following highlighted fields: Multiplex Group #, Sample Name(Max 30 characters)&#13;\n'
-        + '2. Optional: Any annotation characteristic that you selected from the previous screen appears on this screen&#13;\n'
-        + 'as a highlighted column. Please type desired information under the highlighted field with the annotation header.&#13;\n'
-        + '3. After completing all line items, click the \'Next\' button at the bottom of the the page to proceed.&#13;\n'
+        + 'Instructions\n'
+        + '1. Mandatory: Fill in the following highlighted fields: Multiplex Group #, Sample Name(Max 30 characters)\n'
+        + '2. Optional: Any annotation characteristic that you selected from the previous screen appears on this screen'
+        + 'as a highlighted column. Please type desired information under the highlighted field with the annotation header.\n'
+        + '3. After completing all line items, click the \'Next\' button at the bottom of the the page to proceed.'
         + 'You may also upload a sample sheet. Please see the \'Sample sheet help\' for more help.';
 
     public sampleTypes: any[] = [];
     public organisms: any[] = [];
     public form: FormGroup;
+
     private hideCCNum: boolean = true;
     private gridColumnApi;
 
@@ -155,19 +163,28 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     private samplesGridColumnDefs: any[];
 
+    private _tabIndexToInsertAnnotations: number = 0;
+
     private get defaultSampleColumnDefinitions(): any[] {
         let temp: any[] = [];
 
         temp.push({
             headerName: "",
             field: "index",
-            width: 50
+            width:    1.5 * this.emToPxConversionRate,
+            maxWidth: 1.5 * this.emToPxConversionRate,
+            minWidth: 1.5 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            suppressSizeToFit: true
         });
         temp.push({
             headerName: "Multiplex Group",
             editable: true,
             field: "multiplexGroupNumber",
-            width: 100,
+            width:    5 * this.emToPxConversionRate,
+            minWidth: 3 * this.emToPxConversionRate,
+            maxWidth: 7 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             showFillButton: true,
@@ -181,26 +198,31 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 { errorName: 'pattern',  errorMessage: 'Multiplex Group must be numeric' }
             ],
             outerForm: this.form,
-            formName:  "gridFormGroup",
+            formName:  "gridFormGroup"
         });
         temp.push({
             headerName: "Sample Name",
             field: "name",
-            width: 100,
+            width:    7 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate,
+            maxWidth: 9 * this.emToPxConversionRate,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             validators: [ Validators.required ],
             errorNameErrorMessageMap: [
                 { errorName: 'required', errorMessage: 'Sample Name required' }
-            ],
+            ]
         });
         temp.push({
             headerName: "Conc. (ng/ul)",
             field: "concentration",
-            width: 100,
+            width:    5.5 * this.emToPxConversionRate,
+            minWidth: 3 * this.emToPxConversionRate,
+            maxWidth: 7 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             editable: true,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup'
@@ -208,9 +230,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "Vol. (ul)",
             field: "volume",
-            width: 100,
+            width:    5.5 * this.emToPxConversionRate,
+            minWidth: 3 * this.emToPxConversionRate,
+            maxWidth: 7 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             editable: true,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup'
@@ -218,7 +243,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "CC Number",
             field: "ccNum",
-            width: 50,
+            width:    7 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
+            maxWidth: 8 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -226,12 +254,17 @@ export class TabSamplesIlluminaComponent implements OnInit {
             fillGroupAttribute: 'frontEndGridGroup',
             hide: this.hideCCNum
         });
+
+        this._tabIndexToInsertAnnotations = temp.length;
+
         temp.push({
             headerName: "# Seq Lanes",
             field: "numberSequencingLanes",
-            width: 100,
+            width:    5 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            maxWidth: 6 * this.emToPxConversionRate,
             editable: true,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
@@ -241,7 +274,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "Sample Type",
             editable: true,
-            width: 175,
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 7 * this.emToPxConversionRate,
             field: "idSampleType",
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
@@ -249,12 +283,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
             selectOptionsDisplayField: "sampleType",
             selectOptionsValueField: "idSampleType",
             showFillButton: true,
-            fillGroupAttribute: 'idSampleType'
+            fillGroupAttribute: 'frontEndGridGroup'
         });
         temp.push({
             headerName: "Organism",
             editable: true,
-            width: 200,
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 7  * this.emToPxConversionRate,
             field: "idOrganism",
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
@@ -262,7 +297,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "idOrganism",
             showFillButton: true,
-            fillGroupAttribute: 'idOrganism',
+            fillGroupAttribute: 'frontEndGridGroup',
             validators: [Validators.required],
             errorNameErrorMessageMap: [
                 {errorName: 'required', errorMessage: 'Multiplex Group required'}
@@ -271,7 +306,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "Seq Lib Protocol",
             editable: false,
-            width: 200,
+            width:    15 * this.emToPxConversionRate,
+            minWidth: 7  * this.emToPxConversionRate,
             field: "idSeqLibProtocol",
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
@@ -279,59 +315,71 @@ export class TabSamplesIlluminaComponent implements OnInit {
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "idSeqLibProtocol"
         });
-        // TODO : figure out when these columns are really supposed to be added.
-        // temp.push({
-        //     headerName: "Index Tag A",
-        //     editable: true,
-        //     width: 125,
-        //     field: "idOligoBarcode",
-        //     cellRendererFramework: SelectRenderer,
-        //     cellEditorFramework: BarcodeSelectEditor,
-        //     selectOptions: this._barCodes,
-        //     selectOptionsDisplayField: "display",
-        //     selectOptionsValueField: "idOligoBarcode",
-        //     indexTagLetter: 'A',
-        //     validators: [Validators.required],
-        //     errorNameErrorMessageMap: [
-        //         {errorName: 'required', errorMessage: 'Index Tag A required'}
-        //     ],
-        // });
-        // temp.push({
-        //     headerName: "Index Tag Sequence A",
-        //     field: "barcodeSequence",
-        //     width: 100,
-        //     editable: false
-        // });
-        // temp.push({
-        //     headerName: "Index Tag B",
-        //     editable: true,
-        //     width: 125,
-        //     field: "idOligoBarcodeB",
-        //     cellRendererFramework: SelectRenderer,
-        //     cellEditorFramework: BarcodeSelectEditor,
-        //     selectOptions: this._barCodes,
-        //     selectOptionsDisplayField: "display",
-        //     selectOptionsValueField: "idOligoBarcodeB",
-        //     indexTagLetter: 'B'
-        // });
-        // temp.push({
-        //     headerName: "Index Tag Sequence B",
-        //     field: "barcodeSequenceB",
-        //     width: 100,
-        //     editable: false,
-        // });
+        if (this._experiment
+            && this._experiment.seqPrepByCore_forSamples
+            && this._experiment.seqPrepByCore_forSamples === 'Y') {
+
+            temp.push({
+                headerName: "Index Tag A",
+                editable: true,
+                width:    9 * this.emToPxConversionRate,
+                minWidth: 9 * this.emToPxConversionRate,
+                maxWidth: 15 * this.emToPxConversionRate,
+                field: "idOligoBarcode",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: BarcodeSelectEditor,
+                selectOptions: this._barCodes,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOligoBarcode",
+                indexTagLetter: 'A',
+                validators: [Validators.required],
+                errorNameErrorMessageMap: [
+                    {errorName: 'required', errorMessage: 'Index Tag A required'}
+                ]
+            });
+            temp.push({
+                headerName: "Index Tag Sequence A",
+                field: "barcodeSequence",
+                width:    5.5 * this.emToPxConversionRate,
+                minWidth: 5 * this.emToPxConversionRate,
+                maxWidth: 7 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false
+            });
+            temp.push({
+                headerName: "Index Tag B",
+                editable: true,
+                width:    9 * this.emToPxConversionRate,
+                minWidth: 9 * this.emToPxConversionRate,
+                maxWidth: 15 * this.emToPxConversionRate,
+                field: "idOligoBarcodeB",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: BarcodeSelectEditor,
+                selectOptions: this._barCodes,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOligoBarcodeB",
+                indexTagLetter: 'B'
+            });
+            temp.push({
+                headerName: "Index Tag Sequence B",
+                field: "barcodeSequenceB",
+                width:    5.5 * this.emToPxConversionRate,
+                minWidth: 5 * this.emToPxConversionRate,
+                maxWidth: 7 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+        }
 
         return temp;
     }
 
 
-    constructor(private constService: ConstantsService,
+    constructor(public constService: ConstantsService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
                 private fb: FormBuilder,
-                private dialog: MatDialog,
-                private samplesService: SamplesService,
-                private newExperimentService: NewExperimentService) {
+                private dialog: MatDialog) {
 
         this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
 
@@ -469,6 +517,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         if (foundAllOldColumns && this.samplesGridColumnDefs.length === temp.length) {
             // Do nothing - there is no change needed
+            this.samplesGridApi.redrawRows();
         } else {
             this.samplesGridColumnDefs = temp;
 
@@ -478,24 +527,23 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
-    showHideColumns() {
+    private showHideColumns() {
         let hideSampleTypeOnExternalExperiment: boolean = false;
         if (!this.gnomexService.isInternalExperimentSubmission && this.gnomexService.getProperty(this.gnomexService.PROPERTY_HIDE_SAMPLETYPE_ON_EXTERNAL_EXPERIMENT) === "Y") {
             hideSampleTypeOnExternalExperiment = true;
         }
     }
 
-    changeOrganism() {
+    private changeOrganism() {
         if (this.samplesGridApi) {
             // this.samplesGridApi.forEachNode((node: any) => {
             //     node.data.idOrganism = this._experiment.organism.idOrganism;
             // });
             this.samplesGridApi.redrawRows();
         }
-        // this.newExperimentService.sampleOrganisms.add(this.newExperimentService.organism);
     }
 
-    changeCode() {
+    private changeCode() {
         if (this.samplesGridApi) {
             let protocol = this._experiment.codeApplication ? this.dictionaryService.getProtocolFromApplication(this._experiment.codeApplication) : '';
             this.samplesGridApi.forEachNode((node: any) => {
@@ -505,7 +553,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
-    updateRows() {
+    private updateRows() {
 
         if (!this._experiment) {
             return;
@@ -560,10 +608,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
             sample.idSeqLibProtocol = protocol.idSeqLibProtocol;
             sample.idOrganism = idOrganism;
         }
-
     }
 
-    buildInitialRows() {
+    private buildInitialRows() {
 
         if (this._experiment && this._experiment.numberOfSamples) {
 
@@ -656,6 +703,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.samplesGridApi.setColumnDefs(this.samplesGridColumnDefs);
             this.samplesGridApi.setRowData(this._experiment.samples);
             this.samplesGridApi.sizeColumnsToFit();
+
+            if (this.form && this.form.get('invalidateWithoutSamples')) {
+                this.form.removeControl('invalidateWithoutSamples');
+            }
         }
     }
 
@@ -675,57 +726,74 @@ export class TabSamplesIlluminaComponent implements OnInit {
         return lastId;
     }
 
-    changeSampleType() {
+    private changeSampleType() {
         if (this.samplesGridApi) {
             this.samplesGridApi.redrawRows();  // probably only gets hit when off of this tab...
         }
     }
 
-    toggleCC(event) {
-        this.gridColumnApi.setColumnVisible("ccNum", event.checked);
-        this.form.get('invalidateWithoutSamples').setValue(true);
+    public toggleCC(event) {
+        if (this.gridColumnApi
+            && this.gridColumnApi.columnController
+            && this.gridColumnApi.columnController.gridColumns
+            && Array.isArray(this.gridColumnApi.columnController.gridColumns)) {
+
+            let temp: any[] = this.gridColumnApi.columnController.gridColumns.filter((value: any) => {
+                return value && value.colDef && value.colDef.field && value.colDef.field === 'ccNum'
+            });
+
+            if (temp.length > 0) {
+                this.gridColumnApi.setColumnVisible(temp[0].colId, event.checked);
+            }
+
+            this.form.get('invalidateWithoutSamples').setValue(true);
+        }
     }
 
-    onSamplesGridReady(event: any) {
+    public onSamplesGridReady(event: any) {
         this.samplesGridApi = event.api;
         this.gridColumnApi = event.columnApi;
         event.api.setHeaderHeight(50);
     }
 
-    onCellValueChanged(event) {
-        if (event.colDef.headerName === "Organism") {
-            let organism = this.organisms.filter(org => org.idOrganism === event.data.idOrganism);
-            if (organism) {
-                // this.newExperimentService.sampleOrganisms.add(organism[0]);
-                // this.newExperimentService.samplesChanged.next(true);
-            }
-        } else if (event.colDef.headerName === "Index Tag A") {
+    public onGridSizeChanged(event: any) {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
+    }
+
+    public onCellValueChanged(event) {
+        if (event.colDef.headerName === "Index Tag A") {
             let barcode = this._barCodes.filter(barcode => barcode.idOligoBarcode === event.data.idOligoBarcode);
-            if (barcode) {
+            if (Array.isArray(barcode) && barcode.length > 0) {
                 if (this.samplesGridApi
                     && this.samplesGridApi.getRowNode(event.rowIndex)
                     && this.samplesGridApi.getRowNode(event.rowIndex).data) {
                     this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequence = barcode[0].barcodeSequence;
                 }
 
-                // this.newExperimentService.samplesGridRowData[event.rowIndex].barcodeSequence = barcode[0].barcodeSequence;
                 this.samplesGridApi.redrawRows();
             }
         } else if (event.colDef.headerName === "Index Tag B") {
             let barcode = this._barCodes.filter(barcode => barcode.idOligoBarcodeB === event.data.idOligoBarcodeB);
-            if (barcode) {
+            if (Array.isArray(barcode) && barcode.length > 0) {
                 if (this.samplesGridApi
                     && this.samplesGridApi.getRowNode(event.rowIndex)
                     && this.samplesGridApi.getRowNode(event.rowIndex).data) {
-                    this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequenceB = barcode[0].barcodeSequenceB;
+
+                    this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequenceB = barcode[0].barcodeSequence;
                 }
-                // this.newExperimentService.samplesGridRowData[event.rowIndex].barcodeSequenceB = barcode[0].barcodeSequenceB;
+
                 this.samplesGridApi.redrawRows();
             }
         }
     }
 
-    upload(): void {
+    public upload(): void {
         let data = {
             sampleColumns: this.samplesGridColumnDefs,
             rowData: this._experiment.samples
@@ -744,28 +812,29 @@ export class TabSamplesIlluminaComponent implements OnInit {
         });
     }
 
+    public download(): void { }
 
     public onClickShowInstructions(): void {
         this.showInstructions = !this.showInstructions;
     }
 
-    addColumnToColumnDef(columnDefs: any[], annot: any) {
+    private addColumnToColumnDef(columnDefs: any[], annot: any) {
         let column: any;
         switch(annot.codePropertyType) {
             case annotType.CHECK :
-                column = TabSamplesIlluminaComponent.createCheckColumn(annot);
+                column = this.createCheckColumn(annot);
                 break;
             case annotType.MOPTION :
-                column = TabSamplesIlluminaComponent.createMoptionColumn(annot);
+                column = this.createMoptionColumn(annot);
                 break;
             case annotType.OPTION :
-                column = TabSamplesIlluminaComponent.createOptionColumn(annot);
+                column = this.createOptionColumn(annot);
                 break;
             case annotType.TEXT :
-                column = TabSamplesIlluminaComponent.createTextColumn(annot);
+                column = this.createTextColumn(annot);
                 break;
             case annotType.URL :
-                column = TabSamplesIlluminaComponent.createUrlColumn(annot);
+                column = this.createUrlColumn(annot);
                 break;
         }
 
@@ -773,26 +842,34 @@ export class TabSamplesIlluminaComponent implements OnInit {
             columnDefs = [];
         }
 
-        columnDefs.splice(this.samplesGridColumnDefs.length, 0, column);
+        if (!this._tabIndexToInsertAnnotations) {
+            this._tabIndexToInsertAnnotations = columnDefs.length;
+        }
+
+        columnDefs.splice(this._tabIndexToInsertAnnotations, 0, column);
     }
 
-    private static createCheckColumn(annot: any) {
+    private createCheckColumn(annot: any) {
         return {
             headerName: annot.display,
             editable: false,
             checkboxEditable: true,
             idProperty: annot.idProperty,
-            width: 50,
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 7 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
             cellRendererFramework: CheckboxRenderer,
         };
     }
 
-    private static createMoptionColumn(annot: any): any{
+    private createMoptionColumn(annot: any): any{
         return {
             headerName: annot.display,
             editable: true,
-            width: 150,
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 7 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             idProperty: annot.idProperty,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
             cellRendererFramework: MultiSelectRenderer,
@@ -801,16 +878,18 @@ export class TabSamplesIlluminaComponent implements OnInit {
             selectOptionsDisplayField: "option",
             selectOptionsValueField: "idPropertyOption",
             showFillButton: true,
-            fillGroupAttribute: 'idProperty'
+            fillGroupAttribute: 'frontEndGridGroup'
         };
 
     }
 
-    private static createOptionColumn(annot: any): any {
+    private createOptionColumn(annot: any): any {
         return {
             headerName: annot.display,
             editable: true,
-            width: 150,
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 7 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             idProperty: annot.idProperty,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
             cellRendererFramework: SelectRenderer,
@@ -819,25 +898,31 @@ export class TabSamplesIlluminaComponent implements OnInit {
             selectOptionsDisplayField: "option",
             selectOptionsValueField: "idPropertyOption",
             showFillButton: true,
-            fillGroupAttribute: 'idProperty'
+            fillGroupAttribute: 'frontEndGridGroup'
         };
     }
 
-    private static createTextColumn(annot: any): any {
+    private createTextColumn(annot: any): any {
         return {
             headerName: annot.display,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
-            width: 100,
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 7 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             idProperty: annot.idProperty,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
             editable: true
         };
     }
 
-    private static createUrlColumn(annot: any): any {
+    private createUrlColumn(annot: any): any {
         return {
             headerName: annot.display,
             editable: true,
-            width: 150,
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 7 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
             idProperty: annot.idProperty,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
             cellEditorFramework: UrlAnnotEditor,

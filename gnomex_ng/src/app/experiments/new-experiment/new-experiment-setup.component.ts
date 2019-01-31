@@ -1,18 +1,22 @@
 import {Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
+import {URLSearchParams} from "@angular/http";
+import {MatAutocomplete, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+
+import {Subscription} from "rxjs/index";
+import {first} from "rxjs/internal/operators";
+
+import {NewExperimentService} from "../../services/new-experiment.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {GetLabService} from "../../services/get-lab.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {Subscription} from "rxjs/index";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {first} from "rxjs/internal/operators";
-import {URLSearchParams} from "@angular/http";
-import {MatAutocomplete, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {WorkAuthorizationTypeSelectorDialogComponent} from "../../products/work-authorization-type-selector-dialog.component";
+
+import {Experiment} from "../../util/models/experiment.model";
 
 @Component({
     selector: "new-experiment-setup",
@@ -130,7 +134,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
     @Input("idCoreFacility") set idCoreFacility (value: any) {
         this.requestCategories = [];
         this.newExperimentService.components = [];
-        this.newExperimentService.organisms = [];
+        // this.newExperimentService.organisms = [];
         // this.newExperimentService.componentRefs = [];
         // this.newExperimentService.samplesGridRowData = [];
 
@@ -158,7 +162,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
             this.filteredProjectList = this.gnomexService.projectList;
             this.checkSecurity();
             this.newExperimentService.components.push(this);
-            this.newExperimentService.setupView = this;
+            // this.newExperimentService.setupView = this;
         }
     }
 
@@ -209,6 +213,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
     //     return this.form && this.form.valid;
     // }
 
+    private project: any;
 
     public get submitter(): any {
         if (this.form && this.form.get('selectName')) {
@@ -219,12 +224,12 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
     public set submitter(value: any) {
         if (this.form.get('selectName') && this.form.get('selectName').value) {
-            this._experiment.idAppUser = this.newExperimentService.idAppUser;
-            this._experiment.idOwner = this.form.get('selectName').value.idAppUser;
+            // this._experiment.idAppUser = this.newExperimentService.idAppUser;
 
-            this.newExperimentService.experimentOwner = this.form.get('selectName').value;
-            this._experiment.idAppUser = this.newExperimentService.idAppUser;
-            this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
+            this._experiment.experimentOwner = this.form.get('selectName').value;
+            this._experiment.idOwner = this.form.get('selectName').value.idAppUser;
+            // this._experiment.idAppUser = this.newExperimentService.idAppUser;
+            // this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
 
             // this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
             // this.visibilityDetailObj.currentOrder = this.newExperimentService.request;
@@ -354,10 +359,10 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     refreshBillingAccounts() {
         this.checkForOtherAccounts();
-        this.newExperimentService.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
+        // this.newExperimentService.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
         this._experiment.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
 
-        let cat = this.newExperimentService.requestCategory;
+        let cat = this._experiment.requestCategory;
 
         if (this.authorizedBillingAccounts) {
             if (!Array.isArray(this.authorizedBillingAccounts)) {
@@ -382,7 +387,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
             this.billingService.getAuthorizedBillingAccounts(authorizedBillingAccountsParams).subscribe((response: any) => {
                 this.showAccessAuthorizedAccountsLink = response && response.hasAccountsWithinCore && response.hasAccountsWithinCore === 'Y';
             });
-        } else if (this.newExperimentService.idAppUser != null && this.newExperimentService.idAppUser != '') {
+        } else if (this._experiment.idAppUser != null && this._experiment.idAppUser != '') {
             let idCoreFacility: string = this._experiment.idCoreFacility;
         }
     }
@@ -401,20 +406,20 @@ export class NewExperimentSetupComponent implements OnDestroy {
             }
 
             if (this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ) {
-                this.newExperimentService.idAppUser = this.form.controls['selectName'].value.idAppUser;
+                // this.newExperimentService.idAppUser = this.form.controls['selectName'].value.idAppUser;
                 this._experiment.idAppUser          = this.form.controls['selectName'].value.idAppUser;
             } else {
-                this.newExperimentService.idAppUser = "";
+                // this.newExperimentService.idAppUser = "";
                 this._experiment.idAppUser          = "";
             }
         } else if (this.gnomexService.hasPermission('canSubmitForOtherCores') && iCanSubmitToThisCoreFacility) {
             this.adminState = "AdminState";
 
             if (this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '') {
-                this.newExperimentService.idAppUser = this.form.controls['selectName'].value.idAppUser;
+                // this.newExperimentService.idAppUser = this.form.controls['selectName'].value.idAppUser;
                 this._experiment.idAppUser          = this.form.controls['selectName'].value.idAppUser;
             } else {
-                this.newExperimentService.idAppUser = "";
+                // this.newExperimentService.idAppUser = "";
                 this._experiment.idAppUser          = "";
             }
         } else {
@@ -443,14 +448,14 @@ export class NewExperimentSetupComponent implements OnDestroy {
     public selectDefaultUserProject(): void {
         this.form.controls['selectName'].setErrors(null);
 
-        if (this.newExperimentService.idAppUser != null) {
+        if (this._experiment.idAppUser != null) {
             for (let project of this.filteredProjectList) {
                 if (this.form.controls['selectName'].value
                     && this.form.controls['selectName'].value.idAppUser === project.idAppUser) {
 
                     setTimeout(() => {
                         this.form.get('selectProject').setValue(project);
-                        this.newExperimentService.project = this.form.get('selectProject').value;
+                        this.project = this.form.get('selectProject').value;
 
                         // These spoofedEvents are needed in places where the field is assigned a
                         // default value, because (selectionChanged) does not pick up changes to the
@@ -464,8 +469,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
             }
         }
 
-        if (this.newExperimentService.project) {
-            this.newExperimentService.request.idProject = this.newExperimentService.project.idProject;
+        if (this.project) {
+            this._experiment.idProject = this.project.idProject;
         }
     }
 
@@ -525,20 +530,17 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 code = this.defaultCodeRequestCategory;
             }
 
-            this.newExperimentService.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', code.value);
+            this._experiment.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', code.value);
 
-            if (this.newExperimentService.requestCategory) {
-                this._experiment.codeRequestCategory = this.newExperimentService.requestCategory.codeRequestCategory;
+            if (this._experiment.requestCategory) {
                 // this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
 
-                this.workButtonText   = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
+                this.workButtonText   = this.gnomexService.getCoreFacilityProperty(this._experiment.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
                 // this.accessAuthLabel = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT);
-            } else {
-                this._experiment.codeRequestCategory = "";
             }
         }
 
-        this.onChangeRequestCategory.emit(this.newExperimentService.requestCategory);
+        this.onChangeRequestCategory.emit(this._experiment.requestCategory);
     }
 
     public selectLabOption(event: any) {
@@ -609,11 +611,9 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 });
             }
 
-            this._experiment.idLab = event.source.value.idLab;
-
-            this.newExperimentService.lab = event.source.value;
-            this.newExperimentService.getHiSeqPriceList();
-            this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
+            this._experiment.lab = event.source.value;
+            // this.newExperimentService.getHiSeqPriceList();
+            // this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
         }
     }
 
@@ -622,11 +622,11 @@ export class NewExperimentSetupComponent implements OnDestroy {
             return;
         }
 
-        this._experiment.idBillingAccount     = this.form.get("selectAccount").value.idBillingAccount;
-        this._experiment.billingAccountName   = this.form.get("selectAccount").value.billingAccountName;
-        this._experiment.billingAccountNumber = this.form.get("selectAccount").value.billingAccountNumber;
-
-        setTimeout(() => { this.newExperimentService.billingAccount = this.form.get("selectAccount").value; });
+        // this._experiment.idBillingAccount     = this.form.get("selectAccount").value.idBillingAccount;
+        // this._experiment.billingAccountName   = this.form.get("selectAccount").value.billingAccountName;
+        // this._experiment.billingAccountNumber = this.form.get("selectAccount").value.billingAccountNumber;
+        //
+        setTimeout(() => { this._experiment.billingAccount = this.form.get("selectAccount").value; });
         // this.getFilteredApps();
     }
 

@@ -39,7 +39,7 @@
                                              formControlName="selectedDna"
                                              (change)="onDnaChange($event)">
                                 <div *ngFor="let dnaCategory of filteredSampleTypeListDna">
-                                    <mat-radio-button (click)="selectDna($event)" [value]="dnaCategory">
+                                    <mat-radio-button [value]="dnaCategory">
                                         <div class="short-width">
                                             {{dnaCategory.display}}
                                        </div>
@@ -55,7 +55,7 @@
                                              formControlName="selectedRna"
                                              (change)="onRnaChange($event)">
                                 <div *ngFor="let rnaCategory of filteredSampleTypeListRna">
-                                    <mat-radio-button (click)="selectRna($event)" [value]="rnaCategory">
+                                    <mat-radio-button [value]="rnaCategory">
                                         <div class="short-width">
                                             {{rnaCategory.display}}
                                         </div>
@@ -146,7 +146,7 @@
                         </mat-radio-group>
                     </div>
                 </li>
-                <li *ngIf="showSamplePrepContatainer" class="full-width align-baseline">
+                <li *ngIf="showSamplePrepContainer" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
                             Specify the nucleic acid extraction method.

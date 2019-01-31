@@ -1,8 +1,10 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {GnomexService} from "../../services/gnomex.service";
+import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
-import {Experiment, NewExperimentService} from "../../services/new-experiment.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {HttpParams} from "@angular/common/http";
+import {BillingService} from "../../services/billing.service";
+import {Subscription} from "rxjs/index";
+import {Experiment} from "../../util/models/experiment.model";
 
 @Component({
     selector: "tabSeqProtoView",
@@ -86,46 +88,65 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
     `]
 })
 
-export class TabSeqProtoViewComponent implements OnInit {
+export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
+
     @Input() requestCategory: any;
-    @Input("experiment") experiment: Experiment;
+
+    @Input("experiment") set experiment(value: Experiment) {
+        this._experiment = value;
+
+        if (this._experiment && this._experiment.onChange_idLab) {
+            if (this.idLab_subscription) {
+                this.idLab_subscription.unsubscribe();
+            }
+
+
+            this.idLab_subscription = this._experiment.onChange_idLab.subscribe(() => {
+                this.changePrices();
+            })
+        }
+        if (this._experiment && this._experiment.onChange_codeRequestCategory) {
+            if (this.codeRequestCategory_subscription) {
+                this.codeRequestCategory_subscription.unsubscribe();
+            }
+
+            this.codeRequestCategory_subscription = this._experiment.onChange_codeRequestCategory.subscribe(() => {
+                this.changePrices();
+            })
+        }
+
+        this.changePrices();
+    }
+    get experiment(): Experiment {
+        return this._experiment;
+    }
+
+    private _experiment: Experiment;
+
+    private idLab_subscription: Subscription;
+    private codeRequestCategory_subscription: Subscription;
 
     private form: FormGroup;
     private filteredNumberSequencingCyclesAllowedList: any[] = [];
-    // private runTypeLabel: string;
-    // private priceMap: Map<string, string> = new Map<string, string>();
+    private priceMap: Map<string, string> = new Map<string, string>();
 
-    constructor(private dictionaryService: DictionaryService,
-                private newExperimentService: NewExperimentService,
-                // private gnomexService: GnomexService,
+    constructor(private billingService: BillingService,
+                private dictionaryService: DictionaryService,
                 private fb: FormBuilder) { }
 
     public ngOnInit() {
         this.form = this.fb.group({
             selectedProto: ['', Validators.required],
         });
-        this.newExperimentService.hiSeqPricesChanged.subscribe((value) => {
-            if (value ) {
-                if (this.newExperimentService.hiSeqPricesChanged.value === true) {
-                    this.newExperimentService.hiSeqPricesChanged.next(false);
-                }
+    }
 
-                if (this.requestCategory) {
-                    // this.filteredNumberSequencingCyclesAllowedList = this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed')
-                    //     .sort(TabSeqProtoViewComponent.sortNumberSequencingCyclesAllowed);
-                    // this.filteredNumberSequencingCyclesAllowedList = TabSeqProtoViewComponent.filterNumberSequencingCyclesAllowed(this.filteredNumberSequencingCyclesAllowedList, this.requestCategory);
-                    this.filteredNumberSequencingCyclesAllowedList = TabSeqProtoViewComponent.filterNumberSequencingCyclesAllowed(
-                        this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed'),
-                        this.requestCategory
-                    ).sort(TabSeqProtoViewComponent.sortNumberSequencingCyclesAllowed);
-
-                    // this.runTypeLabel = this.gnomexService.getRequestCategoryProperty(this.requestCategory.idCoreFacility, this.requestCategory.codeRequestCategory, this.gnomexService.PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD);
-                    for (let proto of this.filteredNumberSequencingCyclesAllowedList) {
-                        proto.price = this.newExperimentService.priceMap.get(proto.idNumberSequencingCyclesAllowed);
-                    }
-                }
-            }
-        });
+    public ngOnDestroy() {
+        if (this.codeRequestCategory_subscription) {
+            this.codeRequestCategory_subscription.unsubscribe();
+        }
+        if (this.idLab_subscription) {
+            this.idLab_subscription.unsubscribe();
+        }
     }
 
     public static sortNumberSequencingCyclesAllowed(obj1: any, obj2: any): number {
@@ -188,7 +209,35 @@ export class TabSeqProtoViewComponent implements OnInit {
     }
 
     public onProtoChange() {
-        // this.newExperimentService.selectedProto = this.form.get("selectedProto").value;
-        this.experiment.selectedProtocol = this.form.get("selectedProto").value;
+        this._experiment.selectedProtocol = this.form.get("selectedProto").value;
+    }
+
+    private changePrices(): void {
+        if (this._experiment) {
+            let appPriceListParams: HttpParams = new HttpParams()
+                .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
+                .set("idLab", this._experiment.idLab);
+
+            this.billingService.getHiSeqRunTypePriceList(appPriceListParams).subscribe((response: any) => {
+
+                if (Array.isArray(response)) {
+                    for (let price of response) {
+                        let key: string = price.idNumberSequencingCyclesAllowed;
+                        this.priceMap.set(key, price.price);
+                    }
+                }
+
+                if (this.requestCategory) {
+                    this.filteredNumberSequencingCyclesAllowedList = TabSeqProtoViewComponent.filterNumberSequencingCyclesAllowed(
+                        this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed'),
+                        this.requestCategory
+                    ).sort(TabSeqProtoViewComponent.sortNumberSequencingCyclesAllowed);
+
+                    for (let proto of this.filteredNumberSequencingCyclesAllowedList) {
+                        proto.price = this.priceMap.get(proto.idNumberSequencingCyclesAllowed);
+                    }
+                }
+            });
+        }
     }
 }

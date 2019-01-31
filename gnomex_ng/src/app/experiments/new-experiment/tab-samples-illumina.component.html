@@ -33,12 +33,13 @@
                 <mat-checkbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
             </div>
             <div class="full-width flex-grow">
+                <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                                 stopEditingWhenGridLosesFocus="true"
                                  [enableColResize]="true"
                                  [rowSelection]="'single'"
                                  [singleClickEdit]="true"
-                                 stopEditingWhenGridLosesFocus="true"
-                                 (cellValueChanged) = "onCellValueChanged($event)"
+                                 (cellValueChanged)="onCellValueChanged($event)"
                                  (gridReady)="this.onSamplesGridReady($event)">
                 </ag-grid-angular>
             </div>
