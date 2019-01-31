@@ -4,6 +4,7 @@
 import {Component, forwardRef, Input, OnDestroy, OnInit} from "@angular/core";
 import {ControlValueAccessor,FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {IAnnotation, IPropertyEntryValue} from "./interfaces/annotation.model";
+import {UtilService} from "../services/util.service";
 
 
 export const URL_ANNOT_VALUE_ACCESSOR: any = {
@@ -52,7 +53,7 @@ export class UrlAnnotationComponent implements OnInit, OnDestroy, ControlValueAc
     public alias:string ='';
 
 
-    constructor(){
+    constructor(private utilService: UtilService){
     }
 
     ngOnInit(){
@@ -95,7 +96,7 @@ export class UrlAnnotationComponent implements OnInit, OnDestroy, ControlValueAc
 
            this.annot = obj;
            let pev = obj.PropertyEntryValue;
-           this.urlAnnotations = Array.isArray(pev) ? <IPropertyEntryValue[]>pev : <IPropertyEntryValue[]>[pev];
+           this.urlAnnotations = UtilService.getJsonArray(pev, pev);
            // writing PropertyEntryValue Array to Annot again because if only one item return it will be just an object
            // then I add that to an array thus breaking the connection between annot and its property 'PropertyEntryValue'
            this.annot.PropertyEntryValue = this.urlAnnotations;

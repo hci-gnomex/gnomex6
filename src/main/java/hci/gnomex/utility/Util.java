@@ -766,6 +766,15 @@ public class Util {
         }
     }
 
+    public static String getJsonStringSafe(JsonObject object, String valueName) {
+        return object.get(valueName) != null ? object.getString(valueName) : null;
+    }
+
+    public static String getJsonStringSafeNonNull(JsonObject object, String valueName) {
+        String value = getJsonStringSafe(object, valueName);
+        return value != null ? value : "";
+    }
+
 }
 
 
