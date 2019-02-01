@@ -4,7 +4,10 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 
 @Component({
 	template: `
-		<div class="full-width full-height {{this.errorMessage && this.errorMessage !== '' ? 'error' : ''}}">
+		<div [matTooltip]="this.errorMessage"
+             [matTooltipShowDelay]="300"
+             [matTooltipHideDelay]="300"
+			 class="full-width full-height {{this.errorMessage && this.errorMessage !== '' ? 'error' : ''}}">
 			<div class="t full-width full-height fix-table">
 				<div class="tr">
 					<div class="td vertical-center right-align padded ellipsis">

@@ -48,7 +48,6 @@ import {NewExperimentService} from "./new-experiment.service";
 import {ProtocolService} from "./protocol.service";
 import {BrowseOrderValidateService} from "./browse-order-validate.service";
 import {UniqueIdGeneratorService} from "./unique-id-generator.service";
-import {SamplesService} from "./samples.service";
 import {ExperimentPlatformService} from "./experiment-platform.service";
 import {FileService} from "./file.service";
 import {UploadFileService} from "./upload-file.service";
@@ -110,7 +109,6 @@ import {UtilService} from "./util.service";
         ProtocolService,
         BrowseOrderValidateService,
         UniqueIdGeneratorService,
-        SamplesService,
         ExperimentPlatformService,
         RegisterUserResolverService,
         FileService,

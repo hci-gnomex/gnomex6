@@ -49,7 +49,7 @@
         </ng-container>
 
     </form>
-    <div style="flex:1">
+    <div *ngIf="showConfigureAnnotationsButton" style="flex:1">
         <button mat-button color="primary" style="margin:1em" (click)="loadConfigAnnotations()"> Configure Annotations </button>
 
     </div>

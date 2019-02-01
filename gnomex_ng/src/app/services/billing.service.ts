@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable, Output} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
+import {Headers, Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
@@ -77,9 +77,11 @@ export class BillingService {
         return this.httpClient.get("/gnomex/CreateBillingItems.gx", {params: params});
     }
 
-    createBillingItems2(formData: string):Observable<any>{
+    public createBillingItems2(params: URLSearchParams):Observable<any>{
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/CreateBillingItems.gx", formData.toString());
+        let headers: Headers = new Headers();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        return this.http.post("/gnomex/CreateBillingItems.gx", params.toString(), { headers: headers });
     }
 
     public getBillingItemList(params: HttpParams): Observable<any> {

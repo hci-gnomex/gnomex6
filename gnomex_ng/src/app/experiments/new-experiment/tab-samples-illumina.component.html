@@ -1,6 +1,8 @@
 <div class="full-height full-width small-font">
     <form [formGroup]="form" class="full-height full-width flex-container-col">
-        <div *ngIf="showInstructions === true" class="sample-instructions allow-line-breaks">{{ BASIC_INSTRUCTIONS }}
+        <div *ngIf="showInstructions === true" class="full-width padded">
+            <div class="sample-instructions allow-line-breaks padded">{{ BASIC_INSTRUCTIONS }}
+            </div>
         </div>
         <div class="full-width flex-grow flex-container-col">
             <div class="full-width flex-container-row align-center padded">
@@ -9,7 +11,7 @@
                         color="link"
                         matTooltip="{{ TOOLTIP_TEXT }}"
                         (click)="onClickShowInstructions()">
-                    <img class="icon" [src]="constService.ICON_INFORMATION" alt="">
+                    <img class="icon" [src]="this.constService.ICON_INFORMATION" alt="">
                     Instructions
                 </button>
                 <button mat-button
@@ -31,27 +33,15 @@
                 <mat-checkbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
             </div>
             <div class="full-width flex-grow">
+                <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
-                                 [rowSelection]="'single'"
-                                 [rowClassRules]="this.samplesGridRowClassRules"
+                                 stopEditingWhenGridLosesFocus="true"
                                  [enableColResize]="true"
-                                 (cellValueChanged) = "onCellValueChanged($event)"
-                                 (columnEverythingChanged)="this.onEverythingChanged()"
-                                 (gridReady)="this.onSamplesGridReady($event)"
-                                 (rowDataChanged)="this.onSamplesGridRowDataChanged()"
-                                 (rowSelected)="this.onSamplesGridRowSelected($event)">
+                                 [rowSelection]="'single'"
+                                 [singleClickEdit]="true"
+                                 (cellValueChanged)="onCellValueChanged($event)"
+                                 (gridReady)="this.onSamplesGridReady($event)">
                 </ag-grid-angular>
-                <!--<ag-grid-angular class="ag-theme-fresh full-height full-width"-->
-                                 <!--(gridReady)="this.onSamplesGridReady($event)"-->
-                                 <!--(rowDataChanged)="this.onSamplesGridRowDataChanged()"-->
-                                 <!--(columnEverythingChanged)="this.onEverythingChanged()"-->
-                                 <!--[rowSelection]="'single'"-->
-                                 <!--(rowSelected)="this.onSamplesGridRowSelected($event)"-->
-                                 <!--[rowClassRules]="this.samplesGridRowClassRules"-->
-                                 <!--[columnDefs]="this.samplesGridColumnDefs"-->
-                                 <!--(cellValueChanged) = "onCellValueChanged($event)"-->
-                                 <!--[enableColResize]="true">-->
-                <!--</ag-grid-angular>-->
             </div>
         </div>
     </form>
