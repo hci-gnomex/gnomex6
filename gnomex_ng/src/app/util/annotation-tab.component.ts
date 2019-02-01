@@ -55,6 +55,15 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
     private _annotations: IAnnotation[];
     private _disabled: boolean = false;
 
+    @Input("showConfigureAnnotationsButton") public set showConfigureAnnotationsButton(value: boolean) {
+        this._showConfigureAnnotationsButton = value;
+    };
+    public get showConfigureAnnotationsButton(): boolean {
+        return this._showConfigureAnnotationsButton;
+    }
+
+    private _showConfigureAnnotationsButton: boolean = true;
+
     @Input() orderType = OrderType.NONE;
     private orderValidateSubscription: Subscription;
 
@@ -154,8 +163,8 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
                 annotationToSave.push(this.form.controls[annot.name].value);
             }
         }
-        this.orderValidateService.annotationsToSave = annotationToSave;
 
+        this.orderValidateService.annotationsToSave = annotationToSave;
     };
 
 

@@ -109,6 +109,9 @@ export class Experiment {
         if (value && value.idLab) {
             this._idLab = value.idLab;
         }
+        if (value && value.display) {
+            this.labName = value.display;
+        }
         this.onChange_idLab.next(this._idLab);
     }
 
@@ -677,6 +680,125 @@ export class Experiment {
             Experiment.addDescriptionFieldToAnnotations(response);
             this.PropertyEntries = response;
         });
+    }
+
+    public getJSONObjectRepresentation(): any {
+        let tempSamples: any[] = [];
+
+        for (let sample of this.samples) {
+            tempSamples.push(sample.getJSONObjectRepresentation());
+        }
+
+        let temp: any = {
+            idCoreFacility:                     this.idCoreFacility,
+            idProductOrder:                     this.idProductOrder,
+            idLab:                              this.idLab,
+            idAppUser:                          this.idAppUser,
+            targetClassIdentifier:              this.targetClassIdentifier,
+            targetClassName:                    this.targetClassName,
+            idBillingAccount:                   this.idBillingAccount,
+            idProduct:                          this.idProduct,
+            codeApplication:                    this.codeApplication,
+            codeRequestCategory:                this.codeRequestCategory,
+            idRequest:                          this.idRequest,
+            codeBioanalyzerChipType:            this.codeBioanalyzerChipType,
+            isArrayINFORequest:                 this.isArrayINFORequest,
+            project:                            this.project,
+            projectName:                        this.projectName,
+            canRead:                            this.canRead,
+            canUpdate:                          this.canUpdate,
+            canDelete:                          this.canDelete,
+            canUpdateVisibility:                this.canUpdateVisibility,
+            canUploadData:                      this.canUploadData,
+            canDeleteSample:                    this.canDeleteSample,
+            canUpdateSamples:                   this.canUpdateSamples,
+            codeVisibility:                     this.codeVisibility,
+            isVisibleToMembers:                 this.isVisibleToMembers,
+            isVisibleToMembersAndCollaborators: this.isVisibleToMembersAndCollaborators,
+            isVisibleToPublic:                  this.isVisibleToPublic,
+            ownerName:                          this.ownerName,
+            submitterName:                      this.submitterName,
+            labName:                            this.labName,
+            truncatedLabName:                   this.truncatedLabName,
+            billingAccountName:                 this.billingAccountName,
+            billingAccountNumber:               this.billingAccountNumber,
+            lastModifyDate:                     this.lastModifyDate,
+            isExternal:                         this.isExternal,
+            codeProtocolType:                   this.codeProtocolType,
+            corePrepInstructions:               this.corePrepInstructions,
+            analysisInstructions:               this.analysisInstructions,
+            idSubmitter:                        this.idSubmitter,
+            application:                        this.application,
+            captureLibDesignId:                 this.captureLibDesignId,
+            avgInsertSizeFrom:                  this.avgInsertSizeFrom,
+            avgInsertSizeTo:                    this.avgInsertSizeTo,
+            idProject:                          this.idProject,
+            idSlideProduct:                     this.idSlideProduct,
+            protocolNumber:                     this.protocolNumber,
+            numberOfSamples:                    this.numberOfSamples,
+            idSampleTypeDefault:                this.idSampleTypeDefault,
+            notes:                              this.notes,
+            bioinformaticsAssist:               this.bioinformaticsAssist,
+            completedDate:                      this.completedDate,
+            slideProduct:                       this.slideProduct,
+            idOrganismSampleDefault:            this.idOrganismSampleDefault,
+            createDate:                         this.createDate,
+            idInstitution:                      this.idInstitution,
+            privacyExpirationDate:              this.privacyExpirationDate,
+            codeRequestStatus:                  this.codeRequestStatus,
+            requestStatus:                      this.requestStatus,
+            idSampleDropOffLocation:            this.idSampleDropOffLocation,
+            submitterEmail:                     this.submitterEmail,
+            submitterPhone:                     this.submitterPhone,
+            submitterInstitution:               this.submitterInstitution,
+            isDNASeqExperiment:                 this.isDNASeqExperiment,
+            applicationNotes:                   this.applicationNotes,
+            coreToExtractDNA:                   this.coreToExtractDNA,
+            processingDate:                     this.processingDate,
+            codeIsolationPrepType:              this.codeIsolationPrepType,
+            hasPrePooledLibraries:              this.hasPrePooledLibraries,
+            numPrePooledTubes:                  this.numPrePooledTubes,
+            reagent:                            this.reagent,
+            elutionBuffer:                      this.elutionBuffer,
+            usedDnase:                          this.usedDnase,
+            usedRnase:                          this.usedRnase,
+            keepSamples:                        this.keepSamples,
+            seqPrepByCore:                      this.seqPrepByCore,
+            includeBisulfideConversion:         this.includeBisulfideConversion,
+            includeQubitConcentration:          this.includeQubitConcentration,
+            turnAroundTime:                     this.turnAroundTime,
+            adminNotes:                         this.adminNotes,
+            archived:                           this.archived,
+            description:                        this.description,
+            name:                               this.name,
+            number:                             this.number,
+            projectDescription:                 this.projectDescription,
+            accountNumberDisplay:               this.accountNumberDisplay,
+            idOrganism:                         this.idOrganism,
+            organismName:                       this.organismName,
+            otherOrganism:                      this.otherOrganism,
+            hasCCNumber:                        this.hasCCNumber,
+            hasSampleDescription:               this.hasSampleDescription,
+            hasPlates:                          this.hasPlates,
+            isOpeningNewBillingTemplate:        this.isOpeningNewBillingTemplate,
+
+            analysisExperimentItems:  this.analysisExperimentItems,
+            billingItems:             this.billingItems,
+            collaborators:            this.collaborators,
+            files:                    this.files,
+            hybridizations:           this.hybridizations,
+            labeledSamples:           this.labeledSamples,
+            PropertyEntries:          this.PropertyEntries,
+            protocols:                this.protocols,
+            RequestProperties:        this.RequestProperties,
+            samples:                  tempSamples,
+            SeqLibTreatmentEntries:   this.SeqLibTreatmentEntries,
+            seqLibTreatments:         this.seqLibTreatments,
+            sequenceLanes:            this.sequenceLanes,
+            workItems:                this.workItems,
+        };
+
+        return temp;
     }
 
     private static filterOnlyPropertiesForSamples(properties: any[]): any[] {

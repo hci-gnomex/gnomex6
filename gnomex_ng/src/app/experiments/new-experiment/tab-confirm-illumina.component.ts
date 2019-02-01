@@ -9,6 +9,7 @@ import {BarcodeSelectEditor} from "../../util/grid-editors/barcode-select.editor
 import {BillingService} from "../../services/billing.service";
 
 import {Experiment} from "../../util/models/experiment.model";
+import {URLSearchParams} from "@angular/http";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -28,6 +29,8 @@ import {Experiment} from "../../util/models/experiment.model";
         .instructions-background {
             background-color: lightyellow;
         }
+        
+        .minheight { min-height: 3em; }
         
         .font-bold { font-weight: bold; }
         
@@ -273,8 +276,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
         this.isCheckboxChecked = false;
 
         if (this._experiment.isExternal === 'Y') {
-            // This is an external experiment submission.  Don't
-            // attempt to get estimated charges.
+            // This is an external experiment submission.  Don't attempt to get estimated charges.
         } else {
             let accountName:String = "";
 
@@ -288,11 +290,12 @@ export class TabConfirmIlluminaComponent implements OnInit {
             // This is a new experiment request. Get the estimated charges for this request.
             this._experiment.billingItems = [];
 
-            // TODO: Write toJSONString function in Experiment model.
-            let stringifiedRequest: any = JSON.stringify(this._experiment);
-            let formData: FormData = new FormData();
-            formData.append("requestXMLString", stringifiedRequest);
-            this.billingService.createBillingItems2(stringifiedRequest).subscribe((response: any) => {
+            let stringifiedRequest: string = JSON.stringify(this._experiment.getJSONObjectRepresentation());
+            // let formData: FormData = new FormData();
+            // formData.append("requestXMLString", stringifiedRequest);
+            let params: URLSearchParams = new URLSearchParams();
+            params.set("requestXMLString", stringifiedRequest);
+            this.billingService.createBillingItems2(params).subscribe((response: any) => {
                 this.billingItems = response.BillingItem;
             });
         }

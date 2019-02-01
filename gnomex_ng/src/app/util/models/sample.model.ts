@@ -95,4 +95,47 @@ export class Sample {
     public frontEndGridGroup: string;
 
     [prop: string]: any;
+
+    public getJSONObjectRepresentation(): any {
+
+        let temp: any = {
+            idSample:                        this.idSample,
+            name:                            this.name,
+            description:                     this.description,
+            canChangeSampleName:             this.canChangeSampleName,
+            canChangeSampleType:             this.canChangeSampleType,
+            canChangeSampleConcentration:    this.canChangeSampleConcentration,
+            canChangeSampleSource:           this.canChangeSampleSource,
+            canChangeNumberSequencingCycles: this.canChangeNumberSequencingCycles,
+            canChangeNumberSequencingLanes:  this.canChangeNumberSequencingLanes,
+            concentration:                   this.concentration,
+            label:                           this.label,
+            idOligoBarcode:                  this.idOligoBarcode,
+            barcodeSequence:                 this.barcodeSequence,
+            idOligoBarcodeB:                 this.idOligoBarcodeB,
+            barcodeSequenceB:                this.barcodeSequenceB,
+            idNumberSequencingCycles:        this.idNumberSequencingCycles,
+            idNumberSequencingCyclesAllowed: this.idNumberSequencingCyclesAllowed,
+            idSeqRunType:                    this.idSeqRunType,
+            numberSequencingLanes:           this.numberSequencingLanes,
+            codeConcentrationUnit:           this.codeConcentrationUnit,
+            idSampleType:                    this.idSampleType,
+            idSeqLibProtocol:                this.idSeqLibProtocol,
+            seqPrepByCore:                   this.seqPrepByCore,
+            idOrganism:                      this.idOrganism,
+            otherOrganism:                   this.otherOrganism,
+            treatment:                       this.treatment,
+            customColor:                     this.customColor,
+            multiplexGroupNumber:            this.multiplexGroupNumber,
+            isDirty:                         this.isDirty
+        };
+
+        for (let key of Object.keys(this)) {
+            if (key.startsWith("ANNOT")) {
+                temp[key] = this[key];
+            }
+        }
+
+        return temp;
+    }
 }

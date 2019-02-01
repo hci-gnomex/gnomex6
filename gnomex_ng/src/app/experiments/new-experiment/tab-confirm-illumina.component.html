@@ -19,22 +19,22 @@
             Experiment Details
         </div>
         <div class="padded heavily-left-padded">
-            <div class="padded">
+            <div *ngIf="!!submitterName" class="padded">
                 {{ submitterName }}
             </div>
-            <div class="padded">
+            <div *ngIf="!!labName" class="padded">
                 {{ labName }}
             </div>
-            <div class="padded">
+            <div *ngIf="billingAccountName && billingAccountNumber" class="padded">
                 {{ billingAccountName }}({{ billingAccountNumber }})
             </div>
-            <div class="padded">
+            <div *ngIf="experiment && experiment.requestCategory && experiment.requestCategory.display" class="padded">
                 {{ experiment?.requestCategory?.display }}
             </div>
-            <div class="padded">
+            <div *ngIf="experiment && experiment.application" class="padded">
                 {{ experiment?.application }}
             </div>
-            <div class="padded">
+            <div *ngIf="experiment && experiment.selectedProtocol && experiment.selectedProtocol.display" class="padded">
                 {{ experiment?.selectedProtocol?.display }}
             </div>
             <div *ngIf="experiment?.seqPrepByCore_forSamples === 'Y'" class="padded">
@@ -46,7 +46,13 @@
         </div>
         <!--Requires conversion of CreateBillingItems (which is oddly called before confirmation/submitting the form.-->
 
-        <div class="flex-container-row full-height full-width small-font">
+        <div class="top-margin font-bold">
+            Request Properties :
+        </div>
+        <div class="top-margin font-bold">
+            Experiment Design :
+        </div>
+        <div class="flex-container-row full-height full-width small-font minheight">
             <ag-grid-angular class="ag-theme-fresh full-height full-width"
                              [columnDefs]="this.samplesGridConfirmColumnDefs"
                              [enableColResize]="true"

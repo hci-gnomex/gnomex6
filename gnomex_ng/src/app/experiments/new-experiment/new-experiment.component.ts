@@ -112,6 +112,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     annotationInputs = {
         annotations: this.annotations,
         orderType: this.types.EXPERIMENT,
+        showConfigureAnnotationsButton: false,
         disabled: false
     };
 
