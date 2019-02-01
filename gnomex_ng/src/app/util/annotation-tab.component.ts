@@ -108,7 +108,12 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
 
                     this.form.controls[annot.name].setValue(selectedOpts);
                 } else if (annot.codePropertyType === this.OPTION) {
-                    this.form.controls[annot.name].setValue(annot.value ? annot.value : '');
+                    for (let opt  of annot.PropertyOption) {
+                        if (opt.selected === 'Y') {
+                            this.form.controls[annot.name].setValue(opt);
+                            break;
+                        }
+                    }
                 } else if (annot.codePropertyType === this.URL) {
                     this.form.controls[annot.name].setValue(annot);
                 }

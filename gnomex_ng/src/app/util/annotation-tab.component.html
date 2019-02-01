@@ -19,7 +19,7 @@
                 <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.form.controls[annot.name]">
                     <mat-option *ngFor="let opt of annot.PropertyOption"
                                 #mOptRef
-                                (onSelectionChange)="selectOption(mOptRef)"
+                                (onSelectionChange)="selectOpt(mOptRef)"
                                 [value]="opt" > {{opt.name}}
                     </mat-option>
                 </mat-select>

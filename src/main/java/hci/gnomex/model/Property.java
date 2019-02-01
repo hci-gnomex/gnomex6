@@ -385,6 +385,7 @@ implements Serializable, OntologyEntry, DictionaryEntryUserOwned {
         valueNode.setAttribute("urlAlias", av.getUrlAlias() != null ? av.getUrlAlias() : "");
       }
     }
+    /*
     if (property.getCodePropertyType().equals(PropertyType.URL)) {
       // Add an empty value for URL
       Element emptyNode = new Element("PropertyEntryValue");
@@ -395,6 +396,7 @@ implements Serializable, OntologyEntry, DictionaryEntryUserOwned {
       emptyNode.setAttribute("urlDisplay", "");
       emptyNode.setAttribute("value", "");
     }
+    */
 
     if (property.getOptions() != null && property.getOptions().size() > 0) {
       for (Iterator i1 = property.getOptions().iterator(); i1.hasNext(); ) {

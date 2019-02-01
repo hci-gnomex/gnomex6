@@ -70,14 +70,10 @@ export class DataTrackService {
         }));
     }
 
-    saveDataTrack(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveDataTrack.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    public saveDataTrack(params: HttpParams): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveDataTrack.gx", params.toString(), {headers: headers});
     }
 
     deleteDataTrack(params: URLSearchParams): Observable<any> {
