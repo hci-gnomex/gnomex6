@@ -23,6 +23,7 @@ import {ProtocolDialogComponent} from "./protocol-dialog.component";
 import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
 import {AngularSplitModule} from "angular-split";
 import {IconRendererComponent} from "../../util/grid-renderers";
+import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component";
 
 
 @NgModule({
@@ -52,6 +53,7 @@ import {IconRendererComponent} from "../../util/grid-renderers";
         MaterialsMethodsTabComponent,
         ProtocolDialogComponent,
         ExperimentSequenceLanesTab,
+        ExperimentBillingTabComponent,
     ],
     providers: [],
     entryComponents: [

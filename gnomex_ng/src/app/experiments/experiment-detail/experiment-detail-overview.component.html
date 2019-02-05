@@ -28,6 +28,9 @@
             <mat-tab label="Files">
                 <experiment-files-tab></experiment-files-tab>
             </mat-tab>
+            <mat-tab *ngIf="showBillingTab" label="Billing">
+                <experiment-billing-tab></experiment-billing-tab>
+            </mat-tab>
         </mat-tab-group>
     </div>
     <div class="full-width">
