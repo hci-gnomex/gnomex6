@@ -30,6 +30,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public initDescriptionTab = false;
     public showBioinformaticsTab: boolean = false;
     public showSequenceLanesTab: boolean = false;
+    public showBillingTab: boolean = false;
     private overviewListSubscription: Subscription;
     private experimentOverviewNode: any;
     private relatedObjects: IRelatedObject = {};
@@ -53,6 +54,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
         this.route.data.forEach((data: any) => {
             this.experiment = null;
             this.showSequenceLanesTab = false;
+            this.showBillingTab = false;
 
             if (data && data.experiment && data.experiment.Request) {
                 this.experiment = data.experiment.Request;
@@ -70,6 +72,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 }
 
                 this.showSequenceLanesTab = this.requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
+                this.showBillingTab = this.experiment.canRead === 'Y' && this.experiment.isExternal !== 'Y';
 
                 let protocols: any[] = [];
                 if (this.experiment.protocols) {
