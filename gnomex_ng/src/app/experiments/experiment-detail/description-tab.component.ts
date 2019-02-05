@@ -3,11 +3,12 @@ import {
     Component,
     Input,
     OnChanges,
+    OnDestroy,
     OnInit,
-    ViewChild,
     SimpleChanges,
+    ViewChild,
 } from "@angular/core";
-import {FormGroup,FormBuilder,Validators } from "@angular/forms"
+import {FormBuilder, FormGroup, Validators} from "@angular/forms"
 import {ActivatedRoute} from "@angular/router";
 
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
@@ -15,19 +16,24 @@ import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {ExperimentsService} from "../experiments.service";
 
 export const EDITOR_HEIGHT = Object.freeze({
-    HEIGHT_600: "600px",
-    HEIGHT_500: "500px",
-    HEIGHT_400: "400px",
-    HEIGHT_300: "300px",
-    HEIGHT_200: "200px",
-    HEIGHT_250: "250px",
-    HEIGHT_150: "150px",
-    HEIGHT_100: "100px",
-    HEIGHT_50: "50px",
-    HEIGHT_0: "0"
+    HEIGHT_MAX: "50em",
+    HEIGHT_BIGGER: "25em",
+    HEIGHT_BIG: "15em",
+    HEIGHT_MID: "14em",
+    HEIGHT_SMALL: "10em",
+    HEIGHT_MIN: "8em",
+    HEIGHT_ZERO: "0"
 });
+
+export const FONT_FAMILY = [
+    {class: "arial", name: "Arial"},
+    {class: "courier-new", name: "Courier New"},
+    {class: "georgia", name: "Georgia"},
+    {class: "times-new-roman", name: "Times New Roman"},
+];
 
 @Component({
     selector: "description-tab",
@@ -104,7 +110,7 @@ export const EDITOR_HEIGHT = Object.freeze({
 
         .gx-label{
             color: darkblue;
-            margin: 0;
+            margin-top: 0.5rem;
         }
 
         .label-width {
@@ -117,7 +123,7 @@ export const EDITOR_HEIGHT = Object.freeze({
     `]
 
 })
-export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges {
+export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
     
     @Input() editMode: boolean;
     
@@ -134,100 +140,78 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges
     
     descEditorConfig: AngularEditorConfig = {
         spellcheck: true,
-        height: "300px",
-        minHeight: "5rem",
-        maxHeight: "300px",
+        height: "100%",
+        minHeight: "5em",
+        maxHeight: "100%",
         width: "100%",
-        minWidth: "5rem",
+        minWidth: "5em",
         enableToolbar: true,
         defaultFontName: "Arial",
-        defaultFontSize: "7",
-        fonts: [
-            {class: "arial", name: "Arial"},
-            {class: "times-new-roman", name: "Times New Roman"},
-            {class: "courier-new", name: "Courier New"},
-            {class: "georgia", name: "Georgia"},
-        ],
+        defaultFontSize: "2",
+        fonts: FONT_FAMILY,
     };
     
     notesEditorConfig: AngularEditorConfig = {
         spellcheck: true,
-        height: "300px",
-        minHeight: "5rem",
-        maxHeight: "300px",
+        height: "100%",
+        minHeight: "5em",
+        maxHeight: "100%",
         width: "100%",
-        minWidth: "5rem",
+        minWidth: "5em",
         enableToolbar: true,
         defaultFontName: "Arial",
-        defaultFontSize: "7",
-        fonts: [
-            {class: "arial", name: "Arial"},
-            {class: "times-new-roman", name: "Times New Roman"},
-            {class: "courier-new", name: "Courier New"},
-            {class: "georgia", name: "Georgia"},
-        ],
+        defaultFontSize: "2",
+        fonts: FONT_FAMILY,
     };
     
     projectDescEditorConfig: AngularEditorConfig = {
         spellcheck: true,
-        height: "300px",
-        minHeight: "5rem",
-        maxHeight: "300px",
+        height: "100%",
+        minHeight: "5em",
+        maxHeight: "100%",
         width: "100%",
-        minWidth: "5rem",
+        minWidth: "5em",
         enableToolbar: true,
         defaultFontName: "Arial",
-        defaultFontSize: "7",
-        fonts: [
-            {class: "arial", name: "Arial"},
-            {class: "times-new-roman", name: "Times New Roman"},
-            {class: "courier-new", name: "Courier New"},
-            {class: "georgia", name: "Georgia"},
-        ],
+        defaultFontSize: "2",
+        fonts: FONT_FAMILY,
     };
 
     adminNotesEditorConfig: AngularEditorConfig = {
         spellcheck: true,
-        height: "300px",
-        minHeight: "5rem",
-        maxHeight: "300px",
+        height: "100%",
+        minHeight: "5em",
+        maxHeight: "100%",
         width: "100%",
-        minWidth: "5rem",
+        minWidth: "5em",
         enableToolbar: true,
         defaultFontName: "Arial",
-        defaultFontSize: "7",
-        fonts: [
-            {class: "arial", name: "Arial"},
-            {class: "times-new-roman", name: "Times New Roman"},
-            {class: "courier-new", name: "Courier New"},
-            {class: "georgia", name: "Georgia"},
-        ],
+        defaultFontSize: "2",
+        fonts: FONT_FAMILY,
     };
     
     private experiment:any;
-    public showEditors: number;
-    private viewHeight: string = "";
-    private viewMinorHeight: string = "";
-    private editHeight: string = "";
-    private editMinorHeight: string = "";
+    private numEditors: number;
+    private editorHeight: string = "";
+    private editorMinorHeight: string = "";
     
 
-
     constructor(private fb: FormBuilder,
-                private constantsService:ConstantsService,
+                public constantsService:ConstantsService,
                 private secAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
+                private experimentService: ExperimentsService,
                 private route:ActivatedRoute) {
     }
 
 
     ngOnInit(){
         this.descriptionForm = this.fb.group({
-            expName: [{value: "", disabled: true}, Validators.maxLength(200)],
-            description: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_CHARS)],
-            projectDesc: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_CHARS)],
-            notesForCoreFacility: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_CHARS)],
-            adminNotes: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_CHARS)],
+            expName: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_200)],
+            description: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
+            projectDesc: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_4000)],
+            notesForCoreFacility: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
+            adminNotes: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
         });
         
         this.route.data.forEach(data => {
@@ -236,15 +220,17 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges
                 this.experiment = exp.Request;
                 this.descriptionForm.get("expName").setValue( this.experiment.name);
                 this.descriptionForm.get("description").setValue( this.experiment.description);
-                
-                if(this.experiment.isExternal === "Y" && !this.experiment.corePrepInstructions) {
+    
+                this.showNotesForCoreFacility = false;
+                if(this.experiment.isExternal === "Y" && this.experiment.corePrepInstructions !== "") {
                     this.showNotesForCoreFacility = false;
                 } else {
                     this.showNotesForCoreFacility = true;
                     this.descriptionForm.get("notesForCoreFacility").setValue( this.experiment.corePrepInstructions);
                 }
     
-                if(this.experiment.projectDescription) {
+                this.showProjectDesc = false;
+                if(this.experiment.projectDescription && this.experiment.projectDescription !== "") {
                     this.showProjectDesc = true;
                     this.descriptionForm.get("projectDesc").setValue(this.experiment.projectDescription);
                 }
@@ -255,13 +241,14 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges
                     this.descriptionForm.get("adminNotes").setValue( this.experiment.adminNotes);
                 }
                 
-                this.showEditors = this.getShowEditors();
-                this.getEditorHeight();
+                this.numEditors = this.getShowEditors();
+    
+                setTimeout( () => {
+                    this.updateForm();
+                });
+                
             }
     
-            setTimeout( () => {
-                this.updateForm();
-            });
         });
     }
 
@@ -269,37 +256,50 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges
     }
     
     ngOnChanges(changes: SimpleChanges): void {
-        if(!changes["editMode"].isFirstChange()) {
-            this.updateForm();
+        if (this.experimentService.modeChangedExperiment && this.experiment && this.experimentService.modeChangedExperiment.number === this.experiment.number) {
+            if (!changes["editMode"].isFirstChange()) {
+                this.updateForm();
+            }
         }
     }
     
+    ngOnDestroy() {
+        this.experimentService.modeChangedExperiment = undefined;
+        this.experimentService.setEditMode(false);
+    }
+    
     updateForm() {
+        this.getEditorHeight();
+        
         if (this.editMode) {
             this.descriptionForm.get("expName").enable();
             this.descriptionForm.get("description").enable();
             this.descEditor.editorToolbar.showToolbar = true;
             this.descEditorConfig.editable = true;
-            this.descEditorConfig.maxHeight = this.editHeight;
+            this.descEditorConfig.height = this.editorHeight;
+            this.descEditorConfig.maxHeight = this.editorHeight;
             
             if(this.showProjectDesc) {
                 this.descriptionForm.get("projectDesc").enable();
                 this.projectDescEditor.editorToolbar.showToolbar = true;
                 this.projectDescEditorConfig.editable = true;
-                this.projectDescEditorConfig.maxHeight = this.editMinorHeight;
+                this.projectDescEditorConfig.height = this.editorMinorHeight;
+                this.projectDescEditorConfig.maxHeight = this.editorMinorHeight;
             }
             if(this.showNotesForCoreFacility) {
                 this.descriptionForm.get("notesForCoreFacility").enable();
                 this.notesEditor.editorToolbar.showToolbar = true;
                 this.notesEditorConfig.editable = true;
-                this.notesEditorConfig.maxHeight = this.editMinorHeight;
+                this.notesEditorConfig.height = this.editorMinorHeight;
+                this.notesEditorConfig.maxHeight = this.editorMinorHeight;
             }
             
             if(this.showAdminNotes) {
                 this.descriptionForm.get("adminNotes").enable();
                 this.adminNotesEditor.editorToolbar.showToolbar = true;
                 this.adminNotesEditorConfig.editable = true;
-                this.adminNotesEditorConfig.maxHeight = this.editMinorHeight;
+                this.adminNotesEditorConfig.height = this.editorMinorHeight;
+                this.adminNotesEditorConfig.maxHeight = this.editorMinorHeight;
             }
             
         } else {
@@ -311,14 +311,16 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges
             
             this.descEditor.editorToolbar.showToolbar = false;
             this.descEditorConfig.editable = false;
-            this.descEditorConfig.maxHeight = this.viewHeight;
+            this.descEditorConfig.height = this.editorHeight;
+            this.descEditorConfig.maxHeight = this.editorHeight;
             
             if(this.showProjectDesc) {
                 this.descriptionForm.get("projectDesc").setValue(this.experiment.projectDescription);
                 this.descriptionForm.get("projectDesc").disable();
                 this.projectDescEditor.editorToolbar.showToolbar = false;
                 this.projectDescEditorConfig.editable = false;
-                this.projectDescEditorConfig.maxHeight = this.viewMinorHeight;
+                this.projectDescEditorConfig.height = this.editorMinorHeight;
+                this.projectDescEditorConfig.maxHeight = this.editorMinorHeight;
             }
             
             if(this.showNotesForCoreFacility) {
@@ -326,7 +328,8 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges
                 this.descriptionForm.get("notesForCoreFacility").disable();
                 this.notesEditor.editorToolbar.showToolbar = false;
                 this.notesEditorConfig.editable = false;
-                this.notesEditorConfig.maxHeight = this.viewMinorHeight;
+                this.notesEditorConfig.height = this.editorMinorHeight;
+                this.notesEditorConfig.maxHeight = this.editorMinorHeight;
             }
             
             if(this.showAdminNotes) {
@@ -334,7 +337,8 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges
                 this.descriptionForm.get("adminNotes").disable();
                 this.adminNotesEditor.editorToolbar.showToolbar = false;
                 this.adminNotesEditorConfig.editable = false;
-                this.adminNotesEditorConfig.maxHeight = this.viewMinorHeight;
+                this.adminNotesEditorConfig.height = this.editorMinorHeight;
+                this.adminNotesEditorConfig.maxHeight = this.editorMinorHeight;
             }
         }
     }
@@ -354,37 +358,28 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnChanges
     }
     
     getEditorHeight(): void {
-        this.viewHeight = "";
-        this.viewMinorHeight = "";
-        this.editHeight = "";
-        this.editMinorHeight = "";
+        this.editorHeight = "";
+        this.editorMinorHeight = "";
         
-        switch (this.showEditors) {
+        switch (this.numEditors) {
             case 1:
-                this.viewHeight = EDITOR_HEIGHT.HEIGHT_600;
-                this.viewMinorHeight = EDITOR_HEIGHT.HEIGHT_0;
-                this.editHeight = EDITOR_HEIGHT.HEIGHT_500;
-                this.editMinorHeight = EDITOR_HEIGHT.HEIGHT_0;
+                this.editorHeight = EDITOR_HEIGHT.HEIGHT_MAX;
+                this.editorMinorHeight = EDITOR_HEIGHT.HEIGHT_ZERO;
                 break;
             case 2:
-                this.viewHeight = EDITOR_HEIGHT.HEIGHT_300;
-                this.viewMinorHeight = EDITOR_HEIGHT.HEIGHT_300;
-                this.editHeight = EDITOR_HEIGHT.HEIGHT_400;
-                this.editMinorHeight = EDITOR_HEIGHT.HEIGHT_150;
+                this.editorHeight = this.editMode ? EDITOR_HEIGHT.HEIGHT_BIGGER : EDITOR_HEIGHT.HEIGHT_BIGGER;
+                this.editorMinorHeight = this.editMode ? EDITOR_HEIGHT.HEIGHT_MID : EDITOR_HEIGHT.HEIGHT_BIGGER;
                 break;
             case 3:
-                this.viewHeight = EDITOR_HEIGHT.HEIGHT_200;
-                this.viewMinorHeight = EDITOR_HEIGHT.HEIGHT_200;
-                this.editHeight = EDITOR_HEIGHT.HEIGHT_400;
-                this.editMinorHeight = EDITOR_HEIGHT.HEIGHT_100;
+                this.editorHeight = this.editMode ? EDITOR_HEIGHT.HEIGHT_BIGGER : EDITOR_HEIGHT.HEIGHT_BIG;
+                this.editorMinorHeight = this.editMode ? EDITOR_HEIGHT.HEIGHT_MIN : EDITOR_HEIGHT.HEIGHT_BIG;
                 break;
             case 4:
-                this.viewHeight = EDITOR_HEIGHT.HEIGHT_200;
-                this.viewMinorHeight = EDITOR_HEIGHT.HEIGHT_100;
-                this.editHeight = EDITOR_HEIGHT.HEIGHT_300;
-                this.editMinorHeight = EDITOR_HEIGHT.HEIGHT_50;
+                this.editorHeight = this.editMode ? EDITOR_HEIGHT.HEIGHT_BIGGER : EDITOR_HEIGHT.HEIGHT_MID;
+                this.editorMinorHeight = this.editMode ? EDITOR_HEIGHT.HEIGHT_MIN : EDITOR_HEIGHT.HEIGHT_SMALL;
                 break;
             default: //Do nothing
         }
     }
+
 }

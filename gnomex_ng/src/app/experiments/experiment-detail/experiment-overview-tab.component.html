@@ -18,7 +18,7 @@
                         <div [matTooltip]="_experiment?.labName">
                             <mat-form-field class="full-width">
                                 <mat-select [(value)]="_experiment.idLab"
-                                            [disabled]="!isEditMode ? true : (!(isAdmin || _experiment.canUpdate === 'Y'))"
+                                            [disabled]="!isEditMode || !(isAdmin || _experiment.canUpdate === 'Y')"
                                             (selectionChange)="onChange_lab($event)">
                                     <mat-option [value]="">
                                         {{ '' }}
@@ -39,7 +39,7 @@
                         <div [matTooltip]="_experiment?.project?.Project?.name">
                             <mat-form-field class="full-width">
                                 <mat-select [(value)]="_experiment.idProject"
-                                            [disabled]="!isEditMode ? true : (!(isAdmin || _experiment.canUpdate === 'Y'))"
+                                            [disabled]="!isEditMode || !(isAdmin || _experiment.canUpdate === 'Y')"
                                             (selectionChange)="onChange_project($event)">
                                     <mat-option *ngFor="let project of projectsDictionary" [value]="project.idProject">
                                         {{ project.name }}
@@ -77,7 +77,7 @@
                                 <mat-form-field class="full-width">
                                     <mat-select
                                             [(value)]="_experiment.codeApplication"
-                                            [disabled]="!isEditMode ? true : (!(isAdmin || (_experiment.canUpdate === 'Y' && _experiment.isExternal =='Y')))"
+                                            [disabled]="!isEditMode || !(isAdmin || (_experiment.canUpdate === 'Y' && _experiment.isExternal =='Y'))"
                                             (selectionChange)="onChange_application($event)" >
                                         <mat-option [value]="">
                                             {{ '' }}
@@ -137,7 +137,7 @@
                                 <mat-select
                                         [(value)]="_experiment.idAppUser"
                                         (selectionChange)="onChange_owner($event)"
-                                        [disabled]="!isEditMode ? true : (!(isAdmin || _experiment.canUpdate === 'Y'))">
+                                        [disabled]="!isEditMode || !(isAdmin || _experiment.canUpdate === 'Y')">
                                     <mat-option [value]="">
                                         {{ '' }}
                                     </mat-option>

@@ -43,6 +43,7 @@ export class ExperimentsService {
 
     public invalid:boolean = false;
     public dirty:boolean = false;
+    public modeChangedExperiment: any;
     private editMode: boolean = false;
 
 

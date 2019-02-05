@@ -7,59 +7,62 @@
             <mat-form-field class="field-width">
                 <input matInput type="text" formControlName="expName" disabled="false"/>
                 <mat-error *ngIf="descriptionForm.get('expName').hasError('maxlength')">
-                    Experiment Name can be at most 200 characters
+                    Experiment Name can be at most {{this.constantsService.MAX_LENGTH_200}}
+                    characters
                 </mat-error>
             </mat-form-field>
         </div>
     </div>
 
     <div class="full-width flex-container-col padded">
-        <label class="gx-label" for="descEditor" >Experiment Description</label>
+        <label class="gx-label" for="descEditor">Experiment Description</label>
         <angular-editor #descEditorRef id="descEditor"
                         formControlName="description"
                         [config]="descEditorConfig">
         </angular-editor>
         <mat-error *ngIf="descriptionForm.get('description').hasError('maxlength')">
-            Description can be at most 5000 characters
+            Description can be at most {{this.constantsService.MAX_LENGTH_5000}} characters
+            including HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'description').value.toString().length}}
         </mat-error>
     </div>
 
     <div class="full-width flex-container-col padded" *ngIf="showProjectDesc">
-        <label class="gx-label" style="margin-top: 1.5rem;" for="projectDescEditor">
-            Project Description
-        </label>
+        <label class="gx-label" for="projectDescEditor">Project Description</label>
         <angular-editor #projectDescEditorRef id="projectDescEditor"
                         formControlName="projectDesc"
                         [config]="projectDescEditorConfig">
         </angular-editor>
         <mat-error *ngIf="descriptionForm.get('projectDesc').hasError('maxlength')">
-            Project Description can be at most 5000 characters
+            Project Description can be at most {{this.constantsService.MAX_LENGTH_4000}} characters
+            including HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'projectDesc').value.toString().length}}
         </mat-error>
     </div>
 
     <div class="full-width flex-container-col padded" *ngIf="showNotesForCoreFacility">
-        <label class="gx-label" style="margin-top: 1.5rem;" for="notesEditor">
-            Notes for Core Facility
-        </label>
+        <label class="gx-label" for="notesEditor">Notes for Core Facility</label>
         <angular-editor #notesEditorRef id="notesEditor"
                         formControlName="notesForCoreFacility"
                         [config]="notesEditorConfig">
         </angular-editor>
         <mat-error *ngIf="descriptionForm.get('notesForCoreFacility').hasError('maxlength')">
-            Summary can be at most 5000 characters
+            Summary can be at most {{this.constantsService.MAX_LENGTH_5000}} characters including
+            HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'notesForCoreFacility').value.toString().length}}
         </mat-error>
     </div>
 
     <div class="full-width flex-container-col padded" *ngIf="showAdminNotes">
-        <label class="gx-label" style="margin-top: 1.5rem;" for="adminNotesEditor" >
-            Administration Notes
-        </label>
+        <label class="gx-label" for="adminNotesEditor">Administration Notes</label>
         <angular-editor #adminNotesEditorRef id="adminNotesEditor"
                         formControlName="adminNotes"
                         [config]="adminNotesEditorConfig">
         </angular-editor>
         <mat-error *ngIf="descriptionForm.get('adminNotes').hasError('maxlength')">
-            Administration Notes can be at most 5000 characters
+            Administration Notes can be at most {{this.constantsService.MAX_LENGTH_5000}} characters
+            including HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'adminNotes').value.toString().length}}
         </mat-error>
     </div>
 </form>

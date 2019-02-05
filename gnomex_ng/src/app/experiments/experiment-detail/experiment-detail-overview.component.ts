@@ -138,21 +138,19 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 } else {
                     this.annotations = [];
                 }
-            }
     
-            this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y";
-            this.isEditMode = this.experimentService.getEditMode();
-            this.setNodeTitle();
+                this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y";
+                this.isEditMode = this.experimentService.getEditMode();
+                this.setNodeTitle();
+            }
         });
     
-        
     }
 
     ngOnDestroy() {
         this.overviewListSubscription.unsubscribe();
         this.experimentService.setEditMode(false);
     }
-
 
     initRelatedData(experiment: any): boolean {
 
@@ -212,6 +210,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
         // TODO: we can change the logic to not be saved first when change editMode but only when click the save button.
         
         this.experimentService.setEditMode(!this.isEditMode);
+        this.experimentService.modeChangedExperiment = this.experiment;
         this.isEditMode = this.experimentService.getEditMode();
         this.setNodeTitle();
     }

@@ -129,7 +129,9 @@ export class ConstantsService {
     public readonly STATUS_BYPASSED: string = "Bypassed";
     public readonly STATUS_ON_HOLD: string = "On Hold";
     
-    public readonly MAX_CHARS: number = 5000;
+    public readonly MAX_LENGTH_5000: number = 5000;
+    public readonly MAX_LENGTH_4000: number = 4000;
+    public readonly MAX_LENGTH_200: number = 200;
     
     public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
 
