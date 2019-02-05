@@ -2,13 +2,13 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
-
+import {AngularEditorModule} from "@kolkov/angular-editor";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {AgGridModule} from "ag-grid-angular";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {UtilModule} from "../../util/util.module";
 import {RelatedDataModule} from "../../util/related-data.module";
-import {DescriptionTab, ExperimentDetailOverviewComponent} from "./index";
+import {DescriptionTabComponent, ExperimentDetailOverviewComponent} from "./index";
 
 
 import {RichEditorModule} from "../../../modules/index";
@@ -23,7 +23,6 @@ import {ProtocolDialogComponent} from "./protocol-dialog.component";
 import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
 import {AngularSplitModule} from "angular-split";
 import {IconRendererComponent} from "../../util/grid-renderers";
-import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component";
 
 
 @NgModule({
@@ -41,6 +40,7 @@ import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component"
         RichEditorModule,
         ManageFilesModule,
         AngularSplitModule,
+        AngularEditorModule
     ],
 
     declarations: [
@@ -48,12 +48,11 @@ import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component"
         ExperimentBioinformaticsTabComponent,
         ExperimentOverviewTabComponent,
         ExperimentDetailOverviewComponent,
-        DescriptionTab,
+        DescriptionTabComponent,
         ExperimentFilesTabComponent,
         MaterialsMethodsTabComponent,
         ProtocolDialogComponent,
         ExperimentSequenceLanesTab,
-        ExperimentBillingTabComponent,
     ],
     providers: [],
     entryComponents: [

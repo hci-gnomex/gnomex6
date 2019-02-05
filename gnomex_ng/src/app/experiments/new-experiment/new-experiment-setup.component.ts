@@ -1,11 +1,5 @@
 import {Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {URLSearchParams} from "@angular/http";
-import {MatAutocomplete, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
-
-import {Subscription} from "rxjs/index";
-import {first} from "rxjs/internal/operators";
-
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {GetLabService} from "../../services/get-lab.service";
@@ -13,10 +7,12 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
 import {DictionaryService} from "../../services/dictionary.service";
+import {Subscription} from "rxjs/index";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {WorkAuthorizationTypeSelectorDialogComponent} from "../../products/work-authorization-type-selector-dialog.component";
-
-import {Experiment} from "../../util/models/experiment.model";
+import {ExperimentsService} from "../experiments.service";
+import {first} from "rxjs/internal/operators";
+import {URLSearchParams} from "@angular/http";
+import {MatAutocomplete} from "@angular/material";
 
 @Component({
     selector: "new-experiment-setup",
@@ -127,22 +123,18 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
 
-    @Input("experiment") set experiment(value: Experiment) {
-        this._experiment = value;
-    }
-
     @Input("idCoreFacility") set idCoreFacility (value: any) {
         this.requestCategories = [];
         this.newExperimentService.components = [];
-        // this.newExperimentService.organisms = [];
-        // this.newExperimentService.componentRefs = [];
-        // this.newExperimentService.samplesGridRowData = [];
+        this.newExperimentService.organisms = [];
+        this.newExperimentService.componentRefs = [];
+        this.newExperimentService.samplesGridRowData = [];
 
         if (value) {
-            this._experiment.idCoreFacility = value;
-            this.coreFacility = this.dictionaryService.getEntry('hci.gnomex.model.CoreFacility', this._experiment.idCoreFacility);
+            this.newExperimentService.idCoreFacility = value;
+            this.coreFacility = this.dictionaryService.getEntry('hci.gnomex.model.CoreFacility', this.newExperimentService.idCoreFacility);
 
-            this.requestCategories = this.getFilteredRequestCategories().sort(NewExperimentSetupComponent.sortRequestCategory);
+            this.requestCategories = this.getFilteredRequestCategories().sort(this.sortRequestCategory);
 
 
             this.labList = this.gnomexService.labList.filter((lab) => {
@@ -162,23 +154,14 @@ export class NewExperimentSetupComponent implements OnDestroy {
             this.filteredProjectList = this.gnomexService.projectList;
             this.checkSecurity();
             this.newExperimentService.components.push(this);
-            // this.newExperimentService.setupView = this;
+            this.newExperimentService.setupView = this;
         }
     }
 
     @Output("onChangeRequestCategory") onChangeRequestCategory = new EventEmitter<any>();
     @Output("onChangeLab") onChangeLab= new EventEmitter<any>();
 
-    public get description(): string {
-        return this._experiment.description;
-    }
-    public set description(value: string) {
-        this._experiment.description = value;
-    }
-
     public form: FormGroup;
-
-    private _experiment: Experiment;
 
     private labList: any[] = [];
 
@@ -209,11 +192,10 @@ export class NewExperimentSetupComponent implements OnDestroy {
     private submittersSubscription: Subscription;
 
 
-    // public get isValid(): boolean {
-    //     return this.form && this.form.valid;
-    // }
+    public get isValid(): boolean {
+        return this.form && this.form.valid;
+    }
 
-    private project: any;
 
     public get submitter(): any {
         if (this.form && this.form.get('selectName')) {
@@ -224,14 +206,10 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
     public set submitter(value: any) {
         if (this.form.get('selectName') && this.form.get('selectName').value) {
-            // this._experiment.idAppUser = this.newExperimentService.idAppUser;
-
-            this._experiment.experimentOwner = this.form.get('selectName').value;
-            this._experiment.idOwner = this.form.get('selectName').value.idAppUser;
-            // this._experiment.idAppUser = this.newExperimentService.idAppUser;
-            // this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
-
-            // this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
+            this.newExperimentService.experimentOwner = this.form.get('selectName').value;
+            this.newExperimentService.request.idAppUser = this.newExperimentService.idAppUser;
+            this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
+            this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
             // this.visibilityDetailObj.currentOrder = this.newExperimentService.request;
             // this.visibilityDetailObj.ngOnInit();
         }
@@ -240,7 +218,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
 
-    // private showPool: boolean = false;
+    private showPool: boolean = false;
 
     public get showLab(): boolean {
         return !!(this.form && this.form.get("selectedCategory").value)
@@ -269,12 +247,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
             && (this._showBilling_previousValue === false && newValue === true)) {
 
             this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
-
-            // These spoofedEvents are needed in places where the field is assigned a
-            // default value, because (selectionChanged) does not pick up changes to the
-            // form value.
-            let spoofedEvent = { source: { value: this.authorizedBillingAccounts[0] } };
-            this.onBillingSelection(spoofedEvent);
         }
 
         this._showBilling_previousValue = newValue;
@@ -297,8 +269,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     constructor(private billingService: BillingService,
                 private createSecurityAdvisor: CreateSecurityAdvisorService,
-                private dialog: MatDialog,
-                private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private formBuilder: FormBuilder,
                 private getLabService: GetLabService,
@@ -359,37 +329,31 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     refreshBillingAccounts() {
         this.checkForOtherAccounts();
-        // this.newExperimentService.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
-        this._experiment.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
+        this.newExperimentService.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
 
-        let cat = this._experiment.requestCategory;
-
-        if (this.authorizedBillingAccounts) {
-            if (!Array.isArray(this.authorizedBillingAccounts)) {
-                this.authorizedBillingAccounts = [this.authorizedBillingAccounts.BillingAccount];
-            }
-
-            this.authorizedBillingAccounts = this.authorizedBillingAccounts.filter(account => {
-                return account &&
-                    ((account.overrideFilter && account.overrideFilter === 'Y')
-                        || (cat.idCoreFacility && account.idCoreFacility && account.idCoreFacility === cat.idCoreFacility)
-                    );
-            });
+        let cat = this.newExperimentService.requestCategory;
+        if (!Array.isArray(this.authorizedBillingAccounts)) {
+            this.authorizedBillingAccounts = [this.authorizedBillingAccounts.BillingAccount];
         }
+        this.authorizedBillingAccounts = this.authorizedBillingAccounts.filter(account => {
+            return account.overrideFilter === 'Y' || (cat.idCoreFacility && account.idCoreFacility === cat.idCoreFacility);
+        });
+
         // this.selectDefaultUserProject();
     }
 
     checkForOtherAccounts(): void {
         if (this.createSecurityAdvisor.isAdmin || this.createSecurityAdvisor.isBillingAdmin || this.createSecurityAdvisor.isSuperAdmin) {
             this.showAccessAuthorizedAccountsLink = true;
-            let authorizedBillingAccountsParams: HttpParams = new HttpParams().set("idCoreFacility", this._experiment.idCoreFacility);
+            let authorizedBillingAccountsParams: HttpParams = new HttpParams().set("idCoreFacility", this.newExperimentService.idCoreFacility);
 
             this.billingService.getAuthorizedBillingAccounts(authorizedBillingAccountsParams).subscribe((response: any) => {
                 this.showAccessAuthorizedAccountsLink = response && response.hasAccountsWithinCore && response.hasAccountsWithinCore === 'Y';
             });
-        } else if (this._experiment.idAppUser != null && this._experiment.idAppUser != '') {
-            let idCoreFacility: string = this._experiment.idCoreFacility;
+        } else if (this.newExperimentService.idAppUser != null && this.newExperimentService.idAppUser != '') {
+            let idCoreFacility: string = this.newExperimentService.idCoreFacility;
         }
+
     }
 
 
@@ -404,24 +368,11 @@ export class NewExperimentSetupComponent implements OnDestroy {
             } else {
                 this.adminState = "AdminExternalExperimentState";
             }
+            this.newExperimentService.idAppUser = this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ? this.form.controls['selectName'].value.idAppUser : '';
 
-            if (this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ) {
-                // this.newExperimentService.idAppUser = this.form.controls['selectName'].value.idAppUser;
-                this._experiment.idAppUser          = this.form.controls['selectName'].value.idAppUser;
-            } else {
-                // this.newExperimentService.idAppUser = "";
-                this._experiment.idAppUser          = "";
-            }
         } else if (this.gnomexService.hasPermission('canSubmitForOtherCores') && iCanSubmitToThisCoreFacility) {
             this.adminState = "AdminState";
-
-            if (this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '') {
-                // this.newExperimentService.idAppUser = this.form.controls['selectName'].value.idAppUser;
-                this._experiment.idAppUser          = this.form.controls['selectName'].value.idAppUser;
-            } else {
-                // this.newExperimentService.idAppUser = "";
-                this._experiment.idAppUser          = "";
-            }
+            this.newExperimentService.idAppUser = this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ? this.form.controls['selectName'].value.idAppUser : '';
         } else {
             if (this.gnomexService.submitInternalExperiment()) {
                 this.adminState = "";
@@ -448,29 +399,22 @@ export class NewExperimentSetupComponent implements OnDestroy {
     public selectDefaultUserProject(): void {
         this.form.controls['selectName'].setErrors(null);
 
-        if (this._experiment.idAppUser != null) {
+        if (this.newExperimentService.idAppUser != null) {
             for (let project of this.filteredProjectList) {
                 if (this.form.controls['selectName'].value
                     && this.form.controls['selectName'].value.idAppUser === project.idAppUser) {
 
                     setTimeout(() => {
                         this.form.get('selectProject').setValue(project);
-                        this.project = this.form.get('selectProject').value;
-
-                        // These spoofedEvents are needed in places where the field is assigned a
-                        // default value, because (selectionChanged) does not pick up changes to the
-                        // form value.
-                        let spoofedEvent: any = { source: { value: project } };
-                        this.onProjectSelection(spoofedEvent);
+                        this.newExperimentService.project = this.form.get('selectProject').value;
                     });
-
                     break;
                 }
             }
         }
 
-        if (this.project) {
-            this._experiment.idProject = this.project.idProject;
+        if (this.newExperimentService.project) {
+            this.newExperimentService.request.idProject = this.newExperimentService.project.idProject;
         }
     }
 
@@ -519,9 +463,9 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
 
-    onCategoryChange() {
+    onCategoryChange(event) {
         if (this.form && this.form.get("selectedCategory")) {
-            // this.newExperimentService.category = this.form.get("selectedCategory").value;
+            this.newExperimentService.category = this.form.get("selectedCategory").value;
 
             let code = this.form.get("selectedCategory").value;
 
@@ -530,17 +474,17 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 code = this.defaultCodeRequestCategory;
             }
 
-            this._experiment.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', code.value);
+            this.newExperimentService.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', code.value);
 
-            if (this._experiment.requestCategory) {
+            if (this.newExperimentService.requestCategory) {
                 // this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
 
-                this.workButtonText   = this.gnomexService.getCoreFacilityProperty(this._experiment.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
+                this.workButtonText   = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
                 // this.accessAuthLabel = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT);
             }
         }
 
-        this.onChangeRequestCategory.emit(this._experiment.requestCategory);
+        this.onChangeRequestCategory.emit(this.newExperimentService.requestCategory);
     }
 
     public selectLabOption(event: any) {
@@ -611,92 +555,28 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 });
             }
 
-            this._experiment.lab = event.source.value;
-            // this.newExperimentService.getHiSeqPriceList();
-            // this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
+            this.newExperimentService.lab = event.source.value;
+            this.newExperimentService.getHiSeqPriceList();
+            this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
         }
     }
 
-    public onBillingSelection(event: any): void {
-        if (!event || !event.source) {
-            return;
-        }
-
-        // this._experiment.idBillingAccount     = this.form.get("selectAccount").value.idBillingAccount;
-        // this._experiment.billingAccountName   = this.form.get("selectAccount").value.billingAccountName;
-        // this._experiment.billingAccountNumber = this.form.get("selectAccount").value.billingAccountNumber;
-        //
-        setTimeout(() => { this._experiment.billingAccount = this.form.get("selectAccount").value; });
-        // this.getFilteredApps();
-    }
-
-    public onProjectSelection(event: any): void {
-        if (!event || !event.source) {
-            return;
-        }
-
-        this._experiment.idProject          = this.form.get("selectProject").value.idProject;
-        this._experiment.project            = JSON.stringify(this.form.get("selectProject").value);
-        this._experiment.projectName        = this.form.get("selectProject").value.display;
-        this._experiment.projectDescription = this.form.get("selectProject").value.description;
-    }
-
-    public onChangeExperimentName(event: any): void {
-        if (!event) {
-            return;
-        }
-
-        this._experiment.name = this.form.get("experimentName").value;
-    }
-
-    public onInputExperimentalDetails(event: any): void {
-        if (!event) {
-            return;
-        }
-
-        this.description             = this.form.get("description").value;
+    onBillingSelection(event) {
+        this.newExperimentService.billingAccount = this.form.get("selectAccount").value;
+        this.getFilteredApps();
     }
 
     chooseFirstLabOption(): void {
         this.autoLabComplete.options.first.select();
     }
 
-    public onClickNewAccount(): void {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width  = "40em";
-        configuration.height = "30em";
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = { idLab: "" + this.currentIdLab };
 
-        let dialogRef: MatDialogRef<WorkAuthorizationTypeSelectorDialogComponent> = this.dialog.open(WorkAuthorizationTypeSelectorDialogComponent, configuration);
-
-        dialogRef.afterClosed().pipe(first()).subscribe(() => {
-            this.dialogService.confirm('Confirmation', 'New accounts will require approval from billing administrator before use.');
-        });
+    getFilteredApps() {
+        this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);
     }
 
-    public onClickShowMoreAccounts(): void {
-        //TODO: create dialog
-    }
 
-    public onClickSplitBilling(): void {
-        //TODO: create dialog
-    }
-
-    public onClickEditProject(): void {
-        //TODO: create dialog
-    }
-
-    public onClickNewProject(): void {
-        //TODO: create dialog
-    }
-
-    // getFilteredApps() {
-    //     this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);
-    // }
-
-
-    private static sortRequestCategory(obj1: any, obj2: any): number {
+    sortRequestCategory(obj1: any, obj2: any): number {
         if (obj1 === null && obj2 === null) {
             return 0;
         } else if (obj1 == null) {

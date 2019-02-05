@@ -1,152 +1,104 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
-
+import {Component, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
+import {NewExperimentService} from "../../services/new-experiment.service";
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
+import {MatDialog} from "@angular/material";
+import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {GnomexService} from "../../services/gnomex.service";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {BarcodeSelectEditor} from "../../util/grid-editors/barcode-select.editor";
 import {BillingService} from "../../services/billing.service";
-
-import {Experiment} from "../../util/models/experiment.model";
+import {HttpParams} from "@angular/common/http";
 import {URLSearchParams} from "@angular/http";
 
 @Component({
     selector: "tabConfirmIllumina",
     templateUrl: "./tab-confirm-illumina.component.html",
     styles: [`
-        
-        
-        .bordered { border: solid silver 1px; }
-        
-        .heavily-left-padded { padding-left: 1.5em; }
-        
-        
-        .top-margin { margin-top: 0.3em; }
-        
-        .minimal { width: fit-content; }
-        
-        .instructions-background {
+        .confirm-instructions {
             background-color: lightyellow;
+            width: 25%;
+            font-size: 80%;
         }
-        
-        .minheight { min-height: 3em; }
-        
-        .font-bold { font-weight: bold; }
-        
-        
     `]
 })
 
 export class TabConfirmIlluminaComponent implements OnInit {
-
-    @Input("experiment") public set experiment(value: Experiment) {
-        this._experiment = value;
-    }
-    public get experiment(): Experiment {
-        return this._experiment;
-    }
-
-    private _experiment: Experiment;
-
     private form: FormGroup;
     private submitterName: string;
-
+    private labName: string;
+    private billingAccountName: string;
+    private billingAccountNumber: string;
+    private preppedByClient: boolean = false;
     private clientPrepString: string = "Library Prepared By Client";
+    private protoName: string;
     private clientPrepLib: boolean;
+    private agreeCheckBox: boolean;
+    private agreeCheckBoxLabel: string;
     private seqLaneTypeLabel: string;
     private requestPropsGridApi: any;
     private requestPropsColumnApi: any;
     private samplesGridConfirmColumnDefs: any;
     private requestPropsColumnDefs: any;
     private organisms: any[] = [];
-
     private isCheckboxChecked: boolean;
-    private disable_agreeCheckbox: boolean;
-
+    private agreeCheckbox: boolean;
+    private agreeCheckboxLabel: string;
     private requestPropBox: boolean;
     private billingItems: any[] = [];
 
-    public agreeCheckboxLabel: string;
-
-    private _barCodes: any[] = [];
-
-    private sampleTypes: any[] = [];
-
-
-    public get labName(): string {
-        if (this._experiment && this._experiment._labName_notReturned) {
-            return this._experiment._labName_notReturned;
-        } else {
-            return '';
-        }
-    }
-
-
-
-    public get billingAccountName(): string {
-        return this._experiment.billingAccountName;
-    }
-    public set billingAccountName(value: string) {
-        this._experiment.billingAccountName = value;
-    }
-
-    public get billingAccountNumber(): string {
-        return this._experiment.billingAccountNumber;
-    }
-    public set billingAccountNumber(value: string) {
-        this._experiment.billingAccountNumber = value;
-    }
-
-
-
     constructor(private dictionaryService: DictionaryService,
+                private newExperimentService: NewExperimentService,
+                private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
                 private billingService: BillingService,
-                private fb: FormBuilder) {
-
+                private fb: FormBuilder
+    ) {
         this.requestPropsColumnDefs = [
             {
                 headerName: "",
                 field: "name",
                 width: 100,
             },
-            {
-                headerName: "",
+
+            {headerName: "",
                 field: "value",
                 width: 100,
-            }
-        ];
+            },
+        ]
         this.samplesGridConfirmColumnDefs = [
             {
                 headerName: "Multiplex Group",
                 editable: false,
                 field: "multiplexGroupNumber",
-                width: 100
+                width: 100,
             },
-            {
-                headerName: "Sample Name",
+
+            {headerName: "Sample Name",
                 field: "name",
                 width: 100,
-                editable: false
+                editable: false,
             },
-            {
-                headerName: "Conc. (ng/ul)",
+            {headerName: "Conc. (ng/ul)",
                 field: "concentration",
                 width: 100,
-                editable: false
+                editable: false,
             },
-            {
-                headerName: "Vol. (ul)",
+            {headerName: "Vol. (ul)",
                 field: "sampleVolumne",
                 width: 100,
-                editable: false
+                editable: false,
             },
             {
                 headerName: "Index Tag A",
                 editable: false,
                 width: 125,
-                field: "idOligoBarcode"
+                field: "idOligoBarcode",
             },
             {
                 headerName: "Index Tag B",
@@ -155,7 +107,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 field: "idOligoBarcodeB",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
-                selectOptions: this._barCodes,
+                selectOptions: this.newExperimentService.barCodes,
                 selectOptionsDisplayField: "display",
                 selectOptionsValueField: "idOligoBarcodeB",
                 indexTagLetter: 'B'
@@ -167,7 +119,7 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 field: "idOligoBarcodeB",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
-                selectOptions: this._barCodes,
+                selectOptions: this.newExperimentService.barCodes,
                 selectOptionsDisplayField: "display",
                 selectOptionsValueField: "idOligoBarcodeB",
                 indexTagLetter: 'B'
@@ -181,13 +133,13 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 cellEditorFramework: SelectEditor,
                 selectOptions: this.gnomexService.seqLibProtocolsWithAppFilters,
                 selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idSeqLibProtocol"
+                selectOptionsValueField: "idSeqLibProtocol",
+
             },
-            {
-                headerName: "# Seq Lanes",
+            {headerName: "# Seq Lanes",
                 field: "numberSequencingLanes",
                 width: 100,
-                editable: false
+                editable: false,
             },
             {
                 headerName: "Sample Type",
@@ -196,9 +148,9 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 field: "idSampleType",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor,
-                selectOptions: this.sampleTypes,
+                selectOptions: this.newExperimentService.sampleTypes,
                 selectOptionsDisplayField: "sampleType",
-                selectOptionsValueField: "idSampleType"
+                selectOptionsValueField: "idSampleType",
             },
             {
                 headerName: "Organism",
@@ -209,48 +161,71 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 cellEditorFramework: SelectEditor,
                 selectOptions: this.organisms,
                 selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOrganism"
-            }
-        ];
+                selectOptionsValueField: "idOrganism",
+            },
 
+        ];
         this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
+
     }
 
     ngOnInit() {
-        this.loadBarcodes();
+        this.newExperimentService.ownerChanged.subscribe((value) => {
+            if (this.newExperimentService.ownerChanged.value === true) {
+                this.newExperimentService.ownerChanged.next(false);
+            }
+        });
+        this.newExperimentService.labChanged.subscribe((value) => {
+            if (this.newExperimentService.labChanged.value === true) {
+                this.newExperimentService.labChanged.next(false);
+                if (this.newExperimentService.lab) {
+                    this.labName = this.newExperimentService.lab.nameFirstLast;
+                }
+            }
+        });
+        this.newExperimentService.protoChanged.subscribe((value) => {
+            if (this.newExperimentService.protoChanged.value === true) {
+                this.newExperimentService.protoChanged.next(false);
+                if (this.newExperimentService.selectedProto) {
+                    this.protoName = this.newExperimentService.selectedProto.display;
+                }
+            }
+        });
+        this.newExperimentService.preppedChanged.subscribe((value) => {
+            if (this.newExperimentService.preppedChanged.value === true) {
+                this.newExperimentService.preppedChanged.next(false);
+                this.preppedByClient = this.newExperimentService.preppedByClient;
+                this.setClientPrepString();
+            }
+        });
+        this.newExperimentService.onConfirmTab.subscribe((value) => {
+            if (this.newExperimentService.onConfirmTab.value === true) {
+                this.newExperimentService.onConfirmTab.next(false);
+                this.setUpView();
+            }
+        });
+        this.newExperimentService.accountChanged.subscribe((value) => {
+            if (this.newExperimentService.accountChanged.value === true) {
+                this.newExperimentService.accountChanged.next(false);
+                if (this.newExperimentService.billingAccount) {
+                    this.billingAccountName = this.newExperimentService.billingAccount.accountName;
+                    this.billingAccountNumber = this.newExperimentService.billingAccount.accountNumber;
+                }
+            }
+        });
 
-        this.form = this.fb.group({});
-    }
-
-    public tabDisplayed(): void {
-        this.setUpView();
-    }
-
-    private loadBarcodes(): void {
-        this._barCodes = [];
-
-        let allBarcodes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcode");
-        for (let code of allBarcodes) {
-            code.idOligoBarcodeB = code.idOligoBarcode;
-            this._barCodes.push(code);
-        }
+        this.form = this.fb.group({
+        });
     }
 
     setUpView() {
+        this.newExperimentService.checkSamplesCompleteness();
+        this.newExperimentService.updateRequestProperties();
         this.getEstimatedBilling();
-        this.submitterName = '';
-        if (this._experiment && this._experiment.experimentOwner && this._experiment.experimentOwner.displayName) {
-            this.submitterName = this._experiment.experimentOwner.displayName;
-        }
-
+        //this.newExperimentService.getMultiplexLanes();
+        this.submitterName = this.newExperimentService.getSubmitterName();
         this.clientPrepLib = false;
-
-        if (this._experiment.samples
-            && Array.isArray(this._experiment.samples)
-            && this._experiment.samples.length > 0) {
-
-            let s1 = this._experiment.samples[0];
-
+        for (let s1 of this.newExperimentService.samplesGridRowData) {
             let nsca: any = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.NumberSequencingCyclesAllowed").filter(nsca2 =>
                 nsca2.value != "" && nsca2.idSampleType === s1.idNumberSequencingCyclesAllowed
             );
@@ -261,48 +236,82 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 this.clientPrepLib = true;
 
                 this.clientPrepString = "Library Prepared By Client";
-                if (this._experiment.hasPrePooledLibraries === 'Y' && this._experiment.numPrePooledTubes != null && this._experiment.numPrePooledTubes != '') {
-                    this.clientPrepString += ", " + this._experiment.numPrePooledTubes + " Pre-Pooled Tubes";
+                if (this.newExperimentService.request.hasPrePooledLibraries === 'Y' && this.newExperimentService.request.numPrePooledTubes != null && this.newExperimentService.request.numPrePooledTubes != '') {
+                    this.clientPrepString += ", " + this.newExperimentService.request.numPrePooledTubes + " Pre-Pooled Tubes";
                 }
             }
+            break;
         }
 
-        this.requestPropBox = this.gnomexService.getCoreFacilityProperty(this._experiment.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB) === 'Y';
+        this.requestPropBox = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.request.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB) == 'Y';
+
     }
 
-    public getEstimatedBilling(): void {
-        this.disable_agreeCheckbox = true;
-        this.agreeCheckboxLabel = "";
-        this.isCheckboxChecked = false;
-
-        if (this._experiment.isExternal === 'Y') {
-            // This is an external experiment submission.  Don't attempt to get estimated charges.
-        } else {
-            let accountName:String = "";
-
-            if (this._experiment.billingAccount != null) {
-                accountName = this._experiment.billingAccount.accountNumberDisplay;
-            }
-
-            this.agreeCheckboxLabel = "I authorize all charges to be billed to account(s): " + accountName;
-            this.disable_agreeCheckbox = false;
-
-            // This is a new experiment request. Get the estimated charges for this request.
-            this._experiment.billingItems = [];
-
-            let stringifiedRequest: string = JSON.stringify(this._experiment.getJSONObjectRepresentation());
-            // let formData: FormData = new FormData();
-            // formData.append("requestXMLString", stringifiedRequest);
-            let params: URLSearchParams = new URLSearchParams();
-            params.set("requestXMLString", stringifiedRequest);
-            this.billingService.createBillingItems2(params).subscribe((response: any) => {
-                this.billingItems = response.BillingItem;
-            });
-        }
-    }
-
-    public onGridReady(params: any): void {
+    onGridReady(params: any) {
         this.requestPropsGridApi = params.api;
         this.requestPropsColumnApi = params.columnApi;
     }
+
+    onGridRowDataChanged() {
+
+    }
+
+    setClientPrepString() {
+        if (this.preppedByClient) {
+
+        }
+    }
+
+    onCheckboxChanged(event) {
+
+    }
+
+    public getEstimatedBilling(): void {
+        this.newExperimentService.initializeRequest();
+        this.agreeCheckbox = false;
+        this.agreeCheckboxLabel = "";
+        this.isCheckboxChecked = false;
+
+        if (this.newExperimentService.request.isExternal == 'Y') {
+            // This is an external experiment submission.  Don't
+            // attempt to get estimated charges.
+            this.newExperimentService.hideSubmit = false;
+        } else {
+
+            var accountName:String = "";
+            if (this.newExperimentService.billingAccount != null) {
+                accountName = this.newExperimentService.billingAccount.accountNumberDisplay;
+            }
+            // else if (this.newExperimentService.selectedBillingTemplate != null) {
+            //     var template: any = this.newExperimentService.setupView.selectedBillingTemplate;
+            //     var items: any[] = template.BillingTemplateItem;
+            //     var firstAccount: boolean = true;
+            //     for (var item of items) {
+            //         if (firstAccount) {
+            //             accountName = item.accountNumberDisplay;
+            //             firstAccount = false;
+            //         } else {
+            //             accountName += ", " + item.accountNumberDisplay;
+            //         }
+            //     }
+            // }
+
+            this.agreeCheckboxLabel = "I authorize all charges to be billed to account(s): " + accountName;
+
+            // This is a new experiment request. Get the estimated
+            // charnges for this request.
+            // this.newExperimentService.request.PropertyEntries=[];
+            this.newExperimentService.request.billingItems=[];
+            let stringifiedRequest: any = JSON.stringify(this.newExperimentService.request);
+            // let params: HttpParams = new HttpParams()
+            //     .set("requestXMLString", stringifiedRequest);
+            let formData: FormData = new FormData();
+            formData.append("requestXMLString", stringifiedRequest);
+            this.billingService.createBillingItems2(stringifiedRequest).subscribe((response: any) => {
+                this.billingItems = response.BillingItem;
+            })
+        }
+
+    }
+
 }

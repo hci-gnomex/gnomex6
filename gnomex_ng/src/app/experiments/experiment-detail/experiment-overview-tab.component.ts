@@ -7,37 +7,54 @@ import {Subscription, throwError} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {PropertyService} from "../../services/property.service";
 import {ConstantsService} from "../../services/constants.service";
-import {FormControl} from "@angular/forms";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
+import {ExperimentsService} from "../experiments.service";
 
 
 @Component({
     selector: 'experiment-overview-tab',
     templateUrl: 'experiment-overview-tab.component.html',
     styles: [`
-        
-        .text-center { text-align: center; }
-        
-        .padded { padding: 0.3em; }
-        
-        .small-font { font-size: small;   }
-        .tiny-font  { font-size: x-small; }
 
-        .underline { text-decoration: underline; }
-        
-        .label {  
-            color: darkblue;  
+        .text-center {
+            text-align: center;
+        }
+
+        .padded {
+            padding: 0.3em;
+        }
+
+        .small-font {
+            font-size: small;
+        }
+
+        .tiny-font {
+            font-size: x-small;
+        }
+
+        .underline {
+            text-decoration: underline;
+        }
+
+        .label {
+            color: darkblue;
             font-style: italic;
         }
-        
-        .label-width { width: 7rem; }
-        
-        .minor-label { font-style: italic; }
-        
-        .minor-label-width { width: 6rem; }
-        
-        .field-width { 
+
+        .label-width {
+            width: 7rem;
+        }
+
+        .minor-label {
+            font-style: italic;
+        }
+
+        .minor-label-width {
+            width: 6rem;
+        }
+
+        .field-width {
             min-width: 35em;
             width: 40em;
         }
@@ -47,44 +64,66 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
             border-radius: 0.3em;
         }
 
-        .multi-line { white-space: pre-line; }
-        
+        .multi-line {
+            white-space: pre-line;
+        }
+
         .max-height {
             max-height: 6em;
             overflow: auto;
         }
-        
-        .limit-width { max-width: 100%; }
-        
-        .padded { padding: 0.3em; }
-        
-        .margin { margin: 0.5em; }
-        
-        .margin-top { margin-top: 0.3em; }
+
+        .limit-width {
+            max-width: 100%;
+        }
+
+        .padded {
+            padding: 0.3em;
+        }
+
+        .margin {
+            margin: 0.5em;
+        }
+
+        .margin-top {
+            margin-top: 0.3em;
+        }
+
         .margin-top-bottom {
-            margin-top:    0.6em;
+            margin-top: 0.6em;
             margin-bottom: 0.6em;
         }
-        
-        .gnomex-progress-bar { 
+
+        .gnomex-progress-bar {
             height: 1.5rem;
-            background-color: green; 
+            background-color: green;
         }
-        
-        .horizontal-spacing { width:  2em;   }
-        .vertical-spacer    { height: 0.5em; }
-        
-        .max-width { max-width: 70em; }
 
-        .align-right { text-align: right; }
+        .horizontal-spacing {
+            width: 2em;
+        }
 
-        .highlight { 
+        .vertical-spacer {
+            height: 0.5em;
+        }
+
+        .max-width {
+            max-width: 70em;
+        }
+
+        .align-right {
+            text-align: right;
+        }
+
+        .highlight {
             color: green;
             font-weight: bold;
         }
-        
-        .allow-line-breaks { white-space: pre-line; }
-        
+
+        .allow-line-breaks {
+            white-space: pre-line;
+        }
+
     `]
 }) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy {
 
@@ -301,6 +340,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
     public processedWorkflowSteps: any[];
 
     public visibilityOptions: any[];
+    public today: Date = new Date();
 
     public privacyExp: Date;
     public isPrivacyExpSupported: boolean = false;
@@ -378,6 +418,10 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
     public get isAdmin(): boolean {
         return this.secAdvisor.isAdmin;
     }
+    
+    public get isEditMode(): boolean {
+        return this.experimentsService.getEditMode();
+    }
 
     constructor(private constantsService: ConstantsService,
                 public secAdvisor: CreateSecurityAdvisorService,
@@ -386,6 +430,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
                 private getLabService: GetLabService,
                 private labListService: LabListService,
                 private matDialog: MatDialog,
+                private experimentsService: ExperimentsService,
                 private propertyService: PropertyService) { }
 
     public get selectedExperimentCategory(): string {

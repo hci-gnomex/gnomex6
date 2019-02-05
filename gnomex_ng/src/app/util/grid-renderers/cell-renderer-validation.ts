@@ -67,7 +67,7 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
         if (this.params
             && this.params.node
             && this.params.node.gridApi
-            && this.params.node.gridApi.formGroup === undefined) {
+            && !this.params.node.gridApi.formGroup) {
 
             this.determineIfAllRowsNeedValidationInAdvance();
             this.createAllFormControls();
@@ -128,20 +128,6 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
                     && this.params.node.gridApi.formGroup.controls.length != allNodes.length)) {
 
                 this.params.node.gridApi.formGroup = new FormGroup({});
-            }
-
-            if (this.params.node.gridApi.columnController
-                && this.params.node.gridApi.columnController.columnDefs) {
-
-                for (let columnDef of this.params.node.gridApi.columnController.columnDefs) {
-                    if (columnDef.outerForm && columnDef.formName) {
-                        if (!columnDef.outerForm.get(columnDef.formName)) {
-                            columnDef.outerForm.addControl(columnDef.formName, this.params.node.gridApi.formGroup);
-                        } else {
-                            columnDef.outerForm.setControl(columnDef.formName, this.params.node.gridApi.formGroup);
-                        }
-                    }
-                }
             }
 
             let columns: any[];
@@ -230,14 +216,15 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
     private getErrorMessage(): void {
         if (this.params
             && this.params.node
-            && this.params.node.formGroup
             && this.params.column
             && this.params.column.colDef
             && this.params.column.colDef.field) {
 
-            let formControl = this.params.node.formGroup.get(this.params.column.colDef.field + '_formControl');
-
-            this.updateErrorMessage(formControl, this.params.node, this.params.column.colDef);
+            if (this.params.node[this.params.column.colDef.field + "_errorMessage"] === undefined) {
+                // This should only occur if this.params.node.gridApi.mode_needToValidateOnlyRenderedCells is true,
+                // so that not all of the form controls are prepared in advance.
+                this.createAllFormControls();
+            }
 
             this.errorMessage = this.params.node[this.params.column.colDef.field + "_errorMessage"];
         }

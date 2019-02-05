@@ -12,7 +12,6 @@ import {
 import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
 import {BrowseOrderValidateService} from "../services/browse-order-validate.service";
 import {IAnnotationOption} from "./interfaces/annotation-option.model";
-import {AnnotationService} from "../services/annotation.service";
 import {Subscription} from "rxjs";
 
 export enum OrderType {
@@ -55,15 +54,6 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
     private _annotations: IAnnotation[];
     private _disabled: boolean = false;
 
-    @Input("showConfigureAnnotationsButton") public set showConfigureAnnotationsButton(value: boolean) {
-        this._showConfigureAnnotationsButton = value;
-    };
-    public get showConfigureAnnotationsButton(): boolean {
-        return this._showConfigureAnnotationsButton;
-    }
-
-    private _showConfigureAnnotationsButton: boolean = true;
-
     @Input() orderType = OrderType.NONE;
     private orderValidateSubscription: Subscription;
 
@@ -88,8 +78,6 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         }
 
         if (this._annotations) {
-            this._annotations = this._annotations.sort(AnnotationService.sortProperties);
-
             this._annotations.forEach(annot => {
                 this.form.addControl(annot.name, new FormControl());
 
@@ -108,12 +96,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
 
                     this.form.controls[annot.name].setValue(selectedOpts);
                 } else if (annot.codePropertyType === this.OPTION) {
-                    for (let opt  of annot.PropertyOption) {
-                        if (opt.selected === 'Y') {
-                            this.form.controls[annot.name].setValue(opt);
-                            break;
-                        }
-                    }
+                    this.form.controls[annot.name].setValue(annot.value ? annot.value : '');
                 } else if (annot.codePropertyType === this.URL) {
                     this.form.controls[annot.name].setValue(annot);
                 }
@@ -168,8 +151,8 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
                 annotationToSave.push(this.form.controls[annot.name].value);
             }
         }
-
         this.orderValidateService.annotationsToSave = annotationToSave;
+
     };
 
 

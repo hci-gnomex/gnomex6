@@ -1,5 +1,5 @@
 import {EventEmitter, Injectable, Output} from "@angular/core";
-import {Headers, Http, Response, URLSearchParams} from "@angular/http";
+import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
@@ -7,7 +7,6 @@ import {BillingTemplate} from "../util/billing-template-window.component";
 import {BillingViewChangeForCoreCommentsWindowEvent} from "../billing/billing-view-change-for-core-comments-window-event.model";
 import {BillingFilterEvent} from "../billing/billing-filter.component";
 import {map} from "rxjs/operators";
-import {UtilService} from "./util.service";
 
 @Injectable()
 export class BillingService {
@@ -78,11 +77,9 @@ export class BillingService {
         return this.httpClient.get("/gnomex/CreateBillingItems.gx", {params: params});
     }
 
-    public createBillingItems2(params: URLSearchParams):Observable<any>{
+    createBillingItems2(formData: string):Observable<any>{
         this.cookieUtilService.formatXSRFCookie();
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/CreateBillingItems.gx", params.toString(), { headers: headers });
+        return this.httpClient.post("/gnomex/CreateBillingItems.gx", formData.toString());
     }
 
     public getBillingItemList(params: HttpParams): Observable<any> {
@@ -109,31 +106,27 @@ export class BillingService {
 
         return this.httpClient.get("/gnomex/GetBillingTemplate.gx", {params: params}).pipe(map((result: any) => {
             if (result && result.idBillingTemplate) {
-                return BillingService.parseBillingTemplate(result);
+                let billingTemplateItems: any[] = Array.isArray(result.BillingTemplateItem) ? result.BillingTemplateItem : [result.BillingTemplateItem];
+                let totalPercentAccounted: number = 0;
+                for (let i of billingTemplateItems) {
+                    i.percentSplit = Number.parseFloat(i.percentSplit);
+                    i.acceptBalance = i.acceptBalance === "true" || i.acceptBalance === "Y" ? "Y" : "N";
+                    if (i.acceptBalance === "N") {
+                        totalPercentAccounted += i.percentSplit;
+                    }
+                }
+                for (let i of billingTemplateItems) {
+                    if (i.acceptBalance === "Y") {
+                        i.percentSplit = 100 - totalPercentAccounted;
+                    }
+                }
+                result.items = billingTemplateItems;
+
+                return (result as BillingTemplate);
             } else {
                 return null;
             }
         }));
-    }
-
-    public static parseBillingTemplate(template: any): BillingTemplate {
-        let billingTemplateItems: any[] = UtilService.getJsonArray(template.BillingTemplateItem, template.BillingTemplateItem);
-        let totalPercentAccounted: number = 0;
-        for (let i of billingTemplateItems) {
-            i.percentSplit = Number.parseFloat(i.percentSplit);
-            i.acceptBalance = i.acceptBalance === "true" || i.acceptBalance === "Y" ? "Y" : "N";
-            if (i.acceptBalance === "N") {
-                totalPercentAccounted += i.percentSplit;
-            }
-        }
-        for (let i of billingTemplateItems) {
-            if (i.acceptBalance === "Y") {
-                i.percentSplit = 100 - totalPercentAccounted;
-            }
-        }
-        template.items = billingTemplateItems;
-
-        return (template as BillingTemplate);
     }
 
     public saveBillingTemplate(template: BillingTemplate): Observable<any> {

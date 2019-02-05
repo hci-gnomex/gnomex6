@@ -1,4 +1,4 @@
-<div class="full-height full-width flex-container-col padded bordered overflow-auto">
+<div class="full-height full-width flex-container-col padded bordered overflow">
     <div *ngIf="!!icon || !!label" class="full-width align-center padded-bottom">
         <div class="full-height full-width flex-container-row">
             <div *ngIf="!!icon" class="padded-left">
@@ -12,7 +12,7 @@
             </div>
         </div>
     </div>
-    <div class="full-width flex-grow overflow-auto bordered">
+    <div class="full-width flex-grow overflow bordered">
         <mat-tab-group #tabGroup
                        class="full-width full-height"
                        id="linkDataTabs"
@@ -20,7 +20,6 @@
                        (selectedTabChange)="onTabChange($event)">
             <mat-tab label="Setup" class="full-width full-height">
                 <new-experiment-setup #setupTab
-                                      [experiment]="inputs?.experiment"
                                       [idCoreFacility]="inputs?.idCoreFacility"
                                       (onChangeLab)="onChangeLab($event)"
                                       (onChangeRequestCategory)="outputs?.onChangeRequestCategory()">
@@ -28,7 +27,7 @@
             </mat-tab>
             <mat-tab *ngFor="let tab of tabs; let i = index"
                      label="{{tab.label}}"
-                     class="full-height full-width overflow-auto"
+                     class="full-height full-width overflow"
                      [disabled]="i + 1 > index_firstInvalidTab">
                 <!-- Note : This [disabled] attribute is actually looking at the prior form, but we have one non-dynamic tab at the start. -->
                 <div *ngIf="tab.label !== 'Other Details'; else annotate" class="full-width full-height">

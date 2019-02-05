@@ -1,36 +1,32 @@
 import {
     Component, ComponentRef, OnDestroy, OnInit, Output, EventEmitter, ViewChild
 } from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {FormGroup} from "@angular/forms";
-
-import {Subscription} from "rxjs";
-import {first} from "rxjs/internal/operators";
-
-import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
-import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
-import {DictionaryService} from "../../services/dictionary.service";
-import {NewExperimentService} from "../../services/new-experiment.service";
-import {ExperimentBioinformaticsTabComponent} from "../experiment-detail/experiment-bioinformatics-tab.component";
-import {ExperimentsService} from "../experiments.service";
-import {GnomexService} from "../../services/gnomex.service";
-import {NewExperimentSetupComponent} from "./new-experiment-setup.component";
-import {PropertyService} from "../../services/property.service";
-import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
-import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
 import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
-import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
-import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
+import {DictionaryService} from "../../services/dictionary.service";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
+import {GnomexService} from "../../services/gnomex.service";
+import {NewExperimentService} from "../../services/new-experiment.service";
+import {ExperimentsService} from "../experiments.service";
 import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
-import {TabVisibilityComponent} from "./tab-visibility.component";
-
-import {Experiment} from "../../util/models/experiment.model";
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
+import {TabSeqProtoViewComponent} from "./tab-seq-proto-view.component";
+import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
+import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
+import {Subscription} from "rxjs";
+import {TabBioinformaticsViewComponent} from "./tab-bioinformatics-view.component";
+import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
+import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {first} from "rxjs/internal/operators";
+import {FormGroup} from "@angular/forms";
+import {NewExperimentSetupComponent} from "./new-experiment-setup.component";
 
 @Component({
     selector: 'new-experiment',
     templateUrl: "./new-experiment.component.html",
-    styles: [`        
+    styles: [`
+
+        .overflow { overflow: auto; }
         
         .bordered { border: 1px solid silver; }
 
@@ -56,38 +52,18 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     public label: string = "New Experiment Order for ";
     public numTabs: number;
 
-    // private nextButtonIndex: number = -1;
+    private nextButtonIndex: number = -1;
     private annotations: any;
-    private visibilityDetailObj: TabVisibilityComponent;
+    private visibilityDetailObj: VisibilityDetailTabComponent;
 
     public disableSubmit: boolean = true;
 
     private navigationSubscription: Subscription;
 
-    public inputs = {
+    inputs = {
         lab: null,
         requestCategory: null,
-        idCoreFacility: '',
-        organism_current: {
-            idOrganism: '',
-            organism: ''
-        },
-        experiment: {
-            idCoreFacility: '',
-            PropertyEntries: [],
-            requestCategory: {
-                display: '',
-                isIlluminaType: '',
-                type: ''
-            },
-            RequestProperties: [],
-            applicationNotes: '',
-            codeApplication: '',
-            codeIsolationPrepType: '',
-            coreToExtractDNA: '',
-            includeBisulfideConversion: '',
-            includeQubitConcentration: ''
-        }
+        idCoreFacility: ''
     };
 
     outputs = {
@@ -103,8 +79,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 this.icon = value.icon;
             }
 
-            if (this.inputs.experiment.requestCategory) {
-                this.label = "New " + this.inputs.experiment.requestCategory.display + " Experiment for " + this.coreFacility.display;
+            if (this.newExperimentService.requestCategory) {
+                this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
             }
             this.showTabs();
         }
@@ -112,9 +88,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     annotationInputs = {
         annotations: this.annotations,
         orderType: this.types.EXPERIMENT,
-        showConfigureAnnotationsButton: false,
         disabled: false
     };
+
 
     public get formOfCurrentlySelectedTab(): FormGroup {
         if (!this.selectedIndex && this.selectedIndex !== 0) {
@@ -136,27 +112,26 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             return null;
         }
     }
+    public getFormOfTab(index?: number): FormGroup {
+        if (!index && index !== 0) {
+            return this.formOfCurrentlySelectedTab;
+        }
 
-    // public getFormOfTab(index?: number): FormGroup {
-    //     if (!index && index !== 0) {
-    //         return this.formOfCurrentlySelectedTab;
-    //     }
-    //
-    //     if (index === 0) {
-    //         return this.setupTab.form;
-    //     } else if (this.tabs
-    //         && Array.isArray(this.tabs)
-    //         && index >  0
-    //         && index <= this.tabs.length) {
-    //         if (!this.tabs[index - 1] || !this.tabs[index - 1].component) {
-    //             return null;
-    //         } else {
-    //             return this.tabs[index - 1].instance.form;
-    //         }
-    //     } else {
-    //         return null;
-    //     }
-    // }
+        if (index === 0) {
+            return this.setupTab.form;
+        } else if (this.tabs
+            && Array.isArray(this.tabs)
+            && index >  0
+            && index <= this.tabs.length) {
+            if (!this.tabs[index - 1] || !this.tabs[index - 1].component) {
+                return null;
+            } else {
+                return this.tabs[index - 1].instance.form;
+            }
+        } else {
+            return null;
+        }
+    }
 
     public get index_firstInvalidTab(): number {
         if (!this.setupTab || !this.setupTab.form) {
@@ -184,11 +159,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 private gnomexService: GnomexService,
                 private newExperimentService: NewExperimentService,
                 private experimentService: ExperimentsService,
-                private securityAdvisor: CreateSecurityAdvisorService,
-                private propertyService: PropertyService,
                 private route: ActivatedRoute,) {
         this.navigationSubscription = this.router.events.subscribe((e: any) => {
-            // If it is a NavigationEnd event re-initialize the component
+            // If it is a NavigationEnd event re-initalise the component
             if (e instanceof NavigationEnd) {
                 this.reinitialize();
             }
@@ -205,9 +178,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.currentTabComponent = null;
 
             if (params && params.idCoreFacility) {
-                this.inputs.idCoreFacility = params.idCoreFacility;
+                this.newExperimentService.idCoreFacility = params.idCoreFacility;
+                this.inputs.idCoreFacility = this.newExperimentService.idCoreFacility;
 
-                this.coreFacility = this.dictionaryService.getEntry('hci.gnomex.model.CoreFacility', params.idCoreFacility);
+                this.coreFacility = this.dictionaryService.getEntry('hci.gnomex.model.CoreFacility', this.newExperimentService.idCoreFacility);
 
                 if (!!this.coreFacility) {
                     this.label = "New Experiment for " + this.coreFacility.display;
@@ -222,21 +196,26 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                         return;
                     }
 
+                    this.newExperimentService.request = response.Request;
+
                     this.dialogService.stopAllSpinnerDialogs();
 
-                    let experiment: Experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService, this.gnomexService, this.propertyService, this.securityAdvisor, response.Request);
-                    experiment.idCoreFacility = this.inputs.idCoreFacility;
+                    if (!this.gnomexService.isInternalExperimentSubmission) {
+                        this.addDescriptionFieldToAnnotations(this.newExperimentService.request.PropertyEntries);
+                    }
 
-                    this.annotations = experiment.RequestProperties.filter((annotation: any) => {
-                        return annotation
-                            && annotation.isActive === 'Y'
-                            && annotation.idCoreFacility === params.idCoreFacility;
-                    });
+                    this.newExperimentService.propertyEntries = this.newExperimentService.request.PropertyEntries;
 
+                    this.annotations = this.newExperimentService.request.RequestProperties.filter(annotation =>
+                        annotation.isActive === 'Y' && annotation.idCoreFacility === this.newExperimentService.idCoreFacility
+                    );
+
+                    this.newExperimentService.annotations = this.annotations;
                     this.annotationInputs.annotations = this.annotations;
-
-                    this.inputs.experiment = experiment;
                 });
+
+                this.nextButtonIndex = 1;
+                // this.currentTabComponent = this;
             }
         });
     }
@@ -248,27 +227,41 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
 
+    private addDescriptionFieldToAnnotations(props: any[]): void {
+        let descNode: any = {
+            PropertyEntry: {
+                idProperty: "-1",
+                name: "Description",
+                otherLabel: "",
+                Description: "false",
+                isActive: "Y"
+            }
+        };
+        props.splice(1, 0, descNode);
+    }
+
+
     showTabs() {
         this.tabs = [];
 
-        let category = this.inputs.experiment.requestCategory;
+        let category = this.newExperimentService.requestCategory;
         this.inputs.requestCategory = category;
 
-        if (!this.inputs.experiment) {
+        if (!this.newExperimentService.request) {
             return;
         }
 
-        this.inputs.experiment.applicationNotes = '';
-        this.inputs.experiment.codeApplication = '';
-        this.inputs.experiment.codeIsolationPrepType = '';
-        this.inputs.experiment.coreToExtractDNA = 'N';
-        this.inputs.experiment.includeBisulfideConversion = 'N';
-        this.inputs.experiment.includeQubitConcentration = 'N';
+        this.newExperimentService.request.applicationNotes = '';
+        this.newExperimentService.request.codeApplication = '';
+        this.newExperimentService.request.codeIsolationPrepType = '';
+        this.newExperimentService.request.coreToExtractDNA = 'N';
+        this.newExperimentService.request.includeBisulfideConversion = 'N';
+        this.newExperimentService.request.includeQubitConcentration = 'N';
 
         if (category.isIlluminaType === 'Y') {
             this.gnomexService.submitInternalExperiment()
-                ? this.newExperimentService.currentState = 'SolexaBaseState'
-                : this.newExperimentService.currentState = 'SolexaBaseExternalState';
+                ? this.newExperimentService.currentState.next('SolexaBaseState')
+                : this.newExperimentService.currentState.next('SolexaBaseExternalState');
 
             let propertyTab = {
                 label: "Other Details",
@@ -303,12 +296,12 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             let visibilityTab = {
                 label: "Visibility",
                 disabled: true,
-                component: TabVisibilityComponent
+                component: VisibilityDetailTabComponent
             };
             let bioTab = {
                 label: "Bioinformatics",
                 disabled: true,
-                component: ExperimentBioinformaticsTabComponent
+                component: TabBioinformaticsViewComponent
             };
             let confirmTab = {
                 label: "Confirm",
@@ -326,9 +319,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.tabs.push(confirmTab);
             this.numTabs = 10;
         } else if (category.type === this.newExperimentService.TYPE_QC) {
-            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'QCState' :
-                this.newExperimentService.currentState = 'QCExternalState';
-
+            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('QCState') :
+                this.newExperimentService.currentState.next('QCExternalState');
             let sampleSetupTab = {
                 label: "Sample Details",
                 disabled: true,
@@ -337,52 +329,48 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             let visibilityTab = {
                 label: "Visibility",
                 disabled: true,
-                component: TabVisibilityComponent
+                component: VisibilityDetailTabComponent
             };
-
             this.tabs.push(sampleSetupTab);
             this.tabs.push(visibilityTab);
         } else if (category.type === this.newExperimentService.TYPE_GENERIC) {
-            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'GenericState' :
-                this.newExperimentService.currentState = 'GenericExternalState';
+            this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState.next('GenericState') :
+                this.newExperimentService.currentState.next('GenericExternalState');
         } else if (category.type === this.newExperimentService.TYPE_CAP_SEQ) {
-            this.newExperimentService.currentState = "CapSeqState";
+            this.newExperimentService.currentState.next("CapSeqState");
         } else if (category.type === this.newExperimentService.TYPE_FRAG_ANAL) {
-            this.newExperimentService.currentState = "FragAnalState";
+            this.newExperimentService.currentState.next("FragAnalState");
         } else if (category.type === this.newExperimentService.TYPE_MIT_SEQ) {
-            this.newExperimentService.currentState = "MitSeqState";
+            this.newExperimentService.currentState.next("MitSeqState");
         } else if (category.type === this.newExperimentService.TYPE_CHERRY_PICK) {
-            this.newExperimentService.currentState = "CherryPickState";
+            this.newExperimentService.currentState.next("CherryPickState");
         } else if (category.type === this.newExperimentService.TYPE_ISCAN) {
-            this.newExperimentService.currentState = "IScanState";
+            this.newExperimentService.currentState.next("IScanState");
         } else if (category.type === this.newExperimentService.TYPE_SEQUENOM) {
-            this.newExperimentService.currentState = "SequenomState";
+            this.newExperimentService.currentState.next("SequenomState");
         } else if (category.type === this.newExperimentService.TYPE_ISOLATION) {
-            this.newExperimentService.currentState = "IsolationState";
+            this.newExperimentService.currentState.next("IsolationState");
         } else if (category.type === this.newExperimentService.TYPE_NANOSTRING) {
-            this.newExperimentService.currentState = "NanoStringState";
+            this.newExperimentService.currentState.next("NanoStringState");
         } else if (category.type === this.newExperimentService.TYPE_CLINICAL_SEQUENOM) {
-            this.newExperimentService.currentState = "ClinicalSequenomState";
+            this.newExperimentService.currentState.next("ClinicalSequenomState");
         } else if (category.type === this.newExperimentService.TYPE_MICROARRAY) {
             this.gnomexService.submitInternalExperiment()
-                ? this.newExperimentService.currentState = 'MicroarrayState'
-                : this.newExperimentService.currentState = 'MicroarrayExternalState';
+                ? this.newExperimentService.currentState.next('MicroarrayState')
+                : this.newExperimentService.currentState.next('MicroarrayExternalState');
         }
     }
 
     onTabChange(event) {
+        if (this.newExperimentService.samplesGridApi) {
+            this.newExperimentService.samplesGridApi.sizeColumnsToFit();
+            this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
+        }
+
         this.selectedIndex = event.index;
 
-        if (this.tabs
-            && event
-            && event.index
-            && event.index > 0
-            && event.index <= this.tabs.length
-            && this.tabs[event.index - 1]
-            && this.tabs[event.index - 1].instance
-            && typeof this.tabs[event.index - 1].instance.tabDisplayed === 'function') {
-            // this is important for validating the experiment's samples, where changes were made off of the samples grid tab.
-            this.tabs[event.index - 1].instance.tabDisplayed();
+        if (event.tab.textLabel === "Confirm") {
+            this.newExperimentService.onConfirmTab.next(true);
         }
     }
 
@@ -392,7 +380,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     goNext() {
-        switch (this.newExperimentService.currentState) {
+        switch (this.newExperimentService.currentState.value) {
             case 'SolexaBaseState' : {
                 if (this.selectedIndex === 0) {
                     this.tabs[0].disabled = false;
@@ -412,6 +400,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 } else if (this.selectedIndex === 7) {
                     this.tabs[8].disabled = false;
                 } else if (this.selectedIndex === 8) {
+                    this.newExperimentService.hideSubmit = false;
                     this.disableSubmit = true;
                 }
                 break;
@@ -423,19 +412,38 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             }
 
         }
-
         this.selectedIndex++;
         this.currentTabComponent = this.newExperimentService.components[this.selectedIndex];
+
+        // // TODO: revisit
+        // // was getting error
+        // if (this.currentTabComponent.form) {
+        //     this.currentTabComponent.form.markAsPristine();
+        // }
+        //
+        // Object.keys(this.form.controls).forEach((key: string) => {
+        //     this.form.controls[key].markAsPristine();
+        // });
     }
 
+    destroyComponents() {
+        for (let component of this.newExperimentService.componentRefs) {
+            component.destroy();
+        }
+    }
+
+    onNewAccount() {
+
+    }
 
     componentCreated(compRef: ComponentRef<any>) {
         if (compRef) {
             this.newExperimentService.components.push(compRef.instance);
-
-            if (compRef.instance instanceof TabVisibilityComponent) {
-                this.visibilityDetailObj = compRef.instance as TabVisibilityComponent;
+            if (compRef.instance instanceof VisibilityDetailTabComponent) {
+                this.visibilityDetailObj = compRef.instance as VisibilityDetailTabComponent;
+            } else if (compRef.instance instanceof TabSampleSetupViewComponent) {
             }
+            this.newExperimentService.componentRefs.push(compRef);
 
             for (let tab of this.tabs) {
                 if (compRef.instance instanceof tab.component) {
@@ -455,16 +463,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     }
 
     public onClickDebug() {
-        console.log("Debug clicked!");
-
-        // console.log("Spoofing new experiment!");
-        //
-        // let spoofedExperiment: any = this.newExperimentService.spoofNewExperimentObject();
-        // let spoofedProperties: any = { requestProperties: [] };
-        //
-        // this.newExperimentService.saveNewRequest(62962, '$580.00', '', spoofedExperiment, spoofedProperties).subscribe((response: any) => {
-        //     console.log("SaveRequest returned");
-        // });
+        console.log("Cancel clicked!");
     }
 }
 

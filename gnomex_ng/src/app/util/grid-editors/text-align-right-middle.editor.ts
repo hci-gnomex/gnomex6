@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from "@angular/core";
+import { Component } from "@angular/core";
 import {ICellEditorAngularComp} from "ag-grid-angular";
 
 @Component({
@@ -7,7 +7,7 @@ import {ICellEditorAngularComp} from "ag-grid-angular";
 			<div class="t flex-stretch full-height">
 				<div class="tr">
 					<div class="td vertical-center right-align">
-						<input #theInput [(ngModel)]="value" type="text" class="full-width full-height right-align padded"/>
+						<input [(ngModel)]="value" type="text" class="full-width full-height right-align padded"/>
 					</div>
 				</div>
 			</div>
@@ -39,9 +39,6 @@ import {ICellEditorAngularComp} from "ag-grid-angular";
 	`]
 })
 export class TextAlignRightMiddleEditor implements ICellEditorAngularComp {
-
-    @ViewChild('theInput') theInput: ElementRef;
-
     params: any;
     value: string;
 
@@ -69,12 +66,6 @@ export class TextAlignRightMiddleEditor implements ICellEditorAngularComp {
         if (this.showFillButton && (!this.fillGroupAttribute || this.fillGroupAttribute === '')) {
             throw new Error('Invalid state, cannot use fill button without specifying the fillGroupAttribute.');
         }
-
-        setTimeout(() => {
-            if (this.theInput && this.theInput.nativeElement) {
-                this.theInput.nativeElement.focus();
-            }
-        });
     }
 
     getValue(): string {

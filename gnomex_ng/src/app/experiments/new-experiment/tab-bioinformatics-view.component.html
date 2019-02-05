@@ -1,0 +1,43 @@
+<form [formGroup]="form" class="flex-container-col">
+    <div style="font-weight: bold">{{analysisAssistanceHeader}}</div>
+    <span>
+        <div class="questions-assist">{{questionsLabel}}{{analysisAssistanceGroup}}{{atLabel}}</div>
+        <button mat-button class="anal-assist-email">{{bioEmail}}</button>
+    </span>
+    <div>
+        <mat-label>{{alignToLabel}}</mat-label>
+    </div>
+    <div formArrayName="orgList">
+        <div *ngFor="let organism of newExperimentService.sampleOrganisms; let i = index" [formGroupName]="i">
+            <span>
+                <mat-label style="padding-right: 1em;padding-left: 1em">
+                    {{organism.display}}
+                </mat-label>
+            </span>
+            <span>
+                <mat-checkbox formControlName="alignToGenome" (change)="onIsAlignChange($event, i)"></mat-checkbox>
+                <mat-label style="padding-right: 1em;padding-left: 1em">Yes, align to genome build</mat-label>
+                <mat-form-field class="formField">
+                    <mat-select placeholder="Genome Build" formControlName="selectGenomeBuild" (selectionChange)="onGenomeBuildSelection($event)">
+                        <mat-option *ngFor="let genome of genomeBuilds[i]" [value]="genome.idGenomeBuild">
+                            {{ genome.display }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+            </span>
+        </div>
+    </div>
+    <div>
+        {{analysisAssistLabel}}{{analysisAssistanceGroup}}{{assistLabel}}
+    </div>
+    <div style="padding-left: 4em">
+        <span>
+            <mat-checkbox formControlName="analAssist">            Yes,    {{bioAnalysisNote}}
+            </mat-checkbox>
+        </span>
+    </div>
+    <mat-form-field>
+        <textarea matInput formControlName="analysisNote" class="anal-note" placeholder="Enter a note regarding analysis."></textarea>
+    </mat-form-field>
+</form>

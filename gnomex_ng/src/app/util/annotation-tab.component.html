@@ -19,7 +19,7 @@
                 <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.form.controls[annot.name]">
                     <mat-option *ngFor="let opt of annot.PropertyOption"
                                 #mOptRef
-                                (onSelectionChange)="selectOpt(mOptRef)"
+                                (onSelectionChange)="selectOption(mOptRef)"
                                 [value]="opt" > {{opt.name}}
                     </mat-option>
                 </mat-select>
@@ -49,7 +49,7 @@
         </ng-container>
 
     </form>
-    <div *ngIf="showConfigureAnnotationsButton" style="flex:1">
+    <div style="flex:1">
         <button mat-button color="primary" style="margin:1em" (click)="loadConfigAnnotations()"> Configure Annotations </button>
 
     </div>

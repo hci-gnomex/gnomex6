@@ -8,11 +8,11 @@
                             Do you want the Core Facility to perform library preparation on the samples?
                             (Optional)
                         </div>
-                        <mat-radio-group class="flex-container-col flex-grow" (change)="onLipPrepChange($event)" formControlName="seqPrepByCore">
-                            <mat-radio-button [value]="NO">
+                        <mat-radio-group class="flex-container-col flex-grow" (change)="onLipPrepChange($event)" formControlName="seqLibPrep">
+                            <mat-radio-button [value]="YES">
                                 Yes, please prep the library
                             </mat-radio-button>
-                            <mat-radio-button  [value]="YES">
+                            <mat-radio-button  [value]="NO">
                                 No, library has already been prepped
                             </mat-radio-button>
                         </mat-radio-group>
@@ -46,7 +46,7 @@
                     </div>
                 </div>
             </li>
-            <li *ngIf="form?.get('seqPrepByCore')?.value" class="full-width">
+            <li class="full-width">
                 <div class="full-width">
                     <div class="heading">
                         Select a sequencing experiment type :
@@ -79,7 +79,7 @@
                                         </mat-radio-button>
                                     </div>
                                     <div class="td padded right-align">
-                                        <span *ngIf="!this.form.get('seqPrepByCore').value || this.form.get('seqPrepByCore').value !== YES">
+                                        <span *ngIf="!this.form.get('seqLibPrep').value || this.form.get('seqLibPrep').value !== 'no'">
                                             {{ ('' + appPrice?.price).startsWith('$') ? appPrice?.price : ( appPrice?.price ? '$' + appPrice?.price : '') }}
                                         </span>
                                     </div>

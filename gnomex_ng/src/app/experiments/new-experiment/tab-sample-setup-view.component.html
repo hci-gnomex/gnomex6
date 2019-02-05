@@ -1,6 +1,17 @@
 <div class="full-width full-height padded small-font">
     <form [formGroup]="form" class="full-width full-height">
         <div class="full-width full-height">
+            <!--<div>Select a sample quality experiment type.</div>-->
+            <!--<mat-radio-group *ngIf="this.newExperimentService.currentState.value==='QCState'" placeholder="Select a sample quality experiment type." (change)="onTypeChange($event)" formControlName="selectedType">-->
+            <!--<div *ngFor="let type of this.newExperimentService.filteredApps">-->
+            <!--<mat-radio-button (click)="selectType($event)" [value]="type">-->
+            <!--<span class="inline-span">-->
+            <!--{{type.display}}-->
+            <!--</span>-->
+            <!--</mat-radio-button>-->
+            <!--</div>-->
+            <!--</mat-radio-group>-->
+
             <ol class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
@@ -8,18 +19,12 @@
                             How many samples will be sequenced in this experiment order?
                         </div>
                         <mat-form-field>
-                            <!--<input matInput-->
-                                   <!--[(ngModel)]="numberOfSamples"-->
-                                   <!--placeholder="Number of samples."-->
-                                   <!--formControlName="numSamples"-->
-                                   <!--maxlength="4"-->
-                                   <!--required>-->
                             <input matInput
+                                   [(ngModel)]="numberOfSamples"
                                    placeholder="Number of samples."
                                    formControlName="numSamples"
                                    maxlength="4"
-                                   required
-                                   (change)="onChange_numberOfSamples($event)">
+                                   required>
                             <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
                                 Please check number of samples
                             </mat-error>
@@ -39,7 +44,7 @@
                                              formControlName="selectedDna"
                                              (change)="onDnaChange($event)">
                                 <div *ngFor="let dnaCategory of filteredSampleTypeListDna">
-                                    <mat-radio-button [value]="dnaCategory">
+                                    <mat-radio-button (click)="selectDna($event)" [value]="dnaCategory">
                                         <div class="short-width">
                                             {{dnaCategory.display}}
                                        </div>
@@ -55,7 +60,7 @@
                                              formControlName="selectedRna"
                                              (change)="onRnaChange($event)">
                                 <div *ngFor="let rnaCategory of filteredSampleTypeListRna">
-                                    <mat-radio-button [value]="rnaCategory">
+                                    <mat-radio-button (click)="selectRna($event)" [value]="rnaCategory">
                                         <div class="short-width">
                                             {{rnaCategory.display}}
                                         </div>
@@ -91,7 +96,7 @@
                                    (keyup.enter)="chooseFirstOrgOption()"
                                    required>
                             <mat-autocomplete [displayWith]="displayOrg" #autoOrg="matAutocomplete">
-                                <mat-option (onSelectionChange)="selectOrganism($event)" *ngFor="let org of filterOrganism(form.get('organism').value)" [value]="org">{{org.combinedName}}</mat-option>
+                                <mat-option (onSelectionChange)="selectOrgOption($event)" *ngFor="let org of filterOrganism(form.get('organism').value)" [value]="org">{{org.combinedName}}</mat-option>
                             </mat-autocomplete>
                         </mat-form-field>
                     </div>
@@ -126,7 +131,7 @@
                                     </mat-form-field>
                                 </div>
                             </li>
-                            <li *ngIf="this.newExperimentService.currentState !== 'QCState' && (showDnaseBox || showRnaseBox)" class="full-width align-baseline">
+                            <li *ngIf="this.newExperimentService.currentState.value!=='QCState' && (showDnaseBox || showRnaseBox)" class="full-width align-baseline">
                                 <div class="full-width align-baseline">
                                     <mat-checkbox *ngIf="showDnaseBox" formControlName="dnaseBox" (change)="onDnaseChanged($event)">Click if RNA samples were treated with DNase</mat-checkbox>
                                     <mat-checkbox *ngIf="showRnaseBox" formControlName="rnaseBox" (change)="onRnaseChanged($event)">Click if DNA samples were treated with RNase</mat-checkbox>
@@ -146,7 +151,7 @@
                         </mat-radio-group>
                     </div>
                 </li>
-                <li *ngIf="showSamplePrepContainer" class="full-width align-baseline">
+                <li *ngIf="showSamplePrepContatainer" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
                             Specify the nucleic acid extraction method.

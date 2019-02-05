@@ -7,7 +7,7 @@
                         Select a Sequencing Protocol
                     </div>
                     <div class="flex-grow">
-                        <mat-radio-group class="long-width" formControlName="selectedProto" (change)="onProtoChange()">
+                        <mat-radio-group class="long-width" formControlName="selectedProto" (change)="onProtoChange($event)">
                             <div class="t">
                                 <div *ngFor="let proto of filteredNumberSequencingCyclesAllowedList; let index=index; let odd=odd; let even=even;"
                                      class="tr"

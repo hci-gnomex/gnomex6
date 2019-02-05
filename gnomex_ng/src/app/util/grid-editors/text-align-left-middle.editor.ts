@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from "@angular/core";
+import { Component } from "@angular/core";
 import {ICellEditorAngularComp} from "ag-grid-angular";
 
 @Component({
@@ -7,7 +7,7 @@ import {ICellEditorAngularComp} from "ag-grid-angular";
 			<div class="t flex-stretch full-height">
 				<div class="tr">
 					<div class="td vertical-center left-align">
-						<input #theInput [(ngModel)]="value" type="text" class="full-width full-height padded"/>
+						<input [(ngModel)]="value" type="text" class="full-width full-height padded"/>
 					</div>
 				</div>
 			</div>
@@ -39,9 +39,6 @@ import {ICellEditorAngularComp} from "ag-grid-angular";
 	`]
 })
 export class TextAlignLeftMiddleEditor implements ICellEditorAngularComp {
-
-    @ViewChild('theInput') theInput: ElementRef;
-
     params: any;
     value: string;
 
@@ -69,12 +66,6 @@ export class TextAlignLeftMiddleEditor implements ICellEditorAngularComp {
         if (this.showFillButton && (!this.fillGroupAttribute || this.fillGroupAttribute === '')) {
             throw new Error('Invalid state, cannot use fill button without specifying the fillGroupAttribute.');
         }
-
-        setTimeout(() => {
-            if (this.theInput && this.theInput.nativeElement) {
-                this.theInput.nativeElement.focus();
-            }
-        });
     }
 
     getValue(): string {
@@ -93,7 +84,6 @@ export class TextAlignLeftMiddleEditor implements ICellEditorAngularComp {
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
                     && rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
                     rowNode.setDataValue(this.gridFieldName, this.value);
-                    rowNode.setDataValue(this.gridFieldName + "_1", this.value);  // Sometimes, but seemingly not always, the grid puts a _1 on the end of a column's key. We'll just try them both I guess.
                 }
             });
 

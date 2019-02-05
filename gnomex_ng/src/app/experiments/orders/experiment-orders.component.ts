@@ -168,10 +168,9 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
         });
         columnDefinitions.push({
             headerName: "Name",
+            editable: false,
             width: 600,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            editable: false,
-            // editable: true,
             // errorMessageHeader: 'TestingTestingTesting',
             // setErrors: (value: any,
             //             data: any,

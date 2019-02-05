@@ -1,5 +1,7 @@
 import {Component, OnInit} from "@angular/core";
-import {AnnotationTabComponent} from "../../util/annotation-tab.component";
+import {DictionaryService} from "../../services/dictionary.service";
+import {NewExperimentService} from "../../services/new-experiment.service";
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {MatDialog} from "@angular/material";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 
@@ -12,11 +14,15 @@ import {BrowseOrderValidateService} from "../../services/browse-order-validate.s
 
 export class TabPropertiesViewComponent extends AnnotationTabComponent implements OnInit {
 
-    constructor(dialog: MatDialog, orderValidateService: BrowseOrderValidateService
+    constructor(private dictionaryService: DictionaryService,
+                private newExperimentService: NewExperimentService,
+                dialog: MatDialog, orderValidateService: BrowseOrderValidateService
     ) {
         super(dialog, orderValidateService);
     }
 
     ngOnInit() {
     }
+
+
 }

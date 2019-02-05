@@ -1,11 +1,15 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {
+    MatDialogRef, MAT_DIALOG_DATA
+} from '@angular/material';
 import { URLSearchParams } from "@angular/http";
+import {
+    AfterViewInit, Component, Inject, OnInit, ViewChild
+} from "@angular/core";
+import { jqxComboBoxComponent } from "jqwidgets-framework";
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-
 import {ExperimentsService} from "./experiments.service";
 
 @Component({

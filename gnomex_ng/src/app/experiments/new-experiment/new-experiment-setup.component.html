@@ -10,7 +10,7 @@
                                      class="flex-container-col"
                                      placeholder="Select a service category"
                                      formControlName="selectedCategory"
-                                     (change)="onCategoryChange()">
+                                     (change)="onCategoryChange($event)">
                         <div *ngFor="let category of requestCategories" class="full-width">
                             <mat-radio-button [value]="category">
                                 <div class="full-width flex-container-row">
@@ -80,7 +80,7 @@
                             Select a payment method :
                         </div>
                         <mat-form-field class="moderate-width">
-                            <mat-select placeholder="Account" formControlName="selectAccount" (selectionChange)="onBillingSelection($event)">
+                            <mat-select placeholder="Account" formControlName="selectAccount" (change)="onBillingSelection($event)">
                                 <mat-option *ngFor="let account of authorizedBillingAccounts" [value]="account">
                                     {{ account.accountNameDisplay }}
                                 </mat-option>
@@ -93,17 +93,17 @@
                             {{ workAuthInstructions }}
                         </div>
                         <div>
-                            <button mat-button class="link-button minimize" (click)="onClickNewAccount()">{{ workButtonText }}</button>
+                            <button mat-button class="link-button minimize" (click)="onNewAccount()">{{workButtonText}}</button>
                         </div>
                         <div *ngIf="showAccessAuthorizedAccountsLink" class="double-padded-left instructions">
                             {{ accessAuthorizedBillingAccountInstructions }}
                         </div>
                         <div class="flex-container-row">
                             <div class="padded-right">
-                                <button mat-button class="link-button minimize" (click)="onClickShowMoreAccounts()">Show Other Billing Accounts</button>
+                                <button mat-button class="link-button minimize" (click)="onNewAccount()">Show Other Blling Accounts</button>
                             </div>
                             <div class="padded-right">
-                                <button mat-button class="link-button minimize" (click)="onClickSplitBilling()">Split Billing</button>
+                                <button mat-button class="link-button minimize" (click)="onNewAccount()">Split Billing</button>
                             </div>
                         </div>
                     </div>
@@ -115,7 +115,7 @@
                         {{ "Select a folder : \n (for organizing experiments)" }}
                     </div>
                     <mat-form-field class="moderate-width">
-                        <mat-select placeholder="Project" formControlName="selectProject" (selectionChange)="onProjectSelection($event)">
+                        <mat-select placeholder="Project" formControlName="selectProject">
                             <mat-option *ngFor="let project of filteredProjectList" [value]="project">
                                 {{ project.name }}
                             </mat-option>
@@ -124,10 +124,10 @@
                     </mat-form-field>
                     <div class="flex-container-row major-padding-left">
                         <div class="padded-right">
-                            <button mat-button class="link-button minimize" (click)="onClickEditProject()">Edit</button>
+                            <button mat-button class="link-button minimize" (click)="onNewAccount()">Edit</button>
                         </div>
                         <div class="padded-right">
-                            <button mat-button class="link-button minimize" (click)="onClickNewProject()">New</button>
+                            <button mat-button class="link-button minimize" (click)="onNewAccount()">New</button>
                         </div>
                     </div>
                 </div>
@@ -138,7 +138,7 @@
                         {{ "Provide an experiment name \n for the data folder (optional)" }}
                     </div>
                     <mat-form-field class="moderate-width">
-                        <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder" (input)="onChangeExperimentName($event)">
+                        <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder">
                     </mat-form-field>
                 </div>
             </li>
@@ -155,8 +155,7 @@
                                               placeholder="Experimental Details"
                                               formControlName="description"
                                               matAutosizeMinRows="1"
-                                              matAutosizeMaxRows="5"
-                                              (input)="onInputExperimentalDetails($event)">
+                                              matAutosizeMaxRows="5">
                                     </textarea>
                         <mat-error *ngIf="form?.get('description')?.hasError('maxlength')">Details can be at most 5000 characters</mat-error>
                     </mat-form-field>

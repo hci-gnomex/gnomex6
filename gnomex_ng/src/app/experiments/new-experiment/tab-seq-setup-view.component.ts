@@ -1,14 +1,9 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {HttpParams} from "@angular/common/http";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-
-import {Subscription} from "rxjs/index";
-
+import {ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
+import {NewExperimentService} from "../../services/new-experiment.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
-import {GnomexService} from "../../services/gnomex.service";
-
-import {Experiment} from "../../util/models/experiment.model";
 
 @Component({
     selector: "tabSeqSetupView",
@@ -109,14 +104,9 @@ import {Experiment} from "../../util/models/experiment.model";
 
 export class TabSeqSetupViewComponent implements OnInit {
 
-    @Input("requestCategory") requestCategory: any;
-
-    @Input("experiment") set experiment(value: Experiment) {
-        this._experiment = value;
-    };
-
     @Input("lab") set lab(value: any) {
         if (!value || !this.requestCategory) {
+            console.error("Unable to obtain prices on Library Prep screen!");
             return;
         }
 
@@ -124,7 +114,7 @@ export class TabSeqSetupViewComponent implements OnInit {
             .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
             .set("idLab", value.idLab);
 
-        this.themesSubscription = this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
+        this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
             for (let price of response) {
                 let key: string = price.codeApplication;
                 this.priceMap[key] = price.price;
@@ -133,25 +123,25 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.appPrices = [];
             this.form.get("seqType").setValue("");
 
-            this.showPool = this.form
-                && this.form.get("seqPrepByCore")
-                && this.form.get("seqPrepByCore").value === this.NO;
+            if (this.form && this.form.get("seqLibPrep") && this.form.get("seqLibPrep").value === this.NO) {
+                this.showPool = true;
+            } else {
+                this.showPool = false;
+            }
 
-            this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
+            this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
         });
     };
 
-    public readonly YES: string = "Y";
-    public readonly NO: string = "N";
+    public readonly YES: string = "yes";
+    public readonly NO: string = "no";
     public readonly SEPARATE: string = "separate";
     public readonly POOLED: string = "pooled";
     public currState: string;
+    @Input("requestCategory") requestCategory: any;
 
     private form: FormGroup;
-
-    private _experiment: Experiment;
-
     private isPreppedContainer: boolean = true;
     private showPool: boolean = false;
     private priceMap: Map<string, string> = new Map<string, string>();
@@ -159,26 +149,17 @@ export class TabSeqSetupViewComponent implements OnInit {
     themeMap: Map<string, any> = new Map<string, any>();
 
     public themes: any[] = [];
+    public appPrices: any[] = [];
 
-    get appPrices(): any[] {
-        return this._appPrices;
-    }
-    set appPrices(value: any[]) {
-        if (!value) {
-           this._appPrices = [];
-        } else {
-            this._appPrices = value.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
-        }
-    }
-    private _appPrices: any[] = [];
-
+    // private showAppPrice: boolean = false;
+    // private libraryDesign: boolean = false;
     private libToChange: boolean = false;
 
     get showPoolingType(): boolean {
         return this.form
-            && this.form.get('seqPrepByCore')
-            && this.form.get('seqPrepByCore').value
-            && this.form.get('seqPrepByCore').value === this.YES;
+            && this.form.get('seqLibPrep')
+            && this.form.get('seqLibPrep').value
+            && this.form.get('seqLibPrep').value === this.NO;
     }
 
     get showLibraryDesign(): boolean {
@@ -186,7 +167,7 @@ export class TabSeqSetupViewComponent implements OnInit {
             && this.form.get("appPrice")
             && this.form.get("appPrice").value
             && this.form.get("appPrice").value.hasCaptureLibDesign
-            && this.form.get("appPrice").value.hasCaptureLibDesign === this.YES;
+            && this.form.get("appPrice").value.hasCaptureLibDesign === 'Y';
     }
 
 
@@ -213,32 +194,31 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
     set sequenceType(value: any) {
-        let tempAppPrices = [];
+        this.appPrices = [];
 
         if (value) {
             for (let app of this.filteredApps) {
                 if (app.idApplicationTheme === value.idApplicationTheme) {
-                    tempAppPrices.push(app);
+                    this.appPrices.push(app);
                 }
             }
         }
 
-        this.appPrices = tempAppPrices;
+        this.newExperimentService.seqType = value;
     }
 
 
-    private themesSubscription: Subscription;
-
-
     constructor(private dictionaryService: DictionaryService,
-                private gnomexService: GnomexService,
+                private newExperimentService: NewExperimentService,
                 private billingService: BillingService,
-                private fb: FormBuilder) { }
+                private changeRef: ChangeDetectorRef,
+                private fb: FormBuilder) {
+    }
 
     ngOnInit() {
         this.form = this.fb.group({
-            // seqPrepByCore:    [''],
-            seqPrepByCore:    ['', Validators.required],
+            seqLibPrep:    [''],
+            // seqLibPrep:    ['', Validators.required],
             pooledLib:     [''],
             numTubes:      [''],
             seqType:       ['', Validators.required],
@@ -246,18 +226,20 @@ export class TabSeqSetupViewComponent implements OnInit {
             libraryDesign: ['']
         });
 
-        this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
+        this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
         this.setupThemes();
     }
 
+    ngAfterViewInit() {
+    }
 
-    private setupThemes(): void {
+
+    setupThemes() {
         this.themes = [];
         this.themeMap = new Map<string, any>();
 
         let preparedAppList: any[] = [];
         let themeSet: Set<any> = new Set();
-
         for (let item of this.filteredApps) {
             let theme = this.dictionaryService.getEntry("hci.gnomex.model.ApplicationTheme", item.idApplicationTheme);
             if (!theme) {
@@ -269,7 +251,9 @@ export class TabSeqSetupViewComponent implements OnInit {
             if (!themeSet.has(theme)) {
                 themeSet.add(theme);
             }
-
+            // if (theme.length > 0) {
+            //     this.themeMap[item.idApplicationTheme] = theme[0];
+            // }
             if (this.priceMap && this.priceMap[item.codeApplication]) {
                 item.price = this.priceMap[item.codeApplication];
             } else {
@@ -277,22 +261,30 @@ export class TabSeqSetupViewComponent implements OnInit {
             }
             preparedAppList.push(item);
         }
-
         for (let thm of this.themeMap.values()) {
             this.themes.push(thm);
         }
 
-        if (this.form.get("seqPrepByCore").value === this.YES) {
-            preparedAppList.sort(TabSeqSetupViewComponent.sortApplicationsAlphabetically);
+        if (this.form.get("seqLibPrep").value === "yes") {
+            preparedAppList.sort(this.sortApplicationsAlphabetically);
         }
 
-        this.themes.sort(TabSeqSetupViewComponent.sortApplicationsOnOrder);
+
+        this.themes.sort(this.sortApplicationsOnOrder);
+
+        // this.applicationRepeater.dataProvider = preparedAppList;
+        // preparedAppList.refresh();
+        // this.chosenThemeLabel.text = "";
+        // libraryDesign.visible = false;
+        // libraryDesign.includeInLayout = false;
+        //
+
     }
 
-    public onLipPrepChange(event): void {
+    onLipPrepChange(event) {
         let appPriceListParams: HttpParams = new HttpParams()
             .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
-            .set("idLab", this._experiment.idLab);
+            .set("idLab", this.newExperimentService.lab.idLab);
 
         this.themes = [];  // Clearing out themes early to improve visual look of the change.
         this.sequenceType = null;
@@ -308,82 +300,89 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.appPrices = [];
             this.form.get("seqType").setValue("");
 
-            if (this.form && this.form.get("seqPrepByCore")) {
-                if (this.form.get("seqPrepByCore").value) {
-                    this._experiment.seqPrepByCore = this.form.get("seqPrepByCore").value;
-                } else {
-                    this._experiment.seqPrepByCore = '';
-                }
-
-                this.showPool = this.form.get("seqPrepByCore").value === this.NO;
+            if (this.form && this.form.get("seqLibPrep") && this.form.get("seqLibPrep").value === this.NO) {
+                this.showPool = true;
+            } else {
+                this.showPool = false;
             }
 
-
-            this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
+            this.filteredApps = this.newExperimentService.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
+            // this.showAppPrice = true;
         });
 
-        this.isPreppedContainer = !(this.currState === "NanoStringState");
+        if (this.currState === "NanoStringState") {
+            // Hide isPrepped
+            this.isPreppedContainer = false;
+        } else {
+            this.isPreppedContainer = true;
+        }
 
         this.libToChange = false;
     }
+    //
+    // onPooledChanged(event) {
+    //     this.showAppPrice = true;
+    //
+    // }
 
-    public selectTheme(event): void {
-        // TODO: ? Seems like there should be something here
+    // onSeqTypeChanged(event) {
+    //     this.appPrices =[];
+    //     for (let app of this.filteredApps) {
+    //         if (app.idApplicationTheme === event.value.idApplicationTheme) {
+    //             this.appPrices.push(app);
+    //         }
+    //
+    //     }
+    //     this.newExperimentService.seqType = this.form.get("seqType").value;
+    //
+    // }
+
+    selectApp(event) {
+
     }
 
-    public onAppPriceChanged(event): void {
+    selectTheme(event) {
+
+    }
+
+    onAppPriceChanged(event) {
         let application = this.dictionaryService.getEntry('hci.gnomex.model.Application', this.form.get("appPrice").value.value);
         if (application) {
-            this._experiment.application_object = application;
-
-            //If it is sure select we need to show the library capture id input box
-            this.libToChange = application.hasCaptureLibDesign === 'Y';
-        }
-    }
-
-    public onNumTubesChanged(event): void {
-        this._experiment.numPrePooledTubes = event;
-    }
-
-    public filterApplication(requestCategory, seqPrepByCore): any[] {
-        let filteredApps: any[] = [];
-        let filteredAppList: any[] = this.dictionaryService.getEntries('hci.gnomex.model.Application').sort(TabSeqSetupViewComponent.sortApplication);
-        for (let app of filteredAppList) {
-            if (!app.value) {
-                continue;
-            }
-            if (app.isActive === 'N') {
-                continue;
-            }
-            let doesMatchRequestCategory: boolean = false;
-            let theApplications = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategoryApplication").filter((reqCatApp) => {
-                return reqCatApp.value !== "" && reqCatApp.codeApplication === app.value;
-            });
-
-            for (let xref of theApplications) {
-                if (xref.codeRequestCategory === requestCategory.codeRequestCategory) {
-                    doesMatchRequestCategory = true;
-                    break;
-                }
-            }
-
-            let doesMatchSeqPrepByCore: boolean = false;
-            if (doesMatchRequestCategory) {
-                if (requestCategory.isIlluminaType !== 'Y' || !this.gnomexService.isInternalExperimentSubmission) {
-                    doesMatchSeqPrepByCore = true;
-                } else {
-                    doesMatchSeqPrepByCore = (app.onlyForLabPrepped === "N" || seqPrepByCore);
-                }
-            }
-            if (doesMatchRequestCategory && doesMatchSeqPrepByCore) {
-                filteredApps.push(app);
+            this.newExperimentService.applicationName = application.display;
+            this.newExperimentService.codeApplication = application.codeApplication;
+            if(application.hasCaptureLibDesign === 'Y'){ //If it is sure select we need to show the library capture id input box
+                this.libToChange = true;
+            } else {
+                this.libToChange = false;
+                // this.form.controls['libraryDesign'].setValidators([Validators.required]);
+                // TODO Need to create new request
+                // this.newExperimentService.request.captureLibDesignId = "";
             }
         }
-        return filteredApps;
     }
 
-    private static sortApplicationsAlphabetically(obj1, obj2): number{
+    ngAfterViewChecked() {
+        // let detectChanges: boolean = false;
+        //
+        // if (this.libToChange !== this.libraryDesign) {
+        //     this.libraryDesign = this.libToChange;
+        //     detectChanges = true;
+        // }
+        // if (detectChanges) {
+        //     this.changeRef.detectChanges();
+        // }
+    }
+
+    onNumTubesChanged(event) {
+        this.newExperimentService.numTubes = event
+    }
+
+    onNumSamplesChanged(event) {
+
+    }
+
+    private sortApplicationsAlphabetically(obj1, obj2): number{
         if (obj1 == null && obj2 == null) {
             return 0;
         }else if (obj1 == null) {
@@ -401,7 +400,7 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
 
-    private static sortApplicationsOnOrder(obj1, obj2): number{
+    private sortApplicationsOnOrder(obj1, obj2): number{
         if (obj1 == null && obj2 == null) {
             return 0;
         } else if (obj1 == null) {
@@ -421,68 +420,5 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
 
-    private static sortBySortOrderThenDisplay(obj1, obj2): number{
-        if ((obj1 === null || obj1 === undefined) && (obj2 === null || obj2 === undefined)) {
-            return 0;
-        } else if (obj1 === null || obj1 === undefined) {
-            return 1;
-        } else if (obj2 === null || obj2 === undefined) {
-            return -1;
-        } else {
-            let sortOrder1: number = obj1.sortOrder === "" ? 999 : +obj1.sortOrder;
-            let sortOrder2: number = obj2.sortOrder === "" ? 999 : +obj2.sortOrder;
 
-            if (sortOrder1 < sortOrder2) {
-                return -1;
-            } else if (sortOrder1 > sortOrder2) {
-                return 1;
-            } else {
-                if ((obj1.display === null || obj1.display === undefined)
-                    && (obj2.display === null || obj2.display === undefined)) {
-                    return 0;
-                } else if (obj1.display === null || obj1.display === undefined) {
-                    return 1;
-                } else if (obj2.display === null || obj2.display === undefined) {
-                    return -1;
-                } else {
-                    return obj1.display.toUpperCase().localeCompare(obj2.display.toUpperCase());
-                }
-            }
-        }
-    }
-
-    public static sortApplication(obj1, obj2): number {
-        if (obj1 === null && obj2 === null) {
-            return 0;
-        } else if (obj1 === null) {
-            return 1;
-        } else if (obj2 === null) {
-            return -1;
-        } else {
-            let order1: number = obj1.sortOrder;
-            let order2: number = obj2.sortOrder;
-            let disp1: string = obj1.display;
-            let disp2: string = obj2.display;
-
-            if (obj1.value === '') {
-                return -1;
-            } else if (obj2.value === '') {
-                return 1;
-            } else {
-                if (order1 < order2) {
-                    return -1;
-                } else if (order1 > order2) {
-                    return 1;
-                } else {
-                    if (disp1 < disp2) {
-                        return -1;
-                    } else if (disp1 > disp2) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
-            }
-        }
-    }
 }
