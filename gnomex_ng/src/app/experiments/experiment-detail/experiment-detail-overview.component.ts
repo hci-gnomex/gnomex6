@@ -67,6 +67,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public showEdit: boolean = false;
     public isEditMode: boolean;
     public nodeTitle: string = "";
+    public showBillingTab: boolean = false;
     
     types = OrderType;
     
@@ -110,7 +111,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                             || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"));
                 }
 
-                this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
+                this.showSequenceLanesTab = this.requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
+                this.showBillingTab = this.experiment.canRead === 'Y' && this.experiment.isExternal !== 'Y';
 
                 let protocols: any[] = [];
                 if (this.experiment.protocols) {
