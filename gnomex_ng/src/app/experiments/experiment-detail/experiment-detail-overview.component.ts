@@ -10,7 +10,10 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {Subscription} from "rxjs";
 import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
-
+import {Experiment} from "../../util/models/experiment.model";
+import {PropertyService} from "../../services/property.service";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {TabSamplesIlluminaComponent} from "../new-experiment/tab-samples-illumina.component";
 
 @Component({
     templateUrl: "./experiment-detail-overview.component.html",
@@ -25,6 +28,7 @@ import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
 export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public annotations: any = [];
     public experiment: any;
+    public _experiment: Experiment;
     types = OrderType;
     public showMaterialsMethodsTab: boolean = false;
     public initDescriptionTab = false;
@@ -38,9 +42,13 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
 
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
-    constructor(private dictionaryService: DictionaryService,
+    @ViewChild('tabSamplesIlluminaComponent') private tabSamplesIlluminaComponent: TabSamplesIlluminaComponent;
+
+    constructor(private securityAdvisor: CreateSecurityAdvisorService,
+                private dictionaryService: DictionaryService,
                 private experimentService: ExperimentsService,
                 private gnomexService: GnomexService,
+                private propertyService: PropertyService,
                 private route: ActivatedRoute) {
     }
 
@@ -55,7 +63,14 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             this.showSequenceLanesTab = false;
 
             if (data && data.experiment && data.experiment.Request) {
-                this.experiment = data.experiment.Request;
+                this.experiment  = data.experiment.Request;
+                this._experiment = Experiment.createExperimentObjectFromAny(
+                    this.dictionaryService,
+                    this.gnomexService,
+                    this.propertyService,
+                    this.securityAdvisor,
+                    this.experiment
+                );
             }
 
             if (this.experiment) {
@@ -146,6 +161,10 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
         }
         if (event.tab.textLabel === "Sequence Lanes" && this.sequenceLanesTab) {
             this.sequenceLanesTab.prepareView();
+        }
+        if (event.tab.textLabel === "Experiment Design") {
+            console.log('onSelectExperimentDesign');
+            this.tabSamplesIlluminaComponent.tabDisplayed();
         }
     }
 

@@ -259,12 +259,18 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     search() {
-        this.treeModel.filterNodes((node) => this.searchFn(node), true);
+        if (this.searchText) {
+            this.treeModel.filterNodes((node) => this.searchFn(node), true);
+        } else {
+            this.treeModel.clearFilter();
+        }
     }
 
     searchFn(node: any): boolean {
         if (node) {
-            if (node.data.label.indexOf(this.searchText) >= 0 ||
+            if (!this.searchText) {
+                return true;
+            } else if (node.data.label.indexOf(this.searchText) >= 0 ||
                 node.data.description && node.data.description.indexOf(this.searchText) >= 0) {
                 return true;
             } else {

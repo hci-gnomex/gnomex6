@@ -142,6 +142,12 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
         this.analysisGroupListSubscription = this.analysisService.getAnalysisGroupListObservable().subscribe(response => {
             this.items = [].concat([]);
+
+            if (!response) {
+                this.dialogsService.alert("No results");
+                return;
+            }
+
             this.buildTree(response);
             if (this.createAnalysisDialogRef != undefined && this.createAnalysisDialogRef.componentInstance != undefined) {
                 if (this.createAnalysisDialogRef.componentInstance.showSpinner) {

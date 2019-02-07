@@ -50,7 +50,6 @@ import {DeleteExperimentComponent} from "./delete-experiment.component";
 import {AgGridRendererModule,IconTextRendererComponent} from "../util/grid-renderers/index";
 import {CreateProjectLauncherComponent} from "./create-project-launcher-component";
 import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
-import {ExperimentDetailModule} from "./experiment-detail/experiment-detail-module";
 import {TabNotesViewComponent} from "./new-experiment/tab-notes-view.component";
 import {TabSampleSetupViewComponent} from "./new-experiment/tab-sample-setup-view.component";
 import {TabPropertiesViewComponent} from "./new-experiment/tab-properties-view.component";
@@ -75,6 +74,18 @@ import {UploadModule} from "../upload/upload.module";
 import {NewExperimentSetupComponent} from "./new-experiment/new-experiment-setup.component";
 import {ExperimentBioinformaticsTabComponent} from "./experiment-detail/experiment-bioinformatics-tab.component";
 import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component";
+import {CollaboratorsDialogComponent} from "./experiment-detail/collaborators-dialog.component";
+import {ExperimentOverviewTabComponent} from "./experiment-detail/experiment-overview-tab.component";
+import {ExperimentDetailOverviewComponent} from "./experiment-detail/experiment-detail-overview.component";
+import {DescriptionTab} from "./experiment-detail/description-tab.component";
+import {ExperimentFilesTabComponent} from "./experiment-detail/experiment-files-tab.component";
+import {MaterialsMethodsTabComponent} from "./experiment-detail/materials-methods-tab.component";
+import {ProtocolDialogComponent} from "./experiment-detail/protocol-dialog.component";
+import {ExperimentSequenceLanesTab} from "./experiment-detail/experiment-sequence-lanes-tab";
+import {ManageFilesDialogComponent} from "../util/upload/manage-files-dialog.component";
+import {RelatedDataModule} from "../util/related-data.module";
+import {RichEditorModule} from "../../modules/rich-editor.module";
+import {ManageFilesModule} from "../util/upload/manage-files.module";
 
 @NgModule({
     imports: [
@@ -85,7 +96,6 @@ import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component"
         CommonModule,
         EmailRelatedUsersPopupModule,
         ExpanderModule,
-        ExperimentDetailModule,
         FormsModule,
         InputModule,
         LoaderModule,
@@ -97,6 +107,9 @@ import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component"
         TreeModule.forRoot(),
         UtilModule,
         WindowModule,
+        RelatedDataModule,
+        RichEditorModule,
+        ManageFilesModule,
         ReactiveFormsModule,
         DropDownModule,
         AngularMaterialModule,
@@ -126,7 +139,6 @@ import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component"
             UrlAnnotRenderer,
             CheckboxRenderer,
         ]),
-        ExperimentDetailModule,
         UploadModule
     ],
     declarations: [
@@ -153,9 +165,17 @@ import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component"
         NewExperimentSetupComponent,
         TabAnnotationViewComponent,
         TabSamplesIlluminaComponent,
-        // TabBioinformaticsViewComponent,
         TabConfirmIlluminaComponent,
-        TabVisibilityComponent
+        TabVisibilityComponent,
+        CollaboratorsDialogComponent,
+        ExperimentBioinformaticsTabComponent,
+        ExperimentOverviewTabComponent,
+        ExperimentDetailOverviewComponent,
+        DescriptionTab,
+        ExperimentFilesTabComponent,
+        MaterialsMethodsTabComponent,
+        ProtocolDialogComponent,
+        ExperimentSequenceLanesTab
     ],
     entryComponents: [
         CreateProjectComponent,
@@ -173,9 +193,11 @@ import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component"
         TabSeqProtoViewComponent,
         TabAnnotationViewComponent,
         TabSamplesIlluminaComponent,
-        // TabBioinformaticsViewComponent,
         TabConfirmIlluminaComponent,
-        TabVisibilityComponent
+        TabVisibilityComponent,
+        CollaboratorsDialogComponent,
+        ManageFilesDialogComponent,
+        ProtocolDialogComponent,
     ],
     exports:[
         CreateProjectComponent,
@@ -192,7 +214,6 @@ import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component"
         TabSeqProtoViewComponent,
         TabAnnotationViewComponent,
         TabSamplesIlluminaComponent,
-        // TabBioinformaticsViewComponent,
         TabConfirmIlluminaComponent,
         TabVisibilityComponent
     ]
