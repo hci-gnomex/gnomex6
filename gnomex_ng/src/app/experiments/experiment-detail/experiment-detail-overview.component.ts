@@ -10,34 +10,74 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {Subscription} from "rxjs";
 import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
+
 import {Experiment} from "../../util/models/experiment.model";
-import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {PropertyService} from "../../services/property.service";
 import {TabSamplesIlluminaComponent} from "../new-experiment/tab-samples-illumina.component";
+import {ConstantsService} from "../../services/constants.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Component({
     templateUrl: "./experiment-detail-overview.component.html",
     styles: [`
-
         .bordered {
             border: 1px solid #e8e8e8;
         }
 
+        .flex-container{
+            display: flex;
+            /*justify-content: space-between;*/
+            flex:1;
+            font-size:small;
+        }
+        
+        .flexbox-column{
+            display:flex;
+            flex-direction:column;
+            height:100%;
+            width:100%;
+        }
+
+        .label-title{
+            margin-top: 0.2rem;
+            margin-bottom: 0;
+        }
+        
+        .label-title-width {
+            width: 25rem;
+        }
+
+        .overflow {
+            overflow: auto;
+        }
+
+        .flex-grow-greater {
+            flex: 10;
+        }
     `],
 })
 export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public annotations: any = [];
     public experiment: any;
+
     public _experiment: Experiment;
     types = OrderType;
+
     public showMaterialsMethodsTab: boolean = false;
-    public initDescriptionTab = false;
     public showBioinformaticsTab: boolean = false;
     public showSequenceLanesTab: boolean = false;
+    public relatedObjects: IRelatedObject = {};
+    public showRelatedDataTab: boolean = false;
+    public experimentOverviewNode: any;
+    public showEdit: boolean = false;
+    public isEditMode: boolean;
+    public nodeTitle: string = "";
+    public showBillingTab: boolean = false;
+	
+    types = OrderType;
+    
     private overviewListSubscription: Subscription;
-    private experimentOverviewNode: any;
-    private relatedObjects: IRelatedObject = {};
-    private showRelatedDataTab: boolean = false;
     private requestCategory: any;
 
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
@@ -49,6 +89,9 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 private experimentService: ExperimentsService,
                 private gnomexService: GnomexService,
                 private propertyService: PropertyService,
+                public constService: ConstantsService,
+                private secAdvisor: CreateSecurityAdvisorService,
+                private dialogsService: DialogsService,
                 private route: ActivatedRoute) {
     }
 
@@ -56,11 +99,13 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
 
         this.overviewListSubscription = this.experimentService.getExperimentOverviewListSubject().subscribe(data => {
             this.experimentOverviewNode = data;
+            this.experimentService.setEditMode(false);
         });
 
         this.route.data.forEach((data: any) => {
             this.experiment = null;
             this.showSequenceLanesTab = false;
+            this.showBillingTab = false;
 
             if (data && data.experiment && data.experiment.Request) {
                 this.experiment  = data.experiment.Request;
@@ -85,6 +130,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 }
 
                 this.showSequenceLanesTab = this.requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
+                this.showBillingTab = this.experiment.canRead === 'Y' && this.experiment.isExternal !== 'Y';
 
                 let protocols: any[] = [];
                 if (this.experiment.protocols) {
@@ -112,14 +158,19 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 } else {
                     this.annotations = [];
                 }
+    
+                this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y";
+                this.isEditMode = this.experimentService.getEditMode();
+                this.setNodeTitle();
             }
         });
+    
     }
 
     ngOnDestroy() {
         this.overviewListSubscription.unsubscribe();
+        this.experimentService.setEditMode(false);
     }
-
 
     initRelatedData(experiment: any): boolean {
 
@@ -154,11 +205,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     }
 
     tabChanged(event: MatTabChangeEvent) {
-        if (event.tab.textLabel === "Description") {
-            this.initDescriptionTab = true;
-        } else {
-            this.initDescriptionTab = false;
-        }
         if (event.tab.textLabel === "Sequence Lanes" && this.sequenceLanesTab) {
             this.sequenceLanesTab.prepareView();
         }
@@ -169,6 +215,42 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     }
 
     save() {
-
+        // TODO: This is a temporary handle and it needs to be implemented when we work on Save() function
+        let mes: string = "Save() method hasn't been implemented. Continue anyway?";
+        this.dialogsService.yesNoDialog(mes, this, "changeEditMode", null, "Save Confirmation");
     }
+    
+    startEdit(element: Element) {
+        if(this.isEditMode) {
+            let warningMessage: string = "Your changes haven't been saved. Continue anyway?";
+            this.dialogsService.yesNoDialog(warningMessage, this, "changeEditMode", null, "Changing EditMode");
+        } else {
+            this.changeEditMode();
+        }
+    }
+    
+    changeEditMode() {
+        // TODO: Here needs to save the changes first when save() function is implemented, or
+        // TODO: we can change the logic to not be saved first when change editMode but only when click the save button.
+        
+        this.experimentService.setEditMode(!this.isEditMode);
+        this.experimentService.modeChangedExperiment = this.experiment;
+        this.isEditMode = this.experimentService.getEditMode();
+        this.setNodeTitle();
+    }
+    
+    setNodeTitle(): void {
+        if (this.experiment) {
+            let externalStr: string = "";
+            if (this.experiment.isExternal && this.experiment.isExternal === "Y") {
+                externalStr = "External ";
+            }
+            if(this.isEditMode) {
+                this.nodeTitle = "Edit " + (this.requestCategory ? this.requestCategory.display + " " : "") + "Experiment";
+            } else {
+                this.nodeTitle = externalStr + "Experiment " + this.experiment.number;
+            }
+        }
+    }
+    
 }

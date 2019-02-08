@@ -1,11 +1,23 @@
-<div class="full-width full-height flex-container-col">
-    <div class="full-width flex-grow">
+<div class="flexbox-column">
+    <div class="flex-container-row">
+        <label class="label-title label-title-width">
+            <img class="icon" [src]="experimentOverviewNode?.icon">
+            {{nodeTitle}}
+        </label>
+        <div>
+            <button mat-button color="link" *ngIf="showEdit" (click)="startEdit($event)">
+                <img class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
+                {{isEditMode ? "View" : "Edit"}}
+            </button>
+        </div>
+    </div>
+    <div class="flex-grow-greater overflow">
         <mat-tab-group class="full-width full-height bordered" (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Overview">
                 <experiment-overview-tab [experiment]="experiment"></experiment-overview-tab>
             </mat-tab>
             <mat-tab label="Description">
-                <description-tab [showEditor]="initDescriptionTab" ></description-tab>
+                <description-tab [editMode]="isEditMode" ></description-tab>
             </mat-tab>
             <mat-tab label="Materials & Methods" *ngIf="showMaterialsMethodsTab">
                 <materials-methods-tab></materials-methods-tab>
@@ -31,11 +43,14 @@
             <mat-tab label="Files">
                 <experiment-files-tab></experiment-files-tab>
             </mat-tab>
+            <mat-tab *ngIf="showBillingTab" label="Billing">
+                <experiment-billing-tab></experiment-billing-tab>
+            </mat-tab>
         </mat-tab-group>
     </div>
     <div class="full-width">
         <save-footer (saveClicked)="save()"
-                     [disableSave]="true"
+                     [disableSave]="!isEditMode"
                      [dirty]="false">
         </save-footer>
     </div>

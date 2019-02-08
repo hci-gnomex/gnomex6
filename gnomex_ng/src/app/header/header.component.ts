@@ -17,12 +17,11 @@ import {Subscription} from "rxjs";
 import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
 import * as _ from "lodash";
-import {HttpParams} from "@angular/common/http";
 import {TopicService} from "../services/topic.service";
-import {BehaviorSubject} from "rxjs";
 import {MatDialog, MatDialogConfig, MatToolbar} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 import {AuthenticationService} from "../auth/authentication.service";
+import {PropertyService} from "../services/property.service";
 
 @Component({
     selector: "gnomex-header",
@@ -90,7 +89,7 @@ import {AuthenticationService} from "../auth/authentication.service";
     encapsulation: ViewEncapsulation.None
 })
 
-export class HeaderComponent implements OnInit, AfterViewChecked{
+export class HeaderComponent implements OnInit, AfterViewChecked {
 
     @ViewChild('headerRef') headerRef: MatToolbar;
     @ViewChild('spacerRef') spacerRef: ElementRef;
@@ -105,7 +104,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 private launchPropertiesService: LaunchPropertiesService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private topicsService: TopicService,
-                private router:Router,
+                private router: Router,
                 private labListService: LabListService,
                 private gnomexService: GnomexService,
                 private formBuilder: FormBuilder,
@@ -140,6 +139,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
     private authSubscription: Subscription;
 
     private headerHeight: number = 0;
+    private userGuideRoute: string = "";
 
     /**
      * Initialize
@@ -175,7 +175,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
             && this.headerRef._elementRef.nativeElement
             && this.headerRef._elementRef.nativeElement.offsetHeight
             && this.headerRef._elementRef.nativeElement.offsetHeight > 0
-            && this.headerRef._elementRef.nativeElement.offsetHeight != this.headerHeight) {
+            && this.headerRef._elementRef.nativeElement.offsetHeight !== this.headerHeight) {
 
             this.headerHeight = this.headerRef._elementRef.nativeElement.offsetHeight;
 
@@ -186,6 +186,8 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
 
     public buildNavItems() {
         this.resetNavItems();
+        this.createUserGuideRouterLink();
+        
         this.linkNavItems = [
             {
                 displayName: 'Report Problem',
@@ -203,7 +205,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     {
                         displayName: 'User Guide',
                         class: 'mat-menu-item',
-                        route: ''
+                        route: this.userGuideRoute
                     },
                     {
                         displayName: 'About',
@@ -1064,7 +1066,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 ]
             }
 
-        ]
+        ];
 
         // Admin plate based
         this.adminPlateBasedNavItems = [
@@ -1355,7 +1357,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 ]
             }
 
-        ]
+        ];
 
         // Billing admin menu
         this.billingAdminNavItems = [
@@ -1429,7 +1431,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 ]
             }
 
-        ]
+        ];
 
         // Billing admin submitter menu
         this.billingAdminSubmitterNavItems = [
@@ -1519,7 +1521,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 ]
             }
 
-        ]
+        ];
 
         // Billing admin External menu
         this.billingAdminESNavItems = [
@@ -1837,7 +1839,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
             iconName: icon,
             children: children,
             route: route
-        }
+        };
         return obj;
     }
 
@@ -1875,7 +1877,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
             iconName: icon,
             route: '/' + startRoute,
             children: children
-        }
+        };
         this.router.config.push(new ExternalRoute(startRoute, route));
         return obj;
     }
@@ -1887,7 +1889,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
             iconName: icon,
             route: route,
             children: children
-        }
+        };
         return obj;
     }
 
@@ -1901,7 +1903,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
     /**
      * Build the quick links menu items.
      */
-    addQuickLinks():void {
+    addQuickLinks(): void {
         for (let lni of this.linkNavItems) {
             if (lni.displayName === "Links") {
                 lni.children = [];
@@ -1918,9 +1920,6 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 }
                 break;
             }
-            // if (lni && lni.children.length === 0) {
-            //     this.hideMenusByContext(this.linkNavItems, 'quickLinks')
-            // }
         }
     }
 
@@ -1929,7 +1928,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
      * @param {any[]} navMenu
      * @param {string} context
      */
-    hideMenusByContext(navMenu:any[], context:string):void {
+    hideMenusByContext(navMenu: any[], context: string): void {
         let menuItemCtr = 0;
         for (let menuItem of navMenu) {
 
@@ -1950,8 +1949,8 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
      * Determine if user is in a lab that can submit requests.
      * @returns {boolean}
      */
-    canSubmitRequestForALab():boolean {
-        let hasLab:boolean = false;
+    canSubmitRequestForALab(): boolean {
+        let hasLab: boolean = false;
         for (let lab of this.gnomexService.labList) {
             if (lab.canSubmitRequests === 'Y') {
                 hasLab = true;
@@ -1965,15 +1964,16 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
      * Add menu items with context of newExperimentOrder.
      * @param {any[]} navMenu
      */
-    addNewExperimentMenus(navMenu:any[]):void {
+    addNewExperimentMenus(navMenu: any[]): void {
         if (this.gnomexService.myCoreFacilities != null && this.gnomexService.myCoreFacilities.length > 1) {
             for (let i: number = 0; i < navMenu.length; i++) {
                 let children = [];
                 if (navMenu[i].context === "newExperimentOrder") {
                     navMenu[i].children = this.addCoreNewExperiments(navMenu[i], children);
                 }
-                if (navMenu[i].children)
+                if (navMenu[i].children) {
                     this.addNewExperimentMenus(navMenu[i].children);
+                }
             }
         }
     }
@@ -1984,14 +1984,14 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
      * @param {any[]} children
      * @returns {any[]}
      */
-    addCoreNewExperiments(template:any, children: any[]): any[] {
+    addCoreNewExperiments(template: any, children: any[]): any[] {
         let coreCtr: number = 0;
 
         for (let core of this.gnomexService.myCoreFacilities) {
             if (core.hasRequestCategories === 'Y') {
                 let label: string = template.displayName + " for " + core.facilityName;
                 let route: string = "/newExperiment";
-                let menuItem = this.createExperimentMenuItem(label, "", template.iconName, route, core.idCoreFacility,[]);
+                let menuItem = this.createExperimentMenuItem(label, "", template.iconName, route, core.idCoreFacility, []);
                 children[coreCtr] = menuItem;
                 coreCtr++;
             }
@@ -2005,15 +2005,16 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
      *
      * @param {any[]} navMenu
      */
-    addProductOrderMenus(navMenu: any[]):void {
+    addProductOrderMenus(navMenu: any[]): void {
         if (this.gnomexService.myCoreFacilities != null && this.gnomexService.myCoreFacilities.length > 1) {
             for (let i: number = 0; i < navMenu.length; i++) {
                 let children: any[] = [];
                 if (navMenu[i].context === "newProductOrder") {
                     navMenu[i].children = this.addCoreNewProducts(navMenu[i], children);
                 }
-                if (navMenu[i].children)
+                if (navMenu[i].children) {
                     this.addProductOrderMenus(navMenu[i].children);
+                }
             }
         }
     }
@@ -2030,7 +2031,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
 
         for (let core  of this.gnomexService.myCoreFacilities) {
             for (let pt of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.ProductType")) {
-                if (pt.idCoreFacility == core.idCoreFacility) {
+                if (pt.idCoreFacility === core.idCoreFacility) {
                     let label: string = template.displayName + " for " + core.facilityName;
                     let menuItem = this.createMenuItem(label, "", template.iconName, template.route + '/' + core.idCoreFacility, core.idCoreFacility,  []);
                     children[coreCtr] = menuItem;
@@ -2046,7 +2047,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
      * Hide menu items by property
      * @param {any[]} navMenu
      */
-    hideMenusByProperties(navMenu: any[]):void {
+    hideMenusByProperties(navMenu: any[]): void {
         let showMenus: any[] = [];
         let hideMenus: any[] = [];
         for (let property of this.dictionaryService.getEntries("hci.gnomex.model.PropertyDictionary")) {
@@ -2055,8 +2056,8 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
             }
             if (property.propertyName.indexOf("menu_") === 0) {
                 var menuToHideShow: string = "";
-                if (property.propertyValue == "hide" || property.propertyValue == "show") {
-                    if (property.idCoreFacility != "" && !this.createSecurityAdvisorService.isSuperAdmin) {
+                if (property.propertyValue === "hide" || property.propertyValue === "show") {
+                    if (property.idCoreFacility !== "" && !this.createSecurityAdvisorService.isSuperAdmin) {
                         if (this.createSecurityAdvisorService.coreFacilitiesICanManage.length > 0) {
                             // Only hide a menu for a core facility admin when
                             // the menu_ property matches the core facility
@@ -2091,7 +2092,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                     menuToHideShow = property.propertyName.substr(5);
                 }
             }
-            if (menuToHideShow != "") {
+            if (menuToHideShow !== "") {
                 if (property.propertyValue === "hide" || property.propertyValue === "hide super") {
                     hideMenus.push(menuToHideShow);
                 } else if (property.propertyValue === "show") {
@@ -2127,7 +2128,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
      * Hide menu items matching context
      * @param {any[]} navMenu
      */
-    customizeMenus(navMenu: any[]):void {
+    customizeMenus(navMenu: any[]): void {
         if (!this.gnomexService.showBioinformaticsLinks) {
             this.hideMenusByContext(navMenu, "bioinformatics");
         }
@@ -2184,7 +2185,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
                 } else {
                     this.currentState = "AdminState";
                 }
-            } else if (this.createSecurityAdvisorService.isBillingAdmin){
+            } else if (this.createSecurityAdvisorService.isBillingAdmin) {
                 if (this.gnomexService.isExternalDataSharingSite) {
                     this.currentState = "AdminESState";
                 } else if (this.gnomexService.managesPlateBasedWorkflow && this.createSecurityAdvisorService.isBillingAdmin) {
@@ -2262,6 +2263,20 @@ export class HeaderComponent implements OnInit, AfterViewChecked{
         this.addNewExperimentMenus(this.navItems);
         this.addProductOrderMenus(this.navItems);
         this.hideMenusByProperties(this.navItems);
+    }
+    
+    /**
+     * Create externalRoute for the User Guide link menu items.
+     */
+    createUserGuideRouterLink(): void {
+        let userGuideUrl = this.gnomexService.getProperty(PropertyService.PROPERTY_HELP_URL);
+        if(userGuideUrl) {
+            this.userGuideRoute = "userGuide";
+            this.router.config.push(new ExternalRoute(this.userGuideRoute, userGuideUrl));
+        }
+        if(this.userGuideRoute) {
+            this.userGuideRoute = "/" + this.userGuideRoute;
+        }
     }
 
 }
