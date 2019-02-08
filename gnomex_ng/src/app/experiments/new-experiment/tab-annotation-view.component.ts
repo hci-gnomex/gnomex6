@@ -1,24 +1,21 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, SimpleChanges} from "@angular/core";
-import {DictionaryService} from "../../services/dictionary.service";
-import {NewExperimentService} from "../../services/new-experiment.service";
-import {annotType, PropertyService} from "../../services/property.service";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {Component, Input, OnDestroy} from "@angular/core";
 import {Response, URLSearchParams} from "@angular/http";
-import {DialogsService} from "../../util/popup/dialogs.service";
-import {AppUserListService} from "../../services/app-user-list.service";
-import {GnomexService} from "../../services/gnomex.service";
-import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
-import {SelectEditor} from "../../util/grid-editors/select.editor";
-import {MultiSelectEditor} from "../../util/grid-editors/multi-select.editor";
-import {MultiSelectRenderer} from "../../util/grid-renderers/multi-select.renderer";
-import {UrlAnnotEditor} from "../../util/grid-editors/url-annot-editor";
-import {UrlAnnotRenderer} from "../../util/grid-renderers/url-annot-renderer";
-import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
-import {GridApi, GridOptions} from "ag-grid-community";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+
+import {GridApi} from "ag-grid-community";
+
+import {first} from "rxjs/internal/operators";
+import {Subscription} from "rxjs/index";
+
+import {PropertyService} from "../../services/property.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {GnomexService} from "../../services/gnomex.service";
 import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {OrderType} from "../../util/annotation-tab.component";
-import {first} from "rxjs/internal/operators";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {Experiment} from "../../util/models/experiment.model";
+
 
 @Component({
     selector: "tabAnnotationView",
@@ -37,7 +34,36 @@ import {first} from "rxjs/internal/operators";
     `]
 })
 
-export class TabAnnotationViewComponent implements OnInit {
+export class TabAnnotationViewComponent implements OnDestroy {
+
+    @Input("experiment") set experiment(value: Experiment) {
+        this._experiment = value;
+
+        if (this._experiment && !this.experimentSubscription) {
+            this.experimentSubscription = value.onChange_PropertyEntries.subscribe((value) =>{
+                if (value && this.addAnnotationGridApi) {
+                    // this.annotations = this._experiment.PropertyEntries;
+                    this.addAnnotationGridApi.setRowData(this._experiment.PropertyEntries);
+
+                    for (let i = 0; i < this._experiment.PropertyEntries.length; i++) {
+                        // "Required" annotations are selected by default. (? States?)
+                        if (this.addAnnotationGridApi.getRowNode('' + i).data.isSelected
+                            && this.addAnnotationGridApi.getRowNode('' + i).data.isSelected === "true") {
+
+                            this.addAnnotationGridApi.getRowNode('' + i).setSelected(true);
+                            this.addAnnotationGridApi.getRowNode('' + i).data.boldDisplay = 'Y';
+                        }
+                    }
+
+                    this.removeAnnotationGridApi.setRowData([]);
+                }
+            });
+        }
+    }
+
+    private _experiment: Experiment;
+
+    private experimentSubscription: Subscription;
 
     public addAnnotationGridApi: GridApi;
     public removeAnnotationGridApi: GridApi;
@@ -49,15 +75,11 @@ export class TabAnnotationViewComponent implements OnInit {
 
     public currentUsers: any[] = [];
 
-    private currentAnnotColumn: number = 5;
-
-    public annotations: any[] = [];
-
-
     private get addAnnotationColumnDefs(): any[] {
         return [
             {
                 headerName: "Available Annotations",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "name",
                 width: 500
             }
@@ -67,40 +89,28 @@ export class TabAnnotationViewComponent implements OnInit {
         return [
             {
                 headerName: "Sample Annotations to use",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
                 field: "name",
                 width: 500
             }
         ];
     }
 
-    constructor(private dictionaryService: DictionaryService,
-                private fb: FormBuilder,
+    constructor(private fb: FormBuilder,
                 private propertyService: PropertyService,
                 private dialogsService: DialogsService,
                 private gnomexService: GnomexService,
-                private matDialog: MatDialog,
-                private appUserListService: AppUserListService,
-                private newExperimentService: NewExperimentService) {
+                private matDialog: MatDialog) {
 
         this.form = this.fb.group({
             customAnnot: [''],
         });
     }
 
-    ngOnInit() {
-        this.newExperimentService.propEntriesChanged.subscribe((value) =>{
-            if (value && this.addAnnotationGridApi) {
-                this.annotations = this.newExperimentService.propertyEntriesForUser;
-                this.addAnnotationGridApi.setRowData(this.annotations);
-                // this.addAnnotationGridApi.setRowData(this.newExperimentService.propertyEntriesForUser);
-
-                this.removeAnnotationGridApi.setRowData([]);
-
-                if (this.newExperimentService.propEntriesChanged.value === true) {
-                    this.newExperimentService.propEntriesChanged.next(false);
-                }
-            }
-        });
+    ngOnDestroy() {
+        if (this.experimentSubscription) {
+            this.experimentSubscription.unsubscribe();
+        }
     }
 
     public onGridSizeChanged(event: any) {
@@ -124,9 +134,11 @@ export class TabAnnotationViewComponent implements OnInit {
     public onAddAnnotationGridRowSelected(event: any): void {
         let annot = Object(this.gnomexService.getSampleProperty(event.data.idProperty));
         if (event.node.selected) {
-            this.addColumnToSampleGrid(annot);
+            // this.addColumnToSampleGrid(annot); // need to remove this
+            event.node.data.isSelected = 'true';
         } else {
-            this.deleteColumnFromSampleGrid(annot);
+            // this.deleteColumnFromSampleGrid(annot); // need to remove this
+            event.node.data.isSelected = 'false';
         }
 
         if (this.removeAnnotationGridApi
@@ -162,125 +174,14 @@ export class TabAnnotationViewComponent implements OnInit {
         let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.matDialog.open(ConfigAnnotationDialogComponent, configuration);
 
         dialogRef.afterClosed().subscribe(() => {
-            this.newExperimentService.refreshNewExperimentAnnotations();
+            this._experiment.refreshSampleAnnotationList();
         });
-    }
-
-
-
-
-
-
-
-
-    deleteColumnFromSampleGrid(annot: any) {
-        for (let i = 0; i < this.newExperimentService.samplesGridColumnDefs.length; i++) {
-            if (this.newExperimentService.samplesGridColumnDefs[i].headerName === annot.name) {
-                this.newExperimentService.samplesGridColumnDefs.splice(i, 1);
-                this.currentAnnotColumn--;
-            }
-        }
-        let propName = "a" + annot.idProperty;
-        for (let i = 0; i< this.newExperimentService.samplesGridRowData.length; i++) {
-            delete this.newExperimentService.samplesGridRowData[i][propName];
-        }
-    }
-
-    // TODO : move this logic to samples grid screen(?)
-    addColumnToSampleGrid(annot: any) {
-        let column: any;
-        switch(annot.codePropertyType) {
-            case annotType.CHECK :
-                column = this.createCheckColumn(annot);
-                break;
-            case annotType.MOPTION :
-                column = this.createMoptionColumn(annot);
-                break;
-            case annotType.OPTION :
-                column = this.createOptionColumn(annot);
-                break;
-            case annotType.TEXT :
-                column = this.createTextColumn(annot);
-                break;
-            case annotType.URL :
-                column = this.createUrlColumn(annot);
-                break;
-        }
-        annot.currentAnnotColumn = this.currentAnnotColumn;
-        this.newExperimentService.samplesGridColumnDefs.splice(this.currentAnnotColumn, 0, column);
-        this.newExperimentService.samplesGridApi.setColumnDefs(this.newExperimentService.samplesGridColumnDefs);
-        this.currentAnnotColumn++;
-    }
-
-    createCheckColumn(annot: any) {
-        return {
-            headerName: annot.display,
-            editable: false,
-            checkboxEditable: true,
-            width: 50,
-            field: "a"+annot.idProperty,
-            cellRendererFramework: CheckboxRenderer,
-        };
-    }
-
-    createTextColumn(annot: any): any {
-        return {
-            headerName: annot.display,
-            field: "a"+annot.idProperty,
-            width: 100,
-            editable: true
-        };
-    }
-
-    createUrlColumn(annot: any): any {
-        return {
-            headerName: annot.display,
-            editable: true,
-            width: 150,
-            field: "a"+annot.idProperty,
-            cellEditorFramework: UrlAnnotEditor,
-            cellRendererFramework: UrlAnnotRenderer,
-            annotation: annot
-        };
-    }
-
-    createMoptionColumn(annot: any): any{
-        return {
-            headerName: annot.display,
-            editable: true,
-            width: 150,
-            field: "a"+annot.idProperty,
-            cellRendererFramework: MultiSelectRenderer,
-            cellEditorFramework: MultiSelectEditor,
-            selectOptions: annot.options,
-            selectOptionsDisplayField: "option",
-            selectOptionsValueField: "idPropertyOption",
-            showFillButton: true,
-            fillGroupAttribute: 'idProperty'
-        };
-
-    }
-
-    createOptionColumn(annot: any): any {
-        return {
-            headerName: annot.display,
-            editable: true,
-            width: 150,
-            field: "a" + annot.idProperty,
-            cellRendererFramework: SelectRenderer,
-            cellEditorFramework: SelectEditor,
-            selectOptions: annot.options,
-            selectOptionsDisplayField: "option",
-            selectOptionsValueField: "idPropertyOption",
-            showFillButton: true,
-            fillGroupAttribute: 'idProperty'
-        };
     }
 
     onCustomAnnot(event) {
         this.dialogsService.startDefaultSpinnerDialog();
         this.currentUsers = [];
-        let userObj = {idAppUser: this.newExperimentService.idAppUser};
+        let userObj = {idAppUser: this._experiment.idAppUser};
         this.currentUsers.push(userObj);
         let params: URLSearchParams = new URLSearchParams();
         params.set("idProperty", "");
@@ -291,8 +192,8 @@ export class TabAnnotationViewComponent implements OnInit {
         params.set("forDataTrack", "N");
         params.set("forAnalysis", "N");
         params.set("forRequest", "N");
-        params.set("idCoreFacility", this.newExperimentService.idCoreFacility);
-        params.set("idAppUser", this.newExperimentService.idAppUser);
+        params.set("idCoreFacility", this._experiment.idCoreFacility);
+        params.set("idAppUser", this._experiment.idAppUser);
         params.set("codePropertyType", "TEXT");
         params.set("noJSONToXMLConversionNeeded", "Y");
         params.set("optionsJSONString", JSON.stringify([]));
@@ -321,14 +222,13 @@ export class TabAnnotationViewComponent implements OnInit {
                 this.dialogsService.confirm("An error occurred while saving the annotation", null);
             }
 
-            this.newExperimentService.refreshNewExperimentAnnotations();
+            this._experiment.refreshSampleAnnotationList();
 
             this.propertyService.getPropertyList(false).pipe(first()).subscribe((response: any[]) => {
                 this.gnomexService.propertyList = response;
-                this.newExperimentService.buildPropertiesByUser();
+                this._experiment.refreshSampleAnnotationList();
                 this.dialogsService.stopAllSpinnerDialogs();
             });
-
         });
     }
 }

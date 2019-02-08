@@ -24,28 +24,37 @@ export class AnnotationService {
     }
 
     public static isApplicableProperty(property, reqCategory, idOrganism: string, codeApplication: string): boolean {
-        if (property == null) {
+        if (!property) {
             return false;
         }
 
         let filterByOrganism: boolean = false;
-        if (property.organisms && property.organisms.length > 0) {
-            filterByOrganism = true;
+        if (property.organisms) {
+            if (!Array.isArray(property.organisms)) {
+                property.organisms = [property.organisms.Organism];
+            }
+
+            if (property.organisms.length > 0) {
+                filterByOrganism = true;
+            }
         }
 
         let filterByPlatformApplication: boolean = false;
-        if (reqCategory != null) {
-            if (!Array.isArray(property.platformApplications)) {
-                if (property.platformApplications) {
-                    property.platformApplications.PropertyPlatformApplication = [property.platformApplications.PropertyPlatformApplication];
-                } else {
-                    console.log("no propery.platformApplication");
+        if (reqCategory != null && property) {
+            if (property.platformApplications) {
+                if (!Array.isArray(property.platformApplications)) {
+                    property.platformApplications = [property.platformApplications.PropertyPlatformApplication];
                 }
+            } else {
+                console.log("no property.platformApplication");
             }
 
-            if (( property.forRequest != null && property.forRequest == 'Y' ) ||
-                (property.platformApplications && property.platformApplications.PropertyPlatformApplication && property.platformApplications.PropertyPlatformApplication.length > 0) ||
-                reqCategory.type == 'ISCAN' || reqCategory.type == 'CAPSEQ' || reqCategory.type == 'FRAGANAL') {
+            if ((property.forRequest && property.forRequest === 'Y' )
+                || property.platformApplications.length > 0
+                || reqCategory.type === 'ISCAN'
+                || reqCategory.type === 'CAPSEQ'
+                || reqCategory.type === 'FRAGANAL') {
+
                 filterByPlatformApplication = true;
             }
         }
@@ -54,12 +63,12 @@ export class AnnotationService {
         if (!filterByOrganism) {
             keep = true;
         } else {
-            if (idOrganism != null) {
+            if (idOrganism) {
                 if (!Array.isArray(property.organisms)) {
-                    property.organisms.Organisms = [property.organisms.Organism];
+                    property.organisms = [property.organisms.Organism];
                 }
                 for (let org of property.organisms) {
-                    if (idOrganism == org.idOrganism) {
+                    if (idOrganism === org.idOrganism) {
                         keep = true;
                         break;
                     }
@@ -72,10 +81,11 @@ export class AnnotationService {
                 keep = true;
             } else {
                 keep = false;
-                if (reqCategory != null) {
+                if (reqCategory && property) {
                     if (!Array.isArray(property.platformApplications)) {
-                        property.platformApplications = property.platformApplications.PropertyPlatformApplication;
+                        property.platformApplications = [property.platformApplications.PropertyPlatformApplication];
                     }
+
                     for (let pa of property.platformApplications) {
                         if (reqCategory.codeRequestCategory === pa.codeRequestCategory) {
                             if(pa.codeApplication === "" || codeApplication === pa.codeApplication) {
@@ -89,7 +99,7 @@ export class AnnotationService {
         }
 
         if (keep) {
-            if (reqCategory.idCoreFacility != property.idCoreFacility) {
+            if (reqCategory.idCoreFacility !== property.idCoreFacility) {
                 keep = false;
             }
         }
@@ -98,8 +108,8 @@ export class AnnotationService {
     }
 
     /*
- * Sort annotations by sort order then name
- */
+     * Sort annotations by sort order then name
+     */
     public static sortProperties(obj1, obj2): number {
         if (obj1 === null && obj2 === null) {
             return 0;
@@ -110,8 +120,8 @@ export class AnnotationService {
         } else {
             let so1: Number = (obj1.sortOrder === '' || obj1.sortOrder === null) ? Number(999999) : new Number(obj1.sortOrder);
             let so2: Number = (obj2.sortOrder === '' || obj2.sortOrder === null) ? Number(999999) : new Number(obj2.sortOrder);
-            let sc1: string = obj1.name;
-            let sc2: string = obj2.name;
+            let sc1: string = '' + obj1.name;
+            let sc2: string = '' + obj2.name;
 
             if (so1 < so2) {
                 return -1;
@@ -135,6 +145,4 @@ export class AnnotationService {
 
         }
     }
-
-
 }

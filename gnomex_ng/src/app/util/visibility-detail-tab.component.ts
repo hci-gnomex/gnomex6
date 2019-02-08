@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {Component,Input, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
@@ -29,8 +26,6 @@ import {first} from "rxjs/operators";
                         <img [src]="rad.icon">{{rad.display}}
                     </mat-radio-button>
                 </mat-radio-group>
-
-
             </div>
             <mat-form-field class="short-input" *ngIf="isPrivacyExpSupported" 
                             matTooltip="Public visibility date&#13;(visibility automatically changes to public on this date)">
@@ -38,12 +33,8 @@ import {first} from "rxjs/operators";
                 <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
                 <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
             </mat-form-field>
-            
-            
-
             <div style="margin-top: 1em; display: flex; flex-direction: column;" *ngIf="showCollaboratorBlock" >
                 <label class="gx-label"> Individual collaborators allowed access to this data track  </label>
-
                 <div >
                     <mat-form-field style="width:30%" >
                         <mat-select (selectionChange)="collaborDropdownChange($event)"
@@ -66,12 +57,8 @@ import {first} from "rxjs/operators";
                     <button mat-button [disabled]="selectedCollabRow.length < 1" type="button" (click)="removeCollaborator()">
                         <img [src]="this.constService.ICON_DELETE"> remove
                     </button>
-
-
                 </div>
-
             </div>
-
             <div style="flex:3" *ngIf="showCollaboratorBlock" >
                 <ag-grid-angular style="width: 50%; height:100% "
                                  class="ag-theme-fresh"
@@ -83,9 +70,7 @@ import {first} from "rxjs/operators";
                                  [rowData]="this.collabGridRowData"
                                  [columnDefs]="this.columnDefs">
                 </ag-grid-angular>
-
             </div>
-
         </form>
     `,
     styles: [`
@@ -114,6 +99,12 @@ import {first} from "rxjs/operators";
     `]
 })
 export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
+
+    // This getter is needed by the New Experiments process.
+    public get form(): FormGroup {
+        return this.visibilityForm;
+    }
+
     //Override
     public edit = false;
     public visibilityForm: FormGroup;
@@ -147,8 +138,6 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             field: "displayName",
             width: 200,
             editable:false
-
-
         },
         {
             headerName: "Upload",
@@ -178,19 +167,14 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     };
 
 
-
-
-
-
     constructor(protected fb: FormBuilder,
                 private route: ActivatedRoute,
                 private secAdvisor: CreateSecurityAdvisorService,
                 private propertyService: PropertyService,
                 public constService: ConstantsService,
                 private gnomexService:GnomexService,
-                private getLabService : GetLabService){
+                private getLabService : GetLabService) {
     }
-
 
 
     ngOnInit():void{ // Note this hook runs once if route changes to another folder you don't recreate component
@@ -210,7 +194,6 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             collaborator: ''
         });
 
-
         this.route.data.forEach(data => { // new datatrack
             this.currentOrder = this.getOrder(data);
 
@@ -229,9 +212,9 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             }
 
             let currentCollaborators = this.currentOrder.collaborators;
-            if(currentCollaborators){
+            if (currentCollaborators) {
                 currentCollaborators = Array.isArray(currentCollaborators) ? currentCollaborators : [currentCollaborators[this.currentOrder.collabType]];
-            }else{
+            } else {
                 currentCollaborators = [];
             }
 
@@ -240,7 +223,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             let labParams: URLSearchParams = new URLSearchParams();
 
             let idLab = this.currentOrder.idLab;
-            if(idLab !== null  && idLab !== undefined){ //empty string is valid
+            if(idLab !== null  && idLab !== undefined) { //empty string is valid
                 labParams.set('idLab', idLab);
                 labParams.set('includeBillingAccounts', 'N');
                 labParams.set('includeProductCounts','N');
@@ -273,26 +256,21 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
                     }
                 });
             }
+
             this.visibilityForm.markAsPristine();
-
-
         });
-
-
     }
 
 
-    formatCollabList(collabs:any):any[]{
-        if(collabs){
+    formatCollabList(collabs:any): any[] {
+        if (collabs) {
             return (Array.isArray(collabs) ? collabs.slice() : [collabs.AppUser]);
-        }else{
+        } else {
             return [];
         }
-
-
     }
 
-    addNameToCollabs(currentCollabs:any[]){
+    addNameToCollabs(currentCollabs:any[]) {
 
         for(let i= 0; i <  currentCollabs.length; i++ ){
             let collab = currentCollabs[i];
@@ -306,7 +284,6 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
         }
 
         return currentCollabs;
-
     }
 
 
@@ -322,10 +299,11 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             let day:number = +parseDateList[2];
             return [year,month,day]
 
-        }else{
+        } else {
             return [];
         }
     }
+
     formatPrivacyDate(date: Date): string {
         let month = date.getMonth() + 1;
         let strMonth = month < 10 ? "0" + month : ""+ month;
@@ -366,20 +344,20 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     }
 
     collaborDropdownChange(event:MatSelectChange) {
-        if(event.value ){
+        if (event.value ) {
             this.enableAdd = true;
-        }else{
+        } else {
             this.enableAdd = false;
         }
     }
 
 
     getOrder(data:any): any {
-        if(data){
-            if(data.analysis && data.analysis.Analysis){
+        if (data) {
+            if (data.analysis && data.analysis.Analysis) {
                 data.analysis.Analysis.collabType = 'AnalysisCollaborator';
                 return data.analysis.Analysis;
-            }else if(data.experiment && data.experiment.Request) {
+            } else if (data.experiment && data.experiment.Request) {
                 data.experiment.Request.collabType = 'ExperimentCollaborator';
                 return data.experiment.Request;
             }
@@ -390,7 +368,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
         return itemOne && itemTwo && itemOne.idAppUser == itemTwo.idAppUser;
     }
 
-    addCollaborator(){
+    addCollaborator() {
         this.visibilityForm.markAsDirty();
         let collabVal = this.visibilityForm.get("collaborator").value;
         if(collabVal){
@@ -424,34 +402,27 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
             }
 
-
             this.enableAdd = false;
-
-
         }
-
     }
 
-    removeInvalidDropdownCollabs(dropdownCollabs:any[],currentCollabs:any[]):any[]{
+    removeInvalidDropdownCollabs(dropdownCollabs:any[], currentCollabs:any[]): any[] {
         let validCollabsInDropdown :any[] = [];
 
-
         // remove out collabs that are in grid from out of the dropdown. Also remove the owner from the dropdown
-        for(let dropdown of dropdownCollabs){
-            if(dropdown.idAppUser === this.currentOrder.idAppUser ||
-                currentCollabs.find(collab => collab.idAppUser === dropdown.idAppUser )){
+        for(let dropdown of dropdownCollabs) {
+            if (dropdown.idAppUser === this.currentOrder.idAppUser
+                || currentCollabs.find(collab => collab.idAppUser === dropdown.idAppUser )) {
+
                 continue;
             }
             validCollabsInDropdown.push(dropdown);
         }
 
-
         // remove active users out of dropdown
         validCollabsInDropdown = validCollabsInDropdown.filter(own =>  own.isActive === 'Y');
 
-
         return validCollabsInDropdown;
-
     }
     // when user selects
     removeCollaborator(){
@@ -465,8 +436,6 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             if (this.visibilityForm.get("codeVisibility").value === "MEM") {
                 this.collabDropdown = this.memCollaborators.slice();
             }
-
-
         }
 
         let formatPossibleCollabs = this.formatCollabList(this.currentLab.possibleCollaborators);
@@ -479,9 +448,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
         }
 
-
         this.selectedCollabRow = this.gridApi.getSelectedRows();
-
     }
 
     getValue(){
@@ -498,7 +465,6 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
         if(this.gridApi){
             this.gridApi.sizeColumnsToFit();
         }
-
     }
 
     onCollabGridReady(params:any){
@@ -513,16 +479,8 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     }
 
 
-
-
-
     ngOnDestroy(){
         this.getLabService.labMembersSubject.next(null);
 
     }
-
-
-
-
 }
-

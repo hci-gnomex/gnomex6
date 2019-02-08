@@ -1,0 +1,62 @@
+<div class="full-height full-width padded">
+    <form [formGroup]="visibilityForm" class="full-height full-width flex-container-col">
+        <div class="full-width">
+            <label>
+                Select the level of visibility:
+            </label>
+            <mat-radio-group class="full-width flex-container-col extreme-left-padded"  formControlName="codeVisibility" (change)="updateCollaborators()" >
+                <mat-radio-button *ngFor="let rad of visRadio" [value]="rad.value" [matTooltip]="rad.tooltip">
+                    <img [src]="rad.icon">{{rad.display}}
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <mat-form-field *ngIf="isPrivacyExpSupported"
+                        class="short-input"
+                        matTooltip="Public visibility date&#13;(Visibility automatically changes to 'Public' on this date)">
+            <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" formControlName="privacyExp" [min]="this.today">
+            <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
+            <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
+        </mat-form-field>
+        <div *ngIf="showCollaboratorBlock" class="flex-container-col flex-grow padded-top">
+            <label>
+                Specify other {{ visibilityForm && visibilityForm.get('codeVisibility') && visibilityForm.get('codeVisibility').value && visibilityForm.get('codeVisibility').value === 'OWNER' ? 'lab members and ' : '' }}individual collaborators allowed access to this experiment
+            </label>
+            <!--<div>-->
+                <!--<mat-form-field style="width:30%" >-->
+                    <!--<mat-select (selectionChange)="collaboratorDropdownChange($event)"-->
+                                <!--[compareWith]="compareByID"-->
+                                <!--placeholder="Collaborators"-->
+                                <!--formControlName="collaborator" >-->
+                        <!--<mat-option></mat-option>-->
+                        <!--<mat-option *ngFor="let collab of this.collabDropdown"-->
+                                    <!--[value]="collab" >-->
+                            <!--{{ collab.displayName }}-->
+                        <!--</mat-option>-->
+                    <!--</mat-select>-->
+                    <!--<mat-error *ngIf="visibilityForm?.get('collaborator')?.hasError('selectRequired')">-->
+                        <!--This field is required-->
+                    <!--</mat-error>-->
+                <!--</mat-form-field>-->
+                <!--<button mat-button [disabled]="!enableAdd" type="button" (click)="addCollaborator()">-->
+                    <!--<img [src]="this.constService.ICON_ADD"> add-->
+                <!--</button>-->
+                <!--<button mat-button [disabled]="selectedCollabRow.length < 1" type="button" (click)="removeCollaborator()">-->
+                    <!--<img [src]="this.constService.ICON_DELETE"> remove-->
+                <!--</button>-->
+            <!--</div>-->
+            <div class="full-width flex-grow" *ngIf="showCollaboratorBlock" >
+                <ag-grid-angular style="width: 50%;"
+                                 class="ag-theme-fresh full-height"
+                                 [rowDeselection]="true"
+                                 (gridReady)="this.onCollabGridReady($event)"
+                                 (gridSizeChanged)="onGridSizeChanged()"
+                                 (cellValueChanged)="redrawGridRowIfNeeded($event)"
+                                 [rowSelection]="'single'"
+                                 (rowSelected)="this.onCollabGridRowSelected($event)"
+                                 [rowData]="this.collabGridRowData"
+                                 [columnDefs]="this.columnDefs">
+                </ag-grid-angular>
+            </div>
+        </div>
+    </form>
+</div>

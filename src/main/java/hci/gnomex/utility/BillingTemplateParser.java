@@ -39,7 +39,7 @@ public class BillingTemplateParser {
             idBillingTemplate = Integer.parseInt(billingTemplateNode.getAttributeValue("idBillingTemplate"));
         }
 
-        if (idBillingTemplate == 0) {
+        if (idBillingTemplate == null || idBillingTemplate == 0) {
             billingTemplate = new BillingTemplate();
         } else {
             billingTemplate = sess.load(BillingTemplate.class, idBillingTemplate);
