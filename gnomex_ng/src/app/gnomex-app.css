@@ -241,6 +241,10 @@ div.mainnav {
     text-decoration: underline !important;
 }
 
+.italic {
+    font-style: italic;
+}
+
 .overflow-auto {
     overflow: auto;
 }

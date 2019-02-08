@@ -284,7 +284,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	}
 
 	public static Integer saveSample(Session sess, RequestParser requestParser, String idSampleString, Sample sample, Map idSampleMap, Set samples,
-			Set samplesAdded, Map<Integer, Property> propertyMap, Integer nextSampleNumber) throws Exception {
+																	 Set samplesAdded, Map<Integer, Property> propertyMap, Integer nextSampleNumber) throws Exception {
 
 		boolean isNewSample = requestParser.isNewRequest() || idSampleString == null || idSampleString.equals("") || idSampleString.startsWith("Sample");
 
@@ -340,12 +340,12 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	}
 
 	public static void setSampleProperties(Session sess, Request request, Sample sample, Boolean isNewSample, Map sampleAnnotations,
-			String otherCharacteristicLabel, Map<Integer, Property> idToPropertyMap) {
+																				 String otherCharacteristicLabel, Map<Integer, Property> idToPropertyMap) {
 		setSampleProperties(sess, request, sample, isNewSample, sampleAnnotations, otherCharacteristicLabel, null, idToPropertyMap);
 	}
 
 	public static void setSampleProperties(Session sess, Request request, Sample sample, Boolean isNewSample, Map sampleAnnotations,
-			String otherCharacteristicLabel, Map propertiesToDelete, Map<Integer, Property> idToPropertyMap) {
+																				 String otherCharacteristicLabel, Map propertiesToDelete, Map<Integer, Property> idToPropertyMap) {
 		// Delete the existing sample property entries
 		if (!isNewSample) {
 			for (Iterator i = sample.getPropertyEntries().iterator(); i.hasNext();) {
@@ -417,12 +417,12 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	}
 
 	public static Map saveSequenceLanes(SecurityAdvisor secAdvisor, RequestParser requestParser, Session sess, RequestCategory requestCategory,
-			Map idSampleMap, Set sequenceLanes, Set sequenceLanesAdded) throws Exception {
+																			Map idSampleMap, Set sequenceLanes, Set sequenceLanesAdded) throws Exception {
 		return saveSequenceLanes(secAdvisor, requestParser, sess, requestCategory, idSampleMap, sequenceLanes, sequenceLanesAdded, false);
 	}
 
 	public static Map saveSequenceLanes(SecurityAdvisor secAdvisor, RequestParser requestParser, Session sess, RequestCategory requestCategory,
-			Map idSampleMap, Set sequenceLanes, Set sequenceLanesAdded, boolean isImport) throws Exception {
+																			Map idSampleMap, Set sequenceLanes, Set sequenceLanesAdded, boolean isImport) throws Exception {
 
 		HashMap sampleToLaneMap = new HashMap();
 		HashMap existingLanesSaved = new HashMap();
@@ -552,7 +552,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	}
 
 	private static SequenceLane saveSequenceLane(SecurityAdvisor secAdvisor, RequestParser requestParser, RequestParser.SequenceLaneInfo sequenceLaneInfo,
-			Session sess, int lastSampleSeqCount, Date theTime, Map idSampleMap, Set sequenceLanes, Set sequenceLanesAdded, boolean isImport) throws Exception {
+																							 Session sess, int lastSampleSeqCount, Date theTime, Map idSampleMap, Set sequenceLanes, Set sequenceLanesAdded, boolean isImport) throws Exception {
 
 		SequenceLane sequenceLane = null;
 		boolean seqLaneReassignment = false;
@@ -647,25 +647,25 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	}
 
 	public static void createBillingItems(Session sess, Request request, String amendState, BillingPeriod billingPeriod, DictionaryHelper dh,
-			Set<Sample> samples, Set<LabeledSample> labeledSamples, Set<Hybridization> hybs, Set<SequenceLane> lanes,
-			Map<String, ArrayList<String>> sampleToAssaysMap, String codeStepNext, String billingStatus, BillingTemplate billingTemplate,
-			Boolean requestPropertiesOnly, Boolean comingFromWorkflow) throws Exception {
+																				Set<Sample> samples, Set<LabeledSample> labeledSamples, Set<Hybridization> hybs, Set<SequenceLane> lanes,
+																				Map<String, ArrayList<String>> sampleToAssaysMap, String codeStepNext, String billingStatus, BillingTemplate billingTemplate,
+																				Boolean requestPropertiesOnly, Boolean comingFromWorkflow) throws Exception {
 		createBillingItems(sess, request, amendState, billingPeriod, dh, samples, labeledSamples, hybs, lanes, sampleToAssaysMap, codeStepNext, billingStatus,
 				null, billingTemplate, requestPropertiesOnly, comingFromWorkflow);
 	}
 
 	public static void createBillingItems(Session sess, Request request, String amendState, BillingPeriod billingPeriod, DictionaryHelper dh,
-			Set<Sample> samples, Set<LabeledSample> labeledSamples, Set<Hybridization> hybs, Set<SequenceLane> lanes,
-			Map<String, ArrayList<String>> sampleToAssaysMap, BillingTemplate billingTemplate, Boolean requestPropertiesOnly, Boolean comingFromWorkflow)
+																				Set<Sample> samples, Set<LabeledSample> labeledSamples, Set<Hybridization> hybs, Set<SequenceLane> lanes,
+																				Map<String, ArrayList<String>> sampleToAssaysMap, BillingTemplate billingTemplate, Boolean requestPropertiesOnly, Boolean comingFromWorkflow)
 			throws Exception {
 		createBillingItems(sess, request, amendState, billingPeriod, dh, samples, labeledSamples, hybs, lanes, sampleToAssaysMap, null, BillingStatus.PENDING,
 				null, billingTemplate, requestPropertiesOnly, comingFromWorkflow);
 	}
 
 	public static void createBillingItems(Session sess, Request request, String amendState, BillingPeriod billingPeriod, DictionaryHelper dh,
-			Set<Sample> samples, Set<LabeledSample> labeledSamples, Set<Hybridization> hybs, Set<SequenceLane> lanes,
-			Map<String, ArrayList<String>> sampleToAssaysMap, String codeStepNext, String billingStatus, Set<PropertyEntry> propertyEntries,
-			BillingTemplate billingTemplate, Boolean requestPropertiesOnly, Boolean comingFromWorkflow) throws Exception {
+																				Set<Sample> samples, Set<LabeledSample> labeledSamples, Set<Hybridization> hybs, Set<SequenceLane> lanes,
+																				Map<String, ArrayList<String>> sampleToAssaysMap, String codeStepNext, String billingStatus, Set<PropertyEntry> propertyEntries,
+																				BillingTemplate billingTemplate, Boolean requestPropertiesOnly, Boolean comingFromWorkflow) throws Exception {
 
 		// if someone is trying to edit a very old request (i.e, 2014) we could get here with no billing template
 		// if so, just leave
@@ -704,9 +704,9 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				// at submit when we have a bill during workflow
 				if (requestPropertiesOnly
 						&& (priceCategory.getPluginClassName() != null
-								&& !priceCategory.getPluginClassName().equals("hci.gnomex.billing.PropertyPricingPlugin")
-								&& !priceCategory.getPluginClassName().equals("hci.gnomex.billing.PropertyPricingNotBySamplePlugin") && !priceCategory
-								.getPluginClassName().equals("hci.gnomex.billing.UnitChargeAppFilterPlugin"))) {
+						&& !priceCategory.getPluginClassName().equals("hci.gnomex.billing.PropertyPricingPlugin")
+						&& !priceCategory.getPluginClassName().equals("hci.gnomex.billing.PropertyPricingNotBySamplePlugin") && !priceCategory
+						.getPluginClassName().equals("hci.gnomex.billing.UnitChargeAppFilterPlugin"))) {
 					continue;
 				}
 
@@ -714,8 +714,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				// because we already created them at submit time.
 				if (comingFromWorkflow
 						&& (priceCategory.getPluginClassName() != null && (priceCategory.getPluginClassName()
-								.equals("hci.gnomex.billing.PropertyPricingPlugin") || priceCategory.getPluginClassName().equals(
-								"hci.gnomex.billing.PropertyPricingNotBySamplePlugin")))) {
+																																						.equals("hci.gnomex.billing.PropertyPricingPlugin") || priceCategory.getPluginClassName().equals(
+						"hci.gnomex.billing.PropertyPricingNotBySamplePlugin")))) {
 					continue;
 				}
 
@@ -1687,7 +1687,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					// or services have been removed
 					if (!requestParser.isNewRequest()
 							&& (requestParser.isAmendRequest() || !samplesAdded.isEmpty() || !labeledSamplesAdded.isEmpty() || !hybsAdded.isEmpty()
-									|| !sequenceLanesAdded.isEmpty() || !sequenceLanesDeleted.isEmpty())) {
+							|| !sequenceLanesAdded.isEmpty() || !sequenceLanesDeleted.isEmpty())) {
 						originalRequestNumber = requestParser.getRequest().getNumber();
 						int revNumber = 1;
 						// If services are being added to the request,
@@ -1713,7 +1713,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					if (!requestParser.isExternalExperiment()) {
 						if (requestParser.isNewRequest()
 								&& !pdh.getCoreFacilityRequestCategoryProperty(requestParser.getRequest().getIdCoreFacility(),
-										requestParser.getRequest().getCodeRequestCategory(), PropertyDictionary.NEW_REQUEST_SAVE_BEFORE_SUBMIT).equals("Y")) {
+								requestParser.getRequest().getCodeRequestCategory(), PropertyDictionary.NEW_REQUEST_SAVE_BEFORE_SUBMIT).equals("Y")) {
 							// if we are to create billing items during workflow we don't want to create them here...
 							String prop = propertyHelper.getCoreFacilityRequestCategoryProperty(requestCategory.getIdCoreFacility(),
 									requestCategory.getCodeRequestCategory(), PropertyDictionary.BILLING_DURING_WORKFLOW);
@@ -1755,7 +1755,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						sess.flush();
 					} else if (!requestParser.isExternalExperiment()
 							&& !pdh.getCoreFacilityRequestCategoryProperty(requestParser.getRequest().getIdCoreFacility(),
-									requestParser.getRequest().getCodeRequestCategory(), PropertyDictionary.NEW_REQUEST_SAVE_BEFORE_SUBMIT).equals("Y")) {
+							requestParser.getRequest().getCodeRequestCategory(), PropertyDictionary.NEW_REQUEST_SAVE_BEFORE_SUBMIT).equals("Y")) {
 						// if not save then submit but bill during workflow, then create the request properties
 						createBillingItems(sess, requestParser.getRequest(), requestParser.getAmendState(), billingPeriod, dictionaryHelper, samplesAdded,
 								labeledSamplesAdded, hybsAdded, sequenceLanesAdded, requestParser.getSampleAssays(), null, BillingStatus.PENDING,
@@ -1782,7 +1782,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 										PropertyDictionaryHelper.PROPERTY_EXPERIMENT_DIRECTORY));
 					} else if (!requestParser.isExternalExperiment()
 							&& (RequestCategory.isMicroarrayRequestCategory(requestParser.getRequest().getCodeRequestCategory()) || requestParser.getRequest()
-									.getCodeRequestCategory().equals(RequestCategoryType.TYPE_QC))) {
+																																																																	 .getCodeRequestCategory().equals(RequestCategoryType.TYPE_QC))) {
 						this.createResultDirectories(
 								requestParser.getRequest(),
 								"Sample QC",
@@ -2050,9 +2050,9 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			// if this is a new request, create QC work items for each sample
 			if (!requestParser.isExternalExperiment()
 					&& (RequestCategory.isIlluminaRequestCategory(requestParser.getRequest().getCodeRequestCategory())
-							|| RequestCategory.isQCRequestCategory(requestParser.getRequest().getCodeRequestCategory())
-							|| RequestCategory.isMicroarrayRequestCategory(requestParser.getRequest().getCodeRequestCategory()) || RequestCategory
-								.isNanoStringRequestCategoryType(requestParser.getRequest().getCodeRequestCategory()))) {
+					|| RequestCategory.isQCRequestCategory(requestParser.getRequest().getCodeRequestCategory())
+					|| RequestCategory.isMicroarrayRequestCategory(requestParser.getRequest().getCodeRequestCategory()) || RequestCategory
+					.isNanoStringRequestCategoryType(requestParser.getRequest().getCodeRequestCategory()))) {
 				if ((requestParser.isNewRequest() || isNewSample || requestParser.isQCAmendRequest())) {
 					WorkItem workItem = new WorkItem();
 					workItem.setIdRequest(requestParser.getRequest().getIdRequest());
@@ -2642,7 +2642,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			if ((hyb.getLabeledSampleChannel1() == null && idSampleChannel1Real != null)
 					|| (hyb.getLabeledSampleChannel1() != null && idSampleChannel1Real == null)
 					|| (hyb.getLabeledSampleChannel1() != null && idSampleChannel1Real != null && !hyb.getLabeledSampleChannel1().getIdSample()
-							.equals(idSampleChannel1Real))) {
+																																														.equals(idSampleChannel1Real))) {
 
 				LabeledSample labeledSampleObsoleted = null;
 				if (hyb.getIdLabeledSampleChannel1() != null) {
@@ -2680,7 +2680,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					// Replace the labeled sample on the labeling worklist (if present).
 					List referencingWorkItems = sess.createQuery(
 							"SELECT wi from WorkItem wi join wi.labeledSample as ls where ls.idLabeledSample = " + labeledSampleObsoleted.getIdLabeledSample())
-							.list();
+																					.list();
 					if (referencingWorkItems.size() > 0) {
 						for (Iterator i1 = referencingWorkItems.iterator(); i1.hasNext();) {
 							WorkItem wi = (WorkItem) i1.next();
@@ -2708,7 +2708,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			if ((hyb.getLabeledSampleChannel2() == null && idSampleChannel2Real != null)
 					|| (hyb.getLabeledSampleChannel2() != null && idSampleChannel2Real == null)
 					|| (hyb.getLabeledSampleChannel2() != null && idSampleChannel2Real != null && !hyb.getLabeledSampleChannel2().getIdSample()
-							.equals(idSampleChannel2Real))) {
+																																														.equals(idSampleChannel2Real))) {
 
 				LabeledSample labeledSampleObsoleted = null;
 				if (hyb.getIdLabeledSampleChannel1() != null) {
@@ -2746,7 +2746,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					// Replace the labeled sample on the labeling worklist (if present).
 					List referencingWorkItems = sess.createQuery(
 							"SELECT wi from WorkItem wi join wi.labeledSample as ls where ls.idLabeledSample = " + labeledSampleObsoleted.getIdLabeledSample())
-							.list();
+																					.list();
 					if (referencingWorkItems.size() > 0) {
 						for (Iterator i1 = referencingWorkItems.iterator(); i1.hasNext();) {
 							WorkItem wi = (WorkItem) i1.next();
@@ -2825,7 +2825,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				Slide slide = hyb.getSlide();
 				if (hybInfo.getSlideBarcode() != null) {
 					slide = WorkItemHybParser.getSlideForHyb(sess, hyb, hyb.getIdSlideDesign(), hybInfo.getSlideBarcode(), requestParser.getRequest()
-							.getIdRequest());
+																																																															.getIdRequest());
 
 					// Create a new slide if one doesn't already exist
 					if (slide == null) {
@@ -2862,7 +2862,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			hyb.setIdSlideDesign(hybInfo.getIdSlideDesign());
 		} else {
 			List slideDesigns = sess.createQuery("select sd from SlideDesign sd where sd.idSlideProduct = " + requestParser.getRequest().getIdSlideProduct())
-					.list();
+															.list();
 			if (slideDesigns.size() > 1) {
 				throw new Exception("Cannot set slide design because multiple slide designs exist for slide product "
 						+ requestParser.getRequest().getIdSlideProduct());
@@ -3052,7 +3052,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 		}
 
 		String templateString = pdh.getCoreFacilityRequestCategoryProperty(requestParser.getRequest().getIdCoreFacility(), requestParser.getRequest()
-				.getCodeRequestCategory(), PropertyDictionary.EXPERIMENT_CONFIRMATION_EMAIL_TEMPLATE);
+																																																																		.getCodeRequestCategory(), PropertyDictionary.EXPERIMENT_CONFIRMATION_EMAIL_TEMPLATE);
 
 		if (templateString != null && templateString.length() > 0) {
 			Map root = new HashMap();
@@ -3166,7 +3166,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 		String emailBody = "";
 		RequestCategory requestCategory = dictionaryHelper.getRequestCategoryObject(requestParser.getRequest().getCodeRequestCategory());
 		String templateString = pdh.getCoreFacilityRequestCategoryProperty(requestParser.getRequest().getIdCoreFacility(), requestParser.getRequest()
-				.getCodeRequestCategory(), PropertyDictionary.EXPERIMENT_INVOICE_EMAIL_TEMPLATE);
+																																																																		.getCodeRequestCategory(), PropertyDictionary.EXPERIMENT_INVOICE_EMAIL_TEMPLATE);
 
 		if (templateString != null && templateString.length() > 0) {
 			Map root = new HashMap();

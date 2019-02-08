@@ -68,7 +68,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public isEditMode: boolean;
     public nodeTitle: string = "";
     public showBillingTab: boolean = false;
-    
+	
     types = OrderType;
     
     private overviewListSubscription: Subscription;
@@ -95,6 +95,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
         this.route.data.forEach((data: any) => {
             this.experiment = null;
             this.showSequenceLanesTab = false;
+            this.showBillingTab = false;
 
             if (data && data.experiment && data.experiment.Request) {
                 this.experiment = data.experiment.Request;

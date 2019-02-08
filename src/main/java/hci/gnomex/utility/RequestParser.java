@@ -1,5 +1,7 @@
 package hci.gnomex.utility;
 
+import net.sf.json.JSON;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -13,6 +15,11 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+
 import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
 
@@ -20,15 +27,19 @@ public class RequestParser implements Serializable {
 
   private SecurityAdvisor secAdvisor;
   private boolean isImport = false;
-  private Element requestNode;
+
+  // We will either be using the JsonObject or Element exclusively, depending on what we are parsing.
+  private JsonObject requestObject;
+  private Element    requestNode;
+
   private Request request;
   private boolean isNewRequest = false;
   private boolean reassignBillingAccount = false;
   private String otherCharacteristicLabel;
   private List sampleIds = new ArrayList();
   private Map sampleMap = new HashMap();
-  private Map propertiesToApplyMap = new TreeMap();
-  private Map seqLibTreatmentMap = new HashMap();
+  private Map<String, String> propertiesToApplyMap = new TreeMap<>();
+  private Map<String, String> seqLibTreatmentMap = new HashMap<>();
   private Map collaboratorUploadMap = new HashMap();
   private Map collaboratorUpdateMap = new HashMap();
   private Map sampleAnnotationMap = new HashMap();
@@ -57,19 +68,31 @@ public class RequestParser implements Serializable {
   private Set<BillingTemplateItem> 	billingTemplateItems;
   private boolean isOpeningNewBillingTemplate;
 
+  private boolean usingJSON = false;
+
+  public RequestParser(JsonReader reader, SecurityAdvisor secAdvisor) {
+    this.usingJSON = true;
+    this.requestObject = reader.readObject();
+    this.secAdvisor = secAdvisor;
+    this.forDownload = false;
+  }
+
   public RequestParser(Document requestDoc, SecurityAdvisor secAdvisor) {
+    this.usingJSON = false;
     this.requestNode = requestDoc.getRootElement();
     this.secAdvisor = secAdvisor;
     this.forDownload = false;
   }
 
   public RequestParser(Element requestNode, SecurityAdvisor secAdvisor) {
+    this.usingJSON = false;
     this.requestNode = requestNode;
     this.secAdvisor = secAdvisor;
     this.forDownload = false;
   }
 
   public RequestParser(Document requestDoc, SecurityAdvisor secAdvisor, Boolean forDownload) {
+    this.usingJSON = false;
     this.requestNode = requestDoc.getRootElement();
     this.secAdvisor = secAdvisor;
     this.forDownload = forDownload;
@@ -81,8 +104,8 @@ public class RequestParser implements Serializable {
     otherCharacteristicLabel = null;
     sampleIds = new ArrayList();
     sampleMap = new HashMap();
-    propertiesToApplyMap = new TreeMap();
-    seqLibTreatmentMap = new HashMap();
+    propertiesToApplyMap = new TreeMap<>();
+    seqLibTreatmentMap = new HashMap<>();
     collaboratorUploadMap = new HashMap();
     collaboratorUpdateMap = new HashMap();
     sampleAnnotationMap = new HashMap();
@@ -112,7 +135,15 @@ public class RequestParser implements Serializable {
    */
   public void parse(Session sess) throws Exception {
     DictionaryHelper dictionaryHelper = DictionaryHelper.getInstance(sess);
-    RequestCategory requestCategory = dictionaryHelper.getRequestCategoryObject(requestNode.getAttributeValue("codeRequestCategory"));
+    String codeRequestCategoryValue;
+
+    if (this.usingJSON) {
+      codeRequestCategoryValue = requestObject.getString("codeRequestCategory");
+    } else {
+      codeRequestCategoryValue = requestNode.getAttributeValue("codeRequestCategory");
+    }
+
+    RequestCategory requestCategory = dictionaryHelper.getRequestCategoryObject(codeRequestCategoryValue);
     parse(sess, requestCategory);
   }
 
@@ -133,28 +164,137 @@ public class RequestParser implements Serializable {
   private void parse(Session sess, RequestCategory requestCategory, boolean isImport) throws Exception {
     this.isImport = isImport;
 
-    this.initializeRequest(requestNode, sess, requestCategory);
-
-    for (Iterator i = requestNode.getChild("samples").getChildren("Sample").iterator(); i.hasNext();) {
-      Element sampleNode = (Element) i.next();
-      this.initializeSample(requestNode, sampleNode, sess, requestCategory);
+    if (this.usingJSON) {
+      this.initializeRequest(requestObject, sess, requestCategory);
+    } else {
+      this.initializeRequest(requestNode, sess, requestCategory);
     }
 
-    if (requestNode.getChild("hybridizations") != null && !requestNode.getChild("hybridizations").getChildren("Hybridization").isEmpty()) {
-
-      for (Iterator i = requestNode.getChild("hybridizations").getChildren("Hybridization").iterator(); i.hasNext();) {
-        Element hybNode = (Element) i.next();
-        initializeHyb(hybNode);
+    if (this.usingJSON) {
+      for (int i = 0; i < requestObject.getJsonArray("samples").size(); i++) {
+        JsonObject sampleObject = requestObject.getJsonArray("samples").getJsonObject(i);
+        this.initializeSample(requestObject, sampleObject, sess, requestCategory);
       }
-    }
-    if (requestNode.getChild("sequenceLanes") != null && !requestNode.getChild("sequenceLanes").getChildren("SequenceLane").isEmpty()) {
-
-      for (Iterator i = requestNode.getChild("sequenceLanes").getChildren("SequenceLane").iterator(); i.hasNext();) {
-        Element sequenceLaneNode = (Element) i.next();
-        initializeSequenceLane(sequenceLaneNode);
+    } else {
+      for (Iterator i = requestNode.getChild("samples").getChildren("Sample").iterator(); i.hasNext();) {
+        Element sampleNode = (Element) i.next();
+        this.initializeSample(requestNode, sampleNode, sess, requestCategory);
       }
     }
 
+    if (this.usingJSON) {
+      if (requestObject.get("hybridizations") != null) {
+        for (int i = 0; i < requestObject.getJsonArray("hybridizations").size(); i++) {
+          JsonObject hybridization = requestObject.getJsonArray("hybridizations").getJsonObject(i);
+          initializeHyb(hybridization);
+        }
+      }
+    } else {
+      if (requestNode.getChild("hybridizations") != null && !requestNode.getChild("hybridizations").getChildren("Hybridization").isEmpty()) {
+        for (Iterator i = requestNode.getChild("hybridizations").getChildren("Hybridization").iterator(); i.hasNext();) {
+          Element hybNode = (Element) i.next();
+          initializeHyb(hybNode);
+        }
+      }
+    }
+
+
+    if (this.usingJSON) {
+      if (requestObject.get("sequenceLanes") != null) {
+        for (int i = 0; i < requestObject.getJsonArray("sequenceLanes").size(); i++) {
+          JsonObject sequenceLane = requestObject.getJsonArray("sequenceLanes").getJsonObject(i);
+          initializeSequenceLane(sequenceLane);
+        }
+      }
+    } else {
+      if (requestNode.getChild("sequenceLanes") != null && !requestNode.getChild("sequenceLanes").getChildren("SequenceLane").isEmpty()) {
+        for (Iterator i = requestNode.getChild("sequenceLanes").getChildren("SequenceLane").iterator(); i.hasNext();) {
+          Element sequenceLaneNode = (Element) i.next();
+          initializeSequenceLane(sequenceLaneNode);
+        }
+      }
+    }
+
+
+
+  }
+
+  private void initializeRequest(JsonObject n, Session sess, RequestCategory requestCategory) throws Exception {
+
+    Integer idRequest = new Integer(n.getString("idRequest"));
+    System.out.println ("[initializeRequest] idRequest: " + idRequest);
+    if (idRequest.intValue() == 0) {
+      request = new Request();
+      request.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
+      request.setCodeVisibility(n.getString("codeVisibility"));
+      request.setPrivacyExpirationDate(convertDate(n.getString("privacyExpirationDate")));
+
+      // We use the experiment ID in the XML if this is an import
+      if (isImport) {
+        request.setNumber(n.get("number") != null ? n.getString("number") : null);
+
+        JsonArray requestProperties = n.getJsonArray("RequestProperties");
+        if(requestProperties != null){
+
+          for(int i = 0; i < requestProperties.size(); i++) {
+            String idProperty = requestProperties.getJsonObject(i).getString("idProperty");
+            String name = requestProperties.getJsonObject(i).getString("name");
+            String value = requestProperties.getJsonObject(i).getString("value");
+            List<String> idPropertyValuePairList = new ArrayList<String>();
+            idPropertyValuePairList.add(idProperty);
+            idPropertyValuePairList.add(value);
+            this.requestAnnotationMap.put(name,idPropertyValuePairList);
+          }
+
+        }
+
+      }
+
+      if (n.get("idInstitution") != null && !n.getString("idInstitution").equals("")) {
+        request.setIdInstitution(new Integer(n.getString("idInstitution")));
+      }
+      isNewRequest = true;
+    } else {
+      request = sess.load(Request.class, idRequest);
+      originalIdLab = request.getIdLab();
+      saveReuseOfSlides = true;
+
+      // If it is an existing request we want to set any new samples to have
+      // same seqPrepByCore vaule as old samples.
+      if (request.getSamples().size() > 0) {
+        seqPrepByCore = ((Sample) request.getSamples().iterator().next()).getSeqPrepByCore();
+      }
+
+      // Reset the complete date
+      // a QC request to a microarray or sequencing request
+      if (this.isQCAmendRequest()) {
+        request.setCompletedDate(null);
+        request.setCodeRequestStatus(RequestStatus.SUBMITTED);
+      }
+      request.setLastModifyDate(new java.sql.Date(System.currentTimeMillis()));
+
+      // Only some users have permissions to set the visibility on the request
+      if (this.secAdvisor.canUpdate(request, SecurityAdvisor.PROFILE_OBJECT_VISIBILITY)) {
+        if (n.get("codeVisibility") == null || n.getString("codeVisibility").equals("")) {
+          throw new Exception("Visibility is required for experiment " + request.getNumber());
+        }
+        request.setCodeVisibility(n.getString("codeVisibility"));
+        request.setPrivacyExpirationDate(convertDate(n.getString("privacyExpirationDate")));
+
+        if (n.getString("idInstitution") != null && !n.getString("idInstitution").equals("") && !n.getString("idInstitution").equals("null")) {
+          request.setIdInstitution(new Integer(n.getString("idInstitution")));
+        }
+      }
+    }
+
+    if (n.get("codeRequestCategory") != null) {
+      request.setCodeRequestCategory(n.getString("codeRequestCategory"));
+      if (requestCategory.getIsOwnerOnly() != null && requestCategory.getIsOwnerOnly().equals("Y")) {
+        request.setCodeVisibility(Visibility.VISIBLE_TO_OWNER);
+      }
+    }
+
+    initializeRequest(n, request, sess, requestCategory);
   }
 
   private void initializeRequest(Element n, Session sess, RequestCategory requestCategory) throws Exception {
@@ -527,6 +667,296 @@ public class RequestParser implements Serializable {
 
   }
 
+  private void initializeRequest(JsonObject n, Request request, Session sess, RequestCategory requestCategory) throws Exception {
+
+    if (n.get("isExternal") != null && !n.getString("isExternal").equals("")) {
+      request.setIsExternal(n.getString("isExternal"));
+    }
+
+    if (n.get("amendState") != null && !n.getString("amendState").equals("")) {
+      amendState = n.getString("amendState");
+    }
+
+    request.setName(n.get("name") != null ? this.unEscape(n.getString("name")) : null);
+
+    otherCharacteristicLabel = this.unEscape(n.get(PropertyEntry.OTHER_LABEL) != null ? n.getString(PropertyEntry.OTHER_LABEL) : null);
+
+    request.setCodeRequestCategory(n.getString("codeRequestCategory"));
+
+    if (n.get("idCoreFacility") != null && !n.getString("idCoreFacility").equals("")) {
+      request.setIdCoreFacility(new Integer(n.getString("idCoreFacility")));
+    } else {
+      request.setIdCoreFacility(null);
+    }
+
+    if (n.get("codeApplication") != null && !n.getString("codeApplication").equals("")) {
+      request.setCodeApplication(n.getString("codeApplication"));
+    }
+
+    if (n.get("idAppUser") != null && !n.getString("idAppUser").equals("")) {
+      request.setIdAppUser(new Integer(n.getString("idAppUser")));
+    }
+    if (n.get("idSubmitter") != null && !n.getString("idSubmitter").equals("")) {
+      request.setIdSubmitter(new Integer(n.getString("idSubmitter")));
+    }
+    if (n.get("idLab") != null && !n.getString("idLab").equals("")) {
+      request.setIdLab(new Integer(n.getString("idLab")));
+    }
+    if (n.get("idProject") != null && !n.getString("idProject").equals("")) {
+      request.setIdProject(new Integer(n.getString("idProject")));
+    }
+
+    if (n.get("idSlideProduct") != null && !n.getString("idSlideProduct").equals("")) {
+      request.setIdSlideProduct(new Integer(n.getString("idSlideProduct")));
+    }
+
+    if (n.get("idSampleTypeDefault") != null && !n.getString("idSampleTypeDefault").equals("")) {
+      request.setIdSampleTypeDefault(new Integer(n.getString("idSampleTypeDefault")));
+    }
+    if (n.get("idOrganismSampleDefault") != null && !n.getString("idOrganismSampleDefault").equals("")) {
+      request.setIdOrganismSampleDefault(new Integer(n.getString("idOrganismSampleDefault")));
+    } else {
+      request.setIdOrganismSampleDefault(null);
+    }
+    if (n.get("idSampleDropOffLocation") != null && !n.getString("idSampleDropOffLocation").equals("")) {
+      request.setIdSampleDropOffLocation(new Integer(n.getString("idSampleDropOffLocation")));
+    } else {
+      request.setIdSampleDropOffLocation(null);
+    }
+    if (n.get("idProduct") != null && !n.getString("idProduct").equals("")) {
+      request.setIdProduct(new Integer(n.getString("idProduct")));
+    }
+    if (n.get("coreToExtractDNA") != null && !n.getString("coreToExtractDNA").equals(""))
+      request.setCoreToExtractDNA(n.getString("coreToExtractDNA"));
+
+    if (n.get("applicationNotes") != null && !n.getString("applicationNotes").equals(""))
+      request.setApplicationNotes(n.getString("applicationNotes"));
+
+    if (n.get("includeBisulfideConversion") != null && !n.getString("includeBisulfideConversion").equals(""))
+      request.setIncludeBisulfideConversion(n.getString("includeBisulfideConversion"));
+
+    if (n.get("includeQubitConcentration") != null && !n.getString("includeQubitConcentration").equals(""))
+      request.setIncludeQubitConcentration(n.getString("includeQubitConcentration"));
+
+    if (n.get("newBillingTemplateIdBillingAccount") != null && !n.getString("newBillingTemplateIdBillingAccount").equals("")) {
+      BillingTemplate oldBillingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
+      if (oldBillingTemplate == null || !oldBillingTemplate.canBeDeactivated(sess)) {
+        throw new Exception("Current billing template cannot be deactivated");
+      }
+      Integer newIdBillingAccount = new Integer(n.getString("newBillingTemplateIdBillingAccount"));
+      request.setIdBillingAccount(newIdBillingAccount);
+      billingTemplate = new BillingTemplate(request);
+      billingTemplateItems = new TreeSet<BillingTemplateItem>();
+      billingTemplateItems.add(getBillingTemplateItemForIdBA(newIdBillingAccount));
+      isOpeningNewBillingTemplate = true;
+      reassignBillingAccount = false;
+    } else if (n.get("isOpeningNewBillingTemplate") != null
+        && n.getString("isOpeningNewBillingTemplate").equals("Y")
+        && (n.getJsonArray("BillingTemplate") != null
+            || (n.getJsonObject("billingTemplate") != null
+                && n.getJsonObject("billingTemplate").getJsonArray("BillingTemplate") != null))) {
+
+      BillingTemplate oldBillingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
+
+      if (oldBillingTemplate == null || !oldBillingTemplate.canBeDeactivated(sess)) {
+        throw new Exception("Current billing template cannot be deactivated");
+      }
+
+      JsonArray billingTemplateArray = n.getJsonArray("BillingTemplate") != null ? n.getJsonArray("BillingTemplate") : n.getJsonObject("billingTemplate").getJsonArray("BillingTemplate");
+      JsonObject billingTemplateObject = Json.createObjectBuilder().add("billingTemplate", billingTemplateArray).build();
+      BillingTemplateParser btParser = new BillingTemplateParser(billingTemplateObject);
+      btParser.parse(sess);
+      billingTemplate = btParser.getBillingTemplate();
+      billingTemplate.setOrder(request);
+      billingTemplateItems = btParser.getBillingTemplateItems();
+      isOpeningNewBillingTemplate = true;
+      reassignBillingAccount = false;
+    } else if (n.get("idBillingAccount") != null && !n.getString("idBillingAccount").equals("")) {
+      Integer newIdBillingAccount = new Integer(n.getString("idBillingAccount"));
+      request.setIdBillingAccount(newIdBillingAccount);
+      billingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
+      // If the billing account has been changed, we need to know so that any billing items can be revised as well.
+      if (!isNewRequest && !this.isExternalExperiment()) {
+        if (request.getAcceptingBalanceAccountId(sess) == null || !request.getAcceptingBalanceAccountId(sess).equals(newIdBillingAccount) || (billingTemplate != null && billingTemplate.getItems().size() > 1)) {
+          reassignBillingAccount = true;
+          if (!this.secAdvisor.hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT) && !ensureNonAdminCanAccessBillingAccount(newIdBillingAccount, sess)) {
+            throw new Exception("User cannot access selected billing account.");
+          }
+        }
+      }
+      if (billingTemplate == null) {
+        billingTemplate = new BillingTemplate(request);
+      }
+      billingTemplateItems = new TreeSet<BillingTemplateItem>();
+      billingTemplateItems.add(getBillingTemplateItemForIdBA(newIdBillingAccount));
+    } else if (n.get("idBillingTemplate") != null && !n.getString("idBillingTemplate").equals("")) {
+      billingTemplate = sess.get(BillingTemplate.class, Integer.parseInt(n.getString("idBillingTemplate")));
+      Hibernate.initialize(billingTemplate.getItems());
+      billingTemplateItems = billingTemplate.getItems();
+      Hibernate.initialize(billingTemplate.getMasterBillingItems());
+      if (!isNewRequest && !this.isExternalExperiment()) {
+        BillingTemplate oldTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
+        if (oldTemplate == null || !oldTemplate.equals(billingTemplate)) {
+          reassignBillingAccount = true;
+        }
+      }
+      billingTemplate.setOrder(request);
+    } else if (n.getJsonArray("BillingTemplate") != null || (n.getJsonObject("billingTemplate") != null && n.getJsonObject("billingTemplate").getJsonArray("BillingTemplate") != null)) {
+      JsonArray billingTemplateArray = n.getJsonArray("BillingTemplate") != null ? n.getJsonArray("BillingTemplate") : n.getJsonObject("billingTemplate").getJsonArray("BillingTemplate");
+      JsonObject billingTemplateObject = Json.createObjectBuilder().add("billingTemplate", billingTemplateArray).build();
+      BillingTemplateParser btParser = new BillingTemplateParser(billingTemplateObject);
+      btParser.parse(sess);
+      billingTemplate = btParser.getBillingTemplate();
+      billingTemplateItems = btParser.getBillingTemplateItems();
+      if (!isNewRequest && !this.isExternalExperiment()) {
+        BillingTemplate oldTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
+        if (oldTemplate == null || !oldTemplate.equals(billingTemplate)) {
+          reassignBillingAccount = true;
+        }
+      }
+      billingTemplate.setOrder(request);
+    }
+
+    if (n.get("description") != null && !n.getString("description").equals("")) {
+      request.setDescription(n.getString("description"));
+    }
+
+    if (n.get("reagent") != null && !n.getString("reagent").equals("")) {
+      request.setReagent(n.getString("reagent"));
+    }
+    if (n.get("elutionBuffer") != null && !n.getString("elutionBuffer").equals("")) {
+      request.setElutionBuffer(n.getString("elutionBuffer"));
+    }
+    if (n.get("usedDnase") != null && !n.getString("usedDnase").equals("")) {
+      request.setUsedDnase(n.getString("usedDnase"));
+    } else{
+      request.setUsedDnase("N");
+    }
+    if (n.get("usedRnase") != null && !n.getString("usedRnase").equals("")) {
+      request.setUsedRnase(n.getString("usedRnase"));
+    } else{
+      request.setUsedRnase("N");
+    }
+    if (n.get("keepSamples") != null && !n.getString("keepSamples").equals("")) {
+      request.setKeepSamples(n.getString("keepSamples"));
+    }
+
+    if (n.get("captureLibDesignId") != null && !n.getString("captureLibDesignId").equals(""))
+      request.setCaptureLibDesignId(n.getString("captureLibDesignId"));
+
+    if (n.get("analysisInstructions") != null && !n.getString("analysisInstructions").equals(""))
+      request.setAnalysisInstructions(n.getString("analysisInstructions"));
+
+    if (n.get("corePrepInstructions") != null && !n.getString("corePrepInstructions").equals(""))
+      request.setCorePrepInstructions(n.getString("corePrepInstructions"));
+
+    if (n.get("adminNotes") != null && !n.getString("adminNotes").equals(""))
+      request.setAdminNotes(n.getString("adminNotes"));
+
+    if (n.get("codeProtocolType") != null && !n.getString("codeProtocolType").equals("")) {
+      request.setCodeProtocolType(n.getString("codeProtocolType"));
+    }
+    if (n.get("codeBioanalyzerChipType") != null && !n.getString("codeBioanalyzerChipType").equals("")) {
+      request.setCodeBioanalyzerChipType(n.getString("codeBioanalyzerChipType"));
+    }
+    if (n.get("codeIsolationPrepType") != null && !n.getString("codeIsolationPrepType").equals("")) {
+      request.setCodeIsolationPrepType(n.getString("codeIsolationPrepType"));
+    }
+    if (n.get("bioinformaticsAssist") != null && !n.getString("bioinformaticsAssist").equals("")) {
+      request.setBioinformaticsAssist(n.getString("bioinformaticsAssist"));
+    }
+    if (request.getBioinformaticsAssist() == null || (!request.getBioinformaticsAssist().equals("Y") && !request.getBioinformaticsAssist().equals("N"))) {
+      request.setBioinformaticsAssist("N");
+    }
+
+    if (n.get("hasPrePooledLibraries") != null && !n.getString("hasPrePooledLibraries").equals("")) {
+      request.setHasPrePooledLibraries(n.getString("hasPrePooledLibraries"));
+    }
+    if (request.getHasPrePooledLibraries() == null || (!request.getHasPrePooledLibraries().equals("Y") && !request.getHasPrePooledLibraries().equals("N"))) {
+      request.setHasPrePooledLibraries("N");
+    }
+
+    if (request.getHasPrePooledLibraries().equals("Y") && n.getString("numPrePooledTubes") != null && !n.getString("numPrePooledTubes").equals("")) {
+      request.setNumPrePooledTubes(new Integer(n.getString("numPrePooledTubes")));
+    } else {
+      request.setNumPrePooledTubes(null);
+    }
+
+    previousCodeRequestStatus = request.getCodeRequestStatus();
+    if (n.get("codeRequestStatus") != null && !n.getString("codeRequestStatus").equals("")) {
+      // Don't change request status to submitted unless the request is in new status
+      if (n.getString("codeRequestStatus").equals(RequestStatus.SUBMITTED) && (request.getCodeRequestStatus() != null && !request.getCodeRequestStatus().equals(RequestStatus.NEW))) {
+        // Do nothing
+      } else {
+        request.setCodeRequestStatus(n.getString("codeRequestStatus"));
+        if (n.getString("codeRequestStatus").equals(RequestStatus.COMPLETED)) {
+          if (request.getCompletedDate() == null) {
+            request.setCompletedDate(new java.sql.Date(System.currentTimeMillis()));
+          }
+          // Now change the billing items for the request from PENDING to COMPLETE
+          for (BillingItem billingItem : request.getBillingItemList(sess)) {
+            if (billingItem.getCodeBillingStatus().equals(BillingStatus.PENDING)) {
+              billingItem.setCodeBillingStatus(BillingStatus.COMPLETED);
+            }
+          }
+        }
+      }
+    } else {
+      if (PropertyDictionaryHelper.getInstance(sess).getCoreFacilityRequestCategoryProperty(request.getIdCoreFacility(), request.getCodeRequestCategory(), PropertyDictionary.NEW_REQUEST_SAVE_BEFORE_SUBMIT).equals("Y")) {
+        request.setCodeRequestStatus(RequestStatus.NEW);
+      } else {
+        request.setCodeRequestStatus(RequestStatus.SUBMITTED);
+      }
+    }
+    request.setProtocolNumber(n.getString("protocolNumber"));
+
+    if (n.getJsonArray("PropertyEntries") != null) {
+      for (int i = 0; i < n.getJsonArray("PropertyEntries").size(); i++) {
+        JsonObject property = n.getJsonArray("PropertyEntries").getJsonObject(i);
+        if (property.get("isSelected") != null && property.getString("isSelected").equals("true")) {
+          this.propertiesToApplyMap.put(property.getString("idProperty"), null);
+        }
+      }
+    }
+
+    if (n.getJsonArray("SeqLibTreatmentEntries") != null) {
+      for (int i = 0; i < n.getJsonArray("SeqLibTreatmentEntries").size(); i++) {
+        this.seqLibTreatmentMap.put(n.getJsonArray("SeqLibTreatmentEntries").getJsonObject(i).getString("value"), null);
+      }
+    }
+
+    if (n.getJsonArray("collaborators") != null) {
+      for (int i = 0; i < n.getJsonArray("collaborators").size(); i++) {
+        JsonObject collaborator = n.getJsonArray("collaborators").getJsonObject(i);
+        this.collaboratorUploadMap.put(collaborator.getString("idAppUser"), collaborator.getString("canUploadData"));
+        this.collaboratorUpdateMap.put(collaborator.getString("idAppUser"), collaborator.getString("canUpdate"));
+      }
+    }
+
+    // Figure out if the user intended to save sample treatments
+    if (n.get(TreatmentEntry.TREATMENT) != null && n.getString(TreatmentEntry.TREATMENT).equalsIgnoreCase("Y")) {
+      showTreatments = true;
+    }
+
+    // Is reuse slides checked on request (for new submits only, not updates)
+    if (n.get("reuseSlides") != null && n.getString("reuseSlides").equalsIgnoreCase("Y")) {
+      this.saveReuseOfSlides = true;
+    }
+
+    // On existing requests, save visibility and privacyExpirationDate
+    if (!isNewRequest) {
+      if (request.getRequestCategory().getIsOwnerOnly() == null || request.getRequestCategory().getIsOwnerOnly().equals("N")) {
+        if (this.secAdvisor.canUpdate(request, SecurityAdvisor.PROFILE_OBJECT_VISIBILITY)) {
+          request.setCodeVisibility(n.get("codeVisibility") != null ? n.getString("codeVisibility") : null);
+          request.setPrivacyExpirationDate(convertDate(n.getString("privacyExpirationDate")));
+        }
+      } else if (request.getRequestCategory().getIsOwnerOnly() != null && request.getRequestCategory().getIsOwnerOnly().equals("Y")) {
+        request.setCodeVisibility(Visibility.VISIBLE_TO_OWNER);
+      }
+    }
+
+  }
+
   public BillingTemplateItem getBillingTemplateItemForIdBA(int idBillingAccount) throws Exception {
     BillingTemplateItem item = new BillingTemplateItem();
     item.setIdBillingAccount(idBillingAccount);
@@ -536,6 +966,45 @@ public class RequestParser implements Serializable {
 
   public Set<BillingTemplateItem> getBillingTemplateItems() {
     return billingTemplateItems;
+  }
+
+  private void initializeSample(JsonObject requestNode, JsonObject n, Session sess, RequestCategory requestCategory) throws Exception {
+    boolean isNewSample = false;
+    Sample sample = null;
+
+    String idSampleString = n.getString("idSample");
+    if (isNewRequest || idSampleString == null || idSampleString.equals("") || idSampleString.startsWith("Sample")) {
+      sample = new Sample();
+      isNewSample = true;
+    } else {
+      sample = sess.load(Sample.class, new Integer(idSampleString));
+    }
+    sample.setIdSampleString(idSampleString);
+
+    PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(sess);
+
+    Boolean isExternal = (requestNode.get("isExternal") != null && requestNode.getString("isExternal").equals("Y"));
+
+    if (requestCategory.getCategoryType() != null && requestCategory.getCategoryType().getIsIllumina().equals("Y") && !isExternal) {
+      initializeSample(n, sample, idSampleString, isNewSample, propertyHelper, true);
+    } else if (requestCategory.getCategoryType() != null && requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ) && !isExternal) {
+      initializeSample(n, sample, idSampleString, isNewSample, propertyHelper, true);
+    } else {
+      initializeSample(n, sample, idSampleString, isNewSample, propertyHelper, false);
+    }
+
+    if (isExternal) {
+      // the request create screen doesn't do the idOrganism at the request
+      // level so skip.
+      if (requestNode.get("idOrganism") != null && requestNode.getString("idOrganism").toString().length() > 0) {
+        sample.setIdOrganism(new Integer(requestNode.getString("idOrganism")));
+        if (requestNode.get("otherOrganism") != null) {
+          sample.setOtherOrganism(requestNode.getString("otherOrganism"));
+        } else {
+          sample.setOtherOrganism("");
+        }
+      }
+    }
   }
 
   private void initializeSample(Element requestNode, Element n, Session sess, RequestCategory requestCategory) throws Exception {
@@ -574,6 +1043,360 @@ public class RequestParser implements Serializable {
           sample.setOtherOrganism("");
         }
       }
+    }
+  }
+
+  private void initializeSample(JsonObject n, Sample sample, String idSampleString, boolean isNewSample, PropertyDictionaryHelper propertyHelper, boolean isHiseqOrMiseq) throws Exception {
+
+    sample.setName(n.get("name") != null ? unEscape(n.getString("name")) : null);
+
+    sample.setDescription(n.get("description") != null ? unEscape(n.getString("description")) : null);
+
+    // We use the sample ID in the XML if this is an import
+    if (isImport) {
+      sample.setNumber(n.getString("number"));
+    }
+
+    if (n.get("idSampleType") != null && !n.getString("idSampleType").equals("")) {
+      sample.setIdSampleType(new Integer(n.getString("idSampleType")));
+    } else {
+      sample.setIdSampleType(null);
+    }
+    if (n.get("idSampleSource") != null && !n.getString("idSampleSource").equals("")) {
+      sample.setIdSampleSource(new Integer(n.getString("idSampleSource")));
+    } else {
+      sample.setIdSampleSource(null);
+    }
+    if (n.get("numberSequencingLanes") != null && !n.getString("numberSequencingLanes").equals("")) {
+      sample.setNumberSequencingLanes(new Integer(n.getString("numberSequencingLanes")));
+    } else {
+      sample.setNumberSequencingLanes(null);
+    }
+
+    if (n.get("otherSamplePrepMethod") != null && !n.getString("otherSamplePrepMethod").equals("")) {
+      sample.setOtherSamplePrepMethod(n.getString("otherSamplePrepMethod"));
+    } else {
+      sample.setOtherSamplePrepMethod(null);
+    }
+    if (n.get("idOrganism") != null && !n.getString("idOrganism").equals("")) {
+      sample.setIdOrganism(new Integer(n.getString("idOrganism")));
+    } else {
+      sample.setIdOrganism(null);
+    }
+    if (n.get("otherOrganism") != null && !n.getString("otherOrganism").equals("")) {
+      sample.setOtherOrganism(n.getString("otherOrganism"));
+    } else {
+      sample.setOtherOrganism(null);
+    }
+    if (n.get("concentration") != null && !n.getString("concentration").equals("")) {
+      String conc = n.getString("concentration").replaceAll(",", "");
+      sample.setConcentration(new BigDecimal(conc));
+    } else {
+      sample.setConcentration(null);
+    }
+
+    if (n.get("sampleVolume") != null && !n.getString("sampleVolume").equals("")) {
+      String volume = n.getString("sampleVolume").replaceAll(",", "");
+      sample.setSampleVolume(new BigDecimal(volume));
+    } else {
+      sample.setSampleVolume(null);
+    }
+
+    if (n.get("codeConcentrationUnit") != null && !n.getString("codeConcentrationUnit").equals("")) {
+      sample.setCodeConcentrationUnit(unEscape(n.getString("codeConcentrationUnit")));
+    } else {
+      sample.setCodeConcentrationUnit(ConcentrationUnit.DEFAULT_SAMPLE_CONCENTRATION_UNIT);
+    }
+    if (n.get("qubitConcentration") != null && !n.getString("qubitConcentration").equals("")) {
+      sample.setQubitConcentration(new BigDecimal(n.getString("qubitConcentration")));
+    } else {
+      sample.setQubitConcentration(null);
+    }
+    if (n.get("qcCodeApplication") != null && !n.getString("qcCodeApplication").equals("")) {
+      sample.setQcCodeApplication(n.getString("qcCodeApplication"));
+    } else {
+      sample.setQcCodeApplication(null);
+    }
+    if (n.get("codeBioanalyzerChipType") != null && !n.getString("codeBioanalyzerChipType").equals("")) {
+      sample.setCodeBioanalyzerChipType(n.getString("codeBioanalyzerChipType"));
+    } else {
+      sample.setCodeBioanalyzerChipType(null);
+    }
+    if (n.get("idOligoBarcode") != null && !n.getString("idOligoBarcode").equals("")) {
+      sample.setIdOligoBarcode(new Integer(n.getString("idOligoBarcode")));
+    } else {
+      sample.setIdOligoBarcode(null);
+    }
+    if (n.get("idOligoBarcodeB") != null && !n.getString("idOligoBarcodeB").equals("")) {
+      sample.setIdOligoBarcodeB(new Integer(n.getString("idOligoBarcodeB")));
+    } else {
+      sample.setIdOligoBarcodeB(null);
+    }
+
+    if (isHiseqOrMiseq) {
+      if (n.get("multiplexGroupNumber") != null && !n.getString("multiplexGroupNumber").equals("")) {
+        sample.setMultiplexGroupNumber(new Integer(n.getString("multiplexGroupNumber")));
+      } else {
+        // Allow to continue if just downloading a spread sheet.
+        if (!this.forDownload) {
+          throw new Exception("MultiplexGroupNumber cannot be empty for HiSeq or MiSeq experiments");
+        }
+      }
+    } else {
+      if (n.get("multiplexGroupNumber") != null && !n.getString("multiplexGroupNumber").equals("")) {
+        sample.setMultiplexGroupNumber(new Integer(n.getString("multiplexGroupNumber")));
+      } else {
+        sample.setMultiplexGroupNumber(null);
+      }
+    }
+
+    if (n.get("barcodeSequence") != null && !n.getString("barcodeSequence").equals("")) {
+      sample.setBarcodeSequence(n.getString("barcodeSequence"));
+    } else {
+      sample.setBarcodeSequence(null);
+    }
+    if (n.get("barcodeSequenceB") != null && !n.getString("barcodeSequenceB").equals("")) {
+      sample.setBarcodeSequenceB(n.getString("barcodeSequenceB"));
+    } else {
+      sample.setBarcodeSequenceB(null);
+    }
+    if (n.get("idSeqLibProtocol") != null && !n.getString("idSeqLibProtocol").trim().equals("")) {
+      sample.setIdSeqLibProtocol(new Integer(n.getString("idSeqLibProtocol")));
+    } else {
+      sample.setIdSeqLibProtocol(null);
+    }
+
+    if (seqPrepByCore != null) {
+      sample.setSeqPrepByCore(seqPrepByCore);
+    } else if (n.get("seqPrepByCore") != null && !n.getString("seqPrepByCore").equals("")) {
+      sample.setSeqPrepByCore(n.getString("seqPrepByCore"));
+    } else {
+      sample.setSeqPrepByCore("Y");
+    }
+
+    if (n.get("fragmentSizeFrom") != null && !n.getString("fragmentSizeFrom").equals("")) {
+      sample.setFragmentSizeFrom(new Integer(n.getString("fragmentSizeFrom")));
+    } else {
+      sample.setFragmentSizeFrom(null);
+    }
+    if (n.get("fragmentSizeTo") != null && !n.getString("fragmentSizeTo").equals("")) {
+      sample.setFragmentSizeTo(new Integer(n.getString("fragmentSizeTo")));
+    } else {
+      sample.setFragmentSizeTo(null);
+    }
+    if (n.get("prepInstructions") != null && !n.getString("prepInstructions").equals("")) {
+      sample.setPrepInstructions(n.getString("prepInstructions"));
+    } else {
+      sample.setPrepInstructions(null);
+    }
+    if (n.get("meanLibSizeActual") != null && !n.getString("meanLibSizeActual").equals("")) {
+      sample.setMeanLibSizeActual(new Integer((n.getString("meanLibSizeActual"))));
+    } else {
+      sample.setMeanLibSizeActual(null);
+    }
+
+    if (propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED).equals("Y")) {
+      if (n.get("ccNumber") != null && !n.getString("ccNumber").equals("")) {
+        String ccNumber = n.getString("ccNumber");
+        sample.setCcNumber(ccNumber);
+        if (!ccNumberList.contains(ccNumber)) {
+          ccNumberList.add(ccNumber);
+        }
+      } else {
+        sample.setCcNumber(null);
+      }
+    }
+
+    sampleMap.put(idSampleString, sample);
+    sampleIds.add(idSampleString);
+
+    // Hash sample characteristics entries
+    Map annotations = new HashMap();
+    for (Iterator i = n.keySet().iterator(); i.hasNext();) {
+      String attributeName = (String) i.next();
+      String value = n.get(attributeName) != null ? unEscape(n.getString(attributeName)) : null;
+
+      // Strip off "ANNOT" from attribute name
+      if (attributeName.startsWith("ANNOT")) {
+        attributeName = attributeName.substring(5);
+      }
+
+      if (value != null && this.propertiesToApplyMap.containsKey(attributeName)) {
+        annotations.put(Integer.valueOf(attributeName), value);
+        sampleAnnotationCodeMap.put(attributeName, null);
+      }
+    }
+    sampleAnnotationMap.put(idSampleString, annotations);
+
+    // Hash sample treatment
+    if (showTreatments && n.get(TreatmentEntry.TREATMENT) != null && !n.getString(TreatmentEntry.TREATMENT).equals("")) {
+      sampleTreatmentMap.put(idSampleString, unEscape(n.getString(TreatmentEntry.TREATMENT)));
+    }
+
+    // If the user can manage workflow, initialize the sample quality control fields
+    // (for updating).
+    if (this.secAdvisor.hasPermission(SecurityAdvisor.CAN_MANAGE_WORKFLOW)) {
+      if (n.get("qual260nmTo280nmRatio") != null && !n.getString("qual260nmTo280nmRatio").equals("")) {
+        sample.setQual260nmTo280nmRatio(new BigDecimal(n.getString("qual260nmTo280nmRatio")));
+      } else {
+        sample.setQual260nmTo280nmRatio(null);
+      }
+
+      if (n.get("qual260nmTo230nmRatio") != null && !n.getString("qual260nmTo230nmRatio").equals("")) {
+        sample.setQual260nmTo230nmRatio(new BigDecimal(n.getString("qual260nmTo230nmRatio")));
+      } else {
+        sample.setQual260nmTo230nmRatio(null);
+      }
+
+      if (n.get("qualFragmentSizeFrom") != null && !n.getString("qualFragmentSizeFrom").equals("")) {
+        sample.setQualFragmentSizeFrom(new Integer(n.getString("qualFragmentSizeFrom")));
+      } else {
+        sample.setQualFragmentSizeFrom(null);
+      }
+      if (n.get("qualFragmentSizeTo") != null && !n.getString("qualFragmentSizeTo").equals("")) {
+        sample.setQualFragmentSizeTo(new Integer(n.getString("qualFragmentSizeTo")));
+      } else {
+        sample.setQualFragmentSizeTo(null);
+      }
+
+      if (n.get("qualCalcConcentration") != null && !n.getString("qualCalcConcentration").equals("")) {
+        sample.setQualCalcConcentration(new BigDecimal(n.getString("qualCalcConcentration")));
+      } else {
+        sample.setQualCalcConcentration(null);
+      }
+
+      if (n.get("qual28sTo18sRibosomalRatio") != null && !n.getString("qual28sTo18sRibosomalRatio").equals("")) {
+        sample.setQual28sTo18sRibosomalRatio(new BigDecimal(n.getString("qual28sTo18sRibosomalRatio")));
+      } else {
+        sample.setQual28sTo18sRibosomalRatio(null);
+      }
+
+      if (n.get("qualRINNumber") != null && !n.getString("qualRINNumber").equals("")) {
+        sample.setQualRINNumber(n.getString("qualRINNumber"));
+      } else {
+        sample.setQualRINNumber(null);
+      }
+
+      if (n.get("qualStatus") != null && !n.getString("qualStatus").equals("")) {
+        String status = n.getString("qualStatus");
+        if (status.equals(Constants.STATUS_COMPLETED)) {
+          sample.setQualDate(new java.sql.Date(System.currentTimeMillis()));
+          sample.setQualFailed("N");
+          sample.setQualBypassed("N");
+
+        } else if (status.equals(Constants.STATUS_TERMINATED)) {
+          sample.setQualDate(null);
+          sample.setQualFailed("Y");
+          sample.setQualBypassed("N");
+
+        } else if (status.equals(Constants.STATUS_BYPASSED)) {
+          sample.setQualDate(null);
+          sample.setQualFailed("N");
+          sample.setQualBypassed("Y");
+        }
+      } else {
+        sample.setQualDate(null);
+        sample.setQualFailed("N");
+        sample.setQualBypassed("N");
+      }
+
+      if (n.get("seqPrepQualCodeBioanalyzerChipType") != null && !n.getString("seqPrepQualCodeBioanalyzerChipType").equals("")) {
+        sample.setSeqPrepQualCodeBioanalyzerChipType(n.getString("seqPrepQualCodeBioanalyzerChipType"));
+      } else {
+        sample.setSeqPrepQualCodeBioanalyzerChipType(null);
+      }
+
+      if (n.get("seqPrepGelFragmentSizeFrom") != null && !n.getString("seqPrepGelFragmentSizeFrom").equals("")) {
+        sample.setSeqPrepGelFragmentSizeFrom(new Integer(n.getString("seqPrepGelFragmentSizeFrom")));
+      } else {
+        sample.setSeqPrepGelFragmentSizeFrom(null);
+      }
+      if (n.get("seqPrepGelFragmentSizeTo") != null && !n.getString("seqPrepGelFragmentSizeTo").equals("")) {
+        sample.setSeqPrepGelFragmentSizeTo(new Integer(n.getString("seqPrepGelFragmentSizeTo")));
+      } else {
+        sample.setSeqPrepGelFragmentSizeTo(null);
+      }
+
+      if (n.get("seqPrepStatus") != null && !n.getString("seqPrepStatus").equals("")) {
+        String status = n.getString("seqPrepStatus");
+        if (status.equals(Constants.STATUS_COMPLETED)) {
+          sample.setSeqPrepDate(new java.sql.Date(System.currentTimeMillis()));
+          sample.setSeqPrepFailed("N");
+          sample.setSeqPrepBypassed("N");
+
+        } else if (status.equals(Constants.STATUS_TERMINATED)) {
+          sample.setSeqPrepDate(null);
+          sample.setSeqPrepFailed("Y");
+          sample.setSeqPrepBypassed("N");
+
+        } else if (status.equals(Constants.STATUS_BYPASSED)) {
+          sample.setSeqPrepDate(null);
+          sample.setSeqPrepFailed("N");
+          sample.setSeqPrepBypassed("Y");
+        }
+      } else {
+        sample.setSeqPrepDate(null);
+        sample.setSeqPrepFailed("N");
+        sample.setSeqPrepBypassed("N");
+      }
+
+    }
+
+    // Have well and plate names so create well and plate rows
+    if (n.get("wellName") != null && n.getString("wellName").length() > 0 && n.get("plateName") != null && n.getString("plateName").length() > 0) {
+      this.hasPlates = true;
+      Plate plate = new Plate();
+      String plateIdAsString = "";
+      if (n.get("idPlate") != null && n.getString("idPlate").length() > 0) {
+        plateIdAsString = n.getString("idPlate");
+        plate.setIdPlate(Integer.parseInt(n.getString("idPlate")));
+      } else {
+        plateIdAsString = n.getString("plateName");
+        if (plateMap.containsKey(plateIdAsString)) {
+          plate.setIdPlate(plateMap.get(plateIdAsString).getIdPlate());
+        }
+      }
+      plate.setLabel(n.getString("plateName"));
+      this.plateMap.put(plateIdAsString, plate);
+
+      PlateWell well = new PlateWell();
+      String wellIdAsString = "";
+      if (n.get("idPlateWell") != null && n.getString("idPlateWell").length() > 0) {
+        wellIdAsString = n.getString("idPlateWell");
+        well.setIdPlateWell(Integer.parseInt(n.getString("idPlateWell")));
+      } else {
+        wellIdAsString = plateIdAsString + "&" + n.getString("wellName");
+      }
+      well.setRow(n.getString("wellName").substring(0, 1));
+      well.setCol(Integer.parseInt(n.getString("wellName").substring(1)));
+      this.wellMap.put(wellIdAsString, well);
+
+      SamplePlateWell samplePlateWell = new SamplePlateWell();
+      samplePlateWell.plateIdAsString = plateIdAsString;
+      samplePlateWell.wellIdAsString = wellIdAsString;
+      this.sampleToPlateMap.put(idSampleString, samplePlateWell);
+    }
+
+    // Hash map of assays chosen. Build up the map
+    ArrayList<String> assays = new ArrayList<String>();
+    for (Iterator i = n.keySet().iterator(); i.hasNext();) {
+      String attributeName = (String) i.next();
+      if (attributeName.startsWith("hasAssay") && n.get(attributeName) != null && n.getString(attributeName).equals("Y")) {
+        String name = attributeName.substring(8);
+        assays.add(name);
+      }
+    }
+    this.sampleAssays.put(idSampleString, assays);
+
+    // Cherry picking source and destination wells.
+    if (n.get("sourcePlate") != null && n.getString("sourcePlate").length() > 0) {
+      this.cherryPickSourcePlates.put(idSampleString, n.getString("sourcePlate"));
+    }
+    if (n.get("sourceWell") != null && n.getString("sourceWell").length() > 0) {
+      this.cherryPickSourceWells.put(idSampleString, n.getString("sourceWell"));
+    }
+    if (n.get("destinationWell") != null && n.getString("destinationWell").length() > 0) {
+      this.cherryPickDestinationWells.put(idSampleString, n.getString("destinationWell"));
     }
   }
 
@@ -933,6 +1756,180 @@ public class RequestParser implements Serializable {
     }
   }
 
+  private void initializeHyb(JsonObject n) {
+
+    HybInfo hybInfo = new HybInfo();
+
+    hybInfo.setIdHybridization(n.get("idHybridization") != null ? n.getString("idHybridization") : null);
+
+    String idSampleChannel1String = n.get("idSampleChannel1") != null ? n.getString("idSampleChannel1") : null;
+    if (idSampleChannel1String != null && !idSampleChannel1String.equals("")) {
+      hybInfo.setIdSampleChannel1String(idSampleChannel1String);
+      hybInfo.setSampleChannel1((Sample) sampleMap.get(idSampleChannel1String));
+    }
+
+    String idSampleChannel2String = n.get("idSampleChannel2") != null ? n.getString("idSampleChannel2") : null;
+    if (idSampleChannel2String != null && !idSampleChannel2String.equals("")) {
+      hybInfo.setIdSampleChannel2String(idSampleChannel2String);
+      hybInfo.setSampleChannel2((Sample) sampleMap.get(idSampleChannel2String));
+    }
+
+    String codeSlideSource = null;
+    if (n.get("codeSlideSource") != null && !n.getString("codeSlideSource").equals("")) {
+      codeSlideSource = n.getString("codeSlideSource");
+    }
+    hybInfo.setCodeSlideSource(codeSlideSource);
+
+    if (n.get("idSlideDesign") != null && !n.getString("idSlideDesign").equals("")) {
+      hybInfo.setIdSlideDesign(new Integer(n.getString("idSlideDesign")));
+    }
+
+    hybInfo.setNotes(n.get("notes") != null ? unEscape(n.getString("notes")): null);
+
+    //
+    // Workflow fields
+    //
+
+    // Labeling (channel1)
+    if (n.get("labelingYieldChannel1") != null && !n.getString("labelingYieldChannel1").equals("")) {
+      hybInfo.setLabelingYieldChannel1(new BigDecimal(n.getString("labelingYieldChannel1")));
+    }
+    if (n.get("idLabelingProtocolChannel1") != null && !n.getString("idLabelingProtocolChannel1").equals("")) {
+      hybInfo.setIdLabelingProtocolChannel1(new Integer(n.getString("idLabelingProtocolChannel1")));
+    }
+
+    if (n.get("codeLabelingReactionSizeChannel1") != null && !n.getString("codeLabelingReactionSizeChannel1").equals("")) {
+      hybInfo.setCodeLabelingReactionSizeChannel1(n.getString("codeLabelingReactionSizeChannel1"));
+    }
+
+    if (n.get("numberOfReactionsChannel1") != null && !n.getString("numberOfReactionsChannel1").equals("")) {
+      hybInfo.setNumberOfReactionsChannel1(new Integer(n.getString("numberOfReactionsChannel1")));
+    }
+    if (n.get("labelingStatusChannel1") != null && !n.getString("labelingStatusChannel1").equals("")) {
+      String status = n.getString("labelingStatusChannel1");
+      if (status.equals(Constants.STATUS_COMPLETED)) {
+        hybInfo.setLabelingCompletedChannel1("Y");
+        hybInfo.setLabelingFailedChannel1("N");
+        hybInfo.setLabelingBypassedChannel1("N");
+
+      } else if (status.equals(Constants.STATUS_TERMINATED)) {
+        hybInfo.setLabelingCompletedChannel1("N");
+        hybInfo.setLabelingFailedChannel1("Y");
+        hybInfo.setLabelingBypassedChannel1("N");
+
+      } else if (status.equals(Constants.STATUS_BYPASSED)) {
+        hybInfo.setLabelingCompletedChannel1("N");
+        hybInfo.setLabelingFailedChannel1("N");
+        hybInfo.setLabelingBypassedChannel1("Y");
+      }
+    } else {
+      hybInfo.setLabelingCompletedChannel1("N");
+      hybInfo.setLabelingFailedChannel1("N");
+      hybInfo.setLabelingBypassedChannel1("N");
+    }
+
+    // Labeling (channel2)
+    if (n.get("labelingYieldChannel2") != null && !n.getString("labelingYieldChannel2").equals("")) {
+      hybInfo.setLabelingYieldChannel2(new BigDecimal(n.getString("labelingYieldChannel2")));
+    }
+    if (n.get("idLabelingProtocolChannel2") != null && !n.getString("idLabelingProtocolChannel2").equals("")) {
+      hybInfo.setIdLabelingProtocolChannel2(new Integer(n.getString("idLabelingProtocolChannel2")));
+    }
+
+    if (n.get("codeLabelingReactionSizeChannel2") != null && !n.getString("codeLabelingReactionSizeChannel2").equals("")) {
+      hybInfo.setCodeLabelingReactionSizeChannel2(n.getString("codeLabelingReactionSizeChannel2"));
+    }
+
+    if (n.get("numberOfReactionsChannel2") != null && !n.getString("numberOfReactionsChannel2").equals("")) {
+      hybInfo.setNumberOfReactionsChannel2(new Integer(n.getString("numberOfReactionsChannel2")));
+    }
+    if (n.get("labelingStatusChannel2") != null && !n.getString("labelingStatusChannel2").equals("")) {
+      String status = n.getString("labelingStatusChannel2");
+      if (status.equals(Constants.STATUS_COMPLETED)) {
+        hybInfo.setLabelingCompletedChannel2("Y");
+        hybInfo.setLabelingFailedChannel2("N");
+        hybInfo.setLabelingBypassedChannel2("N");
+
+      } else if (status.equals(Constants.STATUS_TERMINATED)) {
+        hybInfo.setLabelingCompletedChannel2("N");
+        hybInfo.setLabelingFailedChannel2("Y");
+        hybInfo.setLabelingBypassedChannel2("N");
+
+      } else if (status.equals(Constants.STATUS_BYPASSED)) {
+        hybInfo.setLabelingCompletedChannel2("N");
+        hybInfo.setLabelingFailedChannel2("N");
+        hybInfo.setLabelingBypassedChannel2("Y");
+      }
+    } else {
+      hybInfo.setLabelingCompletedChannel2("N");
+      hybInfo.setLabelingFailedChannel2("N");
+      hybInfo.setLabelingBypassedChannel2("N");
+    }
+
+    // Hyb
+    if (n.get("hybStatus") != null && !n.getString("hybStatus").equals("")) {
+      String status = n.getString("hybStatus");
+      if (status.equals(Constants.STATUS_COMPLETED)) {
+        hybInfo.setHybCompleted("Y");
+        hybInfo.setHybFailed("N");
+        hybInfo.setHybBypassed("N");
+      } else if (status.equals(Constants.STATUS_TERMINATED)) {
+        hybInfo.setHybCompleted("N");
+        hybInfo.setHybFailed("Y");
+        hybInfo.setHybBypassed("N");
+      } else if (status.equals(Constants.STATUS_BYPASSED)) {
+        hybInfo.setHybCompleted("N");
+        hybInfo.setHybFailed("N");
+        hybInfo.setHybBypassed("Y");
+      }
+    } else {
+      hybInfo.setHybCompleted("N");
+      hybInfo.setHybFailed("N");
+      hybInfo.setHybBypassed("N");
+    }
+
+    if (n.get("slideBarcode") != null && !n.getString("slideBarcode").equals("")) {
+      hybInfo.setSlideBarcode(n.getString("slideBarcode"));
+    }
+    if (n.get("arrayCoordinateName") != null && !n.getString("arrayCoordinateName").equals("")) {
+      hybInfo.setArrayCoordinateName(n.getString("arrayCoordinateName"));
+    }
+
+    if (n.get("idHybProtocol") != null && !n.getString("idHybProtocol").equals("")) {
+      hybInfo.setIdHybProtocol(new Integer(n.getString("idHybProtocol")));
+    }
+    if (n.get("idScanProtocol") != null && !n.getString("idScanProtocol").equals("")) {
+      hybInfo.setIdScanProtocol(new Integer(n.getString("idScanProtocol")));
+    }
+    if (n.get("idFeatureExtractionProtocol") != null && !n.getString("idFeatureExtractionProtocol").equals("")) {
+      hybInfo.setIdFeatureExtractionProtocol(new Integer(n.getString("idFeatureExtractionProtocol")));
+    }
+
+    // Extraction
+    if (n.get("extractionStatus") != null && !n.getString("extractionStatus").equals("")) {
+      String status = n.getString("extractionStatus");
+      if (status.equals(Constants.STATUS_COMPLETED)) {
+        hybInfo.setExtractionCompleted("Y");
+        hybInfo.setExtractionFailed("N");
+        hybInfo.setExtractionBypassed("N");
+      } else if (status.equals(Constants.STATUS_TERMINATED)) {
+        hybInfo.setExtractionCompleted("N");
+        hybInfo.setExtractionFailed("Y");
+        hybInfo.setExtractionBypassed("N");
+      } else if (status.equals(Constants.STATUS_BYPASSED)) {
+        hybInfo.setExtractionCompleted("N");
+        hybInfo.setExtractionFailed("N");
+        hybInfo.setExtractionBypassed("Y");
+      }
+    } else {
+      hybInfo.setExtractionCompleted("N");
+      hybInfo.setExtractionFailed("N");
+      hybInfo.setExtractionBypassed("N");
+    }
+
+    hybInfos.add(hybInfo);
+  }
+
   private void initializeHyb(Element n) {
 
     HybInfo hybInfo = new HybInfo();
@@ -1105,6 +2102,104 @@ public class RequestParser implements Serializable {
     }
 
     hybInfos.add(hybInfo);
+  }
+
+  private void initializeSequenceLane(JsonObject n) {
+
+    SequenceLaneInfo sequenceLaneInfo = new SequenceLaneInfo();
+
+    sequenceLaneInfo.setIdSequenceLane(n.get("idSequenceLane") != null ? n.getString("idSequenceLane") : null);
+
+    String idSampleString = n.get("idSample") != null ? n.getString("idSample") : null;
+    if (idSampleString != null && !idSampleString.equals("")) {
+      sequenceLaneInfo.setIdSampleString(idSampleString);
+      sequenceLaneInfo.setSample((Sample) sampleMap.get(idSampleString));
+    }
+
+    // We use the sample ID in the XML if this is an import
+    if (isImport) {
+      sequenceLaneInfo.setNumber(n.get("number") != null ? n.getString("number") : null);
+    }
+
+    if (n.get("idNumberSequencingCycles") != null && !n.getString("idNumberSequencingCycles").equals("")) {
+      sequenceLaneInfo.setIdNumberSequencingCycles(new Integer(n.getString("idNumberSequencingCycles")));
+    }
+
+    if (n.get("idNumberSequencingCyclesAllowed") != null && !n.getString("idNumberSequencingCyclesAllowed").equals("")) {
+      sequenceLaneInfo.setIdNumberSequencingCyclesAllowed(new Integer(n.getString("idNumberSequencingCyclesAllowed")));
+    }
+
+    if (n.get("idSeqRunType") != null && !n.getString("idSeqRunType").equals("")) {
+      sequenceLaneInfo.setIdSeqRunType(new Integer(n.getString("idSeqRunType")));
+    }
+
+    if (n.get("idGenomeBuildAlignTo") != null && !n.getString("idGenomeBuildAlignTo").equals("")) {
+      sequenceLaneInfo.setIdGenomeBuildAlignTo(new Integer(n.getString("idGenomeBuildAlignTo")));
+    }
+
+    if (n.get("flowCellChannelSampleConcentrationpM") != null && !n.getString("flowCellChannelSampleConcentrationpM").equals("")) {
+      sequenceLaneInfo.setFlowCellChannelSampleConcentrationpM(new BigDecimal(n.getString("flowCellChannelSampleConcentrationpM")));
+    }
+
+    //
+    // workflow fields
+    //
+    if (n.get("numberSequencingCyclesActual") != null && !n.getString("numberSequencingCyclesActual").equals("")) {
+      sequenceLaneInfo.setNumberSequencingCyclesActual(new Integer(n.getString("numberSequencingCyclesActual")));
+    }
+    if (n.get("clustersPerTile") != null && !n.getString("clustersPerTile").equals("")) {
+      sequenceLaneInfo.setClustersPerTile(new Integer(n.getString("clustersPerTile")));
+    }
+    if (n.get("fileName") != null && !n.getString("fileName").equals("")) {
+      sequenceLaneInfo.setFileName(n.getString("fileName"));
+    }
+
+    // first cycle status
+    if (n.get("firstCycleStatus") != null && !n.getString("firstCycleStatus").equals("")) {
+      String status = n.getString("firstCycleStatus");
+      if (status.equals(Constants.STATUS_COMPLETED)) {
+        sequenceLaneInfo.setSeqRunFirstCycleCompleted("Y");
+        sequenceLaneInfo.setSeqRunFirstCycleFailed("N");
+      } else if (status.equals(Constants.STATUS_TERMINATED)) {
+        sequenceLaneInfo.setSeqRunFirstCycleCompleted("N");
+        sequenceLaneInfo.setSeqRunFirstCycleFailed("Y");
+      }
+    } else {
+      sequenceLaneInfo.setSeqRunFirstCycleCompleted("N");
+      sequenceLaneInfo.setSeqRunFirstCycleFailed("N");
+    }
+
+    // last cycle status
+    if (n.get("lastCycleStatus") != null && !n.getString("lastCycleStatus").equals("")) {
+      String status = n.getString("lastCycleStatus");
+      if (status.equals(Constants.STATUS_COMPLETED)) {
+        sequenceLaneInfo.setSeqRunLastCycleCompleted("Y");
+        sequenceLaneInfo.setSeqRunLastCycleFailed("N");
+      } else if (status.equals(Constants.STATUS_TERMINATED)) {
+        sequenceLaneInfo.setSeqRunLastCycleCompleted("N");
+        sequenceLaneInfo.setSeqRunLastCycleFailed("Y");
+      }
+    } else {
+      sequenceLaneInfo.setSeqRunLastCycleCompleted("N");
+      sequenceLaneInfo.setSeqRunLastCycleFailed("N");
+    }
+
+    // pipeline status
+    if (n.get("pipelineStatus") != null && !n.getString("pipelineStatus").equals("")) {
+      String status = n.getString("pipelineStatus");
+      if (status.equals(Constants.STATUS_COMPLETED)) {
+        sequenceLaneInfo.setSeqRunPipelineCompleted("Y");
+        sequenceLaneInfo.setSeqRunPipelineFailed("N");
+      } else if (status.equals(Constants.STATUS_TERMINATED)) {
+        sequenceLaneInfo.setSeqRunPipelineCompleted("N");
+        sequenceLaneInfo.setSeqRunPipelineFailed("Y");
+      }
+    } else {
+      sequenceLaneInfo.setSeqRunPipelineCompleted("N");
+      sequenceLaneInfo.setSeqRunPipelineFailed("N");
+    }
+
+    sequenceLaneInfos.add(sequenceLaneInfo);
   }
 
   private void initializeSequenceLane(Element n) {
