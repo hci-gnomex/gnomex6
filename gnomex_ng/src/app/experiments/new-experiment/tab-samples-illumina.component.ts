@@ -23,9 +23,10 @@ import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
 import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
 import {Experiment} from "../../util/models/experiment.model";
 import {Sample} from "../../util/models/sample.model";
+import {AnnotationService} from "../../services/annotation.service";
 
 @Component({
-    selector: "tabSamplesView",
+    selector: "tab-samples-illumina",
     templateUrl: "./tab-samples-illumina.component.html",
     styles: [`
 
@@ -67,7 +68,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     private emToPxConversionRate: number = 16;
 
-    @Input('experiment') set experiment(value: Experiment) {
+    @Input('experiment') public set experiment(value: Experiment) {
         this._experiment = value;
 
         if (!this.onChange_numberOfSamplesSubscription) {
@@ -164,6 +165,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private samplesGridColumnDefs: any[];
 
     private _tabIndexToInsertAnnotations: number = 0;
+
+    private propertyList: any[] = [];
+
 
     private get defaultSampleColumnDefinitions(): any[] {
         let temp: any[] = [];
@@ -376,6 +380,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
 
     constructor(public constService: ConstantsService,
+                private annotationService: AnnotationService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
                 private fb: FormBuilder,
@@ -401,6 +406,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         );
 
         this.samplesGridColumnDefs = this.defaultSampleColumnDefinitions;
+
+        this.annotationService.getPropertyList().subscribe((result) => {
+            this.propertyList = result;
+        });
     }
 
     ngOnInit() {
@@ -490,7 +499,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         if (this._experiment) {
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
-                this.addColumnToColumnDef(temp, sampleAnnotation);
+                let fullProperty = this.propertyList.filter((value: any) => {
+                    return value.idProperty === sampleAnnotation.idProperty;
+                });
+
+                if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
+                    this.addColumnToColumnDef(temp, fullProperty[0]);
+                }
             }
         }
 
@@ -499,7 +514,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         for (let oldColumn of this.samplesGridColumnDefs) {
             let foundOldColumn: boolean = false;
             for (let newColumn of temp) {
-                if (newColumn.field && oldColumn.field && ('' + newColumn.field).localeCompare('' + oldColumn.field)) {
+                if (newColumn.field && oldColumn.field && ('' + newColumn.field).localeCompare('' + oldColumn.field) === 0) {
                     foundOldColumn = true;
                     break;
                 }
@@ -510,7 +525,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 // the old column was removed, remove the values from the samples.
                 for (let sample of this._experiment.samples) {
                     // Delete is important here, as it actually removes the attribute in question.
-                    delete sample[oldColumn.field];
+                    if (oldColumn.field && ('' + oldColumn.field).startsWith(TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX)) {
+                        delete sample[oldColumn.field];
+                    } else {
+                        sample[oldColumn.field] = '';
+                    }
                 }
             }
         }
@@ -754,6 +773,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.samplesGridApi = event.api;
         this.gridColumnApi = event.columnApi;
         event.api.setHeaderHeight(50);
+
+        this.samplesGridApi.setColumnDefs(this.samplesGridColumnDefs);
+        this.samplesGridApi.setRowData(this._experiment.samples);
+        this.samplesGridApi.sizeColumnsToFit();
     }
 
     public onGridSizeChanged(event: any) {
@@ -818,7 +841,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.showInstructions = !this.showInstructions;
     }
 
-    private addColumnToColumnDef(columnDefs: any[], annot: any) {
+    private addColumnToColumnDef(columnDefs: any[], annot: any): void {
+        if (!annot || !annot.idProperty) {
+            return;
+        }
+
         let column: any;
         switch(annot.codePropertyType) {
             case annotType.CHECK :
@@ -830,12 +857,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
             case annotType.OPTION :
                 column = this.createOptionColumn(annot);
                 break;
-            case annotType.TEXT :
-                column = this.createTextColumn(annot);
-                break;
             case annotType.URL :
                 column = this.createUrlColumn(annot);
                 break;
+            case annotType.TEXT :
+                column = this.createTextColumn(annot);
+                break;
+            default:
+                column = this.createTextColumn(annot);
         }
 
         if (!columnDefs || !Array.isArray(columnDefs)) {
