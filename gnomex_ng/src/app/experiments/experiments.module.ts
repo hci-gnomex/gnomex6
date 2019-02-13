@@ -77,7 +77,7 @@ import {TabVisibilityComponent} from "./new-experiment/tab-visibility.component"
 import {CollaboratorsDialogComponent} from "./experiment-detail/collaborators-dialog.component";
 import {ExperimentOverviewTabComponent} from "./experiment-detail/experiment-overview-tab.component";
 import {ExperimentDetailOverviewComponent} from "./experiment-detail/experiment-detail-overview.component";
-import {DescriptionTab} from "./experiment-detail/description-tab.component";
+import {DescriptionTabComponent} from "./experiment-detail/description-tab.component";
 import {ExperimentFilesTabComponent} from "./experiment-detail/experiment-files-tab.component";
 import {MaterialsMethodsTabComponent} from "./experiment-detail/materials-methods-tab.component";
 import {ProtocolDialogComponent} from "./experiment-detail/protocol-dialog.component";
@@ -171,7 +171,7 @@ import {ManageFilesModule} from "../util/upload/manage-files.module";
         ExperimentBioinformaticsTabComponent,
         ExperimentOverviewTabComponent,
         ExperimentDetailOverviewComponent,
-        DescriptionTab,
+        DescriptionTabComponent,
         ExperimentFilesTabComponent,
         MaterialsMethodsTabComponent,
         ProtocolDialogComponent,
