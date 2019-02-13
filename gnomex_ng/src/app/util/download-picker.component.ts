@@ -1,6 +1,7 @@
 import {Component, Inject, OnInit} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {PropertyService} from "../services/property.service";
+import {FileService} from "../services/file.service";
 
 @Component({
     template: `
@@ -29,9 +30,6 @@ export class DownloadPickerComponent implements OnInit {
 
     public static readonly DOWNLOAD_NORMAL: string = "normal";
     public static readonly DOWNLOAD_FDT: string = "fdt";
-    private static readonly SIZE_GB: number = Math.pow(2, 30);
-    private static readonly SIZE_MB: number = Math.pow(2, 20);
-    private static readonly SIZE_KB: number = Math.pow(2, 10);
 
     public isFDTSupported: boolean = false;
     private estimatedDownloadSize: string = "";
@@ -48,10 +46,10 @@ export class DownloadPickerComponent implements OnInit {
             let sizesAreDifferent: boolean = this.data.estimatedDownloadSize !== this.data.uncompressedDownloadSize;
 
             if (this.data.estimatedDownloadSize) {
-                this.estimatedDownloadSize = DownloadPickerComponent.formatFileSize(parseInt(this.data.estimatedDownloadSize));
+                this.estimatedDownloadSize = FileService.formatFileSize(parseInt(this.data.estimatedDownloadSize));
             }
             if (sizesAreDifferent && this.data.uncompressedDownloadSize) {
-                this.uncompressedDownloadSize = DownloadPickerComponent.formatFileSize(parseInt(this.data.uncompressedDownloadSize));
+                this.uncompressedDownloadSize = FileService.formatFileSize(parseInt(this.data.uncompressedDownloadSize));
             }
 
             this.downloadSizeLabel = this.estimatedDownloadSize;
@@ -69,35 +67,6 @@ export class DownloadPickerComponent implements OnInit {
 
     public selectFDTDownload(): void {
         this.dialogRef.close(DownloadPickerComponent.DOWNLOAD_FDT);
-    }
-
-    public static formatFileSize(size: number): string {
-        let sizeFormatted: number;
-        if (size > DownloadPickerComponent.SIZE_GB) {
-            sizeFormatted = Math.round((size / DownloadPickerComponent.SIZE_GB) * 10) / 10;
-            if (sizeFormatted === 0) {
-                sizeFormatted = 1;
-            }
-            return "" + sizeFormatted + " GB"
-        } else if (size > DownloadPickerComponent.SIZE_MB) {
-            sizeFormatted = Math.round(size / DownloadPickerComponent.SIZE_MB);
-            if (sizeFormatted === 0) {
-                sizeFormatted = 1;
-            }
-            return "" + sizeFormatted + " MB";
-        } else if (size > DownloadPickerComponent.SIZE_KB) {
-            sizeFormatted = Math.round(size / DownloadPickerComponent.SIZE_KB);
-            if (sizeFormatted === 0) {
-                sizeFormatted = 1;
-            }
-            return "" + sizeFormatted + " KB";
-        } else {
-            sizeFormatted = Math.round(size);
-            if (sizeFormatted === 0) {
-                sizeFormatted = 1;
-            }
-            return "" + sizeFormatted + " bytes";
-        }
     }
 
 }
