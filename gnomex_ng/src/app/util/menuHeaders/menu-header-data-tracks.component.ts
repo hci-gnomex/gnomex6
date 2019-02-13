@@ -287,6 +287,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                                     suggestedFilename: "gnomex-datatracks",
                                     fileType: ".zip"
                                 };
+                                progressWindowConfig.disableClose = true;
                                 this.dialog.open(DownloadProgressComponent, progressWindowConfig);
                             } else if (choice === DownloadPickerComponent.DOWNLOAD_FDT) {
                                 let url: string = this.document.location.href;

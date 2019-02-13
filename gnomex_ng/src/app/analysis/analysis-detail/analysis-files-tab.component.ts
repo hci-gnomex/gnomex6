@@ -12,6 +12,7 @@ import {MatDialog, MatDialogConfig} from "@angular/material";
 import {FormGroup} from "@angular/forms";
 import {FileService} from "../../services/file.service";
 import {Subscription} from "rxjs";
+import {DownloadFilesComponent} from "../../util/download-files.component";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -269,7 +270,18 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleDownloadFiles(): void {
-        // TODO Download Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            showCreateSoftLinks: false,
+            downloadListSource: this.getAnalysisDownloadListResult.Analysis,
+            cacheDownloadListFn: this.fileService.cacheAnalysisFileDownloadList,
+            fdtDownloadFn: this.fileService.getFDTDownloadAnalysisServlet,
+            downloadURL: "DownloadAnalysisFileServlet.gx",
+            suggestedFilename: "gnomex-analysis",
+        };
+        config.disableClose = true;
+        this.dialog.open(DownloadFilesComponent, config);
     }
 
     ngOnDestroy() {
