@@ -87,6 +87,7 @@ import {RelatedDataModule} from "../util/related-data.module";
 import {RichEditorModule} from "../../modules/rich-editor.module";
 import {ManageFilesModule} from "../util/upload/manage-files.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {ExperimentBillingTabComponent} from "./experiment-detail/experiment-billing-tab.component";
 
 @NgModule({
     imports: [
@@ -177,7 +178,8 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         ExperimentFilesTabComponent,
         MaterialsMethodsTabComponent,
         ProtocolDialogComponent,
-        ExperimentSequenceLanesTab
+        ExperimentSequenceLanesTab,
+        ExperimentBillingTabComponent
     ],
     entryComponents: [
         CreateProjectComponent,

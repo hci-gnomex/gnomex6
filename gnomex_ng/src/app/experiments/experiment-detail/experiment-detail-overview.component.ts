@@ -62,7 +62,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public experiment: any;
 
     public _experiment: Experiment;
-    types = OrderType;
 
     public showMaterialsMethodsTab: boolean = false;
     public showBioinformaticsTab: boolean = false;
@@ -75,7 +74,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public nodeTitle: string = "";
     public showBillingTab: boolean = false;
 	
-    types = OrderType;
+    public types = OrderType;
     
     private overviewListSubscription: Subscription;
     private requestCategory: any;
