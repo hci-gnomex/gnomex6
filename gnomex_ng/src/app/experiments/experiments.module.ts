@@ -86,6 +86,7 @@ import {ManageFilesDialogComponent} from "../util/upload/manage-files-dialog.com
 import {RelatedDataModule} from "../util/related-data.module";
 import {RichEditorModule} from "../../modules/rich-editor.module";
 import {ManageFilesModule} from "../util/upload/manage-files.module";
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 @NgModule({
     imports: [
@@ -139,7 +140,8 @@ import {ManageFilesModule} from "../util/upload/manage-files.module";
             UrlAnnotRenderer,
             CheckboxRenderer,
         ]),
-        UploadModule
+        UploadModule,
+        AngularEditorModule
     ],
     declarations: [
         BrowseExperimentsComponent,
