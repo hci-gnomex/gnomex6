@@ -78,6 +78,7 @@ export class ConstantsService {
     public readonly ICON_LINK: string = "assets/icon_link.gif";
     public readonly ICON_DELETE_LINK: string = "assets/link_delete.png";
     public readonly ICON_DOWNLOAD: string = "assets/download.png";
+    public readonly ICON_DOWNLOAD_LARGE: string = "assets/download_large.png";
 
     public readonly ICON_ANALYSIS:string = "assets/map.png";
     public readonly ICON_TOPIC:string = "assets/topic_tag.png";

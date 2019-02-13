@@ -1,105 +1,67 @@
 package hci.gnomex.utility;
 
-
 import hci.framework.model.DetailObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jdom.Document;
-import org.jdom.Element;
-
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 public class AnalysisFileDescriptorParser extends DetailObject implements Serializable {
 
-  protected Document   doc;
-  protected Map        fileDescriptorMap = new HashMap();
+    private JsonArray array;
+    private Map<String, List<FileDescriptor>> fileDescriptorMap = new HashMap<>();
 
-  public AnalysisFileDescriptorParser(Document doc) {
-    this.doc = doc;
-
-  }
-
-  public void parse() throws Exception{
-
-    Element root = this.doc.getRootElement();
-
-    for(Iterator i = root.getChildren("FileDescriptor").iterator(); i.hasNext();) {
-      Element node = (Element)i.next();      
-      String analysisNumber = node.getAttributeValue("number");
-      FileDescriptor fd = initializeFileDescriptor(node);
-
-      List fileDescriptors = (List)fileDescriptorMap.get(analysisNumber);
-      if (fileDescriptors == null) {
-        fileDescriptors = new ArrayList();
-        fileDescriptorMap.put(analysisNumber, fileDescriptors);
-      }
-
-      fileDescriptors.add(fd);
-      getChildrenFileDescriptors(node, fd);
-
+    public AnalysisFileDescriptorParser(JsonArray array) {
+        this.array = array;
     }
 
-  }
+    public void parse() throws Exception {
+        for (int i = 0; i < this.array.size(); i++) {
+            JsonObject node = this.array.getJsonObject(i);
+            String analysisNumber = node.getString("number");
 
-  private void getChildrenFileDescriptors(Element parentNode, FileDescriptor parentFileDescriptor) {
+            FileDescriptor fd = this.initializeFileDescriptor(node);
 
-    if (parentNode.getChildren("children") != null && parentNode.getChildren("children").size() > 0) {
-      for(Iterator i = parentNode.getChild("children").getChildren("FileDescriptor").iterator(); i.hasNext();) {
-        Element node = (Element)i.next();      
-        String analysisNumber = node.getAttributeValue("number");
-        FileDescriptor fd = initializeFileDescriptor(node);
-
-        List fileDescriptors = (List)fileDescriptorMap.get(analysisNumber);
-        if (fileDescriptors == null) {
-          fileDescriptors = new ArrayList();
-          fileDescriptorMap.put(analysisNumber, fileDescriptors);
+            List<FileDescriptor> fileDescriptors = this.fileDescriptorMap.get(analysisNumber);
+            if (fileDescriptors == null) {
+                fileDescriptors = new ArrayList<>();
+                fileDescriptorMap.put(analysisNumber, fileDescriptors);
+            }
+            fileDescriptors.add(fd);
         }
-
-        fileDescriptors.add(fd);
-
-        getChildrenFileDescriptors(node, fd);
-
-      }
-
     }
-  }
 
+    private FileDescriptor initializeFileDescriptor(JsonObject n) {
+        FileDescriptor fd = new FileDescriptor();
 
-  protected FileDescriptor initializeFileDescriptor(Element n){
-    FileDescriptor fd = new FileDescriptor();
+        String idAnalysis = Util.getJsonStringSafe(n, "idAnalysis");
+        fd.setId(idAnalysis != null && !idAnalysis.equals("") ? Integer.valueOf(idAnalysis) : null);
+        fd.setFileName(n.getString("fileName"));
+        fd.setQualifiedFilePath(n.getString("qualifiedFilePath"));
+        fd.setBaseFilePath(n.getString("baseFilePath"));
+        fd.setZipEntryName(n.getString("zipEntryName"));
+        fd.setType(n.getString("type"));
+        if (n.getString("fileSize").length() > 0) {
+            long fileSize = Long.parseLong(n.getString("fileSize"));
+            fd.setFileSize(fileSize);
+        }
+        fd.setNumber(n.getString("number"));
 
-    fd.setId(n.getAttributeValue("idAnalysis") != null && !n.getAttributeValue("idAnalysis").equals("") ? Integer.valueOf(n.getAttributeValue("idAnalysis")) : null);
-    fd.setFileName(n.getAttributeValue("fileName"));
-    fd.setQualifiedFilePath(n.getAttributeValue("qualifiedFilePath"));
-    fd.setBaseFilePath(n.getAttributeValue("baseFilePath"));
-    fd.setZipEntryName(n.getAttributeValue("zipEntryName"));
-    fd.setType(n.getAttributeValue("type"));
-    if(n.getAttributeValue("fileSize").length() > 0) {
-      long fileSize = Long.parseLong(n.getAttributeValue("fileSize"));
-      fd.setFileSize(fileSize);    	
+        return fd;
     }
-    fd.setNumber(n.getAttributeValue("number"));
 
-    return fd;
+    public Set<String> getAnalysisNumbers() {
+        return fileDescriptorMap.keySet();
+    }
 
-  }
-
-
-  public Set getAnalysisNumbers() {
-    return fileDescriptorMap.keySet();
-  }
-
-
-  public List getFileDescriptors(String analysisNumber) {
-    return (List)fileDescriptorMap.get(analysisNumber);
-  }
-
-
+    public List<FileDescriptor> getFileDescriptors(String analysisNumber) {
+        return fileDescriptorMap.get(analysisNumber);
+    }
 
 }
