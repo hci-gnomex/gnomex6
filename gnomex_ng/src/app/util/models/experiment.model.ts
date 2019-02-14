@@ -351,7 +351,7 @@ export class Experiment {
             this.onChange_organism.next(value);
         }
     }
-    public onChange_organism: Subject<any> = new Subject<any>();
+    public onChange_organism: BehaviorSubject<any> = new BehaviorSubject<any>(this.organism);
 
     private _sequencingOption: any;
     public get sequencingOption(): any {

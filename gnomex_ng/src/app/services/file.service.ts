@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {Inject, Injectable} from "@angular/core";
 import {forkJoin, Observable, of, throwError} from "rxjs";
 import {Subject} from "rxjs";
 import {URLSearchParams} from "@angular/http";
@@ -7,6 +7,7 @@ import {CookieUtilService} from "./cookie-util.service";
 import {catchError, flatMap, map, mergeMap} from "rxjs/operators";
 import {ExperimentsService} from "../experiments/experiments.service";
 import {AnalysisService} from "./analysis.service";
+import {DOCUMENT} from "@angular/common";
 
 @Injectable()
 export class FileService {
@@ -14,11 +15,47 @@ export class FileService {
     private organizeFilesSubject: Subject<any> = new Subject();
     private updateFileTabSubject : Subject<any> = new Subject();
 
+    public static readonly SIZE_GB: number = Math.pow(2, 30);
+    public static readonly SIZE_MB: number = Math.pow(2, 20);
+    public static readonly SIZE_KB: number = Math.pow(2, 10);
+
 
     constructor(private httpClient:HttpClient,
                 private experimentService: ExperimentsService,
                 private analysisService: AnalysisService,
-                private cookieUtilService:CookieUtilService ) {
+                private cookieUtilService:CookieUtilService,
+                @Inject(DOCUMENT) private document: Document) {
+    }
+
+    public static formatFileSize(size: number): string {
+        let sizeFormatted: number;
+        if (size > FileService.SIZE_GB) {
+            sizeFormatted = Math.round((size / FileService.SIZE_GB) * 10) / 10;
+            if (sizeFormatted === 0) {
+                sizeFormatted = 1;
+            }
+            return "" + sizeFormatted + " GB"
+        } else if (size > FileService.SIZE_MB) {
+            sizeFormatted = Math.round(size / FileService.SIZE_MB);
+            if (sizeFormatted === 0) {
+                sizeFormatted = 1;
+            }
+            return "" + sizeFormatted + " MB";
+        } else if (size > FileService.SIZE_KB) {
+            sizeFormatted = Math.round(size / FileService.SIZE_KB);
+            if (sizeFormatted === 0) {
+                sizeFormatted = 1;
+            }
+            return "" + sizeFormatted + " KB";
+        } else if (size === 0) {
+            return "0 bytes";
+        } else {
+            sizeFormatted = Math.round(size);
+            if (sizeFormatted === 0) {
+                sizeFormatted = 1;
+            }
+            return "" + sizeFormatted + " bytes";
+        }
     }
 
 
@@ -113,6 +150,37 @@ export class FileService {
             })
         );
     }
+
+    public cacheAnalysisFileDownloadList: (files: any[]) => Observable<any> = (files: any[]) => {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        let params: HttpParams = new HttpParams()
+            .set("fileDescriptorJSONString", JSON.stringify(files))
+            .set("noJSONToXMLConversionNeeded", "Y");
+        return this.httpClient.post("/gnomex/CacheAnalysisFileDownloadList.gx", params.toString(), {headers: headers});
+    };
+
+    public getFDTDownloadAnalysisServlet: (emailAddress: string, showCommandLineInstructions: boolean) => Observable<any>
+        = (emailAddress: string, showCommandLineInstructions: boolean) => {
+
+        // This does not work on localhost since the back-end is hard-coded for a linux environment
+        // This workaround hopefully works but it cannot be tested until release
+        /*
+        let params: HttpParams = new HttpParams()
+            .set("emailAddress", emailAddress)
+            .set("showCommandLineInstructions", showCommandLineInstructions ? "Y" : "N");
+        return this.httpClient.get("/gnomex/FastDataTransferDownloadAnalysisServlet.gx", {params: params});
+        */
+
+        let url: string = this.document.location.href;
+        url = url.substring(0, url.indexOf("/gnomex") + 7);
+        url += "/FastDataTransferDownloadAnalysisServlet.gx";
+        url += "?emailAddress=" + emailAddress;
+        url += "&showCommandLineInstructions=" + (showCommandLineInstructions ? "Y" : "N");
+        window.open(url, "_blank");
+
+        return of({result: "SUCCESS"});
+    };
 
     private handleError(errorResponse: HttpErrorResponse){
         if(errorResponse.error instanceof ErrorEvent){

@@ -16,20 +16,23 @@
             <mat-tab label="Overview">
                 <experiment-overview-tab [experiment]="experiment"></experiment-overview-tab>
             </mat-tab>
-            <mat-tab label="Other Details">
-                <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.EXPERIMENT"> </annotation-tab>
-            </mat-tab>
-            <mat-tab label="Related Data" *ngIf="showRelatedDataTab">
-                <related-data-tab [relatedObjects]="relatedObjects" ></related-data-tab>
-            </mat-tab>
-            <mat-tab label="Visibility" >
-                 <visibility-detail-tab> </visibility-detail-tab>
-            </mat-tab>
             <mat-tab label="Description">
                 <description-tab [editMode]="isEditMode" ></description-tab>
             </mat-tab>
             <mat-tab label="Materials & Methods" *ngIf="showMaterialsMethodsTab">
                 <materials-methods-tab></materials-methods-tab>
+            </mat-tab>
+            <mat-tab label="Related Data" *ngIf="showRelatedDataTab">
+                <related-data-tab [relatedObjects]="relatedObjects" ></related-data-tab>
+            </mat-tab>
+            <mat-tab label="Other Details" *ngIf="annotations && annotations.length > 0">
+                <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.EXPERIMENT"> </annotation-tab>
+            </mat-tab>
+            <mat-tab label="Experiment Design">
+                 <tab-samples-illumina #tabSamplesIlluminaComponent [experiment]="_experiment"></tab-samples-illumina>
+            </mat-tab>
+            <mat-tab label="Visibility" >
+                 <visibility-detail-tab></visibility-detail-tab>
             </mat-tab>
             <mat-tab *ngIf="showSequenceLanesTab" label="Sequence Lanes">
                 <experiment-sequence-lanes-tab></experiment-sequence-lanes-tab>

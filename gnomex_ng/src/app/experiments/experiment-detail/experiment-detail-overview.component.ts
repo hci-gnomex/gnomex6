@@ -10,10 +10,13 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {Subscription} from "rxjs";
 import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
-import {ConstantsService} from "../../services/constants.service";
-import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
 
+import {Experiment} from "../../util/models/experiment.model";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {PropertyService} from "../../services/property.service";
+import {TabSamplesIlluminaComponent} from "../new-experiment/tab-samples-illumina.component";
+import {ConstantsService} from "../../services/constants.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Component({
     templateUrl: "./experiment-detail-overview.component.html",
@@ -57,7 +60,9 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public annotations: any = [];
     public experiment: any;
-    
+
+    public _experiment: Experiment;
+
     public showMaterialsMethodsTab: boolean = false;
     public showBioinformaticsTab: boolean = false;
     public showSequenceLanesTab: boolean = false;
@@ -69,16 +74,20 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public nodeTitle: string = "";
     public showBillingTab: boolean = false;
 	
-    types = OrderType;
+    public types = OrderType;
     
     private overviewListSubscription: Subscription;
     private requestCategory: any;
 
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
-    constructor(private dictionaryService: DictionaryService,
+    @ViewChild('tabSamplesIlluminaComponent') private tabSamplesIlluminaComponent: TabSamplesIlluminaComponent;
+
+    constructor(private securityAdvisor: CreateSecurityAdvisorService,
+                private dictionaryService: DictionaryService,
                 private experimentService: ExperimentsService,
                 private gnomexService: GnomexService,
+                private propertyService: PropertyService,
                 public constService: ConstantsService,
                 private secAdvisor: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
@@ -98,7 +107,14 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             this.showBillingTab = false;
 
             if (data && data.experiment && data.experiment.Request) {
-                this.experiment = data.experiment.Request;
+                this.experiment  = data.experiment.Request;
+                this._experiment = Experiment.createExperimentObjectFromAny(
+                    this.dictionaryService,
+                    this.gnomexService,
+                    this.propertyService,
+                    this.securityAdvisor,
+                    this.experiment
+                );
             }
 
             if (this.experiment) {
@@ -190,6 +206,10 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     tabChanged(event: MatTabChangeEvent) {
         if (event.tab.textLabel === "Sequence Lanes" && this.sequenceLanesTab) {
             this.sequenceLanesTab.prepareView();
+        }
+        if (event.tab.textLabel === "Experiment Design") {
+            console.log('onSelectExperimentDesign');
+            this.tabSamplesIlluminaComponent.tabDisplayed();
         }
     }
 

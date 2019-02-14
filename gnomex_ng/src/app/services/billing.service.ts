@@ -82,7 +82,7 @@ export class BillingService {
         this.cookieUtilService.formatXSRFCookie();
         let headers: Headers = new Headers();
         headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/CreateBillingItems.gx", params.toString(), { headers: headers });
+        return this.http.post("/gnomex/CreateBillingItems.gx", params, { headers: headers });
     }
 
     public getBillingItemList(params: HttpParams): Observable<any> {

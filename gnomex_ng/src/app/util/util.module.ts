@@ -38,6 +38,9 @@ import {ContextHelpPopupComponent} from "./context-help-popup.component";
 import {RichEditorModule} from "../../modules/rich-editor.module";
 import {DownloadPickerComponent} from "./download-picker.component";
 import {DownloadProgressComponent} from "./download-progress.component";
+import {DownloadFilesComponent} from "./download-files.component";
+import {AngularSplitModule} from "angular-split";
+import {TreeModule} from "angular-tree-component";
 
 @NgModule({
     imports: [
@@ -53,6 +56,8 @@ import {DownloadProgressComponent} from "./download-progress.component";
             CheckboxRenderer,
         ]),
         RichEditorModule,
+        AngularSplitModule,
+        TreeModule,
     ],
     declarations: [
         BillingUsageReportComponent,
@@ -83,6 +88,7 @@ import {DownloadProgressComponent} from "./download-progress.component";
         ContextHelpPopupComponent,
         DownloadPickerComponent,
         DownloadProgressComponent,
+        DownloadFilesComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -98,6 +104,7 @@ import {DownloadProgressComponent} from "./download-progress.component";
         ContextHelpPopupComponent,
         DownloadPickerComponent,
         DownloadProgressComponent,
+        DownloadFilesComponent,
     ],
     exports: [
         BrowseFilterComponent,
@@ -127,6 +134,7 @@ import {DownloadProgressComponent} from "./download-progress.component";
         ContextHelpPopupComponent,
         DownloadPickerComponent,
         DownloadProgressComponent,
+        DownloadFilesComponent,
     ]
 })
 export class UtilModule {
