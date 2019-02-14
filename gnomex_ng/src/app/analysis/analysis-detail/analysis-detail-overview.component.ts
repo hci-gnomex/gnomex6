@@ -148,7 +148,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
 
     }
     tabChanged(event:MatTabChangeEvent){
-       this.showExpAnalysisTab = event.tab.textLabel === "Experiment"
+        this.showExpAnalysisTab = event.tab.textLabel === "Experiment"
     }
 
     makeLinkToExperiment(){
@@ -241,12 +241,16 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
         });
         params = params.set("noJSONToXMLConversionNeeded", "Y");
 
-       this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp =>{
-            if(resp && resp.idAnalysis){
+        this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp =>{
+            if(resp){
+                if(resp.idAnalysis){
+                    this.gnomexService.navByNumber('A'+resp.idAnalysis);
+                    this.dialogsService.stopAllSpinnerDialogs();
+                }else if(resp.message){
+                    this.dialogsService.stopAllSpinnerDialogs();
+                    this.dialogsService.alert(resp.message);
 
-                this.gnomexService.navByNumber('A'+resp.idAnalysis);
-                this.dialogsService.stopAllSpinnerDialogs();
-                console.log(resp);
+                }
             }
         });
 
