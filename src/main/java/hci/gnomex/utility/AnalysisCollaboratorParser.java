@@ -7,36 +7,37 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 
 public class AnalysisCollaboratorParser extends DetailObject implements Serializable {
   
-  protected Document    doc;
+  protected JsonArray collaboratorList;
   protected HashMap     collaboratorUploadMap = new HashMap();
   protected HashMap     collaboratorUpdateMap = new HashMap();
   
-  public AnalysisCollaboratorParser(Document doc) {
-    this.doc = doc;
- 
+  public AnalysisCollaboratorParser(JsonArray collaboratorList) {
+    this.collaboratorList = collaboratorList;
   }
   
   public void parse(Session sess) throws Exception{
     
-    Element root = this.doc.getRootElement();
-    
-    
-    for(Iterator i = root.getChildren("AnalysisCollaborator").iterator(); i.hasNext();) {
-      Element node = (Element)i.next();
+    for(int i = 0; i < collaboratorList.size(); i++) {
+      JsonObject node = collaboratorList.getJsonObject(i);
       
-      String idAppUserString = node.getAttributeValue("idAppUser");
+      String idAppUserString = node.get("idAppUser") != null ? node.getString("idAppUser") : null;
       Integer idAppUser = Integer.valueOf(idAppUserString);
-      String canUploadData = node.getAttributeValue("canUploadData");
-      String canUpdate = node.getAttributeValue("canUpdate");
+      String canUploadData = node.get("canUploadData") != null ? node.getString("canUploadData") : null;
+      String canUpdate = node.get("canUpdate") != null ? node.getString("canUpdate") : null;
 
-      collaboratorUploadMap.put(idAppUser, canUploadData);
-      collaboratorUpdateMap.put(idAppUser, canUpdate);
+      if(idAppUser != null && canUploadData != null){
+        collaboratorUploadMap.put(idAppUser, canUploadData);
+      }
+      if(idAppUser != null  && canUpdate != null){
+        collaboratorUpdateMap.put(idAppUser, canUpdate);
+      }
+
     }
   }
 

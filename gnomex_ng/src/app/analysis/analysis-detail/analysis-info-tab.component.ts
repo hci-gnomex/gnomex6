@@ -22,7 +22,7 @@ import {AnalysisService} from "../../services/analysis.service";
         <form [formGroup]="this.form" class="padded flex-container-row-children">
             <div class="form-row-children">
                 <mat-form-field>
-                    <input matInput placeholder="Lab Group" [formControlName]="'lab'">
+                    <input matInput placeholder="Lab Group" [formControlName]="'labName'">
                 </mat-form-field>
                 <span></span>
                 <mat-form-field>
@@ -38,7 +38,7 @@ import {AnalysisService} from "../../services/analysis.service";
                 </mat-form-field>
                 <span></span>
                 <mat-form-field>
-                    <input matInput placeholder="Submitter" [formControlName]="'submitter'">
+                    <input matInput placeholder="Submitter" [formControlName]="'submitterName'">
                 </mat-form-field>
             </div>
             <div class="form-row-children">
@@ -132,7 +132,7 @@ import {AnalysisService} from "../../services/analysis.service";
                     </mat-form-field>
                     <div>
                         <ul>Analysis Group(s)
-                            <li *ngFor="let analysisGroup of this.form.controls['analysisGroups'].value">{{analysisGroup.name}}</li>
+                            <li *ngFor="let analysisGroup of this.form.controls['analysisGroupsJSONString'].value">{{analysisGroup.name}}</li>
                         </ul>
                     </div>
                 </div>
@@ -207,15 +207,15 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
                 private analysisService: AnalysisService,
                 public propertyService: PropertyService){
         this.form = this.formBuilder.group({
-            lab: "",
+            labName: "",
             name: ["", Validators.required],
             idAnalysisType: "",
             idAnalysisProtocol: "",
             idOrganism: ["", Validators.required],
             genomeBuildsJSONString: [],
-            analysisGroups: [],
+            analysisGroupsJSONString: [],
             idAppUser: ["", Validators.required],
-            submitter: "",
+            submitterName: "",
             submitDate: "",
             codeVisibility: ["", Validators.required],
             idInstitution: "",
@@ -242,7 +242,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
             }
             this.protocolList = protocols;
         });
-        this.protocolService.getProtocolList();
+        this.protocolService.getProtocolList(new HttpParams().set("protocolClassName",ProtocolService.ANALYSIS_PROTOCOL_CLASS_NAME));
         let visList: any[] = [];
         for (let vis of this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILITY)) {
             let visOption: any = {
@@ -267,10 +267,10 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         this.visibilityList = visList;
         this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
 
-        this.form.controls['lab'].disable();
-        this.form.controls['submitter'].disable();
+        this.form.controls['labName'].disable();
+        this.form.controls['submitterName'].disable();
         this.form.controls['submitDate'].disable();
-        this.form.controls['analysisGroups'].disable();
+        this.form.controls['analysisGroupsJSONString'].disable();
         this.form.controls['privacyExpirationDate'].disable();
 
         this.form.controls['idOrganism'].valueChanges.subscribe(() => {
@@ -287,15 +287,15 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         this.route.data.forEach((data: any) => {
             this.analysis = data.analysis.Analysis;
 
-            this.form.controls['lab'].setValue(this.analysis.labName);
+            this.form.controls['labName'].setValue(this.analysis.labName);
             this.form.controls['name'].setValue(this.analysis.name);
             this.form.controls['idAnalysisType'].setValue(this.analysis.idAnalysisType);
             this.form.controls['idAnalysisProtocol'].setValue(this.analysis.idAnalysisProtocol);
             this.form.controls['idOrganism'].setValue(this.analysis.idOrganism);
             this.form.controls['genomeBuildsJSONString'].setValue(Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]);
-            this.form.controls['analysisGroups'].setValue(Array.isArray(this.analysis.analysisGroups) ? this.analysis.analysisGroups : [this.analysis.analysisGroups.AnalysisGroup]);
+            this.form.controls['analysisGroupsJSONString'].setValue(Array.isArray(this.analysis.analysisGroups) ? this.analysis.analysisGroups : [this.analysis.analysisGroups.AnalysisGroup]);
             this.form.controls['idAppUser'].setValue(this.analysis.idAppUser);
-            this.form.controls['submitter'].setValue(this.analysis.submitterName);
+            this.form.controls['submitterName'].setValue(this.analysis.submitterName);
             this.form.controls['submitDate'].setValue(this.analysis.createDate);
             this.form.controls['codeVisibility'].setValue(this.analysis.codeVisibility);
             this.form.controls['idInstitution'].setValue(this.analysis.idInstitution ? this.analysis.idInstitution : "");

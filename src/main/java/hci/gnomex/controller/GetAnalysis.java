@@ -14,7 +14,6 @@ import hci.gnomex.utility.HybNumberComparator;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.SampleComparator;
 import hci.gnomex.utility.SequenceLaneNumberComparator;
-import hci.gnomex.utility.Util;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -28,7 +27,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -154,9 +152,18 @@ public Command execute() throws RollBackCommandException {
 				Request r = sess.load(Request.class, aei.getIdRequest());
 
 				if (r.getArchived() == null || !r.getArchived().equals("Y")) {
-					experimentItems.addContent(aei.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement());
+					Element aeiXML = aei.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement();
+					Util.preserveXMLNodeName(aeiXML);
+					experimentItems.addContent(aeiXML);
 				}
 			}
+
+
+			//Adding xml node name as an attribute to
+
+
+
+
 
 			aNode.addContent(experimentItems);
 
@@ -208,6 +215,7 @@ public Command execute() throws RollBackCommandException {
 
 			// Add properties
 			Element pNode = getProperties(dh, a);
+
 			aNode.addContent(pNode);
 
 			doc.getRootElement().addContent(aNode);
@@ -393,6 +401,7 @@ private Element getProperties(DictionaryHelper dh, Analysis analysis) {
 		propNode.setAttribute("isRequired", property.getIsRequired());
 
 		Property.appendEntryContentXML(property, ap, propNode);
+		//Util.preserveXMLNodeName(propNode);
 	}
 	return propertiesNode;
 }

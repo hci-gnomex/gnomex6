@@ -5,40 +5,41 @@ import hci.framework.model.DetailObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 
 public class AnalysisHybParser extends DetailObject implements Serializable {
   
-  protected Document    doc;
+  protected JsonArray    hybsList;
   protected List        idHybridizationList = new ArrayList();
   protected HashMap     idRequestMap = new HashMap();
   
-  public AnalysisHybParser(Document doc) {
-    this.doc = doc;
+  public AnalysisHybParser(JsonArray hybsList) {
+    this.hybsList = hybsList;
  
   }
   
   public void parse(Session sess) throws Exception{
     
-    Element root = this.doc.getRootElement();
+    JsonArray root = this.hybsList;
     
     
-    for(Iterator i = root.getChildren("Hybridization").iterator(); i.hasNext();) {
-      Element node = (Element)i.next();
+    for(int i = 0; i < root.size(); i++ ) {
+      JsonObject node = root.getJsonObject(i);
       
-      String idHybridizationString = node.getAttributeValue("idHybridization");
+      String idHybridizationString = node.get("idHybridization") != null ? node.getString("idHybridization") : null;
       Integer idHybridization = new Integer(idHybridizationString);
       
-      String idRequestString = node.getAttributeValue("idRequest");
-      
-      idHybridizationList.add(idHybridization);
-      idRequestMap.put(idHybridization, new Integer(idRequestString));
+      String idRequestString = node.get("idRequest") != null ? node.getString("idRequest") : null;
+      Integer idRequest =  new Integer(idRequestString);
+      if(idHybridization != null && idRequest != null){
+        idHybridizationList.add(idHybridization);
+        idRequestMap.put(idHybridization,idRequest);
+      }
     }
   }
 
