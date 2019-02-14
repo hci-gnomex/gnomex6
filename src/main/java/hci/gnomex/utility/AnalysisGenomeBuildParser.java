@@ -8,29 +8,27 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 
 public class AnalysisGenomeBuildParser extends DetailObject implements Serializable {
   
-  protected Document    doc;
+  protected JsonArray gbArray;
   protected List        idGenomeBuildList = new ArrayList();
   
-  public AnalysisGenomeBuildParser(Document doc) {
-    this.doc = doc;
+  public AnalysisGenomeBuildParser(JsonArray gbArray) {
+    this.gbArray = gbArray;
  
   }
   
   public void parse(Session sess) throws Exception{
-    
-    Element root = this.doc.getRootElement();
-    
-    
-    for(Iterator i = root.getChildren("GenomeBuild").iterator(); i.hasNext();) {
-      Element node = (Element)i.next();
+
+    for(int i = 0; i < gbArray.size(); i++) {
+      JsonObject node = gbArray.getJsonObject(i);
       
-      String idGenomeBuildString = node.getAttributeValue("idGenomeBuild");
+      String idGenomeBuildString = node.get("idGenomeBuild") != null ? node.getString("idGenomeBuild") : null;
       Integer idGenomeBuild = Integer.valueOf(idGenomeBuildString);
 
 //      System.out.println ("[parse AnalysisGenomeBuildParser] idGenomeBuild: " + idGenomeBuild);

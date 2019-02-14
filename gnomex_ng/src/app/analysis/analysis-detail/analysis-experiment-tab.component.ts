@@ -31,7 +31,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
         mat-radio-button.filterOption{
             margin: 0 5px
         }
-        
+
         .flex-column-container {
             display: flex;
             flex-direction: column;
@@ -43,14 +43,14 @@ import {FormBuilder, FormGroup} from "@angular/forms";
             display: flex;
             flex-direction: row;
         }
-        
+
         .br-exp-item {
             flex: 1 1 auto;
             font-size: small;
         }
-        
 
-       
+
+
         .datatracks-panel {
             height:100%;
             width:100%;
@@ -62,8 +62,8 @@ import {FormBuilder, FormGroup} from "@angular/forms";
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
-        
+
+
     `]
 })
 export class AnalysisExperimentTabComponent implements OnInit{
@@ -93,10 +93,13 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
     @Input() set tabVisible(val:boolean){
         this._tabVisible = val;
-     }
-     get tabVisible():boolean{
+        if(val && this.currentLab){
+            this.selectLab(this.currentLab);
+        }
+    }
+    get tabVisible():boolean{
         return this._tabVisible;
-     }
+    }
 
 
 
@@ -166,10 +169,6 @@ export class AnalysisExperimentTabComponent implements OnInit{
                 width: 400
             }
         ];
-
-
-
-
 
 
     seqLaneColDefs:any[] =
@@ -324,17 +323,13 @@ export class AnalysisExperimentTabComponent implements OnInit{
                 });
                 if(lab && lab.length === 1){
                     this.currentLab =  lab[0];
-                    this.selectLab(this.currentLab);
-
+                    if(this.tabVisible){
+                        this.selectLab(this.currentLab);
+                    }
                 }
-
             }
         });
-
-
     }
-
-
 
     // lab combo methods
     compareByID(itemOne, itemTwo) {
@@ -362,13 +357,13 @@ export class AnalysisExperimentTabComponent implements OnInit{
         this.analysisService.getExperimentPickList(params).pipe(first())
             .subscribe(resp =>{
                 this.items = [];
-                if(resp && resp.Project){
+                if(resp){
                     let projects:any[] = Array.isArray(resp) ? resp : resp.Project ? [resp.Project] : [];
                     this.buildTree(projects)
                 }
                 this.showSpinner = false;
 
-            })
+            });
 
 
 

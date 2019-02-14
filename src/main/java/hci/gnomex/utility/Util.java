@@ -765,6 +765,16 @@ public class Util {
             return Json.createArrayBuilder().build();
         }
     }
+    public static JsonObject readJSONObject(HttpServletWrappedRequest request, String parameterName) {
+        String JSONString = request.getParameter(parameterName);
+        if (isParameterNonEmpty(JSONString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(JSONString))) {
+                return jsonReader.readObject();
+            }
+        } else {
+            return null;
+        }
+    }
 
     public static String getJsonStringSafe(JsonObject object, String valueName) {
         return object.get(valueName) != null ? object.getString(valueName) : null;
@@ -775,6 +785,17 @@ public class Util {
         return value != null ? value : "";
     }
 
+
+    public static void preserveXMLNodeName(Element experimentItem) {
+        String name = experimentItem.getName();
+        experimentItem.setAttribute("xmlNodeName", name);
+        List<Element> children = experimentItem.getChildren();
+
+        for(int i = 0; i < children.size(); i++){
+            Element childNode = (Element) children.get(i);
+            preserveXMLNodeName(childNode);
+        }
+    }
 }
 
 

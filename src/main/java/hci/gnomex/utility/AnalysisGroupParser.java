@@ -5,38 +5,38 @@ import hci.gnomex.model.AnalysisGroup;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 
 public class AnalysisGroupParser extends DetailObject implements Serializable {
   
-  protected Document    doc;
+  protected JsonArray    agArray;
   protected Map         analysisGroupMap = new HashMap();
   
-  public AnalysisGroupParser(Document doc) {
-    this.doc = doc;
+  public AnalysisGroupParser(JsonArray agArray) {
+    this.agArray = agArray;
  
   }
   
   public void parse(Session sess) throws Exception{
-    
-    Element root = this.doc.getRootElement();
-    
-    if(		root.getChildren("AnalysisGroup").size() == 1 && 
-    		root.getChild("AnalysisGroup").getAttributeValue("idAnalysisGroup").equals("") && 
-    		root.getChild("AnalysisGroup").getAttributeValue("name").equals("")
+
+
+    if(		agArray.size() == 1 &&
+            agArray.getJsonObject(0).getString("idAnalysisGroup").equals("") &&
+            agArray.getJsonObject(0).getString("name").equals("")
     	) {    	
     		return;	//we have a Lab with no AnalysisGroups. Leave the analysisGroupMap empty.    	
     }else{    
-	    for(Iterator i = root.getChildren("AnalysisGroup").iterator(); i.hasNext();) {
-	      Element node = (Element)i.next();
+	    for(int i = 0; i < agArray.size(); i++) {
+	      JsonObject node = agArray.getJsonObject(i);
 	      
-	      String idAnalysisGroupString = node.getAttributeValue("idAnalysisGroup");      
+	      String idAnalysisGroupString = node.get("idAnalysisGroup") != null ? node.getString("idAnalysisGroup") : "";
 	
 	      AnalysisGroup ag = (AnalysisGroup)sess.load(AnalysisGroup.class, new Integer(idAnalysisGroupString));	      
 	      

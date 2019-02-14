@@ -1,27 +1,24 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AnalysisGroup;
 import hci.gnomex.utility.AnalysisGroupParser;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
+import hci.gnomex.utility.HibernateSession;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.JsonArray;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.apache.log4j.Logger;
 public class MoveAnalysis extends GNomExCommand implements Serializable {
 
@@ -30,9 +27,7 @@ public class MoveAnalysis extends GNomExCommand implements Serializable {
 	private Integer idLab;
 	// private Integer idAppUser;
 	private String idAnalysisString;
-	private Document analysesDoc;
-	private String analysisGroupsXMLString;
-	private Document analysisGroupsDoc;
+	private JsonArray analysisGroupArray;
 	private AnalysisGroupParser analysisGroupParser;
 
 	@Override
@@ -49,19 +44,16 @@ public class MoveAnalysis extends GNomExCommand implements Serializable {
 			this.addInvalidField("missing idAnalysisString", "Please provide idAnalysisString");
 		}
 
-		StringReader reader = null;
-
-		if (request.getParameter("analysisGroupsXMLString") != null && !request.getParameter("analysisGroupsXMLString").equals("")) {
-			analysisGroupsXMLString = request.getParameter("analysisGroupsXMLString");
-			reader = new StringReader(analysisGroupsXMLString);
-			try {
-				SAXBuilder sax = new SAXBuilder();
-				analysisGroupsDoc = sax.build(reader);
-				analysisGroupParser = new AnalysisGroupParser(analysisGroupsDoc);
-			} catch (JDOMException je) {
-				this.addInvalidField("analysisGroupsXMLString", "Invalid analysisGroupsXMLString");
-				this.errorDetails = Util.GNLOG(LOG,"Cannot parse analysisGroupsXMLString", je);
+		try {
+			this.analysisGroupArray = Util.readJSONArray(request, "analysisGroupsJSONString");
+			if(this.analysisGroupArray != null){
+				this.analysisGroupParser = new AnalysisGroupParser(this.analysisGroupArray);
+			}else{
+				this.addInvalidField("missing analysisGroupsJSONString", "Please provide analysisGroupsJSONString");
 			}
+		} catch (Exception e) {
+			this.addInvalidField("analysisGroupsJSONString", "Invalid analysisGroupsJSONString");
+			this.errorDetails = Util.GNLOG(LOG, "Cannot parse analysisGroupsJSONString", e);
 		}
 
 	}

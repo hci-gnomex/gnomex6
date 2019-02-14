@@ -43,7 +43,7 @@ export class UploadFileService {
                 }))
             );
         });
-        return concat<any,any>(...fileUploadObservableList).pipe(catchError(this.handleError));
+        return concat<any>(...fileUploadObservableList).pipe(catchError(this.handleError));
     }
 
 

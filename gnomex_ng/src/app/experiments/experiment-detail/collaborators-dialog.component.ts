@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {RemoveLinkButtonRenderer} from "../../util/grid-renderers/remove-link-button.renderer";
 import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
+import {GnomexService} from "../../services/gnomex.service";
 
 @Component({
     selector: 'collaborators-dialog',
@@ -89,6 +90,7 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
 
     constructor(public constantsService: ConstantsService,
                 private dialogRef: MatDialogRef<CollaboratorsDialogComponent>,
+                private gnomexService: GnomexService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (!this.data || !this.data.possibleCollaborators || !this.data.idFieldValue || !this.data.idField || !Array.isArray(this.data.possibleCollaborators)) {
             this.dialogRef.close();
@@ -98,6 +100,8 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
         this.idField = this.data.idField;
 
         this.currentCollaborators  = [];
+        this.addNameToCollabs(this.data.currentCollaborators, this.gnomexService.appUserList);
+
 
         for (let collaborator of this.data.currentCollaborators) {
             let deepCopy: any = {
@@ -215,6 +219,23 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
         }
 
         this.dialogRef.close(returnedCollaborators);
+    }
+
+    addNameToCollabs(currentCollabs:any[],allCollabs:any[]){
+
+        for(let i= 0; i <  currentCollabs.length; i++ ){
+            let collab = currentCollabs[i];
+            let refCollab = allCollabs.find(ref => collab.idAppUser === ref.idAppUser);
+            if(!refCollab){
+                console.log("Testing: Could not find collaborator, may need to call getAppUser controller as source");
+                break;
+            }
+
+            collab.displayName = refCollab.displayName;
+        }
+
+        return currentCollabs;
+
     }
 
 

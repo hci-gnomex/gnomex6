@@ -200,8 +200,7 @@ public class GetExperimentPickList extends GNomExCommand implements Serializable
 
       if(!doc.getRootElement().hasChildren()){
           JsonArray projectList = Json.createArrayBuilder().build();
-          JsonObject val = Json.createObjectBuilder().add("Project", projectList).build();
-          this.jsonResult = val.toString();
+          this.jsonResult = projectList.toString();
       }else{
           XMLOutputter out = new org.jdom.output.XMLOutputter();
           this.xmlResult = out.outputString(doc);

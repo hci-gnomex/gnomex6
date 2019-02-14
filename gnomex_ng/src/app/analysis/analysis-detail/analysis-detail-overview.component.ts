@@ -20,6 +20,7 @@ import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
 import {FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
+import {GnomexService} from "../../services/gnomex.service";
 
 
 @Component({
@@ -59,6 +60,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
                 public orderValidateService: BrowseOrderValidateService,
                 private propertyService: PropertyService,
                 private dialogsService: DialogsService,
+                private gnomexService: GnomexService,
                 private dataTrackService: DataTrackService) {
     }
 
@@ -146,7 +148,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
 
     }
     tabChanged(event:MatTabChangeEvent){
-       this.showExpAnalysisTab = event.tab.textLabel === "Experiment"
+        this.showExpAnalysisTab = event.tab.textLabel === "Experiment"
     }
 
     makeLinkToExperiment(){
@@ -226,16 +228,30 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
             }else{
                 let analysisTabForm:FormGroup = <FormGroup>analysisOverviewForm.get(key);
                 Object.keys(analysisTabForm.controls).forEach(k =>{
-                    if(k.includes("JSONString")){
-                        params = params.set(k ,JSON.stringify(analysisTabForm.get(k).value));
-                    }else{
-                        params = params.set(k, analysisTabForm.get(k).value);
+                    let val = analysisTabForm.get(k).value;
+                    if(val){
+                        if(k.includes("JSONString")){
+                            params = params.set(k ,JSON.stringify(analysisTabForm.get(k).value));
+                        }else{
+                            params = params.set(k, analysisTabForm.get(k).value);
+                        }
                     }
-                })
+                });
             }
         });
-       this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp =>{
-            //TODO once backend is implemented
+        params = params.set("noJSONToXMLConversionNeeded", "Y");
+
+        this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp =>{
+            if(resp){
+                if(resp.idAnalysis){
+                    this.gnomexService.navByNumber('A'+resp.idAnalysis);
+                    this.dialogsService.stopAllSpinnerDialogs();
+                }else if(resp.message){
+                    this.dialogsService.stopAllSpinnerDialogs();
+                    this.dialogsService.alert(resp.message);
+
+                }
+            }
         });
 
     }

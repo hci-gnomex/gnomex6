@@ -13,6 +13,7 @@ export class ProtocolService {
     private saveNewProtocolSubject: Subject<any> = new Subject();
     private saveExistingProtocolSubject: Subject<any> = new Subject();
     private deleteProtocolSubject: Subject<any> = new Subject();
+    public static readonly ANALYSIS_PROTOCOL_CLASS_NAME: string  = "hci.gnomex.model.AnalysisProtocol";
 
     constructor(private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService) { }
@@ -47,19 +48,31 @@ export class ProtocolService {
             this.protocolSubject.next(result);
         });
     }
-    public getProtocolList(): void {
-        this.httpClient.get('gnomex/GetProtocolList.gx').subscribe((result) => {
-            if (!!result) {
+
+
+
+
+    public getProtocolList(params?:HttpParams): void {
+        let protocolCallBackFn =  (result:any) => {
+            if (result) {
                 if (Array.isArray(result)) {
                     this.protocolListSubject.next(result);
                 } else {
-                    this.protocolListSubject.next([]);
-                    // this.protocolListSubject.next([result.Protocols]);
+                    //this.protocolListSubject.next([]);
+                    this.protocolListSubject.next([result.Protocols]);
                 }
             } else {
                 this.protocolListSubject.next([]);
             }
-        });
+        };
+
+        if(params){
+            this.httpClient.get('gnomex/GetProtocolList.gx',{params: params}).subscribe(protocolCallBackFn)
+        }else{
+            this.httpClient.get('gnomex/GetProtocolList.gx').subscribe(protocolCallBackFn);
+        }
+
+
     }
 
     public saveProtocol(params:HttpParams): Observable<any>{ // used for experiment platform
