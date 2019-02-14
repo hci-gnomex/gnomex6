@@ -118,7 +118,7 @@ public class SaveWorkItemSolexaQualityControl extends GNomExCommand implements S
               wi.setIdRequest(sample.getIdRequest());
               wi.setIdCoreFacility(sample.getRequest().getIdCoreFacility());
               
-              String codeStepNext;
+              String codeStepNext = "99";
               // ILLSEQ
               if(workItem.getCodeStepNext().equals(Step.SEQ_QC)) {
                 codeStepNext = Step.SEQ_PREP;
@@ -128,7 +128,7 @@ public class SaveWorkItemSolexaQualityControl extends GNomExCommand implements S
                 codeStepNext = Step.MISEQ_PREP;
               } else if (workItem.getCodeStepNext().equals(Step.NOSEQ_QC)) {
                 codeStepNext = Step.NOSEQ_PREP;
-              } else {
+              } else if (workItem.getCodeStepNext().equals(Step.ILLSEQ_QC)) {
                 codeStepNext = Step.ILLSEQ_PREP;
               }
               wi.setCodeStepNext(codeStepNext);

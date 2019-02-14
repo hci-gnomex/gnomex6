@@ -165,7 +165,7 @@ public class SaveCombinedWorkItemQualityControl extends GNomExCommand implements
                   codeStepNext = Step.NOSEQ_PREP;
                 } else if (workItem.getCodeStepNext().equals(Step.MISEQ_QC)) {
                   codeStepNext = Step.MISEQ_PREP;                
-		} else {
+		        } else if (workItem.getCodeStepNext().equals(Step.ILLSEQ_QC)) {
                   codeStepNext = Step.ILLSEQ_PREP;
                 }
                 wi.setCodeStepNext(codeStepNext);              

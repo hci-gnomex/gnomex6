@@ -145,7 +145,7 @@ public class SaveWorkItemSolexaPrep extends GNomExCommand implements Serializabl
                       wi.setIdRequest(sample.getIdRequest());
                       wi.setIdCoreFacility(sample.getRequest().getIdCoreFacility());
                       
-                      String codeStepNext = "";
+                      String codeStepNext = "99";
                       // ILLSEQQC
                       if(workItem.getCodeStepNext().equals(Step.SEQ_PREP)) {
                         codeStepNext = Step.SEQ_PREP_QC;
@@ -155,7 +155,7 @@ public class SaveWorkItemSolexaPrep extends GNomExCommand implements Serializabl
                         codeStepNext = Step.MISEQ_PREP_QC;
                       } else if (workItem.getCodeStepNext().equals(Step.NOSEQ_PREP)) {
                         codeStepNext = Step.NOSEQ_PREP_QC;
-                      } else {
+                      } else if (workItem.getCodeStepNext().equals(Step.ILLSEQ_PREP)) {
                         codeStepNext = Step.ILLSEQ_PREP_QC;
                       }
                       wi.setSample(sample);

@@ -193,6 +193,10 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
               sequencingPlatform = SequencingPlatform.ILLUMINA_HISEQ_2000_SEQUENCING_PLATFORM;
             } else if (codeRequestCategory.equals(RequestCategory.ILLUMINA_MISEQ_REQUEST_CATEGORY)) {
               sequencingPlatform = SequencingPlatform.ILLUMINA_MISEQ_SEQUENCING_PLATFORM;
+            } else if (codeRequestCategory.equals(RequestCategory.ILLUMINA_ILLSEQ_REQUEST_CATEGORY)) {
+              sequencingPlatform = SequencingPlatform.ILLUMINA_ILLSEQ_SEQUENCING_PLATFORM;
+            } else if (codeRequestCategory.equals(RequestCategory.ILLUMINA_NOSEQ_REQUEST_CATEGORY)) {
+              sequencingPlatform = SequencingPlatform.ILLUMINA_NOSEQ_SEQUENCING_PLATFORM;
             }
             flowCell.setCodeSequencingPlatform(sequencingPlatform);    //HISEQ
             
