@@ -14,7 +14,7 @@ import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.
  */
 
 const ROUTES: Routes = [
-    {path: "logout", component: LogoutComponent},
+    { path: "logout", component: LogoutComponent, outlet: 'modal'},
     { path: "manageLinks", component: ManageLinksLauncherComponent, outlet: 'modal' },
     { path: "reportProblem", component: CreateReportProblemLauncherComponent, outlet: 'modal' }
 

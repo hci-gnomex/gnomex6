@@ -231,7 +231,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     {
                         displayName: 'Sign out',
                         iconName: '../../assets/flask.png',
-                        route: './logout'
+                        route: [{outlets: {'modal': 'logout'}}]
                     }
                 ]
             }
