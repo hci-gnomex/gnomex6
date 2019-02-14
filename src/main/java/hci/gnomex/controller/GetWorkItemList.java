@@ -412,7 +412,8 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
           if (filter.getCodeStepNext().equals(Step.SEQ_RUN) ||
               filter.getCodeStepNext().equals(Step.HISEQ_RUN) ||
 			 filter.getCodeStepNext().equals(Step.NOSEQ_RUN) ||
-              filter.getCodeStepNext().equals(Step.SEQ_DATA_PIPELINE) ||
+                  filter.getCodeStepNext().equals(Step.ILLSEQ_RUN) ||
+                  filter.getCodeStepNext().equals(Step.SEQ_DATA_PIPELINE) ||
               filter.getCodeStepNext().equals(Step.HISEQ_DATA_PIPELINE) ||
               filter.getCodeStepNext().equals(Step.MISEQ_DATA_PIPELINE) ||
               filter.getCodeStepNext().equals(Step.ILLSEQ_DATA_PIPELINE)) {

@@ -513,10 +513,14 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						workItem.setSequenceLane(lane);
 						String codeStepNext = "";
 						if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
-							codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
+							codeStepNext = Step.HISEQ_CLUSTER_GEN;
 						} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
+							codeStepNext = Step.MISEQ_CLUSTER_GEN;
+						} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_NOSEQ)) {
+							codeStepNext = Step.NOSEQ_CLUSTER_GEN;
+						} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_ILLSEQ)) {
 							codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
-						}
+						}	
 						workItem.setCodeStepNext(codeStepNext);
 						workItem.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
 						sess.save(workItem);
@@ -667,9 +671,11 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 																				Map<String, ArrayList<String>> sampleToAssaysMap, String codeStepNext, String billingStatus, Set<PropertyEntry> propertyEntries,
 																				BillingTemplate billingTemplate, Boolean requestPropertiesOnly, Boolean comingFromWorkflow) throws Exception {
 
+		System.out.println ("[SaveRequest:createBillingItmes] idRequest: " + request.getIdRequest());
 		// if someone is trying to edit a very old request (i.e, 2014) we could get here with no billing template
 		// if so, just leave
 		if (billingTemplate == null) {
+			System.out.println ("[SaveRequest:createBillingItmes] WARNING WARNING BILLINGTEMPLATE IS NULL --> WE ARE LEAVING! <--");
 			return;
 		}
 
@@ -678,6 +684,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 		// Find the appropriate price sheet
 		PriceSheet priceSheet = null;
+		boolean foundpricesheet = false;
 		List priceSheets = sess.createQuery("SELECT ps from PriceSheet as ps").list();
 		for (Iterator i = priceSheets.iterator(); i.hasNext();) {
 			PriceSheet ps = (PriceSheet) i.next();
@@ -685,15 +692,21 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				RequestCategory requestCategory = (RequestCategory) i1.next();
 				if (requestCategory.getCodeRequestCategory().equals(request.getCodeRequestCategory())) {
 					priceSheet = ps;
+					foundpricesheet = true;
 					break;
 				}
 
 			}
+			if (foundpricesheet)
+			{
+				break;
+			}
 		}
 
-		// if (priceSheet == null) {
+		if (priceSheet == null) {
 		// throw new Exception("Cannot find price sheet to create billing items for added services");
-		// }
+			System.out.println ("[SaveRequest:createBillingItmes] WARNING WARNING PRICESHEET IS NULL!");
+		}
 
 		if (priceSheet != null) {
 			for (Iterator i1 = priceSheet.getPriceCategories().iterator(); i1.hasNext();) {
@@ -704,9 +717,10 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				// at submit when we have a bill during workflow
 				if (requestPropertiesOnly
 						&& (priceCategory.getPluginClassName() != null
-						&& !priceCategory.getPluginClassName().equals("hci.gnomex.billing.PropertyPricingPlugin")
-						&& !priceCategory.getPluginClassName().equals("hci.gnomex.billing.PropertyPricingNotBySamplePlugin") && !priceCategory
-						.getPluginClassName().equals("hci.gnomex.billing.UnitChargeAppFilterPlugin"))) {
+								&& !priceCategory.getPluginClassName().equals("hci.gnomex.billing.PropertyPricingPlugin")
+								&& !priceCategory.getPluginClassName().equals("hci.gnomex.billing.PropertyPricingNotBySamplePlugin") && !priceCategory
+								.getPluginClassName().equals("hci.gnomex.billing.UnitChargeAppFilterPlugin"))) {
+					System.out.println ("[SaveRequest:createBillingItmes] requestPropertiesOnly - propertypricingplugin ** ignored **");
 					continue;
 				}
 
@@ -714,18 +728,21 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				// because we already created them at submit time.
 				if (comingFromWorkflow
 						&& (priceCategory.getPluginClassName() != null && (priceCategory.getPluginClassName()
-																																						.equals("hci.gnomex.billing.PropertyPricingPlugin") || priceCategory.getPluginClassName().equals(
-						"hci.gnomex.billing.PropertyPricingNotBySamplePlugin")))) {
+								.equals("hci.gnomex.billing.PropertyPricingPlugin") || priceCategory.getPluginClassName().equals(
+								"hci.gnomex.billing.PropertyPricingNotBySamplePlugin")))) {
+					System.out.println ("[SaveRequest:createBillingItmes] coming from workflow ignoring Property Pricing");
 					continue;
 				}
 
 				// Ignore inactive price categories
 				if (priceCategory.getIsActive() != null && priceCategory.getIsActive().equals("N")) {
+//					System.out.println ("[SaveRequest:createBillingItmes] Ignore inactive price categories");
 					continue;
 				}
 
+				System.out.println ("[SaveRequest:createBillingItmes] codeStepNext: " + codeStepNext);
 				// If a step is provided, ignore price categories that are not available for that step
-				if (codeStepNext != null) {
+				if (codeStepNext != null  && !codeStepNext.equals("HSEQPIPE") && !codeStepNext.equals("ILLSEQPIPE") && !codeStepNext.equals("NOSEQPIPE")) {
 					Boolean found = false;
 					for (Step s : (Set<Step>) priceCategory.getSteps()) {
 						if (s.getCodeStep().equals(codeStepNext)) {
@@ -733,6 +750,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 							break;
 						}
 					}
+					System.out.println ("[SaveRequest:createBillingItmes] found price categories for this step, found: " + found);
 					if (!found) {
 						continue;
 					}
@@ -748,15 +766,17 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 							isDiscount = true;
 						}
 					} catch (Exception e) {
-						LOG.error("Unable to instantiate billing plugin " + priceCategory.getPluginClassName(), e);
+						LOG.error("[SaveRequest:createBillingItmes] Unable to instantiate billing plugin " + priceCategory.getPluginClassName(), e);
 					}
 
 				}
-
+				System.out.println ("[SaveRequest:createBillingItmes] is the plugin null : " + (plugin == null));
 				// Get the billing items
 				if (plugin != null) {
 					List billingItemsForCategory = plugin.constructBillingItems(sess, amendState, billingPeriod, priceCategory, request, samples,
 							labeledSamples, hybs, lanes, sampleToAssaysMap, billingStatus, propertyEntries, billingTemplate);
+
+					System.out.println ("[SaveRequest:createBillingItmes] number of billing items for category found: " + billingItemsForCategory.size());
 					if (isDiscount) {
 						discountBillingItems.addAll(billingItemsForCategory);
 					} else {
@@ -768,6 +788,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			for (MasterBillingItem masterBillingItem : billingTemplate.getMasterBillingItems()) {
 				sess.save(masterBillingItem);
 				for (BillingItem billingItem : masterBillingItem.getBillingItems()) {
+					System.out.println ("[SaveRequest:createBillingItmes] setting masterBillingTempolate id in the billingitem");
 					billingItem.setIdMasterBillingItem(masterBillingItem.getIdMasterBillingItem());
 				}
 			}
@@ -776,6 +797,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			for (Iterator i = billingItems.iterator(); i.hasNext();) {
 				BillingItem bi = (BillingItem) i.next();
 				grandInvoicePrice = grandInvoicePrice.add(bi.getInvoicePrice());
+				System.out.println ("[SaveRequest:createBillingItmes] grandInvoicePrice: " + grandInvoicePrice);
 				sess.save(bi);
 			}
 			for (Iterator i = discountBillingItems.iterator(); i.hasNext();) {
@@ -785,6 +807,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					bi.setUnitPrice(invoicePrice);
 					bi.setInvoicePrice(invoicePrice);
 					bi.resetInvoiceForBillingItem(sess);
+					System.out.println ("[SaveRequest:createBillingItmes] setting invoice price in billing item: " + invoicePrice);
 					sess.save(bi);
 				}
 			}
@@ -2062,8 +2085,12 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						if (requestParser.isQCAmendRequest() && !isNewSample) {
 							String codeStepNext = "";
 							if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
-								codeStepNext = Step.ILLSEQ_PREP;
+								codeStepNext = Step.HISEQ_PREP;
 							} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
+								codeStepNext = Step.MISEQ_PREP;
+							} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_NOSEQ)) {
+								codeStepNext = Step.NOSEQ_PREP;
+							} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_ILLSEQ)) {
 								codeStepNext = Step.ILLSEQ_PREP;
 							}
 							// QC->Solexa request....
@@ -2079,20 +2106,30 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 							// For samples NOT prepped by core, place on Solexa Seq Prep worklist (where the post Lib prep QC fields
 							// will be recorded.
 							if (sample.getSeqPrepByCore() != null && sample.getSeqPrepByCore().equalsIgnoreCase("Y")) {
-								// ILLSEQQC
 								String codeStepNext = "";
 								if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
-									codeStepNext = Step.ILLSEQ_QC;
+									codeStepNext = Step.HISEQ_QC;
 								}
 								if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
+									codeStepNext = Step.MISEQ_QC;
+								}
+								if (requestCategory.getType().equals(RequestCategoryType.TYPE_NOSEQ)) {
+									codeStepNext = Step.NOSEQ_QC;
+								}
+								if (requestCategory.getType().equals(RequestCategoryType.TYPE_ILLSEQ)) {
 									codeStepNext = Step.ILLSEQ_QC;
 								}
+
 								workItem.setCodeStepNext(codeStepNext);
 							} else {
 								String codeStepNext = "";
 								if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
-									codeStepNext = Step.ILLSEQ_PREP_QC;
+									codeStepNext = Step.HISEQ_PREP_QC;
 								} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
+									codeStepNext = Step.MISEQ_PREP_QC;
+								} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_NOSEQ)) {
+									codeStepNext = Step.NOSEQ_PREP_QC;
+								} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_ILLSEQ)) {
 									codeStepNext = Step.ILLSEQ_PREP_QC;
 								}
 								workItem.setCodeStepNext(codeStepNext);

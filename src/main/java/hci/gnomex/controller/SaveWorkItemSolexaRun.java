@@ -124,7 +124,7 @@ public class SaveWorkItemSolexaRun extends GNomExCommand implements Serializable
                   codeStepNext = Step.MISEQ_DATA_PIPELINE;
                 } else if (workItem.getCodeStepNext().equals(Step.NOSEQ_RUN)) {
                   codeStepNext = Step.NOSEQ_DATA_PIPELINE;
-                } else {
+                } else if (workItem.getCodeStepNext().equals(Step.ILLSEQ_RUN)) {
                   codeStepNext = Step.ILLSEQ_DATA_PIPELINE;
                 }
                 wi.setIdCoreFacility(workItem.getIdCoreFacility());

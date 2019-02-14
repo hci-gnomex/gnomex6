@@ -78,6 +78,7 @@ public class ConvertIllumina extends GNomExCommand implements Serializable {
 			for (Iterator i = r.getWorkItems().iterator(); i.hasNext();) {
 				WorkItem wi = (WorkItem) i.next();
 				if (!wi.getCodeStepNext().equals(Step.NOSEQ_QC) && !wi.getCodeStepNext().equals(Step.NOSEQ_PREP) &&
+						!wi.getCodeStepNext().equals(Step.ILLSEQ_QC) && !wi.getCodeStepNext().equals(Step.ILLSEQ_PREP) &&
 						!wi.getCodeStepNext().equals(Step.HISEQ_QC) && !wi.getCodeStepNext().equals(Step.HISEQ_PREP) &&
 						!wi.getCodeStepNext().equals(Step.MISEQ_QC)
 						&& !wi.getCodeStepNext().equals(Step.MISEQ_PREP)) {

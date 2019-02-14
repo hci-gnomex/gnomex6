@@ -8,6 +8,7 @@ public class RequestCategoryType extends DictionaryEntry implements Comparable, 
 
   public static final String   TYPE_MICROARRAY          = "MICROARRAY";
   public static final String   TYPE_QC                  = "QC";
+  public static final String   TYPE_ILLSEQ              = "ILLSEQ";
   public static final String   TYPE_NOSEQ               = "NOSEQ";
   public static final String   TYPE_HISEQ               = "HISEQ";
   public static final String   TYPE_MISEQ               = "MISEQ";

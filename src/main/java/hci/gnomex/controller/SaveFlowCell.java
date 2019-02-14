@@ -152,7 +152,7 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
                   wi.setIdRequest(sl.getIdRequest());
                   wi.setSequenceLane(sl);
 
-                  if (x.getCodeStepNext().equals(Step.ILLSEQ_FINALIZE_FC) || x.getCodeStepNext().equals(Step.HISEQ_DATA_PIPELINE)) {
+                  if (x.getCodeStepNext().equals(Step.ILLSEQ_FINALIZE_FC) || x.getCodeStepNext().equals(Step.ILLSEQ_DATA_PIPELINE)) {
                     wi.setCodeStepNext(Step.ILLSEQ_DATA_PIPELINE);
                   }
 
