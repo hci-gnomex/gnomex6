@@ -67,7 +67,7 @@
     "nodejs-dashboard": "^0.4.1",
     "popper.js": "^1.14.5",
     "reflect-metadata": "^0.1.10",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.4.0",
     "style-loader": "^0.23.1",
     "svg-loader": "0.0.2",
     "transform-loader": "^0.2.4",

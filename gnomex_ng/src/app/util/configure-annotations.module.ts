@@ -9,6 +9,7 @@ import {AgGridModule} from "ag-grid-angular";
 
 import {ConfigureAnnotationsComponent} from "./configure-annotations.component";
 import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
+import {UtilModule} from "./util.module";
 
 
 
@@ -18,6 +19,7 @@ import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.compon
         CommonModule,
         FormsModule,
         ServicesModule,
+        UtilModule,
         AgGridModule.withComponents([]),
         ReactiveFormsModule
 
