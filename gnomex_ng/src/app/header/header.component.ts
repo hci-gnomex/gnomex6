@@ -231,7 +231,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     {
                         displayName: 'Sign out',
                         iconName: '../../assets/flask.png',
-                        route: './logout'
+                        route: [{outlets: {'modal': 'logout'}}]
                     }
                 ]
             }
@@ -277,7 +277,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
         this.userNavItems = [
             {
                 displayName: 'New Experiment Order',
-                iconName: '../../assets/flask.png',
+                iconName: '../../assets/flask_add.png',
                 class: 'top-menu-item',
                 context: 'newExperimentOrder',
                 route: ''
@@ -295,7 +295,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     },
                     {
                         displayName: 'New Experiment Order',
-                        iconName: '../../assets/flask.png',
+                        iconName: '../../assets/flask_add.png',
                         context: 'newExperimentOrder',
                         route: ''
                     },
@@ -435,7 +435,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     },
                     {
                         displayName: 'New Experiment Order',
-                        iconName: '../../assets/flask.png',
+                        iconName: '../../assets/flask_add.png',
                         context: 'newExperimentOrder',
                         route: ''
                     },
@@ -578,7 +578,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     {
                         displayName: 'Create New Experiments and Upload Files',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask.png',
+                        iconName: '../../assets/flask_add.png',
                         route: ''
                     },
                     {
@@ -693,7 +693,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     {
                         displayName: 'New Experiment Order',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask.png',
+                        iconName: '../../assets/flask_add.png',
 
                     },
                     {
@@ -1114,7 +1114,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     {
                         displayName: 'New Experiment Order',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask.png',
+                        iconName: '../../assets/flask_add.png',
                         route: ''
                     },
                     {
@@ -1447,7 +1447,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     },
                     {
                         displayName: 'New Experiment Order',
-                        iconName: '../../assets/flask.png',
+                        iconName: '../../assets/flask_add.png',
                         route: ''
                     }
                 ]
@@ -1538,7 +1538,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     {
                         displayName: 'Create New Experiments and Upload Files',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask.png',
+                        iconName: '../../assets/flask_add.png',
                         route: ''
                     },
                     {
@@ -1667,7 +1667,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
                     {
                         displayName: 'Create New Experiment and Upload Files',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask.png',
+                        iconName: '../../assets/flask_add.png',
                         route: ''
                     },
                     {
