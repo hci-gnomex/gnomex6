@@ -14,180 +14,149 @@ import hci.gnomex.utility.PropertyDictionaryHelper;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.Json;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.apache.log4j.Logger;
+
 public class MakeSoftLinks extends GNomExCommand implements Serializable {
 
-	private static Logger LOG = Logger.getLogger(MakeSoftLinks.class);
+    private static Logger LOG = Logger.getLogger(MakeSoftLinks.class);
 
-	private String serverName;
-	private String directory_bioinformatics_scratch;
+    private String directory_bioinformatics_scratch;
+    private FileDescriptorParser parser = null;
 
-	private FileDescriptorParser parser = null;
+    protected final static String SESSION_KEY_FILE_DESCRIPTOR_PARSER = "GNomExFileDescriptorParser";
 
-	protected final static String SESSION_KEY_FILE_DESCRIPTOR_PARSER = "GNomExFileDescriptorParser";
+    public void validate() {
+    }
 
-	public void validate() {
-	}
+    public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
+        // Get the files JSON string
+        try {
+            this.parser = new FileDescriptorParser(Util.readJSONArray(request, "fileDescriptorJSONString"));
+        } catch (Exception e) {
+            this.addInvalidField("fileDescriptorJSONString", "Invalid fileDescriptorJSONString");
+            this.errorDetails = Util.GNLOG(LOG, "Cannot parse fileDescriptorJSONString", e);
+        }
+    }
 
-	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
+    public Command execute() throws RollBackCommandException {
+        try {
+            Session sess = HibernateSession.currentSession(this.getSecAdvisor().getUsername());
 
-		// Get the files XML string
-		if (request.getParameter("fileDescriptorXMLString") != null && !request.getParameter("fileDescriptorXMLString").equals("")) {
-			String fileDescriptorXMLString = "<FileDescriptorList>" + request.getParameter("fileDescriptorXMLString") + "</FileDescriptorList>";
+            directory_bioinformatics_scratch = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.DIRECTORY_BIOINFORMATICS_SCRATCH);
 
-			// System.out.println("\n[MakeSoftLinks] " + fileDescriptorXMLString + "\n");
+            String softLinkPath = makeSoftLinks();
 
-			StringReader reader = new StringReader(fileDescriptorXMLString);
-			try {
-				SAXBuilder sax = new SAXBuilder();
-				Document doc = sax.build(reader);
-				parser = new FileDescriptorParser(doc);
-			} catch (JDOMException je) {
-				System.out.println("[MakeSoftLinks] Error: Cannot parse fileDescriptorXMLString, " + je);
-				this.errorDetails = Util.GNLOG(LOG,"Cannot parse fileDescriptorXMLString", je);
+            this.jsonResult = Json.createObjectBuilder()
+                    .add("result", "SUCCESS")
+                    .add("softLinkPath", softLinkPath)
+                    .build().toString();
+            setResponsePage(this.SUCCESS_JSP);
+        } catch (Exception e) {
+            this.errorDetails = Util.GNLOG(LOG, "An exception has occurred in MakeSoftLinks ", e);
+            throw new RollBackCommandException(e.getMessage());
+        }
 
-			}
-		}
+        return this;
+    }
 
-		serverName = request.getServerName();
-	}
+    private String makeSoftLinks() throws Exception {
+        // Create the users' soft link directory
+        String username1 = username;
+        if (username1 == null) {
+            username1 = "Guest";
+        }
+        File dir = new File(directory_bioinformatics_scratch, username1);
+        if (!dir.exists())
+            dir.mkdir();
 
-	public Command execute() throws RollBackCommandException {
+        String baseDir = dir.getPath();
 
-		try {
+        parser.parse();
 
-			Session sess = HibernateSession.currentSession(this.getSecAdvisor().getUsername());
+        String requestNumber = parser.getRequestNumbers().iterator().next();
 
-			directory_bioinformatics_scratch = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.DIRECTORY_BIOINFORMATICS_SCRATCH);
+        // directory for the request
+        File rdir = new File(baseDir, requestNumber);
+        if (rdir.exists()) {
+            destroyFolder(rdir);
+        } else {
+            rdir.mkdir();
+        }
 
-			String softLinkPath = makeSoftLinks(sess);
+        String softLinkPath = rdir.getPath();
 
-			// System.out.println("\n[MakeSoftLinks] softLinkPath: " + softLinkPath + "\n");
-			this.xmlResult = "<SUCCESS softLinkPath=\"" + softLinkPath + "\"" + "/>";
-			setResponsePage(this.SUCCESS_JSP);
+        List<FileDescriptor> fileDescriptors = parser.getFileDescriptors(requestNumber);
 
-		} catch (Exception e) {
-			this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in MakeSoftLinks ", e);
-			throw new RollBackCommandException(e.getMessage());
-		}
+        // For each file to create a soft link for
+        for (FileDescriptor fd : fileDescriptors) {
+            // Ignore md5 files
+            if (fd.getType().equals("md5")) {
+                continue;
+            }
 
-		return this;
-	}
+            String targetPath = fd.getFileName();
 
-	private String makeSoftLinks(Session sess) throws Exception {
+            // build the soft link path
+            String linkPath = softLinkPath + Constants.FILE_SEPARATOR;
 
-		String softLinkPath = "";
+            String zipFileName = fd.getZipEntryName();
+            String[] pieces = zipFileName.split(Constants.FILE_SEPARATOR);
 
-		// Create the users' soft link directory
-		String username1 = username;
-		if (username1 == null) {
-			username1 = "Guest";
-		}
-		File dir = new File(directory_bioinformatics_scratch, username1);
-		if (!dir.exists())
-			dir.mkdir();
+            // make any directories we need
+            int lpieces = pieces.length;
+            for (int i = 1; i <= lpieces - 2; i++) {
+                File ldir = new File(linkPath, pieces[i]);
+                if (!ldir.exists()) {
+                    ldir.mkdir();
+                }
 
-		String baseDir = dir.getPath();
+                linkPath = linkPath + pieces[i] + Constants.FILE_SEPARATOR;
+            }
 
-		parser.parse();
+            linkPath = linkPath + pieces[lpieces - 1];
 
-		String requestNumber = (String) parser.getRequestNumbers().iterator().next();
+            // make the soft link
+            makeSoftLinkViaUNIXCommandLine(targetPath, linkPath);
+        }
 
-		// directory for the request
-		File rdir = new File(baseDir, requestNumber);
-		if (rdir.exists()) {
-			destroyFolder(rdir);
-		} else {
-			rdir.mkdir();
-		}
+        return softLinkPath;
+    }
 
-		softLinkPath = rdir.getPath();
+    private static void makeSoftLinkViaUNIXCommandLine(String realFile, String link) {
+        try {
+            String[] cmd = {"ln", "-s", realFile, link};
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            LOG.error("Error in MakeSoftLinks", e);
+        }
+    }
 
-		List fileDescriptors = parser.getFileDescriptors(requestNumber);
+    private static void destroyFolder(File linkDir) {
+        File[] directoryList = linkDir.listFiles();
 
-		// For each file to create a soft link for
-		for (Iterator i1 = fileDescriptors.iterator(); i1.hasNext();) {
+        for (File directory : directoryList) {
+            delete(directory);
+        }
+    }
 
-			FileDescriptor fd = (FileDescriptor) i1.next();
+    private static void delete(File f) {
+        try {
+            if (f.isDirectory()) {
+                for (File c : f.listFiles()) {
+                    delete(c);
+                }
+            }
 
-			// Ignore md5 files
-			if (fd.getType().equals("md5")) {
-				continue;
-			}
-
-			String targetPath = fd.getFileName();
-
-			// build the soft link path
-			String linkPath = softLinkPath + Constants.FILE_SEPARATOR;
-
-			String zipFileName = fd.getZipEntryName();
-			String[] pieces = zipFileName.split(Constants.FILE_SEPARATOR);
-
-			// make any directories we need
-			int lpieces = pieces.length;
-			for (int i = 1; i <= lpieces - 2; i++) {
-				File ldir = new File(linkPath, pieces[i]);
-				if (!ldir.exists()) {
-					ldir.mkdir();
-				}
-
-				linkPath = linkPath + pieces[i] + Constants.FILE_SEPARATOR;
-			}
-
-			linkPath = linkPath + pieces[lpieces - 1];
-
-			// make the soft link
-			// System.out.println("[MakeSoftLinks] targetPath: " + targetPath + "\n                     linkPath: " + linkPath);
-			makeSoftLinkViaUNIXCommandLine(targetPath, linkPath);
-
-		}
-
-		return softLinkPath;
-	}
-
-	public static boolean makeSoftLinkViaUNIXCommandLine(String realFile, String link) {
-		try {
-			String[] cmd = { "ln", "-s", realFile, link };
-			Runtime.getRuntime().exec(cmd);
-			return true;
-		} catch (IOException e) {
-			LOG.error("Error in MakeSoftLinks", e);
-
-		}
-		return false;
-	}
-
-	private static void destroyFolder(File linkDir) {
-		File[] directoryList = linkDir.listFiles();
-
-		for (File directory : directoryList) {
-			delete(directory);
-		}
-	}
-
-	private static void delete(File f) {
-		try {
-			if (f.isDirectory()) {
-				for (File c : f.listFiles()) {
-					delete(c);
-				}
-			}
-
-			f.delete();
-		} catch (Exception e) {
-			LOG.error("Error in makeSoftLinks.java", e);
-		}
-	}
+            f.delete();
+        } catch (Exception e) {
+            LOG.error("Error in makeSoftLinks.java", e);
+        }
+    }
 
 }

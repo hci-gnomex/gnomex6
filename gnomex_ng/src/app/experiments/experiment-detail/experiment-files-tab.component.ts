@@ -8,6 +8,7 @@ import {FileService} from "../../services/file.service";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {Subscription} from "rxjs";
+import {DownloadFilesComponent} from "../../util/download-files.component";
 
 @Component({
     selector: 'experiment-files-tab',
@@ -197,7 +198,19 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleDownloadFiles(): void {
-        // TODO Download Files
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            showCreateSoftLinks: true,
+            downloadListSource: this.getRequestDownloadListResult.Request,
+            cacheDownloadListFn: this.fileService.cacheExperimentFileDownloadList,
+            fdtDownloadFn: this.fileService.getFDTDownloadExperimentServlet,
+            makeSoftLinksFn: this.fileService.makeSoftLinks,
+            downloadURL: "DownloadFileServlet.gx",
+            suggestedFilename: "gnomex-data",
+        };
+        config.disableClose = true;
+        this.dialog.open(DownloadFilesComponent, config);
     }
 
     ngOnDestroy() {

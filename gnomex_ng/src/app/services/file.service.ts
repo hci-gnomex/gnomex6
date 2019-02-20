@@ -182,6 +182,46 @@ export class FileService {
         return of({result: "SUCCESS"});
     };
 
+    public cacheExperimentFileDownloadList: (files: any[]) => Observable<any> = (files: any[]) => {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        let params: HttpParams = new HttpParams()
+            .set("fileDescriptorJSONString", JSON.stringify(files))
+            .set("noJSONToXMLConversionNeeded", "Y");
+        return this.httpClient.post("/gnomex/CacheFileDownloadList.gx", params.toString(), {headers: headers});
+    };
+
+    public getFDTDownloadExperimentServlet: (emailAddress: string, showCommandLineInstructions: boolean) => Observable<any>
+        = (emailAddress: string, showCommandLineInstructions: boolean) => {
+
+        // This does not work on localhost since the back-end is hard-coded for a linux environment
+        // This workaround hopefully works but it cannot be tested until release
+        /*
+        let params: HttpParams = new HttpParams()
+            .set("emailAddress", emailAddress)
+            .set("showCommandLineInstructions", showCommandLineInstructions ? "Y" : "N");
+        return this.httpClient.get("/gnomex/FastDataTransferDownloadExpServlet.gx", {params: params});
+        */
+
+        let url: string = this.document.location.href;
+        url = url.substring(0, url.indexOf("/gnomex") + 7);
+        url += "/FastDataTransferDownloadExpServlet.gx";
+        url += "?emailAddress=" + emailAddress;
+        url += "&showCommandLineInstructions=" + (showCommandLineInstructions ? "Y" : "N");
+        window.open(url, "_blank");
+
+        return of({result: "SUCCESS"});
+    };
+
+    public makeSoftLinks: (files: any[]) => Observable<any> = (files: any[]) => {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        let params: HttpParams = new HttpParams()
+            .set("fileDescriptorJSONString", JSON.stringify(files))
+            .set("noJSONToXMLConversionNeeded", "Y");
+        return this.httpClient.post("/gnomex/MakeSoftLinks.gx", params.toString(), {headers: headers});
+    };
+
     private handleError(errorResponse: HttpErrorResponse){
         if(errorResponse.error instanceof ErrorEvent){
             console.error("Client side Error: ", errorResponse.error.message);
