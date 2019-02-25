@@ -124,10 +124,12 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     public searchText: string;
     private dragEndItems: any[] = [];
     private navDatatrackList: any;
+    private labListSubscription: Subscription;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
-        this.labListService.getLabList().subscribe((response: any[]) => {
+        this.labListService.getLabList_FromBackEnd();
+        this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
             this.labList = response;
         });
     }
@@ -499,6 +501,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     ngOnDestroy(): void {
         this.dataTracksListSubscription.unsubscribe();
         this.navInitSubscription.unsubscribe();
+        this.labListSubscription.unsubscribe();
         //this.gnomexService.navInitBrowseDatatrackSubject.next(null);
         this.navDatatrackList = null;
     }

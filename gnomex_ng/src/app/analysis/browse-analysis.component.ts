@@ -129,12 +129,20 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     // public showSpinner: boolean = false;
     public newAnalysisName: any;
     private navAnalysisGroupListSubscription:Subscription;
+    private labListSubscription:Subscription;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
-        this.labListService.getLabList().subscribe((response: any[]) => {
-            this.labList = response;
+
+        this.labListService.getLabList_FromBackEnd();
+        this.labListSubscription =  this.labListService.getLabListSubject().subscribe((resp: any[]) =>{
+            this.labList = resp;
         });
+
+
+        /*this.labListService.getLabList().subscribe((response: any[]) => {
+            this.labList = response;
+        });*/
 
         if (this.createSecurityAdvisorService.isGuest) {
             this.disableAll = true;
@@ -548,5 +556,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.analysisGroupListSubscription.unsubscribe();
         this.navAnalysisGroupListSubscription.unsubscribe();
         this.gnomexService.navInitBrowseAnalysisSubject.next(null);
+        this.labListSubscription.unsubscribe();
     }
 }

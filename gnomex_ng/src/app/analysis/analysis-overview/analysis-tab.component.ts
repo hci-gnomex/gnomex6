@@ -75,6 +75,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
     //Override
     name = "Analysis";
     private filteredAnalysistOverviewListSubscript: Subscription;
+    private labListSubscription: Subscription;
     private selectedTreeNodeSubscript: Subscription;
     private gridOpt:GridOptions = {};
     public rowSelection ="multiple";
@@ -164,7 +165,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
         this.newSegment = this.constService.SEGMENT_NEW;
         this.removeSegment = this.constService.SEGMENT_REMOVE_DISABLE;
 
-        this.labListService.getLabList().subscribe((response: any[]) => {
+        this.labListSubscription =  this.labListService.getLabListSubject().subscribe((response: any[]) => {
             this.labList = response;
         });
 
@@ -299,6 +300,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
     ngOnDestroy():void{
         this.filteredAnalysistOverviewListSubscript.unsubscribe();
         this.selectedTreeNodeSubscript.unsubscribe();
+        this.labListSubscription.unsubscribe();
     }
 }
 
