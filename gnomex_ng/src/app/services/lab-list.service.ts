@@ -1,12 +1,15 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {BehaviorSubject, Observable, of, Subject, throwError} from "rxjs";
+import {catchError, first, flatMap, map} from "rxjs/operators";
+import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class LabListService {
+    private labListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
 
-    constructor(private http: Http) {
+
+    constructor(private http: Http, private httpClient:HttpClient) {
     }
 
     public getLabListCall(): Observable<Response> {
@@ -14,6 +17,35 @@ export class LabListService {
         params.set("listKind", "UnboundedLabList");
         return this.http.get("/gnomex/GetLabList.gx", {search: params});
     }
+
+
+    getLabListSubject():Observable<any>{
+        return this.labListSubject.asObservable();
+    }
+    private handleError(errorResponse: HttpErrorResponse){
+        if(errorResponse.error instanceof ErrorEvent){
+            console.error("Client side Error: ", errorResponse.error.message);
+        }else{
+            console.error("Server Side Error: ", errorResponse);
+        }
+        return throwError({message: "An error occured please contact GNomEx Support."});
+    }
+
+    getLabList_FromBackEnd():void{
+        let params: HttpParams = new HttpParams().set("listKind", "UnboundedLabList");
+        this.httpClient.get("/gnomex/GetLabLisst.gx",{params:params}).pipe(first())
+            .subscribe( resp => {
+                this.labListSubject.next(resp)
+
+            },(err) =>{
+                this.labListSubject.next(err)
+            });
+
+    }
+
+
+
+
 
     public getLabList(): Observable<any[]> {
         return this.getLabListCall().pipe(map((response: Response) => {

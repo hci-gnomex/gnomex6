@@ -108,12 +108,15 @@ export class FileService {
     getRequestOrganizeFilesObservable(): Observable<any>{
         return this.organizeFilesSubject.pipe( flatMap(params => {
 
-                let expParams : HttpParams =  new HttpParams()
+
+            let expParams : HttpParams =  new HttpParams()
                     .append('idRequest',params.idRequest)
                     .append('showUploads',params.showUploads);
-                let downloadParams:HttpParams = new HttpParams()
+            let downloadParams:HttpParams = new HttpParams()
                     .set('idRequest',params.idRequest)
                     .set('includeUploadStagingDir', params.includeUploadStagingDir);
+
+
 
                 return forkJoin(this.experimentService.getExperimentWithParams(expParams),
                     this.experimentService.getRequestDownloadListWithParams(downloadParams)).pipe(map((resp:any[]) =>{

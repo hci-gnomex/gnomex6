@@ -47,6 +47,7 @@ export class PropertyService {
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
     public static readonly PROPERTY_REQUEST_BIO_ALIGNMENT_NOTE: string = "request_bio_alignment_note";
     public static readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string  = "request_bio_analysis_note";
+    public static readonly PROPERTY_EXPERIMENT_FILE_SAMPLE_LINKING_ENABLED:string = "experiment_file_sample_linking_enabled";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
