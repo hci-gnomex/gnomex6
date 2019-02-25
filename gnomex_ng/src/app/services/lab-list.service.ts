@@ -33,7 +33,7 @@ export class LabListService {
 
     getLabList_FromBackEnd():void{
         let params: HttpParams = new HttpParams().set("listKind", "UnboundedLabList");
-        this.httpClient.get("/gnomex/GetLabLisst.gx",{params:params}).pipe(first())
+        this.httpClient.get("/gnomex/GetLabList.gx",{params:params}).pipe(first())
             .subscribe( resp => {
                 this.labListSubject.next(resp)
 
