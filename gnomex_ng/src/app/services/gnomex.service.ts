@@ -578,6 +578,9 @@ export class GnomexService {
     }
 
     public onGetOrganismList(orgs: any){
+        this.das2OrganismList = [];
+        this.activeOrganismList = [];
+
         let orgList:any[] = Array.isArray(orgs) ? orgs : [orgs.Organism];
 
         for (let organism of orgs) {

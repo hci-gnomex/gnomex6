@@ -81,6 +81,7 @@ import java.util.TreeSet;
 
 import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
@@ -106,6 +107,10 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	private static Logger LOG = Logger.getLogger(SaveRequest.class);
 
 	private String requestXMLString;
+	private String requestJSONString;
+
+	private boolean usingJSON = false;
+
 	private String description;
 	private Document requestDoc;
 	private RequestParser requestParser;
@@ -835,20 +840,30 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 		return ++nextSampleNumber;
 	}
 
-	public static Set saveRequestProperties(String propertiesXML, Session sess, RequestParser requestParser, boolean saveToDB) throws org.jdom.JDOMException {
-		Set<PropertyEntry> propertyEntries = new TreeSet<PropertyEntry>(new PropertyEntryComparator());
+	public static Set saveRequestProperties(String propertiesJSON, Session sess, RequestParser requestParser, boolean saveToDB) throws Exception {
+		Set<PropertyEntry> propertyEntries = new TreeSet<>(new PropertyEntryComparator());
 		// Delete properties
-		if (propertiesXML != null && !propertiesXML.equals("")) {
-			StringReader reader = new StringReader(propertiesXML);
-			SAXBuilder sax = new SAXBuilder();
-			Document propsDoc = sax.build(reader);
+		if (propertiesJSON != null && !propertiesJSON.equals("")) {
+//			StringReader reader = new StringReader(propertiesJSON);
+//			SAXBuilder sax = new SAXBuilder();
+//			Document propsDoc = sax.build(reader);
+
+			JsonArray propertiesArray;
+			try(JsonReader jsonReader = Json.createReader(new StringReader(propertiesJSON))) {
+				propertiesArray = jsonReader.readArray();
+//				filesToRemoveParser = new FileDescriptorUploadParser(filesToRemove);
+			} catch (Exception e) {
+				throw e;
+			}
+
 			if (requestParser.getRequest().getPropertyEntries() != null && saveToDB) {
 				for (Iterator<?> i = requestParser.getRequest().getPropertyEntries().iterator(); i.hasNext();) {
 					PropertyEntry pe = PropertyEntry.class.cast(i.next());
 					boolean found = false;
-					for (Iterator<?> i1 = propsDoc.getRootElement().getChildren().iterator(); i1.hasNext();) {
-						Element propNode = (Element) i1.next();
-						String idPropertyEntry = propNode.getAttributeValue("idPropertyEntry");
+
+//					for (Iterator<?> i1 = propsDoc.getRootElement().getChildren().iterator(); i1.hasNext();) {
+					for (int j = 0; j < propertiesArray.size(); j++) {
+						String idPropertyEntry = Util.getJsonStringSafe(propertiesArray.getJsonObject(j), "idPropertyEntry");
 						if (idPropertyEntry != null && !idPropertyEntry.equals("")) {
 							if (pe.getIdPropertyEntry().equals(new Integer(idPropertyEntry))) {
 								found = true;
@@ -856,6 +871,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 							}
 						}
 					}
+
 					if (!found) {
 						// delete property values
 						for (Iterator<?> i1 = pe.getValues().iterator(); i1.hasNext();) {
@@ -874,10 +890,11 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			}
 
 			// Add properties
-			for (Iterator<?> i = propsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
-				Element node = (Element) i.next();
+//			for (Iterator<?> i = propsDoc.getRootElement().getChildren().iterator(); i.hasNext();) {
+			for (int i = 0; i < propertiesArray.size(); i++) {
+				JsonObject property = propertiesArray.getJsonObject(i);
 				// Adding dataTracks
-				String idPropertyEntry = node.getAttributeValue("idPropertyEntry");
+				String idPropertyEntry = Util.getJsonStringSafe(property, "idPropertyEntry");
 
 				PropertyEntry pe = null;
 				if (idPropertyEntry == null || idPropertyEntry.equals("")) {
@@ -885,8 +902,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				} else {
 					pe = PropertyEntry.class.cast(sess.get(PropertyEntry.class, Integer.valueOf(idPropertyEntry)));
 				}
-				pe.setIdProperty(Integer.valueOf(node.getAttributeValue("idProperty")));
-				pe.setValue(node.getAttributeValue("value"));
+				pe.setIdProperty(Integer.valueOf(property.get("idProperty") != null ? property.getString("idProperty") : "0"));
+				pe.setValue(Util.getJsonStringSafe(property, "value"));
 				pe.setIdRequest(requestParser.getRequest().getIdRequest());
 
 				if ((idPropertyEntry == null || idPropertyEntry.equals("")) && saveToDB) {
@@ -899,17 +916,20 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					for (Iterator<?> i1 = pe.getValues().iterator(); i1.hasNext();) {
 						PropertyEntryValue av = PropertyEntryValue.class.cast(i1.next());
 						boolean found = false;
-						for (Iterator<?> i2 = node.getChildren().iterator(); i2.hasNext();) {
-							Element n = (Element) i2.next();
-							if (n.getName().equals("PropertyEntryValue")) {
-								String idPropertyEntryValue = n.getAttributeValue("idPropertyEntryValue");
+						JsonArray valuesArray = property.getJsonArray("PropertyOption");
+
+//						for (Iterator<?> i2 = .getChildren().iterator(); i2.hasNext();) {
+						for (int j = 0; j < valuesArray.size(); j++) {
+//							Element n = (Element) i2.next();
+//							if (valuesArray.getName().equals("PropertyEntryValue")) {
+								String idPropertyEntryValue = Util.getJsonStringSafe(valuesArray.getJsonObject(j), "idPropertyEntryValue");
 								if (idPropertyEntryValue != null && !idPropertyEntryValue.equals("")) {
 									if (av.getIdPropertyEntryValue().equals(new Integer(idPropertyEntryValue))) {
 										found = true;
 										break;
 									}
 								}
-							}
+//							}
 						}
 						if (!found && saveToDB) {
 							sess.delete(av);
@@ -921,11 +941,13 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				}
 
 				// Add and update PropertyEntryValues
-				for (Iterator<?> i1 = node.getChildren().iterator(); i1.hasNext();) {
-					Element n = (Element) i1.next();
-					if (n.getName().equals("PropertyEntryValue")) {
-						String idPropertyEntryValue = n.getAttributeValue("idPropertyEntryValue");
-						String value = n.getAttributeValue("value");
+
+				JsonArray valuesArray = property.getJsonArray("PropertyOption");
+
+				if (valuesArray != null) {
+					for (int j = 0; j < valuesArray.size(); j++) {
+						String idPropertyEntryValue = Util.getJsonStringSafe(valuesArray.getJsonObject(j), "idPropertyEntryValue");
+						String value = Util.getJsonStringSafe(valuesArray.getJsonObject(j), "value");
 						PropertyEntryValue av = null;
 						// Ignore 'blank' url value
 						if (value == null || value.equals("") || value.equals("Enter URL here...")) {
@@ -937,24 +959,24 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						} else {
 							av = PropertyEntryValue.class.cast(sess.load(PropertyEntryValue.class, Integer.valueOf(idPropertyEntryValue)));
 						}
-						av.setValue(n.getAttributeValue("value"));
+						av.setValue(Util.getJsonStringSafe(valuesArray.getJsonObject(j), "value"));
 
 						if ((idPropertyEntryValue == null || idPropertyEntryValue.equals("")) && saveToDB) {
 							sess.save(av);
 						}
 					}
-				}
-				if (saveToDB) {
-					sess.flush();
-				}
+					if (saveToDB) {
+						sess.flush();
+					}
 
-				String optionValue = "";
-				TreeSet<PropertyOption> options = new TreeSet<PropertyOption>(new PropertyOptionComparator());
-				for (Iterator<?> i1 = node.getChildren().iterator(); i1.hasNext();) {
-					Element n = (Element) i1.next();
-					if (n.getName().equals("PropertyOption")) {
-						Integer idPropertyOption = Integer.parseInt(n.getAttributeValue("idPropertyOption"));
-						String selected = n.getAttributeValue("selected");
+					String optionValue = "";
+					TreeSet<PropertyOption> options = new TreeSet<PropertyOption>(new PropertyOptionComparator());
+
+					for (int j = 0; j < valuesArray.size(); j++) {
+//					Element n = (Element) i1.next();
+
+						Integer idPropertyOption = Integer.parseInt(Util.getJsonStringSafe(valuesArray.getJsonObject(j), "idPropertyOption"));
+						String selected = Util.getJsonStringSafe(valuesArray.getJsonObject(j), "selected");
 						if (selected != null && selected.equals("Y")) {
 							PropertyOption option = PropertyOption.class.cast(sess.load(PropertyOption.class, idPropertyOption));
 							if (!saveToDB) {
@@ -968,11 +990,13 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 							optionValue += option.getOption();
 						}
 					}
+
+					pe.setOptions(options);
+					if (options.size() > 0) {
+						pe.setValue(optionValue);
+					}
 				}
-				pe.setOptions(options);
-				if (options.size() > 0) {
-					pe.setValue(optionValue);
-				}
+
 				if (saveToDB) {
 					sess.flush();
 				}
@@ -980,6 +1004,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				propertyEntries.add(pe);
 			}
 		}
+
 		return propertyEntries;
 	}
 
@@ -1022,6 +1047,12 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 		if (request.getParameter("requestXMLString") != null && !request.getParameter("requestXMLString").equals("")) {
 			requestXMLString = request.getParameter("requestXMLString");
+			usingJSON = false;
+		}
+
+		if (request.getParameter("requestJSONString") != null && !request.getParameter("requestJSONString").equals("")) {
+			requestJSONString = request.getParameter("requestJSONString");
+			usingJSON = true;
 		}
 
 		if (request.getParameter("description") != null) {
@@ -1029,7 +1060,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 		}
 
 		if (request.getParameter("filesToRemoveJSONString") != null && !request.getParameter("filesToRemoveJSONString").equals("")) {
-			String filesToRemoveJSONString =  request.getParameter("filesToRemoveXMLString");
+			String filesToRemoveJSONString =  request.getParameter("filesToRemoveJSONString");
 			if(Util.isParameterNonEmpty(filesToRemoveJSONString)){
 				try(JsonReader jsonReader = Json.createReader(new StringReader(filesToRemoveJSONString))) {
 					filesToRemove = jsonReader.readArray();
@@ -1039,13 +1070,10 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveJSONString", e);
 				}
 			}
-
-
 		}
 
 		if (request.getParameter("propertiesXML") != null && !request.getParameter("propertiesXML").equals("")) {
 			propertiesXML = request.getParameter("propertiesXML");
-
 		}
 
 		invoicePrice = "";
@@ -1055,16 +1083,29 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			invoicePrice = request.getParameter("invoicePrice");
 		}
 
-		StringReader reader = new StringReader(requestXMLString);
-		try {
-			SAXBuilder sax = new SAXBuilder();
-			requestDoc = sax.build(reader);
-			requestParser = new RequestParser(requestDoc, this.getSecAdvisor());
-		} catch (JDOMException je) {
-			this.addInvalidField("RequestXMLString", "Invalid request xml");
-			this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", je);
-		}
+		StringReader reader;
 
+		if (usingJSON) {
+			reader = new StringReader(requestJSONString);
+
+			try (JsonReader jsonReader = Json.createReader(new StringReader(this.requestJSONString))) {
+				requestParser = new RequestParser(jsonReader, this.getSecAdvisor());
+			} catch (Exception e) {
+				this.addInvalidField( "requestJSONString", "Invalid request xml");
+				this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestJSONString", e);
+			}
+		} else {
+			reader = new StringReader(requestXMLString);
+
+			try {
+				SAXBuilder sax = new SAXBuilder();
+				requestDoc = sax.build(reader);
+				requestParser = new RequestParser(requestDoc, this.getSecAdvisor());
+			} catch (JDOMException je) {
+				this.addInvalidField("RequestXMLString", "Invalid request xml");
+				this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", je);
+			}
+		}
 
 		try {
 			launchAppURL = this.getLaunchAppURL(request);
@@ -1633,7 +1674,16 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						}
 					}
 
-					Set propertyEntries = this.saveRequestProperties(propertiesXML, sess, requestParser);
+					Set propertyEntries;
+
+					try {
+						propertyEntries = this.saveRequestProperties(propertiesXML, sess, requestParser);
+					} catch (Exception e) {
+						this.addInvalidField("propertiesXML", "Invalid properties json");
+						this.errorDetails = Util.GNLOG(LOG,"Cannot parse propertiesXML", e);
+
+						throw e;
+					}
 
 					// if it isn't a new request and property entries have been added or removed
 					String requestPropertyBillingMessage = "";
@@ -1686,9 +1736,12 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						String canUpdate = (String) requestParser.getCollaboratorUpdateMap().get(key);
 
 						// TODO (performance): Would be better if app user was cached.
-						ExperimentCollaborator collaborator = (ExperimentCollaborator) sess.createQuery(
-								"SELECT ec from ExperimentCollaborator ec where idRequest = " + requestParser.getRequest().getIdRequest() + " and idAppUser = "
-										+ idAppUser).uniqueResult();
+						ExperimentCollaborator collaborator = (ExperimentCollaborator) sess.createQuery(""
+								+ " SELECT ec "
+								+ "   FROM ExperimentCollaborator ec "
+								+ "  WHERE idRequest = " + requestParser.getRequest().getIdRequest()
+								+ "    AND idAppUser = " + idAppUser
+						).uniqueResult();
 
 						// If the collaborator doesn't exist, create it.
 						if (collaborator == null) {
@@ -3311,7 +3364,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 	}
 
-	private Set saveRequestProperties(String propertiesXML, Session sess, RequestParser requestParser) throws org.jdom.JDOMException {
+	private Set saveRequestProperties(String propertiesXML, Session sess, RequestParser requestParser) throws Exception {
 		return saveRequestProperties(propertiesXML, sess, requestParser, true);
 	}
 

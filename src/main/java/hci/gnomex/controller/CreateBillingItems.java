@@ -48,6 +48,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonReader;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -89,14 +91,12 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
     if (request.getParameter("requestXMLString") != null && !request.getParameter("requestXMLString").equals("")) {
       requestXMLString = request.getParameter("requestXMLString");
       this.requestXMLString = this.requestXMLString.replaceAll("&", "&amp;");
-      StringReader reader = new StringReader(requestXMLString);
-      try {
-        SAXBuilder sax = new SAXBuilder();
-        requestDoc = sax.build(reader);
-        requestParser = new RequestParser(requestDoc, this.getSecAdvisor());
-      } catch (JDOMException je ) {
+
+      try (JsonReader jsonReader = Json.createReader(new StringReader(this.requestXMLString))) {
+        requestParser = new RequestParser(jsonReader, this.getSecAdvisor());
+      } catch (Exception e) {
         this.addInvalidField( "RequestXMLString", "Invalid request xml");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", je);
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", e);
       }
     }
 
@@ -118,7 +118,6 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
     } else {
       setResponsePage(this.ERROR_JSP);
     }
-
   }
 
   public Command execute() throws RollBackCommandException {
@@ -329,7 +328,16 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
 
       }
 
-      Set propertyEntries = SaveRequest.saveRequestProperties( propertiesXML, sess, requestParser, false );
+      Set propertyEntries;
+
+      try {
+        propertyEntries = SaveRequest.saveRequestProperties( propertiesXML, sess, requestParser, false );
+      } catch (Exception e) {
+        this.addInvalidField("propertiesXML", "Invalid properties json");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse propertiesXML", e);
+
+        throw e;
+      }
 
       List discountBillingItems = new ArrayList<BillingItem>();
 

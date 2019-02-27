@@ -133,7 +133,12 @@ export class Experiment {
     public set experimentOwner(value: any) {
         if (value && value.idAppUser) {
             this._experimentOwner = value;
-            this.idAppUser = value.idAppUser;
+            this.idAppUser            = value.idAppUser;
+            this.idSubmitter          = value.idAppUser;
+            this.submitterName        = value.displayName;
+            this.submitterEmail       = value.email;
+            this.submitterPhone       = value.phone;
+            this.submitterInstitution = value.institution;
         } else {
             // TODO replace check with typing
             throw { message: 'Bad experiment owner!!!' };
@@ -282,7 +287,28 @@ export class Experiment {
         }
     }
 
-    public samples:                 Sample[] = [];
+    // Really this will always return a Sample[]...
+    public get samples(): any|any[] {
+        return this._samples
+    }
+    public set samples(value :any|any[]) {
+        if (!value) {
+            this._samples = [];
+        }
+        if (!Array.isArray(value)) {
+            value = [value.Sample]
+        }
+
+        let temp = [];
+        for (let sample of value){
+            if (sample instanceof Sample) {
+                temp.push(sample);
+            } else {
+                temp.push(Sample.createSampleObjectFromAny(this.dictionaryService, sample));
+            }
+        }
+    }
+    public _samples:                 Sample[] = [];
 
     public hybridizations:          any[] = [];
     public labeledSamples:          any[] = [];

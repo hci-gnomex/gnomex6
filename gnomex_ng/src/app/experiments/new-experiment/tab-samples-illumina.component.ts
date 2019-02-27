@@ -66,7 +66,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
-    private emToPxConversionRate: number = 16;
+    private emToPxConversionRate: number = 13;
 
     @Input('experiment') public set experiment(value: Experiment) {
         this._experiment = value;
@@ -175,9 +175,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "",
             field: "index",
-            width:    1.5 * this.emToPxConversionRate,
-            maxWidth: 1.5 * this.emToPxConversionRate,
-            minWidth: 1.5 * this.emToPxConversionRate,
+            width:    2 * this.emToPxConversionRate,
+            maxWidth: 2 * this.emToPxConversionRate,
+            minWidth: 2 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             suppressSizeToFit: true
         });
@@ -185,9 +185,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
             headerName: "Multiplex Group",
             editable: true,
             field: "multiplexGroupNumber",
-            width:    5 * this.emToPxConversionRate,
-            minWidth: 3 * this.emToPxConversionRate,
-            maxWidth: 7 * this.emToPxConversionRate,
+            width:    6.5 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            maxWidth: 9 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -207,9 +207,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "Sample Name",
             field: "name",
-            width:    7 * this.emToPxConversionRate,
-            minWidth: 5 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate,
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 6.5 * this.emToPxConversionRate,
+            maxWidth: 12 * this.emToPxConversionRate,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -221,9 +221,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "Conc. (ng/ul)",
             field: "concentration",
-            width:    5.5 * this.emToPxConversionRate,
-            minWidth: 3 * this.emToPxConversionRate,
-            maxWidth: 7 * this.emToPxConversionRate,
+            width:    7.5 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            maxWidth: 9 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             editable: true,
             cellRendererFramework: TextAlignRightMiddleRenderer,
@@ -233,10 +233,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         });
         temp.push({
             headerName: "Vol. (ul)",
-            field: "volume",
-            width:    5.5 * this.emToPxConversionRate,
-            minWidth: 3 * this.emToPxConversionRate,
-            maxWidth: 7 * this.emToPxConversionRate,
+            field: "sampleVolume",
+            width:    7.5 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            maxWidth: 9 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             editable: true,
             cellRendererFramework: TextAlignRightMiddleRenderer,
@@ -247,9 +247,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "CC Number",
             field: "ccNum",
-            width:    7 * this.emToPxConversionRate,
-            minWidth: 6 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -264,9 +264,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "# Seq Lanes",
             field: "numberSequencingLanes",
-            width:    5 * this.emToPxConversionRate,
-            minWidth: 4 * this.emToPxConversionRate,
-            maxWidth: 6 * this.emToPxConversionRate,
+            width:    6.5 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate,
+            maxWidth: 8 * this.emToPxConversionRate,
             editable: true,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -278,8 +278,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "Sample Type",
             editable: true,
-            width:    10 * this.emToPxConversionRate,
-            minWidth: 7 * this.emToPxConversionRate,
+            width:    13 * this.emToPxConversionRate,
+            minWidth: 9 * this.emToPxConversionRate,
             field: "idSampleType",
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
@@ -292,8 +292,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "Organism",
             editable: true,
-            width:    10 * this.emToPxConversionRate,
-            minWidth: 7  * this.emToPxConversionRate,
+            width:    13 * this.emToPxConversionRate,
+            minWidth: 9  * this.emToPxConversionRate,
             field: "idOrganism",
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
@@ -310,8 +310,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "Seq Lib Protocol",
             editable: false,
-            width:    15 * this.emToPxConversionRate,
-            minWidth: 7  * this.emToPxConversionRate,
+            width:    20 * this.emToPxConversionRate,
+            minWidth: 9  * this.emToPxConversionRate,
             field: "idSeqLibProtocol",
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
@@ -321,14 +321,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
         });
         if (this._experiment
             && this._experiment.seqPrepByCore_forSamples
-            && this._experiment.seqPrepByCore_forSamples === 'Y') {
+            && this._experiment.seqPrepByCore_forSamples === 'N') {
 
             temp.push({
                 headerName: "Index Tag A",
                 editable: true,
-                width:    9 * this.emToPxConversionRate,
-                minWidth: 9 * this.emToPxConversionRate,
-                maxWidth: 15 * this.emToPxConversionRate,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                maxWidth: 20 * this.emToPxConversionRate,
                 field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
@@ -344,18 +344,18 @@ export class TabSamplesIlluminaComponent implements OnInit {
             temp.push({
                 headerName: "Index Tag Sequence A",
                 field: "barcodeSequence",
-                width:    5.5 * this.emToPxConversionRate,
-                minWidth: 5 * this.emToPxConversionRate,
-                maxWidth: 7 * this.emToPxConversionRate,
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 6.5 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false
             });
             temp.push({
                 headerName: "Index Tag B",
                 editable: true,
-                width:    9 * this.emToPxConversionRate,
-                minWidth: 9 * this.emToPxConversionRate,
-                maxWidth: 15 * this.emToPxConversionRate,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                maxWidth: 20 * this.emToPxConversionRate,
                 field: "idOligoBarcodeB",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
@@ -367,9 +367,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
             temp.push({
                 headerName: "Index Tag Sequence B",
                 field: "barcodeSequenceB",
-                width:    5.5 * this.emToPxConversionRate,
-                minWidth: 5 * this.emToPxConversionRate,
-                maxWidth: 7 * this.emToPxConversionRate,
+                width:    7 * this.emToPxConversionRate,
+                minWidth: 6.5 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });
@@ -490,6 +490,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public tabDisplayed(): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         this.rebuildColumnDefinitions();
         this.confirm();
     }
@@ -504,7 +508,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 });
 
                 if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
-                    this.addColumnToColumnDef(temp, fullProperty[0]);
+                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this._tabIndexToInsertAnnotations, this.emToPxConversionRate);
                 }
             }
         }
@@ -774,6 +778,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.gridColumnApi = event.columnApi;
         event.api.setHeaderHeight(50);
 
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         this.samplesGridApi.setColumnDefs(this.samplesGridColumnDefs);
         this.samplesGridApi.setRowData(this._experiment.samples);
         this.samplesGridApi.sizeColumnsToFit();
@@ -841,7 +849,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.showInstructions = !this.showInstructions;
     }
 
-    private addColumnToColumnDef(columnDefs: any[], annot: any): void {
+    public static addColumnToColumnDef(columnDefs: any[], annot: any, tabIndexToInsertAnnotations: number, emToPxConversionRate: number): void {
         if (!annot || !annot.idProperty) {
             return;
         }
@@ -849,55 +857,55 @@ export class TabSamplesIlluminaComponent implements OnInit {
         let column: any;
         switch(annot.codePropertyType) {
             case annotType.CHECK :
-                column = this.createCheckColumn(annot);
+                column = TabSamplesIlluminaComponent.createCheckColumn(annot, emToPxConversionRate);
                 break;
             case annotType.MOPTION :
-                column = this.createMoptionColumn(annot);
+                column = TabSamplesIlluminaComponent.createMoptionColumn(annot, emToPxConversionRate);
                 break;
             case annotType.OPTION :
-                column = this.createOptionColumn(annot);
+                column = TabSamplesIlluminaComponent.createOptionColumn(annot, emToPxConversionRate);
                 break;
             case annotType.URL :
-                column = this.createUrlColumn(annot);
+                column = TabSamplesIlluminaComponent.createUrlColumn(annot, emToPxConversionRate);
                 break;
             case annotType.TEXT :
-                column = this.createTextColumn(annot);
+                column = TabSamplesIlluminaComponent.createTextColumn(annot, emToPxConversionRate);
                 break;
             default:
-                column = this.createTextColumn(annot);
+                column = TabSamplesIlluminaComponent.createTextColumn(annot, emToPxConversionRate);
         }
 
         if (!columnDefs || !Array.isArray(columnDefs)) {
             columnDefs = [];
         }
 
-        if (!this._tabIndexToInsertAnnotations) {
-            this._tabIndexToInsertAnnotations = columnDefs.length;
+        if (!tabIndexToInsertAnnotations) {
+            tabIndexToInsertAnnotations = columnDefs.length;
         }
 
-        columnDefs.splice(this._tabIndexToInsertAnnotations, 0, column);
+        columnDefs.splice(tabIndexToInsertAnnotations, 0, column);
     }
 
-    private createCheckColumn(annot: any) {
+    public static createCheckColumn(annot: any, emToPxConversionRate: number) {
         return {
             headerName: annot.display,
             editable: false,
             checkboxEditable: true,
             idProperty: annot.idProperty,
-            width:    10 * this.emToPxConversionRate,
-            minWidth: 7 * this.emToPxConversionRate,
+            width:    10 * emToPxConversionRate,
+            minWidth: 7 * emToPxConversionRate,
             suppressSizeToFit: true,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
             cellRendererFramework: CheckboxRenderer,
         };
     }
 
-    private createMoptionColumn(annot: any): any{
+    public static createMoptionColumn(annot: any, emToPxConversionRate: number): any{
         return {
             headerName: annot.display,
             editable: true,
-            width:    10 * this.emToPxConversionRate,
-            minWidth: 7 * this.emToPxConversionRate,
+            width:    10 * emToPxConversionRate,
+            minWidth: 7 * emToPxConversionRate,
             suppressSizeToFit: true,
             idProperty: annot.idProperty,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
@@ -912,12 +920,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     }
 
-    private createOptionColumn(annot: any): any {
+    public static createOptionColumn(annot: any, emToPxConversionRate: number): any {
         return {
             headerName: annot.display,
             editable: true,
-            width:    10 * this.emToPxConversionRate,
-            minWidth: 7 * this.emToPxConversionRate,
+            width:    10 * emToPxConversionRate,
+            minWidth: 7 * emToPxConversionRate,
             suppressSizeToFit: true,
             idProperty: annot.idProperty,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
@@ -931,12 +939,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
         };
     }
 
-    private createTextColumn(annot: any): any {
+    public static createTextColumn(annot: any, emToPxConversionRate: number): any {
         return {
             headerName: annot.display,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
-            width:    10 * this.emToPxConversionRate,
-            minWidth: 7 * this.emToPxConversionRate,
+            width:    10 * emToPxConversionRate,
+            minWidth: 7 * emToPxConversionRate,
             suppressSizeToFit: true,
             idProperty: annot.idProperty,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -945,12 +953,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
         };
     }
 
-    private createUrlColumn(annot: any): any {
+    public static createUrlColumn(annot: any, emToPxConversionRate: number): any {
         return {
             headerName: annot.display,
             editable: true,
-            width:    10 * this.emToPxConversionRate,
-            minWidth: 7 * this.emToPxConversionRate,
+            width:    10 * emToPxConversionRate,
+            minWidth: 7 * emToPxConversionRate,
             suppressSizeToFit: true,
             idProperty: annot.idProperty,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,

@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.json.Json;
+import javax.json.JsonReader;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -34,17 +36,14 @@ import org.jdom.output.XMLOutputter;
 import org.apache.log4j.Logger;
 
 public class GetMultiplexLaneList extends GNomExCommand implements Serializable {
-
-
-
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger(GetMultiplexLaneList.class);
-
 
   private String           requestXMLString;
   private Document         requestDoc;
   private RequestParser    requestParser;
 
+  private boolean          usingJSON;
 
   public void validate() {
   }
@@ -53,28 +52,39 @@ public class GetMultiplexLaneList extends GNomExCommand implements Serializable 
 
 
     if (request.getParameter("requestXMLString") != null && !request.getParameter("requestXMLString").equals("")) {
-      requestXMLString = request.getParameter("requestXMLString");
+      this.usingJSON = false;
+
+      this.requestXMLString = request.getParameter("requestXMLString");
       this.requestXMLString = this.requestXMLString.replaceAll("&", "&amp;");
       StringReader reader = new StringReader(requestXMLString);
+
       try {
         SAXBuilder sax = new SAXBuilder();
         requestDoc = sax.build(reader);
         requestParser = new RequestParser(requestDoc, this.getSecAdvisor());
       } catch (JDOMException je ) {
-         this.addInvalidField( "RequestXMLString", "Invalid request xml");
+        this.addInvalidField( "RequestXMLString", "Invalid request xml");
         this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", je);
+      }
+    } else if (request.getParameter("requestJSONString") != null && !request.getParameter("requestJSONString").equals("")) {
+      this.usingJSON = true;
 
+      String requestJSONString = request.getParameter("requestJSONString");
+      if (Util.isParameterNonEmpty(requestJSONString)) {
+        try (JsonReader jsonReader = Json.createReader(new StringReader(requestJSONString))) {
+            requestParser = new RequestParser(jsonReader, this.getSecAdvisor());
+        } catch (Exception e) {
+          this.addInvalidField( "requestJSONString", "Invalid request json");
+          this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", e);
+        }
       }
     }
-
-
 
     if (isValid()) {
       setResponsePage(this.SUCCESS_JSP);
     } else {
       setResponsePage(this.ERROR_JSP);
     }
-
   }
 
   public Command execute() throws RollBackCommandException {
@@ -84,14 +94,10 @@ public class GetMultiplexLaneList extends GNomExCommand implements Serializable 
       Session sess = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
       DictionaryHelper dh = DictionaryHelper.getInstance(sess);
 
-
-
       // Read the experiment
       Request request = null;
-      Set hybs = null;
       Set samples = null;
       Set lanes = null;
-      Set labeledSamples = null;
       int x = 0;
 
       requestParser.parse(sess);
@@ -114,10 +120,9 @@ public class GetMultiplexLaneList extends GNomExCommand implements Serializable 
       samples = new TreeSet(new SampleComparator());
       lanes = new TreeSet(new LaneComparator());
 
-
-      // Parse the samples.   Consider samples for billing if this
-      // is a new request or a qc request being converted to a microarray
-      // or next gen sequencing request
+      // Parse the samples.
+      // Consider samples for billing if this is a new request or a qc request being converted to a
+      // microarray or next gen sequencing request
       x = 0;
       if (!requestParser.isAmendRequest() || requestParser.getAmendState().equals(Constants.AMEND_QC_TO_SEQ)) {
         for(Iterator i = requestParser.getSampleIds().iterator(); i.hasNext();) {

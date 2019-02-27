@@ -42,26 +42,59 @@
             </div>
         </div>
         <div class="top-margin font-bold">
-            Estimated Charges :
+            Estimated Charges : {{ totalEstimatedCharges }}
         </div>
-        <!--Requires conversion of CreateBillingItems (which is oddly called before confirmation/submitting the form.-->
-
+        <div class="padded heavily-left-padded">
+            <div class="t">
+                <div *ngFor="let billingItem of billingItems" class="tr">
+                    <div class="td padded heavily-right-padded">
+                        {{ billingItem.category ? '' + billingItem.category : '' }}
+                    </div>
+                    <div class="td padded heavily-right-padded">
+                        {{ billingItem.description ? '' + billingItem.description : '' }}
+                    </div>
+                    <div class="td padded">
+                        {{ billingItem.qty ? '' + billingItem.qty : '' }}
+                    </div>
+                    <div class="td padded heavily-right-padded">
+                        &#215;
+                    </div>
+                    <div class="td right-align padded">
+                        {{ billingItem.unitPrice ? '' + billingItem.unitPrice : '' }}
+                    </div>
+                    <div class="td padded heavily-right-padded">
+                        =
+                    </div>
+                    <div class="td right-align padded">
+                        {{ billingItem.invoicePriceDisplay ? '' + billingItem.invoicePriceDisplay : '' }}
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="top-margin font-bold">
             Request Properties :
+        </div>
+        <div class="padded heavily-left-padded">
+            <div *ngFor="let experimentAnnotation of _experimentAnnotations" class="full-width flex-container-row padded">
+                <div class="wide-display">
+                    {{ experimentAnnotation.name }}
+                </div>
+                <div class="flex-grow">
+                    {{ experimentAnnotation.value }}
+                </div>
+            </div>
         </div>
         <div class="top-margin font-bold">
             Experiment Design :
         </div>
         <div class="flex-container-row full-height full-width small-font minheight">
+            <div #oneEmWidth class="no-height single-em"></div>
             <ag-grid-angular class="ag-theme-fresh full-height full-width"
                              [columnDefs]="this.samplesGridConfirmColumnDefs"
                              [enableColResize]="true"
                              (gridReady)="this.onGridReady($event)">
             </ag-grid-angular>
         </div>
-        <mat-checkbox [checked]="isCheckboxChecked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}">
-            {{ agreeCheckboxLabel }}
-        </mat-checkbox>
     </form>
 </div>
 

@@ -1,25 +1,46 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
-import {SelectEditor} from "../../util/grid-editors/select.editor";
-import {BarcodeSelectEditor} from "../../util/grid-editors/barcode-select.editor";
 import {BillingService} from "../../services/billing.service";
 
 import {Experiment} from "../../util/models/experiment.model";
-import {URLSearchParams} from "@angular/http";
+import {BehaviorSubject, Subscription} from "rxjs/index";
+import {ExperimentsService} from "../experiments.service";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
+import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
+import {AnnotationService} from "../../services/annotation.service";
+import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
 
 @Component({
     selector: "tabConfirmIllumina",
     templateUrl: "./tab-confirm-illumina.component.html",
     styles: [`
         
+
+        .no-height { height: 0;  }
+        .single-em { width: 1em; }
         
         .bordered { border: solid silver 1px; }
         
         .heavily-left-padded { padding-left: 1.5em; }
+        .heavily-right-padded { padding-right: 1.5em; }
+        
+        
+        .wide-display { 
+            min-width: 30em; 
+            width: 30%; 
+        }
+        
+        
+        .t  { display: table;      }
+        .tr { display: table-row;  }
+        .td { display: table-cell; }
+        
+        .right-align { text-align: right; }
         
         
         .top-margin { margin-top: 0.3em; }
@@ -38,16 +59,40 @@ import {URLSearchParams} from "@angular/http";
     `]
 })
 
-export class TabConfirmIlluminaComponent implements OnInit {
+export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     @Input("experiment") public set experiment(value: Experiment) {
         this._experiment = value;
     }
+
+    @Input("getExperimentAnnotationsSubject") public set getExperimentAnnotationsSubject(subject: BehaviorSubject<any>) {
+        this._getExperimentAnnotationsSubject = subject;
+    }
+    @Input("experimentAnnotations") public set experimentAnnotations(subject: BehaviorSubject<any[]>) {
+        if (!this.experimentAnnotationsSubscription && subject) {
+            this.experimentAnnotationsSubscription = subject.asObservable().subscribe((value: any[]) => {
+                this._experimentAnnotations = value;
+            });
+        }
+    }
+
+    @Input("agreeCheckboxLabelSubject") set agreeCheckboxLabelSubject(subject: BehaviorSubject<string>) {
+        this.agreeCheckboxLabel_subject = subject;
+    }
+
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
     public get experiment(): Experiment {
         return this._experiment;
     }
 
     private _experiment: Experiment;
+    public  _experimentAnnotations: any[];
+
+    private _getExperimentAnnotationsSubject: BehaviorSubject<any>;
+
+    private agreeCheckboxLabel_subject: BehaviorSubject<string>;
 
     private form: FormGroup;
     private submitterName: string;
@@ -55,8 +100,8 @@ export class TabConfirmIlluminaComponent implements OnInit {
     private clientPrepString: string = "Library Prepared By Client";
     private clientPrepLib: boolean;
     private seqLaneTypeLabel: string;
-    private requestPropsGridApi: any;
-    private requestPropsColumnApi: any;
+    private gridApi: any;
+    private columnApi: any;
     private samplesGridConfirmColumnDefs: any;
     private requestPropsColumnDefs: any;
     private organisms: any[] = [];
@@ -65,13 +110,23 @@ export class TabConfirmIlluminaComponent implements OnInit {
     private disable_agreeCheckbox: boolean;
 
     private requestPropBox: boolean;
-    private billingItems: any[] = [];
-
-    public agreeCheckboxLabel: string;
+    public billingItems: any[] = [];
 
     private _barCodes: any[] = [];
 
     private sampleTypes: any[] = [];
+
+    private experimentAnnotationsSubscription: Subscription;
+
+
+    public totalEstimatedCharges: String = '$-.--';
+
+    private tabIndexToInsertAnnotations: number;
+
+    private emToPxConversionRate: number = 13;
+
+    private propertyList: any[];
+    private sequenceLanes: any[];
 
 
     public get labName(): string {
@@ -81,8 +136,6 @@ export class TabConfirmIlluminaComponent implements OnInit {
             return '';
         }
     }
-
-
 
     public get billingAccountName(): string {
         return this._experiment.billingAccountName;
@@ -100,7 +153,9 @@ export class TabConfirmIlluminaComponent implements OnInit {
 
 
 
-    constructor(private dictionaryService: DictionaryService,
+    constructor(private annotationService: AnnotationService,
+                private dictionaryService: DictionaryService,
+                private experimentService: ExperimentsService,
                 private gnomexService: GnomexService,
                 private billingService: BillingService,
                 private fb: FormBuilder) {
@@ -117,113 +172,122 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 width: 100,
             }
         ];
-        this.samplesGridConfirmColumnDefs = [
-            {
-                headerName: "Multiplex Group",
-                editable: false,
-                field: "multiplexGroupNumber",
-                width: 100
-            },
-            {
-                headerName: "Sample Name",
-                field: "name",
-                width: 100,
-                editable: false
-            },
-            {
-                headerName: "Conc. (ng/ul)",
-                field: "concentration",
-                width: 100,
-                editable: false
-            },
-            {
-                headerName: "Vol. (ul)",
-                field: "sampleVolumne",
-                width: 100,
-                editable: false
-            },
-            {
-                headerName: "Index Tag A",
-                editable: false,
-                width: 125,
-                field: "idOligoBarcode"
-            },
-            {
-                headerName: "Index Tag B",
-                editable: false,
-                width: 125,
-                field: "idOligoBarcodeB",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: BarcodeSelectEditor,
-                selectOptions: this._barCodes,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOligoBarcodeB",
-                indexTagLetter: 'B'
-            },
-            {
-                headerName: "Index Tag",
-                editable: false,
-                width: 125,
-                field: "idOligoBarcodeB",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: BarcodeSelectEditor,
-                selectOptions: this._barCodes,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOligoBarcodeB",
-                indexTagLetter: 'B'
-            },
-            {
-                headerName: "Seq Lib Protocol",
-                editable: false,
-                width: 200,
-                field: "idSeqLibProtocol",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.gnomexService.seqLibProtocolsWithAppFilters,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idSeqLibProtocol"
-            },
-            {
-                headerName: "# Seq Lanes",
-                field: "numberSequencingLanes",
-                width: 100,
-                editable: false
-            },
-            {
-                headerName: "Sample Type",
-                editable: false,
-                width: 175,
-                field: "idSampleType",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.sampleTypes,
-                selectOptionsDisplayField: "sampleType",
-                selectOptionsValueField: "idSampleType"
-            },
-            {
-                headerName: "Organism",
-                editable: true,
-                width: 200,
-                field: "idOrganism",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.organisms,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOrganism"
-            }
-        ];
+
+        this.annotationService.getPropertyList().subscribe((result) => {
+            this.propertyList = result;
+            this.buildColumnDefinitions();
+        });
 
         this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
     }
 
     ngOnInit() {
         this.loadBarcodes();
+        this.loadSampleTypes();
 
         this.form = this.fb.group({});
     }
 
+    ngOnDestroy() {
+        if (this.experimentAnnotationsSubscription) {
+            this.experimentAnnotationsSubscription.unsubscribe();
+        }
+    }
+
+    private buildColumnDefinitions(): void {
+        let temp: any[] = [];
+
+        temp.push({
+            headerName: "Multiplex Group #",
+            editable: false,
+            field: "multiplexGroupNumber",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            width: 100
+        });
+        temp.push({
+            headerName: "Sample ID",
+            field: "sampleId",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            width: 100,
+            editable: false
+        });
+        temp.push({
+            headerName: "Sample Name",
+            field: "name",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            width: 100,
+            editable: false
+        });
+        temp.push({
+            headerName: "Conc. (ng/ul)",
+            field: "concentration",
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            width: 100,
+            editable: false
+        });
+        temp.push({
+            headerName: "Sample Volume (ul)",
+            field: "sampleVolume",
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            width: 100,
+            editable: false
+        });
+
+        this.tabIndexToInsertAnnotations = temp.length;
+
+        temp.push({
+            headerName: "# Seq Lanes",
+            field: "numberSequencingLanes",
+            width: 100,
+            editable: false
+        });
+        temp.push({
+            headerName: "Sample Type",
+            editable: false,
+            width: 175,
+            field: "idSampleType",
+            cellRendererFramework: SelectRenderer,
+            selectOptions: this.sampleTypes,
+            selectOptionsDisplayField: "sampleType",
+            selectOptionsValueField: "idSampleType"
+        });
+        temp.push({
+            headerName: "Organism",
+            editable: false,
+            width: 200,
+            field: "idOrganism",
+            cellRendererFramework: SelectRenderer,
+            selectOptions: this.organisms,
+            selectOptionsDisplayField: "display",
+            selectOptionsValueField: "idOrganism"
+        });
+
+        if (this._experiment) {
+            for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
+                let fullProperty = this.propertyList.filter((value: any) => {
+                    return value.idProperty === sampleAnnotation.idProperty;
+                });
+
+                if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
+                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this.tabIndexToInsertAnnotations, this.emToPxConversionRate);
+                }
+            }
+        }
+
+        this.samplesGridConfirmColumnDefs = temp;
+    }
+
     public tabDisplayed(): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        this._getExperimentAnnotationsSubject.next({});
         this.setUpView();
+
+        this.gridApi.setColumnDefs(this.samplesGridConfirmColumnDefs);
+        this.gridApi.setRowData(this.sequenceLanes);
+        this.gridApi.sizeColumnsToFit();
     }
 
     private loadBarcodes(): void {
@@ -236,8 +300,10 @@ export class TabConfirmIlluminaComponent implements OnInit {
         }
     }
 
-    setUpView() {
+    private setUpView() {
         this.getEstimatedBilling();
+        this.getSequenceLanes();
+
         this.submitterName = '';
         if (this._experiment && this._experiment.experimentOwner && this._experiment.experimentOwner.displayName) {
             this.submitterName = this._experiment.experimentOwner.displayName;
@@ -270,9 +336,8 @@ export class TabConfirmIlluminaComponent implements OnInit {
         this.requestPropBox = this.gnomexService.getCoreFacilityProperty(this._experiment.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB) === 'Y';
     }
 
-    public getEstimatedBilling(): void {
+    private getEstimatedBilling(): void {
         this.disable_agreeCheckbox = true;
-        this.agreeCheckboxLabel = "";
         this.isCheckboxChecked = false;
 
         if (this._experiment.isExternal === 'Y') {
@@ -284,25 +349,109 @@ export class TabConfirmIlluminaComponent implements OnInit {
                 accountName = this._experiment.billingAccount.accountNumberDisplay;
             }
 
-            this.agreeCheckboxLabel = "I authorize all charges to be billed to account(s): " + accountName;
+            this.agreeCheckboxLabel_subject.next("I authorize all charges to be billed to account(s): " + accountName);
             this.disable_agreeCheckbox = false;
 
             // This is a new experiment request. Get the estimated charges for this request.
-            this._experiment.billingItems = [];
 
-            let stringifiedRequest: string = JSON.stringify(this._experiment.getJSONObjectRepresentation());
-            // let formData: FormData = new FormData();
-            // formData.append("requestXMLString", stringifiedRequest);
-            let params: URLSearchParams = new URLSearchParams();
-            params.set("requestXMLString", stringifiedRequest);
-            this.billingService.createBillingItems2(params).subscribe((response: any) => {
-                this.billingItems = response.BillingItem;
+            let propertiesXML = JSON.stringify(this._experimentAnnotations);
+            this.billingService.createBillingItems(propertiesXML, this._experiment).subscribe((response: any) => {
+
+                if (!response || !response.Request) {
+                    return;
+                }
+
+                if (response.Request.invoicePrice && ('' + response.Request.invoicePrice).match(/^.\d+\.\d{2}$/)) {
+                    this.totalEstimatedCharges = response.Request.invoicePrice;
+                }
+
+                this.billingItems = [];
+
+                if (response.Request.BillingItem && Array.isArray(response.Request.BillingItem)) {
+                    this.billingItems = response.Request.BillingItem
+                } else {
+                    this.billingItems = [response.Request.BillingItem.BillingItem];
+                }
             });
         }
     }
 
+    private getSequenceLanes(): void {
+
+        this.experimentService.getMultiplexLaneList(this._experiment).subscribe((response: any) => {
+            if (!response || !(Array.isArray(response) || response.MultiplexLane)) {
+                return;
+            }
+
+            let multiplexLanes: any[] = [];
+
+            if (Array.isArray(response)) {
+                multiplexLanes = response;
+            } else {
+                multiplexLanes = [response.MultiplexLane];
+            }
+
+            let sequenceLanes = [];
+
+            for (let sample of this._experiment.samples) {
+                sequenceLanes.push(sample.getJSONObjectRepresentation());
+            }
+
+            let sampleNumber: number = 0;
+
+            for (let multiplexLane of multiplexLanes) {
+                let multiplexNumber = multiplexLane.number;
+
+                if (multiplexLane.SequenceLane) {
+                    if (Array.isArray(multiplexLane.SequenceLane)) {
+                        for (let lane of multiplexLane.SequenceLane) {
+                            sequenceLanes[sampleNumber].sampleId = 'X' + ++sampleNumber;
+                        }
+                    } else {
+                        sequenceLanes[sampleNumber].sampleId        = 'X' + ++sampleNumber;
+                    }
+                }
+            }
+
+            this.sequenceLanes = sequenceLanes;
+            this.gridApi.setRowData(this.sequenceLanes);
+        });
+    }
+
+    private loadSampleTypes(): void {
+        let types: any[] = [];
+
+        for (let sampleType of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+            if (sampleType.isActive === 'N'
+                || (sampleType.codeNucleotideType !== "RNA" && sampleType.codeNucleotideType !== "DNA")) {
+
+                continue;
+            }
+
+            let requestCategories = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleTypeRequestCategory").filter(sampleRequestCategory =>
+                sampleRequestCategory.value !== "" && sampleRequestCategory.idSampleType === sampleType.value
+            );
+
+            for (let requestCategory of requestCategories) {
+                if (this._experiment && requestCategory.codeRequestCategory === this._experiment.codeRequestCategory) {
+                    types.push(sampleType);
+                }
+            }
+        }
+
+        this.sampleTypes = types.sort(TabSampleSetupViewComponent.sortSampleTypes);
+    }
+
     public onGridReady(params: any): void {
-        this.requestPropsGridApi = params.api;
-        this.requestPropsColumnApi = params.columnApi;
+        this.gridApi = params.api;
+        this.columnApi = params.columnApi;
+
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        this.gridApi.setColumnDefs(this.samplesGridConfirmColumnDefs);
+        this.gridApi.setRowData(this.sequenceLanes);
+        this.gridApi.sizeColumnsToFit();
     }
 }

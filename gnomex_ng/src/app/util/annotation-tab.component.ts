@@ -13,7 +13,7 @@ import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.compon
 import {BrowseOrderValidateService} from "../services/browse-order-validate.service";
 import {IAnnotationOption} from "./interfaces/annotation-option.model";
 import {AnnotationService} from "../services/annotation.service";
-import {Subscription} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 
 export enum OrderType {
     ANALYSIS = 'a',
@@ -133,6 +133,22 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         this.form.markAsPristine();
     }
 
+    @Input("experimentAnnotations") public set experimentAnnotations(subject: BehaviorSubject<any[]>) {
+        this.experimentAnnotations_subject = subject;
+    }
+
+    private experimentAnnotations_subject: BehaviorSubject<any>;
+
+    @Input("getExperimentAnnotationsSubject") public set getExperimentAnnotationsSubject(subject: BehaviorSubject<any[]>) {
+        if (!this.getExperimentAnnotationsSubject_subscription && subject) {
+            this.getExperimentAnnotationsSubject_subscription = subject.subscribe((value: any[]) => {
+                this.prepAnnotationForSave();
+            });
+        }
+    }
+
+    private getExperimentAnnotationsSubject_subscription: Subscription;
+
     get annotations() {
         return this._annotations;
     }
@@ -170,6 +186,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         }
 
         this.orderValidateService.annotationsToSave = annotationToSave;
+        this.experimentAnnotations_subject.next(annotationToSave);
     };
 
 
@@ -217,7 +234,13 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
     }
     
     ngOnDestroy(): void {
-        this.orderValidateSubscription.unsubscribe;
+        if (this.orderValidateSubscription) {
+            this.orderValidateSubscription.unsubscribe();
+        }
+
+        if (this.getExperimentAnnotationsSubject_subscription) {
+            this.getExperimentAnnotationsSubject_subscription.unsubscribe();
+        }
     }
 
 }

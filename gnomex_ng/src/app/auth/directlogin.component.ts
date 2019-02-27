@@ -55,8 +55,8 @@ import {Router} from "@angular/router";
                                             </div>
                                         </div>
                                         <div class="flex-container-row align-center flex-grow padded">
-                                            <button class="full-width rounded-button right-rounded" (click)="this.login()"
-                                                    [disabled]="!_loginForm.valid">Login
+                                            <button class="full-width less-massive-padding login-box" 
+                                                    (click)="this.login()">Login
                                             </button>
                                         </div>
                                     </div>
@@ -84,7 +84,7 @@ import {Router} from "@angular/router";
                     </div>
                     <div *ngIf="_errorMsg" class="login-box major-padding minimize login-background horizontal-centered">
                         <div class="alert-box">
-                            <h5 class="error">Authentication Failed</h5>
+                            <h5 class="error">Authentication Failed ({{ numberOfAttempts }})</h5>
                             <span class="alert-text">{{_errorMsg}}</span>
                         </div>
                     </div>
@@ -132,23 +132,6 @@ import {Router} from "@angular/router";
         .right-align { text-align: right; }
         
         .vertical-spacer { height: 0.1em; }
-
-        .rounded-button {
-            height: 4em;
-        }
-        
-        .rounded-button:focus { outline: 0;}
-        
-        .left-rounded {
-            border-top-left-radius: 2em;
-            border-bottom-left-radius: 2em;
-        }
-        .right-rounded {
-            
-            border-top-right-radius: 2em;
-            border-bottom-right-radius: 2em;
-        }
-
         
         
         .major-padding { padding: 15px; }
@@ -194,6 +177,8 @@ export class DirectLoginComponent implements OnInit {
     public _loginForm: FormGroup;
     public _errorMsg: string;
 
+    public numberOfAttempts: number = 0;
+
     constructor(private _authenticationService: AuthenticationService,
                 private _formBuilder: FormBuilder,
                 private router: Router) {
@@ -213,6 +198,8 @@ export class DirectLoginComponent implements OnInit {
      * A function to submit the login form the the {@link UserService}.
      */
     login() {
+        this.numberOfAttempts++;
+
         this._authenticationService.login(this._loginForm.value.username, this._loginForm.value.password)
             .subscribe((res) => {
                 if (res) {
