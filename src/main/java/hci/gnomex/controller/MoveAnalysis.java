@@ -6,140 +6,112 @@ import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AnalysisGroup;
-import hci.gnomex.utility.AnalysisGroupParser;
 import hci.gnomex.utility.HibernateSession;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
 
-import javax.json.JsonArray;
+import java.io.Serializable;
+import java.util.*;
+
+import javax.json.Json;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.apache.log4j.Logger;
+
 public class MoveAnalysis extends GNomExCommand implements Serializable {
 
-	private static Logger LOG = Logger.getLogger(SaveLab.class);
+    private static Logger LOG = Logger.getLogger(MoveAnalysis.class);
 
-	private Integer idLab;
-	// private Integer idAppUser;
-	private String idAnalysisString;
-	private JsonArray analysisGroupArray;
-	private AnalysisGroupParser analysisGroupParser;
+    private Integer idLab;
+    private Integer idAnalysisGroup;
+    private String idAnalysisString;
+    private boolean isCopyMode;
 
-	@Override
-	public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
-		if (request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
-			idLab = Integer.parseInt(request.getParameter("idLab"));
-		} else {
-			this.addInvalidField("missing idlab", "Please provide idLab");
-		}
+    @Override
+    public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
+        String idLabString = request.getParameter("idLab");
+        if (Util.isParameterNonEmpty(idLabString)) {
+            this.idLab = Integer.parseInt(idLabString);
+        } else {
+            this.addInvalidField("missing idlab", "Please provide idLab");
+        }
 
-		if (request.getParameter("idAnalysisString") != null && !request.getParameter("idAnalysisString").equals("")) {
-			idAnalysisString = request.getParameter("idAnalysisString");
-		} else {
-			this.addInvalidField("missing idAnalysisString", "Please provide idAnalysisString");
-		}
+        String idAnalysisGroupString = request.getParameter("idAnalysisGroup");
+        if (Util.isParameterNonEmpty(idAnalysisGroupString)) {
+            this.idAnalysisGroup = Integer.parseInt(idAnalysisGroupString);
+        } else {
+            this.addInvalidField("missing idAnalysisGroup", "Please provide idAnalysisGroup");
+        }
 
-		try {
-			this.analysisGroupArray = Util.readJSONArray(request, "analysisGroupsJSONString");
-			if(this.analysisGroupArray != null){
-				this.analysisGroupParser = new AnalysisGroupParser(this.analysisGroupArray);
-			}else{
-				this.addInvalidField("missing analysisGroupsJSONString", "Please provide analysisGroupsJSONString");
-			}
-		} catch (Exception e) {
-			this.addInvalidField("analysisGroupsJSONString", "Invalid analysisGroupsJSONString");
-			this.errorDetails = Util.GNLOG(LOG, "Cannot parse analysisGroupsJSONString", e);
-		}
+        String idAnalysisStringParameter = request.getParameter("idAnalysisString");
+        if (Util.isParameterNonEmpty(idAnalysisStringParameter)) {
+            this.idAnalysisString = idAnalysisStringParameter;
+        } else {
+            this.addInvalidField("missing idAnalysisString", "Please provide idAnalysisString");
+        }
 
-	}
+        this.isCopyMode = Util.isParameterTrue(request.getParameter("isCopyMode"));
+    }
 
-	@Override
-	public Command execute() throws RollBackCommandException {
-		try {
-			if (this.isValid()) {
-				Session sess = HibernateSession.currentSession(this.getUsername());
-				String idAnalyses[] = idAnalysisString.split(",");
-				List<String> invalidPermissions = new ArrayList<String>();
+    @Override
+    public Command execute() throws RollBackCommandException {
+        try {
+            Session sess = HibernateSession.currentSession(this.getUsername());
+            Set<String> idAnalyses = new HashSet<>(Arrays.asList(idAnalysisString.split(",")));
+            List<String> invalidPermissions = new ArrayList<>();
 
-				for (int i = 0; i < idAnalyses.length; i++) {
-					TreeSet analysisGroups = new TreeSet(new AnalysisGroupComparator());
-					Integer idAnalysis = Integer.parseInt(idAnalyses[i]);
-					Analysis a = (Analysis) sess.load(Analysis.class, idAnalysis);
+            for (String idAnalysisString : idAnalyses) {
+                Integer idAnalysis = Integer.parseInt(idAnalysisString);
+                Analysis a = sess.load(Analysis.class, idAnalysis);
+                if (!this.getSecurityAdvisor().canUpdate(a)) {
+                    invalidPermissions.add(a.getNumber());
+                    continue;
+                }
 
-					if (!this.getSecurityAdvisor().canUpdate(a)) {
-						invalidPermissions.add(a.getNumber());
-						continue;
-					}
+                a.setIdLab(this.idLab);
+                TreeSet<AnalysisGroup> analysisGroups = new TreeSet<>(new AnalysisGroupComparator());
+                if (this.isCopyMode) {
+                    analysisGroups.addAll(a.getAnalysisGroups());
+                }
+                AnalysisGroup newGroup = sess.load(AnalysisGroup.class, this.idAnalysisGroup);
+                analysisGroups.add(newGroup);
+                a.setAnalysisGroups(analysisGroups);
 
-					a.setIdLab(this.idLab);
+                sess.save(a);
+            }
 
-					analysisGroupParser.parse(sess);
-					if (analysisGroupParser != null && analysisGroupParser.getAnalysisGroupMap().isEmpty()) {
-						// If analysis group wasn't provided, create a default one
-						AnalysisGroup defaultAnalysisGroup = new AnalysisGroup();
-						defaultAnalysisGroup.setName(a.getName());
-						defaultAnalysisGroup.setIdLab(a.getIdLab());
-						defaultAnalysisGroup.setIdAppUser(this.getSecAdvisor().getIdAppUser());
-						sess.save(defaultAnalysisGroup);
+            sess.flush();
 
-						// newAnalysisGroupId = defaultAnalysisGroup.getIdAnalysisGroup();
+            StringBuilder badAnalysisBuilder = new StringBuilder();
+            if (!invalidPermissions.isEmpty()) {
+                badAnalysisBuilder.append("The following analyses could not be moved due to invalid permissions: ");
+                for (Iterator<String> i = invalidPermissions.iterator(); i.hasNext();) {
+                    badAnalysisBuilder.append(i.next());
+                    if (i.hasNext()) {
+                        badAnalysisBuilder.append(", ");
+                    }
+                }
+            }
 
-						analysisGroups.add(defaultAnalysisGroup);
-					} else {
-						for (Iterator j = analysisGroupParser.getAnalysisGroupMap().keySet().iterator(); j.hasNext();) {
-							String idAnalysisGroupString = (String) j.next();
-							AnalysisGroup ag = (AnalysisGroup) analysisGroupParser.getAnalysisGroupMap().get(idAnalysisGroupString);
-							analysisGroups.add(ag);
-						}
-					}
+            this.jsonResult = Json.createObjectBuilder()
+                    .add("result", "SUCCESS")
+                    .add("invalidPermission", badAnalysisBuilder.toString())
+                    .build().toString();
+            setResponsePage(this.SUCCESS_JSP);
+        } catch (Exception e) {
+            this.errorDetails = Util.GNLOG(LOG, "An exception has occurred in MoveAnalysis ", e);
+            throw new RollBackCommandException(e.getMessage());
+        }
+        return this;
+    }
 
-					a.setAnalysisGroups(analysisGroups);
-					sess.save(a);
-				}
+    private class AnalysisGroupComparator implements Comparator<AnalysisGroup>, Serializable {
+        public int compare(AnalysisGroup ag1, AnalysisGroup ag2) {
+            return ag1.getIdAnalysisGroup().compareTo(ag2.getIdAnalysisGroup());
+        }
+    }
 
-				sess.flush();
-				if (invalidPermissions.size() != 0) {
-					String badAnalysisString = "";
-					for (Iterator i = invalidPermissions.iterator(); i.hasNext();) {
-						badAnalysisString += i.next();
-						if (i.hasNext()) {
-							badAnalysisString += ", ";
-						}
-					}
-
-					this.xmlResult = "<SUCCESS invalidPermission=\"The following analyses could not be moved due to invalid permissions " + badAnalysisString
-							+ "\"/>";
-				}
-				setResponsePage(this.SUCCESS_JSP);
-			}
-		} catch (Exception e) {
-			this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in MoveAnalysis ", e);
-
-			throw new RollBackCommandException(e.getMessage());
-
-		}
-		return this;
-	}
-
-	private class AnalysisGroupComparator implements Comparator, Serializable {
-		public int compare(Object o1, Object o2) {
-			AnalysisGroup ag1 = (AnalysisGroup) o1;
-			AnalysisGroup ag2 = (AnalysisGroup) o2;
-
-			return ag1.getIdAnalysisGroup().compareTo(ag2.getIdAnalysisGroup());
-
-		}
-	}
-
-	@Override
-	public void validate() {
-		// TODO Auto-generated method stub
-
-	}
+    @Override
+    public void validate() {
+    }
 
 }
