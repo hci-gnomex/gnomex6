@@ -38,7 +38,7 @@ export class ConfigureAnnotationsComponent {
     public appliesToApp: any;
     public appliesToOrganism: any;
     public appliesToAnalysisType: any;
-    public appliesToUser: any;
+    public appliesToUser: FormControl = new FormControl();
     public requestCategory: string;
     private expPlatform:any;
     public listAnalysisType: any[] = [];
@@ -405,17 +405,17 @@ export class ConfigureAnnotationsComponent {
     }
 
     public addUser(): void {
-        if (this.canUpdateSelectedProperty && this.appliesToUser) {
+        if (this.canUpdateSelectedProperty && this.appliesToUser.value) {
             for (let currentU of this.currentUsers) {
-                if (currentU.idAppUser === this.appliesToUser.idAppUser) {
+                if (currentU.idAppUser === this.appliesToUser.value.idAppUser) {
                     // Already in list
                     return;
                 }
             }
 
-            this.currentUsers.push(this.appliesToUser);
+            this.currentUsers.push(this.appliesToUser.value);
             this.userGridApi.setRowData(this.currentUsers);
-            this.appliesToUser = null;
+            this.appliesToUser.setValue(null);
             this.formGroup.markAsDirty();
         }
     }

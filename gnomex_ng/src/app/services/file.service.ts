@@ -108,12 +108,15 @@ export class FileService {
     getRequestOrganizeFilesObservable(): Observable<any>{
         return this.organizeFilesSubject.pipe( flatMap(params => {
 
-                let expParams : HttpParams =  new HttpParams()
+
+            let expParams : HttpParams =  new HttpParams()
                     .append('idRequest',params.idRequest)
                     .append('showUploads',params.showUploads);
-                let downloadParams:HttpParams = new HttpParams()
+            let downloadParams:HttpParams = new HttpParams()
                     .set('idRequest',params.idRequest)
                     .set('includeUploadStagingDir', params.includeUploadStagingDir);
+
+
 
                 return forkJoin(this.experimentService.getExperimentWithParams(expParams),
                     this.experimentService.getRequestDownloadListWithParams(downloadParams)).pipe(map((resp:any[]) =>{
@@ -180,6 +183,46 @@ export class FileService {
         window.open(url, "_blank");
 
         return of({result: "SUCCESS"});
+    };
+
+    public cacheExperimentFileDownloadList: (files: any[]) => Observable<any> = (files: any[]) => {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        let params: HttpParams = new HttpParams()
+            .set("fileDescriptorJSONString", JSON.stringify(files))
+            .set("noJSONToXMLConversionNeeded", "Y");
+        return this.httpClient.post("/gnomex/CacheFileDownloadList.gx", params.toString(), {headers: headers});
+    };
+
+    public getFDTDownloadExperimentServlet: (emailAddress: string, showCommandLineInstructions: boolean) => Observable<any>
+        = (emailAddress: string, showCommandLineInstructions: boolean) => {
+
+        // This does not work on localhost since the back-end is hard-coded for a linux environment
+        // This workaround hopefully works but it cannot be tested until release
+        /*
+        let params: HttpParams = new HttpParams()
+            .set("emailAddress", emailAddress)
+            .set("showCommandLineInstructions", showCommandLineInstructions ? "Y" : "N");
+        return this.httpClient.get("/gnomex/FastDataTransferDownloadExpServlet.gx", {params: params});
+        */
+
+        let url: string = this.document.location.href;
+        url = url.substring(0, url.indexOf("/gnomex") + 7);
+        url += "/FastDataTransferDownloadExpServlet.gx";
+        url += "?emailAddress=" + emailAddress;
+        url += "&showCommandLineInstructions=" + (showCommandLineInstructions ? "Y" : "N");
+        window.open(url, "_blank");
+
+        return of({result: "SUCCESS"});
+    };
+
+    public makeSoftLinks: (files: any[]) => Observable<any> = (files: any[]) => {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        let params: HttpParams = new HttpParams()
+            .set("fileDescriptorJSONString", JSON.stringify(files))
+            .set("noJSONToXMLConversionNeeded", "Y");
+        return this.httpClient.post("/gnomex/MakeSoftLinks.gx", params.toString(), {headers: headers});
     };
 
     private handleError(errorResponse: HttpErrorResponse){

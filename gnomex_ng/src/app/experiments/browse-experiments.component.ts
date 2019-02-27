@@ -148,10 +148,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private viewLimit: number = 999999;
     private navProjectReqList:any;
     private navInitSubscription: Subscription;
+    private labListSubscription: Subscription;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
-        this.labListService.getLabList().subscribe((response: any[]) => {
+        this.labListService.getLabList_FromBackEnd();
+        this.labListSubscription =  this.labListService.getLabListSubject().subscribe((response: any[]) => {
             this.labList = response;
         });
         if (this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS) != null) {
@@ -622,6 +624,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.navInitSubscription.unsubscribe();
         this.gnomexService.navInitBrowseExperimentSubject.next(null);
         this.projectRequestListSubscription.unsubscribe();
+        this.labListSubscription.unsubscribe();
         this.navProjectReqList = null;
     }
 }

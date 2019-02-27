@@ -99,6 +99,7 @@ export class DownloadFilesComponent implements OnInit {
     private suggestedFilename: string = "";
     private cacheDownloadListFn: (files: any[]) => Observable<any>;
     private fdtDownloadFn: (emailAddress: string, showCommandLineInstructions: boolean) => Observable<any>;
+    private makeSoftLinksFn: (files: any[]) => Observable<any>;
 
     constructor(private dialogRef: MatDialogRef<DownloadFilesComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
@@ -111,6 +112,7 @@ export class DownloadFilesComponent implements OnInit {
 
     ngOnInit() {
         this.filesOptions = {
+            idField: 'fileTreeID',
             displayField: 'displayName',
             childrenField: 'FileDescriptor',
             allowDrag: true,
@@ -128,6 +130,9 @@ export class DownloadFilesComponent implements OnInit {
             this.suggestedFilename = this.data.suggestedFilename;
             this.cacheDownloadListFn = this.data.cacheDownloadListFn;
             this.fdtDownloadFn = this.data.fdtDownloadFn;
+            if (this.showCreateSoftLinks && this.data.makeSoftLinksFn) {
+                this.makeSoftLinksFn = this.data.makeSoftLinksFn;
+            }
 
             this.availableFilesNodes = [this.data.downloadListSource];
             this.availableFilesCount = this.countFilesRecursively(this.availableFilesNodes[0]);
@@ -303,7 +308,14 @@ export class DownloadFilesComponent implements OnInit {
     }
 
     public createSoftLinks(): void {
-        // TODO
+        let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
+        this.makeSoftLinksFn(files).subscribe((result: any) => {
+            if (result && result.result === 'SUCCESS' && result.softLinkPath) {
+                this.dialogsService.alert(result.softLinkPath, "Soft Link Path:");
+            } else {
+                this.handleBackendError(result, "making soft links");
+            }
+        });
     }
 
     private handleBackendError(response: any, action: string): void {

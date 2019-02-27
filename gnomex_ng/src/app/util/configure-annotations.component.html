@@ -92,13 +92,11 @@
                             <mat-error *ngIf="this.descriptionFC.hasError('maxlength')">Description can be at most 2000 characters</mat-error>
                         </mat-form-field>
                     </div>
-                    <div class="tabRow">
-                        <mat-form-field class="propFormField">
-                            <mat-select placeholder="Owner" [formControl]="this.ownerFC">
-                                <mat-option>None</mat-option>
-                                <mat-option *ngFor="let user of appUserList" [value]="user.idAppUser">{{user.display}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                    <div class="tabRow" style="width: 65%;">
+                        <lazy-loaded-select placeholder="Owner" [options]="this.appUserList"
+                                            valueField="idAppUser" displayField="display" [allowNone]="true"
+                                            [control]="this.ownerFC" class="full-height full-width">
+                        </lazy-loaded-select>
                     </div>
                     <div class="tabRow" style="align-items: flex-start; height: 30%; flex: 3;">
                         <label style="margin-right: 4%;">Type</label>
@@ -210,13 +208,13 @@
                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode">
                         <label>Only show for these users (only applies to non-required sample annotations)</label>
                         <div style="display: flex; flex-direction: row;">
-                            <mat-form-field class="appliesToField">
-                                <mat-select placeholder="User" [(ngModel)]="this.appliesToUser">
-                                    <mat-option>None</mat-option>
-                                    <mat-option *ngFor="let u of this.appUserList" [value]="u">{{u.display}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToUser == null" (click)="this.addUser()"><img class="icon" src="../../assets/add.png"></button>
+                            <div style="width: 30%; margin-right: 2%;">
+                                <lazy-loaded-select placeholder="User" [options]="this.appUserList"
+                                                    displayField="display" [allowNone]="true"
+                                                    [control]="this.appliesToUser" class="full-height full-width">
+                                </lazy-loaded-select>
+                            </div>
+                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToUser.value == null" (click)="this.addUser()"><img class="icon" src="../../assets/add.png"></button>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedUserIndex == null" (click)="this.deleteUser()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"

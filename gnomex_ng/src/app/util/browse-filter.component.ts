@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {URLSearchParams} from "@angular/http";
 
 import {LabListService} from "../services/lab-list.service";
@@ -13,6 +13,7 @@ import {DataTrackService} from "../services/data-track.service";
 import {BillingService} from "../services/billing.service";
 import {DialogsService} from "./popup/dialogs.service";
 import {DateRange} from "./date-range-filter.component";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'browse-filter',
@@ -96,7 +97,7 @@ import {DateRange} from "./date-range-filter.component";
     `]
 })
 
-export class BrowseFilterComponent implements OnInit {
+export class BrowseFilterComponent implements OnInit, OnDestroy {
     readonly SHOW_EMPTY_FOLDERS: string = "Show Empty Folders";
     readonly HIDE_REQUESTS_WITH_NO_BILLING_ITEMS: string = "Hide requests with no billing items?";
     readonly DATA_TRACK_BROWSE: string = "dataTrackBrowse";
@@ -198,6 +199,8 @@ export class BrowseFilterComponent implements OnInit {
     private showEmptyFoldersCheckboxLabel: string = this.SHOW_EMPTY_FOLDERS;
     private showEmptyFoldersFlag: boolean;
 
+    private labListSuscription:Subscription;
+
     constructor(private labListService: LabListService, private getLabService: GetLabService,
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
@@ -224,7 +227,7 @@ export class BrowseFilterComponent implements OnInit {
                 this.showCCNumberInput = true;
                 this.showEmptyFoldersCheckbox = true;
 
-                this.labListService.getLabList().subscribe((response: any[]) => {
+                this.labListSuscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response;
                 });
             } else if (isGuestState) {
@@ -274,7 +277,7 @@ export class BrowseFilterComponent implements OnInit {
 
                 this.showMore = true;
 
-                this.labListService.getLabList().subscribe((response: any[]) => {
+                this.labListSuscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response;
                 });
             } else if (isGuestState) {
@@ -301,7 +304,7 @@ export class BrowseFilterComponent implements OnInit {
                 this.showLabComboBox = true;
                 this.showVisibilityCheckboxes = true;
 
-                this.labListService.getLabList().subscribe((response: any[]) => {
+                this.labListSuscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response;
                 });
             } else if (isGuestState) {
@@ -471,7 +474,7 @@ export class BrowseFilterComponent implements OnInit {
                 });
             }
             if (this.mode === this.BILLING_BROWSE) {
-                this.labListService.getLabList().subscribe((response: any[]) => {
+                this.labListSuscription = this.labListService.getLabList().subscribe((response: any[]) => {
                     this.labList = response.filter(lab => {
                         if (lab.coreFacilities.length === undefined && !(lab.coreFacilities.CoreFacility === undefined)) {
                             return lab.coreFacilities.CoreFacility.idCoreFacility === this.idCoreFacilityString;
@@ -861,6 +864,11 @@ export class BrowseFilterComponent implements OnInit {
             this.billingService.getBillingInvoiceListDep(billingInvoiceListParams).subscribe((response: any) => {
                 console.log("GetBillingInvoiceList called");
             });
+        }
+    }
+    ngOnDestroy(){
+        if(this.labListSuscription){
+            this.labListSuscription.unsubscribe();
         }
     }
 }

@@ -1,103 +1,59 @@
 package hci.gnomex.utility;
 
-
 import hci.framework.model.DetailObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jdom.Document;
-import org.jdom.Element;
-
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 public class FileDescriptorParser extends DetailObject implements Serializable {
-  
-  protected Document   doc;
-  protected Map        fileDescriptorMap = new HashMap();
-  
-  public FileDescriptorParser(Document doc) {
-    this.doc = doc;
- 
-  }
-  
-  public void parse() throws Exception{
-    
-    Element root = this.doc.getRootElement();
-    
-    
-    for(Iterator i = root.getChildren("FileDescriptor").iterator(); i.hasNext();) {
-      Element node = (Element)i.next();      
-      String requestNumber = node.getAttributeValue("number");
-      FileDescriptor fd = initializeFileDescriptor(node);
-      
-      List fileDescriptors = (List)fileDescriptorMap.get(requestNumber);
-      if (fileDescriptors == null) {
-        fileDescriptors = new ArrayList();
-        fileDescriptorMap.put(requestNumber, fileDescriptors);
-      }
-      
-      fileDescriptors.add(fd);
-      getChildrenFileDescriptors(node, fd);
-      
-    }
-    
-   
-  }
-  
-  private void getChildrenFileDescriptors(Element parentNode, FileDescriptor parentFileDescriptor) {
 
-    if (parentNode.getChildren("children") != null && parentNode.getChildren("children").size() > 0) {
-      for(Iterator i = parentNode.getChild("children").getChildren("FileDescriptor").iterator(); i.hasNext();) {
-        Element node = (Element)i.next();      
-        String requestNumber = node.getAttributeValue("number");
-        FileDescriptor fd = initializeFileDescriptor(node);
-        
-        List fileDescriptors = (List)fileDescriptorMap.get(requestNumber);
-        if (fileDescriptors == null) {
-          fileDescriptors = new ArrayList();
-          fileDescriptorMap.put(requestNumber, fileDescriptors);
+    private JsonArray array;
+    private Map<String, List<FileDescriptor>> fileDescriptorMap = new HashMap<>();
+
+    public FileDescriptorParser(JsonArray array) {
+        this.array = array;
+    }
+
+    public void parse() throws Exception {
+        for (int i = 0; i < this.array.size(); i++) {
+            JsonObject node = this.array.getJsonObject(i);
+            String requestNumber = node.getString("number");
+            FileDescriptor fd = this.initializeFileDescriptor(node);
+
+            List<FileDescriptor> fileDescriptors = this.fileDescriptorMap.get(requestNumber);
+            if (fileDescriptors == null) {
+                fileDescriptors = new ArrayList<>();
+                fileDescriptorMap.put(requestNumber, fileDescriptors);
+            }
+            fileDescriptors.add(fd);
         }
-        
-        fileDescriptors.add(fd);
-        
-        getChildrenFileDescriptors(node, fd);
-        
-      }
-      
     }
-    
-  }
-  
-  protected FileDescriptor initializeFileDescriptor(Element n){
-    FileDescriptor fd = new FileDescriptor();
-    
-    fd.setFileName(n.getAttributeValue("fileName"));
-    fd.setZipEntryName(n.getAttributeValue("zipEntryName"));
-    fd.setType(n.getAttributeValue("type"));
-    if(n.getAttributeValue("fileSize").length() > 0) {
-        long fileSize = Long.parseLong(n.getAttributeValue("fileSize"));
-        fd.setFileSize(fileSize);    	
+
+    private FileDescriptor initializeFileDescriptor(JsonObject n) {
+        FileDescriptor fd = new FileDescriptor();
+        fd.setFileName(n.getString("fileName"));
+        fd.setZipEntryName(n.getString("zipEntryName"));
+        fd.setType(n.getString("type"));
+        if (n.getString("fileSize").length() > 0) {
+            long fileSize = Long.parseLong(n.getString("fileSize"));
+            fd.setFileSize(fileSize);
+        }
+        return fd;
     }
-    
-    return fd;
 
-  }
+    public Set<String> getRequestNumbers() {
+        return fileDescriptorMap.keySet();
+    }
 
-  
-  public Set getRequestNumbers() {
-    return fileDescriptorMap.keySet();
-  }
-
-  
-  public List getFileDescriptors(String requestNumber) {
-    return (List)fileDescriptorMap.get(requestNumber);
-  }
-  
-
+    public List<FileDescriptor> getFileDescriptors(String requestNumber) {
+        return fileDescriptorMap.get(requestNumber);
+    }
 
 }

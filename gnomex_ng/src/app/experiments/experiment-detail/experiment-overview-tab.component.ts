@@ -126,6 +126,7 @@ import {ExperimentsService} from "../experiments.service";
 
     `]
 }) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy {
+    private labListSubscription: Subscription;
 
     @Input('experiment') set experiment(experiment: any) {
         this.isReady_filteredApplicationDictionary = false;
@@ -469,7 +470,7 @@ import {ExperimentsService} from "../experiments.service";
 
 
         // this.labListService.getAllLabsUnbounded().subscribe((labs: any[]) => {
-        this.labListService.getLabList().subscribe((labs: any[]) => {
+        this.labListSubscription =  this.labListService.getLabListSubject().subscribe((labs: any[]) => {
             let labsSafe: any[] = labs ? labs : [];
             this.labDictionary = labsSafe;
             this.isReady_labDictionary = true;
@@ -537,6 +538,9 @@ import {ExperimentsService} from "../experiments.service";
     ngOnDestroy(): void {
         if (this.labSubscription) {
             this.labSubscription.unsubscribe();
+        }
+        if(this.labListSubscription){
+            this.labListSubscription.unsubscribe();
         }
     }
 
@@ -924,4 +928,5 @@ import {ExperimentsService} from "../experiments.service";
             return [];
         }
     }
+
 }
