@@ -182,11 +182,25 @@ export class TabSeqSetupViewComponent implements OnInit {
 
     private libToChange: boolean = false;
 
+    private showPoolingType_prior_value: boolean = false;
+
     get showPoolingType(): boolean {
-        return this.form
+        let newValue: boolean = this.form
             && this.form.get('seqPrepByCore')
             && this.form.get('seqPrepByCore').value
             && this.form.get('seqPrepByCore').value === this.NO;
+
+        if (!this.showPoolingType_prior_value && newValue) {
+            this.form.get("pooledLib").setValue(this.SEPARATE);
+        } else if (this.showPoolingType_prior_value && !newValue) {
+            this.form.get("pooledLib").setValue(null);
+        } else {
+            // do nothing;
+        }
+
+        this.showPoolingType_prior_value = newValue;
+
+        return newValue;
     }
 
     get showLibraryDesign(): boolean {

@@ -29,6 +29,11 @@ import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
         .heavily-left-padded { padding-left: 1.5em; }
         .heavily-right-padded { padding-right: 1.5em; }
         
+        .moderate-width { 
+            width: 5em;
+            min-width: 5em;
+        }
+        
         
         .wide-display { 
             min-width: 30em; 
@@ -233,6 +238,59 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             editable: false
         });
 
+        if (this._experiment
+            && this._experiment.seqPrepByCore_forSamples
+            && this._experiment.seqPrepByCore_forSamples === 'N') {
+
+            temp.push({
+                headerName: "Index Tag A",
+                editable: false,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                maxWidth: 20 * this.emToPxConversionRate,
+                field: "idOligoBarcode",
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this._barCodes,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOligoBarcode",
+                indexTagLetter: 'A',
+                errorNameErrorMessageMap: [
+                    {errorName: 'required', errorMessage: 'Index Tag A required'}
+                ]
+            });
+            temp.push({
+                headerName: "Index Tag Sequence A",
+                field: "barcodeSequence",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 6.5 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false
+            });
+            temp.push({
+                headerName: "Index Tag B",
+                editable: false,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                maxWidth: 20 * this.emToPxConversionRate,
+                field: "idOligoBarcodeB",
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this._barCodes,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOligoBarcodeB",
+                indexTagLetter: 'B'
+            });
+            temp.push({
+                headerName: "Index Tag Sequence B",
+                field: "barcodeSequenceB",
+                width:    7 * this.emToPxConversionRate,
+                minWidth: 6.5 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+        }
+
         this.tabIndexToInsertAnnotations = temp.length;
 
         temp.push({
@@ -282,6 +340,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
         }
 
+        this.buildColumnDefinitions();
+
         this._getExperimentAnnotationsSubject.next({});
         this.setUpView();
 
@@ -305,8 +365,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this.getSequenceLanes();
 
         this.submitterName = '';
-        if (this._experiment && this._experiment.experimentOwner && this._experiment.experimentOwner.displayName) {
-            this.submitterName = this._experiment.experimentOwner.displayName;
+        if (this._experiment && this._experiment.experimentOwner && this._experiment.experimentOwner.firstLastDisplayName) {
+            this.submitterName = this._experiment.experimentOwner.firstLastDisplayName;
         }
 
         this.clientPrepLib = false;

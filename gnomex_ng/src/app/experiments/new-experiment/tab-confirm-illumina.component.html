@@ -19,11 +19,21 @@
             Experiment Details
         </div>
         <div class="padded heavily-left-padded">
-            <div *ngIf="!!submitterName" class="padded">
-                {{ submitterName }}
+            <div class="full-width flex-container-row padded">
+                <div class="font-bold moderate-width">
+                    Name :
+                </div>
+                <div class="flex-grow">
+                    {{ submitterName }}
+                </div>
             </div>
-            <div *ngIf="!!labName" class="padded">
-                {{ labName }}
+            <div class="full-width flex-container-row padded">
+                <div class="font-bold moderate-width">
+                    Group :
+                </div>
+                <div class="flex-grow">
+                    {{ labName }}
+                </div>
             </div>
             <div *ngIf="billingAccountName && billingAccountNumber" class="padded">
                 {{ billingAccountName }}({{ billingAccountNumber }})
