@@ -28,7 +28,6 @@
                                            [nodes]="items"
                                            [options]="options"
                                            (activate)="treeOnSelect($event)"
-                                           (moveNode)="onMoveNode($event)"
                                            (updateData)="treeUpdateData($event)">
                                     <ng-template #treeNodeTemplate let-node let-index="index">
                                         <div class="full-width no-word-wrap">
