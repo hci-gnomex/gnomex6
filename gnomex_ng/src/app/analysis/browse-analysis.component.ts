@@ -1,17 +1,6 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {
-    AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,
-    ViewEncapsulation
-} from "@angular/core";
-
+import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import { URLSearchParams } from "@angular/http";
-
-import {
-    TreeComponent, ITreeOptions, TreeNode, TreeModel, IActionMapping,
-    TREE_ACTIONS
-} from "angular-tree-component";
+import {TreeComponent, ITreeOptions, TreeNode, TreeModel, TREE_ACTIONS} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -19,7 +8,6 @@ import {AnalysisService} from "../services/analysis.service";
 import {MatDialogRef, MatDialog, MatDialogConfig} from '@angular/material';
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {DragDropHintComponent} from "./drag-drop-hint.component";
 import {LabListService} from "../services/lab-list.service";
 import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
@@ -27,79 +15,40 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {GnomexService} from "../services/gnomex.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 
-const actionMapping:IActionMapping = {
-    mouse: {
-        click: (tree, node, $event) => {
-            $event.ctrlKey
-                ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
-        }
-    }
-};
-
 @Component({
     selector: "analysis",
     templateUrl: "./browse-analysis.component.html",
-    styles: [`
-
+    styles: [`        
         .t  { display: table;      }
         .tr { display: table-row;  }
         .td { display: table-cell; }
-
         .padded { padding: 0.3em; }
-
         .left-right-padded {
             padding-left:  0.3em;
             padding-right: 0.3em;
         }
-        
         .major-left-right-padded {
             padding-left: 1em;
             padding-right: 0.3em;
         }
-        
         .no-word-wrap { white-space: nowrap; }
         .no-overflow  { overflow: hidden;    }
-        
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
-
         .vertical-spacer { height: 0.3em; }
-        
         .border { border: #C8C8C8 solid thin; }
-        
         .major-border {
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
-        
     `]
 })
 
 export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("analysisTree") treeComponent: TreeComponent;
-
     private treeModel: TreeModel;
-    /*
-    angular2-tree options
-     */
-    public options: ITreeOptions = {
-        displayField: "label",
-        childrenField: "items",
-        useVirtualScroll: true,
-        nodeHeight: 22,
-        nodeClass: (node: TreeNode) => {
-            return "icon-" + node.data.icon;
-        },
-        allowDrop: (element: any, to: {parent: TreeNode, index: number}) => {
-            this.dragEndItems = _.cloneDeep(this.items);
-            return to.parent.data.idAnalysis || to.parent.data.idAnalysisGroup || to.parent.data.idLab;
-        },
-
-        allowDrag: (node: any) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
-        actionMapping
-    };
+    public options: ITreeOptions;
 
     public items: any;
     public labs: any;
@@ -108,7 +57,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     public labMembers: any;
     private billingAccounts: any;
-    private dragEndItems: any;
     private selectedItem: ITreeNode;
 
     public analysisCount: number = 0;
@@ -126,23 +74,46 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     public createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
     public createAnalysisGroupDialogRef: MatDialogRef<CreateAnalysisGroupComponent>;
     private parentProject: any;
-    // public showSpinner: boolean = false;
     public newAnalysisName: any;
     private navAnalysisGroupListSubscription:Subscription;
     private labListSubscription:Subscription;
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
+        this.options = {
+            idField: "analysisTreeId",
+            displayField: "label",
+            childrenField: "items",
+            useVirtualScroll: true,
+            nodeHeight: 22,
+            nodeClass: (node: TreeNode) => {
+                return "icon-" + node.data.icon;
+            },
+            allowDrop: (element: any, to: {parent: TreeNode, index: number}) => {
+                return !!to.parent.data.idAnalysisGroup;
+            },
+            allowDrag: (node: any) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
+            actionMapping: {
+                mouse: {
+                    click: (tree, node, $event) => {
+                        $event.ctrlKey
+                            ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
+                            : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+                    },
+                    dragStart: (tree: TreeModel, node: TreeNode, $event) => {
+                        if (!node.isActive) {
+                            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+                        }
+                    },
+                    drop: this.moveNode,
+                }
+            },
+        };
 
         this.labListService.getLabList_FromBackEnd();
         this.labListSubscription =  this.labListService.getLabListSubject().subscribe((resp: any[]) =>{
             this.labList = resp;
         });
-
-
-        /*this.labListService.getLabList().subscribe((response: any[]) => {
-            this.labList = response;
-        });*/
 
         if (this.createSecurityAdvisorService.isGuest) {
             this.disableAll = true;
@@ -255,7 +226,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
 
         this.items = [];
-        this.dragEndItems = [];
         this.labMembers = [];
         this.billingAccounts = [];
         this.labs = [];
@@ -269,9 +239,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             }
         })
 
-    }
-
-    go(event: any) {
     }
 
     /*
@@ -354,19 +321,30 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         }
     }
 
+    private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
+        let idLab: string = node.data.idLab;
+        let idAnalysisGroup: string = node.data.idAnalysisGroup;
+        let analyses: any[] = [];
+        for (let n of tree.getActiveNodes()) {
+            analyses.push(n.data);
+        }
+        let isCopyMode: boolean = $event.ctrlKey;
 
-    onMoveNode($event) {
-        console.log(
-            "Moved",
-            $event.node.name,
-            "to",
-            $event.to.parent.name,
-            "at index",
-            $event.to.index);
-        this.currentItem = $event.node;
-        this.targetItem = $event.to.parent;
-        this.doMove($event);
-    }
+        this.analysisService.moveAnalysis(idLab, idAnalysisGroup, analyses, isCopyMode).subscribe((result: any) => {
+            if (result && result.result === 'SUCCESS') {
+                this.analysisService.refreshAnalysisGroupList_fromBackend();
+                if (result.invalidPermission) {
+                    this.dialogsService.alert(result.invalidPermission, "Warning");
+                }
+            } else {
+                let message: string = "";
+                if (result && result.message) {
+                    message = ": " + result.message;
+                }
+                this.dialogsService.confirm("An error occurred while dragging-and-dropping" + message, null);
+            }
+        });
+    };
 
     /*
         Determine if the object is an array
@@ -380,34 +358,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         return (keywords) => {
             window.location.href = "http://localhost/gnomex/analysis/" + keywords;
         };
-    }
-
-    /**
-     * Perform the move
-     * @param event
-     */
-    doMove(event: any) {
-
-        var params: URLSearchParams = new URLSearchParams();
-        params.set("idLab", event.to.parent.idLab);
-        var analysisGroupXMLString: string = "";
-        var idAnalysisString = event.node.idAnalysis;
-        var analysisGroup = event.to.parent;
-        delete event.to.parent.items;
-        // Tree doesnt support multiple drag/drop. It actually woould work, just no visual indication.
-        // for (let n of event.treeModel.activeNodes) {
-        //     idAnalysisString = idAnalysisString.concat(n.data.idAnalysis);
-        //     idAnalysisString = idAnalysisString.concat(",");
-        // }
-        analysisGroupXMLString = JSON.stringify(analysisGroup);
-
-        params.set("analysisGroupsXMLString", analysisGroupXMLString);
-        params.set("idAnalysisString", idAnalysisString);
-        var lPromise = this.analysisService.moveAnalysis(params).toPromise();
-        lPromise.then(response => {
-            console.log("successful move");
-            this.analysisService.refreshAnalysisGroupList_fromBackend();
-        });
     }
 
     /**
@@ -485,21 +435,17 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         }
     }
 
-    /**
-     * Show the drag drop hint
-     * @param event
-     */
     dragDropHintClicked(event: any) {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-
-        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, configuration);
+        this.dialogsService.alert("Drag-and-drop to move analyses to another lab and/or group. Hold Ctrl while dragging-and-dropping to assign to multiple groups");
     }
 
-    /**
-     * A node is selected in the tree.
-     * @param event
-     */
     treeOnSelect(event: any) {
+        // If selecting multiple analyses (for dragging-and-dropping, for example)
+        // improve performance by reducing unnecessary loading
+        if (this.treeModel.getActiveNodes().length > 1) {
+            return;
+        }
+
         this.selectedItem = event.node;
         this.selectedIdLab = this.selectedItem.data.idLab;
         this.selectedLabLabel = this.selectedItem.data.labName;

@@ -183,17 +183,21 @@ export class AnalysisService {
 
     }
 
-    moveAnalysis(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/MoveAnalysis.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error("Error");
-            }
-        }));
-
+    public moveAnalysis(idLab: string, idAnalysisGroup: string, analyses: any[], isCopyMode: boolean): Observable<any> {
+        let idAnalysisString: string = "";
+        for (let analysis of analyses) {
+            idAnalysisString += analysis.idAnalysis + ",";
+        }
+        let params: HttpParams = new HttpParams()
+            .set("idLab", idLab)
+            .set("idAnalysisGroup", idAnalysisGroup)
+            .set("idAnalysisString", idAnalysisString)
+            .set("isCopyMode", isCopyMode ? "Y" : "N")
+            .set("noJSONToXMLConversionNeeded", "Y");
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/MoveAnalysis.gx", params.toString(), {headers: headers});
     }
-
 
     resetAnalysisOverviewListSubject(){
         this.analysisOverviewListSubject = new BehaviorSubject([]);
