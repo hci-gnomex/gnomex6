@@ -4,7 +4,7 @@
     <span *ngIf="child.children && child.children.length > 0">
       <button mat-menu-item
               color="primary" [hidden]="child.hidden" [matMenuTriggerFor]="menu.childMenu">
-        <img *ngIf="child.iconName" src="{{child.iconName}}">
+        <img class="icon" *ngIf="child.iconName" src="{{child.iconName}}">
         <span>{{child.displayName}}</span>
       </button>
       <app-menu-item #menu [items]="child.children"></app-menu-item>
@@ -15,7 +15,7 @@
         <button mat-menu-item
                 class="child.class" [hidden]="child.hidden"
                 [routerLink]="child.route" [queryParams]="{id:child.idCoreFacility}">
-          <img *ngIf="child.iconName" src="{{child.iconName}}">
+          <img class="icon" *ngIf="child.iconName" src="{{child.iconName}}">
           <span>{{child.displayName}}</span>
         </button>
       </span>

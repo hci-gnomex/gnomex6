@@ -163,9 +163,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             setTimeout(() => {
                 this.treeModel.expandAll();
                 if(this.gnomexService.orderInitObj){ // this is if component is being navigated to by url
-                    let id:string = "a" + this.gnomexService.orderInitObj.idAnalysis;
+                    let id:string = "" + this.gnomexService.orderInitObj.idAnalysis;
                     if(this.treeModel && id) {
-                        let node = this.treeModel.getNodeById(id);
+                        let node = this.findNodeByIdAnalysis(id);
                         if(node){
                             node.setIsActive(true);
                             node.scrollIntoView();
@@ -199,6 +199,25 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     ngAfterViewInit() {
+    }
+
+    private findNodeByIdAnalysis(idAnalysis: string): TreeNode {
+        if (this.treeModel && this.treeModel.roots) {
+            for (let lab of this.treeModel.roots) {
+                if (lab.hasChildren) {
+                    for (let analysisGroup of lab.children) {
+                        if (analysisGroup.hasChildren) {
+                            for (let analysis of analysisGroup.children) {
+                                if (analysis.data.idAnalysis === idAnalysis) {
+                                    return analysis;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     selectNode(nodes: any) {
