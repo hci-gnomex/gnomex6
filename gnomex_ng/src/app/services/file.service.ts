@@ -154,6 +154,27 @@ export class FileService {
         );
     }
 
+    public previewAnalysisFile(idAnalysis: string, fileName: string, dir: string): void {
+        let url: string = this.document.location.href;
+        url = url.substring(0, url.lastIndexOf("/gnomex") + 7);
+        url += "/DownloadAnalysisSingleFileServlet.gx";
+        url += "?idAnalysis=" + idAnalysis;
+        url += "&fileName=" + fileName;
+        url += "&view=Y";
+        url += "&dir=" + dir;
+        window.open(url, "_blank");
+    }
+
+    public previewExperimentFile(idRequest: string, fileName: string): void {
+        let url: string = this.document.location.href;
+        url = url.substring(0, url.lastIndexOf("/gnomex") + 7);
+        url += "/DownloadSingleFileServlet.gx";
+        url += "?idRequest=" + idRequest;
+        url += "&fileName=" + fileName;
+        url += "&view=Y";
+        window.open(url, "_blank");
+    }
+
     public cacheAnalysisFileDownloadList: (files: any[]) => Observable<any> = (files: any[]) => {
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");

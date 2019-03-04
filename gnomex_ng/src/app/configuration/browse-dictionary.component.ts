@@ -30,7 +30,7 @@ import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
                 </div>
                 <div class="flex-container-row align-center tree-row">
                     <mat-form-field class="flex-one">
-                        <input matInput placeholder="Search" [(ngModel)]="this.searchText">
+                        <input matInput placeholder="Search" [(ngModel)]="this.searchText" (keydown.enter)="searchDictionary()">
                     </mat-form-field>
                     <div>
                         <button mat-button (click)="searchDictionary()"><img src="../../assets/magnifier.png" class="button-image"></button>
@@ -309,6 +309,7 @@ export class BrowseDictionaryComponent implements OnInit {
         let formattedSearchText: string = this.searchText.toUpperCase();
         this.treeComponent.treeModel.filterNodes((node: TreeNode) => {
             return node.data.display.toUpperCase().includes(formattedSearchText) ||
+                (node.data.propertyValue && node.data.propertyValue.toUpperCase().includes(formattedSearchText)) ||
                 (node.data.propertyDescription && node.data.propertyDescription.toUpperCase().includes(formattedSearchText));
         }, false);
     }
