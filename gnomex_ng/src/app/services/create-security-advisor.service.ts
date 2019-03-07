@@ -132,6 +132,10 @@ export class CreateSecurityAdvisorService {
             return false;
         }
 
+        if (!this.result || !this.result.globalPermissions) {
+            return false;
+        }
+
         let index: number;
         let length: number = this.result.globalPermissions.length;
         for (index = 0; index < length; index++) {

@@ -11,6 +11,7 @@ export class Sample {
     public canChangeNumberSequencingCycles: string = 'Y'; // "Y";
     public canChangeNumberSequencingLanes:  string = 'Y'; // "Y";
     public concentration:                   string = ''; // "";
+    public sampleVolume:                    string = ''; // "";
     public label:                           string = ''; // "";
     public idOligoBarcode:                  string = ''; // "";
     public barcodeSequence:                 string = ''; // "";
@@ -89,6 +90,57 @@ export class Sample {
 
     constructor(private dictionaryService: DictionaryService) { }
 
+    public static createSampleObjectFromAny(dictionaryService: DictionaryService, source: any) {
+        let sample: Sample = new Sample(dictionaryService);
+
+        sample.clonePropertyOnlyIfExists('idSample', source);
+        sample.clonePropertyOnlyIfExists('name', source);
+        sample.clonePropertyOnlyIfExists('description', source);
+        sample.clonePropertyOnlyIfExists('canChangeSampleName', source);
+        sample.clonePropertyOnlyIfExists('canChangeSampleType', source);
+        sample.clonePropertyOnlyIfExists('canChangeSampleConcentration', source);
+        sample.clonePropertyOnlyIfExists('canChangeSampleSource', source);
+        sample.clonePropertyOnlyIfExists('canChangeNumberSequencingCycles', source);
+        sample.clonePropertyOnlyIfExists('canChangeNumberSequencingLanes', source);
+        sample.clonePropertyOnlyIfExists('concentration', source);
+        sample.clonePropertyOnlyIfExists('concentration', source);
+        sample.clonePropertyOnlyIfExists('sampleVolume', source);
+        sample.clonePropertyOnlyIfExists('label', source);
+        sample.clonePropertyOnlyIfExists('idOligoBarcode', source);
+        sample.clonePropertyOnlyIfExists('barcodeSequence', source);
+        sample.clonePropertyOnlyIfExists('idOligoBarcodeB', source);
+        sample.clonePropertyOnlyIfExists('barcodeSequenceB', source);
+        sample.clonePropertyOnlyIfExists('idNumberSequencingCycles', source);
+        sample.clonePropertyOnlyIfExists('idNumberSequencingCyclesAllowed', source);
+        sample.clonePropertyOnlyIfExists('idSeqRunType', source);
+        sample.clonePropertyOnlyIfExists('numberSequencingLanes', source);
+        sample.clonePropertyOnlyIfExists('codeConcentrationUnit', source);
+        sample.clonePropertyOnlyIfExists('idSampleType', source);
+        sample.clonePropertyOnlyIfExists('sampleType', source);
+        sample.clonePropertyOnlyIfExists('idSeqLibProtocol', source);
+        sample.clonePropertyOnlyIfExists('seqPrepByCore', source);
+        sample.clonePropertyOnlyIfExists('idOrganism', source);
+        sample.clonePropertyOnlyIfExists('otherOrganism', source);
+        sample.clonePropertyOnlyIfExists('treatment', source);
+        sample.clonePropertyOnlyIfExists('customColor', source);
+        sample.clonePropertyOnlyIfExists('multiplexGroupNumber', source);
+        sample.clonePropertyOnlyIfExists('isDirty', source);
+        sample.clonePropertyOnlyIfExists('organism', source);
+        sample.clonePropertyOnlyIfExists('sequencingOption', source);
+        sample.clonePropertyOnlyIfExists('application_object', source);
+        sample.clonePropertyOnlyIfExists('index', source);
+        sample.clonePropertyOnlyIfExists('prepInstructions', source);
+        sample.clonePropertyOnlyIfExists('frontEndGridGroup', source);
+
+        // Todo : use keyset to get annotations
+    }
+
+    private clonePropertyOnlyIfExists(propertyName: string, source: any) {
+        if (this[propertyName] && source[propertyName]) {
+            this[propertyName] = source[propertyName];
+        }
+    }
+
     // extra variables for grid stuff?  Not needed back-end.
     public index: number;
     public prepInstructions: string; // ???
@@ -109,6 +161,7 @@ export class Sample {
             canChangeNumberSequencingCycles: this.canChangeNumberSequencingCycles,
             canChangeNumberSequencingLanes:  this.canChangeNumberSequencingLanes,
             concentration:                   this.concentration,
+            sampleVolume:                    this.sampleVolume,
             label:                           this.label,
             idOligoBarcode:                  this.idOligoBarcode,
             barcodeSequence:                 this.barcodeSequence,

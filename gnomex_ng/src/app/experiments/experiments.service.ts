@@ -6,6 +6,8 @@ import {BehaviorSubject} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {map} from "rxjs/operators";
+import {Experiment} from "../util/models/experiment.model";
+import {CookieUtilService} from "../services/cookie-util.service";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -47,7 +49,8 @@ export class ExperimentsService {
     private editMode: boolean = false;
 
 
-    constructor(private _http: Http,
+    constructor(private cookieUtilService: CookieUtilService,
+                private _http: Http,
                 private httpClient: HttpClient,
                 @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
 
@@ -177,8 +180,17 @@ export class ExperimentsService {
         return this.httpClient.get("/gnomex/GetRequest.gx", {params: params});
     }
 
-    public getMultiplexLaneList(params: HttpParams): Observable<any> {
-        return this.httpClient.get("/gnomex/GetMultiplexLaneList.gx", {params: params});
+    public getMultiplexLaneList(experiment: Experiment): Observable<any> {
+
+        let params: HttpParams = new HttpParams()
+            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()));
+
+        this.cookieUtilService.formatXSRFCookie();
+
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+
+        return this.httpClient.post("/gnomex/GetMultiplexLaneList.gx", params.toString(), { headers: headers });
     }
 
     getLab(params: URLSearchParams): Observable<any> {
@@ -201,6 +213,27 @@ export class ExperimentsService {
             }
         }));
 
+    }
+
+    saveRequest(experiment: any):  Observable<any> {
+
+        if (!experiment) {
+            return;
+        }
+
+        let params: HttpParams = new HttpParams()
+            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()))
+            .set('description', experiment.description)
+            .set('idProject', experiment.idProject)
+            .set('propertiesXML', '');
+            // .set('invoicePrice', '');
+
+        this.cookieUtilService.formatXSRFCookie();
+
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+
+        return this.httpClient.post("/gnomex/SaveRequest.gx", params.toString(), { headers: headers });
     }
 
     saveVisibility(body: any, idProject?: string): Observable<any> {

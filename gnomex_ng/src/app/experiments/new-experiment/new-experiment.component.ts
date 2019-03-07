@@ -4,7 +4,7 @@ import {
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {FormGroup} from "@angular/forms";
 
-import {Subscription} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 import {first} from "rxjs/internal/operators";
 
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
@@ -33,6 +33,13 @@ import {Experiment} from "../../util/models/experiment.model";
     styles: [`        
         
         .bordered { border: 1px solid silver; }
+        
+        .highlight-agreement { 
+            color: green;
+            font-style: italic;
+        }
+        
+        .padded-right-large { padding-right: 1em; }
 
     `]
 
@@ -60,7 +67,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     private annotations: any;
     private visibilityDetailObj: TabVisibilityComponent;
 
-    public disableSubmit: boolean = true;
+    // public disableSubmit: boolean = true;
 
     private navigationSubscription: Subscription;
 
@@ -72,6 +79,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             idOrganism: '',
             organism: ''
         },
+        experimentAnnotations: new BehaviorSubject<any[]>([]),
+        getExperimentAnnotationsSubject: new BehaviorSubject<any>({}),
+        agreeCheckboxLabelSubject: new BehaviorSubject<string>(''),
         experiment: {
             idCoreFacility: '',
             PropertyEntries: [],
@@ -112,9 +122,13 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     annotationInputs = {
         annotations: this.annotations,
         orderType: this.types.EXPERIMENT,
+        experimentAnnotations: this.inputs.experimentAnnotations,
+        getExperimentAnnotationsSubject: this.inputs.getExperimentAnnotationsSubject,
         showConfigureAnnotationsButton: false,
         disabled: false
     };
+
+    public agreeCheckboxLabel: string = '';
 
     public get formOfCurrentlySelectedTab(): FormGroup {
         if (!this.selectedIndex && this.selectedIndex !== 0) {
@@ -177,6 +191,11 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         return i; // if all valid returns higher index than in the grid (by one)
     }
 
+    public get onSubmitTab(): boolean {
+        // Assume the submit tab is always the last tab.
+        return this.tabs && Array.isArray(this.tabs) && this.selectedIndex === this.tabs.length;
+    }
+
 
     constructor(private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
@@ -237,6 +256,14 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
                     this.inputs.experiment = experiment;
                 });
+            }
+        });
+
+        this.inputs.agreeCheckboxLabelSubject.subscribe((value: string) => {
+            if (value) {
+                this.agreeCheckboxLabel = value;
+            } else {
+                this.agreeCheckboxLabel = '';
             }
         });
     }
@@ -412,7 +439,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 } else if (this.selectedIndex === 7) {
                     this.tabs[8].disabled = false;
                 } else if (this.selectedIndex === 8) {
-                    this.disableSubmit = true;
+                    // this.disableSubmit = true;
                 }
                 break;
             }
@@ -447,6 +474,50 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     public onChangeLab(event: any): void {
         this.inputs.lab = event;
+    }
+
+
+    public SaveNewExperiment(): void {
+        console.log("Save Experiment!");
+        this.dialogService.startDefaultSpinnerDialog();
+
+        this.experimentService.saveRequest(this.inputs.experiment).subscribe((response) => {
+            console.log("Save Experiment returned!");
+            this.dialogService.stopAllSpinnerDialogs();
+
+            if (!response) {
+                // error
+                return;
+            }
+
+            if (response.requestNumber && this.coreFacility.display) {
+                let submissionMessage = 'Request #  ' + response.requestNumber + '\n'
+                    + 'Experiment has been submitted.  Please print off the request form and deliver it along with your samples to the ' + this.coreFacility.display + '.\n'
+                    + '\n'
+                    + 'Please inscribe database ID numbers on the lids of 1.5 ml microcentrifuge tubes.  Inscribe sample names on the sides of tubes. ';
+
+                let temp = this.dialogService.alert(submissionMessage, "Request Submitted").subscribe((value: boolean) => {
+                    if (response.requestNumber) {
+                        // this.router.navigateByUrl('ShowRequestForm.gx?idRequest=' + response.requestNumber);
+
+                        window.open('ShowRequestForm.gx?idRequest=' + response.idRequest, '_blank');
+
+                        // setTimeout(() => {
+                        //     this.router.navigateByUrl('/experiments/' + response.requestNumber);
+                        // });
+
+                        // this.router.navigate(['/experiments', { outlets: { 'browsePanel': ['id', response.requestNumber] } } ]);
+
+                        this.gnomexService.navByNumber(response.requestNumber);
+                    } else {
+                        // Should not be reachable...
+                        // this.router.navigateByUrl("/home");
+                    }
+
+                    temp.unsubscribe();
+                });
+            }
+        });
     }
 
 

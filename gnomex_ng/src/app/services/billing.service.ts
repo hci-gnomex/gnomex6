@@ -1,13 +1,14 @@
 import {EventEmitter, Injectable, Output} from "@angular/core";
 import {Headers, Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {BillingTemplate} from "../util/billing-template-window.component";
 import {BillingViewChangeForCoreCommentsWindowEvent} from "../billing/billing-view-change-for-core-comments-window-event.model";
 import {BillingFilterEvent} from "../billing/billing-filter.component";
 import {map} from "rxjs/operators";
 import {UtilService} from "./util.service";
+import {Experiment} from "../util/models/experiment.model";
 
 @Injectable()
 export class BillingService {
@@ -74,15 +75,20 @@ export class BillingService {
         return this.httpClient.get("/gnomex/GetBillingRequestList.gx", {params: params});
     }
 
-    public createBillingItems(params: HttpParams): Observable<any> {
-        return this.httpClient.get("/gnomex/CreateBillingItems.gx", {params: params});
-    }
+    public createBillingItems(experimentAnnotations: string, experiment: Experiment):Observable<any>{
 
-    public createBillingItems2(params: URLSearchParams):Observable<any>{
+        let stringifiedRequest: string = JSON.stringify(experiment.getJSONObjectRepresentation());
+
+        let params: HttpParams = new HttpParams()
+            .set("propertiesXML", experimentAnnotations)
+            .set("requestXMLString", stringifiedRequest)
+            .set("noJSONToXMLConversionNeeded", "Y");
+
         this.cookieUtilService.formatXSRFCookie();
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/CreateBillingItems.gx", params, { headers: headers });
+
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/CreateBillingItems.gx", params.toString(), { headers: headers });
     }
 
     public getBillingItemList(params: HttpParams): Observable<any> {

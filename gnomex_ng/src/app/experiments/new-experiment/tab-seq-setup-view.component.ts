@@ -125,17 +125,25 @@ export class TabSeqSetupViewComponent implements OnInit {
             .set("idLab", value.idLab);
 
         this.themesSubscription = this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
-            for (let price of response) {
-                let key: string = price.codeApplication;
-                this.priceMap[key] = price.price;
+
+            if (response) {
+                if (Array.isArray(response)) {
+                    for (let price of response) {
+                        let key: string = price.codeApplication;
+                        this.priceMap[key] = price.price;
+                    }
+                } else if (response.Price && response.Price.codeApplication) {
+                    this.priceMap[response.Price.codeApplication] = response.Price.price;
+                }
             }
+
 
             this.appPrices = [];
             this.form.get("seqType").setValue("");
 
             this.showPool = this.form
                 && this.form.get("seqPrepByCore")
-                && this.form.get("seqPrepByCore").value === this.NO;
+                && this.form.get("seqPrepByCore").value === this.YES;
 
             this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
@@ -143,7 +151,7 @@ export class TabSeqSetupViewComponent implements OnInit {
     };
 
     public readonly YES: string = "Y";
-    public readonly NO: string = "N";
+    public readonly NO: string  = "N";
     public readonly SEPARATE: string = "separate";
     public readonly POOLED: string = "pooled";
     public currState: string;
@@ -174,11 +182,25 @@ export class TabSeqSetupViewComponent implements OnInit {
 
     private libToChange: boolean = false;
 
+    private showPoolingType_prior_value: boolean = false;
+
     get showPoolingType(): boolean {
-        return this.form
+        let newValue: boolean = this.form
             && this.form.get('seqPrepByCore')
             && this.form.get('seqPrepByCore').value
-            && this.form.get('seqPrepByCore').value === this.YES;
+            && this.form.get('seqPrepByCore').value === this.NO;
+
+        if (!this.showPoolingType_prior_value && newValue) {
+            this.form.get("pooledLib").setValue(this.SEPARATE);
+        } else if (this.showPoolingType_prior_value && !newValue) {
+            this.form.get("pooledLib").setValue(null);
+        } else {
+            // do nothing;
+        }
+
+        this.showPoolingType_prior_value = newValue;
+
+        return newValue;
     }
 
     get showLibraryDesign(): boolean {
@@ -282,7 +304,7 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.themes.push(thm);
         }
 
-        if (this.form.get("seqPrepByCore").value === this.YES) {
+        if (this.form.get("seqPrepByCore").value === this.NO) {
             preparedAppList.sort(TabSeqSetupViewComponent.sortApplicationsAlphabetically);
         }
 
@@ -299,9 +321,13 @@ export class TabSeqSetupViewComponent implements OnInit {
 
         this.billingService.getLibPrepApplicationPriceList(appPriceListParams).subscribe((response: any) => {
             if (response) {
-                for (let price of response) {
-                    let key: string = price.codeApplication;
-                    this.priceMap[key] = price.price;
+                if (Array.isArray(response)) {
+                    for (let price of response) {
+                        let key: string = price.codeApplication;
+                        this.priceMap[key] = price.price;
+                    }
+                } else if (response.Price && response.Price.codeApplication) {
+                    this.priceMap[response.Price.codeApplication] = response.Price.price;
                 }
             }
 
@@ -315,7 +341,7 @@ export class TabSeqSetupViewComponent implements OnInit {
                     this._experiment.seqPrepByCore = '';
                 }
 
-                this.showPool = this.form.get("seqPrepByCore").value === this.NO;
+                this.showPool = this.form.get("seqPrepByCore").value === this.YES;
             }
 
 

@@ -9,10 +9,10 @@
                             (Optional)
                         </div>
                         <mat-radio-group class="flex-container-col flex-grow" (change)="onLipPrepChange($event)" formControlName="seqPrepByCore">
-                            <mat-radio-button [value]="NO">
+                            <mat-radio-button [value]="YES">
                                 Yes, please prep the library
                             </mat-radio-button>
-                            <mat-radio-button  [value]="YES">
+                            <mat-radio-button  [value]="NO">
                                 No, library has already been prepped
                             </mat-radio-button>
                         </mat-radio-group>
@@ -79,7 +79,7 @@
                                         </mat-radio-button>
                                     </div>
                                     <div class="td padded right-align">
-                                        <span *ngIf="!this.form.get('seqPrepByCore').value || this.form.get('seqPrepByCore').value !== YES">
+                                        <span *ngIf="!this.form.get('seqPrepByCore').value || this.form.get('seqPrepByCore').value !== NO">
                                             {{ ('' + appPrice?.price).startsWith('$') ? appPrice?.price : ( appPrice?.price ? '$' + appPrice?.price : '') }}
                                         </span>
                                     </div>

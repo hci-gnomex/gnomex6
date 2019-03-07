@@ -50,7 +50,7 @@
         </mat-tab-group>
     </div>
     <div class="full-width padded-top">
-        <div class="full-width flex-container-row">
+        <div class="full-width flex-container-row align-center">
             <div class="padded-right">
                 <button mat-raised-button
                         [disabled]="selectedIndex === 0"
@@ -67,16 +67,23 @@
                     Next
                 </button>
             </div>
-            <div class="full-height flex-grow">
-            </div>
-            <div class="padded-left">
+            <div class="padded-right-large">
                 <button *ngIf="selectedIndex === (numTabs - 1)"
                         mat-raised-button
-                        [disabled]="disableSubmit || selectedIndex !== (numTabs - 1)"
-                        (click)="newExperimentService.submit()">
+                        [disabled]="!isCheckboxChecked || selectedIndex !== (numTabs - 1)"
+                        (click)="SaveNewExperiment()">
                     <img src="../../../assets/accept.png">
                     Submit
                 </button>
+            </div>
+            <div *ngIf="onSubmitTab" class="padded-right">
+                <mat-checkbox [(ngModel)]="isCheckboxChecked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}">
+                    <div class="highlight-agreement">
+                        {{ agreeCheckboxLabel }}
+                    </div>
+                </mat-checkbox>
+            </div>
+            <div class="full-height flex-grow">
             </div>
             <div class="padded-left">
                 <button mat-raised-button
