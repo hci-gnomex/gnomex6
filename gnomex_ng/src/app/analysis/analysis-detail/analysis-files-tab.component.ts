@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode} from "ag-grid-community";
+import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, RowDoubleClickedEvent} from "ag-grid-community";
 import {AnalysisService} from "../../services/analysis.service";
 import {ActivatedRoute} from "@angular/router";
 import {DialogsService} from "../../util/popup/dialogs.service";
@@ -29,6 +29,7 @@ import {DownloadFilesComponent} from "../../util/download-files.component";
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                 (rowDoubleClicked)="this.onGridRowDoubleClicked($event)"
                                  [getNodeChildDetails]="this.getNodeChildDetails"
                                  [enableColResize]="true"
                                  [rowData]="this.gridData">
@@ -136,6 +137,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         });
         this.updateFileSubscription =  this.fileService.getUpdateFileTabObservable().subscribe(data => {
             this.gridData = data;
+            setTimeout(() => {
+                this.determineFileCount();
+            });
         })
     }
 
@@ -157,6 +161,21 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                     this.fileCount++;
                 }
             });
+        }
+    }
+
+    public onGridRowDoubleClicked(event: RowDoubleClickedEvent): void {
+        if (event.data.type) {
+            let extensionType: string = "." + event.data.type;
+            if (ConstantsService.FILE_EXTENSIONS_FOR_VIEW.includes(extensionType)) {
+                let idAnalysis: string = event.data.idAnalysis;
+                let fileName: string = event.data.fileName;
+                let dir: string = "";
+                if (event.node.parent && event.node.parent.data.type && event.node.parent.data.type === 'dir') {
+                    dir = event.node.parent.data.displayName;
+                }
+                this.fileService.previewAnalysisFile(idAnalysis, fileName, dir);
+            }
         }
     }
 

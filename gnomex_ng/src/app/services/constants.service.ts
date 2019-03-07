@@ -67,6 +67,11 @@ export class ConstantsService {
         "Seq Lib Prep Status",
     ];
 
+    public static readonly FILE_EXTENSIONS_FOR_VIEW: string[] = [
+        ".pdf", ".jpg", ".png", ".gif", ".rtf", ".txt", ".html", ".htm", ".csv", ".ppt", ".pptx",
+        ".xls", ".xlsx", ".xml", ".ped", ".Rmd", ".md",
+    ];
+
     public readonly DEFAULT_TOOLBAR_SETTINGS: string = "bold italic underline | left center right |  format font size |" +
         " color | ul ol | outdent indent";
     public readonly ICON_SAVE:string = "assets/save.png";
