@@ -875,6 +875,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 column = TabSamplesIlluminaComponent.createTextColumn(annot, emToPxConversionRate);
         }
 
+        if (annot.isRequired && annot.isRequired === 'Y') {
+            column.cellStyle = {color: 'black', 'background-color': 'yellow'};
+        }
+
         if (!columnDefs || !Array.isArray(columnDefs)) {
             columnDefs = [];
         }

@@ -88,6 +88,7 @@ import {RichEditorModule} from "../../modules/rich-editor.module";
 import {ManageFilesModule} from "../util/upload/manage-files.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {ExperimentBillingTabComponent} from "./experiment-detail/experiment-billing-tab.component";
+import {LinkButtonRenderer} from "../util/grid-renderers/link-button.renderer";
 
 @NgModule({
     imports: [
@@ -132,6 +133,7 @@ import {ExperimentBillingTabComponent} from "./experiment-detail/experiment-bill
             DateRenderer,
             IconTextRendererComponent,
             IconRendererComponent,
+            LinkButtonRenderer,
             MultipleLineTextRenderer,
             SelectRenderer,
             TextAlignLeftMiddleRenderer,

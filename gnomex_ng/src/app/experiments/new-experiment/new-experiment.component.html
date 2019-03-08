@@ -68,9 +68,9 @@
                 </button>
             </div>
             <div class="padded-right-large">
-                <button *ngIf="selectedIndex === (numTabs - 1)"
+                <button *ngIf="onSubmitTab"
                         mat-raised-button
-                        [disabled]="!isCheckboxChecked || selectedIndex !== (numTabs - 1)"
+                        [disabled]="!isCheckboxChecked || !onSubmitTab"
                         (click)="SaveNewExperiment()">
                     <img src="../../../assets/accept.png">
                     Submit
