@@ -13,9 +13,12 @@ import {IFileParams} from "../interfaces/file-params.model";
 @Component({
     template:`
         <div class="full-height full-width flex-container-col">
-            <div mat-dialog-title class="padded-outer">
-                <div class="dialog-header-colors padded-inner">
+            <div mat-dialog-title class="padded-outer dialog-header-colors flex-container-row justify-space-between force-flex" >
+                <div class=" padded-inner">
                     Upload Files
+                </div>
+                <div (click)="onCloseDialog()" class="padded-inner">
+                    <img [src]="this.constService.ICON_CLOSE_BLACK">
                 </div>
             </div>
             <div mat-dialog-content class="full-height" style="margin: 0; padding: 0;">
@@ -59,6 +62,9 @@ import {IFileParams} from "../interfaces/file-params.model";
         }
         .mat-tab-group-border{
             border: 1px solid #e8e8e8;
+        }
+        .force-flex{
+            display:flex !important;
         }
 
 
