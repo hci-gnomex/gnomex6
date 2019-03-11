@@ -18,12 +18,14 @@ export enum qcModes
 
 @Injectable()
 export class WorkflowService {
-    public readonly ILLUMINA_SEQQC = "ILLSEQQC";
-    public readonly ILLSEQ_PREP = "ILLSEQPREP";
-    public readonly ILLSEQ_PREP_QC = "ILLSEQPREPQC";
-    public readonly ILLSEQ_CLUSTER_GEN = "ILLSEQASSEM";
-    public readonly ILLSEQ_FINALIZE_FC = "ILLSEQFINFC";
-    public readonly ILLSEQ_DATA_PIPELINE = "ILLSEQPIPE";
+    // TODO - This is a temporary fix for the Alpha Demo with Brian
+    // Using ILLSEQ instead of HSEQ does not return the correct data from the back-end
+    public readonly ILLUMINA_SEQQC = "HSEQQC";
+    public readonly ILLSEQ_PREP = "HSEQPREP";
+    public readonly ILLSEQ_PREP_QC = "HSEQPREPQC";
+    public readonly ILLSEQ_CLUSTER_GEN = "HSEQASSEM";
+    public readonly ILLSEQ_FINALIZE_FC = "HSEQFINFC";
+    public readonly ILLSEQ_DATA_PIPELINE = "HSEQPIPE";
     public readonly FLOWCELL = "FLOWCELL";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";

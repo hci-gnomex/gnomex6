@@ -14,6 +14,7 @@ import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
 import {HttpParams} from "@angular/common/http";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'finalizeFlowCell-workflow',
@@ -149,11 +150,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         params = params.set("codeStepNext", this.workflowService.ILLSEQ_FINALIZE_FC);
         this.workflowService.getFlowCellList(params).subscribe((response: any) => {
             if (response) {
-                if (!this.securityAdvisor.isArray(response)) {
-                    this.workItemList = [response.Request];
-                } else {
-                    this.workItemList = response;
-                }
+                this.workItemList = UtilService.getJsonArray(response, response.FlowCell);
                 this.workingWorkItemList = this.workItemList;
                 this.assmFlowCellNumber = this.workingWorkItemList.length;
                 this.columnDefs = [

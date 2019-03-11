@@ -1,8 +1,8 @@
 <div>
-    <button mat-button (click)="showBillingInvoice(false)"><img src="../../../assets/page_white_acrobat.png">Printable PDF Invoice</button>
-    <button mat-button (click)="showBillingInvoice(true)"><img src="../../../assets/email_open.png">Email Invoice</button>
-    <button mat-button (click)="showGeneralLedgerInterface()"><img src="../../../assets/feed_disk.png">General Ledger Interface</button>
-    <button mat-button [matMenuTriggerFor]="reportsMenu"><img src="../../../assets/page.png">Reports...</button>
+    <button mat-button (click)="showBillingInvoice(false)"><img class="icon" src="../../../assets/page_white_acrobat.png">Printable PDF Invoice</button>
+    <button mat-button (click)="showBillingInvoice(true)"><img class="icon" src="../../../assets/email_open.png">Email Invoice</button>
+    <button mat-button (click)="showGeneralLedgerInterface()"><img class="icon" src="../../../assets/feed_disk.png">General Ledger Interface</button>
+    <button mat-button [matMenuTriggerFor]="reportsMenu"><img class="icon" src="../../../assets/page.png">Reports...</button>
     <mat-menu #reportsMenu="matMenu">
         <button mat-menu-item (click)="showMonthendBillingReport()">Invoice Report</button>
         <button mat-menu-item matTooltip="Monthend Billing Report (uMerge Format)" matTooltipPosition="right" (click)="showMonthendBillingReport(true)">Monthend Billing Report (uMerge Format)</button>
@@ -10,5 +10,5 @@
         <button mat-menu-item (click)="showUsageReport()">Usage Report</button>
         <button mat-menu-item (click)="showNotesToCore()">Notes to Core</button>
     </mat-menu>
-    <button mat-button (click)="refresh()"><img src="../../../assets/refresh.png">Refresh</button>
+    <button mat-button (click)="refresh()"><img class="icon" src="../../../assets/refresh.png">Refresh</button>
 </div>

@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
 
@@ -25,7 +25,9 @@ export class OrganismService {
 
     public saveOrganismNew(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/SaveOrganism.gx", null, {params: params});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveOrganism.gx", params.toString(), {headers: headers});
     }
 
     public getOrganismListCall(): Observable<Response> {

@@ -92,7 +92,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     private label = "Illumina Flow Cell Assembly";
     private searchText: string;
     private gridOptions:GridOptions = {};
-    private assmGridOptions:GridOptions = {};
     private lanes: any[] = [];
     private selectedSeqlanes: any[] = [];
     private deleteSeqlaneDialogRef: MatDialogRef<DeleteSeqlaneDialogComponent>;

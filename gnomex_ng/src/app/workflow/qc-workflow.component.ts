@@ -11,6 +11,7 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {DialogsService} from "../util/popup/dialogs.service";
 import {GridColumnValidateService} from "../services/grid-column-validate.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'qc-workflow',
@@ -106,12 +107,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         params.set("codeStepNext", this.workflowService.QC);
         this.cores = [];
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
-            this.workItemList = response;
-            if (!this.securityAdvisor.isArray(response)) {
-                this.workItemList = [response.WorkItem];
-            } else {
-                this.workItemList = response;
-            }
+            this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
 
             this.coreIds = [...new Set(this.workItemList.map(item => item.idCoreFacility))];
             for (let coreId of this.coreIds) {

@@ -1,5 +1,5 @@
 import {Component, OnInit} from "@angular/core";
-import {GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
+import {GridApi, GridReadyEvent, RowSelectedEvent, RowNode} from "ag-grid-community";
 import {OrganismService} from "../services/organism.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {DictionaryService} from "../services/dictionary.service";
@@ -11,6 +11,7 @@ import {DateParserComponent} from "../util/parsers/date-parser.component";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'configure-organisms',
@@ -74,7 +75,7 @@ export class ConfigureOrganismsComponent implements OnInit {
         this.canDeleteSelectedOrganism = false;
         this.showSpinner = false;
 
-        this.nameFC = new FormControl("", Validators.maxLength(100));
+        this.nameFC = new FormControl("", [Validators.required, Validators.maxLength(100)]);
         this.activeFC = new FormControl(false);
         this.das2NameFC = new FormControl("", Validators.maxLength(100));
         this.binomialNameFC = new FormControl("", Validators.maxLength(100));
@@ -83,7 +84,7 @@ export class ConfigureOrganismsComponent implements OnInit {
         this.taxIdFC = new FormControl("", Validators.maxLength(100));
         this.sortOrderFC = new FormControl("", Validators.pattern("^[0-9]{0,5}$"));
         this.mageDefFC = new FormControl("", Validators.maxLength(100));
-        this.ownerFC = new FormControl({value: "", disabled: !this.canWriteDictionaries});
+        this.ownerFC = new FormControl({value: "", disabled: !this.canWriteDictionaries}, Validators.required);
         this.formGroup = new FormGroup({
             name: this.nameFC,
             active: this.activeFC,
@@ -100,12 +101,21 @@ export class ConfigureOrganismsComponent implements OnInit {
         this.loadOrganismList();
     }
 
-    private loadOrganismList(): void {
+    private loadOrganismList(preselectOrganism?: string): void {
         this.setOrganism(null);
         this.organismList = [];
         this.organismService.getOrganismListNew().subscribe((response: any) => {
             if (response) {
                 this.organismList = response;
+                if (preselectOrganism) {
+                    setTimeout(() => {
+                        this.organismGridApi.forEachNode((node: RowNode) => {
+                            if (node.data.organism === preselectOrganism) {
+                                node.setSelected(true);
+                            }
+                        });
+                    });
+                }
             }
         });
     }
@@ -117,7 +127,7 @@ export class ConfigureOrganismsComponent implements OnInit {
     public addOrganism(): void {
         let newOrganism: any = {};
         newOrganism.idOrganism = "";
-        newOrganism.organism = "Enter name here...";
+        newOrganism.organism = "";
         newOrganism.isActive = "Y";
         newOrganism.canUpdate = "Y";
         newOrganism.canDelete = "Y";
@@ -140,10 +150,12 @@ export class ConfigureOrganismsComponent implements OnInit {
                 if (result) {
                     this.showSpinner = true;
                     this.organismService.deleteOrganism(this.selectedOrganism.idOrganism).subscribe((response: any) => {
+                        this.showSpinner = false;
                         if (response && response.result && response.result === "SUCCESS") {
                             let config: MatSnackBarConfig = new MatSnackBarConfig();
                             config.duration = 2000;
                             this.snackBar.open("Organism Deleted", "Configure Organisms", config);
+                            this.loadOrganismList();
                         } else {
                             let message: string = "";
                             if (response && response.message) {
@@ -151,8 +163,6 @@ export class ConfigureOrganismsComponent implements OnInit {
                             }
                             this.dialogsService.confirm("An error occurred while deleting the organism" + message, null);
                         }
-                        this.showSpinner = false;
-                        this.loadOrganismList();
                     });
                 }
             });
@@ -204,9 +214,10 @@ export class ConfigureOrganismsComponent implements OnInit {
 
     public saveOrganism(): void {
         this.showSpinner = true;
+        let name: string = this.nameFC.value;
         let params: HttpParams = new HttpParams()
             .set("idOrganism", this.selectedOrganism.idOrganism)
-            .set("organism", this.nameFC.value)
+            .set("organism", name)
             .set("isActive", this.activeFC.value ? "Y" : "N")
             .set("mageOntologyCode", this.mageCodeFC.value)
             .set("mageOntologyDefinition", this.mageDefFC.value)
@@ -220,17 +231,19 @@ export class ConfigureOrganismsComponent implements OnInit {
             .set("genomeBuildsJSONString", JSON.stringify(this.genomeBuildList));
 
         this.organismService.saveOrganismNew(params).subscribe((result: any) => {
+            this.showSpinner = false;
             if (result && result.result && result.result === "SUCCESS") {
                 let config: MatSnackBarConfig = new MatSnackBarConfig();
                 config.duration = 2000;
                 this.snackBar.open("Organism Saved", "Configure Organisms", config);
-            } else if (result && result.message) {
-                this.dialogsService.confirm(result.message, null);
+                this.loadOrganismList(name);
             } else {
-                this.dialogsService.confirm("An error occurred while saving the organism", null);
+                let message: string = "";
+                if (result && result.message) {
+                    message = ": " + result.message;
+                }
+                this.dialogsService.confirm("An error occurred while saving the organism" + message, null);
             }
-            this.showSpinner = false;
-            this.loadOrganismList();
         });
     }
 
@@ -241,15 +254,15 @@ export class ConfigureOrganismsComponent implements OnInit {
             this.canDeleteSelectedOrganism = o.canDelete === "Y";
             this.nameFC.setValue(o.organism);
             this.activeFC.setValue(o.isActive === "Y");
-            this.das2NameFC.setValue(o.das2Name);
-            this.binomialNameFC.setValue(o.binomialName);
-            this.abbreviationFC.setValue(o.abbreviation);
-            this.mageCodeFC.setValue(o.mageOntologyCode);
-            this.taxIdFC.setValue(o.ncbiTaxID);
-            this.sortOrderFC.setValue(o.sortOrder);
-            this.mageDefFC.setValue(o.mageOntologyDefinition);
+            this.das2NameFC.setValue(o.das2Name ? o.das2Name : "");
+            this.binomialNameFC.setValue(o.binomialName ? o.binomialName : "");
+            this.abbreviationFC.setValue(o.abbreviation ? o.abbreviation : "");
+            this.mageCodeFC.setValue(o.mageOntologyCode ? o.mageOntologyCode : "");
+            this.taxIdFC.setValue(o.ncbiTaxID ? o.ncbiTaxID : "");
+            this.sortOrderFC.setValue(o.sortOrder ? o.sortOrder : "");
+            this.mageDefFC.setValue(o.mageOntologyDefinition ? o.mageOntologyDefinition : "");
             this.ownerFC.setValue(o.idAppUser);
-            this.genomeBuildList = Array.isArray(o.genomeBuilds) ? o.genomeBuilds : [o.genomeBuilds.GenomeBuild];
+            this.genomeBuildList = UtilService.getJsonArray(o.genomeBuilds, o.genomeBuilds.GenomeBuild);
         } else {
             this.canUpdateSelectedOrganism = false;
             this.canDeleteSelectedOrganism = false;
@@ -266,6 +279,7 @@ export class ConfigureOrganismsComponent implements OnInit {
             this.genomeBuildList = [];
         }
         this.showSpinner = false;
+        UtilService.markChildrenAsTouched(this.formGroup);
     }
 
     public onOrganismGridReady(params: GridReadyEvent): void {
