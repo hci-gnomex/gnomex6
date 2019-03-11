@@ -217,7 +217,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
         config.panelClass = 'no-padding-dialog';
         config.data = {
             showCreateSoftLinks: true,
-            downloadListSource: this.getRequestDownloadListResult.Request,
+            downloadListSource: this.gridData[0],
             cacheDownloadListFn: this.fileService.cacheExperimentFileDownloadList,
             fdtDownloadFn: this.fileService.getFDTDownloadExperimentServlet,
             makeSoftLinksFn: this.fileService.makeSoftLinks,

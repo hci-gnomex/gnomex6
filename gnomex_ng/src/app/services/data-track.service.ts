@@ -215,17 +215,13 @@ export class DataTrackService {
             }));
     }
 
-    saveGenomeBuild(params: URLSearchParams):  Observable<Response> {
+    public saveGenomeBuild(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/SaveGenomeBuild.gx",params,{headers:headers})
-            .pipe(map((response: Response) => {
-                if (response.status === 200) {
-                    return response.json();
-                }
-            }));
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveGenomeBuild.gx", params.toString(), {headers: headers});
     }
+
     saveFolder(params: URLSearchParams):  Observable<Response> {
         this.cookieUtilService.formatXSRFCookie();
         let headers: Headers = new Headers();

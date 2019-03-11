@@ -9,6 +9,7 @@ import {DataTrackService} from "../../../services/data-track.service";
 import {DialogsService} from "../../../util/popup/dialogs.service";
 import {GnomexStringUtilService} from "../../../services/gnomex-string-util.service";
 import {MatTabChangeEvent} from "@angular/material";
+import {HttpParams} from "@angular/common/http";
 
 
 
@@ -91,7 +92,7 @@ export class DatatracksGenomeBuildComponent implements OnInit{
     save():void{
 
 
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
 
 
 
@@ -108,30 +109,30 @@ export class DatatracksGenomeBuildComponent implements OnInit{
             let seqFilesObj = this.gbValidateService.sequenceFilesList;
             let idGenomeBuild:string = this.dtService.datatrackListTreeNode.idGenomeBuild;
 
-            params.set("idGenomeBuild", idGenomeBuild);
+            params = params.set("idGenomeBuild", idGenomeBuild);
             if(segsObj.length > 0){
-                params.set("segmentsXML", JSON.stringify(segsObj));
+                params = params.set("segmentsXML", JSON.stringify(segsObj));
             }
             if(seqFilesObj.length > 0){
-                params.set("sequenceFilesToRemoveXML", JSON.stringify(seqFilesObj));
+                params = params.set("sequenceFilesToRemoveXML", JSON.stringify(seqFilesObj));
             }
 
 
             Object.keys(this.gbValidateService.detailsForm).forEach(key =>{
                 if(key === "isActive"){
                     let value:string = this.gbValidateService.detailsForm[key] === true ? 'Y': 'N';
-                    params.set(key, value);
+                    params = params.set(key, value);
                 }else if(key === "buildDate"){
                     let date:Date = <Date>this.gbValidateService.detailsForm.buildDate;
-                    params.set("buildDate", date.toLocaleDateString());
+                    params = params.set("buildDate", date.toLocaleDateString());
                 }
                 else{
-                    params.set(key, this.gbValidateService.detailsForm[key]);
+                    params = params.set(key, this.gbValidateService.detailsForm[key]);
                 }
 
             });
 
-            this.dtService.saveGenomeBuild(params).subscribe(resp =>{
+            this.dtService.saveGenomeBuild(params).subscribe(() => {
                  this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
             });
         }

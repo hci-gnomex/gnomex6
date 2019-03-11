@@ -293,7 +293,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         config.panelClass = 'no-padding-dialog';
         config.data = {
             showCreateSoftLinks: false,
-            downloadListSource: this.getAnalysisDownloadListResult.Analysis,
+            downloadListSource: this.gridData[0],
             cacheDownloadListFn: this.fileService.cacheAnalysisFileDownloadList,
             fdtDownloadFn: this.fileService.getFDTDownloadAnalysisServlet,
             downloadURL: "DownloadAnalysisFileServlet.gx",

@@ -16,6 +16,8 @@ import {DownloadPickerComponent} from "../download-picker.component";
 import {DOCUMENT} from "@angular/common";
 import {DownloadProgressComponent} from "../download-progress.component";
 import {HttpParams} from "@angular/common/http";
+import {Router} from "@angular/router";
+import {DictionaryService} from "../../services/dictionary.service";
 
 const DATATRACK = "DATATRACK";
 const GENOMEBUILD = "GENOMEBUILD";
@@ -42,6 +44,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     public newDTisDisabled: boolean = true;
     public newGenomeBuildisDisabled: boolean = true;
     public duplicateDTisDisabled: boolean = true;
+    public removeDisabled: boolean = true;
     public disableAll: boolean = false;
 
     constructor(private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -49,7 +52,9 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                 private dataTrackService: DataTrackService,
                 private dialog: MatDialog,
                 public constantsService: ConstantsService,
-                @Inject(DOCUMENT) private document: Document) {
+                @Inject(DOCUMENT) private document: Document,
+                private router: Router,
+                private dictionaryService: DictionaryService) {
     }
 
     ngOnInit() {
@@ -68,6 +73,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     ngOnChanges(changes: SimpleChanges) {
         if (this.selectedNode) {
+            this.removeDisabled = false;
             if (this.selectedNode.data.idDataTrack) {
                 this.duplicateDTisDisabled = false;
             }
@@ -84,6 +90,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             } else {
                 this.newGenomeBuildisDisabled = true;
             }
+        } else {
+            this.removeDisabled = true;
         }
     }
 
@@ -121,25 +129,33 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         if (type === DATATRACK) {
 
             this.dataTrackService.deleteDataTrack(params).subscribe((response: Response) => {
+                this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             });
         }
         else if (type === DATATRACKFOLDER) {
 
             this.dataTrackService.deleteDataTrackFolder(params).subscribe((response: Response) => {
+                this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             });
         }
         else if (type === GENOMEBUILD) {
 
             this.dataTrackService.deleteGenomeBuild(params).subscribe((response: Response) => {
-                this.dataTrackService.refreshDatatracksList_fromBackend();
+                this.router.navigateByUrl("/datatracks");
+                this.dictionaryService.reloadAndRefresh(() => {
+                    this.dataTrackService.refreshDatatracksList_fromBackend();
+                }, null, DictionaryService.GENOME_BUILD);
             });
         }
         else if (type === ORGANISM) {
 
             this.dataTrackService.deleteOrganism(params).subscribe((response: Response) => {
-                this.dataTrackService.refreshDatatracksList_fromBackend();
+                this.router.navigateByUrl("/datatracks");
+                this.dictionaryService.reloadAndRefresh(() => {
+                    this.dataTrackService.refreshDatatracksList_fromBackend();
+                }, null, DictionaryService.ORGANISM);
             });
         }
     }
@@ -214,8 +230,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     private makeNewGenomeBuild(): void {
         let dialogRef: MatDialogRef<NewGenomeBuildComponent> = this.dialog.open(NewGenomeBuildComponent, {
-            height: '430px',
-            width: '300px',
+            height: '24em',
+            width: '30em',
             data: {
                 selectedItem: this.selectedNode
             }
@@ -224,8 +240,15 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     private makeNewOrganism(): void {
         let dialogRef: MatDialogRef<NewOrganismComponent> = this.dialog.open(NewOrganismComponent, {
-            height: '430px',
-            width: '300px',
+            height: '24em',
+            width: '30em',
+        });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.dictionaryService.reloadAndRefresh(() => {
+                    this.dataTrackService.refreshDatatracksList_fromBackend();
+                }, null, DictionaryService.ORGANISM);
+            }
         });
     }
 

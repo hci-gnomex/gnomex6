@@ -491,11 +491,15 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     expandClicked() {
-        this.selectedItem.expandAll();
+        if (this.selectedItem) {
+            this.selectedItem.expandAll();
+        }
     }
 
     collapseClicked() {
-        this.selectedItem.collapseAll();
+        if (this.selectedItem) {
+            this.selectedItem.collapseAll();
+        }
     }
 
     ngOnDestroy(): void {

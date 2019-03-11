@@ -10,6 +10,7 @@ import {SelectEditor} from "../util/grid-editors/select.editor";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'libprepqc-workflow',
@@ -89,12 +90,7 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         params.set("codeStepNext", this.workflowService.ILLSEQ_PREP_QC);
         this.cores = [];
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
-            this.workItemList = response;
-            if (!this.securityAdvisor.isArray(response)) {
-                this.workItemList = [response.WorkItem];
-            } else {
-                this.workItemList = response;
-            }
+            this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
 
             this.coreIds = [...new Set(this.workItemList.map(item => item.idCoreFacility))];
             for (let coreId of this.coreIds) {

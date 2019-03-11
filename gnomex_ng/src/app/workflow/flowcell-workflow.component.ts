@@ -17,6 +17,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {DOCUMENT} from "@angular/common";
 import {EditFlowcellDialogComponent} from "./edit-flowcell-dialog.component";
+import {UtilService} from "../services/util.service";
 
 
 @Component({
@@ -111,12 +112,7 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
 
         this.workflowService.getFlowCellList(params).subscribe((response: any) => {
             if (response && response.result !== "INVALID") {
-                this.workItemList = response;
-                if (!this.securityAdvisor.isArray(response)) {
-                    this.workItemList = [response.WorkItem];
-                } else {
-                    this.workItemList = response;
-                }
+                this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
 
                 this.workingWorkItemList = this.workItemList;
 

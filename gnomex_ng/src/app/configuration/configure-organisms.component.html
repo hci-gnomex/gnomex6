@@ -72,11 +72,12 @@
                 </ag-grid-angular>
             </div>
             <div class="full-width flex-container-row flex-one align-center">
-                <mat-form-field class="forty-percent-width">
-                    <mat-select placeholder="Owner" [formControl]="this.ownerFC">
-                        <mat-option *ngFor="let user of appUserList" [value]="user.idAppUser">{{user.display}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <div class="forty-percent-width">
+                    <lazy-loaded-select placeholder="Owner" [options]="this.appUserList"
+                                        valueField="idAppUser" displayField="display" [allowNone]="true"
+                                        [control]="this.ownerFC" class="full-height full-width">
+                    </lazy-loaded-select>
+                </div>
             </div>
             <div class="full-width flex-container-row flex-one align-center justify-end">
                 <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirty-note">Changes Have Not Been Saved</span>
