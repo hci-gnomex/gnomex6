@@ -10,6 +10,7 @@ import {SelectEditor} from "../util/grid-editors/select.editor";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'libprep-workflow',
@@ -101,12 +102,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
             this.coreAdmins = response;
 
             this.workflowService.getWorkItemList(params).subscribe((response: any) => {
-                this.workItemList = response;
-                if (!this.securityAdvisor.isArray(response)) {
-                    this.workItemList = [response.WorkItem];
-                } else {
-                    this.workItemList = response;
-                }
+                this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
                 this.coreIds = [...new Set(this.workItemList.map(item => item.idCoreFacility))];
                 for (let coreId of this.coreIds) {
                     let coreObj = {
@@ -423,7 +419,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
             requestNumber = requestsToCheck[idRequestToCheck].requestNumber;
             multiplexGroupNumber = requestsToCheck[idRequestToCheck].multiplexGroupNumber;
             barcodes = [];
-            for (var workItem of this.workItemList) {
+            for (let workItem of this.workItemList) {
                 if ((idRequest === workItem.idRequest && multiplexGroupNumber === workItem.multiplexGroupNumber)) {
                     this.addBarcodes(workItem, barcodes);
                 } else {

@@ -22,8 +22,7 @@
         </mat-form-field>
     </div>
     <div class="row-one" style="width: 100%;height: 90%">
-        <ag-grid-angular id="userTable" style="width: 100%;" class="ag-theme-fresh"
-                         [gridOptions]="gridOptions"
+        <ag-grid-angular id="userTable" class="ag-theme-balham full-width"
                          [rowData]="workingWorkItemList"
                          [columnDefs]="columnDefs"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"

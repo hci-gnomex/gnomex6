@@ -11,6 +11,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {HttpParams} from "@angular/common/http";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {GridColumnValidateService} from "../services/grid-column-validate.service";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'pipeline-workflow',
@@ -68,12 +69,7 @@ export class PipelineWorkflowComponent implements OnInit {
         let params: URLSearchParams = new URLSearchParams();
         params.set("codeStepNext", this.workflowService.ILLSEQ_DATA_PIPELINE);
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
-            this.workItemList = response;
-            if (!this.securityAdvisor.isArray(response)) {
-                this.workItemList = [response.WorkItem];
-            } else {
-                this.workItemList = response;
-            }
+            this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
             this.workingWorkItemList = this.workItemList;
             this.workingWorkItemList = this.filterWorkItems();
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);

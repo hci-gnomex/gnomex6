@@ -55,10 +55,10 @@
                         <div class="full-width">
                             <div class="flex-container-row">
                                 <div class="padded">
-                                    <button mat-button (click)="expandClicked()">Expand</button>
+                                    <button mat-button [disabled]="!this.selectedItem" (click)="expandClicked()">Expand</button>
                                 </div>
                                 <div class="padded flex-grow">
-                                    <button mat-button (click)="collapseClicked()">Collapse</button>
+                                    <button mat-button [disabled]="!this.selectedItem" (click)="collapseClicked()">Collapse</button>
                                 </div>
                             </div>
                         </div>

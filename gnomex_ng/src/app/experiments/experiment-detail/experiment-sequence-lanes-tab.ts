@@ -149,6 +149,12 @@ export class ExperimentSequenceLanesTab implements OnInit {
 
                 this.samplesGridData = samples;
                 this.lanesGridData = lanes;
+
+                setTimeout(() => {
+                    if (this.lanesGridApi) {
+                        this.lanesGridApi.sizeColumnsToFit();
+                    }
+                });
             }
         });
     }
