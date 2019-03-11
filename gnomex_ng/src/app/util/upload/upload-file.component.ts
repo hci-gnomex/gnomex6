@@ -43,6 +43,7 @@ export class UploadFileComponent implements OnInit {
     selectedRowList:any[] = [];
     url:string = '';
     allowFDTButton:boolean;
+    private uploadURLSubscription: Subscription;
     private uploadSubscription: Subscription;
     private orgExperimentFileParams:any;
     private orgAnalysisFileParams:any;
@@ -104,7 +105,7 @@ export class UploadFileComponent implements OnInit {
 
         }
 
-        this.uploadSubscription =  this.fileService.getUploadOrderUrl(this.manageData.uploadURL).subscribe(resp =>{
+        this.uploadURLSubscription =  this.fileService.getUploadOrderUrl(this.manageData.uploadURL).subscribe(resp =>{
             if(resp && resp.url){
                 this.url = resp.url;
             }else if(resp && resp.message){
@@ -144,7 +145,7 @@ export class UploadFileComponent implements OnInit {
                 let type:string = "";
                 let size:number =  file.size;
                 let bytesToKilo = Math.trunc(size/1024).toLocaleString() + " kb";
-                type = (name.split("."))[1];
+                type = name.substring(name.lastIndexOf('.') + 1);
                 this.rowData.push({'file':file,'name':name,'type':type,'size':bytesToKilo});
             }
         }
@@ -169,11 +170,18 @@ export class UploadFileComponent implements OnInit {
     }
 
     upload() {
+        if(this.primaryButtonText === 'Cancel'){
+            this.uploadSubscription.unsubscribe();
+            this.primaryButtonText = "Upload";
+            return;
+        }
+        this.primaryButtonText = "Cancel";
+
         if(!this.manageData.isFDT){
             this.progressVal = 0;
             this.pCount = 0;
 
-            this.uploadService.uploadFromBrowse(this.rowData,this.url,this.manageData.id)
+            this.uploadSubscription =  this.uploadSubscription = this.uploadService.uploadFromBrowse(this.rowData,this.url,this.manageData.id)
                 .pipe(take(this.rowData.length)).subscribe( resp =>{
                 this.pCount++;
                 this.progressVal = ((this.pCount) / this.rowData.length) * 100;
@@ -185,6 +193,8 @@ export class UploadFileComponent implements OnInit {
                     }else{
                         this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams)
                     }
+
+                    this.primaryButtonText = "Upload";
                     this.navToTab.emit(1);
 
                 }
@@ -192,6 +202,7 @@ export class UploadFileComponent implements OnInit {
                 this.rowData = [];
                 this.gridApi.setRowData(this.rowData = []);
                 this.dialogService.alert(error);
+                this.primaryButtonText = "Upload";
             });
         }else{
             this.allowFDTButton = false;
@@ -202,6 +213,6 @@ export class UploadFileComponent implements OnInit {
     }
 
     ngOnDestroy(){
-        this.uploadSubscription.unsubscribe();
+        this.uploadURLSubscription.unsubscribe();
     }
 }

@@ -401,7 +401,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe( resp => {
             if(resp && resp.result && resp.result === "SUCCESS" ){
                 this.expPlatformService.getExperimentPlatformList_fromBackend();
-                //this.dictionaryService.reloadAndRefresh();
+                this.dictionaryService.reloadAndRefresh();
             }else if(resp && resp.message){
                 this.dialogService.alert(resp.message);
                 this.showSpinner = false;
