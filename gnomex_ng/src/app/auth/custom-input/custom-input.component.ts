@@ -35,7 +35,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
         
         
         input {
-            color: black;
+            color: rgba(255,255,255,0);
             background-color: #FFFFFF;
             padding: 0.9em 0.7em 0.5em 1.4em;
             border: 1px solid #CCCCCC;
@@ -57,6 +57,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
         }
 
         input:focus {
+            color: rgba(255,255,255,255);
             background-color: white;
 
             transition: all .3s;
@@ -100,6 +101,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
         }
         
         input:valid {
+            color: rgba(255,255,255,255);
             z-index:999;
             
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACJklEQVRIia3WX2jOURzH8dfz2xK25m+7WEvSrpbkSsTFc7EhDSk3YyUlTSjcLGk5l0qSJEq5crFkCCminqRcrZa0NMuFJK2l9VxILLk4v4fHs+ffnnzqV79zzvf7/v5+53zP95yMSgpgHXZhB9ZjJeaQxzs8xRNMpvbzlKkA7sQw9qfQasrjIc7jQ2mgpIzDHrzG0Trg0IaB1OdAaYCmf1rBIG5hRR3gUrVgL37KeiUXOzMpGPowikUNwIs1h8O4Lfydog5c+w9waMYldFGYoqwL6GkA9gv3U86qov4WtMsazQjWYAyrGwjwAP1oxSNsLhrLY0uC7Q3CZ3BS8D2FLS4Zb0NfIm6iheoHjgs+CRKcw8Yydr0JuhsIcAf30vdNOFPBrjvB8gXCP2JIMCdoxRVxDcqpLREzoZy+oBfHxNyW2h4TfE7bw+IfVFSzuEDldBHP04eY2yNicSPYjFPV4MgneFth8BA6011+AwdxVkDQpr6NOZERHMHNCgZvsFvw8U9PDHi5jq+HoQTPxJwupw14JOgs6usRK20t5fG4UOyu4kQV43Hsw1dx13fVEWAE/YUAHWI9X1PFYRbfxMJYS9PYKpgqVNPPYjr+qOK0vE74HE5jikI1zSHnvaxpsXQ0VXCuBz6M64WT7V9QzpiscWzDsgXCpzFYDJ8fALImcRdLxVvFkhrg2dR+AC9Lz+T5t4qCouFa7BSnrRvt4ik4gwm8UOPa8htG8HgowA/lzwAAAABJRU5ErkJggg==');
@@ -137,12 +139,14 @@ import {FormBuilder, FormGroup} from "@angular/forms";
         }
 
         input:invalid:focus ~ .tooltip {
+            color: rgba(255,255,255,255);
             display: block;
 
             transition: all .3s;
         }
 
         input:placeholder-shown ~ .tooltip {
+            color: rgba(255,255,255,255);
             display: none;
 
             transition: all .3s;

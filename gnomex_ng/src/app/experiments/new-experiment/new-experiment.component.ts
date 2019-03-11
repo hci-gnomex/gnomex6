@@ -62,7 +62,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     public icon: any;
     public label: string = "New Experiment Order for ";
-    public numTabs: number;
 
     private annotations: any;
     private visibilityDetailObj: TabVisibilityComponent;
@@ -304,7 +303,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 component: TabSeqSetupViewComponent
             };
             let seqProtoTab = {
-                label: "Seq Options",
+                label: "Sequencing Options",
                 disabled: true,
                 component: TabSeqProtoViewComponent
             };
@@ -343,7 +342,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.tabs.push(visibilityTab);
             this.tabs.push(bioTab);
             this.tabs.push(confirmTab);
-            this.numTabs = 10;
         } else if (category.type === this.newExperimentService.TYPE_QC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'QCState' :
                 this.newExperimentService.currentState = 'QCExternalState';

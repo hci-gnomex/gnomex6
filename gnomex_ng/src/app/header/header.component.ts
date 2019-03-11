@@ -1,5 +1,5 @@
 import {
-    AfterViewChecked, Component, ElementRef, HostListener, OnInit, ViewChild,
+    AfterViewChecked, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild,
     ViewEncapsulation
 } from "@angular/core";
 import {ProgressService} from "../home/progress.service";
@@ -17,6 +17,7 @@ import {MatDialog, MatDialogConfig, MatToolbar} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 import {AuthenticationService} from "../auth/authentication.service";
 import {PropertyService} from "../services/property.service";
+import {Subscription} from "rxjs/index";
 
 @Component({
     selector: "gnomex-header",
@@ -80,7 +81,7 @@ import {PropertyService} from "../services/property.service";
     encapsulation: ViewEncapsulation.None
 })
 
-export class HeaderComponent implements OnInit, AfterViewChecked {
+export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     @ViewChild('headerRef') headerRef: MatToolbar;
     @ViewChild('spacerRef') spacerRef: ElementRef;
@@ -128,13 +129,29 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
     private headerHeight: number = 0;
     private userGuideRoute: string = "";
 
+    private isAppInitCompleteSubscription: Subscription;
+    private isLoggedInSubscription: Subscription;
+
     ngOnInit() {
-        this.gnomexService.isAppInitCompleteObservable().subscribe(() => {
+        this.isAppInitCompleteSubscription = this.gnomexService.isAppInitCompleteObservable().subscribe(() => {
             this.buildNavItems();
             this.checkSecurity();
             this.gnomexService.isGuestState = this.createSecurityAdvisorService.isGuest;
             this.addQuickLinks();
         });
+
+        this.isLoggedInSubscription = this.gnomexService.isLoggedIn_BehaviorSubject.subscribe((isLoggedIn: boolean) => {
+            this.resizeHeaderSpacing();
+        });
+    }
+
+    ngOnDestroy(): void {
+        if (this.isAppInitCompleteSubscription) {
+            this.isAppInitCompleteSubscription.unsubscribe()
+        }
+        if (this.isLoggedInSubscription) {
+            this.isLoggedInSubscription.unsubscribe()
+        }
     }
 
     ngAfterViewChecked() {
@@ -147,15 +164,22 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
     }
 
     private resizeHeaderSpacing(): void {
-        if (this.spacerRef
+        if (!this.gnomexService.isLoggedIn
+            && this.spacerRef
+            && this.spacerRef.nativeElement
+            && this.spacerRef.nativeElement.style) {
+
+            this.spacerRef.nativeElement.style.height = 'initial';
+            this.spacerRef.nativeElement.style.height = '0px';
+
+        } else if (this.spacerRef
             && this.spacerRef.nativeElement
             && this.spacerRef.nativeElement.style
             && this.headerRef
             && this.headerRef._elementRef
             && this.headerRef._elementRef.nativeElement
             && this.headerRef._elementRef.nativeElement.offsetHeight
-            && this.headerRef._elementRef.nativeElement.offsetHeight > 0
-            && this.headerRef._elementRef.nativeElement.offsetHeight !== this.headerHeight) {
+            && this.headerRef._elementRef.nativeElement.offsetHeight > 0) {
 
             this.headerHeight = this.headerRef._elementRef.nativeElement.offsetHeight;
 

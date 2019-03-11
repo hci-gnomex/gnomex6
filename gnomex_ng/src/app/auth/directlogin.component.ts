@@ -1,6 +1,6 @@
 import {Component, OnInit} from "@angular/core";
 import {AuthenticationService} from "./authentication.service";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {AbstractControl, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Router} from "@angular/router";
 
 @Component({
@@ -21,7 +21,7 @@ import {Router} from "@angular/router";
                             <img src="../../assets/gnomex_logo_hdr.png" alt="GNomEx">
                         </div>
                         <div class="full-width major-vertical-spacer flex-container-row align-center">
-                            <div *ngIf="_errorMsg" class="horizontal-centered {{ errorClasses }}">
+                            <div *ngIf="_errorMsg" class="horizontal-centered small-font {{ errorClasses }}">
                                 <div>
                                     <div class="error">Authentication Failed ({{ numberOfAttempts > 1 ? numberOfAttempts : '' }})</div>
                                     <div class="alert-text">{{_errorMsg}}</div>
@@ -92,6 +92,8 @@ import {Router} from "@angular/router";
     `,
     styles: [`
         
+        .small-font { font-size: small; }
+        
         .primary-button {
             font-family: "Arial", Helvetica, sans-serif;
             font-size: 14pt;
@@ -130,7 +132,7 @@ import {Router} from "@angular/router";
             font-family: "Arial", Helvetica, sans-serif;
             font-size: 12pt;
             
-            color: #FFFFFF;
+            color: grey;
             background-color: #C6CCBE;
             border-radius: 4px
         }
@@ -389,9 +391,25 @@ export class DirectLoginComponent implements OnInit {
      */
     ngOnInit(): void {
         this._loginForm = this._formBuilder.group({
+            invalidateWithoutUsernameAndPasswordComponents: new FormControl('', (control: AbstractControl) => {
+                if (control
+                    && control.parent
+                    && control.parent.controls
+                    && control.parent.controls['username']
+                    && control.parent.controls['password']) {
+                    return null;
+                } else {
+                    return { message: 'Grid is not populated yet' };
+                }
+            }),
             // username: ["", Validators.required],
             // password: ["", Validators.required]
         });
+
+        // This is needed due to a bug with angular adding items in components to surrounding forms.
+        // this._loginForm.addControl(
+        //
+        // );
     }
 
     /**
@@ -407,7 +425,7 @@ export class DirectLoginComponent implements OnInit {
                     this._authenticationService.requestAccessToken(true);
                 }
             }, (error: any) => {
-                this._errorMsg = "Please check your username and password.";
+                this._errorMsg = "Please check your credentials.";
             });
     }
 

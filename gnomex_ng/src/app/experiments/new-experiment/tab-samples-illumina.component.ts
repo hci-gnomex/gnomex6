@@ -350,20 +350,42 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 suppressSizeToFit: true,
                 editable: false
             });
-            temp.push({
-                headerName: "Index Tag B",
-                editable: true,
-                width:    12 * this.emToPxConversionRate,
-                minWidth: 12 * this.emToPxConversionRate,
-                maxWidth: 20 * this.emToPxConversionRate,
-                field: "idOligoBarcodeB",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: BarcodeSelectEditor,
-                selectOptions: this._barCodes,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOligoBarcodeB",
-                indexTagLetter: 'B'
-            });
+            if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
+                temp.push({
+                    headerName: "Index Tag B",
+                    editable: true,
+                    width:    12 * this.emToPxConversionRate,
+                    minWidth: 12 * this.emToPxConversionRate,
+                    maxWidth: 20 * this.emToPxConversionRate,
+                    field: "idOligoBarcodeB",
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: BarcodeSelectEditor,
+                    selectOptions: this._barCodes,
+                    selectOptionsDisplayField: "display",
+                    selectOptionsValueField: "idOligoBarcodeB",
+                    indexTagLetter: 'B',
+                    validators: [Validators.required],
+                    errorNameErrorMessageMap: [
+                        {errorName: 'required', errorMessage: 'Index Tag B required'}
+                    ]
+                });
+            } else {
+                temp.push({
+                    headerName: "Index Tag B",
+                    editable: true,
+                    width:    12 * this.emToPxConversionRate,
+                    minWidth: 12 * this.emToPxConversionRate,
+                    maxWidth: 20 * this.emToPxConversionRate,
+                    field: "idOligoBarcodeB",
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: BarcodeSelectEditor,
+                    selectOptions: this._barCodes,
+                    selectOptionsDisplayField: "display",
+                    selectOptionsValueField: "idOligoBarcodeB",
+                    indexTagLetter: 'B'
+                });
+            }
+
             temp.push({
                 headerName: "Index Tag Sequence B",
                 field: "barcodeSequenceB",
