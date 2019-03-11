@@ -5,7 +5,7 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {OrderType} from "../../util/annotation-tab.component";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {ExperimentsService} from "../experiments.service";
-import {MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {Subscription} from "rxjs";
@@ -17,6 +17,8 @@ import {PropertyService} from "../../services/property.service";
 import {TabSamplesIlluminaComponent} from "../new-experiment/tab-samples-illumina.component";
 import {ConstantsService} from "../../services/constants.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {DownloadFilesComponent} from "../../util/download-files.component";
+import {FileService} from "../../services/file.service";
 
 @Component({
     templateUrl: "./experiment-detail-overview.component.html",
@@ -91,7 +93,9 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 public constService: ConstantsService,
                 private secAdvisor: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
-                private route: ActivatedRoute) {
+                private route: ActivatedRoute,
+                private fileService: FileService,
+                private dialog: MatDialog) {
     }
 
     ngOnInit(): void {
@@ -249,6 +253,34 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             } else {
                 this.nodeTitle = externalStr + "Experiment " + this.experiment.number;
             }
+        }
+    }
+
+    public handleDownloadFiles(): void {
+        if (this.experiment && this.experiment.idRequest) {
+            this.experimentService.getRequestDownloadList(this.experiment.idRequest).subscribe((result: any) => {
+                if (result && result.Request) {
+                    let config: MatDialogConfig = new MatDialogConfig();
+                    config.panelClass = 'no-padding-dialog';
+                    config.data = {
+                        showCreateSoftLinks: true,
+                        downloadListSource: result.Request,
+                        cacheDownloadListFn: this.fileService.cacheExperimentFileDownloadList,
+                        fdtDownloadFn: this.fileService.getFDTDownloadExperimentServlet,
+                        makeSoftLinksFn: this.fileService.makeSoftLinks,
+                        downloadURL: "DownloadFileServlet.gx",
+                        suggestedFilename: "gnomex-data",
+                    };
+                    config.disableClose = true;
+                    this.dialog.open(DownloadFilesComponent, config);
+                } else {
+                    let message: string = "";
+                    if (result && result.message) {
+                        message = ": " + result.message;
+                    }
+                    this.dialogsService.alert("An error occurred while retrieving download list" + message, null);
+                }
+            });
         }
     }
     
