@@ -9,6 +9,10 @@
                 <img class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
                 {{isEditMode ? "View" : "Edit"}}
             </button>
+            <button mat-button (click)="this.handleDownloadFiles()">
+                <img [src]="this.constService.ICON_DOWNLOAD" class="icon">
+                Download Files
+            </button>
         </div>
     </div>
     <div class="flex-grow-greater overflow">
