@@ -23,6 +23,7 @@ export class ExperimentsService {
 
 
     private experimentOrdersSubject: Subject<any[]> = new Subject();
+    private experimentOrdersMessageSubject: Subject<string> = new Subject();
     private experimentSubject: Subject<any> = new Subject();
     private projectRequestListSubject: Subject<any[]> = new Subject();
     private projectSubject:Subject<any> = new Subject();
@@ -58,6 +59,10 @@ export class ExperimentsService {
 		return this.experimentOrdersSubject.asObservable();
 	}
 
+	getExperimentsOrdersMessageObservable(): Observable<any> {
+		return this.experimentOrdersMessageSubject.asObservable();
+	}
+
 	refreshProjectRequestList_fromBackend(): void {
         this.startSearchSubject.next(true);
 		this._http.get("/gnomex/GetProjectRequestList.gx", {
@@ -82,6 +87,7 @@ export class ExperimentsService {
             if (response.status === 200) {
                 this.experimentOrders = response.json().Request;
                 this.emitExperimentOrders();
+                this.experimentOrdersMessageSubject.next(response.json().message);
             } else {
                 throw new Error("Error");
             }

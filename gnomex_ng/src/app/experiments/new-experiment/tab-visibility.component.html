@@ -2,7 +2,7 @@
     <form [formGroup]="visibilityForm" class="full-height full-width flex-container-col">
         <div class="full-width">
             <label>
-                Select the level of visibility:
+                First, select the base level of visibility:
             </label>
             <mat-radio-group class="full-width flex-container-col extreme-left-padded"  formControlName="codeVisibility" (change)="updateCollaborators()" >
                 <mat-radio-button *ngFor="let rad of visRadio" [value]="rad.value" [matTooltip]="rad.tooltip">
@@ -17,9 +17,10 @@
             <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
             <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
         </mat-form-field>
+        <div class="vertical-spacer"></div>
         <div *ngIf="showCollaboratorBlock" class="flex-container-col flex-grow padded-top">
             <label>
-                Specify other {{ visibilityForm && visibilityForm.get('codeVisibility') && visibilityForm.get('codeVisibility').value && visibilityForm.get('codeVisibility').value === 'OWNER' ? 'lab members and ' : '' }}individual collaborators allowed access to this experiment
+                Then, specify any other {{ visibilityForm && visibilityForm.get('codeVisibility') && visibilityForm.get('codeVisibility').value && visibilityForm.get('codeVisibility').value === 'OWNER' ? 'lab member(s) and ' : '' }}individual lab collaborator(s) to allow access to this experiment
             </label>
             <!--<div>-->
                 <!--<mat-form-field style="width:30%" >-->

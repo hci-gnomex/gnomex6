@@ -23,6 +23,7 @@ import { UploadViewRemoveRenderer } from "./upload-view-remove.renderer";
 import {MultiSelectRenderer} from "./multi-select.renderer";
 import {UrlAnnotRenderer} from "./url-annot-renderer";
 import {ViewerLinkRenderer} from "./viewer-link.renderer";
+import {LinkButtonRenderer} from "./link-button.renderer";
 
 @NgModule({
     imports: [
@@ -38,6 +39,7 @@ import {ViewerLinkRenderer} from "./viewer-link.renderer";
 		IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
+        LinkButtonRenderer,
         MultipleLineTextRenderer,
 		RemoveLinkButtonRenderer,
 		SelectRenderer,
@@ -60,6 +62,7 @@ import {ViewerLinkRenderer} from "./viewer-link.renderer";
 		IconLinkButtonRenderer,
         IconTextRendererComponent,
         IconRendererComponent,
+        LinkButtonRenderer,
         MultipleLineTextRenderer,
 		RemoveLinkButtonRenderer,
 		SelectRenderer,

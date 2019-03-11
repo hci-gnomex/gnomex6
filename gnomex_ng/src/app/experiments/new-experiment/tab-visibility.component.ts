@@ -20,6 +20,11 @@ import {Experiment} from "../../util/models/experiment.model";
     styles: [`
 
 
+        .vertical-spacer { 
+            width: 100%; 
+            height: 0.5em; 
+        }
+        
         .extreme-left-padded { padding-left: 3em; }
         
         

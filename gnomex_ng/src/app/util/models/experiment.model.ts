@@ -396,12 +396,24 @@ export class Experiment {
     }
     public sequencingOption_changed: Subject<any> = new Subject<any>();
 
+
     private _selectedProtocol: any;
     public get selectedProtocol(): any {
         return this._selectedProtocol;
     }
     public set selectedProtocol(value: any) {
         this._selectedProtocol = value;
+
+        if (this._selectedProtocol) {
+            for (let sample of this.samples) {
+                sample.idNumberSequencingCycles        = this._selectedProtocol.idNumberSequencingCycles;
+                sample.idNumberSequencingCyclesAllowed = this._selectedProtocol.idNumberSequencingCyclesAllowed;
+            }
+            for (let lane of this.sequenceLanes) {
+                lane.idNumberSequencingCycles        = this._selectedProtocol.idNumberSequencingCycles;
+                lane.idNumberSequencingCyclesAllowed = this._selectedProtocol.idNumberSequencingCyclesAllowed;
+            }
+        }
 
         this.onChange_selectedProtocol.next(value);
     }

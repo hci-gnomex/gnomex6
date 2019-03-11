@@ -79,6 +79,9 @@
 									</div>
 								</div>
 							</div>
+							<div *ngIf="message" class="td vertical-center right-align">
+								({{message}})
+							</div>
 							<div class="td vertical-center right-align">
 								({{(experiments?.length === null) ? 0 : experiments?.length + (experiments?.length != 1 ? " orders" : " order")}})
 							</div>

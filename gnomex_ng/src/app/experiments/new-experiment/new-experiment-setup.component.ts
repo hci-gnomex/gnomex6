@@ -125,7 +125,7 @@ import {Experiment} from "../../util/models/experiment.model";
 })
 export class NewExperimentSetupComponent implements OnDestroy {
 
-    @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
+    @ViewChild("autoLab") autoLab: MatAutocomplete;
 
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
@@ -224,16 +224,9 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
     public set submitter(value: any) {
         if (this.form.get('selectName') && this.form.get('selectName').value) {
-            // this._experiment.idAppUser = this.newExperimentService.idAppUser;
 
             this._experiment.experimentOwner = this.form.get('selectName').value;
             this._experiment.idOwner = this.form.get('selectName').value.idAppUser;
-            // this._experiment.idAppUser = this.newExperimentService.idAppUser;
-            // this.newExperimentService.request.idOwner = this.newExperimentService.experimentOwner.idAppUser;
-
-            // this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
-            // this.visibilityDetailObj.currentOrder = this.newExperimentService.request;
-            // this.visibilityDetailObj.ngOnInit();
         }
 
         this.selectDefaultUserProject();
@@ -252,14 +245,13 @@ export class NewExperimentSetupComponent implements OnDestroy {
             && this.form.get('selectLab')
             && this.form.get('selectLab').valid
             && !!this.possibleSubmitters
-            && this.possibleSubmitters_loaded === true;
+            && this.possibleSubmitters_loaded === true
+            && this.adminState === 'AdminState';
     }
     public get showBilling(): boolean {
 
-        let newValue: boolean = this.showName
-            && this.form
-            && this.form.get('selectName')
-            && this.form.get('selectName').valid;
+        let newValue: boolean = (this.showName && this.adminState === 'AdminState' && this.form && this.form.get('selectName') && this.form.get('selectName').valid)
+            || (this.showLab && this.form && this.form.get('selectLab') && this.form.get('selectLab').valid && this.adminState !== 'AdminState');
 
         // If there is only one choice for billing account, automatically select it for the user.
         if (this.authorizedBillingAccounts
@@ -450,8 +442,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
         if (this._experiment.idAppUser != null) {
             for (let project of this.filteredProjectList) {
-                if (this.form.controls['selectName'].value
-                    && this.form.controls['selectName'].value.idAppUser === project.idAppUser) {
+                if (this._experiment.experimentOwner
+                    && this._experiment.experimentOwner.idAppUser === project.idAppUser) {
 
                     setTimeout(() => {
                         this.form.get('selectProject').setValue(project);
@@ -541,10 +533,14 @@ export class NewExperimentSetupComponent implements OnDestroy {
         }
 
         this.onChangeRequestCategory.emit(this._experiment.requestCategory);
+
+        if (this.labList && Array.isArray(this.labList) && this.labList.length === 1) {
+            this.chooseFirstLabOption();
+        }
     }
 
     public selectLabOption(event: any) {
-        if (event && event.source && event.source.selected == true) {
+        if (event && event.source && event.source.selected === true) {
             let value = event.source.value;
             this.filteredProjectList = this.gnomexService.projectList;
 
@@ -615,6 +611,19 @@ export class NewExperimentSetupComponent implements OnDestroy {
             // this.newExperimentService.getHiSeqPriceList();
             // this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
         }
+
+        if (this.adminState !== "AdminState") {
+            let temp: any[] = this.gnomexService.appUserList.filter((value: any) => {
+                return value.idAppUser === '' + this.createSecurityAdvisor.idAppUser;
+            });
+
+            if (temp && temp.length === 1) {
+                this._experiment.experimentOwner = temp[0];
+                this._experiment.idOwner = '' + this.createSecurityAdvisor.idAppUser;
+
+                this.selectDefaultUserProject();
+            }
+        }
     }
 
     public onBillingSelection(event: any): void {
@@ -657,8 +666,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
         this.description             = this.form.get("description").value;
     }
 
-    chooseFirstLabOption(): void {
-        this.autoLabComplete.options.first.select();
+    public chooseFirstLabOption(): void {
+        this.autoLab.options.first.select();
     }
 
     public onClickNewAccount(): void {

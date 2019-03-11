@@ -15,6 +15,7 @@ import {TimeoutNotificationComponent} from "./timeout-notification.component";
 import {AuthorizationInterceptor} from "./authorization.interceptor";
 import {AuthenticationProvider} from "./authentication.provider";
 import {ServicesModule} from "../services/services.module";
+import {CustomInputModule} from "./custom-input/custom-input.module";
 
 /**
  * Provide a single auth service and interceptor for the implementing application.  Also provide everything
@@ -25,6 +26,7 @@ import {ServicesModule} from "../services/services.module";
 @NgModule({
     imports: [
         CommonModule,
+        CustomInputModule,
         HttpClientModule,
         JwtModule,
         RouterModule,
