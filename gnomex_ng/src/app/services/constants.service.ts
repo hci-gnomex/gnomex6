@@ -100,6 +100,8 @@ export class ConstantsService {
     public readonly ICON_DATATRACK_INSTITUTION:string = "assets/datatrack_institution.png";
     public readonly ICON_DATATRACK_OWNER:string = "assets/datatrack_owner.png" ;
 
+    public readonly ICON_CANCEL:string =  "assets/icon-cancel.png";
+    public readonly ICON_CLOSE_BLACK:string ="assets/close_black.png";
     public readonly ICON_GREEN_BULLET:string = "assets/bullet_green.png";
     public readonly ICON_FOLDER:string = "assets/folder.png";
     public readonly ICON_FOLDER_ADD:string = "assets/folder_add.png";
