@@ -4,7 +4,7 @@
                formControlName="inputControl"
                id="theInput"
                name="theInput"
-               class="full-width username"
+               class="full-width username {{ roundTop ? 'roundTop' : '' }} {{ roundBottom ? 'roundBottom' : '' }} {{ noTopBorder ? 'noTopBorder' : '' }}"
                type="{{type}}"
                placeholder="{{ placeholder }}"
                required>

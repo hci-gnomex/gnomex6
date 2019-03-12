@@ -36,7 +36,9 @@ import {Router} from "@angular/router";
                                         <custom-input [form]="_loginForm"
                                                       [formControlNameToUse]="'username'"
                                                       [type]="'text'" 
-                                                      [placeholder]="'Username placeholder'" 
+                                                      [placeholder]="' '" 
+                                                      [roundTop]="true"
+                                                      [roundBottom]="false"
                                                       [label]="'Username'"
                                                       [tooltip]="'Username tooltip'">
                                         </custom-input>
@@ -46,7 +48,10 @@ import {Router} from "@angular/router";
                                                       [formControlNameToUse]="'password'"
                                                       [label]="'Password'"
                                                       [type]="'password'"
-                                                      [placeholder]="'Username placeholder'"
+                                                      [placeholder]="' '"
+                                                      [roundTop]="false"
+                                                      [roundBottom]="true"
+                                                      [noTopBorder]="true"
                                                       [tooltip]="'Username tooltip'"></custom-input>
                                     </div>
                                 </div>
