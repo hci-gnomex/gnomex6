@@ -7,8 +7,8 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {ConstantsService} from "../../services/constants.service";
 import {Router} from "@angular/router";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
-import {IconRendererComponent} from "../../util/grid-renderers/icon-renderer.component";
 import {GridOptions} from "ag-grid-community/main";
+import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 
 @Component({
     selector: "experiment-browse-tab",
@@ -47,7 +47,7 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
         {headerName: "Project", editable: false, field: "projectName", width:150},
         {headerName: "Experiment Type", editable:false, field:"experimentKind", width:300},
         {headerName: "Microarray", editable:false, field:"slideProductName", width:200, },
-        {headerName: "Analysis?", editable:false, field:"analysisChecked", width:150, cellRendererFramework: IconRendererComponent},
+        {headerName: "Analysis?", editable:false, checkboxEditable: false, field:"analysisChecked", width:150, cellRendererFramework: CheckboxRenderer},
         {headerName: "Analysis Names", editable:false, field:"analysisNames",width:300}
     ];
 

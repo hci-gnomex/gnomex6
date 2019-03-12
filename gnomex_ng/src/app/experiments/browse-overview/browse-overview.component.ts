@@ -203,7 +203,7 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
                     requestList.forEach(rObject => {
                         this.getExperimentKind(rObject);
                         rObject["ownerFullName"] = rObject.ownerLastName + ', ' + rObject.ownerFirstName;
-                        rObject["analysisChecked"] = rObject.analysisNames !== '' ? this.appConstants.ICON_CHECKED : '';
+                        rObject["analysisChecked"] = rObject.analysisNames !== '' ? 'Y' : 'N';
 
                         flatRequestList.push(rObject);
                         this.experimentIdSet.add(rObject.requestNumber);
@@ -238,7 +238,7 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
                                 }
                                 this.getExperimentKind(requestList[k]);
                                 requestList[k]["ownerFullName"] = requestList[k].ownerLastName + ', ' + requestList[k].ownerFirstName;
-                                requestList[k]["analysisChecked"] = requestList[k].analysisNames !== '' ? this.appConstants.ICON_CHECKED : '';
+                                requestList[k]["analysisChecked"] = requestList[k].analysisNames !== '' ? 'Y' : 'N';
                             }
                         }
                     }
