@@ -303,6 +303,10 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
         this.route.data.forEach((data: any) =>{
             if(data && data.analysis){
+                if (!data.analysis.Analysis) {
+                    return;
+                }
+
                 this.analysis = data.analysis.Analysis;
 
                 let expItems:Array<any> = Array.isArray(this.analysis.experimentItems) ? this.analysis.experimentItems:  [this.analysis.experimentItems];

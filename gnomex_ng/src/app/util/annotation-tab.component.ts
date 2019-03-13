@@ -186,7 +186,9 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         }
 
         this.orderValidateService.annotationsToSave = annotationToSave;
-        this.experimentAnnotations_subject.next(annotationToSave);
+        if (this.experimentAnnotations_subject) {
+            this.experimentAnnotations_subject.next(annotationToSave);
+        }
     };
 
 
