@@ -20,6 +20,8 @@ import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer
 import {ManageFilesModule} from "../../util/upload/manage-files.module";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
+import {AngularEditorModule} from "@kolkov/angular-editor";
+import {AnalysisDescriptionTabComponent} from "./analysis-description-tab.component";
 
 
 
@@ -37,7 +39,8 @@ import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
         UtilModule,
         RelatedDataModule,
         AngularSplitModule,
-        ManageFilesModule
+        ManageFilesModule,
+        AngularEditorModule,
     ],
 
     declarations: [
@@ -47,6 +50,7 @@ import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
         AnalysisInfoTabComponent,
         AnalysisFilesTabComponent,
         ManagePedFileWindowComponent,
+        AnalysisDescriptionTabComponent,
     ],
     providers: [],
     entryComponents: [

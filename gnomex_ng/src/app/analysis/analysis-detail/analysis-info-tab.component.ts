@@ -25,12 +25,10 @@ import {AnalysisService} from "../../services/analysis.service";
                     <input matInput placeholder="Lab Group" [formControlName]="'labName'">
                 </mat-form-field>
                 <span></span>
-                <mat-form-field>
-                    <mat-select placeholder="Owner" [formControlName]="'idAppUser'">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let user of this.labUsers" [value]="user.idAppUser">{{user.displayName}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <lazy-loaded-select placeholder="Owner" [options]="this.labUsers"
+                                    valueField="idAppUser" displayField="displayName" [allowNone]="true"
+                                    [control]="this.form.get('idAppUser')">
+                </lazy-loaded-select>
             </div>
             <div class="form-row-children">
                 <mat-form-field>
@@ -43,12 +41,10 @@ import {AnalysisService} from "../../services/analysis.service";
             </div>
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
-                    <mat-form-field>
-                        <mat-select placeholder="Analysis Type" [formControlName]="'idAnalysisType'">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let analysisType of this.analysisTypes" [value]="analysisType.value">{{analysisType.display}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <lazy-loaded-select placeholder="Analysis Type" [options]="this.analysisTypes"
+                                        valueField="value" displayField="display" [allowNone]="true"
+                                        [control]="this.form.get('idAnalysisType')">
+                    </lazy-loaded-select>
                     <button mat-button color="accent" [disabled]="this.form.controls['idAnalysisType'].disabled" (click)="this.openEditAnalysisType()">New/Edit</button>
                 </div>
                 <span></span>
@@ -58,12 +54,10 @@ import {AnalysisService} from "../../services/analysis.service";
             </div>
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
-                    <mat-form-field>
-                        <mat-select placeholder="Analysis Protocol" [formControlName]="'idAnalysisProtocol'">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let protocol of this.protocolList" [value]="protocol.id">{{protocol.label}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <lazy-loaded-select placeholder="Analysis Protocol" [options]="this.protocolList"
+                                        valueField="id" displayField="label" [allowNone]="true"
+                                        [control]="this.form.get('idAnalysisProtocol')">
+                    </lazy-loaded-select>
                     <button mat-button color="accent" [disabled]="this.form.controls['idAnalysisProtocol'].disabled" (click)="this.openEditAnalysisProtocol()">New/Edit</button>
                 </div>
                 <span></span>
@@ -82,12 +76,10 @@ import {AnalysisService} from "../../services/analysis.service";
             </div>
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
-                    <mat-form-field>
-                        <mat-select placeholder="Organism" [formControlName]="'idOrganism'">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let organism of this.organismList" [value]="organism.value">{{organism.display}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <lazy-loaded-select placeholder="Organism" [options]="this.organismList"
+                                        valueField="value" displayField="display" [allowNone]="true"
+                                        [control]="this.form.get('idOrganism')">
+                    </lazy-loaded-select>
                     <button mat-button color="accent" [disabled]="this.form.controls['idOrganism'].disabled" (click)="this.openEditOrganism()">New/Edit</button>
                 </div>
                 <span></span>
@@ -163,7 +155,8 @@ import {AnalysisService} from "../../services/analysis.service";
         .form-row-children > span {
             flex: 1;
         }
-        .form-entry-children > mat-form-field {
+        .form-entry-children > mat-form-field,
+        .form-entry-children > lazy-loaded-select {
             flex: 4;
         }
         .form-entry-children > button {
@@ -285,6 +278,10 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
         });
 
         this.route.data.forEach((data: any) => {
+            if (!data.analysis.Analysis) {
+                return;
+            }
+
             this.analysis = data.analysis.Analysis;
 
             this.form.controls['labName'].setValue(this.analysis.labName);

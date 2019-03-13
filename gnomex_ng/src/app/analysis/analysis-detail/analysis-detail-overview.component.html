@@ -21,6 +21,9 @@
             <mat-tab label="Info">
                 <analysis-info-tab></analysis-info-tab>
             </mat-tab>
+            <mat-tab label="Description">
+                <analysis-description-tab [isEditMode]="true"></analysis-description-tab>
+            </mat-tab>
             <mat-tab label="Annotations">
                 <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.ANALYSIS"> </annotation-tab>
             </mat-tab>
