@@ -6,7 +6,7 @@
         </label>
         <button mat-button *ngIf="this.showAutoDistributeDataTracks" (click)="this.autoDistributeDataTracks()"><img class="icon" [src]="constService.ICON_DATATRACK_NEW">Auto Distribute All Data Tracks</button>
         <button mat-button *ngIf="this.showManagePEDFile" (click)="this.showManagePEDFileWindow()"><img class="icon" [src]="constService.ICON_CHART_ORGANIZATION">Manage Ped File</button>
-        <button mat-button (click)="this.shareWebLink()"><img class="icon" [src]="constService.GLOBE_LINK">Share Web Link</button>
+        <button mat-button (click)="this.shareWebLink()"><img class="icon" [src]="constService.GLOBE_LINK">Share URL</button>
         <button *ngIf="showLinkToExp"
                 mat-button
                 color="link"
