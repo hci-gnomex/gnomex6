@@ -1,5 +1,4 @@
-
-import {Component, OnInit, ViewChild, AfterViewInit, OnDestroy} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {AnalysisService} from "../../services/analysis.service";
 import {ActivatedRoute} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
@@ -25,35 +24,38 @@ import {GnomexService} from "../../services/gnomex.service";
 
 @Component({
 
-    templateUrl:'./analysis-detail-overview.component.html'
+    templateUrl: "./analysis-detail-overview.component.html"
     ,
-    styles:[`
+    styles: [`
         .mat-tab-group-border{
             border: 1px solid #e8e8e8;
             width:100%;
         }
     `]
 })
-export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, OnDestroy{
-    public annotations:any = [];
-    public analysis:any;
+export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, OnDestroy {
+
+    @ViewChild(AnnotationTabComponent) annotTab: AnnotationTabComponent;
+
+    public annotations: any = [];
+    public analysis: any;
     public lab: any;
     types = OrderType;
-    private relatedObjects:IRelatedObject = {};
-    private showRelatedDataTab:boolean =false;
-    private showExpAnalysisTab: boolean =false ;
-    private showLinkToExp:boolean = false;
+    public relatedObjects: IRelatedObject = {};
+    public showRelatedDataTab: boolean = false;
+    public showExpAnalysisTab: boolean = false;
+    public showLinkToExp: boolean = false;
     public showAutoDistributeDataTracks: boolean = false;
     public showManagePEDFile: boolean = false;
 
-    public analysisTreeNode:any;
+    public analysisTreeNode: any;
     private analysisTreeNodeSubscription: Subscription;
     private linkExpDialogRef: MatDialogRef<LinkToExperimentDialogComponent>;
-    @ViewChild(AnnotationTabComponent) annotTab: AnnotationTabComponent;
 
 
-    constructor(private analysisService: AnalysisService,
-                private route:ActivatedRoute,
+
+    constructor(public analysisService: AnalysisService,
+                private route: ActivatedRoute,
                 private dialog: MatDialog,
                 private secAdvisor: CreateSecurityAdvisorService,
                 public constService: ConstantsService,
@@ -64,10 +66,10 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
                 private dataTrackService: DataTrackService) {
     }
 
-    ngOnInit():void{
+    ngOnInit(): void {
         this.analysisService.clearAnalysisOverviewForm();
 
-        this.analysisTreeNodeSubscription = this.analysisService.getAnalysisOverviewListSubject().subscribe(node =>{
+        this.analysisTreeNodeSubscription = this.analysisService.getAnalysisOverviewListSubject().subscribe(node => {
             this.analysisTreeNode = node;
         });
 
@@ -75,20 +77,20 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
             this.analysisService.analysisOverviewForm.reset();
             this.analysis = data.analysis.Analysis;
             this.lab = data.analysis.Lab;
-            if(this.analysis){
+            if(this.analysis) {
                 let annots = this.analysis.AnalysisProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);
-                this.showLinkToExp = !this.secAdvisor.isGuest && this.analysis.canRead === 'Y';
+                this.showLinkToExp = !this.secAdvisor.isGuest && this.analysis.canRead === "Y";
 
-                if(annots){
+                if(annots) {
                     this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
-                    for(let i = 0; i < this.annotations.length; i++){
+                    for(let i = 0; i < this.annotations.length; i++) {
                         let propertyOptions = this.annotations[i].PropertyOption;
-                        if(propertyOptions){
-                            this.annotations[i].PropertyOption =  Array.isArray(propertyOptions)? propertyOptions :  <IAnnotationOption[]>[propertyOptions];
+                        if(propertyOptions) {
+                            this.annotations[i].PropertyOption =  Array.isArray(propertyOptions) ? propertyOptions :  <IAnnotationOption[]>[propertyOptions];
                         }
                     }
-                }else{
+                } else {
                     this.annotations = [];
                 }
             }
@@ -104,74 +106,73 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
                 }
             }
 
-            this.showAutoDistributeDataTracks = this.analysis && !this.secAdvisor.isGuest && this.analysis.canRead === 'Y'
-                && this.propertyService.getProperty(PropertyService.PROPERTY_DATATRACK_SUPPORTED).propertyValue === 'Y';
+            this.showAutoDistributeDataTracks = this.analysis && !this.secAdvisor.isGuest && this.analysis.canRead === "Y"
+                && this.propertyService.getProperty(PropertyService.PROPERTY_DATATRACK_SUPPORTED).propertyValue === "Y";
             this.showManagePEDFile = this.showAutoDistributeDataTracks && !isCollaborator;
         });
     }
     ngAfterViewInit(): void {
-        this.analysisService.addAnalysisOverviewFormMember(this.annotTab.form,"AnnotationTabComponent");
+        this.analysisService.addAnalysisOverviewFormMember(this.annotTab.form, "AnnotationTabComponent");
     }
 
 
-    initRelatedData(analysis:any):boolean {
+    initRelatedData(analysis: any): boolean {
 
         this.relatedObjects = {};
         let rObjects = analysis.relatedObjects;
         let relatedTopics = analysis.relatedTopics;
 
-        if(rObjects){
+        if(rObjects) {
 
-            if(rObjects.Analysis){
-                let order:Array<any> =  rObjects.Analysis;
+            if(rObjects.Analysis) {
+                let order: Array<any> =  rObjects.Analysis;
                 this.relatedObjects.Analysis = Array.isArray(order) ? order : [order];
             }
-            if(rObjects.DataTrack){
-                let order:Array<any> =   rObjects.DataTrack;
+            if(rObjects.DataTrack) {
+                let order: Array<any> =   rObjects.DataTrack;
                 this.relatedObjects.DataTrack = Array.isArray(order) ? order : [order];
             }
-            if(rObjects.Request){
-                let order:Array<any> =   rObjects.Request;
+            if(rObjects.Request) {
+                let order: Array<any> =   rObjects.Request;
                 this.relatedObjects.Request = Array.isArray(order) ? order : [order];
             }
-            if(relatedTopics){
-                let topics:Array<any> = relatedTopics.Topic;
-                if(topics){
+            if(relatedTopics) {
+                let topics: Array<any> = relatedTopics.Topic;
+                if(topics) {
                     this.relatedObjects.Topic = Array.isArray(topics) ? topics : [topics];
                 }
             }
 
             return !!(this.relatedObjects.Topic || this.relatedObjects.Analysis || this.relatedObjects.Request || this.relatedObjects.DataTrack); // !! converts to boolean statement
-        }else{
+        } else {
             return false;
         }
 
     }
-    tabChanged(event:MatTabChangeEvent){
-        this.showExpAnalysisTab = event.tab.textLabel === "Experiment"
+    tabChanged(event: MatTabChangeEvent) {
+        this.showExpAnalysisTab = event.tab.textLabel === "Experiment";
     }
 
-    makeLinkToExperiment(){
+    makeLinkToExperiment() {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
+        config.panelClass = "no-padding-dialog";
         config.data = {
-            idAnalysis : this.analysis ? this.analysis.idAnalysis : '',
-            idLab: this.analysis ? this.analysis.idLab : ''
+            idAnalysis : this.analysis ? this.analysis.idAnalysis : "",
+            idLab: this.analysis ? this.analysis.idLab : ""
         };
 
-
         this.linkExpDialogRef = this.dialog.open(LinkToExperimentDialogComponent, config );
-
-
 
     }
 
     public shareWebLink(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '35em';
+        configuration.width = "35em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = false;
         configuration.data = {
-            name:   this.analysis ? this.analysis.name : '',
-            number: this.analysis ? this.analysis.number : '',
+            name:   "Analysis",
+            number: this.analysis ? this.analysis.number : "",
             type:   "analysisNumber"
         };
         this.dialog.open(ShareLinkDialogComponent, configuration);
@@ -181,7 +182,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
         if (this.analysis && this.analysis.idAnalysis) {
             let genomeBuilds: any[] = this.analysis.genomeBuilds ? (Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]) : [];
             let genomeBuild: any = genomeBuilds.length > 0 ? genomeBuilds[0] : null;
-            if (!genomeBuild || !genomeBuild.isActive || genomeBuild.isActive !== 'Y') {
+            if (!genomeBuild || !genomeBuild.isActive || genomeBuild.isActive !== "Y") {
                 this.dialogsService.alert("An active genome build is required to create data tracks");
                 return;
             }
@@ -189,7 +190,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
             // TODO check files tab does not have unregistered files. If so, save files and then call auto distribute data tracks
 
             this.dataTrackService.createAllDataTracks(this.analysis.idAnalysis).subscribe((result: any) => {
-                if (result && result.result && result.result === 'SUCCESS') {
+                if (result && result.result && result.result === "SUCCESS") {
 
                     // TODO refresh download list of analysis files
 
@@ -208,31 +209,31 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
     public showManagePEDFileWindow(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.data = {
-            idAnalysis: this.analysis && this.analysis.idAnalysis ? this.analysis.idAnalysis : ''
+            idAnalysis: this.analysis && this.analysis.idAnalysis ? this.analysis.idAnalysis : ""
         };
         this.dialog.open(ManagePedFileWindowComponent, configuration);
     }
 
-    save(){
+    save() {
         let analysisOverviewForm: FormGroup = this.analysisService.analysisOverviewForm;
         this.dialogsService.startDefaultSpinnerDialog();
 
-        let params:HttpParams = new HttpParams()
-            .set("idAnalysis",this.analysis.idAnalysis)
+        let params: HttpParams = new HttpParams()
+            .set("idAnalysis", this.analysis.idAnalysis)
             .set("idLab", this.analysis.idLab);
 
-        Object.keys(analysisOverviewForm.controls).forEach(key =>{
-            if(key === "AnnotationTabComponent"){
+        Object.keys(analysisOverviewForm.controls).forEach(key => {
+            if(key === "AnnotationTabComponent") {
                 this.orderValidateService.emitOrderValidateSubject();
                 params = params.set("propertiesJSON", JSON.stringify(this.orderValidateService.annotationsToSave));
-            }else{
-                let analysisTabForm:FormGroup = <FormGroup>analysisOverviewForm.get(key);
-                Object.keys(analysisTabForm.controls).forEach(k =>{
+            } else {
+                let analysisTabForm: FormGroup = <FormGroup>analysisOverviewForm.get(key);
+                Object.keys(analysisTabForm.controls).forEach(k => {
                     let val = analysisTabForm.get(k).value;
-                    if(val){
-                        if(k.includes("JSONString")){
-                            params = params.set(k ,JSON.stringify(analysisTabForm.get(k).value));
-                        }else{
+                    if(val) {
+                        if(k.includes("JSONString")) {
+                            params = params.set(k , JSON.stringify(analysisTabForm.get(k).value));
+                        } else {
                             params = params.set(k, analysisTabForm.get(k).value);
                         }
                     }
@@ -241,12 +242,12 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
         });
         params = params.set("noJSONToXMLConversionNeeded", "Y");
 
-        this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp =>{
-            if(resp){
-                if(resp.idAnalysis){
-                    this.gnomexService.navByNumber('A'+resp.idAnalysis);
+        this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp => {
+            if(resp) {
+                if(resp.idAnalysis) {
+                    this.gnomexService.navByNumber("A" + resp.idAnalysis);
                     this.dialogsService.stopAllSpinnerDialogs();
-                }else if(resp.message){
+                } else if (resp.message) {
                     this.dialogsService.stopAllSpinnerDialogs();
                     this.dialogsService.alert(resp.message);
 
@@ -256,7 +257,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit,AfterViewInit, O
 
     }
 
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.analysisTreeNodeSubscription.unsubscribe();
         this.analysisService.clearAnalysisOverviewForm();
     }
