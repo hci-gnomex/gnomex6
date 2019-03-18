@@ -11,6 +11,7 @@ import {flatMap, last, take} from "rxjs/operators";
 import {TabChangeEvent} from "../tabs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {saveAs} from 'file-saver';
+import {PropertyService} from "../../services/property.service";
 
 @Component({
     selector: 'upload-file',
@@ -80,6 +81,7 @@ export class UploadFileComponent implements OnInit {
                 private dialogService: DialogsService,
                 public constService:ConstantsService,
                 public secAdvisor: CreateSecurityAdvisorService,
+                private propertyService: PropertyService,
                 private fileService: FileService) {}
 
     ngOnInit() {
@@ -117,11 +119,13 @@ export class UploadFileComponent implements OnInit {
     }
 
     onGridReady(event:GridReadyEvent){
-
         this.gridApi = event.api;
         this.gridApi.sizeColumnsToFit();
         this.gridApi.setRowData(this.rowData);
 
+    }
+    sizeGridColumns():void{
+        this.gridApi.sizeColumnsToFit();
     }
 
     selectedRow(event:any){
@@ -189,7 +193,11 @@ export class UploadFileComponent implements OnInit {
                     this.rowData = [];
                     this.gridApi.setRowData(this.rowData = []);
                     if(this.manageData.type === 'e'){
-                        this.fileService.emitGetRequestOrganizeFiles(this.orgExperimentFileParams)
+                        this.fileService.emitGetRequestOrganizeFiles(this.orgExperimentFileParams);
+                        let p = this.propertyService.getProperty(PropertyService.PROPERTY_EXPERIMENT_FILE_SAMPLE_LINKING_ENABLED);
+                        if(p.propertyValue && p.propertyValue === 'Y'){
+                           this.fileService.emitGetLinkedSampleFiles({idRequest: this.manageData.id['idRequest']})
+                        }
                     }else{
                         this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams)
                     }

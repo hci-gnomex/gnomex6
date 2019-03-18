@@ -4,20 +4,25 @@ import {Subject} from "rxjs";
 import {URLSearchParams} from "@angular/http";
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
-import {catchError, flatMap, map, mergeMap} from "rxjs/operators";
+import {catchError, first, flatMap, map, mergeMap} from "rxjs/operators";
 import {ExperimentsService} from "../experiments/experiments.service";
 import {AnalysisService} from "./analysis.service";
 import {DOCUMENT} from "@angular/common";
+import {Form, FormGroup} from "@angular/forms";
 
 @Injectable()
 export class FileService {
     public analysisGroupList: any[];
     private organizeFilesSubject: Subject<any> = new Subject();
     private updateFileTabSubject : Subject<any> = new Subject();
+    private linkedSampleFilesSubject: Subject<any> = new Subject();
+    private manageFileSaveSubject: Subject<any> = new Subject();
+    private manageFileForm:FormGroup = new FormGroup({});
 
     public static readonly SIZE_GB: number = Math.pow(2, 30);
     public static readonly SIZE_MB: number = Math.pow(2, 20);
     public static readonly SIZE_KB: number = Math.pow(2, 10);
+
 
 
     constructor(private httpClient:HttpClient,
@@ -25,6 +30,19 @@ export class FileService {
                 private analysisService: AnalysisService,
                 private cookieUtilService:CookieUtilService,
                 @Inject(DOCUMENT) private document: Document) {
+    }
+
+    public addManageFilesForm(name:string ,form:FormGroup,){
+        setTimeout(() => {
+            this.manageFileForm.addControl(name, form);
+        })
+
+    }
+    public getManageFilesForm():FormGroup{
+        return this.manageFileForm;
+    }
+    resetManageFilesForm():void{
+        this.manageFileForm = new FormGroup({});
     }
 
     public static formatFileSize(size: number): string {
@@ -80,20 +98,25 @@ export class FileService {
 
             let analysisParams : URLSearchParams =  new URLSearchParams();
             analysisParams.append('idAnalysis',params.idAnalysis);
-            analysisParams.append('showUploads',params.showUploads);
+            analysisParams.append('showUploads','Y');
             let downloadParams:HttpParams = new HttpParams()
                 .set('idAnalysis',params.idAnalysis)
-                .set('includeUploadStagingDir', params.includeUploadStagingDir)
-                .set('skipUploadStagingDirFiles', params.skipUploadStagingDirFiles);
+                .set('includeUploadStagingDir', 'N')
+                .set('skipUploadStagingDirFiles', 'Y');
 
             return forkJoin(this.analysisService.getAnalysis(analysisParams),
                 this.analysisService.getAnalysisDownloadListWithParams(downloadParams));
         }));
     }
 
-    organizeExperimentFiles(params:HttpParams):Observable<any>{
+    organizeExperimentFiles(params:any):Observable<any>{
+        let httpParams = new HttpParams();
+        for(let key in params ){
+           httpParams = httpParams.append(key,params[key]);
+        }
+
         let headers: HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
-        return this.httpClient.post("/gnomex/OrganizeExperimentUploadFiles.gx",params.toString(),{headers: headers});
+        return this.httpClient.post("/gnomex/OrganizeExperimentUploadFiles.gx",httpParams.toString(),{headers: headers });
     }
 
     organizeAnalysisUploadFiles(params:HttpParams): Observable<any>{
@@ -101,25 +124,85 @@ export class FileService {
         return this.httpClient.post("/gnomex/OrganizeAnalysisUploadFiles.gx",params.toString(),{headers: headers});
     }
 
+    emitGetLinkedSampleFiles(params:any):void{
+        this.linkedSampleFilesSubject.next(params);
+    }
+    getLinkedSampleFilesSubject():Observable<any> {
+        return this.linkedSampleFilesSubject.pipe(flatMap( params => {
+            let requestList:Observable<any>[] = [];
+            let expParams : HttpParams =  new HttpParams()
+                .append('idRequest',params.idRequest)
+                .append('showUploads','Y');
+            let sampleFileParams: HttpParams = new HttpParams().append('idRequest',params.idRequest);
+
+            requestList.push(this.experimentService.getLinkedSampleFiles(sampleFileParams));
+            requestList.push( this.experimentService.getRequestDownloadListWithParams(expParams));
+            try{
+                return forkJoin(requestList).pipe(first(),catchError(this.handleError),
+                    map((resp:any[]) =>{
+                        let errorMessage = "";
+                        if(resp && Array.isArray(resp) ){
+                            if(resp[0] && resp[0].SampleRoot){
+                                let root:any = resp[0].SampleRoot;
+                                let sampleList:any[] = [];
+                                Object.keys(root).forEach(key => {
+                                    if(Array.isArray(root[key])){
+                                        sampleList = sampleList.concat(root[key])
+                                    }
+                                });
+                                resp[0] = sampleList;
+                            }else{
+                                throw new Error(resp[0].message);
+                            }
+
+                            if(resp[1] && resp[1].Request){ // GetRequestDownloadList doesn't need check for an array
+                                resp[1] = [resp[1].Request];
+                            }else{
+                                throw new Error(resp[0].message)
+                            }
+                        }
+                        return resp;
+
+                    }));
+
+            }catch(e){
+                return throwError(e)
+            }
+
+
+        }))
+    }
+
+    emitSaveManageFiles(){
+        this.manageFileSaveSubject.next();
+    }
+    saveManageFilesObservable(){
+        return this.manageFileSaveSubject;
+    }
+
+
+
     emitGetRequestOrganizeFiles(params:any):void{
         this.organizeFilesSubject.next(params);
     }
 
     getRequestOrganizeFilesObservable(): Observable<any>{
-        return this.organizeFilesSubject.pipe( flatMap(params => {
-
-
-            let expParams : HttpParams =  new HttpParams()
+        return this.organizeFilesSubject.pipe( flatMap((params:any) => {
+                let requestList:Observable<any>[] = [];
+                let expParams : HttpParams =  new HttpParams()
                     .append('idRequest',params.idRequest)
-                    .append('showUploads',params.showUploads);
-            let downloadParams:HttpParams = new HttpParams()
+                    .append('showUploads','Y');
+                requestList.push( this.experimentService.getExperimentWithParams(expParams));
+
+
+                let downloadParams:HttpParams = new HttpParams()
                     .set('idRequest',params.idRequest)
-                    .set('includeUploadStagingDir', params.includeUploadStagingDir);
+                    .set('includeUploadStagingDir', 'N');
+                requestList.push(this.experimentService.getRequestDownloadListWithParams(downloadParams));
 
 
 
-                return forkJoin(this.experimentService.getExperimentWithParams(expParams),
-                    this.experimentService.getRequestDownloadListWithParams(downloadParams)).pipe(map((resp:any[]) =>{
+                return forkJoin(requestList).pipe(map((resp:any[]) =>{
                     if(Array.isArray(resp) && resp.length === 2){
                         let hasError = false;
                         let errorMessage = "";

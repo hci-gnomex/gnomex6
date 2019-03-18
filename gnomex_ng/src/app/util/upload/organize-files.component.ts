@@ -10,7 +10,7 @@ import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
 import { ITreeNode} from "angular-tree-component/dist/defs/api";
-import {FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
@@ -59,8 +59,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     public uploadSelectedNode:ITreeNode;
     public formGroup: FormGroup;
     public removedChildren: Set<string> = new Set();
-    public orgAnalysisFileParams:any;
-    public orgExperimentFileParams:any;
+    public splitOrgSize:number;
+    public showFileTrees: boolean =  false;
 
 
     @ViewChild('organizeTree')
@@ -78,6 +78,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     constructor(private analysisService:AnalysisService,
                 private gnomexService: GnomexService,
                 private secAdvisor: CreateSecurityAdvisorService,
+                private fb:FormBuilder,
                 private fileService: FileService,
                 public constService:ConstantsService,
                 private dialogService: DialogsService,
@@ -85,6 +86,12 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
 
     ngOnInit(){
+        this.splitOrgSize = 0;
+        this.formGroup = this.fb.group({
+            organizeFileParams: {}
+        });
+        this.fileService.addManageFilesForm("OrganizeFilesComponent", this.formGroup);
+
         this.uploadOpts = {
             displayField: 'displayName',
             idField:'idTreeNode',
@@ -120,16 +127,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         };
 
 
-
-
-        this.formGroup = new FormGroup({});
         if(this.data.type === 'a'){
-            this.orgAnalysisFileParams = {
-                idAnalysis:this.data.id.idAnalysis,
-                showUploads:'Y',
-                includeUploadStagingDir:'N',
-                skipUploadStagingDirFiles: 'Y'
-            };
 
             this.manageFileSubscript = this.fileService.getAnalysisOrganizeFilesObservable().subscribe( (resp) => {
                 this.dialogService.stopAllSpinnerDialogs();
@@ -159,14 +157,10 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
                 }
             });
-            this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
+            this.fileService.emitGetAnalysisOrganizeFiles({idAnalysis :this.data.id.idAnalysis});
 
         }else{
-            this.orgExperimentFileParams = {
-                idRequest: this.data.id.idRequest,
-                includeUploadStagingDir: 'N',
-                showUploads: 'Y'
-            };
+
             this.manageFileSubscript = this.fileService.getRequestOrganizeFilesObservable().subscribe(resp =>{
                 this.dialogService.stopAllSpinnerDialogs();
                 this.uploadFiles = resp[0];
@@ -178,7 +172,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 this.dialogService.stopAllSpinnerDialogs();
                 this.dialogService.alert(error);
             });
-            this.fileService.emitGetRequestOrganizeFiles(this.orgExperimentFileParams);
+            this.fileService.emitGetRequestOrganizeFiles( {idRequest: this.data.id.idRequest});
 
 
         }
@@ -191,6 +185,15 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
 
     ngAfterViewInit() {
+    }
+
+    initOrganizeTree(event){
+        event.treeModel.expandAll();
+    }
+
+    prepareView() {
+        this.splitOrgSize = 30;
+        this.showFileTrees = true;
     }
 
 
@@ -443,10 +446,10 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     refresh(){
         if(this.data.type === 'a'){
             this.dialogService.startDefaultSpinnerDialog();
-            this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
+            this.fileService.emitGetAnalysisOrganizeFiles(this.data.id.idAnalysis);
         }else if(this.data.type === 'e'){
             this.dialogService.startDefaultSpinnerDialog();
-            this.fileService.emitGetRequestOrganizeFiles(this.orgExperimentFileParams);
+            this.fileService.emitGetRequestOrganizeFiles( {idRequest: this.data.id.idRequest});
         }
         this.formGroup.markAsPristine();
 
@@ -491,55 +494,33 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
 
 
+    private requestSave():void{
+        this.fileService.emitSaveManageFiles();
+    }
 
+    private makeParams(paramName,paramValue):any{
+        let params = null;
+        let removedChildrenList:any[] = this.removedChildren.size > 0  ? Array.from(this.removedChildren) : [];
+        let childJsonStr = JSON.stringify(removedChildrenList);
+        params = {
+            "filesToRemoveJSONString": childJsonStr,
+            "filesJSONString": JSON.stringify(this.organizeFiles[0]),
+            "noJSONToXMLConversionNeeded": "Y"
+        };
+        params[paramName] = paramValue;
+        return params
+
+    }
 
     save(){
-        this.dialogService.startDefaultSpinnerDialog();
 
+        let params:any = null;
         if(this.data.type === 'a'){
-            let removedChildrenList:any[] = this.removedChildren.size > 0  ? Array.from(this.removedChildren) : [];
-            let params:HttpParams = new HttpParams()
-                .set("filesToRemoveJSONString", JSON.stringify(removedChildrenList))
-                .set("filesJSONString", JSON.stringify(this.organizeFiles[0]))
-                .set("idAnalysis",  this.data.id.idAnalysis)
-                .set("noJSONToXMLConversionNeeded", "Y");
-
-            this.fileService.organizeAnalysisUploadFiles(params).subscribe(resp => {
-                this.dialogService.stopAllSpinnerDialogs();
-                if(resp && resp.result && resp.result === "SUCCESS"){
-                    if(resp.warning){
-                        this.dialogService.alert(resp.warning);
-                    }
-                    this.formGroup.markAsPristine();
-                    this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
-
-                }else if(resp.message){
-                    this.dialogService.alert(resp.message)
-                }
-            });
-
+            params = this.makeParams( "idAnalysis",  this.data.id.idAnalysis);
         }else{
-            let removedChildrenList:any[] = this.removedChildren.size > 0  ? Array.from(this.removedChildren) : [];
-            let params:HttpParams = new HttpParams()
-                .set("filesToRemoveJSONString", JSON.stringify(removedChildrenList))
-                .set("filesJSONString", JSON.stringify(this.organizeFiles[0]))
-                .set("idRequest",  this.data.id.idRequest)
-                .set("noJSONToXMLConversionNeeded", "Y");
-
-            this.fileService.organizeExperimentFiles(params).subscribe( resp => {
-                this.dialogService.stopAllSpinnerDialogs();
-                if(resp && resp.result && resp.result === "SUCCESS"){
-                    if(resp.warning){
-                        this.dialogService.alert(resp.warning);
-                    }
-                    this.formGroup.markAsPristine();
-                    this.fileService.emitGetAnalysisOrganizeFiles(this.orgExperimentFileParams);
-
-                }else if(resp.message){
-                    this.dialogService.alert(resp.message)
-                }
-            });
+            params = this.makeParams( "idRequest", this.data.id.idRequest);
         }
+        this.formGroup.get("organizeFileParams").setValue(params);
         this.removedChildren.clear();
 
 
@@ -553,5 +534,6 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     ngOnDestroy():void{
         this.manageFileSubscript.unsubscribe();
     }
+
 
 }

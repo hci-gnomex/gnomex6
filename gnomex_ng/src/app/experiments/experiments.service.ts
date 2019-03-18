@@ -401,6 +401,10 @@ export class ExperimentsService {
     getRequestDownloadListWithParams(params: HttpParams) {
         return this.httpClient.get("/gnomex/GetRequestDownloadList.gx", {params: params});
     }
+    getLinkedSampleFiles(params: HttpParams):Observable<any>{
+        return this.httpClient.get("/gnomex/GetLinkedSampleFiles.gx", {params:params});
+    }
+
     
     public setEditMode(editMode: boolean): void {
         this.editMode = editMode;
