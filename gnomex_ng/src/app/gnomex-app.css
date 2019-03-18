@@ -273,6 +273,10 @@ img.icon {
     font-size: small;
 }
 
+.title-size {
+    font-size: large;
+}
+
 .padded {
     padding: 0.3em;
 }

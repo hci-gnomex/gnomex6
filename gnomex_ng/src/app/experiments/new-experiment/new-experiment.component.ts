@@ -26,6 +26,7 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
 import {TabVisibilityComponent} from "./tab-visibility.component";
 
 import {Experiment} from "../../util/models/experiment.model";
+import {IAnnotation} from "../../util/interfaces/annotation.model";
 
 @Component({
     selector: 'new-experiment',
@@ -61,9 +62,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     public icon: any;
     public label: string = "New Experiment Order for ";
-    public numTabs: number;
 
-    // private nextButtonIndex: number = -1;
     private annotations: any;
     private visibilityDetailObj: TabVisibilityComponent;
 
@@ -116,6 +115,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             if (this.inputs.experiment.requestCategory) {
                 this.label = "New " + this.inputs.experiment.requestCategory.display + " Experiment for " + this.coreFacility.display;
             }
+
             this.showTabs();
         }
     };
@@ -129,6 +129,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     };
 
     public agreeCheckboxLabel: string = '';
+
+    public firstInclusion: boolean = true;
 
     public get formOfCurrentlySelectedTab(): FormGroup {
         if (!this.selectedIndex && this.selectedIndex !== 0) {
@@ -150,27 +152,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             return null;
         }
     }
-
-    // public getFormOfTab(index?: number): FormGroup {
-    //     if (!index && index !== 0) {
-    //         return this.formOfCurrentlySelectedTab;
-    //     }
-    //
-    //     if (index === 0) {
-    //         return this.setupTab.form;
-    //     } else if (this.tabs
-    //         && Array.isArray(this.tabs)
-    //         && index >  0
-    //         && index <= this.tabs.length) {
-    //         if (!this.tabs[index - 1] || !this.tabs[index - 1].component) {
-    //             return null;
-    //         } else {
-    //             return this.tabs[index - 1].instance.form;
-    //         }
-    //     } else {
-    //         return null;
-    //     }
-    // }
 
     public get index_firstInvalidTab(): number {
         if (!this.setupTab || !this.setupTab.form) {
@@ -297,23 +278,32 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 ? this.newExperimentService.currentState = 'SolexaBaseState'
                 : this.newExperimentService.currentState = 'SolexaBaseExternalState';
 
-            let propertyTab = {
-                label: "Other Details",
-                disabled: true,
-                component: AnnotationTabComponent
-            };
-            let sampleSetupTab = {
+
+            this.tabs.push({
                 label: "Sample Details",
                 disabled: true,
                 component: TabSampleSetupViewComponent
-            };
+            });
+
+            if (this.annotationInputs
+                && this.annotationInputs.annotations
+                && Array.isArray(this.annotationInputs.annotations)
+                && this.annotationInputs.annotations.length) {
+
+                this.tabs.push({
+                    label: "Other Details",
+                    disabled: true,
+                    component: AnnotationTabComponent
+                });
+            }
+
             let libPrepTab = {
                 label: "Library Prep",
                 disabled: true,
                 component: TabSeqSetupViewComponent
             };
             let seqProtoTab = {
-                label: "Seq Options",
+                label: "Sequencing Options",
                 disabled: true,
                 component: TabSeqProtoViewComponent
             };
@@ -342,8 +332,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 disabled: true,
                 component: TabConfirmIlluminaComponent
             };
-            this.tabs.push(sampleSetupTab);
-            this.tabs.push(propertyTab);
+
+            // this.tabs.push(sampleSetupTab);
+            // this.tabs.push(propertyTab);
             this.tabs.push(libPrepTab);
             this.tabs.push(seqProtoTab);
             this.tabs.push(annotationsTab);
@@ -351,7 +342,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.tabs.push(visibilityTab);
             this.tabs.push(bioTab);
             this.tabs.push(confirmTab);
-            this.numTabs = 10;
         } else if (category.type === this.newExperimentService.TYPE_QC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'QCState' :
                 this.newExperimentService.currentState = 'QCExternalState';
@@ -424,25 +414,12 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 if (this.selectedIndex === 0) {
                     this.tabs[0].disabled = false;
                     this.tabs[1].disabled = false;
-                } else if (this.selectedIndex === 1) {
-                    this.tabs[2].disabled = false;
-                } else if (this.selectedIndex === 2) {
-                    this.tabs[3].disabled = false;
-                } else if (this.selectedIndex === 3) {
-                    this.tabs[4].disabled = false;
-                } else if (this.selectedIndex === 4) {
-                    this.tabs[5].disabled = false;
-                } else if (this.selectedIndex === 5) {
-                    this.tabs[6].disabled = false;
-                } else if (this.selectedIndex === 6) {
-                    this.tabs[7].disabled = false;
-                } else if (this.selectedIndex === 7) {
-                    this.tabs[8].disabled = false;
-                } else if (this.selectedIndex === 8) {
-                    // this.disableSubmit = true;
+                } else if (this.selectedIndex > 1 && this.selectedIndex < this.tabs.length - 1) {
+                    this.tabs[this.selectedIndex + 1].disabled = false;
+                } else {
+                    // The submit tab is the next one - Do nothing.
                 }
-                break;
-            }
+            } break;
             case 'QCState' : {
                 if (this.selectedIndex === 0) {
                     this.tabs[0].disabled = false;
@@ -478,7 +455,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
 
     public SaveNewExperiment(): void {
-        console.log("Save Experiment!");
         this.dialogService.startDefaultSpinnerDialog();
 
         this.experimentService.saveRequest(this.inputs.experiment).subscribe((response) => {

@@ -18,6 +18,8 @@ import {ExperimentsService} from "../experiments.service";
 import {PropertyService} from "../../services/property.service";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 import {Validators} from "@angular/forms";
+import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
+import {GnomexService} from "../../services/gnomex.service";
 
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
@@ -118,6 +120,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 
     protected experiments: any[] = [];
 
+	private messageSubscription: Subscription;
 	private experimentsSubscription: Subscription;
 	private statusChangeSubscription: Subscription;
 
@@ -133,6 +136,8 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
     private requestCategories: any[] = [];
 
     public context: any = this;
+
+    public message: string = '';
 
     private emToPxConversionRate: number = 1;
 
@@ -190,15 +195,13 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
         columnDefinitions.push({
             headerName: "Action",
             editable: false,
-            width:    9 * this.emToPxConversionRate,
-            minWidth: 9 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate,
+            width:    5 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate,
+            maxWidth: 5 * this.emToPxConversionRate,
             suppressSizeToFit: true,
-            cellRendererFramework: TwoButtonRenderer,
-            button1Label: 'View',
-            button2Label: 'Edit',
-            onClickButton1: 'onClickView',
-            onClickButton2: 'onClickEdit',
+            cellRendererFramework: LinkButtonRenderer,
+            buttonLabel: 'View',
+            onClickButton: 'onClickView',
             field: ""
         });
         columnDefinitions.push({
@@ -301,11 +304,16 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
                  private dialogService: DialogsService,
                  private dictionaryService: DictionaryService,
 				 private experimentsService: ExperimentsService,
+				 private gnomexService: GnomexService,
 				 private propertyService: PropertyService) {
 	}
 
 	ngOnInit(): void {
 		this.context = this;
+
+		this.messageSubscription = this.experimentsService.getExperimentsOrdersMessageObservable().subscribe((value: string) => {
+            this.message = value;
+        });
 
 		this.experimentsSubscription = this.experimentsService.getExperimentsObservable().subscribe((response) => {
 			this.experiments = response;
@@ -377,16 +385,16 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 	ngOnDestroy(): void {
 		// When the component dies, avoid memory leaks and stop listening to the service
 
+		this.messageSubscription.unsubscribe();
 		this.experimentsSubscription.unsubscribe();
 		this.statusChangeSubscription.unsubscribe();
 	}
 
     onClickView(rowId: any): void {
-        console.log("View button clicked on " + rowId);
-    }
-
-    onClickEdit(rowId: any): void {
-        console.log("Edit button clicked on " + rowId);
+	    let temp = this.gridApi.getRowNode(rowId);
+	    if (temp && temp.data && temp.data.requestNumber) {
+            this.gnomexService.navByNumber(temp.data.requestNumber);
+        }
     }
 
 	goButtonClicked(): void {

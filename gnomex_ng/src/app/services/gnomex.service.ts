@@ -90,7 +90,7 @@ export class GnomexService {
     public coreFacilitiesICanManage: any[] = [];
     public coreFacilitiesICanSubmitTo: any[] = [];
     private authSubscription: Subscription;
-    private _isLoggedIn: boolean = false;
+    private _isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private appInitSubject:Subject<boolean> = new Subject();
     public faqList:any[] = []; // header uses this list is initalized when app is first loaded
     public redirectURL:string;
@@ -131,10 +131,14 @@ export class GnomexService {
         app init is completed.
     * */
     get isLoggedIn(){
-        return this._isLoggedIn;
+        return this._isLoggedInSubject.value;
     }
     set isLoggedIn(loggedIn:boolean){
-        this._isLoggedIn = loggedIn;
+        this._isLoggedInSubject.next(loggedIn);
+    }
+
+    get isLoggedIn_BehaviorSubject(): BehaviorSubject<boolean> {
+        return this._isLoggedInSubject;
     }
 
     /**
@@ -730,7 +734,7 @@ export class GnomexService {
                                             this.uploadSampleSheetURL = response.url;
 
                                             this.emitIsAppInitCompelete(true);
-                                            this._isLoggedIn = true;
+                                            this.isLoggedIn = true;
                                         });
                                     });
 
@@ -773,7 +777,7 @@ export class GnomexService {
                             this.uploadSampleSheetURL = response.url;
 
                             this.emitIsAppInitCompelete(true);
-                            this._isLoggedIn = true;
+                            this.isLoggedIn = true;
                         });
 
                         // TODO will need this in future

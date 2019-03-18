@@ -43,20 +43,32 @@ export class TabAnnotationViewComponent implements OnDestroy {
             this.experimentSubscription = value.onChange_PropertyEntries.subscribe((value) =>{
                 if (value && this.addAnnotationGridApi) {
                     // this.annotations = this._experiment.PropertyEntries;
+                    let allPreviouslySelectedData: any[] = this.addAnnotationGridApi.getSelectedRows();
+
                     this.addAnnotationGridApi.setRowData(this._experiment.PropertyEntries);
+
+                    this.removeAnnotationGridApi.setRowData([]);
 
                     for (let i = 0; i < this._experiment.PropertyEntries.length; i++) {
                         // "Required" annotations are selected by default. (? States?)
-                        if (this.addAnnotationGridApi.getRowNode('' + i).data.isSelected
-                            && this.addAnnotationGridApi.getRowNode('' + i).data.isSelected === "true") {
+                        if ((this.addAnnotationGridApi.getRowNode('' + i).data.isSelected
+                            && this.addAnnotationGridApi.getRowNode('' + i).data.isSelected === "true")) {
 
                             this.addAnnotationGridApi.getRowNode('' + i).setSelected(true);
                             this.addAnnotationGridApi.getRowNode('' + i).data.boldDisplay = 'Y';
                         }
+
+                        for (let row of allPreviouslySelectedData) {
+                            if (row.idProperty === this.addAnnotationGridApi.getRowNode('' + i).data.idProperty) {
+
+                                this.addAnnotationGridApi.getRowNode('' + i).setSelected(true);
+                            }
+                        }
                     }
 
-                    this.removeAnnotationGridApi.setRowData([]);
                 }
+
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         }
     }
@@ -174,6 +186,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
         let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.matDialog.open(ConfigAnnotationDialogComponent, configuration);
 
         dialogRef.afterClosed().subscribe(() => {
+            this.dialogsService.startDefaultSpinnerDialog();
             this._experiment.refreshSampleAnnotationList();
         });
     }

@@ -60,7 +60,7 @@
                     <div class="heading">
                         Verify your name :
                     </div>
-                    <mat-form-field *ngIf="adminState==='AdminState'" class="moderate-width">
+                    <mat-form-field class="moderate-width">
                         <mat-select placeholder="Your name" [(ngModel)]="submitter" formControlName="selectName">
                             <mat-option *ngFor="let mem of possibleSubmitters" [value]="mem">
                                 {{ mem.firstLastDisplayName }}

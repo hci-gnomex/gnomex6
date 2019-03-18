@@ -14,6 +14,7 @@ import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align
 import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
 import {AnnotationService} from "../../services/annotation.service";
 import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -159,6 +160,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
 
     constructor(private annotationService: AnnotationService,
+                private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private experimentService: ExperimentsService,
                 private gnomexService: GnomexService,
@@ -402,6 +404,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         if (this._experiment.isExternal === 'Y') {
             // This is an external experiment submission.  Don't attempt to get estimated charges.
+            this.totalEstimatedCharges = '$-.--';
+            this.billingItems = [];
         } else {
             let accountName:String = "";
 
@@ -415,13 +419,19 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             // This is a new experiment request. Get the estimated charges for this request.
 
             let propertiesXML = JSON.stringify(this._experimentAnnotations);
+
+            this.dialogsService.startDefaultSpinnerDialog();
+            this.totalEstimatedCharges = "Calculating...";
+
             this.billingService.createBillingItems(propertiesXML, this._experiment).subscribe((response: any) => {
+
+                this.dialogsService.stopAllSpinnerDialogs();
 
                 if (!response || !response.Request) {
                     return;
                 }
 
-                if (response.Request.invoicePrice && ('' + response.Request.invoicePrice).match(/^.\d+\.\d{2}$/)) {
+                if (response.Request.invoicePrice && ('' + response.Request.invoicePrice).match(/^.[\d,]+\.\d{2}$/)) {
                     this.totalEstimatedCharges = response.Request.invoicePrice;
                 }
 

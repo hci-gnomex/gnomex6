@@ -1,0 +1,19 @@
+<div class="full-width no-overflow special-height">
+    <div class="full-width full-height" [formGroup]="_form">
+        <input #myInput
+               formControlName="inputControl"
+               id="theInput"
+               name="theInput"
+               class="full-width username {{ roundTop ? 'roundTop' : '' }} {{ roundBottom ? 'roundBottom' : '' }} {{ noTopBorder ? 'noTopBorder' : '' }}"
+               type="{{type}}"
+               placeholder="{{ placeholder }}"
+               required>
+        <div #myLabel *ngIf="showLabel" class="flex-container-row align-center invisible-background" [ngStyle]="labelStyle" (click)="onClick($event)">
+            <div class="label invisible-background">
+                <label for="theInput" class="invisible-background">{{ label }}</label>
+            </div>
+        </div>
+        <!-- TODO: Revisit auto-tooltips if using these elsewhere -->
+        <!--<div #myTooltip class="tooltip">{{ tooltip }}</div>-->
+    </div>
+</div>

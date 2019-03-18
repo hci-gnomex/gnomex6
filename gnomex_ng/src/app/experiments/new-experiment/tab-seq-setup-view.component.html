@@ -6,11 +6,10 @@
                     <div class="flex-container-row">
                         <div class="heading">
                             Do you want the Core Facility to perform library preparation on the samples?
-                            (Optional)
                         </div>
                         <mat-radio-group class="flex-container-col flex-grow" (change)="onLipPrepChange($event)" formControlName="seqPrepByCore">
                             <mat-radio-button [value]="YES">
-                                Yes, please prep the library
+                                Yes, please prep the library (Optional)
                             </mat-radio-button>
                             <mat-radio-button  [value]="NO">
                                 No, library has already been prepped
