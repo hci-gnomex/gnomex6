@@ -16,6 +16,7 @@ import {LaunchPropertiesService} from "../services/launch-properites.service";
 import {ProgressService} from "./progress.service";
 import {first} from "rxjs/operators";
 import {AuthenticationService} from "../auth/authentication.service";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 
 @Component({
     selector: "gnomex-home",
@@ -23,14 +24,13 @@ import {AuthenticationService} from "../auth/authentication.service";
     // template: require("./home.component.html"),
     styles: [`
         
-        .t  { display: table;      }
-        .tr { display: table-row;  }
-        .td { display: table-cell; }
-
         .horizontal-center { text-align: center; }
-        .vertical-center   { vertical-align: middle; }
         
-        .flex-grow-large { flex: 5; }
+        .flex-grow-large { flex: 4; }
+        
+        .multiline { white-space: pre-line; }
+        
+        .major-padded-right { padding-right: 1em; }
         
         
         .progress-bar-container {
@@ -38,17 +38,18 @@ import {AuthenticationService} from "../auth/authentication.service";
             bottom: 5em;
         }
         
-    .gnomex-splash {
-        background-image: url(../gnomex/assets/gnomex_splash_credits.png);
-        width: 19em;
-        height: 15em;
-        padding-bottom: 1em;
-        padding-left: 1em;
-        padding-right: 1em;
-        padding-top: 1em;
-        position: relative;
-        background-repeat: no-repeat;
-    }
+        .gnomex-splash {
+            background-image: url(../gnomex/assets/gnomex_splash_credits.png);
+            width: 19em;
+            height: 15em;
+            padding-bottom: 1em;
+            padding-left: 1em;
+            padding-right: 1em;
+            padding-top: 1em;
+            position: relative;
+            background-repeat: no-repeat;
+        }
+        
     `],
     encapsulation: ViewEncapsulation.None
 })
@@ -62,9 +63,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private site_logo:string;
 
+    public firstLastName: string = '';
+    public permissionsText: string = '';
+
     constructor(private launchPropertiesService: LaunchPropertiesService,
                 private progressService: ProgressService,
                 private gnomexService: GnomexService,
+                private createSecurityAdvisor: CreateSecurityAdvisorService,
                 private router:Router,
                 private authService: AuthenticationService,
     ) {
@@ -76,6 +81,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.loadingProgress.val(value);
                 if (value === 100) {
                     this.progressService.hideLoaderStatus(true);
+
+                    this.setupUserAndPermissionsStrings();
                 }
             }
         })
@@ -125,6 +132,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.router.navigateByUrl("/" + this.gnomexService.redirectURL);
             }
         });
+
+        this.setupUserAndPermissionsStrings();
     }
 
     getProps(response: any) {
@@ -150,6 +159,42 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         if (!this.site_logo) {
             this.site_logo = "./assets/gnomex_logo.png";
+        }
+    }
+
+    private setupUserAndPermissionsStrings() {
+
+        this.firstLastName = this.createSecurityAdvisor.userName;
+
+        this.permissionsText = '??? permissions';
+
+        if (this.createSecurityAdvisor.isSuperAdmin) {
+            this.permissionsText = 'Super Admin privileges';
+        } else if (this.createSecurityAdvisor.isBillingAdmin) {
+            this.permissionsText = 'Billing Admin privileges';
+        } else if (this.createSecurityAdvisor.isAdmin) {
+            this.permissionsText = 'Admin privileges';
+        } else if (this.createSecurityAdvisor.isGuest) {
+            if (this.createSecurityAdvisor.isUniversityOnlyUser) {
+                // This is the special "UnivGuestState" from the flex version
+                this.permissionsText = 'Restricted - For additional access, please sign up for a GNomEx user account\n'
+                    + 'University guest access';
+            } else {
+                // The regular guest state
+                this.permissionsText = 'Guest privileges only';
+            }
+        } else {
+            if ((this.createSecurityAdvisor.hasPermission("canSubmitRequests")
+                && this.gnomexService.canSubmitRequestForALab())
+                || this.createSecurityAdvisor.hasPermission("canSubmitForOtherCores")) {
+
+                if (!this.gnomexService.isExternalDataSharingSite) {
+                    this.permissionsText = '';
+                }
+            } else {
+                // this is the "UserNonSubmitterState" from the old version
+                this.permissionsText = 'Restricted access - Please contact GNomEx support or a core facility director.';
+            }
         }
     }
 
