@@ -345,22 +345,22 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
     remove(treeRemovedFrom:string, nodes:ITreeNode[]){
         for(let node of nodes){
-            if(node.isRoot){
+            if(treeRemovedFrom === 'organize' && node.isRoot ){
                 continue;
             }
 
             let id:any = '';
             let parentNode: ITreeNode = node.parent;
-            let tree:TreeComponent = null;
+            //let tree:TreeComponent = null;
             let children: any[] = [];
 
             if(treeRemovedFrom === 'organize'){
                 id = node.id;
-                tree = this.organizeTree;
+                //tree = this.organizeTree;
                 children = <any[]>parentNode.data.FileDescriptor;
             }else {
                 id = node.id;
-                tree = this.uploadTree;
+                //tree = this.uploadTree;
                 children = <any[]>parentNode.data.children
             }
 
@@ -371,15 +371,29 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 if(treeRemovedFrom === 'organize'){
                     parentNode.data.FileDescriptor =  children.filter(c => c.idTreeNode !== id);
                 }else{
-                    this.uploadFiles = children.filter(c => c.idTreeNode !== id);
+                    let idx:number = -1;
+                    for(let i = 0; i < children.length; i++){
+                        if(children[i].idTreeNode === id){
+                            idx = i;
+                            break;
+                        }
+                    }
+                    if(idx > -1){
+                        children.splice(idx, 1);
+                    }
+                    //this.uploadFiles = children.filter(c => c.idTreeNode !== id);
                 }
-                tree.treeModel.update();
+                //tree.treeModel.update();
                 this.formGroup.markAsDirty();
             }
-            this.uploadSelectedNode = null;
-            this.organizeSelectedNode = null;
-
         }
+        if(treeRemovedFrom === 'organize'){
+            this.organizeTree.treeModel.update();
+        }else{
+            this.uploadTree.treeModel.update();
+        }
+        this.uploadSelectedNode = null;
+        this.organizeSelectedNode = null;
     }
 
     attemptRemove(){
