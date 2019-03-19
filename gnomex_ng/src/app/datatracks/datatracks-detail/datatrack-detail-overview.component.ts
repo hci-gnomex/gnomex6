@@ -20,10 +20,8 @@ import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 import {UtilService} from "../../services/util.service";
 
 @Component({
-    templateUrl: './datatrack-detail-overview.component.html',
-
+    templateUrl: "./datatrack-detail-overview.component.html",
     styles: [`
-
 
         .flex-container {
             display: flex;
@@ -35,15 +33,17 @@ import {UtilService} from "../../services/util.service";
             border: 1px solid #e8e8e8;
         }
 
-
     `]
 })
 export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit, OnDestroy {
-    private dtOverviewForm: FormGroup;
-    private datatrack: any;
-    private datatrackFiles: Array<any>;
-    private datatrackDirectory: any;
-    private annotations: IAnnotation[];
+
+    @ViewChild(DatatracksSummaryTabComponent) summaryComponet: DatatracksSummaryTabComponent;
+    @ViewChild(AnnotationTabComponent) annotationComponent: AnnotationTabComponent;
+    @ViewChild(DatatracksVisibilityTabComponent) visibilityComponent: DatatracksVisibilityTabComponent;
+    @ViewChild(DatatracksFilesTabComponent) filesComponent: DatatracksFilesTabComponent;
+
+    public dtOverviewForm: FormGroup;
+    public annotations: IAnnotation[];
     public relatedObjects: any;
     public showRelatedDataTab: boolean = false;
     public showDownloadLink: boolean = false;
@@ -56,20 +56,20 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     public canWrite = false;
     public folderList: any[];
     public initSummaryView: boolean = true;
-
-    private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
     public types = OrderType;
-    @ViewChild(DatatracksSummaryTabComponent) summaryComponet: DatatracksSummaryTabComponent;
-    @ViewChild(AnnotationTabComponent) annotationComponent: AnnotationTabComponent;
-    @ViewChild(DatatracksVisibilityTabComponent) visibilityComponent: DatatracksVisibilityTabComponent;
-    @ViewChild(DatatracksFilesTabComponent) filesComponent: DatatracksFilesTabComponent;
 
-    constructor(private dataTrackService: DataTrackService, private route: ActivatedRoute,
+    private datatrack: any;
+    private datatrackFiles: Array<any>;
+    private datatrackDirectory: any;
+    private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
+
+
+    constructor(public dataTrackService: DataTrackService, private route: ActivatedRoute,
                 public constService: ConstantsService,
                 private gnomexService: GnomexService,
                 private dialogService: DialogsService,
                 private dialog: MatDialog,
-                private orderValidateService: BrowseOrderValidateService,
+                public orderValidateService: BrowseOrderValidateService,
                 public secAdvisorService: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService) {
     }
@@ -81,7 +81,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             this.initLinkVisibility();
             this.dtOverviewForm = new FormGroup({});
             if (this.datatrack) {
-                this.canWrite = this.datatrack.canWrite === 'Y';
+                this.canWrite = this.datatrack.canWrite === "Y";
                 this.initLinkVisibility();
                 this.showDownloadLink = data.fromTopic ? data.fromTopic : false;
                 this.showRelatedDataTab = this.initRelatedData(this.datatrack);
@@ -118,7 +118,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                     this.annotations = [];
                 }
             }
-        })
+        });
     }
 
     ngAfterViewInit() {
@@ -126,14 +126,14 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
     initLinkVisibility() {
         if (this.datatrack.Files) {
-            let ucscLinkFile: string = '';
+            let ucscLinkFile: string = "";
 
             this.datatrackDirectory = this.datatrack.Files.Dir;
             if (this.datatrackDirectory) {
-                ucscLinkFile = this.datatrack.Files.Dir.ucscLinkFile
+                ucscLinkFile = this.datatrack.Files.Dir.ucscLinkFile;
             }
             this.datatrackFiles = this.gnomexService.getFiles(this.datatrack.Files);
-            this.showUCSC = ucscLinkFile != 'none' && this.datatrackFiles.length > 0;
+            this.showUCSC = ucscLinkFile !== "none" && this.datatrackFiles.length > 0;
             this.showIOBIO = this.datatrackFiles.length > 0;
             this.showLink = this.datatrackFiles.length > 0;
         }
@@ -176,7 +176,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         let params: HttpParams = new HttpParams().set("idDataTrack", this.datatrack.idDataTrack);
 
         if (this.datatrackDirectory) {
-            if (this.datatrackDirectory.ucscLinkFile === 'convert') {
+            if (this.datatrackDirectory.ucscLinkFile === "convert") {
                 this.dialogService.alert("Patience, converting useq to bw/bb format.");
             }
         }
@@ -217,7 +217,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         };
 
         if (this.datatrackDirectory) {
-            if (this.datatrackDirectory.ucscLinkFile === 'convert') {
+            if (this.datatrackDirectory.ucscLinkFile === "convert") {
                 this.dialogService.confirm("Creating an IGV data repository containing all user-visible datatracks affiliated with IGV-supported genome builds. " +
                     "If there are unconverted USeq files, this can take a significant amount of time.  When finished, a URL link will be displayed. " +
                     "Paste the link into IGV's Data Registry URL field.  If new data tracks are added, a new repository must be created, but the " +
@@ -248,7 +248,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dialogService.confirm("An error occurred while making link. " + message, null);
             }
             this.showSpinner = false;
-        })
+        });
     }
 
     makeURLLink() {
@@ -268,7 +268,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dialogService.confirm("An error occurred while making link. " + message, null);
             }
             this.showSpinner = false;
-        })
+        });
     }
 
     destroyLinks(): void {
@@ -287,10 +287,12 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
     shareableLink(): void {
         this.shareWebLinkDialogRef = this.dialog.open(ShareLinkDialogComponent, {
-            width: '35em',
+            width: "35em",
+            panelClass: "no-padding-dialog",
+            autoFocus: false,
             data: {
-                name: this.datatrack.name,
-                number: this.datatrack.number,
+                name: "Data Track",
+                number: this.datatrack ? this.datatrack.number : "",
                 type: "dataTrackNumber"
 
             }
@@ -309,8 +311,8 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.orderValidateService.emitOrderValidateSubject();
         let name = this.dtOverviewForm.get("summaryForm.folderName").value;
         let summary = this.dtOverviewForm.get("summaryForm.summary").value;
-        let description: string = this.orderValidateService.propsNotOnForm['description'];
-        let idAppUser: string = '';
+        let description: string = this.orderValidateService.propsNotOnForm["description"];
+        let idAppUser: string = "";
         let codeVisibility: string = this.dtOverviewForm.get("visibilityForm.codeVisibility").value;
         let idLab: string = this.dtOverviewForm.get("visibilityForm.lab").value.idLab;
 
@@ -326,7 +328,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         if (this.secAdvisorService.isAdmin) {
             idAppUser = this.dtOverviewForm.get("visibilityForm.idAppUser").value;
         } else {
-            idAppUser = this.datatrack ? this.datatrack.idAppUser : '';
+            idAppUser = this.datatrack ? this.datatrack.idAppUser : "";
         }
 
         let params: HttpParams = new HttpParams()

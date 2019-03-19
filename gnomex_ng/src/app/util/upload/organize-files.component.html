@@ -26,7 +26,7 @@
 
     <div class="full-width flex-row-container flex-grow overflow-auto">
         <as-split> <!-- split  mat-tabs have issues -->
-            <as-split-area  size="40">
+            <as-split-area  [size]="this.splitOrgSize">
                 <div class="full-width full-height max-height flex-container-col border-subtle">
                     <div class="full-width padded">
                         Upload Files
@@ -34,6 +34,7 @@
                     <div class="full-width flex-grow left-right-padded overflow-auto">
                         <div class="full-height full-width border-subtle">
                             <tree-root #uploadTree
+                                       *ngIf="showFileTrees && uploadFiles"
                                        (activate)="uploadTreeOnSelect($event)"
                                        (deactivate)="uploadTreeOnUnselect($event)"
                                        [nodes]="uploadFiles"
@@ -53,7 +54,7 @@
                     </div>
                 </div>
             </as-split-area>
-            <as-split-area size="60">
+            <as-split-area [size]="100 - this.splitOrgSize">
                 <div class="full-width full-height max-height flex-container-col border-subtle"><!-- start tree container -->
                     <div class="full-width padded">
                         Folder
@@ -61,7 +62,9 @@
                     <div class="full-width flex-grow left-right-padded overflow-auto">
                         <div  class="full-height full-width border-subtle">
                             <tree-root #organizeTree
+                                       *ngIf="showFileTrees && organizeFiles"
                                        (activate)="organizeTreeOnSelect($event)"
+                                       (initialized)="initOrganizeTree($event)"
                                        (deactivate)="organizeTreeOnUnselect($event)"
                                        (moveNode)="onMove($event)"
                                        [nodes]="organizeFiles"
@@ -92,7 +95,7 @@
     </div>
     <div class="flex-container-row align-center">
         <div class="flex-grow">
-            <save-footer (saveClicked)="save()" [dirty]="formGroup.dirty"></save-footer>
+            <save-footer (saveClicked)="requestSave()" [dirty]="formGroup.dirty"></save-footer>
         </div>
         <button mat-button color="primary" (click)="requestToCloseDialog()" >  Close </button>
 

@@ -59,6 +59,11 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
     private DictionaryHelper dictionaryHelper = null;
 
     private static String flowCellDir = null;
+    private final Map<String, String> sampleHierarchy = new HashMap<String,String>() {{
+        put("SampleGroup", "Sample");
+        put("Sample", "SeqRunNumber");
+        put("SeqRunNumber","FileDescriptor");
+    }};;
 
     public void validate() {
     }
@@ -536,74 +541,75 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                         }
                     }
 
-                    Map<String, List<Element>> sampleGroup = new TreeMap<String, List<Element>>();
+                    Map<String, List<JsonObject>> sampleGroup = new TreeMap<String, List<JsonObject>>();
                     if (linkedSampleFileList != null) {
-                        /*JsonArray root = this.linkedSampleFileList;
-
+                        JsonArray root = this.linkedSampleFileList;
                         for (int i =0; i < root.size(); i++) {
                             JsonObject child = root.getJsonObject(i);
-                            if (child.getName().equals("Sample")) {
+                            if (Util.getJsonStringSafeNonNull(child, "xmlNodeName").equals("Sample")) {
                                 if (sampleGroup.containsKey("*||*")) {
-                                    List<Element> samples = sampleGroup.get("*||*");
+                                    List<JsonObject> samples = sampleGroup.get("*||*");
                                     samples.add(child);
                                     sampleGroup.put("*||*", samples);
                                 } else {
-                                    List<Element> samples = new ArrayList<Element>();
+                                    List<JsonObject> samples = new ArrayList<JsonObject>();
                                     samples.add(child);
                                     sampleGroup.put("*||*", samples);
                                 }
-                            } else if (child.getName().equals("SampleGroup")) {
-                                recurseAddSamples(child, sampleGroup, child.getAttributeValue("displayName"));
+                            } else if (Util.getJsonStringSafeNonNull(child,"xmlNodeName").equals("SampleGroup")) {
+                                recurseAddSamples(child, sampleGroup, Util.getJsonStringSafeNonNull(child,"displayName"));
                             }
-                        }*/
+                        }
                     }
 
                     for (Iterator i = sampleGroup.keySet().iterator(); i.hasNext(); ) {
                         String displayName = (String) i.next();
                         int fileCount = 1;
-                        List<Element> sampleNodes = sampleGroup.get(displayName);
+                        List<JsonObject> sampleNodes = sampleGroup.get(displayName);
                         for (Iterator j = sampleNodes.iterator(); j.hasNext(); ) {
-                            Element sampleNode = (Element) j.next();
-                            Integer idSample = Integer.parseInt(sampleNode.getAttributeValue("idSample"));
+                            JsonObject sampleNode = (JsonObject) j.next();
+                            Integer idSample = Integer.parseInt(Util.getJsonStringSafeNonNull( sampleNode,"idSample"));
                             Sample s = (Sample) sess.load(Sample.class, idSample);
                             s.setGroupName(displayName);
                             sess.save(s);
                             int seqRunNumber = 0;
-                            for (Iterator k = sampleNode.getChildren().iterator(); k.hasNext(); ) {
-                                Element seqRunNode = (Element) k.next();
+
+                            JsonArray sampChildren = getJsonChildren(sampleNode);
+                            for (int k = 0; k < sampChildren.size(); k++ ) {
+                                JsonObject seqRunNode = sampChildren.getJsonObject(k);
                                 SampleExperimentFile sef = new SampleExperimentFile();
                                 Integer idSampleExperimentFile = null;
-                                if (seqRunNode.getAttributeValue("idSampleExperimentFile") != null) {
-                                    idSampleExperimentFile = Integer.parseInt(seqRunNode
-                                            .getAttributeValue("idSampleExperimentFile"));
+                                if (seqRunNode.get("idSampleExperimentFile") != null) {
+                                    idSampleExperimentFile = Integer.parseInt(seqRunNode.getString("idSampleExperimentFile"));
                                 }
 
-                                // If we have already deleted the sef in above code. Don't
-                                // bother doing anything else.
-                                if (deletedSefEntries.contains(idSampleExperimentFile)) {
-                                    continue;
+                                // if you find deleted sef that means the sef has been moved and let it be seen as a new sef
+                                if (!deletedSefEntries.contains(idSampleExperimentFile)) {
+                                    seqRunNumber = seqRunNumber + 1;
+                                    if (idSampleExperimentFile != null && !idSampleExperimentFile.equals("")) {
+                                        sef = (SampleExperimentFile) sess.load(SampleExperimentFile.class,
+                                                idSampleExperimentFile);
+                                    }
                                 }
 
-                                seqRunNumber = seqRunNumber + 1;
-                                if (idSampleExperimentFile != null && !idSampleExperimentFile.equals("")) {
-                                    sef = (SampleExperimentFile) sess.load(SampleExperimentFile.class,
-                                            idSampleExperimentFile);
-                                }
+
 
                                 fileCount = 1;
-                                for (Iterator l = seqRunNode.getChildren().iterator(); l.hasNext(); ) {
-                                    Element expFile = (Element) l.next();
+                                JsonArray seqRunChildren = getJsonChildren(seqRunNode);
+                                for (int l = 0; l < seqRunChildren.size(); l++ ) {
+                                    JsonObject expFile = seqRunChildren.getJsonObject(l);
                                     ExperimentFile ef = new ExperimentFile();
 
                                     // If it is in the dictionary use it.
-                                    if (expFileDictionary.containsKey(expFile.getAttributeValue("zipEntryName").replace(
+                                    String zipEntryName = Util.getJsonStringSafeNonNull(expFile,"zipEntryName");
+
+                                    if (expFileDictionary.containsKey(zipEntryName.replace(
                                             "\\", Constants.FILE_SEPARATOR))) {
-                                        ef = (ExperimentFile) expFileDictionary.get(expFile.getAttributeValue(
-                                                "zipEntryName").replace("\\", Constants.FILE_SEPARATOR));
-                                    } else if (expFile.getAttributeValue("idExperimentFile") != null
-                                            && !expFile.getAttributeValue("idExperimentFile").equals("")) {
+                                        ef = (ExperimentFile) expFileDictionary.get(zipEntryName.replace("\\", Constants.FILE_SEPARATOR));
+                                    } else if (expFile.get("idExperimentFile") != null
+                                            && !expFile.getString("idExperimentFile").equals("")) {
                                         ef = (ExperimentFile) sess.get(ExperimentFile.class,
-                                                Integer.parseInt(expFile.getAttributeValue("idExperimentFile")));
+                                                Integer.parseInt(expFile.getString("idExperimentFile")));
                                         // The experiment file may have been deleted from above code
                                         if (ef == null) {
                                             continue;
@@ -611,8 +617,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                     } else {
                                         java.util.Date d = new java.util.Date();
                                         ef.setIdRequest(this.idRequest);
-                                        ef.setFileName(expFile.getAttributeValue("zipEntryName").replace("\\", Constants.FILE_SEPARATOR));
-                                        ef.setFileSize(new BigDecimal(expFile.getAttributeValue("fileSize")));
+                                        ef.setFileName(zipEntryName.replace("\\", Constants.FILE_SEPARATOR));
+                                        ef.setFileSize(new BigDecimal(Util.getJsonStringSafeNonNull(expFile, "fileSize")));
                                         ef.setCreateDate(new Date(d.getTime()));
                                         sess.save(ef);
                                     }
@@ -635,7 +641,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                         sef.setIdSample(idSample);
                                         sef.setSeqRunNumber(seqRunNumber);
                                         sef.setIdExpFileRead1(ef.getIdExperimentFile());
-                                        if (!k.hasNext()) {
+                                        if (k == sampChildren.size() - 1) {
                                             sef.setIdExpFileRead2(null);
                                             sess.saveOrUpdate(sef);
                                         }
@@ -686,22 +692,35 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
         return this;
     }
+    private JsonArray getJsonChildren(JsonObject child){
+        String parentName = Util.getJsonStringSafeNonNull(child,"xmlNodeName");
+        String childName = sampleHierarchy.get(parentName);
+        JsonArray children = null;
+        if(childName != null && child.get(childName) != null ){
+            children = child.getJsonArray(childName);
+        }else{
+            children = Json.createArrayBuilder().build();
+        }
+        return children;
+    }
 
-    private void recurseAddSamples(Element child, Map<String, List<Element>> sampleGroup, String displayName) {
-        for (Iterator i = child.getChildren().iterator(); i.hasNext(); ) {
-            Element subChild = (Element) i.next();
-            if (subChild.getName().equals("Sample")) {
+    private void recurseAddSamples(JsonObject child, Map<String, List<JsonObject>> sampleGroup, String displayName) {
+        JsonArray children  = getJsonChildren(child);
+        for (int i = 0; i < children.size(); i++ ) {
+            JsonObject  subChild = children.getJsonObject(i);
+            if (Util.getJsonStringSafeNonNull(subChild, "xmlNodeName").equals("Sample")) {
                 if (sampleGroup.containsKey(displayName)) {
-                    List<Element> samples = sampleGroup.get(displayName);
+                    List<JsonObject> samples = sampleGroup.get(displayName);
                     samples.add(subChild);
                     sampleGroup.put(displayName, samples);
                 } else {
-                    List<Element> samples = new ArrayList<Element>();
+                    List<JsonObject> samples = new ArrayList<JsonObject>();
                     samples.add(subChild);
                     sampleGroup.put(displayName, samples);
                 }
-            } else if (subChild.getName().equals("SampleGroup")) {
-                recurseAddSamples(subChild, sampleGroup, displayName + Constants.FILE_SEPARATOR + subChild.getAttributeValue("displayName"));
+            } else if (Util.getJsonStringSafeNonNull(subChild, "xmlNodeName").equals("SampleGroup")) {
+                String name =  Util.getJsonStringSafeNonNull(subChild,"displayName");
+                recurseAddSamples(subChild, sampleGroup, displayName + Constants.FILE_SEPARATOR + name);
             }
         }
     }

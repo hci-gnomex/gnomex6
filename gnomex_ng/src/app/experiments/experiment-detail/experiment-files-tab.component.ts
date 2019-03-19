@@ -171,7 +171,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             isFDT: false
         };
         config.height = "40em";
-        config.width = "55em";
+        config.width = "80em";
         config.disableClose = true;
         this.dialog.open(ManageFilesDialogComponent,config);
     }

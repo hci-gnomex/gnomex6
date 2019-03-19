@@ -19,6 +19,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {DownloadFilesComponent} from "../../util/download-files.component";
 import {FileService} from "../../services/file.service";
+import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 
 @Component({
     templateUrl: "./experiment-detail-overview.component.html",
@@ -33,7 +34,7 @@ import {FileService} from "../../services/file.service";
             flex:1;
             font-size:small;
         }
-        
+
         .flexbox-column{
             display:flex;
             flex-direction:column;
@@ -45,7 +46,7 @@ import {FileService} from "../../services/file.service";
             margin-top: 0.2rem;
             margin-bottom: 0;
         }
-        
+
         .label-title-width {
             width: 25rem;
         }
@@ -75,15 +76,15 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public isEditMode: boolean;
     public nodeTitle: string = "";
     public showBillingTab: boolean = false;
-	
+
     public types = OrderType;
-    
+
     private overviewListSubscription: Subscription;
     private requestCategory: any;
 
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
-    @ViewChild('tabSamplesIlluminaComponent') private tabSamplesIlluminaComponent: TabSamplesIlluminaComponent;
+    @ViewChild("tabSamplesIlluminaComponent") private tabSamplesIlluminaComponent: TabSamplesIlluminaComponent;
 
     constructor(private securityAdvisor: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
@@ -132,8 +133,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                             || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"));
                 }
 
-                this.showSequenceLanesTab = this.requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
-                this.showBillingTab = this.experiment.canRead === 'Y' && this.experiment.isExternal !== 'Y';
+                this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
+                this.showBillingTab = this.experiment.canRead === "Y" && this.experiment.isExternal !== "Y";
 
                 let protocols: any[] = [];
                 if (this.experiment.protocols) {
@@ -161,13 +162,13 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 } else {
                     this.annotations = [];
                 }
-    
+
                 this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y";
                 this.isEditMode = this.experimentService.getEditMode();
                 this.setNodeTitle();
             }
         });
-    
+
     }
 
     ngOnDestroy() {
@@ -212,7 +213,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             this.sequenceLanesTab.prepareView();
         }
         if (event.tab.textLabel === "Experiment Design") {
-            console.log('onSelectExperimentDesign');
+            console.log("onSelectExperimentDesign");
             this.tabSamplesIlluminaComponent.tabDisplayed();
         }
     }
@@ -222,7 +223,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
         let mes: string = "Save() method hasn't been implemented. Continue anyway?";
         this.dialogsService.yesNoDialog(mes, this, "changeEditMode", null, "Save Confirmation");
     }
-    
+
     startEdit(element: Element) {
         if(this.isEditMode) {
             let warningMessage: string = "Your changes haven't been saved. Continue anyway?";
@@ -231,17 +232,17 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             this.changeEditMode();
         }
     }
-    
+
     changeEditMode() {
         // TODO: Here needs to save the changes first when save() function is implemented, or
         // TODO: we can change the logic to not be saved first when change editMode but only when click the save button.
-        
+
         this.experimentService.setEditMode(!this.isEditMode);
         this.experimentService.modeChangedExperiment = this.experiment;
         this.isEditMode = this.experimentService.getEditMode();
         this.setNodeTitle();
     }
-    
+
     setNodeTitle(): void {
         if (this.experiment) {
             let externalStr: string = "";
@@ -261,7 +262,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             this.experimentService.getRequestDownloadList(this.experiment.idRequest).subscribe((result: any) => {
                 if (result && result.Request) {
                     let config: MatDialogConfig = new MatDialogConfig();
-                    config.panelClass = 'no-padding-dialog';
+                    config.panelClass = "no-padding-dialog";
                     config.data = {
                         showCreateSoftLinks: true,
                         downloadListSource: result.Request,
@@ -283,5 +284,18 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             });
         }
     }
-    
+
+    shareLink(): void {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "35em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = false;
+        configuration.data = {
+            name: "Experiment",
+            number: this.experiment ? this.experiment.number : "",
+            type: "requestNumber"
+        };
+        this.dialog.open(ShareLinkDialogComponent, configuration);
+    }
 }
+

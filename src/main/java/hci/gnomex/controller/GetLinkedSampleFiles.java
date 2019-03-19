@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 public class GetLinkedSampleFiles extends GNomExCommand implements Serializable {
 
   private static Logger LOG = Logger.getLogger(GetLinkedSampleFiles.class);
+  private static final String ICON_TEST_TUBE = "assets/test_tube.png";
 
   private Integer                        idRequest;
   private StringBuffer                   queryBuf = new StringBuffer();
@@ -95,6 +96,7 @@ public class GetLinkedSampleFiles extends GNomExCommand implements Serializable 
         sampleNode.setAttribute("name", row[0] != null ? (String)row[0] : "");
         sampleNode.setAttribute("number", row[1] != null ? (String)row[1] : "");
         sampleNode.setAttribute("idSample", row[2] != null ? String.valueOf((Integer)row[2]) : "");
+        sampleNode.setAttribute("icon", ICON_TEST_TUBE);
         previousSampleID = (Integer)row[2];
 
         if(row[3] != null) {
@@ -175,13 +177,17 @@ public class GetLinkedSampleFiles extends GNomExCommand implements Serializable 
       }
 
       HashMap<String, Element> groups = new HashMap<String, Element>();
+      doc.getRootElement().addContent(new Element("SampleRoot"));
+      Element sampleRoot = doc.getRootElement().getChild("SampleRoot");
+
+
       for(Iterator i = sampleGroups.keySet().iterator(); i.hasNext();) {
         String groupName = (String)i.next();
         String restingNode = "";
         TreeMap<String, Element> sampleNodes = sampleGroups.get(groupName);
         if(groupName.equals("*||*")) {
           for(String sampleNumber : sampleNodes.keySet()) {
-            doc.getRootElement().addContent(sampleNodes.get(sampleNumber));
+            sampleRoot.addContent(sampleNodes.get(sampleNumber));
           }
           continue;
         }
@@ -194,11 +200,19 @@ public class GetLinkedSampleFiles extends GNomExCommand implements Serializable 
           recurseAddChildren(restingNode, group, samp);
         }
 
-        doc.getRootElement().addContent(group);
+        sampleRoot.addContent(group);
+      }
+      List<Element> sampList  = sampleRoot.getChildren();
+
+      for(Element samp : sampList){
+        Util.preserveXMLNodeName(samp);
       }
 
-      XMLOutputter out = new org.jdom.output.XMLOutputter();
-      this.xmlResult = out.outputString(doc);
+      Util.setIcons(doc);
+      this.jsonResult =  Util.convertXMLDocumentToJSONString(doc);
+
+      /*XMLOutputter out = new org.jdom.output.XMLOutputter();
+      this.xmlResult = out.outputString(doc);*/
 
       setResponsePage(this.SUCCESS_JSP);
 
