@@ -1208,7 +1208,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
       } else {
         auNode.setAttribute("value", au.getIdAppUser().toString());
       }
-      auNode.setAttribute("display", au.getDisplayName());
+      auNode.setAttribute("display", Util.getAppUserDisplayName(au, this.getUserPreferences()));
       subNode.addContent(auNode);
     }
   }

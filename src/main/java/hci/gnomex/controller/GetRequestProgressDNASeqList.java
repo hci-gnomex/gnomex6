@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.UserPreferences;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.InstrumentRunStatus;
 import hci.gnomex.model.PlateType;
@@ -97,7 +99,7 @@ public class GetRequestProgressDNASeqList extends GNomExCommand implements Seria
           currentNode.setAttribute("requestNumber",         container.getRequestNumber());
           currentNode.setAttribute("createDate",            container.getCreateDate() != null ? this.formatDate(container.getCreateDate()) : "");
           currentNode.setAttribute("codeRequestCategory",   container.getCodeRequestCategory());
-          currentNode.setAttribute("appUserName",           container.getRequestor()!= null ? container.getRequestor() : "");
+          currentNode.setAttribute("appUserName",           container.getRequester(this.getUserPreferences()));
           currentNode.setAttribute("sampleName",            container.getSampleName() == null ? "" : container.getSampleName());
           currentNode.setAttribute("sampleNumber",          container.getSampleNumber() == null ? "" : container.getSampleNumber());
           currentNode.setAttribute("assay",                 container.getAssayOrPrimerName());
@@ -218,15 +220,8 @@ public class GetRequestProgressDNASeqList extends GNomExCommand implements Seria
     public String getCodeRequestCategory() {
       return codeRequestCategory;
     }
-    public String getRequestor() {
-      String requestor = "";
-      if (ownerLastName != null) {
-        requestor += ownerLastName + ", ";
-      }
-      if (ownerFirstName != null) {
-        requestor += ownerFirstName;
-      }
-      return requestor;
+    public String getRequester(UserPreferences userPreferences) {
+      return Util.formatUserDisplayName(ownerFirstName, ownerLastName, userPreferences);
     }
     public String getPlateLabel() {
       return plateLabel;

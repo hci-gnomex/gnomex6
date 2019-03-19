@@ -14,7 +14,7 @@
                             (selectionChange)="collaboratorDropdownChange($event)">
                         <mat-option></mat-option>
                         <mat-option *ngFor="let collab of filteredPossibleCollaborators" [value]="collab" >
-                            {{ collab.displayName }}
+                            {{ collab[this.prefService.userDisplayField] }}
                         </mat-option>
                     </mat-select>
                 </mat-form-field>

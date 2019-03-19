@@ -34,7 +34,7 @@ public class GetBillingRequestList extends GNomExCommand implements Serializable
     try {
       Session session = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
       billingListManager.setSession(session);
-      Element root = billingListManager.buildBillingRequestList();
+      Element root = billingListManager.buildBillingRequestList(this.getUserPreferences());
       XMLOutputter out = new XMLOutputter();
       this.xmlResult = out.outputString(new Document(root));
       setResponsePage(this.SUCCESS_JSP);

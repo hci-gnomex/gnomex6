@@ -269,16 +269,7 @@ public class GetRequestDownloadList extends GNomExCommand implements Serializabl
 
                 viewType = Constants.DOWNLOAD_SINGLE_FILE_SERVLET + "?idRequest=" + row[21];
 
-                String appUserName = "";
-                if (row[29] != null) {
-                    appUserName = (String) row[29];
-                }
-                if (row[28] != null) {
-                    if (appUserName.length() > 0) {
-                        appUserName += ", ";
-                    }
-                    appUserName += (String) row[28];
-                }
+                String appUserName = Util.formatUserDisplayName((String) row[28], (String) row[29], this.getUserPreferences());
 
                 boolean isSolexaRequest = RequestCategory.isIlluminaRequestCategory(codeRequestCategory);
 

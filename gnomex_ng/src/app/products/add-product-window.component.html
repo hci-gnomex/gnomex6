@@ -4,7 +4,7 @@
         <mat-form-field class="full-width">
             <mat-select placeholder="Lab" [formControlName]="'lab'">
                 <mat-option>None</mat-option>
-                <mat-option *ngFor="let lab of this.labList" [value]="lab">{{lab.displayName}}</mat-option>
+                <mat-option *ngFor="let lab of this.labList" [value]="lab">{{lab[this.prefService.labDisplayField]}}</mat-option>
             </mat-select>
         </mat-form-field>
         <mat-form-field class="full-width">

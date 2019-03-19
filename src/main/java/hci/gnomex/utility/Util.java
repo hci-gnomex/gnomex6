@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import hci.framework.control.Command;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
+import hci.gnomex.model.AppUser;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.hibernate.Session;
@@ -808,6 +809,37 @@ public class Util {
             preserveXMLNodeName(childNode);
         }
     }
+
+    public static String getAppUserDisplayName(AppUser userToPrint, UserPreferences userPreferences) {
+        return userPreferences.getFormatNamesFirstLast() ? userToPrint.getFirstLastDisplayName() : userToPrint.getDisplayName();
+    }
+
+    public static String formatUserDisplayName(String firstName, String lastName, UserPreferences userPreferences) {
+        StringBuilder builder = new StringBuilder();
+        if (userPreferences.getFormatNamesFirstLast()) {
+            if (firstName != null && firstName.length() > 0) {
+                builder.append(firstName);
+                if (lastName != null && lastName.length() > 0) {
+                    builder.append(" ");
+                }
+            }
+            if (lastName != null && lastName.length() > 0) {
+                builder.append(lastName);
+            }
+        } else {
+            if (lastName != null && lastName.length() > 0) {
+                builder.append(lastName);
+                if (firstName != null && firstName.length() > 0) {
+                    builder.append(", ");
+                }
+            }
+            if (firstName != null && firstName.length() > 0) {
+                builder.append(firstName);
+            }
+        }
+        return builder.toString();
+    }
+
 }
 
 

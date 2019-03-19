@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ProductsService} from "../services/products.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'add-product-window',
@@ -29,7 +30,8 @@ export class AddProductWindowComponent implements OnInit {
                 @Inject(FormBuilder) private fb: FormBuilder,
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 private dialogRef: MatDialogRef<AddProductWindowComponent>,
-                private dialogsService: DialogsService,) {
+                private dialogsService: DialogsService,
+                public prefService: UserPreferencesService) {
         this.form = fb.group({
             lab: ['', Validators.required],
             product: ['', Validators.required]

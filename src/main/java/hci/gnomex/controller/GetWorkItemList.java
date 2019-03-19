@@ -513,17 +513,7 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
     }
     n.setAttribute("workItemCreateDate",     row[WorkItemFilter.WI_CREATE_DATE] == null ? "" :  this.formatDate((java.sql.Date)row[WorkItemFilter.WI_CREATE_DATE]));
 
-    String appUserName = "";
-    if (row[WorkItemFilter.USER_LAST_NAME] != null) {
-      appUserName = (String)row[WorkItemFilter.USER_LAST_NAME];
-    }
-    if (row[WorkItemFilter.USER_FIRST_NAME] != null) {
-      if (appUserName.length() > 0) {
-        appUserName += ", ";
-      }
-      appUserName += (String)row[WorkItemFilter.USER_FIRST_NAME];
-    }
-    n.setAttribute("appUserName",            appUserName);
+    n.setAttribute("appUserName", Util.formatUserDisplayName((String)row[WorkItemFilter.USER_FIRST_NAME], (String)row[WorkItemFilter.USER_LAST_NAME], this.getUserPreferences()));
     n.setAttribute("isDirty","N");
 
 

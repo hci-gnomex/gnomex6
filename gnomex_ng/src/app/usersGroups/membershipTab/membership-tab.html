@@ -9,7 +9,7 @@
                     <input matInput placeholder="Member to add" aria-label="Member" [matAutocomplete]="autoMem"
                            [(ngModel)]="memberUser" (keyup.enter)="chooseFirstMemOption()" (keyup)="highlightMemFirstOption($event)">
                     <mat-autocomplete #autoMem="matAutocomplete">
-                        <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let member of filterUsers(this.memberUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
+                        <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let member of filterUsers(this.memberUser)" [value]="member[this.prefService.userDisplayField]">{{member[this.prefService.userDisplayField]}}</mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
                 <button mat-button [disabled]="!memberUser" (click)="addUser('member')"><img *ngIf="memberUser;else addDisable" src="../../../assets/add.png"></button>
@@ -26,7 +26,7 @@
                 <mat-table  style="width: 80%" #table [dataSource]="membersDataSource">
                     <ng-container matColumnDef="name">
                         <mat-header-cell *matHeaderCellDef> Members </mat-header-cell>
-                        <mat-cell *matCellDef="let member"> {{member.displayName}} </mat-cell>
+                        <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
                     </ng-container>
                     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                     <mat-row *matRowDef="let row; columns: displayedColumns;"
@@ -46,7 +46,7 @@
                             <input matInput placeholder="Collaborator to add" aria-label="Collaborator" [matAutocomplete]="autoColl"
                                    [(ngModel)]="collUser" (keyup.enter)="chooseFirstCollOption()" (keyup)="highlightCollFirstOption($event)">
                             <mat-autocomplete #autoColl="matAutocomplete">
-                                <mat-option (onSelectionChange)="selectCollOption($event)" *ngFor="let member of filterUsers(this.collUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
+                                <mat-option (onSelectionChange)="selectCollOption($event)" *ngFor="let member of filterUsers(this.collUser)" [value]="member[this.prefService.userDisplayField]">{{member[this.prefService.userDisplayField]}}</mat-option>
                             </mat-autocomplete>
                         </mat-form-field>
                         <button mat-button [disabled]="!collUser" (click)="addUser('collaborator')"><img *ngIf="collUser;else addDisable" src="../../../assets/add.png"></button>
@@ -63,7 +63,7 @@
                         <mat-table style="width: 80%" #table [dataSource]="collaboratorsDataSource">
                             <ng-container matColumnDef="name">
                                 <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
-                                <mat-cell *matCellDef="let member"> {{member.displayName}} </mat-cell>
+                                <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
                             </ng-container>
                             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                             <mat-row *matRowDef="let row; columns: displayedColumns;"
@@ -81,7 +81,7 @@
                             <input matInput placeholder="Manager to add" aria-label="Manager" [matAutocomplete]="autoMan"
                                    [(ngModel)]="manUser" (keyup.enter)="chooseFirstManOption()" (keyup)="highlightManFirstOption($event)">
                             <mat-autocomplete #autoMan="matAutocomplete">
-                                <mat-option (onSelectionChange)="selectManOption($event)" *ngFor="let member of filterUsers(this.manUser)" [value]="member.displayName">{{member.displayName}}</mat-option>
+                                <mat-option (onSelectionChange)="selectManOption($event)" *ngFor="let member of filterUsers(this.manUser)" [value]="member[this.prefService.userDisplayField]">{{member[this.prefService.userDisplayField]}}</mat-option>
                             </mat-autocomplete>
                         </mat-form-field>
                         <button mat-button [disabled]="!manUser" (click)="addUser('manager')"><img *ngIf="manUser;else addDisable" src="../../../assets/add.png"></button>
@@ -98,7 +98,7 @@
                         <mat-table style="width: 80%" #table [dataSource]="managersDataSource">
                             <ng-container matColumnDef="name">
                                 <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
-                                <mat-cell *matCellDef="let member"> {{member.displayName}} </mat-cell>
+                                <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
                             </ng-container>
                             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                             <mat-row *matRowDef="let row; columns: displayedColumns;"

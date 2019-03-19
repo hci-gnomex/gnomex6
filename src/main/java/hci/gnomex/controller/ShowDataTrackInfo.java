@@ -103,7 +103,7 @@ public class ShowDataTrackInfo extends GNomExCommand implements Serializable {
 
 			row = table.addElement("TR");
 			row.addElement("TD").addText("Owner").addAttribute("CLASS", "label");
-			row.addElement("TD").addCDATA(dataTrack.getIdAppUser() != null ? dh.getAppUserObject(dataTrack.getIdAppUser()).getDisplayName() : "&nbsp;");
+			row.addElement("TD").addCDATA(dataTrack.getIdAppUser() != null ? Util.getAppUserDisplayName(dh.getAppUserObject(dataTrack.getIdAppUser()), this.getSecAdvisor().getUserPreferences()) : "&nbsp;");
 
 			row = table.addElement("TR");
 			row.addElement("TD").addText("Owner email").addAttribute("CLASS", "label");

@@ -21,7 +21,7 @@
                                 #opt
                                 [value]="collab"
                                 (onSelectionChange)="collaborChange(opt.selected, i)">
-                        {{collab.displayName}}
+                        {{collab[this.prefService.userDisplayField]}}
                     </mat-option>
                 </mat-select>
                 <mat-error *ngIf="this.visibilityForm?.get('collaborators')?.hasError('selectRequired')">
@@ -57,7 +57,7 @@
         <mat-select placeholder="Owner" formControlName="idAppUser">
             <mat-option>-- None --</mat-option>
             <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem.idAppUser">
-                {{ mem.displayName }}
+                {{ mem[this.prefService.userDisplayField] }}
             </mat-option>
         </mat-select>
         <mat-error *ngIf="visibilityForm?.get('idAppUser')?.hasError('required')"> Owner is required </mat-error>

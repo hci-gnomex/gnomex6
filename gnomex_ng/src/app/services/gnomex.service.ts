@@ -15,6 +15,7 @@ import {ProjectService} from "./project.service";
 import {AppUserListService} from "./app-user-list.service";
 import {AuthenticationService} from "../auth/authentication.service";
 import {first} from "rxjs/operators";
+import {UserPreferencesService} from "./user-preferences.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -122,7 +123,8 @@ export class GnomexService {
         private appUserListService: AppUserListService,
         //private http:Http
         private http:HttpClient,
-        private router:Router) {
+        private router:Router,
+        private userPreferencesService: UserPreferencesService) {
     }
 
     /* The header only uses this for displaying itself.
@@ -587,7 +589,7 @@ export class GnomexService {
 
         let orgList:any[] = Array.isArray(orgs) ? orgs : [orgs.Organism];
 
-        for (let organism of orgs) {
+        for (let organism of orgList) {
             if (organism.das2Name != '' && organism.bionomialName != '' && organism.isActive == 'Y') {
                 this.das2OrganismList.push(organism);
             }
@@ -730,11 +732,14 @@ export class GnomexService {
                                         this.progressService.displayLoader(95);
 
                                         this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
-                                            this.progressService.displayLoader(100);
+                                            this.progressService.displayLoader(98);
                                             this.uploadSampleSheetURL = response.url;
 
-                                            this.emitIsAppInitCompelete(true);
-                                            this.isLoggedIn = true;
+                                            this.userPreferencesService.createUserPreferences(false).subscribe((response: any) => {
+                                                this.progressService.displayLoader(100);
+                                                this.emitIsAppInitCompelete(true);
+                                                this.isLoggedIn = true;
+                                            });
                                         });
                                     });
 
@@ -773,11 +778,14 @@ export class GnomexService {
                     this.onDictionariesLoaded().then((response) => {
                         this.progressService.displayLoader(90);
                         this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
-                            this.progressService.displayLoader(100);
+                            this.progressService.displayLoader(95);
                             this.uploadSampleSheetURL = response.url;
 
-                            this.emitIsAppInitCompelete(true);
-                            this.isLoggedIn = true;
+                            this.userPreferencesService.createUserPreferences(true).subscribe((response: any) => {
+                                this.progressService.displayLoader(100);
+                                this.emitIsAppInitCompelete(true);
+                                this.isLoggedIn = true;
+                            });
                         });
 
                         // TODO will need this in future

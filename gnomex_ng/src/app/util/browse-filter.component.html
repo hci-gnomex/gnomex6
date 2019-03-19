@@ -47,7 +47,7 @@
             <div class="inlineDiv" *ngIf="showOwnerComboBox && !(idLabString === '')">
                 <label class="leading-label">Owner/Submitter</label>
                 <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an Owner...'"
-                             [source]="ownerList" [displayMember]="'displayName'" [valueMember]="'idAppUser'"
+                             [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
                              (onSelect)="onAppUserSelect($event)" (onUnselect)="onAppUserUnselect()">
                 </jqxComboBox>
             </div>
@@ -134,7 +134,7 @@
         </div>
         <jqxComboBox *ngIf="showExperimentsRadioGroup && showLabMembersComboBox && experimentsRadioString == 'myLab'"
                      class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Filter by lab member...'"
-                     [source]="labMembersList" [displayMember]="'displayName'" [valueMember]="'idAppUser'"
+                     [source]="labMembersList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
                      (onSelect)="onAppUserSelect($event)" (onUnselect)="onAppUserUnselect()">
         </jqxComboBox>
         <div class="inlineDiv children-spaced" *ngIf="showCoreFacilityComboBox">

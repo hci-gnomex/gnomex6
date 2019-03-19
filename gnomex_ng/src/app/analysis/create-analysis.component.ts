@@ -20,6 +20,7 @@ import {NewGenomeBuildComponent} from '../util/new-genome-build.component';
 import * as _ from "lodash";
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'create-analysis-dialog',
@@ -77,7 +78,8 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private analysisService: AnalysisService,
                 private formBuilder: FormBuilder,
-                private dialogsService: DialogsService
+                private dialogsService: DialogsService,
+                public prefService: UserPreferencesService
     ) {
         this._labList = data.labList;
         this.items = data.items;

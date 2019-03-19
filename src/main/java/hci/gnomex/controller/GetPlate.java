@@ -75,7 +75,7 @@ public class GetPlate extends GNomExCommand implements Serializable {
         String creator = p.getCreator();
         if ( creator != null && !creator.equals( "" ) ) {
           AppUser user = (AppUser)sess.get(AppUser.class, Integer.valueOf(creator));
-          pNode.setAttribute( "creator", user != null ? user.getDisplayName() : creator);
+          pNode.setAttribute( "creator", user != null ? Util.getAppUserDisplayName(user, this.getUserPreferences()) : creator);
         } else {
           pNode.setAttribute( "creator", creator);
         }

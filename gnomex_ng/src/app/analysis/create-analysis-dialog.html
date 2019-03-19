@@ -11,7 +11,7 @@
         <div *ngIf="showOwnerComboBox">
             <label style="width: 10em">Analysis Owner</label>
             <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an Owner...'"
-                         [source]="ownerList" [displayMember]="'displayName'" [valueMember]="'idAppUser'"
+                         [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
                          (onSelect)="onUserSelect($event)" formControlName="analysisOwner">
             </jqxComboBox>
         </div>
