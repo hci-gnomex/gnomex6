@@ -189,7 +189,7 @@ public class GetChromatogramList extends GNomExCommand implements Serializable {
         cNode.setAttribute("altColor",  new Boolean(alt).toString());
         cNode.setAttribute("plateLabel",  plateLabel != null && !plateLabel.equals("") ? plateLabel : idPlate.toString());
         cNode.setAttribute("redoFlag", redoFlag);
-        cNode.setAttribute("releaser", releaser != null ? releaser.getDisplayName() : "");
+        cNode.setAttribute("releaser", releaser != null ? Util.getAppUserDisplayName(releaser, this.getUserPreferences()) : "");
         cNode.setAttribute("lane", lane);
         cNode.setAttribute("wellPosition", wellPosDisplay);
         cNode.setAttribute("quadrant", quadrantDisplay);

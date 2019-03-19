@@ -3,10 +3,7 @@ package hci.gnomex.controller;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.BillingAccountUtil;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -56,7 +53,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 			ba.setApprovedDate(new Date(System.currentTimeMillis()));
 			ba.setIsApproved("Y");
 			ba.setApproverEmail(approverEmail);
-			BillingAccountUtil.sendApprovedBillingAccountEmail(sess, serverName, launchAppURL, ba, lab, approverEmail);
+			BillingAccountUtil.sendApprovedBillingAccountEmail(sess, new UserPreferences(), serverName, launchAppURL, ba, lab, approverEmail);
 
 			message = "Billing Account " + ba.getAccountNameDisplay() + " has been successfully approved.";
 

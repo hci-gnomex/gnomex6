@@ -19,6 +19,7 @@ import hci.gnomex.model.RequestSampleFilter;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DataTrackQuery;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.Util;
 import hci.report.constants.ReportFormats;
 import hci.report.model.Column;
 import hci.report.model.ReportRow;
@@ -278,7 +279,7 @@ public class ShowAnnotationReport extends ReportCommand implements Serializable 
               GenomeBuild genomeBuild = (GenomeBuild)row[DataTrackQuery.COL_GENOME_BUILD];
 
               String labName = dataTrack.getLab() != null ? dataTrack.getLab().getName(false, true) : "";
-              String ownerName = dataTrack.getAppUser() != null ? dataTrack.getAppUser().getDisplayName() : "";
+              String ownerName = dataTrack.getAppUser() != null ? Util.getAppUserDisplayName(dataTrack.getAppUser(), secAdvisor.getUserPreferences()) : "";
 
 
               values.add(labName);

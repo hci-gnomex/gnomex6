@@ -40,7 +40,7 @@
                             <mat-select placeholder="Owner" formControlName="selectOwner">
                                 <mat-option>-- None --</mat-option>
                                 <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem.idAppUser">
-                                    {{ mem.displayName }}
+                                    {{ mem[this.prefService.userDisplayField] }}
                                 </mat-option>
                             </mat-select>
                             <mat-error *ngIf="topicForm?.get('selectOwner')?.hasError('required')"> Owner is required</mat-error>

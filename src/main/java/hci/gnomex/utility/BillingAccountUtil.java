@@ -21,7 +21,7 @@ public class BillingAccountUtil {
 	// The static field for logging in Log4J
 	private static Logger LOG = Logger.getLogger(BillingAccountUtil.class);
 	
-	private static void sendApprovedBillingAccountEmail(Session sess, String serverName, String launchAppURL, BillingAccount billingAccount, Lab lab, AppUser approver, String approverEmail) throws AddressException, NamingException, MessagingException, IOException {
+	private static void sendApprovedBillingAccountEmail(Session sess, UserPreferences userPreferences, String serverName, String launchAppURL, BillingAccount billingAccount, Lab lab, AppUser approver, String approverEmail) throws AddressException, NamingException, MessagingException, IOException {
 		PropertyDictionaryHelper dictionaryHelper = PropertyDictionaryHelper.getInstance(sess);
 
 	    StringBuffer submitterNote = new StringBuffer();
@@ -66,7 +66,7 @@ public class BillingAccountUtil {
 	    
 	    body.append("<tr><td>Approved By:</td><td>");
 	    if (approver != null) {
-	    	body.append(approver.getDisplayName());
+	    	body.append(Util.getAppUserDisplayName(approver, userPreferences));
 	        if (approver.getEmail() != null && !approver.getEmail().equals("")) {
 	        	body.append(" (" + approver.getEmail() + ")" );
 	        }
@@ -122,12 +122,12 @@ public class BillingAccountUtil {
 	    }
 	}
 	
-	public static void sendApprovedBillingAccountEmail(Session sess, String serverName, String launchAppURL, BillingAccount billingAccount, Lab lab, AppUser approver) throws AddressException, NamingException, MessagingException, IOException {
-		sendApprovedBillingAccountEmail(sess, serverName, launchAppURL, billingAccount, lab, approver, null);
+	public static void sendApprovedBillingAccountEmail(Session sess, UserPreferences userPreferences, String serverName, String launchAppURL, BillingAccount billingAccount, Lab lab, AppUser approver) throws AddressException, NamingException, MessagingException, IOException {
+		sendApprovedBillingAccountEmail(sess, userPreferences, serverName, launchAppURL, billingAccount, lab, approver, null);
 	}
 	
-	public static void sendApprovedBillingAccountEmail(Session sess, String serverName, String launchAppURL, BillingAccount billingAccount, Lab lab, String approverEmail) throws AddressException, NamingException, MessagingException, IOException {
-		sendApprovedBillingAccountEmail(sess, serverName, launchAppURL, billingAccount, lab, null, approverEmail);
+	public static void sendApprovedBillingAccountEmail(Session sess, UserPreferences userPreferences, String serverName, String launchAppURL, BillingAccount billingAccount, Lab lab, String approverEmail) throws AddressException, NamingException, MessagingException, IOException {
+		sendApprovedBillingAccountEmail(sess, userPreferences, serverName, launchAppURL, billingAccount, lab, null, approverEmail);
 	}
 
 }

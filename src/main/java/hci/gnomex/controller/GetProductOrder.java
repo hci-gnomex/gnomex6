@@ -92,7 +92,7 @@ public class GetProductOrder extends GNomExCommand implements Serializable {
             SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
             String submitDate = po.getSubmitDate() != null ? sdf.format(po.getSubmitDate()) : "";
             root.setAttribute("idProductOrder", po.getIdProductOrder().toString());
-            root.setAttribute("submitter", po.getSubmitter().getFirstLastDisplayName());
+            root.setAttribute("submitter", Util.getAppUserDisplayName(po.getSubmitter(), this.getUserPreferences()));
             root.setAttribute("labName", po.getLab().getFormattedLabName(true));
             root.setAttribute("submitDate", submitDate);
             root.setAttribute("orderStatus", po.getStatus());

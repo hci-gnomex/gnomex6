@@ -14,6 +14,7 @@ import {BillingService} from "../services/billing.service";
 import {DialogsService} from "./popup/dialogs.service";
 import {DateRange} from "./date-range-filter.component";
 import {Subscription} from "rxjs";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'browse-filter',
@@ -205,7 +206,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
                 private dictionaryService: DictionaryService, private billingService: BillingService,
-                private dialogService: DialogsService) {
+                private dialogService: DialogsService,
+                public prefService: UserPreferencesService) {
         this.showMore = false;
         this.resetFields();
     }

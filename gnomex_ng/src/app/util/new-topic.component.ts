@@ -6,6 +6,7 @@ import {TopicService} from "../services/topic.service";
 import {LabListService} from "../services/lab-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'new-topic',
@@ -33,6 +34,7 @@ export class NewTopicComponent {
                 private getLabService: GetLabService,
                 private topicService: TopicService,
                 private labListService: LabListService,
+                public prefService: UserPreferencesService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
         if (this.data != null) {
             this.selectedItem = data.selectedItem;

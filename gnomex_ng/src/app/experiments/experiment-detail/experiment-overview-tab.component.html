@@ -142,7 +142,7 @@
                                         {{ '' }}
                                     </mat-option>
                                     <mat-option *ngFor="let appUser of possibleOwnersForLabDictionary" [value]="appUser.idAppUser">
-                                        {{ appUser.displayName }}
+                                        {{ appUser[this.prefService.userDisplayField] }}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
@@ -164,7 +164,7 @@
                                         {{ '' }}
                                     </mat-option>
                                     <mat-option *ngFor="let appUser of possibleSubmittersForLabDictionary" [value]="appUser.idAppUser">
-                                        {{ appUser.displayName }}
+                                        {{ appUser[this.prefService.userDisplayField] }}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>

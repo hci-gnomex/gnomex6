@@ -390,7 +390,7 @@ public class SaveBillingItemList extends GNomExCommand implements Serializable {
                     new Lab[0], billingAccount, new BillingAccount[0],
                     PropertyDictionaryHelper.getInstance(sess).getCoreFacilityProperty(coreFacility.getIdCoreFacility(), PropertyDictionary.CONTACT_ADDRESS_CORE_FACILITY),
                     PropertyDictionaryHelper.getInstance(sess).getCoreFacilityProperty(coreFacility.getIdCoreFacility(), PropertyDictionary.CONTACT_REMIT_ADDRESS_CORE_FACILITY),
-                    billingItemMaps, relatedBillingItemMaps, requestMaps);
+                    billingItemMaps, relatedBillingItemMaps, requestMaps, this.getUserPreferences());
 
             MailUtilHelper helper = new MailUtilHelper(emailRecipients, ccList, null, fromAddress, subject, "" + emailFormatter.format(), billingInvoice, true, dictionaryHelper, serverName);
             MailUtil.validateAndSendEmail(helper);

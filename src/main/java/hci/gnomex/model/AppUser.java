@@ -349,6 +349,9 @@ public class AppUser extends HibernateDetailObject implements Serializable, Comp
       }
       name += lastName;
     }
+    if (this.getIsActive() != null && this.getIsActive().equalsIgnoreCase("N")) {
+      name += " (inactive)";
+    }
     return name;
   }
 

@@ -23,6 +23,7 @@ import {GetLabService} from "../services/get-lab.service";
 import {LabListService} from "../services/lab-list.service";
 import {PasswordUtilService} from "../services/password-util.service";
 import {BillingAccountTabComponent} from "./billingAccountTab/billing-account-tab.component";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 /**
  * @title Basic tabs
@@ -208,13 +209,14 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
                 private labListService: LabListService,
                 private dictionaryService: DictionaryService,
                 private changeRef:ChangeDetectorRef,
+                public prefService: UserPreferencesService,
                 private dialog: MatDialog
                 ) {
         this.columnDefs = [
             {
                 headerName: "",
                 editable: false,
-                field: "displayName",
+                field: this.prefService.userDisplayField,
                 width: 200
             },
             {
@@ -846,7 +848,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
         configuration.data = {
             idAppUser: this.idAppUser,
-            userName: this.selectedUser.displayName
+            userName: this.selectedUser[this.prefService.userDisplayField]
         };
 
         this.deleteUserDialogRef = this.dialog.open(DeleteUserDialogComponent, configuration);
@@ -862,7 +864,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     onGridReady(params) {
         this.gridOptions.columnApi.setColumnVisible('email', false);
         let api = params.api;
-        let filter = api.getFilterInstance("displayName");
+        let filter = api.getFilterInstance(this.prefService.userDisplayField);
         this.gridOptions.api.sizeColumnsToFit();
 
     }

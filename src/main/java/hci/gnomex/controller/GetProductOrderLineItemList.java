@@ -70,7 +70,7 @@ public class GetProductOrderLineItemList extends GNomExCommand implements Serial
           e.setAttribute("unitPrice", getNonNullString(unitPrice));
           e.setAttribute("totalPrice", getNonNullString(unitPrice.multiply(new BigDecimal(qty))));
           e.setAttribute("labName", po.getLab().getFormattedLabName(true));
-          e.setAttribute("submitter", po.getSubmitter().getDisplayName());
+          e.setAttribute("submitter", Util.getAppUserDisplayName(po.getSubmitter(), this.getUserPreferences()));
           e.setAttribute("status", codeProductOrderStatus != null ? DictionaryManager.getDisplay("hci.gnomex.model.ProductOrderStatus", codeProductOrderStatus) : "");
           e.setAttribute("submitDate", submitDate);
 

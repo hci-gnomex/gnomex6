@@ -21,6 +21,7 @@ import {jqxEditorComponent} from "../../assets/jqwidgets-ts/angular_jqxeditor";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 import {first} from "rxjs/operators";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     templateUrl: "./topics-detail.component.html",
@@ -78,6 +79,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 private dialogService: DialogsService,
                 private dialog: MatDialog,
                 private snackBar: MatSnackBar,
+                public prefService: UserPreferencesService
     ) {
     }
 

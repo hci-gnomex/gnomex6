@@ -379,7 +379,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 						if (ba.isJustApproved()) {
 							ba.setIdApprover(this.getSecAdvisor().getIdAppUser());
 							AppUser au = (AppUser) sess.load(AppUser.class, this.getSecAdvisor().getIdAppUser());
-							BillingAccountUtil.sendApprovedBillingAccountEmail(sess, serverName, launchAppURL, ba, lab, au);
+							BillingAccountUtil.sendApprovedBillingAccountEmail(sess, this.getUserPreferences(), serverName, launchAppURL, ba, lab, au);
 						}
 
 						// If this is a new PO billing account notify the PI of the lab of its creation

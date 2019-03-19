@@ -170,7 +170,8 @@ public class SendBillingInvoiceEmail extends GNomExCommand implements Serializab
                                 coreFacility.getIdCoreFacility(), PropertyDictionary.CONTACT_ADDRESS_CORE_FACILITY),
                         PropertyDictionaryHelper.getInstance(sess).getCoreFacilityProperty(
                                 coreFacility.getIdCoreFacility(), PropertyDictionary.CONTACT_REMIT_ADDRESS_CORE_FACILITY),
-                        billingItemMaps, relatedBillingItemMaps, requestMaps);
+                        billingItemMaps, relatedBillingItemMaps, requestMaps,
+                        this.getUserPreferences());
 
                 MailUtilHelper helper = new MailUtilHelper(emailRecipients, ccList, null, fromAddress, subject, body,
                         billingInvoice, true, dh, serverName);
