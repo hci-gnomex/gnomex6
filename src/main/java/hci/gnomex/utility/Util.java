@@ -673,6 +673,18 @@ public class Util {
                             icon = "assets/folder.png";
                         }
                     }
+                } else if(node.getName().equals("SampleGroup")){
+                        if(node.getChildren().size() > 0){
+                            icon = "assets/blue_folder.png";
+                        }else {
+                            icon = "assets/folder_disable.png";
+                        }
+                } else if(node.getName().equals("SeqRunNumber")){
+                    if(node.getChildren().size() > 0){
+                        icon = "assets/folder.png";
+                    }else {
+                        icon = "assets/folder_disable.png";
+                    }
                 }
             }
 

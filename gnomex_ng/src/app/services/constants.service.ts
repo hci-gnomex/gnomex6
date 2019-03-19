@@ -76,6 +76,7 @@ export class ConstantsService {
         " color | ul ol | outdent indent";
     public readonly ICON_SAVE:string = "assets/save.png";
     public readonly GLOBE_LINK: string = "assets/globe_link.png";
+    public readonly ICON_TABLE_LINK: string = "assets/table_link.png";
     public readonly EMAIL_GO_LINK: string = "assets/email_go.png";
     public readonly ICON_UCSC: string = "assets/ucscFavicon.png";
     public readonly ICON_IGV: string = "assets/igv.png";
@@ -103,6 +104,7 @@ export class ConstantsService {
     public readonly ICON_CANCEL:string =  "assets/icon-cancel.png";
     public readonly ICON_CLOSE_BLACK:string ="assets/close_black.png";
     public readonly ICON_GREEN_BULLET:string = "assets/bullet_green.png";
+    public readonly ICON_BLUE_FOLDER:string = "assets/blue_folder.png";
     public readonly ICON_FOLDER:string = "assets/folder.png";
     public readonly ICON_FOLDER_ADD:string = "assets/folder_add.png";
     public readonly ICON_FLASK:string = "assets/flask.png";

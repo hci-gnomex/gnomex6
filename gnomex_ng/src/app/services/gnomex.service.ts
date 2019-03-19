@@ -831,7 +831,7 @@ export class GnomexService {
 
     private recurseGetFiles(fileStruct : any, flattenedFiles: any[] ):void{
         Object.keys(fileStruct).forEach(objName =>{
-            if(objName === 'File'){
+            if(objName === 'File' || objName === 'FileDescriptor'){
                 let files = Array.isArray(fileStruct.File) ? fileStruct.File : [fileStruct.File];
                 for(let f of files){
                     flattenedFiles.push(f);

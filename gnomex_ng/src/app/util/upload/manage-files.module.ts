@@ -20,6 +20,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {TreeModule} from "angular-tree-component";
 import {AngularSplitModule} from "angular-split";
 import {UtilModule} from "../util.module";
+import {LinkedSampleFileComponent} from "./linked-sample-file.component";
 
 @NgModule({
     imports: [
@@ -42,7 +43,12 @@ import {UtilModule} from "../util.module";
         ReactiveFormsModule
 
     ],
-    declarations: [ UploadFileComponent, ManageFilesDialogComponent, OrganizeFilesComponent, NameFileDialogComponent],
+    declarations: [ UploadFileComponent,
+        ManageFilesDialogComponent,
+        OrganizeFilesComponent,
+        NameFileDialogComponent,
+        LinkedSampleFileComponent
+    ],
     exports: [ManageFilesDialogComponent],
     entryComponents: [ NameFileDialogComponent]
 })
