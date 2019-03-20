@@ -200,14 +200,14 @@ public class BillingListManager {
                         labNode.addContent(node);
                     }
                 } else if (mode == MODE_BILLING_ITEM_LIST) {
-                    this.appendBillingItemNodes(node, rowResult, resultSetType);
+                    this.appendBillingItemNodes(node, rowResult, resultSetType, userPreferences);
                     root.addContent(node);
                 }
             }
         }
     }
 
-    private void appendBillingItemNodes(Element node, QueryRowResult queryResult, int resultSetType) {
+    private void appendBillingItemNodes(Element node, QueryRowResult queryResult, int resultSetType, UserPreferences userPreferences) {
         String idColumnName = null;
         Integer id = null;
         if (resultSetType == RESULT_SET_TYPE_REQUEST) {
@@ -230,7 +230,7 @@ public class BillingListManager {
         totalPrice = totalPrice.setScale(2, BigDecimal.ROUND_UP);
         for (Integer idBillingItem : idBillingItemsMain) {
             BillingItem item = sess.get(BillingItem.class, idBillingItem);
-            Element billingItemNode = this.createBillingItemNode(item, false, nf);
+            Element billingItemNode = this.createBillingItemNode(item, false, nf, userPreferences);
             node.addContent(billingItemNode);
             invoicePrice = invoicePrice.add(item.getInvoicePrice() != null ? item.getInvoicePrice() : new BigDecimal(0));
             totalPrice = totalPrice.add(item.getTotalPrice() != null ? item.getTotalPrice() : new BigDecimal(0));
@@ -241,19 +241,19 @@ public class BillingListManager {
         if (showOtherBillingItems) {
             for (Integer idBillingItem : this.getIdBillingItems(idColumnName, id, idBillingAccount, true)) {
                 BillingItem item = sess.get(BillingItem.class, idBillingItem);
-                Element billingItemNode = this.createBillingItemNode(item, true, nf);
+                Element billingItemNode = this.createBillingItemNode(item, true, nf, userPreferences);
                 node.addContent(billingItemNode);
             }
         }
     }
 
-    private Element createBillingItemNode(BillingItem bi, boolean isOther, NumberFormat nf) {
+    private Element createBillingItemNode(BillingItem bi, boolean isOther, NumberFormat nf, UserPreferences userPreferences) {
         Element billingItemNode = new Element("BillingItem");
         billingItemNode.setAttribute("description", bi.getDescription());
         billingItemNode.setAttribute("idBillingAccount", bi.getIdBillingAccount().toString());
         billingItemNode.setAttribute("idCoreFacility", this.getNonNullString(bi.getIdCoreFacility()));
         billingItemNode.setAttribute("idProductOrder", this.getNonNullString(bi.getIdProductOrder()));
-        billingItemNode.setAttribute("labName", bi.getLabName());
+        billingItemNode.setAttribute("labName", Util.getLabDisplayName(bi.getLab(), userPreferences));
         billingItemNode.setAttribute("notes", this.getNonNullString(bi.getNotes()));
         billingItemNode.setAttribute("accountName", bi.getAccountName());
         billingItemNode.setAttribute("idLab", bi.getIdLab().toString());
@@ -432,7 +432,7 @@ public class BillingListManager {
         String labIsExternalPricingCommercial = queryResult.getFieldValueString("lab.isExternalPricingCommercial", null);
         String idLab = queryResult.getFieldValueIntegerAsString("lab.idLab");
 
-        String labName = Lab.formatLabName(labLastName, labFirstName);
+        String labName = Util.formatLabDisplayName(labFirstName, labLastName, userPreferences);
         toolTip.append(" ");
         toolTip.append(labName);
         StringBuilder labBillingName = new StringBuilder();

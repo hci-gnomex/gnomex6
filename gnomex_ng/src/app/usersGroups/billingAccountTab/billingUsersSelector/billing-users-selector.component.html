@@ -30,7 +30,7 @@
 							<mat-form-field style="width: 80%;">
 								<mat-select placeholder="Select a Lab..." [(value)]="selectedLab" (selectionChange)="onLabListSelection($event)">
 									<mat-option *ngFor="let lab of labList" [value]="lab">
-										{{ lab.name }}
+										{{ lab[this.prefService.labDisplayField] }}
 									</mat-option>
 								</mat-select>
 							</mat-form-field>

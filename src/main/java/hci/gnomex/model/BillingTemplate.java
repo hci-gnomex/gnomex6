@@ -8,15 +8,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import hci.gnomex.utility.*;
 import org.hibernate.Session;
 import org.jdom.Element;
 
 import hci.gnomex.controller.SaveBillingTemplate;
-import hci.gnomex.utility.BillingItemQueryManager;
-import hci.gnomex.utility.DetailObject;
-import hci.gnomex.utility.Order;
-import hci.gnomex.utility.QueryManager;
-import hci.gnomex.utility.XMLTools;
 import hci.hibernate5utils.HibernateDetailObject;
 
 @SuppressWarnings("serial")
@@ -167,7 +163,7 @@ public class BillingTemplate extends HibernateDetailObject implements DetailObje
     }
 
 	@Override
-	public Element toXML(Session sess, Set<String> detailParameters) {
+	public Element toXML(Session sess, Set<String> detailParameters, UserPreferences userPreferences) {
 		Element billingTemplateNode = new Element("BillingTemplate");
 		
 		billingTemplateNode.setAttribute("idBillingTemplate", XMLTools.safeXMLValue(this.getIdBillingTemplate()));
@@ -180,7 +176,7 @@ public class BillingTemplate extends HibernateDetailObject implements DetailObje
 				usingPercentSplit = true;
 			}
 			
-			billingTemplateNode.addContent(item.toXML(sess, null));
+			billingTemplateNode.addContent(item.toXML(sess, null, userPreferences));
 		}
 		
 		billingTemplateNode.setAttribute("usingPercentSplit", usingPercentSplit ? "true" : "false");

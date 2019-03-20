@@ -7,6 +7,7 @@ import { TextAlignLeftMiddleRenderer } from "../../../util/grid-renderers/text-a
 import * as _ from "lodash";
 import {GetLabService} from "../../../services/get-lab.service";
 import {LabListService} from "../../../services/lab-list.service";
+import {UserPreferencesService} from "../../../services/user-preferences.service";
 
 @Component({
 	selector: "billing-users-selector",
@@ -72,6 +73,7 @@ export class BillingUsersSelectorComponent {
 	constructor(private dialogRef: MatDialogRef<BillingUsersSelectorComponent>,
 							private labListService: LabListService,
 							private getLabService: GetLabService,
+							public prefService: UserPreferencesService,
 							@Inject(MAT_DIALOG_DATA) private data) {
 		this.optionName   = 'Option';
 		this.displayField = 'display';

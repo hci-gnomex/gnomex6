@@ -28,7 +28,7 @@
             <mat-form-field class="small-margin-right">
                 <mat-select placeholder="Lab Group" [formControlName]="'idLab'">
                     <mat-option>None</mat-option>
-                    <mat-option *ngFor="let l of this.filteredLabList" [value]="l.idLab">{{l.name}}</mat-option>
+                    <mat-option *ngFor="let l of this.filteredLabList" [value]="l.idLab">{{l[this.prefService.labDisplayField]}}</mat-option>
                 </mat-select>
             </mat-form-field>
             <mat-form-field>

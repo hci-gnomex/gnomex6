@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Set;
 
+import hci.gnomex.utility.UserPreferences;
+import hci.gnomex.utility.Util;
 import org.hibernate.Session;
 import org.jdom.Element;
 
@@ -127,7 +129,7 @@ public class BillingTemplateItem extends HibernateDetailObject implements Compar
 	}
 
 	@Override
-	public Element toXML(Session sess, Set<String> detailParameters) {
+	public Element toXML(Session sess, Set<String> detailParameters, UserPreferences userPreferences) {
 		Element billingTemplateItemNode = new Element("BillingTemplateItem");
 		
 		billingTemplateItemNode.setAttribute("idBillingTemplateItem", XMLTools.safeXMLValue(this.getIdBillingTemplateItem()));
@@ -147,7 +149,7 @@ public class BillingTemplateItem extends HibernateDetailObject implements Compar
 			Lab lab = billingAccount.getLab();
 			if (lab != null) {
 				billingTemplateItemNode.setAttribute("idLab", XMLTools.safeXMLValue(lab.getIdLab()));
-				billingTemplateItemNode.setAttribute("labName", XMLTools.safeXMLValue(lab.getName()));
+				billingTemplateItemNode.setAttribute("labName", Util.getLabDisplayName(lab, userPreferences));
 			}
 		}
 		

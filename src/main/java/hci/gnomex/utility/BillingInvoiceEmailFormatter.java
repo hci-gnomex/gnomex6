@@ -108,7 +108,7 @@ public class BillingInvoiceEmailFormatter extends DetailObject{
     return ccList;
   }
 
-  public String format() throws Exception {
+  public String format(UserPreferences userPreferences) throws Exception {
 
     BillingInvoiceHTMLFormatter formatter = new BillingInvoiceHTMLFormatter(coreFacilityName, coreFacilityContactName, coreFacilityContactPhone,
         invoiceNote1, invoiceNote2, billingPeriod, lab, billingAccount, invoice, billingItemMap, relatedBillingItemMap, requestMap,
@@ -119,7 +119,7 @@ public class BillingInvoiceEmailFormatter extends DetailObject{
     Element root = new Element("HTML");
     Document doc = new Document(root);
 
-    Element center1 = formatHeader(formatter, root);
+    Element center1 = formatHeader(formatter, root, userPreferences);
 
     center1.addContent(formatter.makeDetail());
 
@@ -136,7 +136,7 @@ public class BillingInvoiceEmailFormatter extends DetailObject{
 
 
 
-  protected Element formatHeader(BillingInvoiceHTMLFormatter formatter, Element root) {
+  protected Element formatHeader(BillingInvoiceHTMLFormatter formatter, Element root, UserPreferences userPreferences) {
 
 
     Element head = new Element("HEAD");
@@ -157,7 +157,7 @@ public class BillingInvoiceEmailFormatter extends DetailObject{
 
     body.addContent(formatter.makeIntroNote());
     body.addContent(new Element("HR"));    
-    body.addContent(formatter.makeHeader(sess));
+    body.addContent(formatter.makeHeader(sess, userPreferences));
 
 
     return body;

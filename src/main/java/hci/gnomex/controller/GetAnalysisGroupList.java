@@ -267,7 +267,7 @@ public class GetAnalysisGroupList extends GNomExCommand implements Serializable 
 
 
   private void addLabNode(Object[] row) {
-    String labName = Lab.formatLabNameFirstLast((String)row[6], (String)row[5]);
+    String labName = Util.formatLabDisplayName((String)row[6], (String)row[5], this.getUserPreferences());
 
     labNode = new Element("Lab");
     labNode.setAttribute("idLab",            ((Integer)row[3]).toString());
@@ -278,14 +278,15 @@ public class GetAnalysisGroupList extends GNomExCommand implements Serializable 
 
   private void addLabNode(Lab lab) {
     labNode = new Element("Lab");
+    String labName = Util.getLabDisplayName(lab, this.getUserPreferences());
     labNode.setAttribute("idLab",            lab.getIdLab().toString());
-    labNode.setAttribute("labName",          lab.getName(false, true));
-    labNode.setAttribute("label",            lab.getName(false, true));
+    labNode.setAttribute("labName",          labName);
+    labNode.setAttribute("label",            labName);
     rootNode.addContent(labNode);
   }
 
   private void addAnalysisGroupNode(Object[] row) {
-    String labName = Lab.formatLabNameFirstLast((String)row[6], (String)row[5]);
+    String labName = Util.formatLabDisplayName((String)row[6], (String)row[5], this.getUserPreferences());
 
     analysisGroupNode = new Element("AnalysisGroup");
     analysisGroupNode.setAttribute("idAnalysisGroup", row[0] == null ? ""  : ((Integer)row[0]).toString());
@@ -300,9 +301,9 @@ public class GetAnalysisGroupList extends GNomExCommand implements Serializable 
   }
 
   private void addAnalysisNode(Object[] row) {
-    String labName = Lab.formatLabNameFirstLast( (String)row[6], (String)row[5]);
+    String labName = Util.formatLabDisplayName( (String)row[6], (String)row[5], this.getUserPreferences());
 
-    String aLabName = Lab.formatLabNameFirstLast( (String)row[14], (String)row[13]);
+    String aLabName = Util.formatLabDisplayName( (String)row[14], (String)row[13], this.getUserPreferences());
 
     analysisNode = new Element("Analysis");
     analysisNode.setAttribute("idAnalysis",         row[7] == null ? ""  : ((Integer)row[7]).toString());
@@ -362,7 +363,7 @@ public class GetAnalysisGroupList extends GNomExCommand implements Serializable 
 
   private void addLabWithZeroAnalyses(Object[] row) {
 
-    String labName = Lab.formatLabNameFirstLast((String)row[2], (String)row[1]);
+    String labName = Util.formatLabDisplayName((String)row[2], (String)row[1], this.getUserPreferences());
 
     labNode = new Element("Lab");
     labNode.setAttribute("idLab",            ((Integer)row[0]).toString());

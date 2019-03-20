@@ -62,7 +62,7 @@ public Command execute() throws RollBackCommandException {
 		for (Iterator i = l.iterator(); i.hasNext();) {
 			Lab lab = (Lab) i.next();
 			Element node = new Element("Lab");
-			node.setAttribute("displayName", lab.getName(true, true));
+			node.setAttribute("displayName", Util.getLabDisplayName(lab, this.getUserPreferences()));
 			node.setAttribute("idLab", lab.getIdLab().toString());
 			doc.getRootElement().addContent(node);
 		}

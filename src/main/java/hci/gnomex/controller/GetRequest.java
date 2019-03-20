@@ -233,7 +233,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
           requestNode.setAttribute("accountNumberDisplay", accountNumberDisplay);
 
           if (billingTemplate != null) {
-        	  requestNode.addContent(billingTemplate.toXML(sess, null));
+        	  requestNode.addContent(billingTemplate.toXML(sess, null, this.getUserPreferences()));
               requestNode.setAttribute("canOpenNewBillingTemplate", billingTemplate.canBeDeactivated(sess) ? "Y" : "N");
           }
 
@@ -635,7 +635,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
             TreeMap billingItemMap = new TreeMap();
             for (Iterator i = request.getBillingItemList(sess).iterator(); i.hasNext();) {
               BillingItem bi = (BillingItem) i.next();
-              String key = bi.getLabName() + "_%%%_" + bi.getAccountNameAndNumber();
+              String key = Util.getLabDisplayName(bi.getLab(), this.getUserPreferences()) + "_%%%_" + bi.getAccountNameAndNumber();
               List billingItems = (List) billingItemMap.get(key);
               if (billingItems == null) {
                 billingItems = new ArrayList();

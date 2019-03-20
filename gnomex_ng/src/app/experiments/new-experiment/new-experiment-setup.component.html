@@ -42,11 +42,11 @@
                                formControlName="selectLab"
                                [matAutocomplete]="autoLab"
                                (keyup.enter)="chooseFirstLabOption()">
-                        <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
+                        <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
                             <mat-option *ngFor="let lab of filterLabList(form.get('selectLab').value)"
                                         [value]="lab"
                                         (onSelectionChange)="selectLabOption($event)">
-                                {{ lab.name }}
+                                {{ lab[this.prefService.labDisplayField] }}
                             </mat-option>
                         </mat-autocomplete>
                         <mat-error *ngIf="form?.get('selectLab')?.hasError('required')">

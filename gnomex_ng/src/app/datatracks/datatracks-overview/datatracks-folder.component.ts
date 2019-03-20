@@ -9,6 +9,7 @@ import {URLSearchParams} from "@angular/http";
 import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
 import jqxComboBox = jqwidgets.jqxComboBox;
 import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 
 
@@ -32,7 +33,8 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
 
 
     constructor(protected fb: FormBuilder,private dtService: DataTrackService,
-                private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService){
+                private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService,
+                public prefService: UserPreferencesService){
         super(fb);
     }
 

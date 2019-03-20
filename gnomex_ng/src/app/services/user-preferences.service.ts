@@ -56,4 +56,46 @@ export class UserPreferencesService {
         return formattedName;
     }
 
+    private createDisplaySortFunction(displayField: string): (a: any, b: any) => number {
+        return (a: any, b: any) => {
+            if (a && b) {
+                let aDisplay: string = a[displayField];
+                let bDisplay: string = b[displayField];
+                if (aDisplay && bDisplay) {
+                    return aDisplay.localeCompare(bDisplay)
+                } else if (aDisplay && !bDisplay) {
+                    return 1;
+                } else if (!aDisplay && bDisplay) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else if (a && !b) {
+                return 1;
+            } else if (!a && b) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public createUserDisplaySortFunction(): (a: any, b: any) => number {
+        return this.createDisplaySortFunction(this.userDisplayField);
+    }
+
+    public createLabDisplaySortFunction(): (a: any, b: any) => number {
+        return this.createDisplaySortFunction(this.labDisplayField);
+    }
+
+    private createDisplayWithFunction(displayField: string): (value: any) => string {
+        return (value: any) => {
+            return value ? value[displayField] : "";
+        }
+    }
+
+    public createLabDisplayWithFunction(): (value: any) => string {
+        return this.createDisplayWithFunction(this.labDisplayField);
+    }
+
 }

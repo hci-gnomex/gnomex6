@@ -8,7 +8,7 @@
     <div class="dialogDiv">
         <label>Group</label>
         <jqxComboBox class="dialogComboBox" [width]="'100%'" [height]="30" [placeHolder]="'...'"
-                     [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                     [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
                      (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
         </jqxComboBox>
     </div>

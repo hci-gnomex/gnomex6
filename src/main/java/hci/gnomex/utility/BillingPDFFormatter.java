@@ -124,7 +124,7 @@ public class BillingPDFFormatter extends DetailObject {
 		ArrayList<Element> content = new ArrayList<Element>();
 		
 		// Header
-		ArrayList<Element> headerElements = makeHeader(lab, billingAccount, invoice);
+		ArrayList<Element> headerElements = makeHeader(lab, billingAccount, invoice, userPreferences);
 		for (Element e : headerElements) {
 			content.add(e);
 		}
@@ -140,11 +140,11 @@ public class BillingPDFFormatter extends DetailObject {
 		return content;
 	}
 	
-	private ArrayList<Element> makeHeader(Lab lab, BillingAccount billingAccount, Invoice invoice) {
+	private ArrayList<Element> makeHeader(Lab lab, BillingAccount billingAccount, Invoice invoice, UserPreferences userPreferences) {
 		ArrayList<Element> headerElements = new ArrayList<Element>();
 		
 		if (!isDNASeqCore) {
-			headerElements.addAll(makeLabInfoHeader(lab, billingAccount));
+			headerElements.addAll(makeLabInfoHeader(lab, billingAccount, userPreferences));
 			headerElements.add(Chunk.NEWLINE);
 		}
 		
@@ -156,7 +156,7 @@ public class BillingPDFFormatter extends DetailObject {
 		}
 		
 		if (!headerElements.isEmpty()) headerElements.add(Chunk.NEWLINE);
-		headerElements.addAll(makePersonalAddressHeader(lab, billingAccount));
+		headerElements.addAll(makePersonalAddressHeader(lab, billingAccount, userPreferences));
 		headerElements.add(Chunk.NEWLINE);
 		
 		if (isDNASeqCore && billingAccount.getIsPO().equals("N") && billingAccount.getIsCreditCard().equals("N")) {
@@ -475,20 +475,20 @@ public class BillingPDFFormatter extends DetailObject {
 		PDFFormatterUtil.addToTable(table, invoicePrice, FONT_TABLE_VALUE_RELATED_ITEMS, Element.ALIGN_CENTER, Element.ALIGN_MIDDLE, false, false, false, false, BaseColor.BLACK, 1, 1);
 	}
 	
-	private ArrayList<Element> makeLabInfoHeader(Lab lab, BillingAccount billingAccount) {
+	private ArrayList<Element> makeLabInfoHeader(Lab lab, BillingAccount billingAccount, UserPreferences userPreferences) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 		
-		PDFFormatterUtil.addPhrase(elements, lab.getName(false, true), FONT_HEADER);
+		PDFFormatterUtil.addPhrase(elements, Util.getLabDisplayName(lab, userPreferences), FONT_HEADER);
 		PDFFormatterUtil.addPhrase(elements, formatAccountNumber(billingAccount.getAccountNumber(), billingAccount.getAccountName()), FONT_HEADER);		
 		
 		return elements;
 	}
 	
-	private ArrayList<Element> makePersonalAddressHeader(Lab lab, BillingAccount billingAccount) {
+	private ArrayList<Element> makePersonalAddressHeader(Lab lab, BillingAccount billingAccount, UserPreferences userPreferences) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 		
 		if (isDNASeqCore && billingAccount.getIsPO().equals("Y") && billingAccount.getIsCreditCard().equals("N")) {
-			PDFFormatterUtil.addPhrase(elements, lab.getName(false, true), FONT_HEADER);
+			PDFFormatterUtil.addPhrase(elements, Util.getLabDisplayName(lab, userPreferences), FONT_HEADER);
 		}
 		if (lab.getContactName() != null && !lab.getContactName().equals("")) {
 			PDFFormatterUtil.addPhrase(elements, "ATTN: " + lab.getContactName(), FONT_HEADER);
