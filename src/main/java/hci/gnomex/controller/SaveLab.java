@@ -473,7 +473,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 						for (Iterator<AppUser> iter = newUsers.keySet().iterator(); iter.hasNext(); ) {
 							AppUser newMember = iter.next();
 							String  email     = newUsers.get(newMember);
-							newMemberNotificationEmail(sess, email, lab.getName(false, true), newMember);
+							newMemberNotificationEmail(sess, email, Util.getLabDisplayName(lab, this.getUserPreferences()), newMember);
 						}
 
 						sess.flush();
@@ -760,7 +760,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 		StringBuffer submitterNote = new StringBuffer();
 		StringBuffer body          = new StringBuffer();
 		String submitterSubject = "GNomEx Billing Account \'" + billingAccount.getAccountName() + "\' for "
-				+ lab.getName(false, true) + " approved";
+				+ Util.getLabDisplayName(lab, this.getUserPreferences()) + " approved";
 
 		String PIEmail = lab.getContactEmail();
 

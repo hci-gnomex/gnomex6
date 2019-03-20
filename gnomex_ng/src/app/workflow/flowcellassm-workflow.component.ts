@@ -14,6 +14,7 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
 import {DeleteSeqlaneDialogComponent} from "./delete-seqlane-dialog.component";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'flowcellassm-workflow',
@@ -113,7 +114,8 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 private dialogsService: DialogsService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
-                private dictionaryService: DictionaryService) {
+                private dictionaryService: DictionaryService,
+                public prefService: UserPreferencesService) {
         this.barcodeFC = new FormControl("");
         this.runFC = new FormControl("");
         this.createDateFC = new FormControl("");
@@ -421,10 +423,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
             this.autoLabComplete.options.first.setActiveStyles();
             this.previousLabMatOption = this.autoLabComplete.options.first;
         }
-    }
-
-    displayLab(lab) {
-        return lab ? lab.name : lab;
     }
 
     selectLabOption(event) {

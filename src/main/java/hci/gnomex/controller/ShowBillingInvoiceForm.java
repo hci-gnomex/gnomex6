@@ -192,7 +192,7 @@ public Command execute() throws RollBackCommandException {
 					labs = null;
 					billingAccounts = null;
 
-					title = "Billing Invoice - " + lab.getName(false, true) + " " + billingAccount.getAccountName();
+					title = "Billing Invoice - " + Util.getLabDisplayName(lab, this.userPreferences) + " " + billingAccount.getAccountName();
 					fileName = "gnomex_billing_invoice";
 
 					billingItemMap = new TreeMap[1];
@@ -267,7 +267,7 @@ public static File makePDFBillingInvoice(Session sess, String serverName, Billin
 	doc.open();
 
 	doc.addCreationDate();
-	doc.addTitle("Billing Invoice - " + lab.getName(false, true) + " " + billingAccount.getAccountName());
+	doc.addTitle("Billing Invoice - " + Util.getLabDisplayName(lab, userPreferences) + " " + billingAccount.getAccountName());
 
 	BillingPDFFormatter formatter = new BillingPDFFormatter(sess, billingPeriod, coreFacility, multipleLabs, lab, labs,
 			billingAccount, billingAccounts, PropertyDictionaryHelper.getInstance(sess).getCoreFacilityProperty(

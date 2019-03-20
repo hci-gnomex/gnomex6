@@ -1,6 +1,8 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.UserPreferences;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.utilities.Annotations;
@@ -141,7 +143,7 @@ public class GetLabList extends GNomExCommand implements Serializable {
                             || activeLabMap.containsKey(lab.getIdLab())
                             || labsToSubmitOnBehalfOf.containsKey(lab.getIdLab())
                             || collaboratingLabs.containsKey(lab.getIdLab())) {
-                        processLab(doc, lab);
+                        processLab(doc, lab, this.getUserPreferences());
                     }
 
                 }
@@ -199,13 +201,13 @@ public class GetLabList extends GNomExCommand implements Serializable {
 
     }
 
-    private void processLab(Document doc, Lab lab) throws XMLReflectException {
+    private void processLab(Document doc, Lab lab, UserPreferences userPreferences) throws XMLReflectException {
         addExclusions(lab);
 
         Element labNode = lab.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL, null, Annotations.IGNORE).getRootElement();
         Integer defaultId = lab.getDefaultIdInstitutionForLab();
         labNode.setAttribute("defaultIdInstitutionForLab", defaultId == null ? "" : defaultId.toString());
-        labNode.setAttribute("display", lab.getNameFirstLast());
+        labNode.setAttribute("display", Util.getLabDisplayName(lab, userPreferences));
 
         Element institutionsNode = new Element("institutions");
         for(Object objInst : lab.getInstitutions()) {

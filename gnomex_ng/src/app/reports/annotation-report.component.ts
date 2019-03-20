@@ -5,6 +5,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {jqxComboBoxComponent} from "../../assets/jqwidgets-ts/angular_jqxcombobox";
 import {DictionaryService} from "../services/dictionary.service";
 import {AnnotationService} from "../services/annotation.service";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'annotation-report',
@@ -41,6 +42,7 @@ export class AnnotationReportComponent {
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
                 private annotationService: AnnotationService,
+                public prefService: UserPreferencesService,
                 @Inject(DOCUMENT) private document: Document) {
 
         this.coreList = this.createSecurityAdvisorService.myCoreFacilities;

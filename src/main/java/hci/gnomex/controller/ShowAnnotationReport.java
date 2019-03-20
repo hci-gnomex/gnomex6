@@ -278,7 +278,7 @@ public class ShowAnnotationReport extends ReportCommand implements Serializable 
               Organism organism = (Organism)row[DataTrackQuery.COL_ORGANISM];
               GenomeBuild genomeBuild = (GenomeBuild)row[DataTrackQuery.COL_GENOME_BUILD];
 
-              String labName = dataTrack.getLab() != null ? dataTrack.getLab().getName(false, true) : "";
+              String labName = dataTrack.getLab() != null ? Util.getLabDisplayName(dataTrack.getLab(), this.secAdvisor.getUserPreferences()) : "";
               String ownerName = dataTrack.getAppUser() != null ? Util.getAppUserDisplayName(dataTrack.getAppUser(), secAdvisor.getUserPreferences()) : "";
 
 

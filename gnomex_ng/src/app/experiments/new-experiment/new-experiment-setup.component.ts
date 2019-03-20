@@ -17,6 +17,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {WorkAuthorizationTypeSelectorDialogComponent} from "../../products/work-authorization-type-selector-dialog.component";
 
 import {Experiment} from "../../util/models/experiment.model";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 @Component({
     selector: "new-experiment-setup",
@@ -295,7 +296,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 private formBuilder: FormBuilder,
                 private getLabService: GetLabService,
                 private gnomexService: GnomexService,
-                private newExperimentService: NewExperimentService) {
+                private newExperimentService: NewExperimentService,
+                public prefService: UserPreferencesService) {
 
         this.form = this.formBuilder.group({
             selectedCategory: ['', Validators.required],
@@ -430,11 +432,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
         this.workAuthInstructions = this.gnomexService.getProperty(this.gnomexService.PROPERTY_WORKAUTH_INSTRUCTIONS);
         this.accessAuthorizedBillingAccountInstructions = this.gnomexService.getProperty(this.gnomexService.PROPERTY_AUTH_ACCOUNTS_DESCRIPTION);
 
-    }
-
-
-    public displayLab(lab: any) {
-        return lab ? lab.name : lab;
     }
 
     public selectDefaultUserProject(): void {

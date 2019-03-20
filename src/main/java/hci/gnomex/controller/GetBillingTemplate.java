@@ -65,7 +65,7 @@ public class GetBillingTemplate extends GNomExCommand implements Serializable {
 				//BillingTemplate billingTemplate = queryManager.retrieveBillingTemplate(sess);
 				BillingTemplate billingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, targetClassIdentifier, QueryManager.convertToFullTargetClassName(targetClassName));
 
-				Element billingTemplateNode = billingTemplate.toXML(sess, null);
+				Element billingTemplateNode = billingTemplate.toXML(sess, null, this.getUserPreferences());
 
 				XMLOutputter out = new org.jdom.output.XMLOutputter();
 				this.xmlResult = out.outputString(new Document(billingTemplateNode));

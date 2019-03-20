@@ -4,7 +4,7 @@
         <div>
             <label style="width: 10em">Group</label>
             <jqxComboBox #labCombo class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
-                         [source]="_labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                         [source]="_labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
                          (onSelect)="onLabSelect($event)" formControlName="selectedLab">
             </jqxComboBox>
         </div>

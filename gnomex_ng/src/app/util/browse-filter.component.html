@@ -41,7 +41,7 @@
         <div class="inlineDiv children-spaced" *ngIf="showLabComboBox && (mode === 'billingBrowse' ? !(idCoreFacilityString === '') : true)">
             <label class="leading-label">Group</label>
             <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
-                         [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                         [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
                          (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
             </jqxComboBox>
             <div class="inlineDiv" *ngIf="showOwnerComboBox && !(idLabString === '')">
@@ -128,7 +128,7 @@
         <div class="inlineDiv" *ngIf="showLabMultiSelectComboBox">
             <label class="leading-label">Group(s)</label>
             <jqxComboBox class="inlineComboBox" [width]="220" [multiSelect]="true"
-                         [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                         [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
                          (onSelect)="onMultiLabSelect($event)" (onUnselect)="onMultiLabUnselect($event)">
             </jqxComboBox>
         </div>

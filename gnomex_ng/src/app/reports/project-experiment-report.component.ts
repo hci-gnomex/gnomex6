@@ -2,6 +2,7 @@ import {Component, Inject} from "@angular/core";
 import {LabListService} from "../services/lab-list.service";
 import {DOCUMENT} from "@angular/common";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'project-experiment-report',
@@ -23,6 +24,7 @@ export class ProjectExperimentReportComponent {
 
     constructor(private labListService: LabListService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                public prefService: UserPreferencesService,
                 @Inject(DOCUMENT) private document: Document) {
         this.coreList = this.createSecurityAdvisorService.myCoreFacilities;
         this._isAdmin = this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin;

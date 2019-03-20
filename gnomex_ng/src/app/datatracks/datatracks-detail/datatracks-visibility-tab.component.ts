@@ -158,10 +158,6 @@
 
             }
 
-            displayLab(lab: any) {
-                return lab ? lab.name : lab;
-            }
-
             selectOption($event){
                 let value = $event.source.value;
                 this.visibilityForm.get("lab").setValue($event.source.value);

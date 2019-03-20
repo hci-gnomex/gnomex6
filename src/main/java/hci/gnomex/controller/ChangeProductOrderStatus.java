@@ -86,7 +86,7 @@ public class ChangeProductOrderStatus extends GNomExCommand implements Serializa
 
                         sess.refresh(po);
                         if (codeProductOrderStatus.equals(ProductOrderStatus.COMPLETED)) {
-                            SaveProductOrder.sendConfirmationEmail(sess, po, ProductOrderStatus.COMPLETED, serverName);
+                            SaveProductOrder.sendConfirmationEmail(sess, po, ProductOrderStatus.COMPLETED, serverName, this.getUserPreferences());
                         }
                     }
                 }
@@ -114,7 +114,7 @@ public class ChangeProductOrderStatus extends GNomExCommand implements Serializa
                         }
 
                         if (allItemsComplete) {
-                            SaveProductOrder.sendConfirmationEmail(sess, po, ProductOrderStatus.COMPLETED, serverName);
+                            SaveProductOrder.sendConfirmationEmail(sess, po, ProductOrderStatus.COMPLETED, serverName, this.getUserPreferences());
                         }
                     }
                 }

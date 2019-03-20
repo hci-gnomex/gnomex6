@@ -4,12 +4,7 @@ import hci.framework.security.UnknownPermissionException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.BillingItemQueryManager;
-import hci.gnomex.utility.BillingTemplateQueryManager;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.Order;
-import hci.gnomex.utility.ProductException;
-import hci.gnomex.utility.ProductUtil;
+import hci.gnomex.utility.*;
 import hci.hibernate5utils.HibernateDetailObject;
 
 import java.sql.Date;
@@ -1082,7 +1077,7 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
 
     String labName = "";
     if(this.getLab() != null) {
-      labName = Lab.formatLabName(this.getLab().getLastName(), this.getLab().getFirstName());
+      labName = Util.getLabDisplayName(this.getLab(), secAdvisor.getUserPreferences());
     }
 
     String projectName = "";

@@ -363,7 +363,7 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
 
             String labLastName = (String)row[WorkItemFilter.CLSTR_LAB_LAST_NAME];
             String labFirstName = (String)row[WorkItemFilter.CLSTR_LAB_FIRST_NAME];
-            labName = Lab.formatLabNameFirstLast(labFirstName, labLastName);
+            labName = Util.formatLabDisplayName(labFirstName, labLastName, this.getUserPreferences());
             String multiplexGroupNumber = row[WorkItemFilter.CLSTR_MULTIPLEX_GROUP_NUM] != null ? ((Integer)row[WorkItemFilter.CLSTR_MULTIPLEX_GROUP_NUM]).toString() : "-1";
 
             clusterGenKey = requestNumber + DELIM + codeRequestCategory + DELIM + labName + DELIM + idRequest + DELIM + multiplexGroupNumber;

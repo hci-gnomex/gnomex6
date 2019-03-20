@@ -137,7 +137,7 @@ public class SendBillingInvoiceEmail extends GNomExCommand implements Serializab
         BillingInvoiceEmailFormatter emailFormatter = new BillingInvoiceEmailFormatter(sess, coreFacility, billingPeriod,
                 lab, billingAccount, invoice, billingItemMap, relatedBillingItemMap, requestMap);
         String subject = emailFormatter.getSubject();
-        String body = emailFormatter.format();
+        String body = emailFormatter.format(this.getUserPreferences());
 
         String note;
         String ccList = emailFormatter.getCCList(sess);
@@ -192,12 +192,12 @@ public class SendBillingInvoiceEmail extends GNomExCommand implements Serializab
                 note = "Unable to email invoice to " + emailRecipients + " due to the following error: " + e.toString();
             }
         } else {
-            note = "Unable to email billing invoice. Billing contact email is blank for " + lab.getName(false, true);
+            note = "Unable to email billing invoice. Billing contact email is blank for " + Util.getLabDisplayName(lab, this.getUserPreferences());
         }
 
         this.jsonResult = Json.createObjectBuilder()
                 .add("note", note)
-                .add("title", "Email Billing Invoice - " + lab.getName(false, true) + " " + billingAccount.getAccountName())
+                .add("title", "Email Billing Invoice - " + Util.getLabDisplayName(lab, this.getUserPreferences()) + " " + billingAccount.getAccountName())
                 .build().toString();
     }
 

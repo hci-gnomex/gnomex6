@@ -6,7 +6,7 @@
                 <mat-form-field class="reduced-font">
                     <mat-select placeholder="Lab" [formControlName]="'lab'">
                         <mat-option>None</mat-option>
-                        <mat-option *ngFor="let lab of this.filterLabList" [value]="lab.idLab">{{lab.name}}</mat-option>
+                        <mat-option *ngFor="let lab of this.filterLabList" [value]="lab.idLab">{{lab[this.prefService.labDisplayField]}}</mat-option>
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field class="reduced-font">

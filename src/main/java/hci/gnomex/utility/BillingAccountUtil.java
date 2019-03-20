@@ -26,7 +26,7 @@ public class BillingAccountUtil {
 
 	    StringBuffer submitterNote = new StringBuffer();
 	    StringBuffer body = new StringBuffer();
-	    String submitterSubject = "GNomEx Billing Account '" + billingAccount.getAccountName() + "' for " + lab.getName(false, true) + " approved";    
+	    String submitterSubject = "GNomEx Billing Account '" + billingAccount.getAccountName() + "' for " + Util.getLabDisplayName(lab, userPreferences) + " approved";
 
 	    String submitterEmail = billingAccount.getSubmitterEmail();
 

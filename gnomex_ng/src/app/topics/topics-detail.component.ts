@@ -174,10 +174,6 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
     }
 
-    displayLab(lab: any) {
-        return lab ? lab.name : lab;
-    }
-
     filterLabList(selectedLab: any) {
 
         let fLabs: any[];

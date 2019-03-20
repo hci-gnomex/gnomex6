@@ -8,7 +8,7 @@
                         [disabled]="!edit"
                         (selectionChange)="selectLab($event)">
                 <mat-option *ngFor="let lab of labList" [value]="lab">
-                    {{ lab.name }}
+                    {{ lab[this.prefService.labDisplayField] }}
                 </mat-option>
             </mat-select>
         </mat-form-field>
