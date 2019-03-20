@@ -41,6 +41,9 @@ import {DialogsService} from "../util/popup/dialogs.service";
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
+        .no-padding-dialog {
+            padding: 0;
+        }
     `]
 })
 
@@ -129,9 +132,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             this.buildTree(response);
             if (this.createAnalysisDialogRef != undefined && this.createAnalysisDialogRef.componentInstance != undefined) {
-                if (this.createAnalysisDialogRef.componentInstance.showSpinner) {
-                    this.createAnalysisDialogRef.componentInstance.showSpinner = false;
-                }
+                this.dialogsService.stopAllSpinnerDialogs();
                 this.newAnalysisName = this.createAnalysisDialogRef.componentInstance.newAnalysisName;
                 this.createAnalysisDialogRef.close();
             }
@@ -425,6 +426,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 selectedLabLabel:   this.selectedLabLabel,
                 selectedItem:       this.selectedItem
             };
+            configuration.panelClass = 'no-padding-dialog';
 
             this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
         }

@@ -32,8 +32,8 @@ import {UploadFileComponent} from "./upload-file.component";
             </div>
             <div mat-dialog-content class="full-height" style="margin: 0; padding: 0;">
                 <div style="padding:0.5em;" class="full-height full-width flex-container-col">
-                    <mat-tab-group [(selectedIndex)]="this.selectedTabIndex" 
-                                   (selectedTabChange)="tabChanged($event)" 
+                    <mat-tab-group [(selectedIndex)]="this.selectedTabIndex"
+                                   (selectedTabChange)="tabChanged($event)"
                                    class="mat-tab-group-border full-height full-width">
                         <mat-tab class="full-height" label="Upload">
                             <upload-file (navToTab)="tabNavigateTo($event)" [manageData]="this.manageData"> </upload-file>
@@ -107,9 +107,7 @@ export class ManageFilesDialogComponent implements OnInit{
         let uploadURL = '';
         let idObj:any = null;
         let p = this.propertyService.getProperty(PropertyService.PROPERTY_EXPERIMENT_FILE_SAMPLE_LINKING_ENABLED);
-        if(p.propertyValue && p.propertyValue === 'Y'){
-            this.showLinkedSampleTab = true;
-        }
+
 
 
         if(this.data){
@@ -137,6 +135,13 @@ export class ManageFilesDialogComponent implements OnInit{
                 isFDT: this.data.isFDT
             });
         }
+        if(p.propertyValue && p.propertyValue === 'Y' && this.manageData.type === 'e'){
+            this.showLinkedSampleTab = true;
+        }else{
+            this.showLinkedSampleTab = false;
+        }
+
+
         this.saveSubscription =  this.fileService.saveManageFilesObservable().subscribe( () =>{
             this.dialogService.startDefaultSpinnerDialog();
             this.save()
@@ -146,20 +151,23 @@ export class ManageFilesDialogComponent implements OnInit{
     ngAfterViewInit(){ // hack for setting split size and enabling trees
         setTimeout(()=>{
             if(this.selectedTabIndex > 0){
-                this.orgFileTab.prepareView();
+                this.orgFileTab.prepareView(true);
             }
         });
 
     }
 
     tabChanged(event:MatTabChangeEvent){
-        if(event.tab.textLabel === "Link Samples"){
-            this.linkedSampleTab.prepareView();
-        }else if(event.tab.textLabel === "Organize Files"){
-            this.orgFileTab.prepareView();
-        }else if(event.tab.textLabel === "Upload"){
+        if(this.showLinkedSampleTab){
+            let activeLink:boolean = event.tab.textLabel === "Link Samples";
+            this.linkedSampleTab.prepareView(activeLink);
+        }
+        if(event.tab.textLabel === "Upload"){
             this.uploadFileTab.sizeGridColumns();
         }
+        let activeOrganize:boolean = event.tab.textLabel === "Organize Files";
+        this.orgFileTab.prepareView(activeOrganize);
+
     }
     tabNavigateTo(index){
         this.selectedTabIndex = index;

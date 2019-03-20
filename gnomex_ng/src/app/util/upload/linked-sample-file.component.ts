@@ -54,7 +54,6 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
     public expFileSelectedNodes: ITreeNode[] = [];
     public sampleFileSelectedNode: RowNode;
     public formGroup: FormGroup;
-    public orgExperimentFileParams: any;
     public linkedSampleRowData: any[] = [];
     public getNodeChildDetails: any;
     private idCounter: number;
@@ -197,7 +196,6 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
                 this.prepSampleGridData(this.linkedSampleRowData);
                 this.experimentFiles = resp[1];
                 this.prepExpFilesTreeData(this.experimentFiles);
-
                 this.formGroup.get("linkedSampleFiles" ).setValue(this.linkedSampleRowData);
                 this.formGroup.get("addedLinkedSampleFiles").setValue([]);
                 this.formGroup.get("unlinkedSampleFiles").setValue([]);
@@ -218,9 +216,9 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
 
     }
 
-    public prepareView() {
+    public prepareView(showTree:boolean) {
         this.expTreeSplitSize = 30;
-        this.showTree = true;
+        this.showTree = showTree;
     }
 
 
@@ -652,17 +650,6 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
 
 
 
-    refresh(){
-        if(this.data.type === 'e'){
-            this.dialogService.startDefaultSpinnerDialog();
-            this.fileService.emitGetRequestOrganizeFiles(this.orgExperimentFileParams);
-        }
-        this.formGroup.markAsPristine();
-
-    }
-
-
-
     requestToCloseDialog(){
         this.closeDialog.emit();
     }
@@ -720,7 +707,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
         this.fileService.emitSaveManageFiles();
     }
 
-    save(){
+    save(){ // save is called by manage-files-dialog
 
         let addedFiles =  this.formGroup.get("addedLinkedSampleFiles").value;
         let linkSamp = this.formGroup.get("linkedSampleFiles").value;
@@ -731,8 +718,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
             "filesToUnlinkJSONString" : JSON.stringify(unlinkSamp)
         };
         this.formGroup.get("linkedSampleParams").setValue(params);
-        this.showTree = false;
-
+        this.experimentFiles = [];
     }
 
 
