@@ -7,6 +7,7 @@ import { URLSearchParams } from "@angular/http";
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {ExperimentsService} from "./experiments.service";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'create-project-dialog',
@@ -41,7 +42,8 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
 
     constructor(private dialogRef: MatDialogRef<CreateProjectComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private experimentsService: ExperimentsService,
-                private formBuilder: FormBuilder
+                private formBuilder: FormBuilder,
+                public prefService: UserPreferencesService,
     ) {
         this.labListString = data.labListString;
         this.labList = data.labList;

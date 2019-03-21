@@ -1015,19 +1015,18 @@ public class GetUsageData extends GNomExCommand implements Serializable {
    * is not a part of (member, manager, or collaborator).
    */
   private String getLabName(Lab lab) {
-    String labName = "";
+    String labName = Util.getLabDisplayName(lab, this.getUserPreferences());
     if (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT)) {
-      labName = lab.getName(false, true);
+      return labName;
     } else if (usageUserVisibility.equals(PropertyDictionary.OPTION_USER_USER_VISIBILITY_MASKED)) {
       if (this.getSecAdvisor().isGroupIAmMemberOf(lab.getIdLab()) || this.getSecAdvisor().isGroupICollaborateWith(lab.getIdLab())) {
-        labName = lab.getName(false, true);
+        return labName;
       } else {
-        labName = "-";
+        return "-";
       }
     } else {
-      labName = lab.getName(false, true);
+      return labName;
     }
-    return labName;
   }
 
   private int daysBetween(Calendar startDate, Calendar endDate) {

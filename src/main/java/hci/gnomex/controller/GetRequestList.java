@@ -135,7 +135,7 @@ public Command execute() throws RollBackCommandException {
 			// Integer numberOfHybs = (Integer) row[20];
 
 			String requestStatus = dh.getRequestStatus(codeRequestStatus);
-			String labName = Lab.formatLabNameFirstLast(labFirstName, labLastName);
+			String labName = Util.formatLabDisplayName(labFirstName, labLastName, this.getUserPreferences());
 			String ownerName = AppUser.formatName(submitterLastName, submitterFirstName);
 			// RequestCategory requestCategory = dh.getRequestCategoryObject(codeRequestCategory);
 

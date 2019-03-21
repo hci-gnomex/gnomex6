@@ -20,6 +20,7 @@ import {
 } from "@angular/material";
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 @Component({
 	selector: "new-billing-account-launcher",
@@ -29,7 +30,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 export class NewBillingAccountLauncher {
 
 	constructor(private dialog: MatDialog, private router: Router,
-				public createSecurityAdvisorService: CreateSecurityAdvisorService) {
+				public createSecurityAdvisorService: CreateSecurityAdvisorService,
+				public prefService: UserPreferencesService) {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = '60em';
         config.panelClass = 'no-padding-dialog';
@@ -360,6 +362,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 				private labListService: LabListService,
 				private newBillingAccountService: NewBillingAccountService,
 				private propertyService: PropertyService,
+				public prefService: UserPreferencesService,
 				@Inject(MAT_DIALOG_DATA) private data) { }
 
 	ngOnInit(): void {

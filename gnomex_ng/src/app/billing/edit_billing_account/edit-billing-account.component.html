@@ -15,7 +15,7 @@
 							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" disabled>
 								<mat-option>--</mat-option>
 								<mat-option *ngFor="let lab of labList" [value]="lab">
-									{{ lab.name }}
+									{{ lab[this.prefService.labDisplayField] }}
 								</mat-option>
 							</mat-select>
 						</mat-form-field>

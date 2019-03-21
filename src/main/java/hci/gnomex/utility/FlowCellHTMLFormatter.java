@@ -80,7 +80,7 @@ public class FlowCellHTMLFormatter extends DetailObject {
 		return table;
 	}
 
-	public Element makeFlowCellChannelTable(Set channels) throws Exception {
+	public Element makeFlowCellChannelTable(Set channels, UserPreferences userPreferences) throws Exception {
 		Element table = new Element("TABLE");
 		table.setAttribute("CLASS", "grid");
 		table.setAttribute("CELLPADDING", "0");
@@ -140,7 +140,7 @@ public class FlowCellHTMLFormatter extends DetailObject {
 					String requester = "&nbsp;";
 					Request request = (Request) sess.get(Request.class, lane.getIdRequest());
 					if (request.getAppUser() != null) {
-						requester = request.getAppUser().getDisplayName();
+						requester = Util.getAppUserDisplayName(request.getAppUser(), userPreferences);
 					}
 
 					this.addCell(row, requester);
@@ -164,7 +164,7 @@ public class FlowCellHTMLFormatter extends DetailObject {
 		return table;
 	}
 
-	public Element makeFlowCellPrepChannelTable(Set channels) throws Exception {
+	public Element makeFlowCellPrepChannelTable(Set channels, UserPreferences userPreferences) throws Exception {
 		Element table = new Element("TABLE");
 		table.setAttribute("CLASS", "grid");
 		table.setAttribute("CELLPADDING", "0");
@@ -222,7 +222,7 @@ public class FlowCellHTMLFormatter extends DetailObject {
 					String requester = "&nbsp;";
 					if (lane != null) {
 						Request request = (Request) sess.get(Request.class, lane.getIdRequest());
-						requester = request.getAppUser() != null ? request.getAppUser().getDisplayName() : "&nbsp;";
+						requester = request.getAppUser() != null ? Util.getAppUserDisplayName(request.getAppUser(), userPreferences) : "&nbsp;";
 					}
 
 					this.addCell(row, requester);

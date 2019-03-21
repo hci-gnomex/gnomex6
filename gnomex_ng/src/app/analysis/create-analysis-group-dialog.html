@@ -3,7 +3,7 @@
     <mat-dialog-content>
         <div>
             <jqxComboBox class="inlineComboBox" [width]="170" [height]="20"
-                         [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                         [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
                          (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
             </jqxComboBox>
         </div>

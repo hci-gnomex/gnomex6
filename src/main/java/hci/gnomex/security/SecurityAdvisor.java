@@ -36,12 +36,7 @@ import hci.gnomex.model.SlideProduct;
 import hci.gnomex.model.Topic;
 import hci.gnomex.model.UserPermissionKind;
 import hci.gnomex.model.Visibility;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.LabComparator;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.Util;
+import hci.gnomex.utility.*;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -112,6 +107,7 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
 
     // Session info
     private AppUser appUser;
+    private UserPreferences userPreferences;
     private boolean isGuest = false;
     private boolean isGNomExUniversityUser = false;
     private boolean isGNomExExternalUser = false;
@@ -2622,6 +2618,14 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
 
     public void setAppUser(AppUser appUser) {
         this.appUser = appUser;
+    }
+
+    public UserPreferences getUserPreferences() {
+        return this.userPreferences;
+    }
+
+    public void setUserPreferences(UserPreferences userPreferences) {
+        this.userPreferences = userPreferences != null ? userPreferences : new UserPreferences();
     }
 
     public boolean buildSpannedSecurityCriteria(StringBuffer queryBuf, String inheritedClassShortName,

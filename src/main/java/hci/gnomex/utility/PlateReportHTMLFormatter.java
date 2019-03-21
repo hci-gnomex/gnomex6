@@ -41,7 +41,7 @@ public class PlateReportHTMLFormatter {
       String create = ir.getCreator();
       if ( create != null && !create.equals( "" ) ) {
         AppUser user = (AppUser)sess.get(AppUser.class, Integer.valueOf(create));
-        creator = user != null ? user.getDisplayName() : create;
+        creator = user != null ? Util.getAppUserDisplayName(user, secAdvisor.getUserPreferences()) : create;
       } else {
         creator = create;
       }

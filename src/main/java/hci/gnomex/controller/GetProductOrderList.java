@@ -77,7 +77,7 @@ public class GetProductOrderList extends GNomExCommand implements Serializable {
 
 
         Element lab = new Element("Lab");
-        lab.setAttribute("display", l.getName(false, true));
+        lab.setAttribute("display", Util.getLabDisplayName(l, this.getUserPreferences()));
         lab.setAttribute("idLab", idLab.toString());
 
         lab.setAttribute("icon", "assets/group.png");

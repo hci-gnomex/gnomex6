@@ -104,7 +104,7 @@ public class BillingInvoiceHTMLFormatter  extends DetailObject {
   }
 
 
-  public Element makeHeader(Session sess) {
+  public Element makeHeader(Session sess, UserPreferences userPreferences) {
     Element table = new Element("TABLE");    
     table.setAttribute("CELLPADDING", "0");    
     if(billingAccount.getIdCoreFacility().intValue() == CoreFacility.CORE_FACILITY_DNA_SEQ_ID.intValue() && billingAccount.getIsPO().equals("N") && billingAccount.getIsCreditCard().equals("N")){    
@@ -149,7 +149,7 @@ public class BillingInvoiceHTMLFormatter  extends DetailObject {
       table.addContent(new Element("TR"));// add line break before billing address
       table.addContent(new Element("TR"));
       table.addContent(new Element("TR"));
-      table.addContent(makeRow(lab.getName(false, true)));
+      table.addContent(makeRow(Util.getLabDisplayName(lab, userPreferences)));
       if(lab.getContactName() != null && !lab.getContactName().equals(""))
         table.addContent(makeRow("ATTN: " + lab.getContactName()));
       if(lab.getContactAddress2() != null && !lab.getContactAddress2().equals(""))
@@ -177,7 +177,7 @@ public class BillingInvoiceHTMLFormatter  extends DetailObject {
       table.addContent(makeRow(billingAccount.getAccountName()));
     } 
     else{
-      table.addContent(makeRow(lab.getName(false, true)));
+      table.addContent(makeRow(Util.getLabDisplayName(lab, userPreferences)));
       table.addContent(makeRow(formatAccountNumber(billingAccount.getAccountNumber(), billingAccount.getAccountName())));
       table.addContent(new Element("TR"));// add line break before billing address
       table.addContent(new Element("TR"));

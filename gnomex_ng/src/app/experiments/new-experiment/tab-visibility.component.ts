@@ -13,6 +13,7 @@ import {first} from "rxjs/operators";
 import {Subscription} from "rxjs/index";
 
 import {Experiment} from "../../util/models/experiment.model";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 @Component({
     selector: 'tab-visibility',
@@ -145,7 +146,7 @@ export class TabVisibilityComponent implements OnDestroy{
     public columnDefs = [
         {
             headerName: "Collaborator",
-            field: "displayName",
+            field: this.prefService.userDisplayField,
             width: 200,
             editable:false
         },
@@ -184,13 +185,14 @@ export class TabVisibilityComponent implements OnDestroy{
         let temp: any[] = [];
 
         for (let item of this.memCollaborators) {
-            temp.push({
+            let tempItem: any = {
                 idAppUser: item.idAppUser,
-                displayName: item.displayName,
                 canUploadData: 'N',
                 canUpdate: 'N',
                 canView_frontEndOnly: 'N'
-            });
+            };
+            tempItem[this.prefService.userDisplayField] = item[this.prefService.userDisplayField];
+            temp.push(tempItem);
         }
 
         return temp;
@@ -200,13 +202,14 @@ export class TabVisibilityComponent implements OnDestroy{
         let temp: any[] = [];
 
         for (let item of this.possibleCollaborators) {
-            temp.push({
+            let tempItem: any = {
                 idAppUser: item.idAppUser,
-                displayName: item.displayName,
                 canUploadData: 'N',
                 canUpdate: 'N',
                 canView_frontEndOnly: 'N'
-            });
+            };
+            tempItem[this.prefService.userDisplayField] = item[this.prefService.userDisplayField];
+            temp.push(tempItem);
         }
 
         return temp;
@@ -258,7 +261,8 @@ export class TabVisibilityComponent implements OnDestroy{
                 private propertyService: PropertyService,
                 public constService: ConstantsService,
                 private gnomexService:GnomexService,
-                private getLabService : GetLabService) {
+                private getLabService : GetLabService,
+                public prefService: UserPreferencesService) {
 
         this.visRadio = [
             {display:'Owner',value:'OWNER', icon: this.constService.ICON_TOPIC_OWNER, tooltip:'Visible to the submitter and the lab PI'},
@@ -305,7 +309,7 @@ export class TabVisibilityComponent implements OnDestroy{
                 break;
             }
 
-            collab.displayName = refCollab.displayName;
+            collab[this.prefService.userDisplayField] = refCollab[this.prefService.userDisplayField];
         }
 
         return currentCollabs;

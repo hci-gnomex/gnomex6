@@ -6,6 +6,7 @@ import {GetLabService} from "../services/get-lab.service";
 import {BillingPeriod} from "../util/billing-period-selector.component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {BillingService} from "../services/billing.service";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'billing-filter',
@@ -52,7 +53,8 @@ export class BillingFilterComponent implements OnInit {
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private labListService: LabListService,
                 private getLabService: GetLabService,
-                private billingService: BillingService) {
+                private billingService: BillingService,
+                public prefService: UserPreferencesService) {
         this.form = fb.group({
             idCoreFacility: '',
             idBillingPeriod: '',

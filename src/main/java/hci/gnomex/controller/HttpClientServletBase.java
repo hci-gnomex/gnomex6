@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import hci.gnomex.utility.UserPreferences;
 import org.hibernate.Session;
 
 public abstract class HttpClientServletBase extends HttpServlet {
@@ -52,6 +53,9 @@ protected void doGet(HttpServletRequest req1, HttpServletResponse res) throws Se
 			secAdvisor = SecurityAdvisor.create(sess, username);
 		}
 
+		// Get user preferences
+		UserPreferences userPreferences = (UserPreferences) req.getSession().getAttribute(UserPreferences.USER_PREFERENCES_SESSION_KEY);
+
 		HttpSession session = req.getSession(true);
 
 		// Load dictionaries if necessary
@@ -65,6 +69,7 @@ protected void doGet(HttpServletRequest req1, HttpServletResponse res) throws Se
 		// Execute the command
 		GNomExCommand cmd = getCommand();
 		cmd.setSecurityAdvisor(secAdvisor);
+		cmd.setUserPreferences(userPreferences);
 		cmd.loadCommand(req, session);
 		cmd.execute();
 		cmd.setRequestState(req);

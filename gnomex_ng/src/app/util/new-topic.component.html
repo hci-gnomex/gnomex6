@@ -8,14 +8,14 @@
     <div class="dialogDiv">
         <label>Group</label>
         <jqxComboBox class="dialogComboBox" [width]="'100%'" [height]="30" [placeHolder]="'...'"
-                     [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                     [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
                      (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
         </jqxComboBox>
     </div>
     <div class="dialogDiv">
         <label>Owner</label>
         <jqxComboBox class="dialogComboBox" [width]="'100%'" [height]="30" [placeHolder]="'...'"
-                     [source]="ownerList" [displayMember]="'displayName'" [valueMember]="'idAppUser'"
+                     [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
                      (onSelect)="onOwnerSelect($event)" (onUnselect)="onOwnerUnselect()">
         </jqxComboBox>
     </div>

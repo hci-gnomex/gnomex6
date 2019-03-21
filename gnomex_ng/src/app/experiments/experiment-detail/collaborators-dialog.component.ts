@@ -6,6 +6,7 @@ import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {RemoveLinkButtonRenderer} from "../../util/grid-renderers/remove-link-button.renderer";
 import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
 import {GnomexService} from "../../services/gnomex.service";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 @Component({
     selector: 'collaborators-dialog',
@@ -50,7 +51,7 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
         return [
             {
                 headerName: "Collaborator",
-                field: "displayName",
+                field: this.prefService.userDisplayField,
                 width: 200,
                 editable:false
             },
@@ -91,6 +92,7 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
     constructor(public constantsService: ConstantsService,
                 private dialogRef: MatDialogRef<CollaboratorsDialogComponent>,
                 private gnomexService: GnomexService,
+                public prefService: UserPreferencesService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         if (!this.data || !this.data.possibleCollaborators || !this.data.idFieldValue || !this.data.idField || !Array.isArray(this.data.possibleCollaborators)) {
             this.dialogRef.close();
@@ -107,10 +109,10 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
             let deepCopy: any = {
                 canUpdate:     '' + collaborator.canUpdate,
                 canUploadData: '' + collaborator.canUploadData,
-                displayName:   '' + collaborator.displayName,
                 idAppUser:     '' + collaborator.idAppUser,
                 buttonName:    'Remove'
             };
+            deepCopy[this.prefService.userDisplayField] = '' + collaborator[this.prefService.userDisplayField];
             deepCopy[this.idField] = '' + collaborator[this.idField];
 
             this.currentCollaborators.push(deepCopy);
@@ -158,10 +160,10 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
             let newEntry: any = {
                 canUpdate: "N",
                 canUploadData: "N",
-                displayName: this.collaboratorToAdd.displayName,
                 idAppUser: this.collaboratorToAdd.idAppUser,
                 buttonName: 'Remove'
             };
+            newEntry[this.prefService.userDisplayField] = this.collaboratorToAdd[this.prefService.userDisplayField];
             newEntry[this.idField] = this.idFieldValue;
 
             this.currentCollaborators.push(newEntry);
@@ -209,10 +211,10 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
             let deepCopy: any = {
                 canUpdate:     '' + collaborator.canUpdate,
                 canUploadData: '' + collaborator.canUploadData,
-                displayName:   '' + collaborator.displayName,
                 idAppUser:     '' + collaborator.idAppUser,
                 buttonName:    'Remove'
             };
+            deepCopy[this.prefService.userDisplayField] = '' + collaborator[this.prefService.userDisplayField];
             deepCopy[this.idField] = '' + collaborator[this.idField];
 
             returnedCollaborators.push(deepCopy);
@@ -231,7 +233,7 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
                 break;
             }
 
-            collab.displayName = refCollab.displayName;
+            collab[this.prefService.userDisplayField] = refCollab[this.prefService.userDisplayField];
         }
 
         return currentCollabs;

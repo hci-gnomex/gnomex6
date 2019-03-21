@@ -1,6 +1,7 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
+import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.BillingItem;
@@ -14,9 +15,6 @@ import hci.gnomex.model.ProductOrder;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Request;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.BillingPDFFormatter;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.report.constants.ReportFormats;
 import hci.report.model.ReportTray;
 import hci.report.utility.ReportCommand;
@@ -54,6 +52,8 @@ public static final String PRODUCT_ORDER_NUMBER_PREFIX = "ZZZZProductOrder"; // 
 private static Logger LOG = Logger.getLogger(ShowBillingInvoiceForm.class);
 
 public String SUCCESS_JSP = "/form_pdf.jsp";
+
+private UserPreferences userPreferences;
 
 private Integer idLab;
 private Integer idBillingAccount;
@@ -127,6 +127,7 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 	}
 
 	secAdvisor = (SecurityAdvisor) session.getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
+	userPreferences = (UserPreferences) session.getAttribute(UserPreferences.USER_PREFERENCES_SESSION_KEY);
 }
 
 @Override
@@ -191,7 +192,7 @@ public Command execute() throws RollBackCommandException {
 					labs = null;
 					billingAccounts = null;
 
-					title = "Billing Invoice - " + lab.getName(false, true) + " " + billingAccount.getAccountName();
+					title = "Billing Invoice - " + Util.getLabDisplayName(lab, this.userPreferences) + " " + billingAccount.getAccountName();
 					fileName = "gnomex_billing_invoice";
 
 					billingItemMap = new TreeMap[1];
@@ -225,7 +226,7 @@ public Command execute() throws RollBackCommandException {
 						coreFacility.getContactName(), coreFacility.getContactPhone(), billingItemMap,
 						relatedBillingItemMap, requestMap);
 
-				ArrayList<Element> content = formatter.makeContent();
+				ArrayList<Element> content = formatter.makeContent(this.userPreferences);
 				for (Element e : content) {
 					rows.add(e);
 				}
@@ -253,7 +254,7 @@ public Command execute() throws RollBackCommandException {
 public static File makePDFBillingInvoice(Session sess, String serverName, BillingPeriod billingPeriod,
 		CoreFacility coreFacility, boolean multipleLabs, Lab lab, Lab[] labs, BillingAccount billingAccount,
 		BillingAccount[] billingAccounts, String contactAddressCoreFacility, String contactRemitAddressCoreFacility,
-		Map[] billingItemMap, Map[] relatedBillingItemMap, Map[] requestMap) throws Exception {
+		Map[] billingItemMap, Map[] relatedBillingItemMap, Map[] requestMap, UserPreferences userPreferences) throws Exception {
 	PropertyDictionaryHelper pdh = PropertyDictionaryHelper.getInstance(sess);
 
 	String filename = "gnomex_billing_invoice.pdf";
@@ -266,7 +267,7 @@ public static File makePDFBillingInvoice(Session sess, String serverName, Billin
 	doc.open();
 
 	doc.addCreationDate();
-	doc.addTitle("Billing Invoice - " + lab.getName(false, true) + " " + billingAccount.getAccountName());
+	doc.addTitle("Billing Invoice - " + Util.getLabDisplayName(lab, userPreferences) + " " + billingAccount.getAccountName());
 
 	BillingPDFFormatter formatter = new BillingPDFFormatter(sess, billingPeriod, coreFacility, multipleLabs, lab, labs,
 			billingAccount, billingAccounts, PropertyDictionaryHelper.getInstance(sess).getCoreFacilityProperty(
@@ -275,7 +276,7 @@ public static File makePDFBillingInvoice(Session sess, String serverName, Billin
 					PropertyDictionary.CONTACT_REMIT_ADDRESS_CORE_FACILITY), coreFacility.getContactName(),
 			coreFacility.getContactPhone(), billingItemMap, relatedBillingItemMap, requestMap);
 
-	ArrayList<Element> content = formatter.makeContent();
+	ArrayList<Element> content = formatter.makeContent(userPreferences);
 	for (Element e : content) {
 		doc.add(e);
 	}

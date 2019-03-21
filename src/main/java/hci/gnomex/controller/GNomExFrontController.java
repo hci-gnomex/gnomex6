@@ -189,6 +189,10 @@ public static boolean areWeLite() {
       commandInstance.setSecurityAdvisor((SecurityAdvisor) session.getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY));
     }
 
+    if (commandInstance instanceof GNomExCommand) {
+		((GNomExCommand) commandInstance).setUserPreferences((UserPreferences) session.getAttribute(UserPreferences.USER_PREFERENCES_SESSION_KEY));
+	}
+
     if (commandInstance.getSecurityAdvisor() == null
         && (requestName.compareTo("ManageDictionaries") != 0 // You can reload dictionary cache without
             // security

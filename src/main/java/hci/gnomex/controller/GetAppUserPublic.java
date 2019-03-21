@@ -73,19 +73,13 @@ public class GetAppUserPublic extends GNomExCommand implements Serializable {
 
 				String lastName = rs.getString("lastName");
 				String firstName = rs.getString("firstName");
-				String labName = lastName != null ? lastName : "";
-				if (firstName != null) {
-					if (labName.length() > 0) {
-						labName += ", ";
-					}
-					labName += firstName;
-				}
+				String labName = Util.formatLabDisplayName(firstName, lastName, this.getUserPreferences());
 				String doUploadAlert = rs.getString("doUploadAlert");
 				if (doUploadAlert == null || doUploadAlert.equals("")) {
 					doUploadAlert = "N";
 				}
 
-				labNode.setAttribute("labName", labName + " Lab");
+				labNode.setAttribute("labName", labName);
 				labNode.setAttribute("role", rs.getString("role"));
 				labNode.setAttribute("doUploadAlert", doUploadAlert);
 				notificationLabs.addContent(labNode);

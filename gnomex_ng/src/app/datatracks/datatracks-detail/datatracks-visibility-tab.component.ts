@@ -10,6 +10,7 @@
         import {GnomexService} from "../../services/gnomex.service";
         import {GetLabService} from "../../services/get-lab.service";
         import {first} from "rxjs/operators";
+        import {UserPreferencesService} from "../../services/user-preferences.service";
 
 
 
@@ -49,7 +50,8 @@
             constructor(protected fb: FormBuilder,private dtService: DataTrackService,
                         private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService,
                         private propertyService: PropertyService, private constService: ConstantsService,
-                        private gnomexService:GnomexService, private getLabService : GetLabService){
+                        private gnomexService:GnomexService, private getLabService : GetLabService,
+                        public prefService: UserPreferencesService){
             }
 
 
@@ -154,10 +156,6 @@
                     return this.labList;
                 }
 
-            }
-
-            displayLab(lab: any) {
-                return lab ? lab.name : lab;
             }
 
             selectOption($event){

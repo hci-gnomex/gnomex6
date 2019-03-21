@@ -52,7 +52,7 @@ public class GetProductOrderDetails extends GNomExCommand {
         for(Iterator i = details.iterator(); i.hasNext();) {
           Object row[] = (Object []) i.next();
           String productName = (String) row[0];
-          String submitter = AppUser.formatNameFirstLast((String)row[1], (String)row[2]);
+          String submitter = Util.formatUserDisplayName((String)row[1], (String)row[2], this.getUserPreferences());
           String submitDate = ((Date) row[3]).toString();
           String quoteReceivedDate = row[4] != null ? ((Date) row[4]).toString() : "";
           String quoteNumber = row[5] != null ? (String)row[5] : "";
