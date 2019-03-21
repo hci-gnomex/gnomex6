@@ -1,92 +1,114 @@
-<form (ngSubmit)="save(createAnalysisForm.value)" [formGroup]="createAnalysisForm" >
-    <h6 mat-dialog-title><img src="../../assets/map_add.png">Add Analysis</h6>
-    <div mat-dialog-content>
-        <div>
-            <label style="width: 10em">Group</label>
-            <jqxComboBox #labCombo class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
-                         [source]="_labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                         (onSelect)="onLabSelect($event)" formControlName="selectedLab">
-            </jqxComboBox>
-        </div>
-        <div *ngIf="showOwnerComboBox">
-            <label style="width: 10em">Analysis Owner</label>
-            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an Owner...'"
-                         [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
-                         (onSelect)="onUserSelect($event)" formControlName="analysisOwner">
-            </jqxComboBox>
-        </div>
-        <div *ngIf="!newAnalysisGroup">
-            <label style="width: 10em">Analysis Group</label>
-            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'...'"
-                         [source]="analysisGroupList" [displayMember]="'name'" [valueMember]="'idAnalysisGroup'"
-                         (onSelect)="onAnalysisGroupSelect($event)" formControlName="analysisGroup">
-            </jqxComboBox>
-            <div>
-                <button mat-icon-button>
 
-                    <mat-icon aria-label="New..." (click)="includeNewGroup()">note_add</mat-icon>
-                </button>
-            </div>
-        </div>
-        <div *ngIf="newAnalysisGroup">
-            <label style="width: 10em">New Analysis Group Name</label>
-            <mat-form-field class="example-full-width">
-                <input matInput formControlName="analysisGroupName">
-            </mat-form-field>
-            <mat-error *ngIf="newAnalysisGroup && createAnalysisForm.controls['analysisGroupName'].hasError('required')">
-                Analysis Group Name is <strong>required</strong>
-            </mat-error>
-
-        </div>
-
-        <div>
-            <label style="width: 10em">Analysis Name</label>
-            <mat-form-field class="example-full-width">
-                <input matInput formControlName="analysisName" >
-            </mat-form-field>
-            <mat-error *ngIf="createAnalysisForm.controls['analysisName'].hasError('required')">
-                Analysis Name is <strong>required</strong>
-            </mat-error>
-
-        </div>
-        <div>
-            <label style="width: 10em">Organism</label>
-            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Organism...'"
-                         [source]="activeOrganismList" [displayMember]="'display'" [valueMember]="'idOrganism'"
-                         (onSelect)="onOrganismSelect($event)" formControlName="organism">
-            </jqxComboBox>
-        </div>
-        <div>
-            <button mat-icon-button>
-                <mat-icon aria-label="New/Edit..." (click)="newOrganism()">note_add</mat-icon>
-            </button>
-        </div>
-
-        <div>
-            <label style="width: 10em">Genome Build</label>
-            <jqxComboBox class="inlineComboBox" [width]="170" [multiSelect]="true"
-                         [source]="genomeBuildList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
-                         (onSelect)="onGenomeBuildSelect($event)">
-            </jqxComboBox>
-        </div>
-        <div>
-            <button mat-icon-button>
-                <mat-icon aria-label="New/Edit..." (click)="newGenomeBuild()">note_add</mat-icon>
-            </button>
-        </div>
-
-        <div>
-            <label style="width: 10em">Visibility</label>
-            <jqxComboBox #visibilityCombo class="inlineComboBox" [width]="170" [height]="20"
-                         [source]="visibilityList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
-                         (onSelect)="onVisibilitySelect($event)" formControlName="visibility">
-            </jqxComboBox>
+<div class="full-height full-width flex-container-col">
+    <div mat-dialog-title class="dialog-header-colors no-padding no-margin" >
+        <div class="full-width full-height padded title-size">
+            <img class="icon" src="../../assets/map_add.png"> Add Analysis
         </div>
     </div>
 
-    <mat-dialog-actions>
-        <button #yesButton *ngIf="!showSpinner" mat-raised-button color="primary" (click)="createAnalysisYesButtonClicked()" tabindex="2" [disabled]="createAnalysisForm.invalid">Save</button>
-        <button *ngIf="!showSpinner" mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
-        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-    </mat-dialog-actions>
-</form>
+
+    <div mat-dialog-content class="flex-grow padded-outer">
+        <div class="full-width full-height flex-container-col padded-inner">
+            <form  class="full-height full-width padded-inner flex-container-col" [formGroup]="createAnalysisForm" >
+                <div class="flex-container-row align-center padded">
+                    <label style="width: 10em">Group</label>
+                    <jqxComboBox #labCombo [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
+                                 [source]="_labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
+                                 (onSelect)="onLabSelect($event)" formControlName="selectedLab">
+                    </jqxComboBox>
+                </div>
+                <div class="flex-container-row align-center padded" *ngIf="showOwnerComboBox">
+                    <label style="width: 10em">Analysis Owner</label>
+                    <jqxComboBox  [width]="170" [height]="20" [placeHolder]="'Select an Owner...'"
+                                 [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
+                                 (onSelect)="onUserSelect($event)" formControlName="analysisOwner">
+                    </jqxComboBox>
+                </div>
+                <div class="flex-container-row align-center padded" *ngIf="!newAnalysisGroup">
+                    <label style="width: 10em">Analysis Group</label>
+                    <jqxComboBox #analysisGroupCombo [width]="170" [height]="20" [placeHolder]="'...'"
+                                 [source]="analysisGroupList" [displayMember]="'name'" [valueMember]="'idAnalysisGroup'"
+                                 (onSelect)="onAnalysisGroupSelect($event)" formControlName="analysisGroup">
+                    </jqxComboBox>
+                    <div>
+                        <button mat-icon-button>
+                            <mat-icon aria-label="New..." (click)="includeNewGroup()">note_add</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-container-row align-center padded" *ngIf="newAnalysisGroup">
+                    <mat-form-field >
+                        <input placeholder="New Analysis Group Name" matInput formControlName="analysisGroupName">
+                        <mat-error *ngIf="newAnalysisGroup && createAnalysisForm.controls['analysisGroupName'].hasError('required')">
+                            Analysis Group Name is required
+                        </mat-error>
+                    </mat-form-field>
+                    <div>
+                        <button mat-icon-button>
+                            <mat-icon aria-label="New..." (click)="includeNewGroup()">note_add</mat-icon>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="flex-container-row align-center padded" >
+                    <mat-form-field  >
+                        <input placeholder="Analysis Name" matInput formControlName="analysisName" >
+                        <mat-error *ngIf="createAnalysisForm.controls['analysisName'].hasError('required')">
+                            Analysis Name is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex-container-row align-center padded">
+                    <label style="width: 10em" >Organism</label>
+                    <jqxComboBox [width]="170" [height]="20" [placeHolder]="'Organism...'"
+                                 [source]="activeOrganismList" [displayMember]="'display'" [valueMember]="'idOrganism'"
+                                 (onSelect)="onOrganismSelect($event)" formControlName="organism">
+                    </jqxComboBox>
+                    <div>
+                        <button mat-icon-button>
+                            <mat-icon aria-label="New/Edit..." (click)="newOrganism()">note_add</mat-icon>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="flex-container-row align-center padded">
+                    <label style="width: 10em"> Genome Build</label>
+                    <jqxComboBox [width]="170" [multiSelect]="true"
+                                 [source]="genomeBuildList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
+                                 (onSelect)="onGenomeBuildSelect($event)">
+                    </jqxComboBox>
+                    <div>
+                        <button mat-icon-button>
+                            <mat-icon aria-label="New/Edit..." (click)="newGenomeBuild()">note_add</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-container-row align-center padded">
+                    <label style="width: 10em">Visibility</label>
+                    <jqxComboBox #visibilityCombo class="inlineComboBox" [width]="170" [height]="20"
+                                 [source]="visibilityList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
+                                 (onSelect)="onVisibilitySelect($event)" formControlName="visibility">
+                    </jqxComboBox>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div mat-dialog-actions  class="padded-outer justify-flex-end" >
+        <div class="flex-container-row" class="padded">
+            <button #yesButton
+                    mat-raised-button
+                    color="primary"
+                    (click)="createAnalysisYesButtonClicked()"
+                    tabindex="2" [disabled]="createAnalysisForm.invalid">
+                Save
+            </button>
+            <button mat-raised-button color="primary" mat-dialog-close tabindex="-1">Cancel</button>
+        </div>
+    </div>
+
+</div>
+
+

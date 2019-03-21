@@ -191,9 +191,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         event.treeModel.expandAll();
     }
 
-    prepareView() {
+    prepareView(showFileTree) {
         this.splitOrgSize = 30;
-        this.showFileTrees = true;
+        this.showFileTrees = showFileTree;
     }
 
 

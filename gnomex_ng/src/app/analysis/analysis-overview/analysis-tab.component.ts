@@ -68,6 +68,9 @@ import {ConstantsService} from "../../services/constants.service";
             padding-left:  0.3em;
             padding-right: 0.3em;
         }
+        .no-padding-dialog {
+            padding: 0;
+        }
         
     `]
 })
@@ -156,6 +159,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
                 private StrUtil:GnomexStringUtilService,
                 private labListService:LabListService,
                 private dialog: MatDialog,
+                private dialogService:DialogsService,
                 private createSecurityAdvisorService:CreateSecurityAdvisorService,
                 private constService:ConstantsService) {
         super(fb);
@@ -196,9 +200,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
             this.rowData = this.analysisService.analysisList;
 
             if (this.createAnalysisDialogRef != undefined && this.createAnalysisDialogRef.componentInstance != undefined) {
-                if (this.createAnalysisDialogRef.componentInstance.showSpinner) {
-                    this.createAnalysisDialogRef.componentInstance.showSpinner = false;
-                }
+                this.dialogService.stopAllSpinnerDialogs();
                 this.createAnalysisDialogRef.close();
             }
             if (this.deleteAnalysisDialogRef != undefined && this.deleteAnalysisDialogRef.componentInstance != undefined) {
@@ -281,6 +283,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit{
             selectedLabLabel: selectedLabLabel
             //selectedItem: this.selectedItem
         };
+        configuration.panelClass = 'no-padding-dialog';
 
         this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
     }
