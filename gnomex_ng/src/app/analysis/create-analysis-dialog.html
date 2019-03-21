@@ -13,14 +13,14 @@
                 <div class="flex-container-row align-center padded">
                     <label style="width: 10em">Group</label>
                     <jqxComboBox #labCombo [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
-                                 [source]="_labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                                 [source]="_labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
                                  (onSelect)="onLabSelect($event)" formControlName="selectedLab">
                     </jqxComboBox>
                 </div>
                 <div class="flex-container-row align-center padded" *ngIf="showOwnerComboBox">
                     <label style="width: 10em">Analysis Owner</label>
                     <jqxComboBox  [width]="170" [height]="20" [placeHolder]="'Select an Owner...'"
-                                 [source]="ownerList" [displayMember]="'displayName'" [valueMember]="'idAppUser'"
+                                 [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
                                  (onSelect)="onUserSelect($event)" formControlName="analysisOwner">
                     </jqxComboBox>
                 </div>
