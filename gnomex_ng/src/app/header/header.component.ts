@@ -23,6 +23,21 @@ import {Subscription} from "rxjs/index";
     selector: "gnomex-header",
     templateUrl: "./header.component.html",
     styles: [`
+        
+        .minimize {
+            width:  fit-content;
+            height: fit-content;
+        }
+        
+        .red {
+            /*font-weight: bold;*/
+            color: red;
+        }
+        
+        .horizontal-spacing-center {
+            text-align: center;
+        }
+        
         .no-padding-dialog .mat-dialog-container {
             padding: 0;
         }
@@ -46,8 +61,7 @@ import {Subscription} from "rxjs/index";
         .top-menu-item {
             flex: 1;
         }
-        .links-menu {
-            flex: 1;
+        .right-align {
             text-align: right;
         }
         .links {

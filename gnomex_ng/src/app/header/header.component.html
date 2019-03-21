@@ -1,11 +1,11 @@
 <mat-toolbar #headerRef class="header-one" *ngIf="this.gnomexService.isLoggedIn">
     <mat-toolbar-row>
-        <span class="top-menu-item">
+        <span class="flex-grow">
             <a [routerLink]="['/home']">
                 <img src="../../assets/gnomex_logo_hdr.png">
             </a>
         </span>
-        <span class="top-menu-item lookup horizontal-center">
+        <span class="lookup horizontal-center">
             <div class="inline-block horizontal-padding">
                 <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
                                 [floatLabel]="options.value.floatPlaceholder">
@@ -24,8 +24,17 @@
                 </button>
             </div>
         </span>
-        <span class="links-menu">
-            <span class="top-menu-item" *ngFor="let item of linkNavItems">
+        <span class="flex-grow flex-container-row">
+            <div class="flex-grow horizontal-spacing-center flex-container-row align-center">
+                <div class="flex-grow">
+                </div>
+                <div class="minimize red">
+                    FOR RESEARCH ONLY
+                </div>
+                <div class="flex-grow">
+                </div>
+            </div>
+            <span *ngFor="let item of linkNavItems">
                 <!-- Handle branch node buttons here -->
                 <span *ngIf="item.children && item.children.length > 0">
                     <button mat-button
@@ -46,7 +55,7 @@
                 </span>
             </span>
         </span>
-        <mat-list></mat-list>
+        <!--<mat-list></mat-list>-->
     </mat-toolbar-row>
     <mat-toolbar-row class="header-two">
         <span *ngFor="let item of navItems" class="full-height" [ngClass]="item.class">
