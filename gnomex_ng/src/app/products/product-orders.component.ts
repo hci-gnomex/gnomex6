@@ -11,6 +11,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {MatSnackBar} from "@angular/material";
 import {ITreeOptions, TreeComponent} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'product-orders',
@@ -98,7 +99,8 @@ export class ProductOrdersComponent implements OnInit {
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private productsService: ProductsService,
                 private dialogsService: DialogsService,
-                private snackBar: MatSnackBar) {
+                private snackBar: MatSnackBar,
+                public prefService: UserPreferencesService) {
         this.filterForm = fb.group({
             lab: '',
             coreFacility: '',

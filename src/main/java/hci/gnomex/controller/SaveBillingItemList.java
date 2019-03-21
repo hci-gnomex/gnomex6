@@ -344,7 +344,7 @@ public class SaveBillingItemList extends GNomExCommand implements Serializable {
             notifyCoreFacilityOfEmptyBillingEmail = true;
             //emailInfo += "Please note that we could not send the following invoice to the lab specified because the lab has no email address on file.  Please update the lab's information.<br><br>";
             missingBillingEmailNote = "Please note that the invoice for the account " + billingAccount.getAccountNameDisplay() +
-                    ", assigned to the " + lab.getName(false, true) + ", under the billing period " +
+                    ", assigned to the " + Util.getLabDisplayName(lab, this.getUserPreferences()) + ", under the billing period " +
                     billingPeriod.getDisplay() +
                     " has not been delivered because no billing contact email or P.I. email was on file for the lab.  Please update the lab's billing contact information for the future.<br><br>";
 
@@ -390,9 +390,9 @@ public class SaveBillingItemList extends GNomExCommand implements Serializable {
                     new Lab[0], billingAccount, new BillingAccount[0],
                     PropertyDictionaryHelper.getInstance(sess).getCoreFacilityProperty(coreFacility.getIdCoreFacility(), PropertyDictionary.CONTACT_ADDRESS_CORE_FACILITY),
                     PropertyDictionaryHelper.getInstance(sess).getCoreFacilityProperty(coreFacility.getIdCoreFacility(), PropertyDictionary.CONTACT_REMIT_ADDRESS_CORE_FACILITY),
-                    billingItemMaps, relatedBillingItemMaps, requestMaps);
+                    billingItemMaps, relatedBillingItemMaps, requestMaps, this.getUserPreferences());
 
-            MailUtilHelper helper = new MailUtilHelper(emailRecipients, ccList, null, fromAddress, subject, "" + emailFormatter.format(), billingInvoice, true, dictionaryHelper, serverName);
+            MailUtilHelper helper = new MailUtilHelper(emailRecipients, ccList, null, fromAddress, subject, "" + emailFormatter.format(this.getUserPreferences()), billingInvoice, true, dictionaryHelper, serverName);
             MailUtil.validateAndSendEmail(helper);
 
             billingInvoice.delete();

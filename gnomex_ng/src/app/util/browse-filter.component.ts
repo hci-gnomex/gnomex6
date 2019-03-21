@@ -14,6 +14,7 @@ import {BillingService} from "../services/billing.service";
 import {DialogsService} from "./popup/dialogs.service";
 import {DateRange} from "./date-range-filter.component";
 import {Subscription} from "rxjs";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'browse-filter',
@@ -205,7 +206,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
                 private dictionaryService: DictionaryService, private billingService: BillingService,
-                private dialogService: DialogsService) {
+                private dialogService: DialogsService,
+                public prefService: UserPreferencesService) {
         this.showMore = false;
         this.resetFields();
     }
@@ -229,6 +231,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
                 this.labListSuscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response;
+                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showMoreSwitch = true;
@@ -247,6 +250,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
                 this.appUserListService.getMembersOnly().subscribe((response: any[]) => {
                     this.labMembersList = response;
+                    this.labMembersList.sort(this.prefService.createUserDisplaySortFunction());
                 });
             }
             this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
@@ -279,6 +283,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
                 this.labListSuscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response;
+                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showDateRangePicker = true;
@@ -306,6 +311,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
                 this.labListSuscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response;
+                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showOrganismComboBox = true;
@@ -405,6 +411,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 if (this.showOwnerComboBox) {
                     this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
                         this.ownerList = response.Lab.historicalOwnersAndSubmitters;
+                        this.ownerList.sort(this.prefService.createUserDisplaySortFunction());
                     });
                 }
                 if (this.showBillingAccountComboBox && this.mode === this.BILLING_BROWSE) {
@@ -488,6 +495,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         }
                         return false;
                     });
+                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
                 });
             }
         } else {

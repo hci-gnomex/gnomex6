@@ -7,7 +7,7 @@ import {
 } from '@angular/material';
 import { URLSearchParams } from "@angular/http";
 import {
-    AfterViewInit, Component, ElementRef, Inject, OnInit, ViewChild
+    AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild
 } from "@angular/core";
 import {AnalysisService} from "../services/analysis.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
@@ -20,17 +20,21 @@ import {NewGenomeBuildComponent} from '../util/new-genome-build.component';
 import * as _ from "lodash";
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
+import {UserPreferencesService} from "../services/user-preferences.service";
+import jqxComboBox = jqwidgets.jqxComboBox;
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Component({
     selector: 'create-analysis-dialog',
     templateUrl: 'create-analysis-dialog.html',
     styles: [`
-        .inlineComboBox {
-            display: inline-block;
+        .padded-outer{
+            margin:0;
+            padding:0;
         }
-        div.inlineDiv {
-            display: inline-block;
-            margin: 0.3rem 0.8rem 0.3rem 0.8rem;
+        .padded-inner{
+            padding:0.3em;
+
         }
 
     `]
@@ -38,8 +42,9 @@ import {first} from "rxjs/operators";
 
 export class CreateAnalysisComponent implements OnInit, AfterViewInit{
     @ViewChild("labCombo") labCombo;
+    @ViewChild("analysisGroupCombo") analysisGroupCombo: jqxComboBox;
     formControl: FormControl = new FormControl();
-    private _analysisGroups: any[] = [];
+    private selectedAnalysisLevel: ITreeNode;
     private _labList: any[];
     private items: any[];
     private i:number = 0;
@@ -65,24 +70,26 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
     private createAnalysisForm: FormGroup;
     private selectedLabLabel: string;
     private codeVisibility: string;
-    public showSpinner: boolean = false;
-    private analGroupListForXML: any[] = [];
     private analysisGroups: any;
+    public showSpinner = false;
     public newAnalysisName: string;
 
     constructor(private dialogRef: MatDialogRef<CreateAnalysisComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private dictionaryService: DictionaryService,
                 private dialog: MatDialog,
+                private cdr :ChangeDetectorRef,
                 private getLabService: GetLabService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private analysisService: AnalysisService,
                 private formBuilder: FormBuilder,
-                private dialogsService: DialogsService
+                private dialogsService: DialogsService,
+                public prefService: UserPreferencesService
     ) {
         this._labList = data.labList;
         this.items = data.items;
         this.selectedLab = data.selectedLab;
         this.selectedLabLabel = data.selectedLabLabel;
+        this.selectedAnalysisLevel = data.selectedItem;
         this.createForm();
 
     }
@@ -110,7 +117,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
             visibility: ['', [
                 Validators.required
             ]]
-        })
+        });
         if (this.createSecurityAdvisorService.isAdmin) {
             this.createAnalysisForm.addControl("analysisOwner", new FormControl("", Validators.required));
         }
@@ -126,6 +133,11 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         if (this.createSecurityAdvisorService.isAdmin) {
             this.showOwnerComboBox = true;
         }
+        if(this.selectedAnalysisLevel.data.idAnalysisGroup){
+            this.idAnalysisGroup = this.selectedAnalysisLevel.data.idAnalysisGroup;
+        }
+
+
     }
 
     ngAfterViewInit() {
@@ -133,7 +145,9 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         var fname = this.selectedLabLabel.substring(0, this.selectedLabLabel.indexOf(' '));
         var lname = lnameLab.substring(0, lnameLab.indexOf(' '));
         var fNameFirst = lname+", "+fname+" Lab";
-        this.labCombo.selectItem(fNameFirst);
+        this.labCombo.selectItem(this.selectedLab);
+        this.cdr.detectChanges();
+
     }
 
     /**
@@ -157,6 +171,19 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
             if (!this.isArray(this.analysisGroupList)) {
                 this.analysisGroupList = [this.analysisGroupList];
             }
+
+            if(this.analysisGroupCombo && this.idAnalysisGroup){
+                for(let ag of this.analysisGroupList){
+                    if(ag.idAnalysisGroup === this.idAnalysisGroup){
+                        setTimeout(()=>{
+                            this.analysisGroupCombo.selectItem(this.idAnalysisGroup);
+                        });
+
+                    }
+                }
+
+            }
+
         }
     }
 
@@ -168,7 +195,6 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.idAnalysisGroup = event.args.item.value;
             this.analysisGroup = this.analysisGroupList.filter(group=>group.idAnalysisGroup===this.idAnalysisGroup);
-            this.analGroupListForXML = _.cloneDeep(this.analysisLabList);
         }
     }
 
@@ -235,7 +261,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
      * Setup and call the SaveAnalysis.
      */
     saveAnalysis() {
-        this.showSpinner = true;
+        this.dialogsService.startDefaultSpinnerDialog();
         var idAnalysis: any = 0;
         var params: HttpParams = new HttpParams();
         var stringifiedGenomBuild;
@@ -248,28 +274,37 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
             stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
         }
         params = params.set("lanesXMLString", "")
-            .set("samplesXMLString", "")
-            .set("collaboratorsXMLString", "")
-            .set("analysisFilesXMLString", "")
-            .set("hybsXMLString", "")
+            .set("samplesJSONString", "")
+            .set("collaboratorsJSONString", "")
+            .set("analysisFilesJSONString", "")
+            .set("hybsJSONString", "")
             .set("idInstitution", "")
-            .set("analysisFilesToDeleteXMLString", "")
+            .set("analysisFilesToDeleteJSONString", "")
             .set("idOrganism", this.idOrganism)
             .set("idAppUser", this.idAppUser)
             .set("idLab", this.idLabString)
             .set("idAnalysis", idAnalysis)
             .set("codeVisibility", this.codeVisibility)
-            .set("name", this.createAnalysisForm.controls['analysisName'].value);
+            .set("name", this.createAnalysisForm.controls['analysisName'].value)
+            .set("noJSONToXMLConversionNeeded", "Y")
 
         this.newAnalysisName = this.createAnalysisForm.controls['analysisName'].value;
         if (this.createAnalysisForm.controls['analysisGroupName']) {
             params = params.set("newAnalysisGroupName", this.createAnalysisForm.controls['analysisGroupName'].value);
         }
-        var genomeBuilds = {genomeBuilds};
-        params =  params.set("genomeBuildsXMLString", stringifiedGenomBuild)
-                        .set("analysisGroupsXMLString", stringifiedAnalysisGroup);
+
+        params =  params.set("genomeBuildsJSONString", stringifiedGenomBuild)
+                        .set("analysisGroupsJSONString", stringifiedAnalysisGroup);
         this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp =>{
-            this.analysisService.refreshAnalysisGroupList_fromBackend();
+            if(resp && !resp.message){
+                this.analysisService.refreshAnalysisGroupList_fromBackend();
+            }else if(resp && resp.message){
+                this.dialogsService.alert(resp.message);
+                this.dialogsService.stopAllSpinnerDialogs();
+            }
+
+        }, (err)=>{
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
@@ -305,9 +340,16 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
      * The new analysis group button was selected on the dialog.
      */
     includeNewGroup() {
-        this.newAnalysisGroup = true;
-        this.createAnalysisForm.addControl("analysisGroupName", new FormControl("", Validators.required));
-        this.createAnalysisForm.removeControl("analysisGroup");
+
+        this.newAnalysisGroup = !this.newAnalysisGroup;
+        if(this.newAnalysisGroup){
+            this.createAnalysisForm.addControl("analysisGroupName", new FormControl("", Validators.required));
+            this.createAnalysisForm.removeControl("analysisGroup");
+        }else{
+            this.createAnalysisForm.addControl("analysisGroup", new FormControl("", Validators.required));
+            this.createAnalysisForm.removeControl("analysisGroupName");
+        }
+
     }
 
     newOrganism() {
@@ -324,6 +366,4 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit{
         });
     }
 
-    save(formData:any){
-    }
 }

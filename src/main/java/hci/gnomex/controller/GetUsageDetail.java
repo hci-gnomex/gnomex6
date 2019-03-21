@@ -558,19 +558,18 @@ public class GetUsageDetail extends GNomExCommand implements Serializable {
    * is not a part of (member, manager, or collaborator).
    */
   private String getLabName(Integer idLab, String labLastName, String labFirstName) {
-    String labName = "";
+    String labName = Util.formatLabDisplayName(labFirstName, labLastName, this.getUserPreferences());
     if (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT)) {
-      labName = Lab.formatLabNameFirstLast(labFirstName, labLastName);
+      return labName;
     } else if (usageUserVisibility.equals(PropertyDictionary.OPTION_USER_USER_VISIBILITY_MASKED)) {
       if (this.getSecAdvisor().isGroupIAmMemberOf(idLab) || this.getSecAdvisor().isGroupICollaborateWith(idLab)) {
-        labName = Lab.formatLabNameFirstLast(labFirstName, labLastName);
+        return labName;
       } else {
-        labName = "-";
+        return "-";
       }
     } else {
-      labName = Lab.formatLabNameFirstLast(labFirstName, labLastName);
+      return labName;
     }
-    return labName;
   }
 
 }

@@ -10,6 +10,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentsService} from "../experiments.service";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 
 @Component({
@@ -220,11 +221,11 @@ import {ExperimentsService} from "../experiments.service";
                     if (sample.idLibPrepPerformedBy && !addedIds.find((a) => { return a === sample.idLibPrepPerformedBy}) ) {
                         let libraryPreparer: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', sample.idLibPrepPerformedBy);
 
-                        if (libraryPreparer && libraryPreparer.display) {
+                        if (libraryPreparer && (libraryPreparer.firstName || libraryPreparer.lastName)) {
                             if (this.libraryPreparedBy.length > 0) {
-                                this.libraryPreparedBy = this.libraryPreparedBy += '\n';
+                                this.libraryPreparedBy += '\n';
                             }
-                            this.libraryPreparedBy = this.libraryPreparedBy += libraryPreparer.display
+                            this.libraryPreparedBy += this.prefService.formatUserName(libraryPreparer.firstName, libraryPreparer.lastName);
                         }
 
                         addedIds.push('' + sample.idLibPrepPerformedBy);
@@ -432,7 +433,8 @@ import {ExperimentsService} from "../experiments.service";
                 private labListService: LabListService,
                 private matDialog: MatDialog,
                 private experimentsService: ExperimentsService,
-                private propertyService: PropertyService) { }
+                private propertyService: PropertyService,
+                public prefService: UserPreferencesService) { }
 
     public get selectedExperimentCategory(): string {
         if (!this._experiment || !this._experiment.experimentCategoryName) {
@@ -752,14 +754,14 @@ import {ExperimentsService} from "../experiments.service";
                     let currentRequestOwner: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', this._experiment.idAppUser);
                     let newNode: any = {
                         idAppUser: currentRequestOwner.idAppUser,
-                        displayName: currentRequestOwner.display
                     };
+                    newNode[this.prefService.userDisplayField] = this.prefService.formatUserName(currentRequestOwner.firstName, currentRequestOwner.lastName);
                     this.possibleOwnersForLabDictionary.push(newNode);
                 }
             }
         }
 
-        this.possibleOwnersForLabDictionary.sort(this.sortAppUsers);
+        this.possibleOwnersForLabDictionary.sort(this.createSortAppUsersFunction(this.prefService.userDisplayField));
 
         this.isReady_possibleOwnersForLabDictionary = true;
     }
@@ -827,39 +829,43 @@ import {ExperimentsService} from "../experiments.service";
             let currentRequestOwner: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', this._experiment.idSubmitter);
             let newNode: any = {
                 idAppUser: currentRequestOwner.idAppUser,
-                displayName: currentRequestOwner.display
             };
+            newNode[this.prefService.userDisplayField] = this.prefService.formatUserName(currentRequestOwner.firstName, currentRequestOwner.lastName);
             this.possibleSubmittersForLabDictionary.push(newNode);
         }
-        this.possibleSubmittersForLabDictionary.sort(this.sortAppUsers);
+        this.possibleSubmittersForLabDictionary.sort(this.createSortAppUsersFunction(this.prefService.userDisplayField));
 
         this.isReady_possibleSubmittersForLabDictionary = true;
     }
 
-    private sortAppUsers(a, b): number {
-        if (!a && !b) {
-            return 0;
-        } else if (!a) {
-            return 1;
-        } else if (!b) {
-            return -1;
-        } else {
-            if (!a.displayName && !b.displayName) {
+    private createSortAppUsersFunction(userDisplayField: string): (a,b) => number {
+        return (a, b) => {
+            if (!a && !b) {
                 return 0;
-            } else if (!a.displayName) {
+            } else if (!a) {
                 return 1;
-            } else if (!b.displayName) {
+            } else if (!b) {
                 return -1;
             } else {
-                if (a.displayName.toLowerCase() === b.displayName.toLowerCase()) {
+                if (!a[userDisplayField] && !b[userDisplayField]) {
                     return 0;
-                } else if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
+                } else if (!a[userDisplayField]) {
                     return 1;
-                } else if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
+                } else if (!b[userDisplayField]) {
                     return -1;
                 } else {
-                    // should never be reached.
-                    return 0;
+                    let aDisplayLower: string = a[userDisplayField].toLowerCase();
+                    let bDisplayLower: string = b[userDisplayField].toLowerCase();
+                    if (aDisplayLower === bDisplayLower) {
+                        return 0;
+                    } else if (aDisplayLower > bDisplayLower) {
+                        return 1;
+                    } else if (aDisplayLower < bDisplayLower) {
+                        return -1;
+                    } else {
+                        // should never be reached.
+                        return 0;
+                    }
                 }
             }
         }
@@ -896,16 +902,16 @@ import {ExperimentsService} from "../experiments.service";
 
             for (let collaborator of this._experiment.collaborators) {
                 if (this.currentCollaboratorsDisplay) {
-                    this.currentCollaboratorsDisplay = this.currentCollaboratorsDisplay + '\n';
+                    this.currentCollaboratorsDisplay += '\n';
                 }
 
-                if (!collaborator.displayName) {
+                if (!collaborator[this.prefService.userDisplayField]) {
                     let currentRequestOwner: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', collaborator.idAppUser);
 
-                    collaborator.displayName = currentRequestOwner.display;
+                    collaborator[this.prefService.userDisplayField] = this.prefService.formatUserName(currentRequestOwner.firstName, currentRequestOwner.lastName);
                 }
 
-                this.currentCollaboratorsDisplay = this.currentCollaboratorsDisplay + collaborator.displayName;
+                this.currentCollaboratorsDisplay += collaborator[this.prefService.userDisplayField];
             }
         }
     }

@@ -204,8 +204,8 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 		String       launchBillingAccountDetail = Util.addURLParameter(this.launchAppURL, "?launchWindow=" + Constants.WINDOW_BILLING_ACCOUNT_DETAIL + "&idLab=" + lab.getIdLab());
 		StringBuffer submitterNote              = new StringBuffer();
 		StringBuffer body                       = new StringBuffer();
-		String       submitterSubject           = "GNomEx Billing Account '" + billingAccount.getAccountName() + "' for " + lab.getName(false, true) + " submitted";
-		String       coreSubject                = "GNomEx Billing Account '" + billingAccount.getAccountName() + "' for " + lab.getName(false, true) + " pending";
+		String       submitterSubject           = "GNomEx Billing Account '" + billingAccount.getAccountName() + "' for " + Util.getLabDisplayName(lab, this.getUserPreferences()) + " submitted";
+		String       coreSubject                = "GNomEx Billing Account '" + billingAccount.getAccountName() + "' for " + Util.getLabDisplayName(lab, this.getUserPreferences()) + " pending";
 
 		String submitterEmail  = billingAccount.getSubmitterEmail();
 		String emailRecipients = submitterEmail;
@@ -228,7 +228,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 		body.append("<br />");
 		body.append("<br />");
 		body.append("<table border=0>");
-		body.append("<tr><td>Lab:</td><td>" + lab.getName(false, true) + "</td></tr>");
+		body.append("<tr><td>Lab:</td><td>" + Util.getLabDisplayName(lab, this.getUserPreferences()) + "</td></tr>");
 		body.append("<tr><td>Core Facility:</td><td>" + facility.getDisplay() + "</td></tr>");
 		body.append("<tr><td>Account:</td><td>" + billingAccount.getAccountName() + "</td></tr>");
 		body.append("<tr><td>Chartfield:</td><td>" + billingAccount.getAccountNumber() + "</td></tr>");

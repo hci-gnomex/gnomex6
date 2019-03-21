@@ -5,6 +5,7 @@ import {Observable} from "rxjs";
 import {DataSource} from '@angular/cdk/collections';
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {of} from "rxjs";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 @Component({
     selector: 'membership-tab',
@@ -118,14 +119,15 @@ export class MembershipTabComponent implements OnInit {
     private previousMemMatOption: MatOption;
     private previousColMatOption: MatOption;
     private previousManMatOption: MatOption;
-    constructor(private securityAdvisor: CreateSecurityAdvisorService) {
+    constructor(private securityAdvisor: CreateSecurityAdvisorService,
+                public prefService: UserPreferencesService) {
 
     }
 
     ngOnInit() {
-        this.membersDataSource = new MyDataSource(this.arrayize(this.memberGroup.members));
-        this.managersDataSource = new MyDataSource(this.arrayize(this.memberGroup.managers));
-        this.collaboratorsDataSource = new MyDataSource(this.arrayize(this.memberGroup.collaborators));
+        this.membersDataSource = new MyDataSource(this.arrayize(this.memberGroup.members), this.prefService);
+        this.managersDataSource = new MyDataSource(this.arrayize(this.memberGroup.managers), this.prefService);
+        this.collaboratorsDataSource = new MyDataSource(this.arrayize(this.memberGroup.collaborators), this.prefService);
         this.filterByInactive();
         this.createMembershipForm();
         this.resetFields();
@@ -137,9 +139,9 @@ export class MembershipTabComponent implements OnInit {
                 this.resetFields();
             }
         }
-        this.membersDataSource = new MyDataSource(this.arrayize(this.memberGroup.members));
-        this.managersDataSource = new MyDataSource(this.arrayize(this.memberGroup.managers));
-        this.collaboratorsDataSource = new MyDataSource(this.arrayize(this.memberGroup.collaborators));
+        this.membersDataSource = new MyDataSource(this.arrayize(this.memberGroup.members), this.prefService);
+        this.managersDataSource = new MyDataSource(this.arrayize(this.memberGroup.managers), this.prefService);
+        this.collaboratorsDataSource = new MyDataSource(this.arrayize(this.memberGroup.collaborators), this.prefService);
         this.filterByInactive();
     }
 
@@ -148,16 +150,16 @@ export class MembershipTabComponent implements OnInit {
 
     filterByInactive() {
         if (this.showInactive) {
-            this.membersDataSource = new MyDataSource(this.arrayize(this.memberGroup.members));
-            this.managersDataSource = new MyDataSource(this.arrayize(this.memberGroup.managers));
-            this.collaboratorsDataSource = new MyDataSource(this.arrayize(this.memberGroup.collaborators));
+            this.membersDataSource = new MyDataSource(this.arrayize(this.memberGroup.members), this.prefService);
+            this.managersDataSource = new MyDataSource(this.arrayize(this.memberGroup.managers), this.prefService);
+            this.collaboratorsDataSource = new MyDataSource(this.arrayize(this.memberGroup.collaborators), this.prefService);
         } else {
             this.membersDataSource.data = this.membersDataSource.data.filter((row => row.isActive === 'Y'));
-            this.membersDataSource = new MyDataSource(this.membersDataSource.data);
+            this.membersDataSource = new MyDataSource(this.membersDataSource.data, this.prefService);
             this.collaboratorsDataSource.data = this.collaboratorsDataSource.data.filter((row => row.isActive === 'Y'));
-            this.collaboratorsDataSource = new MyDataSource(this.collaboratorsDataSource.data);
+            this.collaboratorsDataSource = new MyDataSource(this.collaboratorsDataSource.data, this.prefService);
             this.managersDataSource.data = this.managersDataSource.data.filter((row => row.isActive === 'Y'));
-            this.managersDataSource = new MyDataSource(this.managersDataSource.data);
+            this.managersDataSource = new MyDataSource(this.managersDataSource.data, this.prefService);
         }
     }
 
@@ -206,7 +208,7 @@ export class MembershipTabComponent implements OnInit {
         let fUsers: any[];
         if (name) {
             fUsers = this.users.filter(user =>
-                user.displayName.toLowerCase().indexOf(name.toLowerCase()) >= 0);
+                user[this.prefService.userDisplayField].toLowerCase().indexOf(name.toLowerCase()) >= 0);
             return fUsers;
         } else {
             return this.users;
@@ -218,9 +220,9 @@ export class MembershipTabComponent implements OnInit {
             case "member": {
                 if (!this.sourceHasItem(this.membersDataSource.data, this.memberUser)) {
                     this.membershipForm.controls['members'].markAsDirty();
-                    let addedMember = this.users.filter((row => row.displayName === this.memberUser));
+                    let addedMember = this.users.filter((row => row[this.prefService.userDisplayField] === this.memberUser));
                     this.membersDataSource.data = this.membersDataSource.data.concat(addedMember);
-                    this.membersDataSource = new MyDataSource(this.membersDataSource.data);
+                    this.membersDataSource = new MyDataSource(this.membersDataSource.data, this.prefService);
                 }
                 this.memberUser = "";
                 break;
@@ -228,9 +230,9 @@ export class MembershipTabComponent implements OnInit {
             case "collaborator": {
                 if (!this.sourceHasItem(this.collaboratorsDataSource.data, this.collUser)) {
                     this.membershipForm.controls['collaborators'].markAsDirty();
-                    let addedMember = this.users.filter((row => row.displayName === this.collUser));
+                    let addedMember = this.users.filter((row => row[this.prefService.userDisplayField] === this.collUser));
                     this.collaboratorsDataSource.data = this.collaboratorsDataSource.data.concat(addedMember);
-                    this.collaboratorsDataSource = new MyDataSource(this.collaboratorsDataSource.data);
+                    this.collaboratorsDataSource = new MyDataSource(this.collaboratorsDataSource.data, this.prefService);
                 }
                 this.collUser = "";
                 break;
@@ -238,9 +240,9 @@ export class MembershipTabComponent implements OnInit {
             case "manager": {
                 if (!this.sourceHasItem(this.managersDataSource.data, this.manUser)) {
                     this.membershipForm.controls['managers'].markAsDirty();
-                    let addedMember = this.users.filter((row => row.displayName === this.manUser));
+                    let addedMember = this.users.filter((row => row[this.prefService.userDisplayField] === this.manUser));
                     this.managersDataSource.data = this.managersDataSource.data.concat(addedMember);
-                    this.managersDataSource = new MyDataSource(this.managersDataSource.data);
+                    this.managersDataSource = new MyDataSource(this.managersDataSource.data, this.prefService);
                 }
                 this.manUser = "";
                 break;
@@ -251,7 +253,7 @@ export class MembershipTabComponent implements OnInit {
     sourceHasItem(source: any[], name: string): boolean {
         let found: boolean = false;
         for (let item of source) {
-            if (item.displayName === name) {
+            if (item[this.prefService.userDisplayField] === name) {
                 found = true;
                 break;
             }
@@ -264,21 +266,21 @@ export class MembershipTabComponent implements OnInit {
             case "member": {
                 this.membershipForm.controls['members'].markAsDirty();
                 this.membersDataSource.data = this.membersDataSource.data.filter((row => row.idAppUser !== this.selectedMemberRowIndex));
-                this.membersDataSource = new MyDataSource(this.membersDataSource.data);
+                this.membersDataSource = new MyDataSource(this.membersDataSource.data, this.prefService);
                 this.selectedMemberRowIndex = -1;
                 break;
             }
             case "collaborator": {
                 this.membershipForm.controls['collaborators'].markAsDirty();
                 this.collaboratorsDataSource.data = this.collaboratorsDataSource.data.filter((row => row.idAppUser !== this.selectedCollRowIndex));
-                this.collaboratorsDataSource = new MyDataSource(this.collaboratorsDataSource.data);
+                this.collaboratorsDataSource = new MyDataSource(this.collaboratorsDataSource.data, this.prefService);
                 this.selectedCollRowIndex = -1;
                 break;
             }
             case "manager": {
                 this.membershipForm.controls['managers'].markAsDirty();
                 this.managersDataSource.data = this.managersDataSource.data.filter((row => row.idAppUser !== this.selectedManRowIndex));
-                this.managersDataSource = new MyDataSource(this.managersDataSource.data);
+                this.managersDataSource = new MyDataSource(this.managersDataSource.data, this.prefService);
                 this.selectedManRowIndex = -1;
                 break;
             }
@@ -350,14 +352,15 @@ export class MembershipTabComponent implements OnInit {
 }
 
 export class MyDataSource extends DataSource<any> {
-    constructor(public data: any[]) {
+    constructor(public data: any[],
+                public prefService: UserPreferencesService) {
         super();
     }
 
     connect(): Observable<any[]> {
         return of(this.data.sort((a, b) => {
-            if (a.displayName < b.displayName) return -1;
-            else if (a.displayName > b.displayName) return 1;
+            if (a[this.prefService.userDisplayField] < b[this.prefService.userDisplayField]) return -1;
+            else if (a[this.prefService.userDisplayField] > b[this.prefService.userDisplayField]) return 1;
             else {
                 return 0;
             }

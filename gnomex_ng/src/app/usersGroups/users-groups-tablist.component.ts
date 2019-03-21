@@ -23,6 +23,7 @@ import {GetLabService} from "../services/get-lab.service";
 import {LabListService} from "../services/lab-list.service";
 import {PasswordUtilService} from "../services/password-util.service";
 import {BillingAccountTabComponent} from "./billingAccountTab/billing-account-tab.component";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 /**
  * @title Basic tabs
@@ -208,13 +209,14 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
                 private labListService: LabListService,
                 private dictionaryService: DictionaryService,
                 private changeRef:ChangeDetectorRef,
+                public prefService: UserPreferencesService,
                 private dialog: MatDialog
                 ) {
         this.columnDefs = [
             {
                 headerName: "",
                 editable: false,
-                field: "displayName",
+                field: this.prefService.userDisplayField,
                 width: 200
             },
             {
@@ -227,7 +229,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
             {
                 headerName: "",
                 editable: false,
-                field: "name",
+                field: this.prefService.labDisplayField,
                 width: 200
             },
             {
@@ -244,21 +246,21 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
             {
                 headerName: "Labs",
                 editable: false,
-                field: "name",
+                field: this.prefService.labDisplayField,
             },
         ];
         this.collColumnDefs = [
             {
                 headerName: "Collaborating Labs",
                 editable: false,
-                field: "name",
+                field: this.prefService.labDisplayField,
             }
         ];
         this.manColumnDefs = [
             {
                 headerName: "Managing Labs",
                 editable: false,
-                field: "name",
+                field: this.prefService.labDisplayField,
             }
         ];
         this.rowSelection = "single";
@@ -846,7 +848,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
         configuration.data = {
             idAppUser: this.idAppUser,
-            userName: this.selectedUser.displayName
+            userName: this.selectedUser[this.prefService.userDisplayField]
         };
 
         this.deleteUserDialogRef = this.dialog.open(DeleteUserDialogComponent, configuration);
@@ -862,7 +864,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     onGridReady(params) {
         this.gridOptions.columnApi.setColumnVisible('email', false);
         let api = params.api;
-        let filter = api.getFilterInstance("displayName");
+        let filter = api.getFilterInstance(this.prefService.userDisplayField);
         this.gridOptions.api.sizeColumnsToFit();
 
     }
@@ -914,15 +916,15 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     buildLabsMessage (): string {
         let message: string = "";
         for (let lab of this.labs) {
-            message = message.concat(lab.name + " as a member");
+            message = message.concat(lab[this.prefService.labDisplayField] + " as a member");
             message = message.concat(", ");
         }
         for (let lab of this.collaboratingLabs) {
-            message = message.concat(lab.name + " as a collaborator");
+            message = message.concat(lab[this.prefService.labDisplayField] + " as a collaborator");
             message = message.concat(", ");
         }
         for (let lab of this.managingLabs) {
-            message = message.concat(lab.name) + " as a manager";
+            message = message.concat(lab[this.prefService.labDisplayField]) + " as a manager";
             message = message.concat(", ");
         }
         message = message.substring(0, message.lastIndexOf(","));
@@ -1372,7 +1374,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
         configuration.data = {
             idLab: this.idLab,
-            labName: this.selectedGroup.name
+            labName: this.selectedGroup[this.prefService.labDisplayField]
         };
 
         this.deleteGroupDialogRef = this.dialog.open(DeleteGroupDialogComponent, configuration);
@@ -1394,7 +1396,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
         configuration.data = {
             idLab: theLabId,
-            labName: this.selectedGroup.name
+            labName: this.selectedGroup[this.prefService.labDisplayField]
         };
 
         this.verifyUsersDialogRef = this.dialog.open(VerifyUsersDialogComponent, configuration);

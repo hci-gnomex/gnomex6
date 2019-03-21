@@ -15,6 +15,7 @@ import {ConfigureOrganismsComponent} from "../../configuration/configure-organis
 import {PropertyService} from "../../services/property.service";
 import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/collaborators-dialog.component";
 import {AnalysisService} from "../../services/analysis.service";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 @Component({
     selector: 'analysis-info-tab',
@@ -26,7 +27,7 @@ import {AnalysisService} from "../../services/analysis.service";
                 </mat-form-field>
                 <span></span>
                 <lazy-loaded-select placeholder="Owner" [options]="this.labUsers"
-                                    valueField="idAppUser" displayField="displayName" [allowNone]="true"
+                                    valueField="idAppUser" [displayField]="this.prefService.userDisplayField" [allowNone]="true"
                                     [control]="this.form.get('idAppUser')">
                 </lazy-loaded-select>
             </div>
@@ -198,6 +199,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
                 private dialog: MatDialog,
                 private router: Router,
                 private analysisService: AnalysisService,
+                public prefService: UserPreferencesService,
                 public propertyService: PropertyService){
         this.form = this.formBuilder.group({
             labName: "",
@@ -353,9 +355,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
                         if (list.filter((user: any) => {return user.idAppUser === this.analysis.idAppUser}).length === 0) {
                             list.push(owner);
                         }
-                        list.sort((a: any, b: any) => {
-                            return (a.displayName as string).localeCompare((b.displayName as string));
-                        });
+                        list.sort(this.createAppUserSortFunction(this.prefService.userDisplayField));
                         this.labUsers = list;
 
                         if (result.Lab.institutions) {
@@ -374,6 +374,22 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy {
                 });
             }
         });
+    }
+
+    private createAppUserSortFunction(userDisplayField: string): (a, b) => number {
+        return (a, b) => {
+            if (!a && !b) {
+                return 0;
+            } else if (a && !b) {
+                return 1;
+            } else if (!a && b) {
+                return -1;
+            } else {
+                let aDisplay: string = a[userDisplayField] ? a[userDisplayField] : "";
+                let bDisplay: string = b[userDisplayField] ? b[userDisplayField] : "";
+                return (aDisplay.localeCompare(bDisplay));
+            }
+        }
     }
 
     private refreshGenomeBuilds(): void {

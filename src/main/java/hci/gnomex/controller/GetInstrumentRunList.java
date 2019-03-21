@@ -102,7 +102,7 @@ public class GetInstrumentRunList extends GNomExCommand implements Serializable 
             irNode.setAttribute( "codeReactionType", codeReactionType );
             if ( creator != null && !creator.equals( "" ) ) {
               AppUser user = (AppUser)sess.get(AppUser.class, Integer.valueOf(creator));
-              irNode.setAttribute( "creator", user != null ? user.getDisplayName() : creator);
+              irNode.setAttribute( "creator", user != null ? Util.getAppUserDisplayName(user, this.getUserPreferences()) : creator);
             } else {
               irNode.setAttribute( "creator", creator);
             }

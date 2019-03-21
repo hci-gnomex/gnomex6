@@ -379,7 +379,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 						if (ba.isJustApproved()) {
 							ba.setIdApprover(this.getSecAdvisor().getIdAppUser());
 							AppUser au = (AppUser) sess.load(AppUser.class, this.getSecAdvisor().getIdAppUser());
-							BillingAccountUtil.sendApprovedBillingAccountEmail(sess, serverName, launchAppURL, ba, lab, au);
+							BillingAccountUtil.sendApprovedBillingAccountEmail(sess, this.getUserPreferences(), serverName, launchAppURL, ba, lab, au);
 						}
 
 						// If this is a new PO billing account notify the PI of the lab of its creation
@@ -473,7 +473,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 						for (Iterator<AppUser> iter = newUsers.keySet().iterator(); iter.hasNext(); ) {
 							AppUser newMember = iter.next();
 							String  email     = newUsers.get(newMember);
-							newMemberNotificationEmail(sess, email, lab.getName(false, true), newMember);
+							newMemberNotificationEmail(sess, email, Util.getLabDisplayName(lab, this.getUserPreferences()), newMember);
 						}
 
 						sess.flush();
@@ -760,7 +760,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 		StringBuffer submitterNote = new StringBuffer();
 		StringBuffer body          = new StringBuffer();
 		String submitterSubject = "GNomEx Billing Account \'" + billingAccount.getAccountName() + "\' for "
-				+ lab.getName(false, true) + " approved";
+				+ Util.getLabDisplayName(lab, this.getUserPreferences()) + " approved";
 
 		String PIEmail = lab.getContactEmail();
 

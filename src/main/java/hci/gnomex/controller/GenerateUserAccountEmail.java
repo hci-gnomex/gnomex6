@@ -115,7 +115,7 @@ public class GenerateUserAccountEmail extends GNomExCommand implements Serializa
           }
         }
 
-        String labName =  l.getName(false, true);
+        String labName =  Util.getLabDisplayName(l, this.getUserPreferences());
 
         // Bypass labs without any user accounts
         if (managers.isEmpty() && members.isEmpty() && collaborators.isEmpty()) {

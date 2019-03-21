@@ -1,8 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
+import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.billing.ProductPlugin;
 import hci.gnomex.constants.Constants;
@@ -22,12 +21,6 @@ import hci.gnomex.model.ProductOrder;
 import hci.gnomex.model.ProductOrderStatus;
 import hci.gnomex.model.ProductType;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.BillingTemplateParser;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -234,7 +227,7 @@ public class SaveProductOrder extends GNomExCommand implements Serializable {
                             sess.save(bi);
                         }
 
-                        sendConfirmationEmail(sess, po, ProductOrderStatus.NEW, serverName);
+                        sendConfirmationEmail(sess, po, ProductOrderStatus.NEW, serverName, this.getUserPreferences());
 
                     }
                 }
@@ -255,7 +248,7 @@ public class SaveProductOrder extends GNomExCommand implements Serializable {
         return this;
     }
 
-    public static void sendConfirmationEmail(Session sess, ProductOrder po, String orderStatus, String serverName)
+    public static void sendConfirmationEmail(Session sess, ProductOrder po, String orderStatus, String serverName, UserPreferences userPreferences)
             throws NamingException, MessagingException, IOException {
 
         DictionaryHelper dictionaryHelper = DictionaryHelper.getInstance(sess);
@@ -310,7 +303,7 @@ public class SaveProductOrder extends GNomExCommand implements Serializable {
         body.append(po.getSubmitter().getDisplayName());
         body.append("</td></tr>");
         body.append("<tr><td>Lab:</td><td>");
-        body.append(po.getLab().getName(false, true));
+        body.append(Util.getLabDisplayName(po.getLab(), userPreferences));
         body.append("</td></tr>");
         body.append("<tr><td>Billing Acct:</td><td>");
         body.append(ba.getAccountNameAndNumber());

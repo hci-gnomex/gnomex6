@@ -8,6 +8,7 @@ import {OrganismService} from "../services/organism.service";
 import {DataTrackService} from "../services/data-track.service";
 import {LabListService} from "../services/lab-list.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'new-datatrack-folder',
@@ -29,6 +30,7 @@ export class NewDataTrackFolderComponent {
     constructor(public dialogRef: MatDialogRef<NewDataTrackFolderComponent>,
                 private dataTrackService: DataTrackService,
                 private labListService: LabListService,
+                public prefService: UserPreferencesService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
 
         this.selectedItem = data.selectedItem;

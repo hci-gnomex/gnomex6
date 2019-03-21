@@ -81,41 +81,41 @@ public class BillingListManager {
         return "Please select a core facility and a billing period or provide an experiment or invoice number";
     }
 
-    public Element buildBillingItemList() {
+    public Element buildBillingItemList(UserPreferences userPreferences) {
         this.mode = MODE_BILLING_ITEM_LIST;
-        return this.buildList();
+        return this.buildList(userPreferences);
     }
 
-    public Element buildBillingRequestList() {
+    public Element buildBillingRequestList(UserPreferences userPreferences) {
         this.mode = MODE_BILLING_REQUEST_LIST;
-        return this.buildList();
+        return this.buildList(userPreferences);
     }
 
-    private Element buildList() {
+    private Element buildList(UserPreferences userPreferences) {
         Map<String, Element> statusMap = new HashMap<String, Element>();
         Map<String, Element> labMap = new HashMap<String, Element>();
         Element root = new Element(mode == MODE_BILLING_REQUEST_LIST ? "BillingRequestList" : "BillingItemList");
 
         if (requestNumber != null) {
-            this.buildXML(root, statusMap, labMap, this.getRequestNumberQueryResult(), RESULT_SET_TYPE_REQUEST);
+            this.buildXML(root, statusMap, labMap, this.getRequestNumberQueryResult(), RESULT_SET_TYPE_REQUEST, userPreferences);
         } else if (invoiceLookupNumber != null) {
             // Search requests
-            this.buildXML(root, statusMap, labMap, this.getInvoiceNumberQueryResult("Request", "req", "idRequest"), RESULT_SET_TYPE_REQUEST);
+            this.buildXML(root, statusMap, labMap, this.getInvoiceNumberQueryResult("Request", "req", "idRequest"), RESULT_SET_TYPE_REQUEST, userPreferences);
 
             // Search product orders
-            this.buildXML(root, statusMap, labMap, this.getInvoiceNumberQueryResult("ProductOrder", "po", "idProductOrder"), RESULT_SET_TYPE_PRODUCT_ORDER);
+            this.buildXML(root, statusMap, labMap, this.getInvoiceNumberQueryResult("ProductOrder", "po", "idProductOrder"), RESULT_SET_TYPE_PRODUCT_ORDER, userPreferences);
 
             // Search disk usage
-            this.buildXML(root, statusMap, labMap, this.getInvoiceNumberQueryResult("DiskUsageByMonth", "dsk", "idDiskUsageByMonth"), RESULT_SET_TYPE_DISK_USAGE);
+            this.buildXML(root, statusMap, labMap, this.getInvoiceNumberQueryResult("DiskUsageByMonth", "dsk", "idDiskUsageByMonth"), RESULT_SET_TYPE_DISK_USAGE, userPreferences);
         } else {
             // Search requests
-            this.buildXML(root, statusMap, labMap, this.getMainQueryResult("Request", "req", "idRequest"), RESULT_SET_TYPE_REQUEST);
+            this.buildXML(root, statusMap, labMap, this.getMainQueryResult("Request", "req", "idRequest"), RESULT_SET_TYPE_REQUEST, userPreferences);
 
             // Search product orders
-            this.buildXML(root, statusMap, labMap, this.getMainQueryResult("ProductOrder", "po", "idProductOrder"), RESULT_SET_TYPE_PRODUCT_ORDER);
+            this.buildXML(root, statusMap, labMap, this.getMainQueryResult("ProductOrder", "po", "idProductOrder"), RESULT_SET_TYPE_PRODUCT_ORDER, userPreferences);
 
             // Search disk usage
-            this.buildXML(root, statusMap, labMap, this.getMainQueryResult("DiskUsageByMonth", "dsk", "idDiskUsageByMonth"), RESULT_SET_TYPE_DISK_USAGE);
+            this.buildXML(root, statusMap, labMap, this.getMainQueryResult("DiskUsageByMonth", "dsk", "idDiskUsageByMonth"), RESULT_SET_TYPE_DISK_USAGE, userPreferences);
         }
 
         if (sortResults) {
@@ -162,10 +162,10 @@ public class BillingListManager {
         }
     }
 
-    private void buildXML(Element root, Map<String, Element> statusMap, Map<String, Element> labMap, Set<Integer> resultSet, int resultSetType) {
+    private void buildXML(Element root, Map<String, Element> statusMap, Map<String, Element> labMap, Set<Integer> resultSet, int resultSetType, UserPreferences userPreferences) {
         for (Integer idOrder : resultSet) {
             for (QueryRowResult rowResult : this.makeOrderNodesQuery(idOrder, resultSetType)) {
-                Element node = this.createOrderNode(rowResult, resultSetType);
+                Element node = this.createOrderNode(rowResult, resultSetType, userPreferences);
 
                 if (mode == MODE_BILLING_REQUEST_LIST) {
                     // Make status node
@@ -200,14 +200,14 @@ public class BillingListManager {
                         labNode.addContent(node);
                     }
                 } else if (mode == MODE_BILLING_ITEM_LIST) {
-                    this.appendBillingItemNodes(node, rowResult, resultSetType);
+                    this.appendBillingItemNodes(node, rowResult, resultSetType, userPreferences);
                     root.addContent(node);
                 }
             }
         }
     }
 
-    private void appendBillingItemNodes(Element node, QueryRowResult queryResult, int resultSetType) {
+    private void appendBillingItemNodes(Element node, QueryRowResult queryResult, int resultSetType, UserPreferences userPreferences) {
         String idColumnName = null;
         Integer id = null;
         if (resultSetType == RESULT_SET_TYPE_REQUEST) {
@@ -230,7 +230,7 @@ public class BillingListManager {
         totalPrice = totalPrice.setScale(2, BigDecimal.ROUND_UP);
         for (Integer idBillingItem : idBillingItemsMain) {
             BillingItem item = sess.get(BillingItem.class, idBillingItem);
-            Element billingItemNode = this.createBillingItemNode(item, false, nf);
+            Element billingItemNode = this.createBillingItemNode(item, false, nf, userPreferences);
             node.addContent(billingItemNode);
             invoicePrice = invoicePrice.add(item.getInvoicePrice() != null ? item.getInvoicePrice() : new BigDecimal(0));
             totalPrice = totalPrice.add(item.getTotalPrice() != null ? item.getTotalPrice() : new BigDecimal(0));
@@ -241,19 +241,19 @@ public class BillingListManager {
         if (showOtherBillingItems) {
             for (Integer idBillingItem : this.getIdBillingItems(idColumnName, id, idBillingAccount, true)) {
                 BillingItem item = sess.get(BillingItem.class, idBillingItem);
-                Element billingItemNode = this.createBillingItemNode(item, true, nf);
+                Element billingItemNode = this.createBillingItemNode(item, true, nf, userPreferences);
                 node.addContent(billingItemNode);
             }
         }
     }
 
-    private Element createBillingItemNode(BillingItem bi, boolean isOther, NumberFormat nf) {
+    private Element createBillingItemNode(BillingItem bi, boolean isOther, NumberFormat nf, UserPreferences userPreferences) {
         Element billingItemNode = new Element("BillingItem");
         billingItemNode.setAttribute("description", bi.getDescription());
         billingItemNode.setAttribute("idBillingAccount", bi.getIdBillingAccount().toString());
         billingItemNode.setAttribute("idCoreFacility", this.getNonNullString(bi.getIdCoreFacility()));
         billingItemNode.setAttribute("idProductOrder", this.getNonNullString(bi.getIdProductOrder()));
-        billingItemNode.setAttribute("labName", bi.getLabName());
+        billingItemNode.setAttribute("labName", Util.getLabDisplayName(bi.getLab(), userPreferences));
         billingItemNode.setAttribute("notes", this.getNonNullString(bi.getNotes()));
         billingItemNode.setAttribute("accountName", bi.getAccountName());
         billingItemNode.setAttribute("idLab", bi.getIdLab().toString());
@@ -290,7 +290,7 @@ public class BillingListManager {
         return billingItemNode;
     }
 
-    private Element createOrderNode(QueryRowResult queryResult, int resultSetType) {
+    private Element createOrderNode(QueryRowResult queryResult, int resultSetType, UserPreferences userPreferences) {
         Element node = new Element("Request");
         StringBuilder toolTip = new StringBuilder();
         Date createDate = null;
@@ -340,7 +340,7 @@ public class BillingListManager {
             node.setAttribute("idBillingAccount", idBillingAccountString);
             node.setAttribute("createDate", createDateString);
             node.setAttribute("completedDate", completedDateString);
-            node.setAttribute("submitter", submitter.getDisplayName());
+            node.setAttribute("submitter", Util.getAppUserDisplayName(submitter, userPreferences));
             if (mode == MODE_BILLING_REQUEST_LIST) {
                 node.setAttribute("codeBillingStatus", codeBillingStatus);
                 node.setAttribute("hasBillingItems", hasBillingItems);
@@ -432,7 +432,7 @@ public class BillingListManager {
         String labIsExternalPricingCommercial = queryResult.getFieldValueString("lab.isExternalPricingCommercial", null);
         String idLab = queryResult.getFieldValueIntegerAsString("lab.idLab");
 
-        String labName = Lab.formatLabName(labLastName, labFirstName);
+        String labName = Util.formatLabDisplayName(labFirstName, labLastName, userPreferences);
         toolTip.append(" ");
         toolTip.append(labName);
         StringBuilder labBillingName = new StringBuilder();

@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import hci.gnomex.utility.Util;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -226,7 +227,7 @@ public class Topic extends DetailObject implements Serializable, VisibilityInter
      root.setAttribute("description", this.getDescription() != null ? this.getDescription() : "");	
      root.setAttribute("lab", this.getIdLab() != null ? dictionaryHelper.getLabObject(this.getIdLab()).getName() : "");
      root.setAttribute("idLab", this.getIdLab() != null ? this.getIdLab().toString() : "");
-     root.setAttribute("appUser", this.getIdAppUser() != null ? dictionaryHelper.getAppUserObject(this.getIdAppUser()).getDisplayName() : "");
+     root.setAttribute("appUser", this.getIdAppUser() != null ? Util.getAppUserDisplayName(dictionaryHelper.getAppUserObject(this.getIdAppUser()), secAdvisor.getUserPreferences()) : "");
      root.setAttribute("idAppUser", this.getIdAppUser() != null ? this.getIdAppUser().toString() : "");
      root.setAttribute("codeVisibility", this.getNonNullString(this.getCodeVisibility()));
      root.setAttribute("idInstitution", this.getIdInstitution() != null ? this.getIdInstitution().toString() : "");

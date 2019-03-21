@@ -26,9 +26,9 @@
                         <mat-form-field class="formField">
                             <input matInput placeholder="Lab" aria-label="State" [matAutocomplete]="autoLab"
                                    formControlName="selectLab" (keyup.enter)="firstLabOpt()"  >
-                            <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
+                            <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
                                 <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let lab of  filterLabList(topicForm.get('selectLab').value)" [value]="lab">
-                                    {{lab.name }}
+                                    {{lab[this.prefService.labDisplayField] }}
                                 </mat-option>
                             </mat-autocomplete>
                             <mat-error *ngIf="topicForm?.get('selectLab')?.hasError('required')">
@@ -40,7 +40,7 @@
                             <mat-select placeholder="Owner" formControlName="selectOwner">
                                 <mat-option>-- None --</mat-option>
                                 <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem.idAppUser">
-                                    {{ mem.displayName }}
+                                    {{ mem[this.prefService.userDisplayField] }}
                                 </mat-option>
                             </mat-select>
                             <mat-error *ngIf="topicForm?.get('selectOwner')?.hasError('required')"> Owner is required</mat-error>

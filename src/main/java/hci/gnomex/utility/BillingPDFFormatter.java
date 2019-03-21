@@ -98,24 +98,24 @@ public class BillingPDFFormatter extends DetailObject {
 		useInvoiceNumbering = PropertyDictionaryHelper.getInstance(this.sess).getCoreFacilityProperty(this.coreFacility.getIdCoreFacility(), PropertyDictionary.USE_INVOICE_NUMBERING);
 	}
 	
-	public ArrayList<Element> makeContent() {
+	public ArrayList<Element> makeContent(UserPreferences userPreferences) {
 		ArrayList<Element> content = new ArrayList<Element>();
 		
 		if (multipleLabs && labs.length > 0) {
-			content.addAll(makeContentForLab(labs[0], billingAccounts[0], billingItemMap[0], relatedBillingItemMap[0], requestMap[0]));
+			content.addAll(makeContentForLab(labs[0], billingAccounts[0], billingItemMap[0], relatedBillingItemMap[0], requestMap[0], userPreferences));
 			for (int i = 1; i < labs.length; i++) {
 				content.add(Chunk.NEXTPAGE);
-				content.addAll(makeContentForLab(labs[i], billingAccounts[i], billingItemMap[i], relatedBillingItemMap[i], requestMap[i]));
+				content.addAll(makeContentForLab(labs[i], billingAccounts[i], billingItemMap[i], relatedBillingItemMap[i], requestMap[i], userPreferences));
 			}
 		}
 		else {
-			content.addAll(makeContentForLab(lab, billingAccount, billingItemMap[0], relatedBillingItemMap[0], requestMap[0]));
+			content.addAll(makeContentForLab(lab, billingAccount, billingItemMap[0], relatedBillingItemMap[0], requestMap[0], userPreferences));
 		}
 		
 		return content;
 	}
 	
-	private ArrayList<Element> makeContentForLab(Lab lab, BillingAccount billingAccount, Map billingItemMap, Map relatedBillingItemMap, Map requestMap) {
+	private ArrayList<Element> makeContentForLab(Lab lab, BillingAccount billingAccount, Map billingItemMap, Map relatedBillingItemMap, Map requestMap, UserPreferences userPreferences) {
 		isDNASeqCore = billingAccount.getIdCoreFacility().intValue() == CoreFacility.CORE_FACILITY_DNA_SEQ_ID.intValue();
 		grandTotal = new BigDecimal(0);
 		
@@ -124,7 +124,7 @@ public class BillingPDFFormatter extends DetailObject {
 		ArrayList<Element> content = new ArrayList<Element>();
 		
 		// Header
-		ArrayList<Element> headerElements = makeHeader(lab, billingAccount, invoice);
+		ArrayList<Element> headerElements = makeHeader(lab, billingAccount, invoice, userPreferences);
 		for (Element e : headerElements) {
 			content.add(e);
 		}
@@ -132,7 +132,7 @@ public class BillingPDFFormatter extends DetailObject {
 		content.add(Chunk.NEWLINE);
 		
 		// Body table
-		ArrayList<Element> bodyElements = makeBody(invoice, lab, billingAccount, billingItemMap, relatedBillingItemMap, requestMap);
+		ArrayList<Element> bodyElements = makeBody(invoice, lab, billingAccount, billingItemMap, relatedBillingItemMap, requestMap, userPreferences);
 		for (Element e : bodyElements) {
 			content.add(e);
 		}
@@ -140,11 +140,11 @@ public class BillingPDFFormatter extends DetailObject {
 		return content;
 	}
 	
-	private ArrayList<Element> makeHeader(Lab lab, BillingAccount billingAccount, Invoice invoice) {
+	private ArrayList<Element> makeHeader(Lab lab, BillingAccount billingAccount, Invoice invoice, UserPreferences userPreferences) {
 		ArrayList<Element> headerElements = new ArrayList<Element>();
 		
 		if (!isDNASeqCore) {
-			headerElements.addAll(makeLabInfoHeader(lab, billingAccount));
+			headerElements.addAll(makeLabInfoHeader(lab, billingAccount, userPreferences));
 			headerElements.add(Chunk.NEWLINE);
 		}
 		
@@ -156,7 +156,7 @@ public class BillingPDFFormatter extends DetailObject {
 		}
 		
 		if (!headerElements.isEmpty()) headerElements.add(Chunk.NEWLINE);
-		headerElements.addAll(makePersonalAddressHeader(lab, billingAccount));
+		headerElements.addAll(makePersonalAddressHeader(lab, billingAccount, userPreferences));
 		headerElements.add(Chunk.NEWLINE);
 		
 		if (isDNASeqCore && billingAccount.getIsPO().equals("N") && billingAccount.getIsCreditCard().equals("N")) {
@@ -190,7 +190,7 @@ public class BillingPDFFormatter extends DetailObject {
 		return headerElements;
 	}
 	
-	private ArrayList<Element> makeBody(Invoice invoice, Lab lab, BillingAccount billingAccount, Map billingItemMap, Map relatedBillingItemMap, Map requestMap) {
+	private ArrayList<Element> makeBody(Invoice invoice, Lab lab, BillingAccount billingAccount, Map billingItemMap, Map relatedBillingItemMap, Map requestMap, UserPreferences userPreferences) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 
 		// Table
@@ -236,7 +236,7 @@ public class BillingPDFFormatter extends DetailObject {
 			String number = (String) i.next();
 			BigDecimal totalPriceForRequest = new BigDecimal(0);
 			
-			populateTableRequestHeader(table, number, showPercentColumn, columnCount, billingItemMap, relatedBillingItemMap, requestMap);
+			populateTableRequestHeader(table, number, showPercentColumn, columnCount, billingItemMap, relatedBillingItemMap, requestMap, userPreferences);
 			List billingItems = (List) billingItemMap.get(number);
 			for (Iterator biIter = billingItems.iterator(); biIter.hasNext();) {
 				BillingItem bi = (BillingItem) biIter.next();
@@ -328,7 +328,7 @@ public class BillingPDFFormatter extends DetailObject {
 		return remitTable;
 	}
 	
-	private void populateTableRequestHeader(PdfPTable table, String number, boolean showPercentColumn, int columnCount, Map billingItemMap, Map relatedBillingItemMap, Map requestMap) {
+	private void populateTableRequestHeader(PdfPTable table, String number, boolean showPercentColumn, int columnCount, Map billingItemMap, Map relatedBillingItemMap, Map requestMap, UserPreferences userPreferences) {
 		Request request = null;
 		DiskUsageByMonth dsk = null;
 		ProductOrder po = null;
@@ -342,7 +342,7 @@ public class BillingPDFFormatter extends DetailObject {
 		
 		String client = "";
 		if (request != null && request.getAppUser() != null) {
-			client = request.getAppUser().getDisplayName();
+			client = Util.getAppUserDisplayName(request.getAppUser(), userPreferences);
 		} else if (dsk != null) {
 			client = "Disk Usage";
 		} else {
@@ -475,20 +475,20 @@ public class BillingPDFFormatter extends DetailObject {
 		PDFFormatterUtil.addToTable(table, invoicePrice, FONT_TABLE_VALUE_RELATED_ITEMS, Element.ALIGN_CENTER, Element.ALIGN_MIDDLE, false, false, false, false, BaseColor.BLACK, 1, 1);
 	}
 	
-	private ArrayList<Element> makeLabInfoHeader(Lab lab, BillingAccount billingAccount) {
+	private ArrayList<Element> makeLabInfoHeader(Lab lab, BillingAccount billingAccount, UserPreferences userPreferences) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 		
-		PDFFormatterUtil.addPhrase(elements, lab.getName(false, true), FONT_HEADER);
+		PDFFormatterUtil.addPhrase(elements, Util.getLabDisplayName(lab, userPreferences), FONT_HEADER);
 		PDFFormatterUtil.addPhrase(elements, formatAccountNumber(billingAccount.getAccountNumber(), billingAccount.getAccountName()), FONT_HEADER);		
 		
 		return elements;
 	}
 	
-	private ArrayList<Element> makePersonalAddressHeader(Lab lab, BillingAccount billingAccount) {
+	private ArrayList<Element> makePersonalAddressHeader(Lab lab, BillingAccount billingAccount, UserPreferences userPreferences) {
 		ArrayList<Element> elements = new ArrayList<Element>();
 		
 		if (isDNASeqCore && billingAccount.getIsPO().equals("Y") && billingAccount.getIsCreditCard().equals("N")) {
-			PDFFormatterUtil.addPhrase(elements, lab.getName(false, true), FONT_HEADER);
+			PDFFormatterUtil.addPhrase(elements, Util.getLabDisplayName(lab, userPreferences), FONT_HEADER);
 		}
 		if (lab.getContactName() != null && !lab.getContactName().equals("")) {
 			PDFFormatterUtil.addPhrase(elements, "ATTN: " + lab.getContactName(), FONT_HEADER);

@@ -15,6 +15,7 @@ import {
 } from "../util/billing-template-window.component";
 import {BillingService} from "../services/billing.service";
 import {WorkAuthorizationTypeSelectorDialogComponent} from "./work-authorization-type-selector-dialog.component";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'order-products',
@@ -87,7 +88,8 @@ export class OrderProductsComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private router: Router,
                 private dialog: MatDialog,
-                private billingService: BillingService) {
+                private billingService: BillingService,
+                public prefService: UserPreferencesService) {
     }
 
     ngOnInit() {

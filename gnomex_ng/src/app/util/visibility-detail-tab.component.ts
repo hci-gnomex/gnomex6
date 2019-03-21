@@ -12,6 +12,7 @@ import {GridApi} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {MatSelectChange} from "@angular/material";
 import {first} from "rxjs/operators";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'visibility-detail-tab',
@@ -44,7 +45,7 @@ import {first} from "rxjs/operators";
                             <mat-option ></mat-option>
                             <mat-option *ngFor="let collab of this.collabDropdown"
                                         [value]="collab" >
-                                {{collab.displayName}}
+                                {{collab[this.prefService.userDisplayField]}}
                             </mat-option>
                         </mat-select>
                         <mat-error *ngIf="this.visibilityForm?.get('collaborator')?.hasError('selectRequired')">
@@ -135,7 +136,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     public columnDefs = [
         {
             headerName: "Collaborator",
-            field: "displayName",
+            field: this.prefService.userDisplayField,
             width: 200,
             editable:false
         },
@@ -159,9 +160,9 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     ];
 
     sortFn = (obj1,obj2 ) =>{
-        if (obj1.displayName < obj2.displayName)
+        if (obj1[this.prefService.userDisplayField] < obj2[this.prefService.userDisplayField])
             return -1;
-        if (obj1.displayName> obj2.displayName)
+        if (obj1[this.prefService.userDisplayField] > obj2[this.prefService.userDisplayField])
             return 1;
         return 0;
     };
@@ -173,7 +174,8 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
                 private propertyService: PropertyService,
                 public constService: ConstantsService,
                 private gnomexService:GnomexService,
-                private getLabService : GetLabService) {
+                private getLabService : GetLabService,
+                public prefService: UserPreferencesService) {
     }
 
 
@@ -280,7 +282,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
                 break;
             }
 
-            collab.displayName = refCollab.displayName;
+            collab[this.prefService.userDisplayField] = refCollab[this.prefService.userDisplayField];
         }
 
         return currentCollabs;
@@ -374,11 +376,11 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
         if(collabVal){
             let collabGridItem = {
                     idAppUser: collabVal.idAppUser,
-                    displayName: collabVal.displayName,
                     canUploadData: 'N',
                     canUpdate: 'N'
                 }
             ;
+            collabGridItem[this.prefService.userDisplayField] = collabVal[this.prefService.userDisplayField];
             // add to grid
             this.collabGridRowData.push(collabGridItem);
             this.gridApi.setRowData(this.collabGridRowData);

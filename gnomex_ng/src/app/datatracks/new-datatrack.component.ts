@@ -6,6 +6,7 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DictionaryService} from "../services/dictionary.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'new-datatrack-folder',
@@ -30,6 +31,7 @@ export class NewDataTrackComponent implements OnInit{
                 private labListService: LabListService,
                 private dictionaryService: DictionaryService,
                 private dialogsService: DialogsService,
+                public prefService: UserPreferencesService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
 
         this.selectedItem = data.selectedItem;

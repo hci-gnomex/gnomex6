@@ -13,6 +13,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {Subscription} from "rxjs";
 import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 
 @Component({
@@ -101,7 +102,8 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
     constructor(private appConstants:ConstantsService,private route:ActivatedRoute,
                 public experimentsService:ExperimentsService, private router:Router,
                 public dictionary:DictionaryService,
-                public createSecurityAdvisorService: CreateSecurityAdvisorService){
+                public createSecurityAdvisorService: CreateSecurityAdvisorService,
+                public prefService: UserPreferencesService){
     }
 
     ngOnInit(){
@@ -202,7 +204,7 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
                 if(requestList){
                     requestList.forEach(rObject => {
                         this.getExperimentKind(rObject);
-                        rObject["ownerFullName"] = rObject.ownerLastName + ', ' + rObject.ownerFirstName;
+                        rObject["ownerFullName"] = this.prefService.formatUserName(rObject.ownerFirstName, rObject.ownerLastName);
                         rObject["analysisChecked"] = rObject.analysisNames !== '' ? 'Y' : 'N';
 
                         flatRequestList.push(rObject);
@@ -237,7 +239,7 @@ export class BrowseOverviewComponent implements OnInit,OnDestroy{
                                     this.experimentIdSet.add(requestList[k].requestNumber);
                                 }
                                 this.getExperimentKind(requestList[k]);
-                                requestList[k]["ownerFullName"] = requestList[k].ownerLastName + ', ' + requestList[k].ownerFirstName;
+                                requestList[k]["ownerFullName"] = this.prefService.formatUserName(requestList[k].ownerFirstName, requestList[k].ownerLastName);
                                 requestList[k]["analysisChecked"] = requestList[k].analysisNames !== '' ? 'Y' : 'N';
                             }
                         }

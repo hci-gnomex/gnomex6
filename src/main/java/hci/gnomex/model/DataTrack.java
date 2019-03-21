@@ -9,6 +9,7 @@ import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DataTrackUtil;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.USeqUtilities;
+import hci.gnomex.utility.Util;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -288,7 +289,7 @@ public class DataTrack extends DetailObject implements Serializable, Owned, Visi
         root.setAttribute("idAppUser", this.getIdAppUser() != null ? this.getIdAppUser().toString() : "");
         root.setAttribute("idLab", this.getIdLab() != null ? this.getIdLab().toString() : "");
         root.setAttribute("idInstitution", this.getIdInstitution() != null ? this.getIdInstitution().toString() : "");
-        root.setAttribute("owner", this.getIdAppUser() != null ? dh.getAppUserObject(this.getIdAppUser()).getDisplayName() : "");
+        root.setAttribute("owner", this.getIdAppUser() != null ? Util.getAppUserDisplayName(dh.getAppUserObject(this.getIdAppUser()), secAdvisor.getUserPreferences()) : "");
         root.setAttribute("genomeBuild", genomeBuild.getGenomeBuildName() );
         String orgString = DictionaryManager.getDisplay("hci.gnomex.model.OrganismLite", genomeBuild.getIdOrganism().toString());
         root.setAttribute("idOrganism", genomeBuild.getIdOrganism() != null ? genomeBuild.getIdOrganism().toString() : "");
@@ -353,8 +354,8 @@ public class DataTrack extends DetailObject implements Serializable, Owned, Visi
                     Element userNode = new Element("AppUser");
                     collaboratorsNode.addContent(userNode);
                     userNode.setAttribute("idAppUser", u.getIdAppUser().toString());
-                    userNode.setAttribute("name", u.getDisplayName());
-                    userNode.setAttribute("userDisplayName", u.getDisplayName());
+                    userNode.setAttribute("name", Util.getAppUserDisplayName(u, secAdvisor.getUserPreferences()));
+                    userNode.setAttribute("userDisplayName", Util.getAppUserDisplayName(u, secAdvisor.getUserPreferences()));
                 }
             }
         }
@@ -409,8 +410,8 @@ public class DataTrack extends DetailObject implements Serializable, Owned, Visi
                     Element userNode = new Element("AppUser");
                     possibleCollaboratorsNode.addContent(userNode);
                     userNode.setAttribute("idAppUser", user.getIdAppUser().toString());
-                    userNode.setAttribute("name", user.getDisplayName());
-                    userNode.setAttribute("userDisplayName", user.getDisplayName());
+                    userNode.setAttribute("name", Util.getAppUserDisplayName(user, secAdvisor.getUserPreferences()));
+                    userNode.setAttribute("userDisplayName", Util.getAppUserDisplayName(user, secAdvisor.getUserPreferences()));
                 }
 
             }

@@ -70,8 +70,7 @@ public Command execute() throws RollBackCommandException {
 			theAppUser.excludeMethodFromXML("getPasswordExternal");
 
 			Document doc = new Document(new Element("OpenAppUserList"));
-			doc.getRootElement().addContent(
-					theAppUser.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement());
+			doc.getRootElement().addContent(theAppUser.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement());
 
 			getCoreFacilities(sess, doc, theAppUser);
 			getCoreFacilitiesICanSubmitTo(sess, doc, theAppUser);
