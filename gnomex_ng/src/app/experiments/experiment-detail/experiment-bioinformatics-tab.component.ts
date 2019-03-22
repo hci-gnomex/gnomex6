@@ -7,12 +7,12 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 @Component({
     selector: 'experiment-bioinformatics-tab',
     templateUrl: 'experiment-bioinformatics-tab.component.html',
-    styles: [`        
+    styles: [`
         
         .margin-top { margin-top: 0.5rem; }
         
         
-        .label { 
+        .label {
             color: blue;
             font-style: italic;
             
@@ -270,7 +270,16 @@ export class ExperimentBioinformaticsTabComponent {
         } else {
             this._experiment.sequenceLanes = [];
 
-            for (let sample of this._experiment.samples) {
+            let samples: any[] = [];
+            if(this._experiment.samples) {
+                if (Array.isArray(this._experiment.samples)) {
+                    samples = this._experiment.samples;
+                } else {
+                    samples = [this._experiment.samples.Sample];
+                }
+            }
+
+            for (let sample of samples) {
                 let idOrganism: string = '';
 
                 if (sample.idOrganism) {

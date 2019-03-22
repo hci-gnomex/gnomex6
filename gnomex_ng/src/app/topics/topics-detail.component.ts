@@ -263,7 +263,6 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             data.format =  "text";
             data.idAppUser = idAppUser;
 
-
             let params: HttpParams = new HttpParams()
                 .set("body", data.body)
                 .set("format", data.format)
@@ -271,22 +270,38 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 .set("idAppUser", data.idAppUser)
                 .set("subject", data.subject);
 
-
-
             this.topicService.emailTopicOwner(params).pipe(first()).subscribe(resp => {
                 let email = <BasicEmailDialogComponent>this.emailImportDialogRef.componentInstance;
                 email.showSpinner = false;
 
-                let snackBarRef = this.snackBar.open("Email was sent", "Email Topic", {
-                    duration: 2000
-                });
+                if(resp && resp.result === "SUCCESS") {
+                    this.emailImportDialogRef.close();
 
+                    this.snackBar.open("Email was sent", "Email Topic Owner", {
+                        duration: 2000
+                    });
+
+                } else if(resp && resp.message) {
+                    this.dialogService.alert("Error sending email" + ": " + resp.message);
+                }
+
+            }, error => {
+                this.dialogService.alert(error);
             });
         };
 
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = "40em";
-        configuration.data = { saveFn: saveFn };
+        configuration.width = "45em";
+        configuration.height = "35em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = false;
+        configuration.disableClose = true;
+        configuration.data = {
+            saveFn: saveFn,
+            title: "Email Topic Owner",
+            parentComponent: "Topics",
+            subjectText: "",
+        };
 
         this.emailImportDialogRef = this.dialog.open(BasicEmailDialogComponent, configuration);
     }
