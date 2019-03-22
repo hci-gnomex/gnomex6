@@ -13,12 +13,24 @@
                 <img [src]="this.constService.ICON_DOWNLOAD" class="icon">
                 Download Files
             </button>
+            <button mat-button color="link" (click)="showPrintableRequestForm()">
+                <img class="icon" [src]="this.constService.PAGE_WHITE_ACROBAT">
+                Print Experiment Order
+            </button>
+            <button mat-button *ngIf="showCreateAnalysisButton" [disabled]="isDirty"
+                    (click)="createNewAnalysis($event)"
+                    [matTooltip]="!isDirty ? toolTips.CREATE_NEW_ANALYSIS : toolTips.CREATE_NEW_ANALYSIS_DIRTY">
+                <img class="icon" [src]="this.constService.ICON_ANALYSIS">Create New Analysis
+            </button>
             <button mat-button color="link" (click)="shareLink()">
                 <img class="icon" [src]="this.constService.GLOBE_LINK">Share URL
             </button>
+            <button mat-button *ngIf="!this.secAdvisor.isGuest" color="link" (click)="onEmailClick()">
+                <img class="icon" [src]="this.constService.EMAIL_GO_LINK">Contact Core
+            </button>
         </div>
     </div>
-    <div class="flex-grow-greater overflow">
+    <div class="flex-grow-greater overflow-auto">
         <mat-tab-group class="full-width full-height bordered" (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Overview">
                 <experiment-overview-tab [experiment]="experiment"></experiment-overview-tab>

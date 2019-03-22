@@ -5,7 +5,13 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {OrderType} from "../../util/annotation-tab.component";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {ExperimentsService} from "../experiments.service";
-import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
+import {
+    MatDialog,
+    MatDialogConfig,
+    MatDialogRef,
+    MatSnackBar,
+    MatTabChangeEvent,
+} from "@angular/material";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {Subscription} from "rxjs";
@@ -20,6 +26,18 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {DownloadFilesComponent} from "../../util/download-files.component";
 import {FileService} from "../../services/file.service";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
+import {CreateAnalysisComponent} from "../../analysis/create-analysis.component";
+import {HttpParams} from "@angular/common/http";
+import {first} from "rxjs/operators";
+import {BasicEmailDialogComponent} from "../../util/basic-email-dialog.component";
+
+export const TOOLTIPS = Object.freeze({
+    PRINT_EXPERIMENT_ORDER: "Create PDF form for this experiment order",
+    CREATE_NEW_ANALYSIS: "Create an analysis linked to this experiment",
+    CREATE_NEW_ANALYSIS_DIRTY: "Please save the request before creating a linked analysis",
+    CONTACT_CORE: "Email Core Regarding this Experiment",
+    ARCHIVE: "Archive experiment"
+});
 
 @Component({
     templateUrl: "./experiment-detail-overview.component.html",
@@ -58,9 +76,11 @@ import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
         .flex-grow-greater {
             flex: 10;
         }
-    `],
+    `]
 })
 export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
+    public toolTips: any = TOOLTIPS;
+
     public annotations: any = [];
     public experiment: any;
 
@@ -73,14 +93,18 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public showRelatedDataTab: boolean = false;
     public experimentOverviewNode: any;
     public showEdit: boolean = false;
-    public isEditMode: boolean;
+    public isEditMode: boolean = false;
     public nodeTitle: string = "";
     public showBillingTab: boolean = false;
+    public isDirty: boolean = false;
+    public showCreateAnalysisButton: boolean = false;
 
     public types = OrderType;
 
     private overviewListSubscription: Subscription;
     private requestCategory: any;
+    private createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
+    private contactCoreEmailDialogRef: MatDialogRef<BasicEmailDialogComponent>;
 
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
@@ -92,11 +116,12 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 private gnomexService: GnomexService,
                 private propertyService: PropertyService,
                 public constService: ConstantsService,
-                private secAdvisor: CreateSecurityAdvisorService,
+                public secAdvisor: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
                 private route: ActivatedRoute,
                 private fileService: FileService,
-                private dialog: MatDialog) {
+                private dialog: MatDialog,
+                private snackBar: MatSnackBar) {
     }
 
     ngOnInit(): void {
@@ -110,6 +135,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             this.experiment = null;
             this.showSequenceLanesTab = false;
             this.showBillingTab = false;
+            this.showCreateAnalysisButton = false;
 
             if (data && data.experiment && data.experiment.Request) {
                 this.experiment  = data.experiment.Request;
@@ -133,6 +159,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                             || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"));
                 }
 
+                this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.requestCategory.isActive === "Y" && this.requestCategory.associatedWithAnalysis === "Y";
                 this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
                 this.showBillingTab = this.experiment.canRead === "Y" && this.experiment.isExternal !== "Y";
 
@@ -296,6 +323,101 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             type: "requestNumber"
         };
         this.dialog.open(ShareLinkDialogComponent, configuration);
+    }
+
+    showPrintableRequestForm() {
+        if (this.experiment && this.experiment.idRequest) {
+            window.open("ShowRequestForm.gx?idRequest=" + this.experiment.idRequest, "_blank");
+        }
+    }
+
+    createNewAnalysis(event: any) {
+        if (this.experiment) {
+            let items = [];
+
+            let useThisLabList: any[];
+            if (this.secAdvisor.isSuperAdmin) {
+                useThisLabList = this.experimentService.labList;
+            } else {
+                useThisLabList = this.experimentService.filteredLabs;
+            }
+
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.width = "35em";
+            // config.height = "30em";
+            config.panelClass = "no-padding-dialog";
+            config.autoFocus = false;
+            config.disableClose = true;
+            config.data = {
+                labList: useThisLabList,
+                items: items,
+                selectedLab: this.experiment.idLab,
+                selectedLabAnalysis: null,
+                selectedOrganism: this.experiment.idOrganismSampleDefault,
+
+            };
+
+            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, config);
+        }
+    }
+
+    onEmailClick(): void {
+        if (this.experiment) {
+            let subjectText = "Inquiry about Experiment " + this.experiment.number;
+
+            let saveFn = (data: any) => {
+
+                data.format =  "text";
+                data.idAppUser = this.secAdvisor.idAppUser.toString();
+
+                let coreFacility = this.dictionaryService.getEntry("hci.gnomex.model.CoreFacility", this.experiment.idCoreFacility);
+                if (coreFacility) {
+                    data.toAddress = coreFacility.contactEmail;
+                }
+
+                    let params: HttpParams = new HttpParams()
+                    .set("body", data.body)
+                    .set("format", data.format)
+                    .set("senderAddress", data.fromAddress)
+                    .set("recipientAddress", data.toAddress)
+                    .set("idAppUser", data.idAppUser)
+                    .set("subject", data.subject);
+
+                this.experimentService.emailServlet(params).pipe(first()).subscribe(resp => {
+                    let email = <BasicEmailDialogComponent>this.contactCoreEmailDialogRef.componentInstance;
+                    email.showSpinner = false;
+                    if(resp && resp.result === "SUCCESS") {
+                        this.contactCoreEmailDialogRef.close();
+
+                        this.snackBar.open("Email successfully sent", "Contact Core", {
+                            duration: 2000
+                        });
+
+                    } else if(resp && resp.message) {
+                        this.dialogsService.alert("Error sending email" + ": " + resp.message);
+                    }
+
+                }, error => {
+                    this.dialogsService.alert(error);
+                });
+            };
+
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.width = "45em";
+            configuration.height = "35em";
+            configuration.panelClass = "no-padding-dialog";
+            configuration.autoFocus = false;
+            configuration.disableClose = true;
+            configuration.data = {
+                saveFn: saveFn,
+                title: "Email Core Regarding this Experiment",
+                parentComponent: "Experiment",
+                subjectText: subjectText,
+            };
+
+            this.contactCoreEmailDialogRef = this.dialog.open(BasicEmailDialogComponent, configuration);
+
+        }
     }
 }
 

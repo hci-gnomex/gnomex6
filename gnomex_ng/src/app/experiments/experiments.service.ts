@@ -47,6 +47,8 @@ export class ExperimentsService {
     public invalid:boolean = false;
     public dirty:boolean = false;
     public modeChangedExperiment: any;
+    public filteredLabs: any;
+    public labList: any[] = [];
     private editMode: boolean = false;
 
 
@@ -407,16 +409,21 @@ export class ExperimentsService {
     getRequestDownloadListWithParams(params: HttpParams) {
         return this.httpClient.get("/gnomex/GetRequestDownloadList.gx", {params: params});
     }
+
     getLinkedSampleFiles(params: HttpParams):Observable<any>{
         return this.httpClient.get("/gnomex/GetLinkedSampleFiles.gx", {params:params});
     }
 
-    
     public setEditMode(editMode: boolean): void {
         this.editMode = editMode;
     }
-    
+
     public getEditMode(): boolean {
         return this.editMode;
+    }
+
+    emailServlet(params: HttpParams): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        return this.httpClient.post("/gnomex/EmailServlet.gx", null, {params: params});
     }
 }
