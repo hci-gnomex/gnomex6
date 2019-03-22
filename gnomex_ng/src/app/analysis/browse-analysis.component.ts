@@ -1,6 +1,19 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import { URLSearchParams } from "@angular/http";
-import {TreeComponent, ITreeOptions, TreeNode, TreeModel, TREE_ACTIONS} from "angular-tree-component";
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from "@angular/core";
+import {URLSearchParams} from "@angular/http";
+import {
+    ITreeOptions,
+    TREE_ACTIONS,
+    TreeComponent,
+    TreeModel,
+    TreeNode,
+} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -42,9 +55,9 @@ import {DialogsService} from "../util/popup/dialogs.service";
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
-        /*.no-padding-dialog {*/
-            /*padding: 0;*/
-        /*}*/
+        .no-padding-dialog {
+            padding: 0;
+        }
     `]
 })
 
@@ -134,9 +147,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             this.buildTree(response);
             if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
-                // if (this.createAnalysisDialogRef.componentInstance.showSpinner) {
-                //                 //     this.createAnalysisDialogRef.componentInstance.showSpinner = false;
-                //                 // }
                 this.dialogsService.stopAllSpinnerDialogs();
                 this.newAnalysisName = this.createAnalysisDialogRef.componentInstance.newAnalysisName;
                 this.createAnalysisDialogRef.close();
@@ -389,8 +399,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 items: useItems,
                 selectedLab: this.selectedIdLab,
                 selectedAnalysisGroup: this.selectedIdAnalysisGroup,
-                // selectedLabLabel:   this.selectedLabLabel,
-                // selectedItem:       this.selectedItem
             };
 
             this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);

@@ -13,7 +13,8 @@
                 <img [src]="this.constService.ICON_DOWNLOAD" class="icon">
                 Download Files
             </button>
-            <button mat-button color="link" (click)="showPrintableRequestForm()">
+            <button mat-button color="link" (click)="showPrintableRequestForm()"
+                    [matTooltip]="toolTips.PRINT_EXPERIMENT_ORDER">
                 <img class="icon" [src]="this.constService.PAGE_WHITE_ACROBAT">
                 Print Experiment Order
             </button>
@@ -25,7 +26,8 @@
             <button mat-button color="link" (click)="shareLink()">
                 <img class="icon" [src]="this.constService.GLOBE_LINK">Share URL
             </button>
-            <button mat-button *ngIf="!this.secAdvisor.isGuest" color="link" (click)="onEmailClick()">
+            <button mat-button *ngIf="!this.secAdvisor.isGuest" color="link" (click)="onEmailClick()"
+                    [matTooltip]="toolTips.CONTACT_CORE">
                 <img class="icon" [src]="this.constService.EMAIL_GO_LINK">Contact Core
             </button>
         </div>

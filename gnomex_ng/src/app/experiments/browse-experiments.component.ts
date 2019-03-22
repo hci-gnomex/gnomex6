@@ -1,11 +1,4 @@
-import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component,
-    OnDestroy,
-    OnInit,
-    ViewChild,
-} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 
 import {URLSearchParams} from "@angular/http";
 
