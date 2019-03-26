@@ -1,5 +1,4 @@
 import {Component, Inject} from '@angular/core';
-import {Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
 import {TopicService} from "../services/topic.service";
@@ -7,6 +6,8 @@ import {LabListService} from "../services/lab-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
+import {DialogsService} from "./popup/dialogs.service";
 
 @Component({
     selector: 'new-topic',
@@ -16,9 +17,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 export class NewTopicComponent {
 
     public title: string = "";
-    private parentTopicLabel: string = "";
 
-    private idParentTopic = "";
     public name: string = "";
     public idLab: string = "";
     public idOwner: string = "";
@@ -35,6 +34,7 @@ export class NewTopicComponent {
                 private topicService: TopicService,
                 private labListService: LabListService,
                 public prefService: UserPreferencesService,
+                private dialogService: DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
         if (this.data != null) {
             this.selectedItem = data.selectedItem;
@@ -99,17 +99,25 @@ export class NewTopicComponent {
 
     public save(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idParentTopic", this.selectedItem.data.idTopic);
-        params.set("name", this.name);
-        params.set("description", "");
-        params.set("idLab", this.idLab);
-        params.set("idAppUser", this.idOwner);
-        params.set("codeVisibility", "MEM");
-        this.topicService.saveTopic(params).subscribe((response: Response) => {
+        let params: HttpParams = new HttpParams()
+            .set("idParentTopic", this.selectedItem.data.idTopic ? this.selectedItem.data.idTopic : "")
+            .set("name", this.name)
+            .set("description", "")
+            .set("idLab", this.idLab)
+            .set("idAppUser", this.idOwner)
+            .set("codeVisibility", "MEM");
+        this.topicService.saveTopic(params).subscribe((result: any) => {
             this.showSpinner = false;
-            this.dialogRef.close();
-            this.topicService.refreshTopicsList_fromBackend();
+            if (result && result.result === 'SUCCESS') {
+                this.dialogRef.close();
+                this.topicService.refreshTopicsList_fromBackend();
+            } else {
+                let message: string = "";
+                if (result && result.message) {
+                    message = ": " + result.message;
+                }
+                this.dialogService.alert("An error occurred while saving the topic" + message);
+            }
         });
     }
 
