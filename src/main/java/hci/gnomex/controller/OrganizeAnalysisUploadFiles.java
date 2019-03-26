@@ -122,8 +122,15 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                 throw new Exception("Unable to create directory " + directoryName);
                             }
                         }
+
+                        // tim 01/28/2019 added
+                        this.xmlResult = "<SUCCESS/>";
+                        System.out.println ("[OAULF] (1) this.xmlResult: " + this.xmlResult);
+                        setResponsePage(this.SUCCESS_JSP);
+                        return this;                  // you can only have one...
                     }
 
+                    
                     // Rename files for(Iterator i = parser.getFilesToRenameMap().keySet().iterator(); i.hasNext();)
                     // These are files that were explicitly renamed (or moved) or a directory was renamed (or moved)
                     // thus all the children were too
@@ -231,6 +238,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
 
                             // Change qualifiedFilePath if the file is registered in the db
                             // There is NO reason to do this if we haven't moved or renamed the file!!!!
+/*
                             if (parser.getFileIdMap().containsKey(fileName)) {
 
                                 String idFileString = (String) parser.getFileIdMap().get(fileName);
@@ -279,7 +287,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                     sess.save(af);
                                 }
                             }
-
+*/
                             sourceFile = sourceFile.getAbsoluteFile();
                             String targetDirName = baseDir + Constants.FILE_SEPARATOR + analysis.getNumber() + Constants.FILE_SEPARATOR + qualifiedFilePath;
                             File targetDir = new File(targetDirName);
@@ -356,6 +364,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                 String fileName = (String) i1.next();
 
 //                                System.out.println("[OAUF] delete file: " + fileName);
+/*
 
                                 // Remove references of file in TransferLog
                                 String queryBuf = "SELECT tl from TransferLog tl where tl.idAnalysis = :idAnalysis AND tl.fileName like :fileName";
@@ -373,7 +382,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
 //                                    System.out.println("[OAUF] l 360");
                                     sess.delete(transferLog);
                                 }
-
+*/
                                 // Delete the file from the DB
                                 if (idFileString != null) {
                                     AnalysisFile af;
@@ -424,7 +433,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                             directory.delete();
                         }
                     }
-
+/*
                     // clean up ghost files
                     String queryBuf = "SELECT af from AnalysisFile af where af.idAnalysis = :idAnalysis";
                     Query query = sess.createQuery(queryBuf);
@@ -443,7 +452,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
 //                        System.out.println("[OAUF] remove ghost file: " + filePath);
                         analysis.getFiles().remove(af);
                     }
-
+*/
 //                    System.out.println("[OAUF] l 430 *** at the end ***");
                     sess.flush();
 

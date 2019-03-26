@@ -420,14 +420,15 @@ public class GetExperimentPickList extends GNomExCommand implements Serializable
       String seq1 = null;
 
       String splitLetter = "";
-      if (hybNumber1.indexOf("E") >= 0) {
-        splitLetter = "E";
-      } else if (hybNumber1.indexOf("L") >= 0) {
-        splitLetter = "L";
-      } else if (hybNumber1.indexOf(PropertyDictionaryHelper.getInstance(null).getProperty(PropertyDictionary.SEQ_LANE_LETTER)) >= 0) {
+
+      if (hybNumber1.indexOf(PropertyDictionaryHelper.getInstance(null).getProperty(PropertyDictionary.SEQ_LANE_LETTER)) >= 0) {
         splitLetter = PropertyDictionaryHelper.getInstance(null).getProperty(PropertyDictionary.SEQ_LANE_LETTER);
       } else if (hybNumber1.indexOf("X") >= 0) {
-    	  splitLetter = "X";
+        splitLetter = "X";
+      } else if (hybNumber1.indexOf("L") >= 0) {
+          splitLetter = "L";
+      } else if (hybNumber1.indexOf("E") >= 0) {
+          splitLetter = "E";
       }
       String[] hybNumberTokens1 = hybNumber1.split(splitLetter);
       itemNumber1 = hybNumberTokens1[hybNumberTokens1.length - 1];
@@ -444,15 +445,15 @@ public class GetExperimentPickList extends GNomExCommand implements Serializable
       String itemNumber2 = null;
       String seq2 = null;
       splitLetter = "";
-      if (hybNumber2.indexOf("E") >= 0) {
-        splitLetter = "E";
-      } else if (hybNumber2.indexOf("L") >= 0) {
-        splitLetter = "L";
-      } else if (hybNumber2.indexOf(PropertyDictionaryHelper.getInstance(null).getProperty(PropertyDictionary.SEQ_LANE_LETTER)) >= 0) {
-        splitLetter = PropertyDictionaryHelper.getInstance(null).getProperty(PropertyDictionary.SEQ_LANE_LETTER);
-      } else if (hybNumber2.indexOf("X") >= 0) {
-    	  splitLetter = "X";
-      }
+        if (hybNumber2.indexOf(PropertyDictionaryHelper.getInstance(null).getProperty(PropertyDictionary.SEQ_LANE_LETTER)) >= 0) {
+            splitLetter = PropertyDictionaryHelper.getInstance(null).getProperty(PropertyDictionary.SEQ_LANE_LETTER);
+        } else if (hybNumber2.indexOf("X") >= 0) {
+            splitLetter = "X";
+        } else if (hybNumber2.indexOf("L") >= 0) {
+            splitLetter = "L";
+        } else if (hybNumber2.indexOf("E") >= 0) {
+            splitLetter = "E";
+        }
 
       String[] hybNumberTokens2 = hybNumber2.split(splitLetter);
       itemNumber2 = hybNumberTokens2[hybNumberTokens2.length - 1];
@@ -470,9 +471,9 @@ public class GetExperimentPickList extends GNomExCommand implements Serializable
         if (date1.equals(date2)) {
           if (reqNumber1.equals(reqNumber2)) {
             if (itemNumber1.equals(itemNumber2)) {
-              return new Integer(seq1).compareTo(new Integer(seq2));
+              return seq1.compareTo(seq2);
             } else {
-              return new Integer(itemNumber1).compareTo(new Integer(itemNumber2));
+              return itemNumber1.compareTo(itemNumber2);
             }
           } else {
             return reqNumber2.compareTo(reqNumber1);
