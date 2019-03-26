@@ -1,88 +1,62 @@
 <div class="flexbox-column">
-    <div style="display:flex; flex:1">
+    <div class="flex-container-row">
         <div style="margin:1em" >
-            <img [src]="this.topicNode?.icon">Topic {{"T"+this.topicNode?.idTopic+" - "}} {{this.topicNode?.name}}
+            <img [src]="this.constService.ICON_TOPIC" class="icon">
+            Topic {{'T' + this.topicNode?.idTopic + ' -'}} {{(this.topicNode?.name.length > 60) ? (this.topicNode?.name | slice:0:60) + '...' : this.topicNode?.name}}
         </div>
-        <button mat-button color="primary" (click)="onShareLinkClick()" style="margin:1em" >
-            <img [src]="this.constService.GLOBE_LINK"> Share URL
+        <button mat-button color="primary" (click)="onShareLinkClick()" style="margin:1em">
+            <img [src]="this.constService.GLOBE_LINK" class="icon">Share URL
         </button>
-        <button mat-button color="primary" (click)="onEmailClick()" style="margin:1em" >
-            <img [src]="this.constService.EMAIL_GO_LINK"> Email topic owner
+        <button mat-button color="primary" (click)="onEmailClick()" style="margin:1em">
+            <img [src]="this.constService.EMAIL_GO_LINK" class="icon">Email topic owner
         </button>
-
     </div>
-    <div style="width:100%; flex:8">
-        <mat-tab-group class="mat-tab-group-border" >
-            <mat-tab  label="Info">
-                <form [formGroup]="topicForm" class="flexbox-column">
-
+    <form class="full-width" style="flex:8" [formGroup]="topicForm">
+        <mat-tab-group class="mat-tab-group-border full-height">
+            <mat-tab label="Info" class="full-height">
+                <div class="flexbox-column">
                     <mat-form-field class="formField" >
-                        <input  matInput formControlName="name" type="text" placeholder="name"/>
-                        <mat-error *ngIf="topicForm.get('name').hasError('required')">
-                            Name is required
-                        </mat-error>
+                        <input matInput formControlName="name" type="text" placeholder="Name"/>
+                        <mat-error *ngIf="topicForm.get('name').hasError('required')">Name is required</mat-error>
                     </mat-form-field>
-                    <div style="display:flex;">
+                    <div *ngIf="this.topicForm.enabled" class="flex-container-row">
+                        <lazy-loaded-select class="formField" placeholder="Lab" [options]="this.labList"
+                                            valueField="idLab" [displayField]="this.prefService.labDisplayField" [allowNone]="true"
+                                            [control]="this.topicForm.get('idLab')">
+                        </lazy-loaded-select>
                         <mat-form-field class="formField">
-                            <input matInput placeholder="Lab" aria-label="State" [matAutocomplete]="autoLab"
-                                   formControlName="selectLab" (keyup.enter)="firstLabOpt()"  >
-                            <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
-                                <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let lab of  filterLabList(topicForm.get('selectLab').value)" [value]="lab">
-                                    {{lab[this.prefService.labDisplayField] }}
-                                </mat-option>
-                            </mat-autocomplete>
-                            <mat-error *ngIf="topicForm?.get('selectLab')?.hasError('required')">
-                                Lab is required
-                            </mat-error>
-                        </mat-form-field>
-
-                        <mat-form-field class="formField">
-                            <mat-select placeholder="Owner" formControlName="selectOwner">
-                                <mat-option>-- None --</mat-option>
+                            <mat-select placeholder="Owner" formControlName="idAppUser">
+                                <mat-option>None</mat-option>
                                 <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem.idAppUser">
                                     {{ mem[this.prefService.userDisplayField] }}
                                 </mat-option>
                             </mat-select>
-                            <mat-error *ngIf="topicForm?.get('selectOwner')?.hasError('required')"> Owner is required</mat-error>
+                            <mat-error *ngIf="topicForm?.get('idAppUser')?.hasError('required')">Owner is required</mat-error>
                         </mat-form-field>
-
                     </div>
-
-
-                    <div style="width:100%;">
-
-                        <!-- <label > Description </label>
-                         <jqxEditor #editorReference
-                                    [(ngModel)]="description"
-                                    (onChange)="changed($event)"
-                                    [ngModelOptions]="{standalone: true}"
-                                    width="100%"
-                                    [height]="400"
-                                    [editable]="edit"
-                                    [tools]="toolBarSettings"
-                                    [toolbarPosition]="'bottom'">
-                         </jqxEditor> -->
+                    <div *ngIf="this.topicForm.disabled" class="flex-container-row">
+                        <label class="formField">Lab: {{this.topicNode?.lab}}</label>
+                        <label class="formField">Owner: {{this.topicNode?.appUser}}</label>
                     </div>
-                    <div> Created By:   {{topicNode?.createdBy}} {{topicNode?.createDate}}
+                    <div class="full-width">
+                        <angular-editor formControlName="description" [config]="this.editorConfig"></angular-editor>
                     </div>
-
-                </form>
-
+                    <div> Created By: {{topicNode?.createdBy}} {{topicNode?.createDate}}
+                    </div>
+                </div>
             </mat-tab>
-            <mat-tab label="Visibility">
-                <mat-radio-group class="flexbox-column" [disabled]="!edit" [(ngModel)]="visOpt" (change)="radioChange()">
-                    <mat-radio-button style="margin: 0.5em"  *ngFor="let rad of visRadio" [value]="rad.value">
-                        <img [src]="rad.icon">{{rad.display}}
+            <mat-tab label="Visibility" class="full-height">
+                <mat-radio-group class="flexbox-column" formControlName="codeVisibility">
+                    <mat-radio-button style="margin: 0.5em" *ngFor="let rad of visRadio" [value]="rad.value">
+                        <img [src]="rad.icon" class="icon">{{rad.display}}
                     </mat-radio-button>
                 </mat-radio-group>
-
             </mat-tab>
         </mat-tab-group>
-    </div>
+    </form>
     <div style="flex:1">
         <save-footer  (saveClicked)="save()" [dirty]="topicForm.dirty" [showSpinner]="showSpinner"
-                      [disableSave]="topicForm.invalid || !edit">
+                      [disableSave]="topicForm.invalid || topicForm.disabled">
         </save-footer>
     </div>
-
 </div>

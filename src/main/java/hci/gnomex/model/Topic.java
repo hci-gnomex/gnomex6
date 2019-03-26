@@ -225,7 +225,7 @@ public class Topic extends DetailObject implements Serializable, VisibilityInter
      root.setAttribute("name", this.getName());
      root.setAttribute("idParentTopic",this.getIdParentTopic() != null ? this.getIdParentTopic().toString() : "");
      root.setAttribute("description", this.getDescription() != null ? this.getDescription() : "");	
-     root.setAttribute("lab", this.getIdLab() != null ? dictionaryHelper.getLabObject(this.getIdLab()).getName() : "");
+     root.setAttribute("lab", this.getIdLab() != null ? Util.getLabDisplayName(dictionaryHelper.getLabObject(this.getIdLab()), secAdvisor.getUserPreferences()) : "");
      root.setAttribute("idLab", this.getIdLab() != null ? this.getIdLab().toString() : "");
      root.setAttribute("appUser", this.getIdAppUser() != null ? Util.getAppUserDisplayName(dictionaryHelper.getAppUserObject(this.getIdAppUser()), secAdvisor.getUserPreferences()) : "");
      root.setAttribute("idAppUser", this.getIdAppUser() != null ? this.getIdAppUser().toString() : "");

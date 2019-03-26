@@ -1,26 +1,23 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {FormsModule,ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
-import { TreeModule } from "angular-tree-component";
+import {TreeModule} from "angular-tree-component";
 
-import { ButtonModule } from "../../modules/button.module";
-import { CheckBoxModule} from "../../modules/checkbox.module";
-import { ComboBoxModule }     from "../../modules/combobox.module";
-import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
-import { ExpanderModule }     from "../../modules/expander.module";
-import { InputModule } from "../../modules/input.module";
-import { LoaderModule }       from "../../modules/loader.module";
-import { PanelModule }        from "../../modules/panel.module";
-import { NotificationModule } from "../../modules/notification.module";
-import { TextAreaModule }     from "../../modules/textarea.module";
-import { ToggleButtonModule } from "../../modules/togglebutton.module";
-import {WindowModule}       from "../../modules/window.module";
+import {ButtonModule} from "../../modules/button.module";
+import {CheckBoxModule} from "../../modules/checkbox.module";
+import {ComboBoxModule} from "../../modules/combobox.module";
+import {EmailRelatedUsersPopupModule} from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
+import {ExpanderModule} from "../../modules/expander.module";
+import {InputModule} from "../../modules/input.module";
+import {LoaderModule} from "../../modules/loader.module";
+import {PanelModule} from "../../modules/panel.module";
+import {NotificationModule} from "../../modules/notification.module";
+import {TextAreaModule} from "../../modules/textarea.module";
+import {ToggleButtonModule} from "../../modules/togglebutton.module";
+import {WindowModule} from "../../modules/window.module";
 import {ServicesModule} from "../services/services.module";
-import { AngularSplitModule } from 'angular-split';
+import {AngularSplitModule} from 'angular-split';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {DialogsModule} from "../util/popup/dialogs.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
@@ -34,12 +31,7 @@ import {TopicsPanelComponent} from "./topics-panel.component"
 import {RichEditorModule} from "../../modules/rich-editor.module";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
-
-/**
- * @author jdewell
- * @since 12/19/16
- */
-
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 @NgModule({
     imports: [
@@ -66,20 +58,28 @@ import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
         WindowModule,
         ReactiveFormsModule,
         AngularSplitModule,
-        RichEditorModule
+        RichEditorModule,
+        AngularEditorModule,
     ],
     declarations: [
-                    BrowseTopicsComponent,
-                    MoveTopicComponent,
-                    DeleteTopicComponent ,
-                    TopicDetailComponent,
-                    TopicsPanelComponent,
-                    BasicEmailDialogComponent,
-                    ShareLinkDialogComponent
-
+        BrowseTopicsComponent,
+        MoveTopicComponent,
+        DeleteTopicComponent,
+        TopicDetailComponent,
+        TopicsPanelComponent,
+        BasicEmailDialogComponent,
+        ShareLinkDialogComponent
     ],
-    entryComponents: [MoveTopicComponent, DeleteTopicComponent,BasicEmailDialogComponent,ShareLinkDialogComponent],
-    exports: [MoveTopicComponent, DeleteTopicComponent]
+    entryComponents: [
+        MoveTopicComponent,
+        DeleteTopicComponent,
+        BasicEmailDialogComponent,
+        ShareLinkDialogComponent
+    ],
+    exports: [
+        MoveTopicComponent,
+        DeleteTopicComponent
+    ]
 })
 export class TopicsModule {
 }
