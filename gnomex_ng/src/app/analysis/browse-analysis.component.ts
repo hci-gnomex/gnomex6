@@ -83,7 +83,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     public disableAll: boolean = false;
     public createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
     public createAnalysisGroupDialogRef: MatDialogRef<CreateAnalysisGroupComponent>;
-    public newAnalysisName: any;
     private treeModel: TreeModel;
     private billingAccounts: any;
     private selectedItem: ITreeNode;
@@ -148,7 +147,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.buildTree(response);
             if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
                 this.dialogsService.stopAllSpinnerDialogs();
-                this.newAnalysisName = this.createAnalysisDialogRef.componentInstance.newAnalysisName;
                 this.createAnalysisDialogRef.close();
             }
             if (this.deleteAnalysisDialogRef && this.deleteAnalysisDialogRef.componentInstance) {
@@ -188,8 +186,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                             this.gnomexService.orderInitObj = null;
                         }
                     }
-                } else if (this.newAnalysisName) {
+                } else if (this.analysisService.createdAnalysis) {
                     this.selectNode(this.treeModel.getFirstRoot().children);
+                    this.analysisService.createdAnalysis = "";
                 }
             });
         });
@@ -218,16 +217,17 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     selectNode(nodes: any) {
         for (let node of nodes) {
-            if (node.data.name === this.newAnalysisName && node.data.idAnalysis) {
-                node.setActiveAndVisible(false);
+            if (node.data.idAnalysis && node.data.idAnalysis === this.analysisService.createdAnalysis) {
+                let newAnalysisNode = this.findNodeByIdAnalysis(node.data.idAnalysis);
+                if(newAnalysisNode) {
+                    newAnalysisNode.setIsActive(true);
+                    newAnalysisNode.scrollIntoView();
+                }
                 break;
             } else if (node.hasChildren) {
                 this.selectNode(node.children);
-
             }
-
         }
-        this.newAnalysisName = "";
     }
 
     constructor(private analysisService: AnalysisService, private router: Router,
@@ -399,6 +399,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 items: useItems,
                 selectedLab: this.selectedIdLab,
                 selectedAnalysisGroup: this.selectedIdAnalysisGroup,
+                parentComponent: "Analysis",
             };
 
             this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
@@ -442,8 +443,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
         this.selectedItem = event.node;
         this.selectedIdLab = this.selectedItem.data.idLab;
-        this.selectedIdAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
-        // this.selectedLabLabel = this.selectedItem.data.labName;
         let idAnalysis = this.selectedItem.data.idAnalysis;
         let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
         let idLab = this.selectedItem.data.idLab;
@@ -463,6 +462,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             //AnalysisGroup
         } else if (this.selectedItem.level === 2) {
+            this.selectedIdAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
@@ -473,6 +473,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         } else if (this.selectedItem.level === 3) {
             navArray = ["/analysis", {outlets: {"analysisPanel": [idAnalysis]}}];
             this.parentProject = event.node.parent;
+            this.selectedIdAnalysisGroup = this.parentProject.data.idAnalysisGroup;
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;

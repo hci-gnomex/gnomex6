@@ -352,8 +352,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 labList: useThisLabList,
                 items: items,
                 selectedLab: this.experiment.idLab,
-                selectedLabAnalysis: null,
                 selectedOrganism: this.experiment.idOrganismSampleDefault,
+                parentComponent: "Experiment",
 
             };
 

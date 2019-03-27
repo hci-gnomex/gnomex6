@@ -31,6 +31,7 @@
                                                (moveNode)="onMoveNode($event)"
                                                (updateData)="treeUpdateData($event)"
                                                (activate)="treeOnSelect($event)"
+                                               [(state)]="state"
                                                [nodes]="items"
                                                [options]="options">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
@@ -49,6 +50,11 @@
                                         <jqxToggleButton #toggleButton [template]="'link'" (onClick)="expandCollapseClicked()">
                                             Expand Projects
                                         </jqxToggleButton>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <mat-checkbox class="inlineDiv small-font" [(ngModel)]="showEmptyFolders" (change)="onShowEmptyFolders($event)">
+                                            Show Empty Folders
+                                        </mat-checkbox>
                                     </div>
                                 </div>
                                 <div class="t">

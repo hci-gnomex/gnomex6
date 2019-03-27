@@ -149,6 +149,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
     private createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
     private deleteAnalysisDialogRef: MatDialogRef<DeleteAnalysisComponent>;
     private labs: any[] = [];
+    private analysisTabNode: any;
 
     onGridReady(params) { }
 
@@ -182,6 +183,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
         });
 
         this.selectedTreeNodeSubscript = this.analysisService.getAnalysisOverviewListSubject().subscribe(data => {
+            this.analysisTabNode = data;
             this.enableRemoveAnalysis = false;
             this.analysisService.analysisList.forEach(aObj => {
                 this.enableCreateAnalysis = true;
@@ -209,9 +211,6 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
 
 
             if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
-                // if (this.createAnalysisDialogRef.componentInstance.showSpinner) {
-                //     this.createAnalysisDialogRef.componentInstance.showSpinner = false;
-                // }
                 this.dialogService.stopAllSpinnerDialogs();
                 this.createAnalysisDialogRef.close();
             }
@@ -222,7 +221,9 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
                 this.deleteAnalysisDialogRef.close();
             }
         });
+
     }
+
 
     startEditingCell(event: any) {
         //console.log(event)
@@ -272,7 +273,18 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
             items = this.createAnalysisData.items;
             labs = this.createAnalysisData.labs ? this.createAnalysisData.labs : [];
             selectedIdLab = this.analysisService.analysisList[0].idLab;
-            selectedIdAnalysisGroup = this.createAnalysisData.idAnalysisGroup;
+            selectedIdAnalysisGroup = this.analysisService.analysisList[0].idAnalysisGroup;
+        } else {
+            items = this.labs ? this.labs : [];
+            labs = this.labs ? this.labs : [];
+            if(this.analysisService.analysisList.length > 0) {
+                selectedIdLab = this.analysisService.analysisList[0].idLab;
+                selectedIdAnalysisGroup = this.analysisService.analysisList[0].idAnalysisGroup;
+            } else {
+                selectedIdLab = this.analysisTabNode.idLab;
+                selectedIdAnalysisGroup = "";
+            }
+
         }
 
         let labListString = this.labList.map(function (item) {
@@ -280,11 +292,12 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
         });
 
         let useThisLabList: any[];
+        let useItems: any[];
         if (this.createSecurityAdvisorService.isSuperAdmin) {
             useThisLabList = this.labList;
         } else {
             useThisLabList = labs;
-            items = this.labs;
+            useItems = items;
         }
 
         let configuration: MatDialogConfig = new MatDialogConfig();
@@ -294,10 +307,10 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
         configuration.disableClose = true;
         configuration.data = {
             labList: useThisLabList,
-            items: items,
+            items: useItems,
             selectedLab: selectedIdLab,
             selectedAnalysisGroup: selectedIdAnalysisGroup,
-            selectedOrganism: null,
+            parentComponent: "Analysis",
         };
 
         this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
