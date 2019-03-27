@@ -4,10 +4,19 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {BroadcastEmailService} from "../services/broadcast-email.service";
 import {Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef} from "@angular/material";
+import {AngularEditorConfig} from "@kolkov/angular-editor";
 
 @Component({
     selector: 'email-all-users',
     templateUrl: "./email-all-users.component.html",
+    styles: [`
+        :host /deep/ angular-editor #editor {
+            resize: none;
+        }
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
+    `]
 })
 
 export class EmailAllUsersComponent {
@@ -24,6 +33,7 @@ export class EmailAllUsersComponent {
     private uploadFile: File = null;
     public fileSize: string = "";
     public showSpinner: boolean = false;
+    public editorConfig: AngularEditorConfig;
 
     public bodyType: string = this.SHOW_BODY;
     private uploadURL: string = null;
@@ -41,6 +51,14 @@ export class EmailAllUsersComponent {
             from: this.fromFormControl,
             body: this.bodyFormControl,
         });
+
+        this.editorConfig = {
+            spellcheck: true,
+            height: '13rem',
+            editable: true,
+            enableToolbar: true,
+            showToolbar: true,
+        };
 
         this.coreFacilities = this.createSecurityAdvisorService.coreFacilitiesICanManage;
 
@@ -100,7 +118,7 @@ export class EmailAllUsersComponent {
         } else {
             let params: URLSearchParams = new URLSearchParams();
             params.set("subject", this.subjectFormControl.value);
-            params.set("format", "text");
+            params.set("format", "html");
             params.set("fromAddress", this.fromFormControl.value);
             params.set("body", this.bodyFormControl.value);
             params.set("coreFacilityIds", this.coresFormControl.value);
