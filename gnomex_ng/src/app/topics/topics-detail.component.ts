@@ -47,6 +47,9 @@ import {AngularEditorConfig} from "@kolkov/angular-editor";
         :host /deep/ angular-editor #editor {
             resize: none;
         }
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
     `]
 })
 
@@ -64,7 +67,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     public labList: any[] = [];
     private emailImportDialogRef: MatDialogRef<BasicEmailDialogComponent>;
 
-    private editorConfig: AngularEditorConfig;
+    public editorConfig: AngularEditorConfig;
     private labChangesSubscription: Subscription;
 
     constructor(private route: ActivatedRoute,
