@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {BehaviorSubject, Observable, of, Subject, throwError} from "rxjs";
 import {catchError, first, flatMap, map} from "rxjs/operators";
-import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class LabListService {
@@ -67,8 +67,10 @@ export class LabListService {
         }));
     }
 
-    saveLab(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveLab.gx", {search: params});
+    saveLab(params: HttpParams): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveLab.gx", params.toString(), {headers: headers});
     }
 
     getOrganismList(): Observable<any> {

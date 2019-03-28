@@ -145,6 +145,10 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
         if (this.createSecurityAdvisorService.isAdmin) {
             this.showOwnerComboBox = true;
         }
+
+        if (!this.showOwnerComboBox) {
+            this.idAppUser = "" + this.createSecurityAdvisorService.idAppUser;
+        }
     }
 
     ngAfterViewInit() {
@@ -297,13 +301,13 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
      */
     saveAnalysis() {
         this.dialogsService.startDefaultSpinnerDialog();
-        var idAnalysis: any = 0;
-        var params: HttpParams = new HttpParams();
-        var stringifiedGenomBuild;
+        let idAnalysis: any = 0;
+        let params: HttpParams = new HttpParams();
+        let stringifiedGenomBuild = "";
         if (this.genomBuilds.length > 0) {
             stringifiedGenomBuild = JSON.stringify(this.genomBuilds);
         }
-        var stringifiedAnalysisGroup;
+        let stringifiedAnalysisGroup = "";
         if (this.analysisGroup.length > 0) {
             stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
         }
