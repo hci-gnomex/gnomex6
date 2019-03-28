@@ -24,6 +24,7 @@ import {LabListService} from "../services/lab-list.service";
 import {PasswordUtilService} from "../services/password-util.service";
 import {BillingAccountTabComponent} from "./billingAccountTab/billing-account-tab.component";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 /**
  * @title Basic tabs
@@ -1168,7 +1169,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     }
 
     saveGroup() {
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
         let cores: any[] = [];
 
         let accountsJSONString: string;
@@ -1211,7 +1212,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
         }
 
         let stringifiedAccounts: string = JSON.stringify(billingAccounts);
-        params.set("accountsJSONString", stringifiedAccounts);
+        params = params.set("accountsJSONString", stringifiedAccounts);
 
 
         if (this.groupForm) {
@@ -1221,18 +1222,18 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
                     if (field === "pricing") {
                         switch (control.value) {
                             case this.EXACADEMIC: {
-                                params.set("isExternalPricing", 'Y');
-                                params.set("isExternalPricingCommercial", 'N');
+                                params = params.set("isExternalPricing", 'Y');
+                                params = params.set("isExternalPricingCommercial", 'N');
                                 break;
                             }
                             case this.EXCOMM: {
-                                params.set("isExternalPricing", 'Y');
-                                params.set("isExternalPricingCommercial", 'Y');
+                                params = params.set("isExternalPricing", 'Y');
+                                params = params.set("isExternalPricingCommercial", 'Y');
                                 break;
                             }
                             case this.INTERNAL: {
-                                params.set("isExternalPricing", 'N');
-                                params.set("isExternalPricingCommercial", 'N');
+                                params = params.set("isExternalPricing", 'N');
+                                params = params.set("isExternalPricingCommercial", 'N');
                                 break;
                             }
                         }
@@ -1247,51 +1248,48 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
                         }
 
                     } else {
-                        params.set(field, control.value);
+                        params = params.set(field, control.value);
                     }
                 }
             }
             let stringifiedSF = JSON.stringify(cores);
-            params.set("coreFacilitiesJSONString", stringifiedSF);
-            params.set("excludeUsage", this.selectedGroup.excludeUsage);
-            params.set("lab", this.selectedGroup.lab);
-            params.set("idLab", this.selectedGroup.idLab);
-            params.set("version", this.selectedGroup.version);
+            params = params.set("coreFacilitiesJSONString", stringifiedSF);
+            params = params.set("excludeUsage", this.selectedGroup.excludeUsage);
+            params = params.set("lab", this.selectedGroup.lab);
+            params = params.set("idLab", this.selectedGroup.idLab);
+            params = params.set("version", this.selectedGroup.version);
         }
         if (this.billingAdminTab) {
             for (let field in this.billingAdminTab.billingForm.controls) {
                 const control = this.billingAdminTab.billingForm.get(field);
                 if (control) {
-                    params.set(field, control.value);
+                    params = params.set(field, control.value);
                 }
             }
         }
         if (this.membershipTab) {
             // let stringifiedMembers = JSON.stringify(this.addAppUser(this.membershipTab.membersDataSource.data));
             let stringifiedMembers = JSON.stringify(this.membershipTab.membersDataSource.data);
-            params.set("membersJSONString", stringifiedMembers);
+            params = params.set("membersJSONString", stringifiedMembers);
             let stringifiedColls = JSON.stringify(this.addAppUser(this.membershipTab.collaboratorsDataSource.data));
-            params.set("collaboratorsJSONString", stringifiedColls);
+            params = params.set("collaboratorsJSONString", stringifiedColls);
             let stringifiedManagers = JSON.stringify(this.addAppUser(this.membershipTab.managersDataSource.data));
-            params.set("managersJSONString", stringifiedManagers);
+            params = params.set("managersJSONString", stringifiedManagers);
 
         }
 
-        params.set("noJSONToXMLConversionNeeded", "Y");
+        params = params.set("noJSONToXMLConversionNeeded", "Y");
 
-        this.labListService.saveLab(params).subscribe((response: Response) => {
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.groupForm.markAsPristine();
-                    this.touchGroupFields();
+        this.labListService.saveLab(params).subscribe((responseJSON: any) => {
+            if (responseJSON.result && responseJSON.result === "SUCCESS") {
+                this.groupForm.markAsPristine();
+                this.touchGroupFields();
 
-                    let config: MatSnackBarConfig = new MatSnackBarConfig();
-                    config.duration = 2000;
+                let config: MatSnackBarConfig = new MatSnackBarConfig();
+                config.duration = 2000;
 
-                    this.snackBar.open("Changes Saved", "Lab", config);
-                    this.buildLabList();
-                }
+                this.snackBar.open("Changes Saved", "Lab", config);
+                this.buildLabList();
             }
             this.showSpinner = false;
         });
