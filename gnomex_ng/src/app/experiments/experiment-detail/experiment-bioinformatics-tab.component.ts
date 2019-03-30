@@ -3,6 +3,8 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {Experiment} from "../../util/models/experiment.model";
+import {GnomexService} from "../../services/gnomex.service";
 
 @Component({
     selector: 'experiment-bioinformatics-tab',
@@ -59,7 +61,11 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 export class ExperimentBioinformaticsTabComponent {
 
     @Input('experiment') set experiment(experiment: any) {
-        this._experiment = experiment;
+        this._experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService,
+            this.gnomexService,
+            this.propertyService,
+            this.createSecurityAdvisorService,
+            experiment);
 
         if (this._experiment && this._experiment.sequenceLanes) {
 
@@ -132,6 +138,7 @@ export class ExperimentBioinformaticsTabComponent {
 
     constructor(private dictionaryService: DictionaryService,
                 private formBuilder: FormBuilder,
+                private gnomexService: GnomexService,
                 private propertyService: PropertyService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService) {
 

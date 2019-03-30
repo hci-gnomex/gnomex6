@@ -1,8 +1,8 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatCheckbox, MatDialog, MatDialogConfig} from "@angular/material";
 import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 
-import {Subscription} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {ConstantsService} from "../../services/constants.service";
@@ -13,7 +13,7 @@ import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-
 import {GnomexService} from "../../services/gnomex.service";
 import {UploadSampleSheetComponent} from "../../upload/upload-sample-sheet.component";
 import {BarcodeSelectEditor} from "../../util/grid-editors/barcode-select.editor";
-import {annotType} from "../../services/property.service";
+import {annotType, PropertyService} from "../../services/property.service";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {UrlAnnotEditor} from "../../util/grid-editors/url-annot-editor";
 import {UrlAnnotRenderer} from "../../util/grid-renderers/url-annot-renderer";
@@ -24,6 +24,9 @@ import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align
 import {Experiment} from "../../util/models/experiment.model";
 import {Sample} from "../../util/models/sample.model";
 import {AnnotationService} from "../../services/annotation.service";
+import {TextAlignRightMiddleEditor} from "../../util/grid-editors/text-align-right-middle.editor";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -65,11 +68,36 @@ import {AnnotationService} from "../../services/annotation.service";
 export class TabSamplesIlluminaComponent implements OnInit {
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('ccCheckbox') ccCheckbox: MatCheckbox;
 
     private emToPxConversionRate: number = 13;
 
     @Input('experiment') public set experiment(value: Experiment) {
+
+        let newExperiment: boolean = (this._experiment !== value);
+
         this._experiment = value;
+
+        if (this._stateChangeSubject && this._stateChangeSubject.value !== TabSamplesIlluminaComponent.STATE_NEW) {
+            this._stateChangeSubject.next(TabSamplesIlluminaComponent.STATE_VIEW)
+        }
+
+        if (newExperiment && this.onChange_numberOfSamplesSubscription) {
+            this.onChange_numberOfSamplesSubscription.unsubscribe();
+        }
+        if (newExperiment && this.onChange_sampleTypeSubscription) {
+            this.onChange_sampleTypeSubscription.unsubscribe();
+        }
+        if (newExperiment && this.onChange_organismSubscription) {
+            this.onChange_organismSubscription.unsubscribe();
+        }
+        if (newExperiment && this.onChange_codeApplicationSubscription) {
+            this.onChange_codeApplicationSubscription.unsubscribe();
+        }
+        if (newExperiment && this.onChange_selectedProtocolSubscription) {
+            this.onChange_selectedProtocolSubscription.unsubscribe();
+        }
+
 
         if (!this.onChange_numberOfSamplesSubscription) {
             this.onChange_numberOfSamplesSubscription = this._experiment.onChange_numberOfSamples.subscribe((value) =>{
@@ -87,7 +115,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
             });
         }
-
         if (!this.onChange_sampleTypeSubscription) {
             this.onChange_sampleTypeSubscription = this._experiment.onChange_sampleType.subscribe((value) => {
                 if (value && this.samplesGridApi) {
@@ -95,7 +122,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
             });
         }
-
         if (!this.onChange_organismSubscription) {
             this.onChange_organismSubscription = this._experiment.onChange_organism.subscribe((value) => {
                 if (value && this.samplesGridApi) {
@@ -104,7 +130,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
             });
         }
-
         if (!this.onChange_codeApplicationSubscription) {
             this._experiment.onChange_codeApplication.subscribe((value) => {
                 if (value && this.samplesGridApi) {
@@ -112,7 +137,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
             });
         }
-
         if (!this.onChange_selectedProtocolSubscription) {
             this._experiment.onChange_selectedProtocol.subscribe((value) => {
                 if (value && this.samplesGridApi) {
@@ -120,11 +144,192 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
             });
         }
+
+        this.bioanalyzerChipType = this.dictionaryService.getEntries("hci.gnomex.model.BioanalyzerChipType").filter((a) => {
+            return a.codeApplication === this._experiment.codeApplication;
+        });
+
+        this.rebuildColumnDefinitions();
+        this.loadSampleTypes();
+        this.loadSeqLibProtocol();
     }
+
+
+    @Input('stateChangeSubject') set stateChangeSubject(value: BehaviorSubject<string>) {
+        if (value) {
+            this._stateChangeSubject = value;
+
+            if (this._stateChangeSubscription) {
+                this._stateChangeSubscription.unsubscribe();
+            }
+
+            this._stateChangeSubscription = value.subscribe((state: string) => {
+                if (this.ccCheckbox) {
+                    this.ccCheckbox.checked = false;
+                }
+
+                this._state = state;
+                this.createColumnsBasedOnState(state);
+                this.assignRowDataBasedOnState(state);
+
+                if (this.showCcCheckbox
+                    && (this._state === TabSamplesIlluminaComponent.STATE_EDIT
+                        || this._state === TabSamplesIlluminaComponent.STATE_VIEW)) {
+
+                    setTimeout(() => {
+                        if (this.ccCheckbox) {
+                            this.ccCheckbox.checked = true;
+                            this.toggleCC({ checked: true });
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    private _stateChangeSubject: BehaviorSubject<string>;
+
+    public static readonly STATE_NEW: string  = 'NEW';
+    public static readonly STATE_EDIT: string = 'EDIT';
+    public static readonly STATE_VIEW: string = 'VIEW';
+
+    public get STATE_NEW(): string {
+        return TabSamplesIlluminaComponent.STATE_NEW;
+    }
+    public get STATE_EDIT(): string {
+        return TabSamplesIlluminaComponent.STATE_EDIT;
+    }
+    public get STATE_VIEW(): string {
+        return TabSamplesIlluminaComponent.STATE_VIEW;
+    }
+
+    public get usingMultiplexGroupGroups(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    };
+
+    public get showConcentrationUnitColumn(): boolean {
+        return !this.usingMultiplexGroupGroups;
+    }
+
+    public get showVolumeColumn(): boolean {
+        return this.usingMultiplexGroupGroups;
+    }
+
+    public get showCcCheckbox(): boolean {
+        let search1: any = this.propertyService.getProperty("bst_linkage_supported");
+        let search2: any = this.propertyService.getProperty("can_access_bstx");
+
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'N'
+            && search1 && search1.propertyValue
+            && search2 && search2.propertyValue;
+    }
+
+    public get showNucleicAcidExtractionMethod(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'N';
+    }
+
+    public get showAssayColumn(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'N';
+    }
+
+    public get showOrganism(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    }
+
+    public get showQC260_230(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'N';
+    }
+
+    public get showSampleTypeInViewMode(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    }
+
+    public get showSeqLibProtocol(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    }
+
+    public get showAverageInsertSizeColumn(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    }
+
+    public get showSeqLibPrepStatus(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    }
+
+    public get showPreppedByCorePositionLast(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    }
+
+    public get showPreppedByCorePositionMiddle(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'N';
+    }
+
+    public get showQCStatus(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'N';
+    }
+
+    public get showLinkToCCNumber(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'N';
+    }
+
+    public get showDescription(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'N';
+    }
+
+    public context: any = this;
 
     private _experiment: Experiment;
 
     private _barCodes: any[] = [];
+
+    public _state: string = TabSamplesIlluminaComponent.STATE_NEW;
+
+    private _stateChangeSubscription: Subscription;
 
     private onChange_numberOfSamplesSubscription: Subscription;
     private onChange_sampleTypeSubscription: Subscription;
@@ -153,6 +358,40 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     public sampleTypes: any[] = [];
     public organisms: any[] = [];
+    public concentrationUnits: any[] = [];
+    public bioanalyzerChipType: any[] = [];
+
+    private get workflowStatus(): any[] {
+        let temp: any[] = [];
+
+        temp.push({
+            value: '',
+            display: ''
+        });
+        temp.push({
+            value: 'In Progress',
+            display: 'In Progress'
+        });
+        temp.push({
+            value: 'Completed',
+            display: 'Complete'
+        });
+        temp.push({
+            value: 'On Hold',
+            display: 'On Hold'
+        });
+        temp.push({
+            value: 'Terminated',
+            display: 'Terminate'
+        });
+        temp.push({
+            value: 'Bypassed',
+            display: 'Bypass'
+        });
+
+        return temp;
+    }
+
     public form: FormGroup;
 
     private hideCCNum: boolean = true;
@@ -161,6 +400,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public showInstructions: boolean = false;
 
     private samplesGridApi: any;
+
+    public nodeChildDetails: any;
 
     private samplesGridColumnDefs: any[];
 
@@ -181,6 +422,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             cellRendererFramework: TextAlignRightMiddleRenderer,
             suppressSizeToFit: true
         });
+
         temp.push({
             headerName: "Multiplex Group",
             editable: true,
@@ -204,6 +446,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             outerForm: this.form,
             formName:  "gridFormGroup"
         });
+
         temp.push({
             headerName: "Sample Name",
             field: "name",
@@ -246,7 +489,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         });
         temp.push({
             headerName: "CC Number",
-            field: "ccNum",
+            field: "ccNumber",
             width:    9 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
             maxWidth: 10 * this.emToPxConversionRate,
@@ -260,6 +503,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
         });
 
         this._tabIndexToInsertAnnotations = temp.length;
+
+        temp.push({
+            headerName: "Prepped by Core?",
+            editable: false,
+            width:    5 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate,
+            field: "seqPrepByCore",
+            cellRendererFramework: TextAlignLeftMiddleRenderer
+        });
 
         temp.push({
             headerName: "# Seq Lanes",
@@ -315,7 +567,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             field: "idSeqLibProtocol",
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
-            selectOptions: this.gnomexService.seqLibProtocolsWithAppFilters,
+            selectOptions: this.seqLibProtocols,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "idSeqLibProtocol"
         });
@@ -400,15 +652,820 @@ export class TabSamplesIlluminaComponent implements OnInit {
         return temp;
     }
 
+    private get editSampleColumnDefinitions(): any[] {
+        let temp: any[] = [];
+
+        temp.push({
+            headerName: "",
+            field: "counter",
+            width:    2 * this.emToPxConversionRate,
+            maxWidth: 2 * this.emToPxConversionRate,
+            minWidth: 2 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            suppressSizeToFit: true,
+            editable: false,
+            pinned: "left"
+        });
+
+        if (this.usingMultiplexGroupGroups) {
+            temp.push({
+                headerName: "Multiplex Group",
+                editable: true,
+                field: "multiplexGroupNumber",
+                width: 6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                validators: [
+                    Validators.required,
+                    Validators.pattern(/^\d*$/)
+                ],
+                errorNameErrorMessageMap: [
+                    {errorName: 'required', errorMessage: 'Multiplex Group required'},
+                    {errorName: 'pattern', errorMessage: 'Multiplex Group must be numeric'}
+                ],
+                outerForm: this.form,
+                formName: "gridFormGroup",
+                pinned: "left"
+            });
+        }
+
+        temp.push({
+            headerName: "ID",
+            field: "number",
+            width:    6 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
+            maxWidth: 9 * this.emToPxConversionRate,
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            validators: [ Validators.required ],
+            errorNameErrorMessageMap: [
+                { errorName: 'required', errorMessage: 'Sample Name required' }
+            ],
+            pinned: "left"
+        });
+        temp.push({
+            headerName: "Sample Name",
+            field: "name",
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 6.5 * this.emToPxConversionRate,
+            maxWidth: 12 * this.emToPxConversionRate,
+            editable: true,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [ Validators.required ],
+            errorNameErrorMessageMap: [
+                { errorName: 'required', errorMessage: 'Sample Name required' }
+            ],
+            pinned: "left"
+        });
+
+        if (!this.showConcentrationUnitColumn) {
+            temp.push({
+                headerName: "Conc. (ng/ul)",
+                field: "concentration",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: true,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        } else {
+            temp.push({
+                headerName: "Concentration",
+                field: "concentration",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: true,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+            temp.push({
+                headerName: "Units",
+                field: "codeConcentrationUnit",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: true,
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.concentrationUnits,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        if (this.showVolumeColumn) {
+            temp.push({
+                headerName: "Vol. (ul)",
+                field: "sampleVolume",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: true,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        temp.push({
+            headerName: "CC Number",
+            field: "ccNumber",
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
+            editable: true,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup',
+            hide: this.hideCCNum
+        });
+
+        this._tabIndexToInsertAnnotations = temp.length;
+
+        temp.push({
+            headerName: "Sample Type",
+            editable: true,
+            width:    13 * this.emToPxConversionRate,
+            minWidth: 9 * this.emToPxConversionRate,
+            field: "idSampleType",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.sampleTypes,
+            selectOptionsDisplayField: "sampleType",
+            selectOptionsValueField: "idSampleType",
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup'
+        });
+
+        if (this.showNucleicAcidExtractionMethod) {
+            temp.push({
+                headerName: "Nucl. acid extraction meth.",
+                field: "otherSamplePrepMethod",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: true,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        if (this.showAssayColumn) {
+            temp.push({
+                headerName: "Assay",
+                editable: true,
+                width:    13 * this.emToPxConversionRate,
+                minWidth: 9 * this.emToPxConversionRate,
+                field: "codeBioanalyzerChipType",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.bioanalyzerChipType,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        if (this.showOrganism) {
+            temp.push({
+                headerName: "Organism",
+                editable: true,
+                width:    13 * this.emToPxConversionRate,
+                minWidth: 9  * this.emToPxConversionRate,
+                field: "idOrganism",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.organisms,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOrganism",
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                validators: [Validators.required],
+                errorNameErrorMessageMap: [
+                    {errorName: 'required', errorMessage: 'Multiplex Group required'}
+                ]
+            });
+        }
+
+        temp.push({
+            headerName: "QC Conc. (ng/uL)",
+            editable: true,
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 9  * this.emToPxConversionRate,
+            field: "qualCalcConcentration",
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup'
+        });
+
+        if (this.showQC260_230) {
+            temp.push({
+                headerName: "QC 260/230",
+                editable: true,
+                width:    9 * this.emToPxConversionRate,
+                minWidth: 9  * this.emToPxConversionRate,
+                field: "qual260nmTo230nmRatio",
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        temp.push({
+            headerName: "QC RIN",
+            editable: true,
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 9  * this.emToPxConversionRate,
+            field: "qualRINNumber",
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup'
+        });
+
+        if (this.showSeqLibProtocol) {
+            temp.push({
+                headerName: "Seq Lib Protocol",
+                editable: true,
+                width:    20 * this.emToPxConversionRate,
+                minWidth: 9  * this.emToPxConversionRate,
+                field: "idSeqLibProtocol",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.seqLibProtocols,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idSeqLibProtocol"
+            });
+        }
+
+        if (this.showAverageInsertSizeColumn) {
+            temp.push({
+                headerName: "Ave Insert Size",
+                field: "meanLibSizeActual",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                suppressSizeToFit: true,
+                editable: true,
+            });
+        }
+
+        temp.push({
+            headerName: "QC Frag Size (from)",
+            field: "qualFragmentSizeFrom",
+            width:    8.5 * this.emToPxConversionRate,
+            minWidth: 8.5 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            suppressSizeToFit: true,
+            editable: true,
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup'
+        });
+        temp.push({
+            headerName: "QC Frag Size (to)",
+            field: "qualFragmentSizeTo",
+            width:    8.5 * this.emToPxConversionRate,
+            minWidth: 8.5 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            suppressSizeToFit: true,
+            editable: true,
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup'
+        });
+        temp.push({
+            headerName: "QC Status",
+            field: "qualStatus",
+            width:    8.5 * this.emToPxConversionRate,
+            minWidth: 8.5 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.workflowStatus,
+            selectOptionsDisplayField: "display",
+            selectOptionsValueField: "value",
+            suppressSizeToFit: true,
+            editable: true,
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup'
+        });
+
+        if (this.showSeqLibPrepStatus) {
+            temp.push({
+                headerName: "Seq Lib Prep Status",
+                field: "seqPrepStatus",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                suppressSizeToFit: true,
+                editable: true,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        return temp;
+    }
+
+    private get viewSampleColumnDefinitions(): any[] {
+        let temp: any[] = [];
+
+        if (this.usingMultiplexGroupGroups) {
+            temp.push({
+                headerName: "Multiplex Group",
+                field: "mainMultiplexGroupNumber",
+                width: 5 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                minWidth: 5 * this.emToPxConversionRate,
+                cellRenderer: "agGroupCellRenderer",
+                cellRendererParams: {
+                    innerRenderer: getGroupRenderer(),
+                    suppressCount: true
+                },
+                pinned: 'left'
+            });
+        }
+
+        temp.push({
+            headerName: "ID",
+            field: "number",
+            width:    5 * this.emToPxConversionRate,
+            maxWidth: 5 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            suppressSizeToFit: true,
+            pinned: 'left'
+        });
+        temp.push({
+            headerName: "Sample Name",
+            field: "name",
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 6.5 * this.emToPxConversionRate,
+            maxWidth: 12 * this.emToPxConversionRate,
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [ Validators.required ],
+            errorNameErrorMessageMap: [
+                { errorName: 'required', errorMessage: 'Sample Name required' }
+            ],
+            pinned: 'left'
+        });
+
+        if (!this.showConcentrationUnitColumn) {
+            temp.push({
+                headerName: "Conc. (ng/ul)",
+                field: "concentration",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        } else {
+            temp.push({
+                headerName: "Concentration",
+                field: "concentration",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: true,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+            temp.push({
+                headerName: "Units",
+                field: "codeConcentrationUnit",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: true,
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.concentrationUnits,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        if (this.showVolumeColumn) {
+            temp.push({
+                headerName: "Vol. (ul)",
+                field: "sampleVolume",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        temp.push({
+            headerName: "CC Number",
+            field: "ccNumber",
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup',
+            hide: this.hideCCNum
+        });
+
+        this._tabIndexToInsertAnnotations = temp.length;
+
+        if (this.showPreppedByCorePositionMiddle) {
+            temp.push({
+                headerName: "Prepped by Core?",
+                editable: false,
+                width:    5 * this.emToPxConversionRate,
+                minWidth: 5 * this.emToPxConversionRate,
+                field: "seqPrepByCore",
+                cellRendererFramework: TextAlignLeftMiddleRenderer
+            });
+        }
+
+        if (this.showSampleTypeInViewMode) {
+            temp.push({
+                headerName: "Sample Type",
+                editable: false,
+                width:    13 * this.emToPxConversionRate,
+                minWidth: 9 * this.emToPxConversionRate,
+                field: "idSampleType",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.sampleTypes,
+                selectOptionsDisplayField: "sampleType",
+                selectOptionsValueField: "idSampleType",
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        if (this.showNucleicAcidExtractionMethod) {
+            temp.push({
+                headerName: "Nucl. acid extraction meth.",
+                field: "otherSamplePrepMethod",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: true,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        if (this.showAssayColumn) {
+            temp.push({
+                headerName: "Assay",
+                editable: false,
+                width:    13 * this.emToPxConversionRate,
+                minWidth: 9 * this.emToPxConversionRate,
+                field: "codeBioanalyzerChipType",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.bioanalyzerChipType,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        if (this.showOrganism) {
+            temp.push({
+                headerName: "Organism",
+                editable: false,
+                width:    13 * this.emToPxConversionRate,
+                minWidth: 9  * this.emToPxConversionRate,
+                field: "idOrganism",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.organisms,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOrganism",
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                validators: [Validators.required],
+                errorNameErrorMessageMap: [
+                    {errorName: 'required', errorMessage: 'Multiplex Group required'}
+                ]
+            });
+        }
+
+        temp.push({
+            headerName: "QC Conc. (ng/uL)",
+            editable: false,
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 9  * this.emToPxConversionRate,
+            field: "qualCalcConcentration",
+            cellRendererFramework: TextAlignRightMiddleRenderer
+        });
+
+        if (this.showQC260_230) {
+            temp.push({
+                headerName: "QC 260/230",
+                editable: true,
+                width:    9 * this.emToPxConversionRate,
+                minWidth: 9  * this.emToPxConversionRate,
+                field: "qual260nmTo230nmRatio",
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup'
+            });
+        }
+
+        temp.push({
+            headerName: "QC RIN",
+            editable: false,
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 9  * this.emToPxConversionRate,
+            field: "qualRINNumber",
+            cellRendererFramework: TextAlignRightMiddleRenderer
+        });
+
+        if (this.showSeqLibProtocol) {
+            temp.push({
+                headerName: "Seq Lib Protocol",
+                editable: false,
+                width:    20 * this.emToPxConversionRate,
+                minWidth: 9  * this.emToPxConversionRate,
+                field: "idSeqLibProtocol",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.seqLibProtocols,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idSeqLibProtocol"
+            });
+        }
+
+        if (this.showPreppedByCorePositionLast) {
+            temp.push({
+                headerName: "Prepped by Core?",
+                editable: false,
+                width:    5 * this.emToPxConversionRate,
+                minWidth: 5 * this.emToPxConversionRate,
+                field: "seqPrepByCore",
+                cellRendererFramework: TextAlignLeftMiddleRenderer
+            });
+        }
+
+        if (this._experiment
+            && this._experiment.seqPrepByCore_forSamples
+            && this._experiment.seqPrepByCore_forSamples === 'N') {
+
+            temp.push({
+                headerName: "Index Tag A",
+                editable: false,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                maxWidth: 20 * this.emToPxConversionRate,
+                field: "idOligoBarcode",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: BarcodeSelectEditor,
+                selectOptions: this._barCodes,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOligoBarcode",
+                indexTagLetter: 'A',
+                validators: [Validators.required],
+                errorNameErrorMessageMap: [
+                    {errorName: 'required', errorMessage: 'Index Tag A required'}
+                ]
+            });
+            temp.push({
+                headerName: "Index Tag Sequence A",
+                field: "barcodeSequence",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false
+            });
+            if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
+                temp.push({
+                    headerName: "Index Tag B",
+                    editable: false,
+                    width:    12 * this.emToPxConversionRate,
+                    minWidth: 12 * this.emToPxConversionRate,
+                    maxWidth: 20 * this.emToPxConversionRate,
+                    field: "idOligoBarcodeB",
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: BarcodeSelectEditor,
+                    selectOptions: this._barCodes,
+                    selectOptionsDisplayField: "display",
+                    selectOptionsValueField: "idOligoBarcodeB",
+                    indexTagLetter: 'B',
+                    validators: [Validators.required],
+                    errorNameErrorMessageMap: [
+                        {errorName: 'required', errorMessage: 'Index Tag B required'}
+                    ]
+                });
+            } else {
+                temp.push({
+                    headerName: "Index Tag B",
+                    editable: false,
+                    width:    12 * this.emToPxConversionRate,
+                    minWidth: 12 * this.emToPxConversionRate,
+                    maxWidth: 20 * this.emToPxConversionRate,
+                    field: "idOligoBarcodeB",
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: BarcodeSelectEditor,
+                    selectOptions: this._barCodes,
+                    selectOptionsDisplayField: "display",
+                    selectOptionsValueField: "idOligoBarcodeB",
+                    indexTagLetter: 'B'
+                });
+            }
+
+            temp.push({
+                headerName: "Index Tag Sequence B",
+                field: "barcodeSequenceB",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+
+            if (this.showAverageInsertSizeColumn) {
+                temp.push({
+                    headerName: "Ave Insert Size",
+                    field: "meanLibSizeActual",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                });
+            }
+
+            temp.push({
+                headerName: "QC Frag Size (from)",
+                field: "qualFragmentSizeFrom",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+            temp.push({
+                headerName: "QC Frag Size (to)",
+                field: "qualFragmentSizeTo",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+            temp.push({
+                headerName: "QC Status",
+                field: "qualStatus",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+            temp.push({
+                headerName: "Seq Lib Prep Status",
+                field: "seqPrepStatus",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+            temp.push({
+                headerName: "Core to prep lib?",
+                field: "seqPrepByCore",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+            temp.push({
+                headerName: "Seq Lib Conc. ng/uL",
+                field: "seqPrepLibConcentration",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+        } else {
+
+            if (this.showQCStatus) {
+                temp.push({
+                    headerName: "QC Status",
+                    field: "qualStatus",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                });
+            }
+
+            if (this.showLinkToCCNumber) {
+                temp.push({
+                    headerName: "CC Number",
+                    field: "ccNumber",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    cellRendererFramework: LinkButtonRenderer,
+                    onClickButton: 'onClickCCNumberLink',
+                    buttonValueLabel: 'ccNumber'
+                });
+            }
+
+            if (this.showDescription) {
+                temp.push({
+                    headerName: "Description",
+                    field: "description",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    cellRendererFramework: TextAlignLeftMiddleRenderer
+                });
+            }
+        }
+
+        return temp;
+    }
+
 
     constructor(public constService: ConstantsService,
                 private annotationService: AnnotationService,
+                private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
                 private fb: FormBuilder,
-                private dialog: MatDialog) {
+                private dialog: MatDialog,
+                private propertyService: PropertyService) {
 
         this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
+        this.concentrationUnits = this.dictionaryService.getEntries("hci.gnomex.model.ConcentrationUnit");
 
         this.form = this.fb.group({});
 
@@ -428,9 +1485,17 @@ export class TabSamplesIlluminaComponent implements OnInit {
         );
 
         this.samplesGridColumnDefs = this.defaultSampleColumnDefinitions;
+        this.nodeChildDetails = this.getItemNodeChildDetails;
+
+        setTimeout(() => {
+            this.dialogService.startDefaultSpinnerDialog();
+        });
 
         this.annotationService.getPropertyList().subscribe((result) => {
             this.propertyList = result;
+            this.rebuildColumnDefinitions();
+
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 
@@ -457,6 +1522,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
         if (this.onChange_selectedProtocolSubscription) {
             this.onChange_selectedProtocolSubscription.unsubscribe();
+        }
+
+        if (this._stateChangeSubscription) {
+            this._stateChangeSubscription.unsubscribe();
         }
     }
 
@@ -494,6 +1563,40 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.sampleTypes = types.sort(TabSampleSetupViewComponent.sortSampleTypes);
     }
 
+    private seqLibProtocols: any[];
+
+    private loadSeqLibProtocol(): void {
+        this.seqLibProtocols = this.dictionaryService.getEntries('hci.gnomex.model.SeqLibProtocol').sort((a, b) => {
+            if (!a && !b) {
+                return 0;
+            } else if (!a) {
+                return 1;
+            } else if (!b) {
+                return -1;
+            } else {
+                if (!a.sortOrder && !b.sortOrder) {
+                    // compare based on display
+                    if (!a.display && !a.display) {
+                        return 0;
+                    } else if (!a.display) {
+                        return 1;
+                    } else if (!b.display) {
+                        return -1
+                    } else {
+                        return 0;
+                    }
+                } else if (!a.sortOrder) {
+                    return 1;
+                } else if (!b.sortOrder) {
+                    return -1;
+                } else {
+                    return (+a.sortOrder) - (+b.sortOrder);
+                }
+            }
+        });
+    }
+
+
     public requireReconfirmation(): void {
         if (this.form && !this.form.contains('invalidateWithoutConfirmation')) {
             this.form.addControl(
@@ -530,7 +1633,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 });
 
                 if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
-                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this._tabIndexToInsertAnnotations, this.emToPxConversionRate);
+                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this._tabIndexToInsertAnnotations, this.emToPxConversionRate, this._state);
                 }
             }
         }
@@ -560,17 +1663,31 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         }
 
-        if (foundAllOldColumns && this.samplesGridColumnDefs.length === temp.length) {
-            // Do nothing - there is no change needed
-            this.samplesGridApi.redrawRows();
-        } else {
+        if (this.samplesGridApi) {
             this.samplesGridColumnDefs = temp;
 
-            this.samplesGridApi.setColumnDefs(this.samplesGridColumnDefs);
-            this.samplesGridApi.setRowData(this._experiment.samples);
+            this.createColumnsBasedOnState(this._state);
+            this.assignRowDataBasedOnState(this._state);
+            // this.samplesGridApi.setRowData(this._experiment.samples);
             this.samplesGridApi.sizeColumnsToFit();
         }
     }
+
+
+    public getItemNodeChildDetails(rowItem: any): any {
+        // if (this._state === TabSamplesIlluminaComponent.STATE_VIEW && rowItem.multiplexGroupNumber) {
+        if (rowItem && rowItem.samples) {
+            return {
+                group: true,
+                expanded: true,
+                children: rowItem.samples,
+                key: rowItem.mainMultiplexGroupNumber
+            };
+        } else {
+            return null;
+        }
+    };
+
 
     private showHideColumns() {
         let hideSampleTypeOnExternalExperiment: boolean = false;
@@ -745,8 +1862,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 this._experiment.samples.splice(-1, Math.abs(index));
             }
 
-            this.samplesGridApi.setColumnDefs(this.samplesGridColumnDefs);
-            this.samplesGridApi.setRowData(this._experiment.samples);
+            this.createColumnsBasedOnState(this._state);
+            this.assignRowDataBasedOnState(this._state); // REMEMBER
+            // this.samplesGridApi.setRowData(this._experiment.samples);
             this.samplesGridApi.sizeColumnsToFit();
 
             if (this.form && this.form.get('invalidateWithoutSamples')) {
@@ -777,6 +1895,98 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
+
+    private createColumnsBasedOnState(state: string): any[] {
+        if (state && this._state !== state) {
+            this._state = state;
+        }
+
+        let temp: any[] = [];
+
+        if (this.samplesGridApi) {
+            if (this._state === TabSamplesIlluminaComponent.STATE_NEW) {
+                temp = this.defaultSampleColumnDefinitions;
+            } else if (this._state === TabSamplesIlluminaComponent.STATE_EDIT) {
+                temp = this.editSampleColumnDefinitions;
+            } else if (this._state === TabSamplesIlluminaComponent.STATE_VIEW) {
+                temp = this.viewSampleColumnDefinitions;
+            }
+
+            if (temp && this._experiment) {
+                for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
+                    let fullProperty = this.propertyList.filter((value: any) => {
+                        return value.idProperty === sampleAnnotation.idProperty;
+                    });
+
+                    if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
+                        TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this._tabIndexToInsertAnnotations, this.emToPxConversionRate, this._state);
+                    }
+                }
+            }
+
+            this.samplesGridApi.setColumnDefs(temp);
+            this.samplesGridApi.redrawRows();
+        }
+        if (this.ccCheckbox) {
+            this.ccCheckbox.checked = false;
+        }
+
+        return temp;
+    }
+
+    private assignRowDataBasedOnState(state: string): void {
+        if (!state || !this.samplesGridApi || !this._experiment || !this._experiment.samples) {
+            return;
+        }
+
+        this.samplesGridApi.setRowData([]);
+
+        if (this.usingMultiplexGroupGroups && state === TabSamplesIlluminaComponent.STATE_VIEW) {
+            let keysUsed: string[] = [];
+
+            for (let sample of this._experiment.samples) {
+                let search: string[] = keysUsed.filter((a: string) => {
+                    return a === sample.multiplexGroupNumber;
+                });
+
+                if (search && Array.isArray(search) && search.length < 1) {
+                    keysUsed.push(sample.multiplexGroupNumber);
+                }
+            }
+
+            let rowData: any[] = [];
+
+            for (let key of keysUsed) {
+                rowData.push({
+                    mainMultiplexGroupNumber: key,
+                    samples: []
+                });
+            }
+
+            for (let sample of this._experiment.samples) {
+                let search: any[] = rowData.filter((a: any) => {
+                    return a.mainMultiplexGroupNumber === sample.multiplexGroupNumber;
+                });
+
+                if (search && Array.isArray(search) && search.length === 1) {
+                    search[0].samples.push(sample);
+                }
+            }
+
+            this.samplesGridApi.setRowData(rowData);
+        } else {
+            let counter = 1;
+
+            for (let sample of this._experiment.samples) {
+                sample.counter = counter++;
+            }
+
+            this.samplesGridApi.setRowData(this._experiment.samples);
+        }
+
+        // this.samplesGridApi.redrawRows();
+    }
+
     public toggleCC(event) {
         if (this.gridColumnApi
             && this.gridColumnApi.columnController
@@ -784,7 +1994,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && Array.isArray(this.gridColumnApi.columnController.gridColumns)) {
 
             let temp: any[] = this.gridColumnApi.columnController.gridColumns.filter((value: any) => {
-                return value && value.colDef && value.colDef.field && value.colDef.field === 'ccNum'
+                return value && value.colDef && value.colDef.field && value.colDef.field === 'ccNumber'
             });
 
             if (temp.length > 0) {
@@ -792,6 +2002,25 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
 
             this.form.get('invalidateWithoutSamples').setValue(true);
+        }
+    }
+
+    public onClickCCNumberLink(event: any): void {
+        console.log("Hello World");
+
+        let search: any = this.propertyService.getProperty("gnomex_linkage_bst_url");
+        let ccNum: string = '';
+
+        if (this.samplesGridApi
+            && this.samplesGridApi.getRowNode(event)
+            && this.samplesGridApi.getRowNode(event).data
+            && this.samplesGridApi.getRowNode(event).data.ccNumber) {
+
+            ccNum = this.samplesGridApi.getRowNode(event).data.ccNumber;
+        }
+
+        if (search && search.propertyValue) {
+            window.open(search.propertyValue + '#ccNumber=' + ccNum, "_blank");
         }
     }
 
@@ -804,8 +2033,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
         }
 
-        this.samplesGridApi.setColumnDefs(this.samplesGridColumnDefs);
-        this.samplesGridApi.setRowData(this._experiment.samples);
+        this.createColumnsBasedOnState(this._state);
+        this.assignRowDataBasedOnState(this._state);
+        // this.samplesGridApi.setRowData(this._experiment.samples);
         this.samplesGridApi.sizeColumnsToFit();
     }
 
@@ -865,13 +2095,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
         });
     }
 
-    public download(): void { }
+    public download(): void {
+
+    }
 
     public onClickShowInstructions(): void {
         this.showInstructions = !this.showInstructions;
     }
 
-    public static addColumnToColumnDef(columnDefs: any[], annot: any, tabIndexToInsertAnnotations: number, emToPxConversionRate: number): void {
+    public static addColumnToColumnDef(columnDefs: any[], annot: any, tabIndexToInsertAnnotations: number, emToPxConversionRate: number, state: string): void {
         if (!annot || !annot.idProperty) {
             return;
         }
@@ -897,7 +2129,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 column = TabSamplesIlluminaComponent.createTextColumn(annot, emToPxConversionRate);
         }
 
-        if (annot.isRequired && annot.isRequired === 'Y') {
+        if (annot.isRequired && annot.isRequired === 'Y' && state === TabSamplesIlluminaComponent.STATE_NEW) {
             column.cellStyle = {color: 'black', 'background-color': 'yellow'};
         }
 
@@ -975,6 +2207,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
             idProperty: annot.idProperty,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup',
             editable: true
         };
     }
@@ -993,4 +2227,24 @@ export class TabSamplesIlluminaComponent implements OnInit {
             annotation: annot
         };
     }
+}
+
+function getGroupRenderer() {
+    function GroupRenderer() { }
+
+    GroupRenderer.prototype.init = function(params) {
+        let tempDiv = document.createElement("div");
+        if (params.data.icon) {
+            tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" class="icon"/>' + params.value + '</span>';
+        } else {
+            tempDiv.innerHTML = '<span>' + params.value + '</span>';
+        }
+        this.eGui = tempDiv.firstChild;
+    };
+
+    GroupRenderer.prototype.getGui = function() {
+        return this.eGui;
+    };
+
+    return GroupRenderer;
 }

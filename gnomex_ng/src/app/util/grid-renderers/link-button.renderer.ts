@@ -55,6 +55,8 @@ export class LinkButtonRenderer implements ICellRendererAngularComp {
 
             if (this.params.colDef.buttonLabel) {
                 this.buttonName = this.params.colDef.buttonLabel;
+            } else if (this.params.colDef.buttonValueLabel && this.params.node && this.params.node.data) {
+                this.buttonName = this.params.node.data[this.params.colDef.buttonValueLabel];
             }
         }
     }
