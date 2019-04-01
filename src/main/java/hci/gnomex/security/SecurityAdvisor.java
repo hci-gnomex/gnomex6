@@ -7,35 +7,7 @@ import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.controller.GetCoreFacilityLabList;
 import hci.gnomex.lucene.GlobalIndexHelper;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.AnalysisCollaborator;
-import hci.gnomex.model.AnalysisGroup;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.AppUserLite;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFolder;
-import hci.gnomex.model.DictionaryEntryUserOwned;
-import hci.gnomex.model.ExperimentCollaborator;
-import hci.gnomex.model.FAQ;
-import hci.gnomex.model.FlowCell;
-import hci.gnomex.model.Institution;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.NewsItem;
-import hci.gnomex.model.PlateType;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.ProductOrder;
-import hci.gnomex.model.Project;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.RequestStatus;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SlideProduct;
-import hci.gnomex.model.Topic;
-import hci.gnomex.model.UserPermissionKind;
-import hci.gnomex.model.Visibility;
+import hci.gnomex.model.*;
 import hci.gnomex.utility.*;
 
 import java.io.Serializable;
@@ -1769,6 +1741,14 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
         else if (object instanceof Property) {
             canDelete = canUpdate(object);
         }
+        else if(object instanceof Organism){
+            Organism org = (Organism) object;
+            if(org.getIdAppUser() != null ){
+                canDelete = isOwner(org.getIdAppUser());
+            }
+
+        }
+
         //
         // Dictionary
         //

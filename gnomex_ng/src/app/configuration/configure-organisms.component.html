@@ -5,7 +5,7 @@
         <button mat-button [disabled]="!this.selectedOrganism || !this.canDeleteSelectedOrganism" (click)="this.removeOrganism()"><img class="icon" src="../../assets/page_remove.png">Remove</button>
     </div>
     <div class="full-width flex-container-row flex-twenty">
-        <ag-grid-angular class="ag-theme-fresh full-height quarter-width margin-right"
+        <ag-grid-angular class="ag-theme-balham full-height quarter-width margin-right"
                          (gridReady)="this.onOrganismGridReady($event)"
                          [rowSelection]="'single'"
                          (rowSelected)="this.onOrganismGridRowSelected($event)"
@@ -62,7 +62,7 @@
                     <button mat-button [disabled]="!this.canUpdateSelectedOrganism" (click)="this.addGenomeBuild()"><img class="icon" src="../../assets/add.png">Add</button>
                     <button mat-button [disabled]="!this.canUpdateSelectedOrganism || this.genomeBuildSelectedIndex == null" (click)="this.removeGenomeBuild()"><img class="icon" src="../../assets/delete.png">Remove</button>
                 </div>
-                <ag-grid-angular class="ag-theme-fresh flex-two full-width"
+                <ag-grid-angular class="ag-theme-balham flex-two full-width"
                                  (gridReady)="this.onGenomeBuildGridReady($event)"
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onGenomeBuildGridRowSelected($event)"
