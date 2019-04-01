@@ -166,6 +166,14 @@ export class ConfigureOrganismsComponent implements OnInit {
                     });
                 }
             });
+        }else if(this.selectedOrganism && !this.selectedOrganism.idOrganism){
+            let idOwner:string = this.formGroup.get("owner").value;
+            this.formGroup.reset();
+            this.genomeBuildList = [];
+            if(idOwner){
+                this.formGroup.get("owner").setValue(idOwner);
+            }
+            this.selectedOrganism = null;
         }
     }
 
