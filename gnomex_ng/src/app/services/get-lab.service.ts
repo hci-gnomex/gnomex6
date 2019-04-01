@@ -3,6 +3,7 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {BehaviorSubject, Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {first, map} from "rxjs/operators";
+import {UtilService} from "./util.service";
 
 @Injectable()
 export class GetLabService {
@@ -185,7 +186,7 @@ export class GetLabService {
         return this.getLabBasic(idLab).pipe(map((response: Response) => {
             if (response.status === 200) {
                 let lab = response.json();
-                return lab.Lab.members;
+                return UtilService.getJsonArray(lab.Lab.members, lab.Lab.members.AppUser);
             } else {
                 return [];
             }
