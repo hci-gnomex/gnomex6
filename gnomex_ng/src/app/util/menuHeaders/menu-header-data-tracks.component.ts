@@ -1,4 +1,4 @@
-import {Component, Inject, Input, OnInit, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChanges} from '@angular/core';
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewGenomeBuildComponent} from "../new-genome-build.component";
@@ -46,6 +46,9 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     public duplicateDTisDisabled: boolean = true;
     public removeDisabled: boolean = true;
     public disableAll: boolean = false;
+
+    @Output() onDataTrackFolderCreated: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onDataTrackCreated: EventEmitter<string> = new EventEmitter<string>();
 
     constructor(private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
@@ -97,20 +100,30 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     public makeNewDataTrack(): void {
         let dialogRef: MatDialogRef<NewDataTrackComponent> = this.dialog.open(NewDataTrackComponent, {
-            height: '390px',
-            width: '300px',
+            height: '23em',
+            width: '40em',
             data: {
                 selectedItem: this.selectedNode
+            }
+        });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.onDataTrackCreated.emit(result);
             }
         });
     }
 
     public makeNewFolder(): void {
         let dialogRef: MatDialogRef<NewDataTrackFolderComponent> = this.dialog.open(NewDataTrackFolderComponent, {
-            height: '350px',
-            width: '300px',
+            height: '18em',
+            width: '40em',
             data: {
                 selectedItem: this.selectedNode
+            }
+        });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.onDataTrackFolderCreated.emit(result);
             }
         });
     }
