@@ -2,7 +2,8 @@
     <div class="full-width full-height flex-container-col foreground">
         <div class="full-width small-font">
             <div class="full-width">
-                <menu-header-data-tracks [selectedNode]="selectedItem" [allActiveNodes]="this.allActiveNodes"></menu-header-data-tracks>
+                <menu-header-data-tracks [selectedNode]="selectedItem" [allActiveNodes]="this.allActiveNodes" (onDataTrackFolderCreated)="this.onDataTrackFolderCreated($event)"
+                                         (onDataTrackCreated)="this.onDataTrackCreated($event)"></menu-header-data-tracks>
             </div>
             <div class="full-width vertical-spacer">
             </div>
