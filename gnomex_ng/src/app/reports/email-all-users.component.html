@@ -19,10 +19,9 @@
         <mat-radio-button class="radioOption" [value]="SHOW_BODY">Enter Text</mat-radio-button>
         <mat-radio-button class="radioOption" [value]="SHOW_FILE_UPLOAD">Upload File</mat-radio-button>
     </mat-radio-group>
-    <mat-form-field *ngIf="bodyType === SHOW_BODY" class="formField">
-        <textarea style="resize: none; height: 14rem;" matInput placeholder="Body" [formControl]="bodyFormControl"></textarea>
-        <mat-error *ngIf="bodyFormControl.hasError('required')">Body is required</mat-error>
-    </mat-form-field>
+    <div *ngIf="bodyType === SHOW_BODY" class="formField">
+        <angular-editor [formControl]="this.bodyFormControl" [config]="this.editorConfig"></angular-editor>
+    </div>
     <div class="formField" *ngIf="bodyType === SHOW_FILE_UPLOAD">
         <input type="file" (change)="fileChange($event)" style="width: 70%;" accept=".txt,.text,.htm,.html">
         <label *ngIf="fileSize != ''" style="width: 30%;">({{fileSize}} bytes)</label>
@@ -34,7 +33,7 @@
     <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
 </mat-dialog-actions>
 <style>
-    mat-form-field.formField {
+    .formField {
         width: 100%;
         margin: 0.25rem 0;
     }

@@ -1,76 +1,93 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {Component, Inject} from '@angular/core';
-import {Response, URLSearchParams} from "@angular/http";
+import {Component, Inject, OnInit} from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
-import {OrganismService} from "../services/organism.service";
 import {DataTrackService} from "../services/data-track.service";
 import {LabListService} from "../services/lab-list.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {UserPreferencesService} from "../services/user-preferences.service";
+import {ConstantsService} from "../services/constants.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {HttpParams} from "@angular/common/http";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Component({
     selector: 'new-datatrack-folder',
-    templateUrl: "./new-datatrackfolder-dialog.html",
+    template: `
+        <h6 mat-dialog-title><img class="icon" [src]="this.constantsService.ICON_FOLDER_GROUP">Add new data track folder to {{label}}</h6>
+        <mat-dialog-content>
+            <form [formGroup]="this.form">
+                <div class="dialogDiv">
+                    <mat-form-field class="full-width">
+                        <input matInput formControlName="name" placeholder="Folder Name">
+                    </mat-form-field>
+                </div>
+                <div class="dialogDiv">
+                    <lazy-loaded-select class="full-width" placeholder="Lab" [options]="this.labList"
+                                        valueField="idLab" [displayField]="this.prefService.labDisplayField" [allowNone]="true"
+                                        [control]="this.form.get('idLab')">
+                    </lazy-loaded-select>
+                </div>
+            </form>
+        </mat-dialog-content>
+        <mat-dialog-actions class="justify-flex-end">
+            <button mat-button *ngIf="!showSpinner" [disabled]="this.form.invalid" (click)="save()">Save</button>
+            <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
+            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+        </mat-dialog-actions>
+    `,
 })
 
-export class NewDataTrackFolderComponent {
-    private selectedItem: ITreeNode;
-    public title: string = "";
-    private idGenomeBuild: string = "";
+export class NewDataTrackFolderComponent implements OnInit {
 
-    public folderName: string = "";
-    public idLab: string = "";
-    private item: string = "";
+    public label: string = "";
+    public form: FormGroup;
     public labList: any[] = [];
-
     public showSpinner: boolean = false;
+
+    private selectedItem: ITreeNode;
 
     constructor(public dialogRef: MatDialogRef<NewDataTrackFolderComponent>,
                 private dataTrackService: DataTrackService,
+                private dialogsService: DialogsService,
                 private labListService: LabListService,
+                public prefService: UserPreferencesService,
+                public constantsService: ConstantsService,
+                private formBuilder: FormBuilder,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
+    }
 
-        this.selectedItem = data.selectedItem;
-        this.item = this.selectedItem.data.label;
-        this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
-            this.labList = response;
+    ngOnInit(): void {
+        this.selectedItem = this.data.selectedItem;
+        this.label = this.selectedItem.data.label;
+        this.form = this.formBuilder.group({
+            name: ["", [Validators.required, Validators.maxLength(2000)]],
+            idLab: ["", Validators.required],
         });
-
-    }
-
-    public onLabSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idLab = event.args.item.value;
-            }
-        } else {
-            this.resetLabSelection();
-        }
-    }
-
-    public onLabUnselect(): void {
-        this.resetLabSelection();
-    }
-
-    private resetLabSelection(): void {
-        this.idLab = "";
+        this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
+            this.labList = response.sort(this.prefService.createLabDisplaySortFunction());
+        });
     }
 
     public save(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idLab", this.idLab);
-        params.set("idGenomeBuild", this.selectedItem.data.idGenomeBuild);
-        params.set("name", this.folderName);
+        let params: HttpParams = new HttpParams()
+            .set("idLab", this.form.get("idLab").value)
+            .set("idGenomeBuild", this.selectedItem.data.idGenomeBuild)
+            .set("name", this.form.get("name").value);
         if (this.selectedItem.data.idDataTrackFolder) {
-            params.set("idParentDataTrackFolder", this.selectedItem.data.idDataTrackFolder)
+            params = params.set("idParentDataTrackFolder", this.selectedItem.data.idDataTrackFolder)
         }
 
-        this.dataTrackService.saveDataTrackFolder(params).subscribe((response: Response) => {
+        this.dataTrackService.saveDataTrackFolder(params).subscribe((response: any) => {
             this.showSpinner = false;
-            this.dialogRef.close();
-            this.dataTrackService.refreshDatatracksList_fromBackend();
+            if (response && response.result && response.result === "SUCCESS") {
+                this.dialogRef.close(response.idDataTrackFolder);
+            } else {
+                let message: string = "";
+                if (response && response.message) {
+                    message = ": " + response.message;
+                }
+                this.dialogsService.alert("An error occurred while adding data track folder" + message);
+            }
         });
     }
 

@@ -25,9 +25,9 @@
                 <mat-form-field class="formField">
                     <input #labInput matInput placeholder="Lab" aria-label="Lab" [matAutocomplete]="autoLab"
                            [(ngModel)]="selectedLab" (keyup.enter)="chooseFirstLabOption()" (keyup)="highlightFirstLabOption($event)"  >
-                    <mat-autocomplete [displayWith]="displayLab" #autoLab="matAutocomplete">
+                    <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
                         <mat-option (onSelectionChange)="selectLabOption($event)" *ngFor="let lab of  filterLabList(this.selectedLab)" [value]="lab">
-                            {{lab.name }}
+                            {{lab[this.prefService.labDisplayField] }}
                         </mat-option>
                     </mat-autocomplete>
                 </mat-form-field>

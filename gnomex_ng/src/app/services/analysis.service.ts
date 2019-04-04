@@ -25,6 +25,7 @@ export class AnalysisService {
     public invalid:boolean = false;
     public dirty:boolean = false;
     private _analysisOverviewForm: FormGroup;
+    private _createdAnalysis: any;
 
 
     constructor(private http: Http, private httpClient:HttpClient,
@@ -32,6 +33,13 @@ export class AnalysisService {
         this._analysisOverviewForm = new FormGroup({});
     }
 
+
+    get createdAnalysis(): any {
+        return this._createdAnalysis;
+    }
+    set createdAnalysis(data: any) {
+        this._createdAnalysis = data;
+    }
 
     get analysisList(): Array<any>{
         return this._analysisList;

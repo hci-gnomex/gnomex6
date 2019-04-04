@@ -447,7 +447,7 @@ private void appendSubmitters(Element labNode, Lab theLab) throws Exception {
 			} else {
 				node.setAttribute("value", u.getIdAppUser().toString());
 			}
-			node.setAttribute("display", u.getDisplayName());
+			node.setAttribute("display", Util.getAppUserDisplayName(u, this.getUserPreferences()));
 			activeSubmittersNode.addContent(node);
 		}
 	}
@@ -482,7 +482,7 @@ private void appendBillingAccounts(List accounts, String nodeName, Element labNo
 			} else {
 				userNode.setAttribute("value", user.getIdAppUser().toString());
 			}
-			userNode.setAttribute("display", user.getDisplayName());
+			userNode.setAttribute("display", Util.getAppUserDisplayName(user, this.getUserPreferences()));
 			users.add(userNode);
 
 			if (userIds.length() > 0) {

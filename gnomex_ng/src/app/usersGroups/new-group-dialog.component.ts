@@ -5,6 +5,7 @@ import {LabListService} from "../services/lab-list.service";
 import {
     FormBuilder, FormControl, FormGroup, Validators
 } from "@angular/forms";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: 'new-group-dialog',
@@ -60,37 +61,34 @@ export class NewGroupDialogComponent implements OnInit{
 
     public save(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("accountsJSONString", "");
-        params.set("collaboratorsJSONString", "");
-        params.set("contactPhone", this.addGroupFG.controls['phone'].value);
-        params.set("contactEmail", this.emailFC.value);
-        params.set("idLab", '0');
+        let params: HttpParams = new HttpParams();
+        params = params.set("accountsJSONString", "");
+        params = params.set("collaboratorsJSONString", "");
+        params = params.set("contactPhone", this.addGroupFG.controls['phone'].value);
+        params = params.set("contactEmail", this.emailFC.value);
+        params = params.set("idLab", '0');
         if (this.pricingFC.value === "INTERNAL") {
-            params.set("isExternalPricing", "N");
-            params.set("isExternalPricingCommercial", "N");
+            params = params.set("isExternalPricing", "N");
+            params = params.set("isExternalPricingCommercial", "N");
 
         } else if (this.pricingFC.value === "EXACADEMIC") {
-            params.set("isExternalPricing", "Y");
-            params.set("isExternalPricingCommercial", "N");
+            params = params.set("isExternalPricing", "Y");
+            params = params.set("isExternalPricingCommercial", "N");
 
         } else if (this.pricingFC.value === "EXCOMM") {
-            params.set("isExternalPricing", "Y");
-            params.set("isExternalPricingCommercial", "Y");
+            params = params.set("isExternalPricing", "Y");
+            params = params.set("isExternalPricingCommercial", "Y");
         }
-        params.set("institutionsJSONString", "");
-        params.set("firstName", this.addGroupFG.controls['firstName'].value);
-        params.set("lastName", this.addGroupFG.controls['lastName'].value);
-        params.set("managersJSONString", "");
-        params.set("membersJSONString", "");
+        params = params.set("institutionsJSONString", "");
+        params = params.set("firstName", this.addGroupFG.controls['firstName'].value);
+        params = params.set("lastName", this.addGroupFG.controls['lastName'].value);
+        params = params.set("managersJSONString", "");
+        params = params.set("membersJSONString", "");
 
-        this.labListService.saveLab(params).subscribe((response: Response) => {
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.rebuildGroups = true;
-                    this.showSpinner = false;
-                }
+        this.labListService.saveLab(params).subscribe((responseJSON: any) => {
+            if (responseJSON.result && responseJSON.result === "SUCCESS") {
+                this.rebuildGroups = true;
+                this.showSpinner = false;
             }
             this.dialogRef.close();
         });

@@ -1,16 +1,15 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import { URLSearchParams } from "@angular/http";
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import {URLSearchParams} from "@angular/http";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 import {ExperimentsService} from "./experiments.service";
+import {UserPreferencesService} from "../services/user-preferences.service";
+import {jqxComboBoxComponent} from "../../assets/jqwidgets-ts/angular_jqxcombobox";
 
 @Component({
-    selector: 'create-project-dialog',
-    templateUrl: 'create-project-dialog.html',
+    selector: "create-project-dialog",
+    templateUrl: "create-project-dialog.html",
     styles: [`
         .inlineComboBox {
             display: inline-block;
@@ -23,30 +22,30 @@ import {ExperimentsService} from "./experiments.service";
     `]
 })
 
-export class CreateProjectComponent implements OnInit, AfterViewInit{
+export class CreateProjectComponent implements OnInit, AfterViewInit {
     @ViewChild("yesButton") yesButton;
+    @ViewChild("labComboBox") labComboBox: jqxComboBoxComponent;
 
-    formControl: FormControl = new FormControl();
-    private labList: any[];
-    private labListString: any[];
+    public createProjectForm: FormGroup;
+    public newProjectName: string;
+    public showSpinner: boolean = false;
+    public labList: any[];
     private items: any[];
-    private i:number = 0;
-    private selectedItem: any;
+    private selectedLab: any;
     private idLabString: string;
-    private projectName: string;
     private projectDescription: string;
     private selectedProjectLabItem: any;
-    private createProjectForm: FormGroup;
-    public showSpinner: boolean = false;
+
+
 
     constructor(private dialogRef: MatDialogRef<CreateProjectComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private experimentsService: ExperimentsService,
-                private formBuilder: FormBuilder
+                private formBuilder: FormBuilder,
+                public prefService: UserPreferencesService,
     ) {
-        this.labListString = data.labListString;
         this.labList = data.labList;
         this.items = data.items;
-        this.selectedItem = data.selectedLabItem;
+        this.selectedLab = data.selectedLabItem;
 
         this.createForm();
     }
@@ -56,17 +55,22 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
      */
     createForm() {
         this.createProjectForm = this.formBuilder.group({
-            projectName: ['', [
+            projectName: ["", [
                 Validators.required
             ]],
-            selectedLab: ['', [
+            selectedLab: ["", [
                 Validators.required
             ]],
             "projectDescription": this.projectDescription
-        })
+        });
     }
 
     ngOnInit() {
+        setTimeout( () => {
+            if(this.selectedLab) {
+                this.labComboBox.selectItem(this.selectedLab);
+            }
+        });
     }
 
     ngAfterViewInit() {
@@ -77,7 +81,7 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
      * @param event
      */
     onLabSelect(event: any) {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args && event.args.item && event.args.item.value) {
             this.selectedProjectLabItem = event.args.item.originalItem;
 
             this.idLabString = event.args.item.value;
@@ -93,17 +97,20 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
         this.showSpinner = true;
         var params: URLSearchParams = new URLSearchParams();
         var stringifiedProject: string;
-        project.name = this.createProjectForm.controls['projectName'].value;
-        project.projectDescription = this.createProjectForm.controls['projectDescription'].value;
+
+        this.newProjectName = this.createProjectForm.controls["projectName"].value;
+        project.name = this.createProjectForm.controls["projectName"].value;
+        project.projectDescription = this.createProjectForm.controls["projectDescription"].value;
         stringifiedProject = JSON.stringify(project);
         params.set("projectXMLString", stringifiedProject);
         params.set("parseEntries", "Y");
         var lPromise = this.experimentsService.saveProject(params).toPromise();
         lPromise.then(response => {
-            if (this.items.length === 0)
+            if(this.items.length === 0) {
                 this.dialogRef.close();
-            else
+            } else {
                 this.refreshProjectRequestList();
+            }
         });
 
     }
@@ -137,19 +144,6 @@ export class CreateProjectComponent implements OnInit, AfterViewInit{
     createProjectSaveButtonClicked() {
         this.getProject();
     }
-    /**
-     * The no button was selected in the delete project window.
-     */
-    createProjectCancelButtonClicked() {
-        this.dialogRef.close();
-    }
-
-    save(formData:any){
-        console.log(formData);
-    }
 
 }
 
-export class CreateProjectComponentLauncher {
-
-}

@@ -388,7 +388,7 @@ public class GetPendingSampleList extends GNomExCommand implements Serializable 
     n.setAttribute("index",          wellIndex != null ? wellIndex.toString() : "");
     n.setAttribute("idPlate",        idPlate != null ? idPlate.toString() : "");
     n.setAttribute("requestSubmitDate",  createDate == null ? ""  : this.formatDate((java.util.Date)createDate, this.DATE_OUTPUT_DASH));
-    n.setAttribute("requestSubmitter",   submitter != null ? submitter.getDisplayName() : "");
+    n.setAttribute("requestSubmitter",   submitter != null ? Util.getAppUserDisplayName(submitter, this.getUserPreferences()) : "");
     n.setAttribute("redoFlag",       redoFlag != null ? redoFlag : "");
     n.setAttribute("idSourcePlateWell",        idPlateWell != null ? idPlateWell.toString() : "");
 

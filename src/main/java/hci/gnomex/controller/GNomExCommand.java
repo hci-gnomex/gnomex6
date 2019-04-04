@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import hci.gnomex.utility.UserPreferences;
 import org.hibernate.Session;
 
 /**
@@ -41,6 +42,8 @@ public abstract class GNomExCommand extends Command implements Serializable {
   protected String xmlResult = "";
   protected String jsonResult = null;
   protected String errorDetails = "";
+
+  private UserPreferences userPreferences;
 
   public String SUCCESS_JSP = "/message.jsp";
   public String ERROR_JSP = "/message.jsp";
@@ -241,5 +244,12 @@ public abstract class GNomExCommand extends Command implements Serializable {
     sess.flush();
   }
 
+  public UserPreferences getUserPreferences() {
+    return userPreferences;
+  }
+
+  public void setUserPreferences(UserPreferences userPreferences) {
+    this.userPreferences = userPreferences != null ? userPreferences : new UserPreferences();
+  }
 
 }

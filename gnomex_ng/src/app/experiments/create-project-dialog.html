@@ -1,10 +1,10 @@
-<form (ngSubmit)="save(createProjectForm.value)" [formGroup]="createProjectForm" >
+<form [formGroup]="createProjectForm" >
     <h6 mat-dialog-title><img src="../../assets/folder_add.png">New Project</h6>
     <div mat-dialog-content>
         <div>
             <label style="width: 10em">Group</label>
             <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
-                         [source]="labList" [displayMember]="'name'" [valueMember]="'idLab'"
+                         [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
                          (onSelect)="onLabSelect($event)" formControlName="selectedLab">
             </jqxComboBox>
         </div>

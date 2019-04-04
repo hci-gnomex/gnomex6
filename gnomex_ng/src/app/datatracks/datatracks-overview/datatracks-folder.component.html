@@ -15,7 +15,7 @@
                 <jqxComboBox id="descriptEditor" width="100%"
                              #comboBox
                              [placeHolder]="'Select a lab...'"
-                             [displayMember]="'name'"
+                             [displayMember]="this.prefService.labDisplayField"
                              [valueMember]="'idLab'"
                              [height]="20"
                              [disabled]="secAdvisor.isGuest"

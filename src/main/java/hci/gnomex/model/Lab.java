@@ -165,39 +165,41 @@ public class Lab extends HibernateDetailObject implements java.lang.Comparable {
 
 
   public String getName( Boolean lastNameFirst, Boolean includeLab, Boolean includeActiveFlag) {
-
-    String name = "";
-
-    if ( lastNameFirst ) {
+    StringBuilder name = new StringBuilder();
+    if (lastNameFirst) {
       if (lastName != null && !lastName.equals("")) {
-        name = lastName;
+        name.append(lastName);
+        if (firstName != null && !firstName.equals("")) {
+          name.append(", ");
+        }
       }
       if (firstName != null && !firstName.equals("")) {
-        if (name.length() > 0) {
-          name += ", ";
-        }
-        name += firstName;
+        name.append(firstName);
       }
     } else {
       if (firstName != null && !firstName.equals("")) {
-        name = firstName;
+        name.append(firstName);
+        if (lastName != null && !lastName.equals("")) {
+          name.append(" ");
+        }
       }
       if (lastName != null && !lastName.equals("")) {
-        name += " " + lastName;
+        name.append(lastName);
       }
     }
-    if ( includeLab ) {
+    if (includeLab) {
       if (name.length() > 0) {
-        name += " Lab";
+        name.append(" ");
       }
+      name.append("Lab");
     }
-    if ( includeActiveFlag ) {
-      if (this.getIsActive() != null && this.getIsActive().equalsIgnoreCase("N")) {
-        name += " (inactive)";
+    if (includeActiveFlag && this.getIsActive() != null && this.getIsActive().equalsIgnoreCase("N")) {
+      if (name.length() > 0) {
+        name.append(" ");
       }
+      name.append("(inactive)");
     }
-
-    return name;
+    return name.toString();
   }
 
 

@@ -8,6 +8,7 @@ import {
 import { URLSearchParams } from "@angular/http";
 import {AnalysisService} from "../services/analysis.service";
 import {FormControl, Validators} from '@angular/forms';
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'create-analysis-group-dialog',
@@ -43,7 +44,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
         ]);
 
     constructor(private dialogRef: MatDialogRef<CreateAnalysisGroupComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
-                private analysisService: AnalysisService) {
+                private analysisService: AnalysisService, public prefService: UserPreferencesService) {
 
         this.labList = data.labList
     }

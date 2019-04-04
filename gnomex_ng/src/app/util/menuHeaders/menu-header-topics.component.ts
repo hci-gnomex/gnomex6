@@ -1,30 +1,38 @@
 import {Component, EventEmitter, Input, OnInit, Output, SimpleChanges} from '@angular/core';
-
 import {MatDialogRef, MatDialog} from '@angular/material';
 import {NewTopicComponent} from "../new-topic.component";
 import {DeleteTopicComponent} from "../../topics/delete-topic.component";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {Router} from "@angular/router";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Component({
     selector: 'menu-header-topics',
-    templateUrl: "./menu-header-topics.component.html"
+    template: `
+        <div>
+            <label style="width: 7rem; margin: 0 0 0 0.5rem"><img src="../../../assets/topic_tag.png" class="icon">Topics</label>
+            <button mat-button [disabled]="!showNewTopic || this.disableAll" (click)="makeNewTopic()"><img src="../../../assets/topic_tag_new.png" class="icon">New Topic</button>
+            <button [disabled]="(!showDelete && !showRemoveLink) || this.disableAll" mat-button (click)="doDelete()"><img src="../../../assets/crossout.png" class="icon">{{showRemoveLink ? 'Remove link' : 'Delete'}}</button>
+            <button mat-button [disabled]="this.disableAll" (click)="doLinkToData()"><img src="../../../assets/link.png" class="icon">Link to Data</button>
+        </div>
+    `
 })
 
 export class MenuHeaderTopicsComponent implements OnInit {
-    @Input() selectedNode: any;
+    @Input() selectedNode: ITreeNode;
 
     private idParentTopic = "";
     private parentTopicLabel = "";
     public showDelete: boolean = false;
     public showRemoveLink: boolean = false;
     public showNewTopic: boolean = false;
-    public message: string = "startLinkToData";
     public disableAll: boolean = false;
 
     @Output() messageEvent = new EventEmitter<string>();
 
     constructor(private dialog: MatDialog,
-                private createSecurityAdvisorService: CreateSecurityAdvisorService) {
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private router: Router) {
     }
 
     ngOnInit() {
@@ -36,7 +44,7 @@ export class MenuHeaderTopicsComponent implements OnInit {
     public makeNewTopic(): void {
         // TODO depending on where the user has clicked in the topics tree, this dialog
         // needs to be provided with an idParentTopic and parentTopicLabel parameter
-        let dialogRef: MatDialogRef<NewTopicComponent> = this.dialog.open(NewTopicComponent, {
+        this.dialog.open(NewTopicComponent, {
             height: '430px',
             width: '300px',
             data: {
@@ -47,33 +55,10 @@ export class MenuHeaderTopicsComponent implements OnInit {
         });
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        if (this.selectedNode) {
-            this.showNewTopic = true;
-            this.removeLinkEnabled();
-        }
-    }
-
-    public removeLinkEnabled() {
-        if ((this.selectedNode.isLeaf && this.selectedNode.data.idParentTopic === undefined))  {
-            this.showRemoveLink = true;
-            this.showDelete = false;
-        } else {
-            this.deleteEnabled();
-        }
-    }
-
-    public deleteEnabled() {
-        if (this.selectedNode.data.Request || this.selectedNode.data.Analysis || this.selectedNode.data.DataTrack) {
-            this.showRemoveLink = false;
-            this.showDelete = false;
-        } else if (this.selectedNode.data.idTopic) {
-            this.showRemoveLink = false;
-            this.showDelete = true;
-        } else if (this.selectedNode.id = "topic") {
-            this.showRemoveLink = false;
-            this.showDelete = false;
-        }
+    ngOnChanges(changes: SimpleChanges): void {
+        this.showNewTopic = !!this.selectedNode;
+        this.showRemoveLink = this.selectedNode && this.selectedNode.isLeaf && !this.selectedNode.data.idParentTopic && this.selectedNode.parent.parent.data.canWrite === 'Y';
+        this.showDelete = this.selectedNode && this.selectedNode.data.idTopic && this.selectedNode.data.canWrite === 'Y';
     }
 
     public doDelete(): void {
@@ -86,14 +71,17 @@ export class MenuHeaderTopicsComponent implements OnInit {
                 topic: this.selectedNode.parent.parent.data
             }
         });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
+                this.selectedNode = null;
+                this.ngOnChanges(null);
+            }
+        });
     }
 
     public doLinkToData(): void {
-        this.messageEvent.emit(this.message);
-        // TODO
-    }
-
-    public doRefresh(): void {
+        this.messageEvent.emit("startLinkToData");
         // TODO
     }
 

@@ -17,6 +17,9 @@ import {AnalysisService} from "../../services/analysis.service";
         :host /deep/ angular-editor #editor {
             resize: none;
         }
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
     `]
 })
 export class AnalysisDescriptionTabComponent implements OnInit, OnChanges {
@@ -25,7 +28,7 @@ export class AnalysisDescriptionTabComponent implements OnInit, OnChanges {
 
     private canUpdate: boolean = false;
     private form: FormGroup;
-    private editorConfig: AngularEditorConfig;
+    public editorConfig: AngularEditorConfig;
 
     constructor(private route: ActivatedRoute,
                 private formBuilder: FormBuilder,

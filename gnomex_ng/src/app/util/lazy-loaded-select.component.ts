@@ -12,6 +12,7 @@ import {Subscription} from "rxjs";
                 <mat-option *ngFor="let opt of this.loadedOptions" [value]="this.valueField ? opt[this.valueField] : opt">{{opt[this.displayField]}}</mat-option>
                 <mat-option *ngIf="this.isLoading">Loading...</mat-option>
             </mat-select>
+            <mat-error *ngIf="this.control.hasError('required')">{{this.placeholder}} is required</mat-error>
         </mat-form-field>
     `,
 })

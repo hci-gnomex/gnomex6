@@ -194,6 +194,13 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                             }
 
                         }
+
+                        // tim 01/28/2019 added
+                        this.xmlResult = "<SUCCESS/>";
+                        System.out.println ("[OEULF] (1) this.xmlResult: " + this.xmlResult);
+                        setResponsePage(this.SUCCESS_JSP);
+                        return this;                  // you can only have one...
+
                     }
 
                     // Rename files
@@ -321,6 +328,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                 // If we have renamed a file that is registered in the database
                                 // under the ExperimentFile table, then update the ExperimentFile name
                                 // so that we don't do an unnecessary delete in the register files servlet
+
+/*
                                 String currentExpFileName = fileName.substring(fileName.indexOf(baseRequestNumber))
                                         .replace("\\", Constants.FILE_SEPARATOR); // REMOVE
                                 // REPLACE
@@ -343,6 +352,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                     ef.setFileSize(BigDecimal.valueOf(destFile.length()));
                                     sess.save(ef);
                                 }
+*/
                             } else {
                                 problemFiles.add(fileName);
                             }
@@ -356,22 +366,6 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                         for (Iterator i = filesToRemoveParser.parseFilesToRemove().iterator(); i.hasNext(); ) {
                             String fileName = (String) i.next();
                             File f = new File(fileName);
-
-                            // Remove references of file in TransferLog
-                            String queryBuf = "SELECT tl from TransferLog tl where tl.idRequest = :idRequest AND tl.fileName like :fileName";
-                            Query query = sess.createQuery(queryBuf);
-                            query.setParameter("idRequest", idRequest);
-                            query.setParameter("fileName", "%" + new File(fileName).getName());
-                            List transferLogs = query.list();
-
-                            // Go ahead and delete the transfer log if there is just one row.
-                            // If there are multiple transfer log rows for this filename, just
-                            // bypass deleting the transfer log since it is not possible
-                            // to tell which entry should be deleted.
-                            if (transferLogs.size() == 1) {
-                                TransferLog transferLog = (TransferLog) transferLogs.get(0);
-                                sess.delete(transferLog);
-                            }
 
                             // The "file" might be a directory so we have to delete all of the
                             // files underneath it first
@@ -426,11 +420,11 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                         sess.flush();
                                     }
                                 }
-                            }
+                            }  // if f.exists
 
-                        }
+                        }  // end of for
                         sess.flush();
-                    }
+                    } // enf of filestoremove
 
                     sess.flush();
 

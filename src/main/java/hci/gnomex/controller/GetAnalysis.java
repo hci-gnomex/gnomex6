@@ -145,6 +145,7 @@ public Command execute() throws RollBackCommandException {
 
 			Document doc = new Document(new Element("OpenAnalysisList"));
 			Element aNode = a.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement();
+			aNode.setAttribute("labName", Util.getLabDisplayName(a.getLab(), this.getUserPreferences()));
 
 			Element experimentItems = new Element("experimentItems");
 			for (Iterator i = a.getExperimentItems().iterator(); i.hasNext();) {

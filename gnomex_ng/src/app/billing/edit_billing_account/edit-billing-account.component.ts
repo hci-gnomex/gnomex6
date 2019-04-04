@@ -17,6 +17,7 @@ import { DictionaryService } from "../../services/dictionary.service";
 import { LabListService } from "../../services/lab-list.service";
 import { PropertyService } from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 
 @Component({
@@ -27,7 +28,8 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 export class EditBillingAccountLauncher {
 
 	constructor(private dialog: MatDialog,
-				private router: Router) {
+				private router: Router,
+				public prefService: UserPreferencesService) {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '60em';
         configuration.panelClass = 'no-padding-dialog';

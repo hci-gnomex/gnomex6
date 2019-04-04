@@ -6,7 +6,14 @@
         <div class="horizontal-center">
             <img src="{{site_splash}}" alt="">
         </div>
-        <div class="flex-grow-large">
+        <div class="flex-grow-large right-align flex-container-col">
+            <div class="flex-grow">
+            </div>
+            <div class="flex-container-row full-width">
+                <div class="flex-grow"></div>
+                <div class="small-font padded major-padded-right">{{ firstLastName }}</div>
+                <div class="small-font padded multiline">{{ permissionsText }}</div>
+            </div>
         </div>
     </div>
     <ng-template #loading>

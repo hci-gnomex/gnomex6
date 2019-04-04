@@ -33,6 +33,7 @@ import {AnalysisService} from "../services/analysis.service";
 import {DataTrackService} from "../services/data-track.service";
 import {DictionaryService} from "../services/dictionary.service";
 import { transaction } from 'mobx';
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -342,7 +343,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 private datatrackService: DataTrackService,
                 public experimentsService: ExperimentsService,
                 public dictionaryService: DictionaryService,
-                private analysisService: AnalysisService) {
+                private analysisService: AnalysisService,
+                public prefService: UserPreferencesService) {
 
 
         this.items = [];
@@ -906,10 +908,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     displayGen(gen: any) {
         return gen ? gen.genomeBuildName : gen;
-    }
-
-    displayLab(lab: any) {
-        return lab ? lab.name : lab;
     }
 
     filterGenomeBuild(genomeBuild: any): any[] {

@@ -116,7 +116,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 		try {
 			this.analysisGroupArray = Util.readJSONArray(request, "analysisGroupsJSONString");
-			if(this.analysisGroupArray != null){
+			if(this.analysisGroupArray.size() > 0 ){
 				this.analysisGroupParser = new AnalysisGroupParser(this.analysisGroupArray);
 			}
 		} catch (Exception e) {
@@ -126,7 +126,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 		try {
 			this.hybsArray = Util.readJSONArray(request, "hybsJSONString");
-			if(this.hybsArray != null){
+			if(this.hybsArray.size() > 0){
 				this.hybParser = new AnalysisHybParser(hybsArray);
 			}
 
@@ -150,7 +150,9 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 		if (request.getParameter("lanesJSONString") != null && !request.getParameter("lanesJSONString").equals("")) {
 			try {
 				this.lanesArray = Util.readJSONArray(request, "lanesJSONString");
-				this.laneParser = new AnalysisLaneParser(this.lanesArray);
+				if(lanesArray.size() > 0 ){
+					this.laneParser = new AnalysisLaneParser(this.lanesArray);
+				}
 			} catch (Exception e) {
 				this.addInvalidField("lanesJSONString", "Invalid lanesJSONString");
 				this.errorDetails = Util.GNLOG(LOG, "Cannot parse lanesJSONString", e);
@@ -176,7 +178,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 		try {
 			this.samplesArray = Util.readJSONArray(request, "samplesJSONString");
-			if(this.samplesArray != null ){
+			if(this.samplesArray.size() > 0 ){
 				sampleParser = new AnalysisSampleParser(this.samplesArray);
 			}
 		} catch (Exception e) {
@@ -186,7 +188,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 		try {
 			this.collaboratorsArray = Util.readJSONArray(request, "collaboratorsJSONString");
-			if(this.collaboratorsArray != null){
+			if(this.collaboratorsArray.size() > 0 ){
 				collaboratorParser = new AnalysisCollaboratorParser(this.collaboratorsArray);
 			}
 		} catch (Exception e) {
@@ -197,7 +199,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 		try {
 			genomeBuildsArray = Util.readJSONArray(request,"genomeBuildsJSONString");
-			if(genomeBuildsArray != null){
+			if(genomeBuildsArray.size() > 0 ){
 				genomeBuildParser = new AnalysisGenomeBuildParser(genomeBuildsArray);
 			}
 		} catch (Exception e) {
@@ -1031,7 +1033,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 	private void saveAnalysisProperties(Session sess, Analysis analysis) throws org.jdom.JDOMException {
 		// Delete  properties
-		if (propertiesArray != null) {
+		if (propertiesArray.size() > 0 ) {
 			for (Iterator<?> i = analysis.getPropertyEntries().iterator(); i.hasNext();) {
 				PropertyEntry pe = PropertyEntry.class.cast(i.next());
 				boolean found = false;

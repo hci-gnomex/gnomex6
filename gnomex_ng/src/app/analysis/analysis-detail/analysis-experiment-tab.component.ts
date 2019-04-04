@@ -15,6 +15,7 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {first} from "rxjs/operators";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 
 @Component({
@@ -274,7 +275,8 @@ export class AnalysisExperimentTabComponent implements OnInit{
                 private dialogService: DialogsService,
                 private fb:FormBuilder,
                 private route:ActivatedRoute,
-                private dictionaryService: DictionaryService ) {
+                private dictionaryService: DictionaryService,
+                public prefService: UserPreferencesService) {
     }
 
     ngOnInit(){

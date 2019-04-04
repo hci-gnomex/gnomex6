@@ -13,6 +13,7 @@ import {TrackUsageComponent} from "./track-usage.component";
 import {ChartsModule} from "ng2-charts";
 import {EmailAllUsersComponent} from "./email-all-users.component";
 import {EmailAllUsersLauncherComponent} from "./email-all-users-launcher.component";
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 @NgModule({
     imports: [
@@ -25,6 +26,7 @@ import {EmailAllUsersLauncherComponent} from "./email-all-users-launcher.compone
         AgGridModule.withComponents([]),
         ChartsModule,
         ReactiveFormsModule,
+        AngularEditorModule,
     ],
     declarations: [
         AnnotationProgressReportComponent,

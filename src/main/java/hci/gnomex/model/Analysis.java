@@ -3,6 +3,7 @@ package hci.gnomex.model;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.Util;
 import hci.hibernate5utils.HibernateDetailObject;
 
 import java.sql.Date;
@@ -400,8 +401,7 @@ public class Analysis extends HibernateDetailObject implements VisibilityInterfa
 
     String labName = "";
     if (this.getLab() != null) {
-      labName = Lab.formatLabName(this.getLab().getLastName(), this.getLab()
-          .getFirstName());
+      labName = Util.getLabDisplayName(this.getLab(), secAdvisor.getUserPreferences());
     }
 
     root.setAttribute("idAnalysis", this.getNonNullString(this.getIdAnalysis()));
