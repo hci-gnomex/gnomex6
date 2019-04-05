@@ -1464,8 +1464,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 private dialog: MatDialog,
                 private propertyService: PropertyService) {
 
-        this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
-        this.concentrationUnits = this.dictionaryService.getEntries("hci.gnomex.model.ConcentrationUnit");
+        this.organisms = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
+        this.concentrationUnits = this.dictionaryService.getEntries(DictionaryService.CONCENTRATION_UNIT);
 
         this.form = this.fb.group({});
 
