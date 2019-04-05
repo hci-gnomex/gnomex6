@@ -6,7 +6,7 @@
         </div>
         <div class="full-width flex-grow flex-container-col">
             <div class="full-width flex-container-row align-center padded">
-                <button mat-button
+                <button *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT" mat-button
                         class="padded-right"
                         color="link"
                         matTooltip="{{ TOOLTIP_TEXT }}"
@@ -14,7 +14,7 @@
                     <img class="icon" [src]="this.constService.ICON_INFORMATION" alt="">
                     Instructions
                 </button>
-                <button mat-button
+                <button *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT" mat-button
                         class="padded-right"
                         color="link"
                         matTooltip="Upload Sample Sheet&#13;tab delimited txt file"
@@ -30,12 +30,15 @@
                     <img class="icon" [src]="constService.ICON_DOWNLOAD">
                     Download Sample Sheet
                 </button>
-                <mat-checkbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
+                <mat-checkbox *ngIf="_state === this.STATE_NEW || (_state === this.STATE_EDIT && this.showCcCheckbox)" #ccCheckbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
             </div>
             <div class="full-width flex-grow">
                 <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                  stopEditingWhenGridLosesFocus="true"
+                                 [context]="context"
+                                 [animateRows]="true"
+                                 [getNodeChildDetails]="nodeChildDetails"
                                  [enableColResize]="true"
                                  [rowSelection]="'single'"
                                  [singleClickEdit]="true"

@@ -455,129 +455,151 @@ export class Experiment {
                                                 securityAdvisor: CreateSecurityAdvisorService,
                                                 value: any): Experiment {
 
+        if (!value) {
+            return null;
+        }
+
         let experiment = new Experiment(dictionaryService, gnomexService, propertyService, securityAdvisor);
 
-        experiment.clonePropertyOnlyIfExists("name", value);
-        experiment.clonePropertyOnlyIfExists("number", value);
-        experiment.clonePropertyOnlyIfExists("description", value);
-        experiment.clonePropertyOnlyIfExists("codeProtocolType", value);
-        experiment.clonePropertyOnlyIfExists("corePrepInstructions", value);
-        experiment.clonePropertyOnlyIfExists("analysisInstructions", value);
-        experiment.clonePropertyOnlyIfExists("captureLibDesignId", value);
-        experiment.clonePropertyOnlyIfExists("avgInsertSizeFrom", value);
-        experiment.clonePropertyOnlyIfExists("avgInsertSizeTo", value);
-        experiment.clonePropertyOnlyIfExists("idSlideProduct", value);
-        experiment.clonePropertyOnlyIfExists("protocolNumber", value);
-        experiment.clonePropertyOnlyIfExists("numberOfSamples", value);
-        experiment.clonePropertyOnlyIfExists("idSampleTypeDefault", value);
-        experiment.clonePropertyOnlyIfExists("sampleType", value);
-        experiment.clonePropertyOnlyIfExists("bioinformaticsAssist", value);
-        experiment.clonePropertyOnlyIfExists("idOrganismSampleDefault", value);
-        experiment.clonePropertyOnlyIfExists("isArrayINFORequest", value);
-        experiment.clonePropertyOnlyIfExists("canDeleteSample", value);
-        experiment.clonePropertyOnlyIfExists("canUpdateSamples", value);
-        experiment.clonePropertyOnlyIfExists("isVisibleToMembers", value);
-        experiment.clonePropertyOnlyIfExists("isVisibleToPublic", value);
-        experiment.clonePropertyOnlyIfExists("truncatedLabName", value);
-        experiment.clonePropertyOnlyIfExists("billingAccountName", value);
-        experiment.clonePropertyOnlyIfExists("billingAccountNumber", value);
-        experiment.clonePropertyOnlyIfExists("lastModifyDate", value);
-        experiment.clonePropertyOnlyIfExists("codeRequestStatus", value);
-        experiment.clonePropertyOnlyIfExists("idSampleDropOffLocation", value);
-        experiment.clonePropertyOnlyIfExists("submitterEmail", value);
-        experiment.clonePropertyOnlyIfExists("submitterPhone", value);
-        experiment.clonePropertyOnlyIfExists("submitterInstitution", value);
-        experiment.clonePropertyOnlyIfExists("isDNASeqExperiment", value);
-        experiment.clonePropertyOnlyIfExists("applicationNotes", value);
-        experiment.clonePropertyOnlyIfExists("coreToExtractDNA", value);
-        experiment.clonePropertyOnlyIfExists("processingDate", value);
-        experiment.clonePropertyOnlyIfExists("codeIsolationPrepType", value);
-        experiment.clonePropertyOnlyIfExists("hasPrePooledLibraries", value);
-        experiment.clonePropertyOnlyIfExists("numPrePooledTubes", value);
-        experiment.clonePropertyOnlyIfExists("includeBisulfideConversion", value);
-        experiment.clonePropertyOnlyIfExists("includeQubitConcentration", value);
-        experiment.clonePropertyOnlyIfExists("turnAroundTime", value);
-        experiment.clonePropertyOnlyIfExists("idCoreFacility", value);
-        experiment.clonePropertyOnlyIfExists("idProductOrder", value);
-        experiment.clonePropertyOnlyIfExists("idLab", value);
-        experiment.clonePropertyOnlyIfExists("idRequest", value);
-        experiment.clonePropertyOnlyIfExists("experimentOwner", value);
-        experiment.clonePropertyOnlyIfExists("idAppUser", value);
-        experiment.clonePropertyOnlyIfExists("idOwner", value);
-        experiment.clonePropertyOnlyIfExists("createDate", value);
-        experiment.clonePropertyOnlyIfExists("completedDate", value);
-        experiment.clonePropertyOnlyIfExists("notes", value);
-        experiment.clonePropertyOnlyIfExists("application", value);
-        experiment.clonePropertyOnlyIfExists("projectName", value);
-        experiment.clonePropertyOnlyIfExists("idProject", value);
-        experiment.clonePropertyOnlyIfExists("project", value);
-        experiment.clonePropertyOnlyIfExists("slideProduct", value);
-        experiment.clonePropertyOnlyIfExists("isExternal", value);
-        experiment.clonePropertyOnlyIfExists("requestStatus", value);
-        experiment.clonePropertyOnlyIfExists("reagent", value);
-        experiment.clonePropertyOnlyIfExists("elutionBuffer", value);
-        experiment.clonePropertyOnlyIfExists("usedDnase", value);
-        experiment.clonePropertyOnlyIfExists("usedRnase", value);
-        experiment.clonePropertyOnlyIfExists("keepSamples", value);
-        experiment.clonePropertyOnlyIfExists("seqPrepByCore", value);
-        experiment.clonePropertyOnlyIfExists("adminNotes", value);
-        experiment.clonePropertyOnlyIfExists("archived", value);
-        experiment.clonePropertyOnlyIfExists("codeRequestCategory", value);
-        experiment.clonePropertyOnlyIfExists("requestCategory", value);
-        experiment.clonePropertyOnlyIfExists("privacyExpirationDate", value);
-        experiment.clonePropertyOnlyIfExists("targetClassIdentifier", value);
-        experiment.clonePropertyOnlyIfExists("targetClassName", value);
-        experiment.clonePropertyOnlyIfExists("idBillingAccount", value);
-        experiment.clonePropertyOnlyIfExists("codeApplication", value);
-        experiment.clonePropertyOnlyIfExists("application_object", value);
-        experiment.clonePropertyOnlyIfExists("codeBioanalyzerChipType", value);
-        experiment.clonePropertyOnlyIfExists("codeVisibility", value);
-        experiment.clonePropertyOnlyIfExists("canUpdateVisibility", value);
-        experiment.clonePropertyOnlyIfExists("isVisibleToMembersAndCollaborators", value);
-        experiment.clonePropertyOnlyIfExists("idProduct", value);
-        experiment.clonePropertyOnlyIfExists("canRead", value);
-        experiment.clonePropertyOnlyIfExists("canUploadData", value);
-        experiment.clonePropertyOnlyIfExists("canDelete", value);
-        experiment.clonePropertyOnlyIfExists("ownerName", value);
-        experiment.clonePropertyOnlyIfExists("idInstitution", value);
-        experiment.clonePropertyOnlyIfExists("idSubmitter", value);
-        experiment.clonePropertyOnlyIfExists("canUpdate", value);
-        experiment.clonePropertyOnlyIfExists("submitterName", value);
-        experiment.clonePropertyOnlyIfExists("labName", value);
-        experiment.clonePropertyOnlyIfExists("projectDescription", value);
-        experiment.clonePropertyOnlyIfExists("accountNumberDisplay", value);
-        experiment.clonePropertyOnlyIfExists("idOrganism", value);
-        experiment.clonePropertyOnlyIfExists("organismName", value);
-        experiment.clonePropertyOnlyIfExists("otherOrganism", value);
-        experiment.clonePropertyOnlyIfExists("hasCCNumber", value);
-        experiment.clonePropertyOnlyIfExists("hasSampleDescription", value);
-        experiment.clonePropertyOnlyIfExists("hasPlates", value);
-        experiment.clonePropertyOnlyIfExists("isOpeningNewBillingTemplate", value);
-        experiment.clonePropertyOnlyIfExists("isRapidMode", value);
-        experiment.clonePropertyOnlyIfExists("samples", value);
-        experiment.clonePropertyOnlyIfExists("hybridizations", value);
-        experiment.clonePropertyOnlyIfExists("labeledSamples", value);
-        experiment.clonePropertyOnlyIfExists("analysisExperimentItems", value);
-        experiment.clonePropertyOnlyIfExists("seqLibTreatments", value);
-        experiment.clonePropertyOnlyIfExists("files", value);
-        experiment.clonePropertyOnlyIfExists("collaborators", value);
-        experiment.clonePropertyOnlyIfExists("workItems", value);
-        experiment.clonePropertyOnlyIfExists("billingItems", value);
-        experiment.clonePropertyOnlyIfExists("SeqLibTreatmentEntries", value);
-        experiment.clonePropertyOnlyIfExists("protocols", value);
-        experiment.clonePropertyOnlyIfExists("sequenceLanes", value);
-        experiment.clonePropertyOnlyIfExists("PropertyEntries", value);
-        experiment.clonePropertyOnlyIfExists("organism", value);
-        experiment.clonePropertyOnlyIfExists("sequencingOption", value);
-        experiment.clonePropertyOnlyIfExists("RequestProperties", value);
+        experiment.cloneProperty("name", value);
+        experiment.cloneProperty("number", value);
+        experiment.cloneProperty("description", value);
+        experiment.cloneProperty("codeProtocolType", value);
+        experiment.cloneProperty("corePrepInstructions", value);
+        experiment.cloneProperty("analysisInstructions", value);
+        experiment.cloneProperty("captureLibDesignId", value);
+        experiment.cloneProperty("avgInsertSizeFrom", value);
+        experiment.cloneProperty("avgInsertSizeTo", value);
+        experiment.cloneProperty("idSlideProduct", value);
+        experiment.cloneProperty("protocolNumber", value);
+        experiment.cloneProperty("numberOfSamples", value);
+        experiment.cloneProperty("idSampleTypeDefault", value);
+        experiment.cloneProperty("sampleType", value);
+        experiment.cloneProperty("bioinformaticsAssist", value);
+        experiment.cloneProperty("idOrganismSampleDefault", value);
+        experiment.cloneProperty("isArrayINFORequest", value);
+        experiment.cloneProperty("canDeleteSample", value);
+        experiment.cloneProperty("canUpdateSamples", value);
+        experiment.cloneProperty("isVisibleToMembers", value);
+        experiment.cloneProperty("isVisibleToPublic", value);
+        experiment.cloneProperty("truncatedLabName", value);
+        experiment.cloneProperty("billingAccountName", value);
+        experiment.cloneProperty("billingAccountNumber", value);
+        experiment.cloneProperty("lastModifyDate", value);
+        experiment.cloneProperty("codeRequestStatus", value);
+        experiment.cloneProperty("idSampleDropOffLocation", value);
+        experiment.cloneProperty("submitterEmail", value);
+        experiment.cloneProperty("submitterPhone", value);
+        experiment.cloneProperty("submitterInstitution", value);
+        experiment.cloneProperty("isDNASeqExperiment", value);
+        experiment.cloneProperty("applicationNotes", value);
+        experiment.cloneProperty("coreToExtractDNA", value);
+        experiment.cloneProperty("processingDate", value);
+        experiment.cloneProperty("codeIsolationPrepType", value);
+        experiment.cloneProperty("hasPrePooledLibraries", value);
+        experiment.cloneProperty("numPrePooledTubes", value);
+        experiment.cloneProperty("includeBisulfideConversion", value);
+        experiment.cloneProperty("includeQubitConcentration", value);
+        experiment.cloneProperty("turnAroundTime", value);
+        experiment.cloneProperty("idCoreFacility", value);
+        experiment.cloneProperty("idProductOrder", value);
+        experiment.cloneProperty("idLab", value);
+        experiment.cloneProperty("idRequest", value);
+        experiment.cloneProperty("experimentOwner", value);
+        experiment.cloneProperty("idAppUser", value);
+        experiment.cloneProperty("idOwner", value);
+        experiment.cloneProperty("createDate", value);
+        experiment.cloneProperty("completedDate", value);
+        experiment.cloneProperty("notes", value);
+        experiment.cloneProperty("application", value);
+        experiment.cloneProperty("projectName", value);
+        experiment.cloneProperty("idProject", value);
+        experiment.cloneProperty("project", value);
+        experiment.cloneProperty("slideProduct", value);
+        experiment.cloneProperty("isExternal", value);
+        experiment.cloneProperty("requestStatus", value);
+        experiment.cloneProperty("reagent", value);
+        experiment.cloneProperty("elutionBuffer", value);
+        experiment.cloneProperty("usedDnase", value);
+        experiment.cloneProperty("usedRnase", value);
+        experiment.cloneProperty("keepSamples", value);
+        experiment.cloneProperty("seqPrepByCore", value);
+        experiment.cloneProperty("adminNotes", value);
+        experiment.cloneProperty("archived", value);
+
+        experiment.codeRequestCategory = value.codeRequestCategory;
+
+        // experiment.clonePropertyOnlyIfExists("requestCategory", value);
+        experiment.cloneProperty("privacyExpirationDate", value);
+        experiment.cloneProperty("targetClassIdentifier", value);
+        experiment.cloneProperty("targetClassName", value);
+        experiment.cloneProperty("idBillingAccount", value);
+        experiment.cloneProperty("codeApplication", value);
+        experiment.cloneProperty("application_object", value);
+        experiment.cloneProperty("codeBioanalyzerChipType", value);
+        experiment.cloneProperty("codeVisibility", value);
+        experiment.cloneProperty("canUpdateVisibility", value);
+        experiment.cloneProperty("isVisibleToMembersAndCollaborators", value);
+        experiment.cloneProperty("idProduct", value);
+        experiment.cloneProperty("canRead", value);
+        experiment.cloneProperty("canUploadData", value);
+        experiment.cloneProperty("canDelete", value);
+        experiment.cloneProperty("ownerName", value);
+        experiment.cloneProperty("idInstitution", value);
+        experiment.cloneProperty("idSubmitter", value);
+        experiment.cloneProperty("canUpdate", value);
+        experiment.cloneProperty("submitterName", value);
+        experiment.cloneProperty("labName", value);
+        experiment.cloneProperty("projectDescription", value);
+        experiment.cloneProperty("accountNumberDisplay", value);
+        experiment.cloneProperty("idOrganism", value);
+        experiment.cloneProperty("organismName", value);
+        experiment.cloneProperty("otherOrganism", value);
+        experiment.cloneProperty("hasCCNumber", value);
+        experiment.cloneProperty("hasSampleDescription", value);
+        experiment.cloneProperty("hasPlates", value);
+        experiment.cloneProperty("isOpeningNewBillingTemplate", value);
+        experiment.cloneProperty("isRapidMode", value);
+
+        if (value && value.samples && Array.isArray(value.samples)) {
+            experiment.samples = [];
+
+            for (let sample of value.samples) {
+                experiment.samples.push(Sample.createSampleObjectFromAny(dictionaryService, sample));
+            }
+        }
+
+        experiment.cloneProperty("samples", value);
+
+        experiment.cloneProperty("hybridizations", value);
+        experiment.cloneProperty("labeledSamples", value);
+        experiment.cloneProperty("analysisExperimentItems", value);
+        experiment.cloneProperty("seqLibTreatments", value);
+        experiment.cloneProperty("files", value);
+        experiment.cloneProperty("collaborators", value);
+        experiment.cloneProperty("workItems", value);
+        experiment.cloneProperty("billingItems", value);
+        experiment.cloneProperty("SeqLibTreatmentEntries", value);
+        experiment.cloneProperty("protocols", value);
+        experiment.cloneProperty("sequenceLanes", value);
+        experiment.cloneProperty("PropertyEntries", value);
+        experiment.cloneProperty("organism", value);
+        experiment.cloneProperty("sequencingOption", value);
+        experiment.cloneProperty("RequestProperties", value);
 
         experiment._PropertyEntries_original = experiment.PropertyEntries;
 
         return experiment;
     }
 
+    private cloneProperty(propertyName: string, source: any) {
+        if (source && source[propertyName]) {
+            this[propertyName] = source[propertyName];
+        }
+    }
+
     private clonePropertyOnlyIfExists(propertyName: string, source: any) {
-        if (this[propertyName] && source[propertyName]) {
+        if (source && this[propertyName] && source[propertyName]) {
             this[propertyName] = source[propertyName];
         }
     }

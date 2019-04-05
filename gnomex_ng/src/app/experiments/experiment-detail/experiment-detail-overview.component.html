@@ -50,7 +50,7 @@
                 <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.EXPERIMENT"> </annotation-tab>
             </mat-tab>
             <mat-tab label="Experiment Design">
-                 <tab-samples-illumina #tabSamplesIlluminaComponent [experiment]="_experiment"></tab-samples-illumina>
+                 <tab-samples-illumina #tabSamplesIlluminaComponent [experiment]="_experiment" [stateChangeSubject]="modeSubject"></tab-samples-illumina>
             </mat-tab>
             <mat-tab label="Visibility" >
                  <visibility-detail-tab></visibility-detail-tab>

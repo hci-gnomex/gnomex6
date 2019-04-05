@@ -3,6 +3,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 export class Sample {
     public idSample:                        string = ''; // "Sample0";
     public name:                            string = ''; // "asdffdsa";
+    public number:                          string = ''; // "asdffdsa";
     public description:                     string = ''; // "";
     public canChangeSampleName:             string = 'Y'; // "Y";
     public canChangeSampleType:             string = 'Y'; // "Y";
@@ -12,6 +13,7 @@ export class Sample {
     public canChangeNumberSequencingLanes:  string = 'Y'; // "Y";
     public concentration:                   string = ''; // "";
     public sampleVolume:                    string = ''; // "";
+    public ccNumber:                        string = ''; // "";
     public label:                           string = ''; // "";
     public idOligoBarcode:                  string = ''; // "";
     public barcodeSequence:                 string = ''; // "";
@@ -20,6 +22,12 @@ export class Sample {
     public idNumberSequencingCycles:        string = ''; // "5";
     public idNumberSequencingCyclesAllowed: string = ''; // "69";
     public idSeqRunType:                    string = ''; // "4";
+    public meanLibSizeActual:               string = '';
+    public codeBioanalyzerChipType:         string = '';
+    public qualFragmentSizeFrom:            string = '';
+    public qualFragmentSizeTo:              string = '';
+    public qualStatus:                      string = '';
+    public seqPrepStatus:                   string = '';
     public numberSequencingLanes:           string = ''; // "1";
     public codeConcentrationUnit:           string = ''; // "ng/ul";
     public idSampleType:                    string = ''; // "1";
@@ -42,6 +50,10 @@ export class Sample {
     public treatment:                       string = ''; // "";
     public customColor:                     string = ''; // "0xFFFFFF";
     public multiplexGroupNumber:            string = ''; // "10";
+    public qualCalcConcentration:           string = '';
+    public qual260nmTo230nmRatio:           string = '';
+    public qualRINNumber:                   string = '';
+    public otherSamplePrepMethod:           string = '';
     public isDirty:                         string = ''; // "Y";
 
     private _organism: any = {};
@@ -90,53 +102,67 @@ export class Sample {
 
     constructor(private dictionaryService: DictionaryService) { }
 
-    public static createSampleObjectFromAny(dictionaryService: DictionaryService, source: any) {
+    public static createSampleObjectFromAny(dictionaryService: DictionaryService, source: any): Sample {
         let sample: Sample = new Sample(dictionaryService);
 
-        sample.clonePropertyOnlyIfExists('idSample', source);
-        sample.clonePropertyOnlyIfExists('name', source);
-        sample.clonePropertyOnlyIfExists('description', source);
-        sample.clonePropertyOnlyIfExists('canChangeSampleName', source);
-        sample.clonePropertyOnlyIfExists('canChangeSampleType', source);
-        sample.clonePropertyOnlyIfExists('canChangeSampleConcentration', source);
-        sample.clonePropertyOnlyIfExists('canChangeSampleSource', source);
-        sample.clonePropertyOnlyIfExists('canChangeNumberSequencingCycles', source);
-        sample.clonePropertyOnlyIfExists('canChangeNumberSequencingLanes', source);
-        sample.clonePropertyOnlyIfExists('concentration', source);
-        sample.clonePropertyOnlyIfExists('concentration', source);
-        sample.clonePropertyOnlyIfExists('sampleVolume', source);
-        sample.clonePropertyOnlyIfExists('label', source);
-        sample.clonePropertyOnlyIfExists('idOligoBarcode', source);
-        sample.clonePropertyOnlyIfExists('barcodeSequence', source);
-        sample.clonePropertyOnlyIfExists('idOligoBarcodeB', source);
-        sample.clonePropertyOnlyIfExists('barcodeSequenceB', source);
-        sample.clonePropertyOnlyIfExists('idNumberSequencingCycles', source);
-        sample.clonePropertyOnlyIfExists('idNumberSequencingCyclesAllowed', source);
-        sample.clonePropertyOnlyIfExists('idSeqRunType', source);
-        sample.clonePropertyOnlyIfExists('numberSequencingLanes', source);
-        sample.clonePropertyOnlyIfExists('codeConcentrationUnit', source);
-        sample.clonePropertyOnlyIfExists('idSampleType', source);
-        sample.clonePropertyOnlyIfExists('sampleType', source);
-        sample.clonePropertyOnlyIfExists('idSeqLibProtocol', source);
-        sample.clonePropertyOnlyIfExists('seqPrepByCore', source);
-        sample.clonePropertyOnlyIfExists('idOrganism', source);
-        sample.clonePropertyOnlyIfExists('otherOrganism', source);
-        sample.clonePropertyOnlyIfExists('treatment', source);
-        sample.clonePropertyOnlyIfExists('customColor', source);
-        sample.clonePropertyOnlyIfExists('multiplexGroupNumber', source);
-        sample.clonePropertyOnlyIfExists('isDirty', source);
-        sample.clonePropertyOnlyIfExists('organism', source);
-        sample.clonePropertyOnlyIfExists('sequencingOption', source);
-        sample.clonePropertyOnlyIfExists('application_object', source);
-        sample.clonePropertyOnlyIfExists('index', source);
-        sample.clonePropertyOnlyIfExists('prepInstructions', source);
-        sample.clonePropertyOnlyIfExists('frontEndGridGroup', source);
+        sample.cloneProperty("idSample", source);
+        sample.cloneProperty("name", source);
+        sample.cloneProperty("number", source);
+        sample.cloneProperty("description", source);
+        sample.cloneProperty("canChangeSampleName", source);
+        sample.cloneProperty("canChangeSampleType", source);
+        sample.cloneProperty("canChangeSampleConcentration", source);
+        sample.cloneProperty("canChangeSampleSource", source);
+        sample.cloneProperty("canChangeNumberSequencingCycles", source);
+        sample.cloneProperty("canChangeNumberSequencingLanes", source);
+        sample.cloneProperty("concentration", source);
+        sample.cloneProperty("concentration", source);
+        sample.cloneProperty("sampleVolume", source);
+        sample.cloneProperty("ccNumber", source);
+        sample.cloneProperty("label", source);
+        sample.cloneProperty("idOligoBarcode", source);
+        sample.cloneProperty("barcodeSequence", source);
+        sample.cloneProperty("idOligoBarcodeB", source);
+        sample.cloneProperty("barcodeSequenceB", source);
+        sample.cloneProperty("idNumberSequencingCycles", source);
+        sample.cloneProperty("idNumberSequencingCyclesAllowed", source);
+        sample.cloneProperty("idSeqRunType", source);
+        sample.cloneProperty("meanLibSizeActual", source);
+        sample.cloneProperty("codeBioanalyzerChipType", source);
+        sample.cloneProperty("qualFragmentSizeFrom", source);
+        sample.cloneProperty("qualFragmentSizeTo", source);
+        sample.cloneProperty("qualStatus", source);
+        sample.cloneProperty("seqPrepStatus", source);
+        sample.cloneProperty("numberSequencingLanes", source);
+        sample.cloneProperty("codeConcentrationUnit", source);
+        sample.cloneProperty("idSampleType", source);
+        sample.cloneProperty("sampleType", source);
+        sample.cloneProperty("idSeqLibProtocol", source);
+        sample.cloneProperty("seqPrepByCore", source);
+        sample.cloneProperty("idOrganism", source);
+        sample.cloneProperty("otherOrganism", source);
+        sample.cloneProperty("treatment", source);
+        sample.cloneProperty("customColor", source);
+        sample.cloneProperty("qualCalcConcentration", source);
+        sample.cloneProperty("qual260nmTo230nmRatio", source);
+        sample.cloneProperty("qualRINNumber", source);
+        sample.cloneProperty("otherSamplePrepMethod", source);
+        sample.cloneProperty("multiplexGroupNumber", source);
+        sample.cloneProperty("isDirty", source);
+        sample.cloneProperty("organism", source);
+        sample.cloneProperty("sequencingOption", source);
+        sample.cloneProperty("application_object", source);
+        sample.cloneProperty("index", source);
+        sample.cloneProperty("prepInstructions", source);
+        sample.cloneProperty("frontEndGridGroup", source);
 
         // Todo : use keyset to get annotations
+
+        return sample;
     }
 
-    private clonePropertyOnlyIfExists(propertyName: string, source: any) {
-        if (this[propertyName] && source[propertyName]) {
+    private cloneProperty(propertyName: string, source: any): void {
+        if (source && source[propertyName]) {
             this[propertyName] = source[propertyName];
         }
     }
@@ -153,6 +179,7 @@ export class Sample {
         let temp: any = {
             idSample:                        this.idSample,
             name:                            this.name,
+            number:                          this.number,
             description:                     this.description,
             canChangeSampleName:             this.canChangeSampleName,
             canChangeSampleType:             this.canChangeSampleType,
@@ -162,6 +189,7 @@ export class Sample {
             canChangeNumberSequencingLanes:  this.canChangeNumberSequencingLanes,
             concentration:                   this.concentration,
             sampleVolume:                    this.sampleVolume,
+            ccNumber:                        this.ccNumber,
             label:                           this.label,
             idOligoBarcode:                  this.idOligoBarcode,
             barcodeSequence:                 this.barcodeSequence,
@@ -170,6 +198,12 @@ export class Sample {
             idNumberSequencingCycles:        this.idNumberSequencingCycles,
             idNumberSequencingCyclesAllowed: this.idNumberSequencingCyclesAllowed,
             idSeqRunType:                    this.idSeqRunType,
+            meanLibSizeActual:               this.meanLibSizeActual,
+            codeBioanalyzerChipType:         this.codeBioanalyzerChipType,
+            qualFragmentSizeFrom:            this.qualFragmentSizeFrom,
+            qualFragmentSizeTo:              this.qualFragmentSizeTo,
+            qualStatus:                      this.qualStatus,
+            seqPrepStatus:                   this.seqPrepStatus,
             numberSequencingLanes:           this.numberSequencingLanes,
             codeConcentrationUnit:           this.codeConcentrationUnit,
             idSampleType:                    this.idSampleType,
@@ -180,6 +214,10 @@ export class Sample {
             treatment:                       this.treatment,
             customColor:                     this.customColor,
             multiplexGroupNumber:            this.multiplexGroupNumber,
+            qualCalcConcentration:           this.qualCalcConcentration,
+            qual260nmTo230nmRatio:           this.qual260nmTo230nmRatio,
+            qualRINNumber:                   this.qualRINNumber,
+            otherSamplePrepMethod:           this.otherSamplePrepMethod,
             isDirty:                         this.isDirty
         };
 
