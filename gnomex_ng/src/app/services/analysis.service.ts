@@ -71,16 +71,6 @@ export class AnalysisService {
         return this.httpClient.post("/gnomex/SaveAnalysis.gx", params.toString(), {headers: headers});
     }
 
-    getAnalysisGroup1(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetAnalysisGroup.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
-    }
-
     getAnalysisGroup(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysisGroup.gx", {params: params}).pipe(map((response) => {
             if (response["AnalysisGroup"]) {

@@ -46,11 +46,11 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                     <div class="full-height flex-grow" style="height: 2.85em;">&nbsp;
                     </div>
                     <div>
-                    <save-footer *ngIf="!this.noSave" (saveClicked)="saveManager()"
-                                 [dirty]="this.analysisService.dirty"
-                                 [showSpinner]="this.showSpinner"
-                                 [disableSave]="this.analysisService.invalid || this.noSave || this.createSecurityAdvisorService.isGuest">
-                    </save-footer>
+                        <save-footer *ngIf="!this.noSave" (saveClicked)="saveManager()"
+                                     [dirty]="this.analysisService.dirty"
+                                     [showSpinner]="this.showSpinner"
+                                     [disableSave]="this.analysisService.invalid || this.noSave || this.createSecurityAdvisorService.isGuest">
+                        </save-footer>
                     </div>
                 </div>
             </div>
