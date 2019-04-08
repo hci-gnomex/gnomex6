@@ -1,19 +1,11 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {FormGroup,FormBuilder,Validators } from "@angular/forms"
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {URLSearchParams} from "@angular/http"
+import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {ActivatedRoute, Router} from "@angular/router";
 import {TabContainer} from "../../util/tabs/tab-container.component";
-import {TabChangeEvent} from "../../util/tabs/tab-change-event"
 import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Subscription} from "rxjs";
 import {AnalysisService} from "../../services/analysis.service";
 import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
-import {AnalysisGroupComponent} from "./analysis-group.component";
-import {AnalysisVisibleTabComponent} from "./analysis-visible-tab.component";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
@@ -23,7 +15,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
             <div class="full-width full-height flex-container-col">
                 <div class="full-width flex-container-row align-center">
                     <div class="flex-grow padded">
-                        {{ this.analysisService.analysisList.length + ((this.analysisService.analysisList.length != 1) ? " Analyses" : " Analysis")}}
+                        {{ nodeTitle}} &nbsp;&nbsp;&nbsp;&nbsp; {{"(" + this.analysisService.analysisList.length + ((this.analysisService.analysisList.length !== 1) ? " Analyses)" : " Analysis)")}}
                     </div>
                     <div class="flex-container-row align-center right-padding">
                         <div class="padded">Analysis #</div>
@@ -31,7 +23,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                                      [width]="170"
                                      [height]="20"
                                      [source]="orderedAnalysisIds"
-                                     (onSelect)="onIDSelect($event)" 
+                                     (onSelect)="onIDSelect($event)"
                                      (onUnselect)="onUnselectID($event)">
                         </jqxComboBox>
                     </div>
@@ -46,32 +38,36 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                             <analysis-visiblity-tab (saveSuccess)="saveVis()" ></analysis-visiblity-tab>
                         </mat-tab>
                         <mat-tab *ngIf="this.analysisGroup" class="full-height full-width" label="Analysis Group">
-                            <analysis-group-tab (saveSuccess)="saveGroup()"></analysis-group-tab>
+                            <analysis-group-tab (saveSuccess)="saveGroup($event)"></analysis-group-tab>
                         </mat-tab>
                     </mat-tab-group>
                 </div>
-                <div class="full-width">
-                    <save-footer (saveClicked)="saveManager()"
+                <div class="full-width flex-container-row right-align">
+                    <div class="full-height flex-grow" style="height: 2.85em;">&nbsp;
+                    </div>
+                    <div>
+                    <save-footer *ngIf="!this.noSave" (saveClicked)="saveManager()"
                                  [dirty]="this.analysisService.dirty"
                                  [showSpinner]="this.showSpinner"
                                  [disableSave]="this.analysisService.invalid || this.noSave || this.createSecurityAdvisorService.isGuest">
                     </save-footer>
+                    </div>
                 </div>
             </div>
         </div>
     `,
     styles: [`
-        
+
         .padded { padding: 0.3em; }
 
         .right-padding { padding-right: 0.5em; }
-        
+
         .border { border: 1px solid #e8e8e8; }
-        
+
         .vertical-spacer { height: 0.3em; }
-        
+
         .no-top-margin { margin-top: 0; }
-        
+
 
         .flex-container{
             display: flex;
@@ -81,33 +77,35 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
         /deep/ .mat-tab-body-wrapper {
             flex-grow: 1 !important;
         }
-        
+
     `]
 })
-export class AnalysisOverviewComponent implements OnInit,OnDestroy{
-    public analysisGroup:any;
-    public readonly message:string = "Your changes haven't been saved";
-    private analysisIdSet: Set<string> = new Set();
-    public orderedAnalysisIds: Array<string> = [];
-    private overviewListSuscript: Subscription;
-    private initialized:boolean = false;
-    public showSpinner:boolean = false;
-    private noSave:boolean = true;
+export class AnalysisOverviewComponent implements OnInit, OnDestroy {
     @ViewChild(MatTabGroup) tabs: MatTabGroup;
+    state: string = TabContainer.VIEW;
+    public nodeTitle: string = "";
+    public analysisGroup: any;
+    public readonly message: string = "Your changes haven't been saved";
+    public orderedAnalysisIds: Array<string> = [];
+    public showSpinner: boolean = false;
+    public noSave: boolean = true;
 
-    state:string = TabContainer.VIEW;
-    tabNames:Array<string>;
-    constructor(private appConstants:ConstantsService,private route:ActivatedRoute,
-                public analysisService:AnalysisService, private router:Router,
-                public dictionary:DictionaryService,
-                public createSecurityAdvisorService: CreateSecurityAdvisorService){
+    private analysisIdSet: Set<string> = new Set();
+    private overviewListSubscript: Subscription;
+    private initialized: boolean = false;
+
+
+    constructor(private appConstants: ConstantsService, private route: ActivatedRoute,
+                public analysisService: AnalysisService, private router: Router,
+                public dictionary: DictionaryService,
+                public createSecurityAdvisorService: CreateSecurityAdvisorService) {
     }
 
-    ngOnInit(){
+    ngOnInit() {
 
         // This 'data' observable fires when tree node changes because url will change.
         this.route.data.forEach((data) => {
-            this.analysisGroup = data['analysisGroup']; // this data is carried on route look at browse-analysis.component.ts
+            this.analysisGroup = data["analysisGroup"]; // this data is carried on route look at browse-analysis.component.ts
         });
 
 
@@ -120,42 +118,45 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
         selected. This is the first subscriber called and saves analysisList in the service so subsequent subscribers
         can use it.
      */
-    refreshOverviewData():void{
-        this.overviewListSuscript = this.analysisService.getAnalysisOverviewListSubject()
-            .subscribe(data =>{
+    refreshOverviewData(): void {
+        this.overviewListSubscript = this.analysisService.getAnalysisOverviewListSubject()
+            .subscribe(data => {
                 this.analysisService.invalid = false;
                 this.analysisService.dirty = false;
                 this.analysisIdSet.clear();
                 this.analysisService.analysisList = this.getAnalyses(data);
-                let sortIdFn = (obj1:string , obj2:string) => {
-                    if(obj2 < obj1){
+                let sortIdFn = (obj1: string , obj2: string) => {
+                    if(obj2 < obj1) {
                         return 1;
                     }
-                    if(obj2 > obj1){
+                    if(obj2 > obj1) {
                         return -1;
                     }
                     return 0;
                 };
                 this.orderedAnalysisIds = Array.from(this.analysisIdSet).sort(sortIdFn);
+
+                if(data && !data.idAnalysis) {
+                    this.nodeTitle = data.label;
+                }
             });
     }
 
 
-    getAnalyses(data:any):Array<any>{
-        let flatAnalysisList:Array<any> = [];
-        if(!data){
+    getAnalyses(data: any): Array<any> {
+        let flatAnalysisList: Array<any> = [];
+        if(!data) {
             return flatAnalysisList;
         }
 
-        if(Array.isArray(data) ){
-            if(data.length > 0 && !data[0].AnalysisGroup){
-                (<Array<any>> data).forEach(aObj =>{
-                    this.analysisIdSet.add(aObj.number)
+        if(Array.isArray(data) ) {
+            if(data.length > 0 && !data[0].AnalysisGroup) {
+                (<Array<any>> data).forEach(aObj => {
+                    this.analysisIdSet.add(aObj.number);
                 });
                 flatAnalysisList = data;
-            }
-            else{
-                return this.initAllLabs(data,flatAnalysisList);
+            } else {
+                return this.initAllLabs(data, flatAnalysisList);
             }
         }
 
@@ -164,62 +165,66 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
             let projectList: Array<any> = Array.isArray(data.AnalysisGroup) ? data.AnalysisGroup : [data.AnalysisGroup];
             projectList.forEach(subData => {
                 let aList: Array<any> = Array.isArray(subData.Analysis) ? subData.Analysis :  subData.Analysis ? [subData.Analysis] : subData.Analysis;
-                if(aList){
+                if(aList) {
                     aList.forEach(aObject => {
                         flatAnalysisList.push(aObject);
                         this.analysisIdSet.add(aObject.number);
                     });
                 }
             });
-        }
-        else if(data.Analysis){ // Analysis Group level
+        } else if(data.Analysis) { // Analysis Group level
             flatAnalysisList = Array.isArray(data.Analysis) ? data.Analysis : [data.Analysis];
-            flatAnalysisList.forEach(aObj =>{
+            flatAnalysisList.forEach(aObj => {
                 this.analysisIdSet.add(aObj.number);
             });
         }
 
         return flatAnalysisList;
     }
-    tabChanged(event:MatTabChangeEvent){
-        if(event.index === 0){
+
+
+    tabChanged(event: MatTabChangeEvent) {
+        if(event.index === 0) {
             this.noSave = true;
-        }else{
+        } else {
             this.noSave = false;
         }
 
     }
 
 
-
-    saveVis():void{
-        this.showSpinner = false;
-        this.analysisService.dirty = false;
-
-
-    }
-    saveGroup():void{
+    saveVis(): void {
         this.showSpinner = false;
         this.analysisService.dirty = false;
     }
 
 
-    initAllLabs(data:any ,flatAList:Array<any>):Array<any>{
+    saveGroup(saveSuccess: boolean): void {
+        this.showSpinner = false;
+        if(saveSuccess) {
+            this.analysisService.dirty = false;
+        } else {
+            this.analysisService.dirty = true;
+        }
 
-        if(data.length > 0 && data[0].AnalysisGroup){ // array of labs(more complex parsing)
-            for(let i = 0; i < data.length; i++){
-                if(data[i].AnalysisGroup){
+    }
+
+
+    initAllLabs(data: any, flatAList: Array<any>): Array<any> {
+
+        if(data.length > 0 && data[0].AnalysisGroup) { // array of labs(more complex parsing)
+            for(let i = 0; i < data.length; i++) {
+                if(data[i].AnalysisGroup) {
                     let projectList = Array.isArray(data[i].AnalysisGroup) ? data[i].AnalysisGroup : [data[i].AnalysisGroup] ;
-                    for(let j = 0; j < projectList.length; j++){
-                        if(projectList[j].Analysis){
+                    for(let j = 0; j < projectList.length; j++) {
+                        if(projectList[j].Analysis) {
                             let aList =  Array.isArray(projectList[j].Analysis) ? projectList[j].Analysis : [projectList[j].Analysis];
-                            for(let k = 0; k < aList.length; k++){
-                                if(i === 0 && j === 0){
+                            for(let k = 0; k < aList.length; k++) {
+                                if(i === 0 && j === 0) {
                                     flatAList.push(aList[k]);
                                     this.analysisIdSet.add(aList[k].number);
                                 }
                                 aList[k].idAnalysisGroup = projectList[j].idAnalysisGroup;
-                                //aList[k]["analysisChecked"] = aList[k].analysisNames !== '' ? this.appConstants.ICON_CHECKED : '';
                             }
                         }
                     }
@@ -230,47 +235,42 @@ export class AnalysisOverviewComponent implements OnInit,OnDestroy{
 
     }
 
-
-    private onIDSelect($event:any): void{
-        let filteredIdList:Array<any> = [];
-        if($event.args && $event.args.item.value){
-            let aList:Array<any> = this.analysisService.analysisList;
-            if(aList){
+    onIDSelect($event: any): void {
+        let filteredIdList: Array<any> = [];
+        if($event.args && $event.args.item.value) {
+            let aList: Array<any> = this.analysisService.analysisList;
+            if(aList) {
                 aList.forEach(aObject => {
-                    if($event.args.item.value === aObject.number){
+                    if($event.args.item.value === aObject.number) {
                         filteredIdList.push(aObject);
                     }
                 });
             }
         }
-        if(filteredIdList.length > 0 ){
+        if(filteredIdList.length > 0) {
             this.analysisService.emitFilteredOverviewList(filteredIdList);
         }
     }
-    private onUnselectID($event:any):void{
-        let eList:Array<any> = this.analysisService.analysisList;
-        if(eList){
+
+    onUnselectID($event: any): void {
+        let eList: Array<any> = this.analysisService.analysisList;
+        if(eList) {
             this.analysisService.emitFilteredOverviewList(eList);
         }
     }
 
-    saveManager(){
+    saveManager() {
         this.showSpinner = true;
-        if(this.tabs.selectedIndex === 1){
-            this.analysisService.emitSaveManger("visibility")
-        }else if (this.tabs.selectedIndex === 2){
-            this.analysisService.emitSaveManger("group")
+        if(this.tabs.selectedIndex === 1) {
+            this.analysisService.emitSaveManger("visibility");
+        } else if (this.tabs.selectedIndex === 2) {
+            this.analysisService.emitSaveManger("group");
         }
 
-        console.log(this.tabs.selectedIndex)
-
     }
 
-
-
-    ngOnDestroy():void{
-        this.overviewListSuscript.unsubscribe();
+    ngOnDestroy(): void {
+        this.overviewListSubscript.unsubscribe();
     }
-
 
 }

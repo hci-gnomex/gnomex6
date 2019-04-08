@@ -5,9 +5,10 @@ import {Observable} from "rxjs";
 import {BehaviorSubject} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {map} from "rxjs/operators";
+import {first, map} from "rxjs/operators";
 import {Experiment} from "../util/models/experiment.model";
 import {CookieUtilService} from "../services/cookie-util.service";
+import {element} from "@angular/core/src/render3";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -289,26 +290,27 @@ export class ExperimentsService {
 
 
 
-    getProject(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/GetProject.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
-
+    getProject(params: HttpParams):  Observable<any> {
+        return this.httpClient.get("/gnomex/GetProject.gx", {params: params})
+            .pipe(map((response) => {
+                if(response["Project"]) {
+                    return response;
+                } else {
+                    throw new Error("Error occurred while getting project: " + response["message"]);
+                }
+            }));
     }
 
-    saveProject(params: URLSearchParams):  Observable<any> {
-        return this._http.get("/gnomex/SaveProject.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error("Error");
-            }
+    saveProject(params: HttpParams):  Observable<any> {
+        let headers : HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveProject.gx", params.toString(), {headers: headers})
+            .pipe(map((response) => {
+                if(response["idProject"]) {
+                    return response;
+                } else {
+                    throw new Error("Error occurred while saving project: " + response["message"]);
+                }
         }));
-
     }
 
     deleteExperiment(params: URLSearchParams):  Observable<any> {

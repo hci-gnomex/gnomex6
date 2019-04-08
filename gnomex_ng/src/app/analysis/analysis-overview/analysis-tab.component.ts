@@ -213,12 +213,15 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
             if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
                 this.dialogService.stopAllSpinnerDialogs();
                 this.createAnalysisDialogRef.close();
+                this.createAnalysisDialogRef = null;
             }
             if (this.deleteAnalysisDialogRef && this.deleteAnalysisDialogRef.componentInstance) {
                 if (this.deleteAnalysisDialogRef.componentInstance.showSpinner) {
                     this.deleteAnalysisDialogRef.componentInstance.showSpinner = false;
                 }
+                this.dialogService.stopAllSpinnerDialogs();
                 this.deleteAnalysisDialogRef.close();
+                this.deleteAnalysisDialogRef = null;
             }
         });
 

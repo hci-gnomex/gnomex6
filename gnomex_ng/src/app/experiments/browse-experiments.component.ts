@@ -1,4 +1,11 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from "@angular/core";
 
 import {URLSearchParams} from "@angular/http";
 
@@ -28,7 +35,6 @@ import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {DictionaryService} from "../services/dictionary.service";
 import {PropertyService} from "../services/property.service";
 import {GnomexService} from "../services/gnomex.service";
-import {el} from "@angular/platform-browser/testing/src/browser_util";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -89,42 +95,24 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     @ViewChild(BrowseFilterComponent)
 
-    private treeModel: TreeModel;
-    /*
+    /**
     angular2-tree options
      */
-    public options: ITreeOptions = {
-        displayField: "label",
-        childrenField: "items",
-        useVirtualScroll: true,
-        nodeHeight: 22,
-        nodeClass: (node: TreeNode) => {
-            return "icon-" + node.data.icon;
-        },
-        allowDrop: (element, { parent, index }) => {
-            this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.labName) {
-                return false;
-            } else {
-                return true;
-            }
-        },
-
-        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
-    };
-
+    public options: ITreeOptions;
     public state: ITreeState;
-
     public showEmptyFolders: boolean = false;
     public items: any;
-    private labs: any;
-    private isClose = true;
     public responseMsg: string = "";
+    public experimentCount: number = 0;
+    public disableNewProject: boolean = true;
+    public disableDeleteProject: boolean = true;
+    public disableDeleteExperiment: boolean = true;
+    public disableAll: boolean = false;
+
+    private treeModel: TreeModel;
     private currentItem: any;
     private targetItem: any;
-    private projectDescription: string = "";
-    private projectName: string = "";
-
+    private labs: any;
     private labMembers: any;
     private billingAccounts: any;
     private dragEndItems: any;
@@ -132,25 +120,41 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private showBillingCombo: boolean = false;
     private labList: any[] = [];
     private selectedExperiment: any;
-    public experimentCount: number = 0;
     private projectRequestListSubscription: Subscription;
-    public disableNewProject: boolean = true;
-    public disableDeleteProject: boolean = true;
-    public disableDeleteExperiment: boolean = true;
-    public disableAll: boolean = false;
-    public deleteProjectDialogRef: MatDialogRef<DeleteProjectComponent>;
-    public createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
-    public reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
-    public deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
-    // public showSpinner: boolean = false;
+    private deleteProjectDialogRef: MatDialogRef<DeleteProjectComponent>;
+    private createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
+    private reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
+    private deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
     private viewLimit: number = 999999;
     private navProjectReqList: any;
     private navInitSubscription: Subscription;
     private labListSubscription: Subscription;
-    private newProjectName: any;
+    private parentProject: any;
+    private setActiveNodeId: string;
+
 
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
+        this.options = {
+            displayField: "label",
+            childrenField: "items",
+            useVirtualScroll: true,
+            nodeHeight: 22,
+            nodeClass: (node: TreeNode) => {
+                return "icon-" + node.data.icon;
+            },
+            allowDrop: (element, { parent, index }) => {
+                this.dragEndItems = _.cloneDeep(this.items);
+                if (parent.data.labName) {
+                    return false;
+                } else {
+                    return true;
+                }
+            },
+
+            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
+        };
+
         this.labListService.getLabList_FromBackEnd();
         this.labListSubscription =  this.labListService.getLabListSubject().subscribe((response: any[]) => {
             this.labList = response;
@@ -164,7 +168,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }
     }
 
-    ngAfterViewInit() { }
+    ngAfterViewInit() {}
 
 
     constructor(public experimentsService: ExperimentsService,
@@ -188,39 +192,59 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response);
             if (this.createProjectDialogRef && this.createProjectDialogRef.componentInstance) {
-                this.dialogsService.stopAllSpinnerDialogs();
-                this.newProjectName = this.createProjectDialogRef.componentInstance.newProjectName;
+                if(this.createProjectDialogRef.componentInstance.showSpinner === true) {
+                    this.createProjectDialogRef.componentInstance.showSpinner = false;
+                }
+                if(this.createProjectDialogRef.componentInstance.newProjectId) {
+                    this.setActiveNodeId = "p" + this.createProjectDialogRef.componentInstance.newProjectId;
+                }
                 this.createProjectDialogRef.close();
                 this.createProjectDialogRef = null;
             }
-            if (this.deleteProjectDialogRef) {
-                this.dialogsService.stopAllSpinnerDialogs();
-                // this.deleteProjectDialogRef.componentInstance.showSpinner = false;
+
+            if (this.deleteProjectDialogRef && this.deleteProjectDialogRef.componentInstance) {
+                if(this.deleteProjectDialogRef.componentInstance.showSpinner === true) {
+                    this.deleteProjectDialogRef.componentInstance.showSpinner = false;
+                }
+                if(this.parentProject) {
+                    this.setActiveNodeId = this.parentProject.data.id;
+                }
                 this.deleteProjectDialogRef.close();
                 this.deleteProjectDialogRef = null;
             }
 
-            if (this.deleteExperimentDialogRef) {
-                this.dialogsService.stopAllSpinnerDialogs();
-                // this.deleteExperimentDialogRef.componentInstance.showSpinner = false;
+            if (this.deleteExperimentDialogRef && this.deleteExperimentDialogRef.componentInstance) {
+                if(this.deleteExperimentDialogRef.componentInstance.showSpinner === true) {
+                    this.deleteExperimentDialogRef.componentInstance.showSpinner = false;
+                }
+                if(this.parentProject) {
+                    this.setActiveNodeId = this.parentProject.data.id;
+                }
                 this.deleteExperimentDialogRef.close();
                 this.deleteExperimentDialogRef = null;
             }
 
             if (this.reassignExperimentDialogRef) {
                 this.dialogsService.stopAllSpinnerDialogs();
-                // this.reassignExperimentDialogRef.componentInstance.showSpinner = false;
                 this.reassignExperimentDialogRef.close();
                 this.reassignExperimentDialogRef = null;
             }
 
-            this.experimentsService.emitExperimentOverviewList(response);
-            if(this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
+            if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
+                this.experimentsService.emitExperimentOverviewList(response);
 
                 this.showEmptyFolders = this.experimentsService.browsePanelParams.get("showEmptyProjectFolders") === "Y" ? true : false;
-                let navArray : any[] = ["/experiments"];
+                let navArray: any[] = ["/experiments"];
                 this.experimentsService.browsePanelParams["refreshParams"] = false;
                 this.router.navigate(navArray);
+
+                if (this.treeModel && this.treeModel.getActiveNode()) {// Refresh to initial state when search button clicked
+                    this.treeModel.getActiveNode().setIsActive(false);
+                    this.treeModel.setFocusedNode(null);
+                    this.disableNewProject = true;
+                    this.disableDeleteProject = true;
+                    this.disableDeleteExperiment = true;
+                }
             }
 
 
@@ -235,9 +259,16 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                         this.treeModel.getNodeById(id).scrollIntoView();
                         this.gnomexService.orderInitObj = null;
                     }
-                } else if (this.newProjectName) {
-                    this.selectNode(this.treeModel.getFirstRoot().children);
+                } else if(this.setActiveNodeId) {
+                    let node: TreeNode;
+                    node = this.findNodeById(this.setActiveNodeId);
+                    this.setActiveNodeId = "";
+                    if(node) {
+                        node.setIsActive(true);
+                        node.scrollIntoView();
+                    }
                 }
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         });
 
@@ -248,7 +279,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 let idProject = this.gnomexService.orderInitObj.idProject;
 
                 ids.set("idProject", idProject);
-                ids.set("showEmptyProjectFolders", "N");
+                ids.set("showEmptyProjectFolders", "Y");
                 ids.set("showCategory", "N");
                 ids.set("showSamples", "N");
                 this.experimentsService.browsePanelParams = ids;
@@ -263,16 +294,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
         });
 
-
-
-
-
     }
 
     go(event: any) {
     }
 
-    /*
+    /**
     Build the tree data
     @param
      */
@@ -342,21 +369,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }
     }
 
-    selectNode(nodes: any) {
-        for (let node of nodes) {
-            if (node.data.idProject && node.data.projectName === this.newProjectName) {
-                this.treeModel.getActiveNode().setIsActive(false);
-                this.treeModel.getNodeById(node.data.id).setIsActive(true);
-                this.treeModel.getNodeById(node.data.id).scrollIntoView();
-                break;
-            } else if (node.hasChildren) {
-                this.selectNode(node.children);
-
-            }
-
-        }
-        this.newProjectName = "";
-    }
 
     treeUpdateData(event) {
         if (this.experimentsService.startSearchSubject.getValue() === true) {
@@ -369,11 +381,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
 
-    /*
-
+    /**
     Start of Ng2 tree
      */
-
     onMoveNode($event) {
         console.log(
             "Moved",
@@ -387,7 +397,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.getLabUsers($event);
     }
 
-    /*
+    /**
         Determine if the object is an array
         @param what
      */
@@ -421,7 +431,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
         });
     }
-
 
 
     /**
@@ -554,7 +563,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     deleteProjectClicked(event: any) {
         if(!this.selectedItem.data.isEmptyFolder) {
-            this.dialogsService.alert("This project has at least one experiment. Please delete the experiment(s) first.", "Warning: Nonempty Folder");
+            this.dialogsService.alert("Project cannot be deleted because it has experiments. Please reassign experiments to another project before deleting.", "Warning");
             return;
         }
         let configuration: MatDialogConfig = new MatDialogConfig();
@@ -595,6 +604,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             //Project
         } else if (this.selectedItem.level === 2) {
+            this.parentProject = event.node.parent;
             this.disableNewProject = false;
             this.disableDeleteProject = false;
             this.disableDeleteExperiment = true;
@@ -604,6 +614,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             //Experiment
         } else {
             navArray = ["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
+            this.parentProject = event.node.parent;
             this.disableNewProject = true;
             this.disableDeleteProject = true;
             this.experimentsService.getExperiment(this.selectedItem.data.idRequest).subscribe((response: any) => {
@@ -684,4 +695,36 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             hiddenNodeIds
         };
     }
+
+    private findNodeById(id: string): TreeNode {
+        if (this.treeModel && this.treeModel.roots) {
+            for (let lab of this.treeModel.roots) {
+                if(id.substr(0, 1) === "l") {
+                    if(lab.data.id === id) {
+                        return lab;
+                    }
+                } else {
+                    if (lab.hasChildren) {
+                        for (let project of lab.children) {
+                            if(id.substr(0, 1) === "p") {
+                                if (project.data.id === id) {
+                                    return project;
+                                }
+                            } else if (id.substr(0, 1) === "r") {
+                                if (project.hasChildren) {
+                                    for (let experiment of project.children) {
+                                        if (experiment.data.id === id) {
+                                            return experiment;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 }
