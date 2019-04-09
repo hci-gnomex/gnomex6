@@ -1,13 +1,11 @@
-
-import {Component, OnInit, ViewChild,AfterViewInit} from "@angular/core";
-import {FormGroup,FormBuilder,Validators } from "@angular/forms"
-import {PrimaryTab} from "../../util/tabs/primary-tab.component"
+import {Component, OnInit} from "@angular/core";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {PrimaryTab} from "../../util/tabs/primary-tab.component";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {URLSearchParams} from "@angular/http";
 import {specialChars} from "../../util/validators/special-characters.validator";
-
 
 
 @Component({
@@ -36,7 +34,7 @@ import {specialChars} from "../../util/validators/special-characters.validator";
                         <mat-error *ngIf="orgFormGroup.get('binomialName').hasError('maxlength')">
                             Your field exceeds 200 characters
                         </mat-error>
-                        
+
                     </mat-form-field>
                 </p>
                 <p>
@@ -53,7 +51,7 @@ import {specialChars} from "../../util/validators/special-characters.validator";
                         </mat-error>
 
                     </mat-form-field>
-                    
+
                 </p>
                 <p>
                     <mat-form-field >
@@ -69,15 +67,15 @@ import {specialChars} from "../../util/validators/special-characters.validator";
                 <p>
                     <mat-checkbox matInput class="example-margin" formControlName="isActive">Active </mat-checkbox>
                 </p>
-                
+
             </div>
-            <save-footer [disableSave]="orgFormGroup.invalid || secAdvisor.isGuest" 
-                         [showSpinner]="showSpinner" 
+            <save-footer [disableSave]="orgFormGroup.invalid || secAdvisor.isGuest || !canWrite"
+                         [showSpinner]="showSpinner"
                          [dirty]="orgFormGroup.dirty">
             </save-footer>
-            
+
         </form>
-        
+
     `,
     styles: [`
         .body-footer-form{
@@ -89,38 +87,38 @@ import {specialChars} from "../../util/validators/special-characters.validator";
         }
     `]
 })
-export class DatatracksOrganismComponent extends PrimaryTab implements OnInit{
+export class DatatracksOrganismComponent extends PrimaryTab implements OnInit {
     //Override
 
-    public showSpinner:boolean = false;
-    public dirty= false;
-    private orgFormGroup: FormGroup;
-    private idOrganism:string;
+    public showSpinner: boolean = false;
+    public dirty = false;
+    public orgFormGroup: FormGroup;
+    public canWrite: boolean = false;
 
 
-    constructor(protected fb: FormBuilder,private dtService: DataTrackService,
-                private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService){
+    constructor(protected fb: FormBuilder, private dtService: DataTrackService,
+                private route: ActivatedRoute, public secAdvisor: CreateSecurityAdvisorService) {
         super(fb);
     }
 
 
-    ngOnInit():void{ // Note this hook runs once if route changes to another organism you don't recreate component
+    ngOnInit(): void { // Note this hook runs once if route changes to another organism you don't recreate component
 
 
-       this.orgFormGroup=  this.fb.group({
-           commonName:[{value:''  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(100)],
-           binomialName:[{value:''  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(200)],
-           name:[{value:'',disabled: this.secAdvisor.isGuest},[Validators.maxLength(200), Validators.required, specialChars()]],
-           NCBITaxID:[{value:''  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(45)],
-           isActive:[{value:false  , disabled: this.secAdvisor.isGuest}]
+       this.orgFormGroup =  this.fb.group({
+           commonName: [{value: ""  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(100)],
+           binomialName: [{value: ""  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(200)],
+           name: [{value: "", disabled: this.secAdvisor.isGuest}, [Validators.maxLength(200), Validators.required, specialChars()]],
+           NCBITaxID: [{value: ""  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(45)],
+           isActive: [{value: false  , disabled: this.secAdvisor.isGuest}]
 
        });
-        this.route.paramMap.forEach(params =>{
+        this.route.paramMap.forEach(params => {
             let commonName = this.dtService.datatrackListTreeNode.commonName;
             let binomialName = this.dtService.datatrackListTreeNode.binomialName;
             let name = this.dtService.datatrackListTreeNode.name;
-            let NCBITaxID =this.dtService.datatrackListTreeNode.NCBITaxID;
-            let isActive : boolean = this.dtService.datatrackListTreeNode.isActive  === 'Y';
+            let NCBITaxID = this.dtService.datatrackListTreeNode.NCBITaxID;
+            let isActive : boolean = this.dtService.datatrackListTreeNode.isActive  === "Y";
             this.orgFormGroup.get("commonName").setValue(commonName);
             this.orgFormGroup.get("binomialName").setValue(binomialName);
             this.orgFormGroup.get("name").setValue(name);
@@ -128,32 +126,32 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit{
             this.orgFormGroup.get("isActive").setValue(isActive);
             this.orgFormGroup.markAsPristine();
 
-
+            this.canWrite = this.dtService.datatrackListTreeNode.canWrite === "Y";
         });
 
 
     }
 
-    save():void{
+    save(): void {
         this.showSpinner = true;
 
-        let params:URLSearchParams = new URLSearchParams();
-        let isActiveStr = this.orgFormGroup.get("isActive").value ? 'Y': 'N';
+        let params: URLSearchParams = new URLSearchParams();
+        let isActiveStr = this.orgFormGroup.get("isActive").value ? "Y" : "N";
         let idOrganism = this.dtService.datatrackListTreeNode.idOrganism;
 
 
-        params.set('das2Name',this.orgFormGroup.get("name").value);
-        params.set('isActive',isActiveStr);
-        params.set('binomialName',this.orgFormGroup.get("binomialName").value);
-        params.set('organism',this.orgFormGroup.get("commonName").value);
-        params.set('idOrganism',idOrganism);
+        params.set("das2Name", this.orgFormGroup.get("name").value);
+        params.set("isActive", isActiveStr);
+        params.set("binomialName", this.orgFormGroup.get("binomialName").value);
+        params.set("organism", this.orgFormGroup.get("commonName").value);
+        params.set("idOrganism", idOrganism);
 
 
-        this.dtService.saveOrganism(params).subscribe(resp =>{
+        this.dtService.saveOrganism(params).subscribe(resp => {
                 this.showSpinner = false;
                 this.orgFormGroup.markAsPristine();
                 this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
-            })
+            });
 
 
     }
