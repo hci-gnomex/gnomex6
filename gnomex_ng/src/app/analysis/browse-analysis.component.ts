@@ -27,6 +27,8 @@ import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {GnomexService} from "../services/gnomex.service";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -195,15 +197,15 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
         this.navAnalysisGroupListSubscription = this.gnomexService.navInitBrowseAnalysisSubject.subscribe( orderInitObj => {
             if(orderInitObj) {
-                let ids: URLSearchParams = new URLSearchParams;
+
                 let idLab = this.gnomexService.orderInitObj.idLab;
                 let idAnalysisGroup = this.gnomexService.orderInitObj.idAnalysisGroup;
-
-                ids.set("idLab", idLab);
-                ids.set("searchPublicProjects", "Y");
-                ids.set("showCategory", "N");
-                ids.set("idAnalysisGroup", idAnalysisGroup);
-                ids.set("showSamples", "N");
+                let ids: HttpParams = new HttpParams()
+                    .set("idLab", idLab)
+                    .set("searchPublicProjects", "Y")
+                    .set("showCategory", "N")
+                    .set("idAnalysisGroup", idAnalysisGroup)
+                    .set("showSamples", "N");
 
                 this.analysisService.analysisPanelParams = ids;
                 this.analysisService.getAnalysisGroupList_fromBackend(ids);
@@ -477,14 +479,16 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
-            var params: URLSearchParams = new URLSearchParams();
-            params.set("idAnalysis", idAnalysis);
+            let params: HttpParams = new HttpParams()
+                .set("idAnalysis", idAnalysis);
             this.analysisService.getAnalysis(params).subscribe((response) => {
                 if (response.Analysis.canDelete === "Y") {
                     this.disableDelete = false;
                 } else {
                     this.disableDelete = true;
                 }
+            },(err: IGnomexErrorResponse) => {
+                console.log(err);
             });
         }
         this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
@@ -533,13 +537,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 if (result.invalidPermission) {
                     this.dialogsService.alert(result.invalidPermission, "Warning");
                 }
-            } else {
-                let message: string = "";
-                if (result && result.message) {
-                    message = ": " + result.message;
-                }
-                this.dialogsService.confirm("An error occurred while dragging-and-dropping" + message, null);
             }
+        }, (err:IGnomexErrorResponse) => {
+            this.dialogsService.confirm("An error occurred while dragging-and-dropping" + err.gError.message, null);
         });
     }
 }

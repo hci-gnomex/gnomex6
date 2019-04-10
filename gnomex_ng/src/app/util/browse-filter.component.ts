@@ -15,6 +15,7 @@ import {DialogsService} from "./popup/dialogs.service";
 import {DateRange} from "./date-range-filter.component";
 import {Subscription} from "rxjs";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: 'browse-filter',
@@ -605,129 +606,129 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         }
     }
 
-    getExperimentBrowseParameters(): URLSearchParams {
-        let params: URLSearchParams = new URLSearchParams();
+    getExperimentBrowseParameters(): HttpParams {
+        let params: HttpParams = new HttpParams();
 
         if (this.showCoreFacilityComboBox && !(this.idCoreFacilityString === "")) {
-            params.set("idCoreFacility", this.idCoreFacilityString);
+            params = params.set("idCoreFacility", this.idCoreFacilityString);
 
             if (this.showRequestCategoryComboBox && !(this.codeRequestCategoryString === "")) {
-                params.set("codeRequestCategory", this.codeRequestCategoryString);
+                params = params.set("codeRequestCategory", this.codeRequestCategoryString);
             }
         }
 
         if (this.showCCNumberInput && !(this.ccNumberString === "")) {
-            params.set("ccNumber", this.ccNumberString);
+            params = params.set("ccNumber", this.ccNumberString);
         }
 
         if (this.showAllCheckbox && this.allFlag) {
-            params.set("allExperiments", "Y");
+            params = params.set("allExperiments", "Y");
         } else {
             if (this.showLabComboBox && !(this.idLabString === "")) {
-                params.set("idLab", this.idLabString);
+                params = params.set("idLab", this.idLabString);
             }
             if (this.showOwnerComboBox && !(this.idAppUserString === "")) {
-                params.set("idAppUser", this.idAppUserString);
+                params = params.set("idAppUser", this.idAppUserString);
             }
             if (this.showExperimentsRadioGroup) {
                 if (this.experimentsRadioString === "myExperiments") {
-                    params.set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString());
+                    params = params.set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString());
                 } else if (this.experimentsRadioString === "myLab" && this.showLabMembersComboBox && !(this.idAppUserString === "")) {
-                    params.set("idAppUser", this.idAppUserString);
+                    params = params.set("idAppUser", this.idAppUserString);
                 } else if (this.experimentsRadioString === "myCollaborations") {
-                    params.set("allCollaborations", "Y");
-                    params.set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString());
+                    params = params.set("allCollaborations", "Y");
+                    params = params.set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString());
                 } else if (this.experimentsRadioString === "all") {
-                    params.set("allExperiments", "Y");
+                    params = params.set("allExperiments", "Y");
                 }
-                params.set("publicExperimentsInOtherGroups", this.experimentsRadioString === "publicData" ? "Y" : "N");
+                params = params.set("publicExperimentsInOtherGroups", this.experimentsRadioString === "publicData" ? "Y" : "N");
             }
             if (this.showExternalExperimentsCheckbox && this.externalExperimentsFlag) {
-                params.set("isExternalOnly", "Y");
+                params = params.set("isExternalOnly", "Y");
             }
-            params.set("showMyLabsAlways", this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin ? "N" : "Y");
+            params = params.set("showMyLabsAlways", this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin ? "N" : "Y");
         }
 
         if (this.showDateRangePicker && !(this.dateFromString === "") && !(this.dateToString === "")) {
-            params.set("createDateFrom", this.dateFromString);
-            params.set("createDateTo", this.dateToString);
+            params = params.set("createDateFrom", this.dateFromString);
+            params = params.set("createDateTo", this.dateToString);
         }
 
-        params.set("showEmptyProjectFolders", "Y");
+        params = params.set("showEmptyProjectFolders", "Y");
 
-        params.set("showSamples", "N");
-        params.set("showCategory", "N");
+        params = params.set("showSamples", "N");
+        params = params.set("showCategory", "N");
 
         return params;
     }
 
-    getOrderBrowseParameters(): URLSearchParams {
-        let params: URLSearchParams = new URLSearchParams();
+    getOrderBrowseParameters(): HttpParams {
+        let params: HttpParams = new HttpParams();
 
-        params.set("includeSampleInfo", "Y");
+        params = params.set("includeSampleInfo", "Y");
 
         if (this.showDateRangePicker && !(this.dateFromString === "") && !(this.dateToString === "")) {
-            params.set("createDateFrom", this.dateFromString);
-            params.set("createDateTo", this.dateToString);
+            params = params.set("createDateFrom", this.dateFromString);
+            params = params.set("createDateTo", this.dateToString);
         }
 
         if (this.showOrderNumberInput && !(this.orderNumberString === "")) {
-            params.set("number", this.orderNumberString);
+            params = params.set("number", this.orderNumberString);
             this.workflowStateString = "";
         }
 
         if (this.showWorkflowStateRadioGroup && !(this.workflowStateString === "")) {
-            params.set("status", this.workflowStateString);
+            params = params.set("status", this.workflowStateString);
         }
 
         if (this.showRedosCheckbox && this.redosFlag) {
-            params.set("hasRedo", "Y");
+            params = params.set("hasRedo", "Y");
         }
 
         if (this.showCoreFacilityComboBox && !(this.idCoreFacilityString === "")) {
-            params.set("idCoreFacility", this.idCoreFacilityString);
+            params = params.set("idCoreFacility", this.idCoreFacilityString);
 
             if (this.showRequestCategoryComboBox && !(this.codeRequestCategoryString === "")) {
-                params.set("codeRequestCategory", this.codeRequestCategoryString);
+                params = params.set("codeRequestCategory", this.codeRequestCategoryString);
             }
         }
 
         return params;
     }
 
-    getAnalysisBrowseParameters(): URLSearchParams {
-        let params: URLSearchParams = new URLSearchParams();
+    getAnalysisBrowseParameters(): HttpParams {
+        let params: HttpParams = new HttpParams();
 
         if (this.showAllCheckbox && this.allFlag) {
-            params.set("allAnalysis", "Y");
+            params = params.set("allAnalysis", "Y");
         } else {
             if (this.showAnalysesRadioGroup) {
                 if (this.analysesRadioString === "all") {
-                    params.set("allAnalysis", "Y");
+                    params = params.set("allAnalysis", "Y");
                 } else if (this.analysesRadioString === "myAnalyses") {
-                    params.set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString());
+                    params = params.set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString());
                 } else if (this.analysesRadioString === "otherLabs") {
-                    params.set("publicAnalysisOtherGroups", "Y");
+                    params = params.set("publicAnalysisOtherGroups", "Y");
                 }
             }
 
-            params.set("showMyLabsAlways", (this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin || this.idLabString) ? "N" : "Y");
+            params = params.set("showMyLabsAlways", (this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin || this.idLabString) ? "N" : "Y");
 
             if (this.createSecurityAdvisorService.isGuest || (this.showPublicCheckbox && this.publicFlag)) {
-                params.set("publicProjects", "Y");
+                params = params.set("publicProjects", "Y");
             }
 
             if (this.showDateRangePicker && !(this.dateFromString === "") && !(this.dateToString === "")) {
-                params.set("createDateFrom", this.dateFromString);
-                params.set("createDateTo", this.dateToString);
+                params = params.set("createDateFrom", this.dateFromString);
+                params = params.set("createDateTo", this.dateToString);
             }
 
             if (this.showSearchTextInput && !(this.searchText === "")) {
-                params.set("searchText", this.searchText);
+                params = params.set("searchText", this.searchText);
             }
 
             if (this.showLabComboBox && this.idLabString && !(this.analysesRadioString === "otherLabs" || this.analysesRadioString === "all")) {
-                params.set("idLab", this.idLabString);
+                params = params.set("idLab", this.idLabString);
             }
 
             if (this.showLabMultiSelectComboBox && this.multiSelectIdLabs.size > 0) {
@@ -739,13 +740,13 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         labKeys = labKeys.concat(":", lab);
                     }
                 }, this);
-                params.set("labKeys", labKeys);
+                params = params.set("labKeys", labKeys);
             }
 
             if (this.showOrganismComboBox && !(this.idOrganismString === "")) {
-                params.set("idOrganism", this.idOrganismString);
+                params = params.set("idOrganism", this.idOrganismString);
                 if (this.showGenomeBuildComboBox && !(this.idGenomeBuildString === "")) {
-                    params.set("idGenomeBuild", this.idGenomeBuildString);
+                    params = params.set("idGenomeBuild", this.idGenomeBuildString);
                 }
             }
         }
@@ -753,25 +754,25 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         return params;
     }
 
-    getDataTrackBrowseParameters(): URLSearchParams {
-        let params: URLSearchParams = new URLSearchParams();
+    getDataTrackBrowseParameters(): HttpParams {
+        let params: HttpParams = new HttpParams();
 
         if (this.showLabComboBox && !(this.idLabString === "")) {
-            params.set("idLab", this.idLabString);
+            params = params.set("idLab", this.idLabString);
         }
 
         if (this.showOrganismComboBox && !(this.idOrganismString === "")) {
-            params.set("idOrganism", this.idOrganismString);
+            params = params.set("idOrganism", this.idOrganismString);
             if (this.showGenomeBuildComboBox && !(this.idGenomeBuildString === "")) {
-                params.set("idGenomeBuild", this.idGenomeBuildString);
+                params = params.set("idGenomeBuild", this.idGenomeBuildString);
             }
         }
 
         if (this.showVisibilityCheckboxes) {
-            params.set("isVisibilityPublic", this.visibilityPublicFlag ? "Y" : "N");
-            params.set("isVisibilityOwner", this.visibilityOwnerFlag ? "Y" : "N");
-            params.set("isVisibilityMembers", this.visibilityAllLabMembersFlag ? "Y" : "N");
-            params.set("isVisibilityInstitute", this.visibilityInstitutionFlag ? "Y" : "N");
+            params = params.set("isVisibilityPublic", this.visibilityPublicFlag ? "Y" : "N");
+            params = params.set("isVisibilityOwner", this.visibilityOwnerFlag ? "Y" : "N");
+            params = params.set("isVisibilityMembers", this.visibilityAllLabMembersFlag ? "Y" : "N");
+            params = params.set("isVisibilityInstitute", this.visibilityInstitutionFlag ? "Y" : "N");
         }
 
         return params;
@@ -856,23 +857,22 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     search(): void {
         if (this.mode === this.EXPERIMENT_BROWSE) {
-            let params: URLSearchParams = this.getExperimentBrowseParameters();
+            let params: HttpParams = this.getExperimentBrowseParameters();
             this.experimentsService.browsePanelParams = params;
             this.experimentsService.browsePanelParams["refreshParams"] = true;
             this.experimentsService.getProjectRequestList_fromBackend(params);
         } else if (this.mode === this.ORDER_BROWSE) {
             this.dialogService.startDefaultSpinnerDialog();
 
-            let params: URLSearchParams = this.getOrderBrowseParameters();
+            let params: HttpParams = this.getOrderBrowseParameters();
             this.experimentsService.getExperiments_fromBackend(params);
         } else if (this.mode === this.ANALYSIS_BROWSE) {
-            let params: URLSearchParams = this.getAnalysisBrowseParameters();
+            let params: HttpParams = this.getAnalysisBrowseParameters();
             this.analysisService.analysisPanelParams = params;
             this.analysisService.analysisPanelParams["refreshParams"] = true;
             this.analysisService.getAnalysisGroupList_fromBackend(params);
-                console.log("GetAnalysisGroupList called");
         } else if (this.mode === this.DATA_TRACK_BROWSE) {
-            let params: URLSearchParams = this.getDataTrackBrowseParameters();
+            let params: HttpParams = this.getDataTrackBrowseParameters();
             this.dataTrackService.previousURLParams = params;
             this.dataTrackService.previousURLParams["refreshParams"] = true;
             this.dataTrackService.labList = this.labList;

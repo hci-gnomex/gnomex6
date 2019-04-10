@@ -6,6 +6,7 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "./popup/dialogs.service";
 import {DictionaryService} from "../services/dictionary.service";
+import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-genome-build',
@@ -68,6 +69,8 @@ export class NewGenomeBuildComponent {
         }
         this.organismService.getDas2OrganismList().subscribe((response: any[]) => {
             this.das2OrganismList = response;
+        },(err:IGnomexErrorResponse) =>{
+            this.dialogsService.alert(err.gError.message);
         });
     }
 
@@ -112,13 +115,10 @@ export class NewGenomeBuildComponent {
                     }, null, DictionaryService.GENOME_BUILD);
                 }
                 this.dialogRef.close(true);
-            } else {
-                let message: string = "";
-                if (response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.confirm("An error occurred while saving genome build" + message, null);
             }
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogsService.alert("An error occurred while saving genome build\n" + err.gError.message);
         });
     }
 

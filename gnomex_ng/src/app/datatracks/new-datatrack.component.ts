@@ -7,6 +7,7 @@ import {DictionaryService} from "../services/dictionary.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-datatrack-folder',
@@ -79,13 +80,10 @@ export class NewDataTrackComponent implements OnInit{
                 this.showSpinner = false;
                 this.dialogRef.close();
                 this.dataTrackService.refreshDatatracksList_fromBackend();
-            } else {
-                let message: string = "";
-                if (response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.confirm("An error occurred while saving data track" + message, null);
             }
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogsService.alert("An error occurred while saving data track\n" + err.gError.message);
         });
     }
 

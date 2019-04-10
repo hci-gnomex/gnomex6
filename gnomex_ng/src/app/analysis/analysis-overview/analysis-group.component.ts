@@ -7,6 +7,9 @@ import {URLSearchParams} from "@angular/http";
 import {AnalysisService} from "../../services/analysis.service";
 import {Subscription} from "rxjs";
 import {distinctUntilChanged, first} from "rxjs/operators";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 
 @Component({
@@ -40,6 +43,7 @@ export class AnalysisGroupComponent implements OnInit,OnDestroy{
 
 
     constructor(protected fb: FormBuilder,private analysisService:AnalysisService,
+                private dialogService: DialogsService,
                 private route:ActivatedRoute,private router:Router) {
     }
 
@@ -85,24 +89,24 @@ export class AnalysisGroupComponent implements OnInit,OnDestroy{
 
     save(){
 
-        let saveParams: URLSearchParams = new URLSearchParams();
-        let getParams: URLSearchParams = new URLSearchParams();
+        let saveParams: HttpParams = new HttpParams();
+        let getParams: HttpParams = new HttpParams();
 
         let idLab = this.route.snapshot.paramMap.get("idLab");
         let idAnalysisGroup = this.route.snapshot.paramMap.get("idAnalysisGroup");
-        getParams.set("idLab",idLab);
-        getParams.set("idAnalysisGroup",idAnalysisGroup);
+        getParams = getParams.set("idLab",idLab);
+        getParams = getParams.set("idAnalysisGroup",idAnalysisGroup);
 
 
         this.project.name = this.projectBrowseForm.controls['name'].value;
         this.project.description = this.projectBrowseForm.controls['description'].value;
 
-        saveParams.set("idLab", idLab);
-        saveParams.set("idAnalysisGroup",idAnalysisGroup);
-        saveParams.set("name",this.project.name);
-        saveParams.set("description", this.project.description);
+        saveParams = saveParams.set("idLab", idLab);
+        saveParams = saveParams.set("idAnalysisGroup",idAnalysisGroup);
+        saveParams = saveParams.set("name",this.project.name);
+        saveParams = saveParams.set("description", this.project.description);
 
-        getParams.set("idAnalysisGroup",idAnalysisGroup);
+        getParams = getParams.set("idAnalysisGroup",idAnalysisGroup);
 
         this.analysisService.saveAnalysisGroup(saveParams).pipe(first()).subscribe(response =>{
             this.analysisService.refreshAnalysisGroupList_fromBackend();
@@ -113,6 +117,8 @@ export class AnalysisGroupComponent implements OnInit,OnDestroy{
                 this.projectBrowseForm.get("name").setValue( response["AnalysisGroup"].name);
                 this.projectBrowseForm.get("description").setValue( response["AnalysisGroup"].description);
             });
+        }, (err:IGnomexErrorResponse) => {
+            this.dialogService.alert(err.gError.message);
         });
 
     }

@@ -10,6 +10,7 @@ import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {FormControl, FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "browse-dictionary",
@@ -215,13 +216,9 @@ export class BrowseDictionaryComponent implements OnInit {
                 if (callback) {
                     callback();
                 }
-            } else {
-                let message: string = "";
-                if (response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.confirm("An error occurred while retrieving dictionary meta data" + message, null);
             }
+        },(err:IGnomexErrorResponse) =>{
+            this.dialogsService.alert("An error occurred while retrieving dictionary meta data " + err.gError.message)
         });
     }
 

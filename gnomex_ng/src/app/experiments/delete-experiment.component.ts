@@ -5,6 +5,10 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {Component, Inject} from "@angular/core";
 import { URLSearchParams } from "@angular/http";
 import {ExperimentsService} from "./experiments.service";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {HttpParams} from "@angular/common/http";
+import {first} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'delete-experiment-dialog',
@@ -16,6 +20,7 @@ export class DeleteExperimentComponent {
     private selectedExperiment: any;
 
     constructor(private dialogRef: MatDialogRef<DeleteExperimentComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
+                private dialogService: DialogsService,
                 private experimentsService: ExperimentsService) {
         this.selectedExperiment = data.selectedExperiment;
     }
@@ -32,11 +37,13 @@ export class DeleteExperimentComponent {
      */
     deleteExperiment() {
         this.showSpinner = true;
-        var params: URLSearchParams = new URLSearchParams();
-        params.set("idRequest", this.selectedExperiment.idRequest);
-        var ePromise = this.experimentsService.deleteExperiment(params).toPromise();
-        ePromise.then(response => {
-            this.experimentsService.refreshProjectRequestList_fromBackend();
-        })
+        let params: HttpParams = new HttpParams()
+            .set("idRequest", this.selectedExperiment.idRequest);
+        this.experimentsService.deleteExperiment(params).pipe(first())
+            .subscribe(response => {
+                this.experimentsService.refreshProjectRequestList_fromBackend();
+            },(err:IGnomexErrorResponse) => {
+                this.dialogService.alert(err.gError.message);
+            })
     }
 }

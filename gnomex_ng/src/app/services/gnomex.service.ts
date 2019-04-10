@@ -16,6 +16,7 @@ import {AppUserListService} from "./app-user-list.service";
 import {AuthenticationService} from "../auth/authentication.service";
 import {first} from "rxjs/operators";
 import {UserPreferencesService} from "./user-preferences.service";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -124,6 +125,7 @@ export class GnomexService {
         //private http:Http
         private http:HttpClient,
         private router:Router,
+        private dialogService: DialogsService,
         private userPreferencesService: UserPreferencesService) {
     }
 
@@ -713,39 +715,39 @@ export class GnomexService {
                         this.progressService.displayLoader(30);
                         forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
                             .pipe(first()).subscribe((response: any[]) => {
-                                this.progressService.displayLoader(45);
-                                this.appUserList = response[0];
-                                this.labList = response[1];
-                                this.progressService.displayLoader(60);
-                                this.myCoreFacilities = this.dictionaryService.coreFacilities();
-                                this.progressService.displayLoader(75);
-                                this.onDictionariesLoaded().then((response) => {
-                                    this.progressService.displayLoader(90);
-                                    this.launchPropertiesService.getFAQ().pipe(first()).subscribe((response: any) => {
-                                        if (response != null) {
-                                            if (!this.createSecurityAdvisorService.isArray(response)) {
-                                                this.faqList = [response.FAQ];
-                                            } else {
-                                                this.faqList = response;
-                                            }
+                            this.progressService.displayLoader(45);
+                            this.appUserList = response[0];
+                            this.labList = response[1];
+                            this.progressService.displayLoader(60);
+                            this.myCoreFacilities = this.dictionaryService.coreFacilities();
+                            this.progressService.displayLoader(75);
+                            this.onDictionariesLoaded().then((response) => {
+                                this.progressService.displayLoader(90);
+                                this.launchPropertiesService.getFAQ().pipe(first()).subscribe((response: any) => {
+                                    if (response != null) {
+                                        if (!this.createSecurityAdvisorService.isArray(response)) {
+                                            this.faqList = [response.FAQ];
+                                        } else {
+                                            this.faqList = response;
                                         }
-                                        this.progressService.displayLoader(95);
+                                    }
+                                    this.progressService.displayLoader(95);
 
-                                        this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
-                                            this.progressService.displayLoader(98);
-                                            this.uploadSampleSheetURL = response.url;
+                                    this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
+                                        this.progressService.displayLoader(98);
+                                        this.uploadSampleSheetURL = response.url;
 
-                                            this.userPreferencesService.createUserPreferences(false).subscribe((response: any) => {
-                                                this.progressService.displayLoader(100);
-                                                this.emitIsAppInitCompelete(true);
-                                                this.isLoggedIn = true;
-                                            });
+                                        this.userPreferencesService.createUserPreferences(false).subscribe((response: any) => {
+                                            this.progressService.displayLoader(100);
+                                            this.emitIsAppInitCompelete(true);
+                                            this.isLoggedIn = true;
                                         });
                                     });
+                                });
 
 
 
-                                    //TODO implemented, delete this V
+                                //TODO implemented, delete this V
                                 // TODO will need this in future
                                 // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
                                 //      this.progressService.displayLoader(100);
@@ -897,59 +899,62 @@ export class GnomexService {
         if(number){
             let match = number.match(/([A-Za-z]*)([0-9]+)([A-Za-z]?)/);
             let path:Array<string> = [];
+            if(match){
+                if( match[3].toUpperCase() === 'R'){
 
-            if( match[3].toUpperCase() === 'R'){
+                    //path = ["experiments","idProject","browsePanel","idRequest"];
+                    path = ["experiments"];
+                    let sub = this.navInitBrowseExperimentSubject;
+                    if(!idInstead){
+                        params = params.set("requestNumber", number);
+                        this.getOrderID(params,path,sub);
+                    }else{
+                        params = params.set("requestNumber", match[2])
+                            .set("hasID","Y");
+                        this.getOrderID(params,path,sub);
+                    }
 
-                //path = ["experiments","idProject","browsePanel","idRequest"];
-                path = ["experiments"];
-                let sub = this.navInitBrowseExperimentSubject;
-                if(!idInstead){
-                    params = params.set("requestNumber", number);
-                    this.getOrderID(params,path,sub);
-                }else{
-                    params = params.set("requestNumber", match[2])
-                        .set("hasID","Y");
+                }else if(match[1].toUpperCase() === 'A'){
+
+                    //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
+                    path = ["analysis"];
+                    let sub = this.navInitBrowseAnalysisSubject;
+                    if(!idInstead){
+                        params = params.set("analysisNumber", number);
+                        this.getOrderID(params,path,sub);
+                    }else{
+                        params = params.set("analysisNumber",match[2])
+                            .set("hasID", "Y");
+                        this.getOrderID(params,path,sub);
+                    }
+
+                }else if(match[1].toUpperCase()=== 'DT' ){
+
+                    //path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
+                    path = ["datatracks"];
+                    let sub = this.navInitBrowseDatatrackSubject;
+                    if(!idInstead){
+                        params = params.set("dataTrackNumber",number);
+                        this.getOrderID(params,path,sub);
+                    }else{
+                        params = params.set("dataTrackNumber",match[2])
+                            .set("hasID","Y");
+                        this.getOrderID(params,path,sub);
+                    }
+
+                }else if(match[1].toUpperCase() === 'T'){ // topic doesn't have number only ID
+                    if(match[2]){
+                        params = params.set("topicNumber", match[2]);
+                    }
+                    //path = [ "topics","topicsPanel", "idLab" ] ;
+                    path = [ "topics"] ;
+                    let sub = this.navInitBrowseTopicSubject;
                     this.getOrderID(params,path,sub);
                 }
 
-            }else if(match[1].toUpperCase() === 'A'){
-
-                //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
-                path = ["analysis"];
-                let sub = this.navInitBrowseAnalysisSubject;
-                if(!idInstead){
-                    params = params.set("analysisNumber", number);
-                    this.getOrderID(params,path,sub);
-                }else{
-                    params = params.set("analysisNumber",match[2])
-                        .set("hasID", "Y");
-                    this.getOrderID(params,path,sub);
-                }
-
-            }else if(match[1].toUpperCase()=== 'DT' ){
-
-                //path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
-                path = ["datatracks"];
-                let sub = this.navInitBrowseDatatrackSubject;
-                if(!idInstead){
-                    params = params.set("dataTrackNumber",number);
-                    this.getOrderID(params,path,sub);
-                }else{
-                    params = params.set("dataTrackNumber",match[2])
-                        .set("hasID","Y");
-                    this.getOrderID(params,path,sub);
-                }
-
-            }else if(match[1].toUpperCase() === 'T'){ // topic doesn't have number only ID
-                if(match[2]){
-                    params = params.set("topicNumber", match[2]);
-                }
-                //path = [ "topics","topicsPanel", "idLab" ] ;
-                path = [ "topics"] ;
-                let sub = this.navInitBrowseTopicSubject;
-                this.getOrderID(params,path,sub);
             }
-
+        }else{
+            this.dialogService.alert("Lookup ID is Invalid");
         }
     }
 
@@ -960,17 +965,15 @@ export class GnomexService {
 
     private getOrderID(params:HttpParams,path:string[],initOrderSubject:BehaviorSubject<any> ){
         this.getOrderFromNumber(params).pipe(first()).subscribe(data =>{
-            if(data.result === 'SUCCESS'){
-                this.orderInitObj = data;
-                this.orderInitObj.urlSegList = path;
-                let url = this.makeURL(this.orderInitObj);
+            this.orderInitObj = data;
+            this.orderInitObj.urlSegList = path;
+            let url = this.makeURL(this.orderInitObj);
+            this.router.navigateByUrl(url);
+            initOrderSubject.next(this.orderInitObj);
 
-                this.router.navigateByUrl(url);
-                initOrderSubject.next(this.orderInitObj);
+        },err =>{
+            this.dialogService.alert(err.gError.message);
 
-            }else{
-                console.log(data.ERROR);
-            }
         });
     }
 

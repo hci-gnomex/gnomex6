@@ -5,6 +5,8 @@ import {Observable} from "rxjs";
 import {Subject} from "rxjs";
 
 import {CookieUtilService} from "../services/cookie-util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 
 @Injectable()
@@ -24,7 +26,8 @@ export class SampleUploadService {
     private bulkUploadImportedSubject: Subject<any>;
 
 
-    constructor(private http: Http, private cookieUtilService: CookieUtilService) {
+    constructor(private http: Http, private cookieUtilService: CookieUtilService,
+                private dialogService: DialogsService) {
         this.hasSampleUploadURLSubject = new Subject();
     }
 
@@ -37,6 +40,9 @@ export class SampleUploadService {
                 this.hasSampleUploadURLSubject.next(this.sampleUpload_URL);
                 this.hasSampleUploadURLSubject.unsubscribe();
             }
+        },(err:IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
+            this.dialogService.alert(err.gError.message)
         });
     }
 
@@ -80,13 +86,16 @@ export class SampleUploadService {
                 this.cookieUtilService.formatXSRFCookie();
 
                 this.http.post('/gnomex/UploadMultiRequestSampleSheetFileServlet.gx', params).subscribe((response: any) => {
-                    if (response && response.status === 200) {
-                        this.bulkUploadSubject.next(response.json());
-                    } else {
-                        this.bulkUploadSubject.next(null);
-                    }
+                    this.bulkUploadSubject.next(response.json());
+
+                    },(err:IGnomexErrorResponse) => {
+                    this.dialogService.stopAllSpinnerDialogs();
+                    this.dialogService.alert(err.gError.message)
                 });
             }
+        },(err:IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
+            this.dialogService.alert(err.gError.message)
         });
 
         if (!this.bulkUploadSubject) {

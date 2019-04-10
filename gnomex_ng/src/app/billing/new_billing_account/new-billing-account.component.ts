@@ -21,6 +21,7 @@ import {
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
 	selector: "new-billing-account-launcher",
@@ -707,6 +708,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			//this.window.close();
 			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
 				this.openSuccessDialog();
+			},(err:IGnomexErrorResponse) => {
+				this.dialogService.stopAllSpinnerDialogs();
+				this.dialogService.alert(err.gError.message);
 			});
 		} else {
 			// validation has caught problems - report them.
@@ -935,6 +939,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
 				this.openSuccessDialog();
+			},(err:IGnomexErrorResponse) => {
+				this.dialogService.stopAllSpinnerDialogs();
+				this.dialogService.alert(err.gError.message);
 			});
 		} else {
 			// validation has caught problems - report them.
@@ -1098,6 +1105,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
 				this.openSuccessDialog();
+			}, (err: IGnomexErrorResponse) => {
+				this.dialogService.stopAllSpinnerDialogs();
+				this.dialogService.alert(err.gError.message);
 			});
 		} else {
 			// validation has caught problems - report them.

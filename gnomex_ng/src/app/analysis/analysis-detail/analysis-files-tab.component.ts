@@ -13,6 +13,7 @@ import {FormGroup} from "@angular/forms";
 import {FileService} from "../../services/file.service";
 import {Subscription} from "rxjs";
 import {DownloadFilesComponent} from "../../util/download-files.component";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -125,13 +126,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                         setTimeout(() => {
                             this.determineFileCount();
                         });
-                    } else {
-                        let message: string = "";
-                        if (result && result.message) {
-                            message = ": " + result.message;
-                        }
-                        this.dialogsService.alert("An error occurred while retrieving download list" + message, null);
                     }
+                },(err:IGnomexErrorResponse) =>{
+                    this.dialogsService.alert("An error occurred while retrieving download list" + err.gError.message);
                 });
             }
         });
@@ -185,9 +182,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         this.dataTrackService.makeURLLink(params).subscribe((result: any) => {
             if (result && result.urlsToLink) {
                 this.dialogsService.alert(result.urlsToLink);
-            } else {
-                this.handleBackendLinkError(result);
             }
+        },(err:IGnomexErrorResponse) => {
+            this.handleBackendLinkError(err.gError);
         });
     };
 
@@ -198,9 +195,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         this.dataTrackService.makeUCSCLinks(params).subscribe((result: any) => {
             if (result && result.ucscURL1) {
                 window.open(result.ucscURL1, "_blank");
-            } else {
-                this.handleBackendLinkError(result);
             }
+        },(err:IGnomexErrorResponse) => {
+            this.handleBackendLinkError(err.gError);
         });
     };
 
@@ -208,9 +205,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         this.dataTrackService.makeIGVLink().subscribe((result: any) => {
             if (result && result.igvURL) {
                 this.dialogsService.alert(result.igvURL);
-            } else {
-                this.handleBackendLinkError(result);
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.handleBackendLinkError(err.gError);
         });
     };
 
@@ -221,9 +218,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         this.dataTrackService.makeIOBIOLink(params).subscribe((result: any) => {
             if (result && result.urlsToLink) {
                 window.open(result.urlsToLink, "_blank");
-            } else {
-                this.handleBackendLinkError(result);
             }
+        },(err:IGnomexErrorResponse) =>{
+            this.handleBackendLinkError(err.gError);
         });
     };
 
@@ -237,9 +234,9 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         this.dataTrackService.makeGENELink(params).subscribe((result: any) => {
             if (result && result.urlsToLink) {
                 window.open(result.urlsToLink, "_blank");
-            } else {
-                this.handleBackendLinkError(result);
             }
+        },(err:IGnomexErrorResponse) => {
+            this.handleBackendLinkError(err.gError);
         });
     };
 

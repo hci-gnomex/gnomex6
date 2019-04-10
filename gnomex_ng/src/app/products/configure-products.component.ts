@@ -9,6 +9,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {HttpParams} from "@angular/common/http";
 import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
 import {ConfigureProductTypesComponent} from "./configure-product-types.component";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'configure-products',
@@ -143,6 +144,8 @@ export class ConfigureProductsComponent implements OnInit {
                 }
                 this.dialogsService.confirm("An error occurred while retrieving the product list" + message, null);
             }
+        }, (err:IGnomexErrorResponse) =>{
+            this.dialogsService.alert(err.gError.message)
         });
     }
 

@@ -3,6 +3,8 @@ import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
 import { CookieUtilService } from "./cookie-util.service";
 import {Observable, Subject, throwError} from "rxjs";
 import { catchError } from "rxjs/operators";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Injectable()
 export class ProtocolService {
@@ -16,7 +18,8 @@ export class ProtocolService {
     public static readonly ANALYSIS_PROTOCOL_CLASS_NAME: string  = "hci.gnomex.model.AnalysisProtocol";
 
     constructor(private httpClient: HttpClient,
-                private cookieUtilService: CookieUtilService) { }
+                private cookieUtilService: CookieUtilService,
+                private dialogService: DialogsService) { }
 
 
     public getProtocolObservable(): Observable<any> {
@@ -46,7 +49,10 @@ export class ProtocolService {
             .pipe(catchError(this.handleError))
             .subscribe((result) => {
             this.protocolSubject.next(result);
-        });
+        }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs();
+                this.dialogService.alert(err.gError.message);
+            });
     }
 
 
@@ -67,9 +73,15 @@ export class ProtocolService {
         };
 
         if(params){
-            this.httpClient.get('gnomex/GetProtocolList.gx',{params: params}).subscribe(protocolCallBackFn)
+            this.httpClient.get('gnomex/GetProtocolList.gx',{params: params}).subscribe(protocolCallBackFn, (err:IGnomexErrorResponse) =>{
+                this.dialogService.stopAllSpinnerDialogs();
+                this.dialogService.alert(err.gError.message);
+            })
         }else{
-            this.httpClient.get('gnomex/GetProtocolList.gx').subscribe(protocolCallBackFn);
+            this.httpClient.get('gnomex/GetProtocolList.gx').subscribe(protocolCallBackFn, (err:IGnomexErrorResponse) =>{
+                this.dialogService.stopAllSpinnerDialogs();
+                this.dialogService.alert(err.gError.message);
+            });
         }
 
 

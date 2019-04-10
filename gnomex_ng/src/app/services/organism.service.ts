@@ -1,9 +1,9 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable} from "rxjs";
+import {Observable, throwError} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
-import {map} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 
 @Injectable()
 export class OrganismService {
@@ -44,7 +44,7 @@ export class OrganismService {
             } else {
                 return [];
             }
-        }));
+        }),catchError(err => {return throwError(err)}));
     }
 
     public saveOrganism(params: URLSearchParams):  Observable<Response> {

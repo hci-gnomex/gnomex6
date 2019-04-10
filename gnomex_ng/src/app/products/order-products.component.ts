@@ -16,6 +16,7 @@ import {
 import {BillingService} from "../services/billing.service";
 import {WorkAuthorizationTypeSelectorDialogComponent} from "./work-authorization-type-selector-dialog.component";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'order-products',
@@ -189,14 +190,12 @@ export class OrderProductsComponent implements OnInit {
                                 }
                             }
                         }
-                    } else {
-                        let message: string = "";
-                        if (response && response.message) {
-                            message = ": " + response.message;
-                        }
-                        this.dialogsService.confirm("An error occurred while retrieving the product list" + message, null);
                     }
+                },(err:IGnomexErrorResponse) => {
+                    this.dialogsService.alert("An error occurred while retrieving the product list " + err.gError.message);
                 });
+            }, (err:IGnomexErrorResponse) => {
+                this.dialogsService.alert(err.gError.message);
             });
         }
     }

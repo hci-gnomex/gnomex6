@@ -9,6 +9,9 @@ import { URLSearchParams } from "@angular/http";
 import {AnalysisService} from "../services/analysis.service";
 import {FormControl, Validators} from '@angular/forms';
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Component({
     selector: 'create-analysis-group-dialog',
@@ -44,6 +47,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
         ]);
 
     constructor(private dialogRef: MatDialogRef<CreateAnalysisGroupComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
+                private dialogService:DialogsService,
                 private analysisService: AnalysisService, public prefService: UserPreferencesService) {
 
         this.labList = data.labList
@@ -67,21 +71,21 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
 
     /**
      * Save a new analysis group.
-     * @param {URLSearchParams} params
      */
-    createAnalysisGroupSaveButtonClicked(params: URLSearchParams) {
+    createAnalysisGroupSaveButtonClicked() {
         this.showSpinner = true;
-        var idAnalysisGroup: any = 0;
-        var params: URLSearchParams = new URLSearchParams();
+        let idAnalysisGroup: any = 0;
+        let params: HttpParams  = new HttpParams()
+            .set("idLab", this.idLabString)
+            .set("idAnalysisGroup", idAnalysisGroup)
+            .set("name", this.analysisGroupName)
+            .set("description", this.analysisGroupDescription);
 
-        params.set("idLab", this.idLabString);
-        params.set("idAnalysisGroup", idAnalysisGroup);
-        params.set("name", this.analysisGroupName);
-        params.set("description", this.analysisGroupDescription);
-
-        var lPromise = this.analysisService.saveAnalysisGroup(params).toPromise();
-        lPromise.then(response => {
+        this.analysisService.saveAnalysisGroup(params).subscribe(response => {
             this.analysisService.refreshAnalysisGroupList_fromBackend();
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogService.alert(err.gError.message);
         });
     }
 }

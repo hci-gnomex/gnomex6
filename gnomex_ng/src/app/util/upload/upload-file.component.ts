@@ -12,6 +12,7 @@ import {TabChangeEvent} from "../tabs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {saveAs} from 'file-saver';
 import {PropertyService} from "../../services/property.service";
+import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'upload-file',
@@ -110,9 +111,10 @@ export class UploadFileComponent implements OnInit {
         this.uploadURLSubscription =  this.fileService.getUploadOrderUrl(this.manageData.uploadURL).subscribe(resp =>{
             if(resp && resp.url){
                 this.url = resp.url;
-            }else if(resp && resp.message){
-                this.dialogService.alert(resp.message)
             }
+        },(err:IGnomexErrorResponse) =>{
+            this.dialogService.stopAllSpinnerDialogs();
+            this.dialogService.alert(err.gError.message);
         });
 
 

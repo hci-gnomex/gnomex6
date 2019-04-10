@@ -7,6 +7,9 @@ import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {URLSearchParams} from "@angular/http";
 import {Subscription} from "rxjs";
 import {distinctUntilChanged, first} from "rxjs/operators";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 
 @Component({
@@ -50,7 +53,8 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
 
 
     constructor(protected fb: FormBuilder,private experimentsService:ExperimentsService,
-                private route:ActivatedRoute,private router:Router) {
+                private route:ActivatedRoute,private router:Router,
+                private dialogService: DialogsService) {
         super(fb);
     }
 
@@ -96,21 +100,21 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
 
     save(){
 
-        let saveParams: URLSearchParams = new URLSearchParams();
-        let getParams: URLSearchParams = new URLSearchParams();
+        let saveParams: HttpParams = new HttpParams();
+        let getParams: HttpParams = new HttpParams();
 
 
         let idLab = this.route.snapshot.paramMap.get("idLab");
         let idProject = this.route.snapshot.paramMap.get("idProject");
-        getParams.set("idLab",idLab);
-        getParams.set("idProject",idProject);
+        getParams = getParams.set("idLab",idLab);
+        getParams = getParams.set("idProject",idProject);
 
 
         this.project.name = this.projectBrowseForm.controls['projectName'].value;
         this.project.description = this.projectBrowseForm.controls['description'].value;
         let stringifiedProject = JSON.stringify(this.project);
-        saveParams.set("projectXMLString", stringifiedProject);
-        saveParams.set("parseEntries", "Y");
+        saveParams = saveParams.set("projectXMLString", stringifiedProject);
+        saveParams = saveParams.set("parseEntries", "Y");
 
         this.experimentsService.saveProject(saveParams).pipe(first()).subscribe(response =>{
             this.experimentsService.refreshProjectRequestList_fromBackend();
@@ -120,7 +124,11 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
             this.experimentsService.getProject(getParams).pipe(first()).subscribe(response =>{
                 this.projectBrowseForm.get("projectName").setValue( response["Project"].name);
                 this.projectBrowseForm.get("description").setValue( response["Project"].description);
+            }, (err:IGnomexErrorResponse) => {
+                this.dialogService.alert(err.gError.message);
             });
+        },(err:IGnomexErrorResponse) => {
+            this.dialogService.alert(err.gError.message);
         });
 
     }

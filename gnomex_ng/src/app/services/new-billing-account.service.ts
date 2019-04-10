@@ -12,8 +12,6 @@ import {map} from "rxjs/operators";
 		return this._http.get("/gnomex/SubmitWorkAuthForm.gx", {withCredentials: true, search: parameters}).pipe(map((response) => {
 			if (response.status === 200) {
 				return response.json();
-			} else {
-				throw new Error("Error");
 			}
 		}));
 	}

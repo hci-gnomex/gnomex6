@@ -9,6 +9,8 @@ import {DataTrackService} from "../services/data-track.service";
 import {LabListService} from "../services/lab-list.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-datatrack-folder',
@@ -31,6 +33,7 @@ export class NewDataTrackFolderComponent {
                 private dataTrackService: DataTrackService,
                 private labListService: LabListService,
                 public prefService: UserPreferencesService,
+                private dialogService: DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
 
         this.selectedItem = data.selectedItem;
@@ -73,6 +76,9 @@ export class NewDataTrackFolderComponent {
             this.showSpinner = false;
             this.dialogRef.close();
             this.dataTrackService.refreshDatatracksList_fromBackend();
+        },(err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogService.alert(err.gError.message);
         });
     }
 

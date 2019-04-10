@@ -18,6 +18,7 @@ import {DownloadProgressComponent} from "../download-progress.component";
 import {HttpParams} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {DictionaryService} from "../../services/dictionary.service";
+import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 
 const DATATRACK = "DATATRACK";
 const GENOMEBUILD = "GENOMEBUILD";
@@ -116,46 +117,56 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public doDuplicate(): void {
-        var params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams()
+            .set("idDataTrack", this.selectedNode.data.idDataTrack)
+            .set("idDataTrackFolder", this.selectedNode.data.idDataTrackFolder);
 
-        params.set("idDataTrack", this.selectedNode.data.idDataTrack);
-        params.set("idDataTrackFolder", this.selectedNode.data.idDataTrackFolder);
-        this.dataTrackService.duplicateDataTrack(params).subscribe((response: Response) => {
+        this.dataTrackService.duplicateDataTrack(params).subscribe((response: any) => {
             this.dataTrackService.refreshDatatracksList_fromBackend();
+        }, (err:IGnomexErrorResponse) => {
+            this.dialogsService.alert(err.gError.message)
         });
     }
 
-    public deleteDataTrack(type: string, params:URLSearchParams): void {
+    public deleteDataTrack(type: string, params:HttpParams): void {
         if (type === DATATRACK) {
 
-            this.dataTrackService.deleteDataTrack(params).subscribe((response: Response) => {
+            this.dataTrackService.deleteDataTrack(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
+            }, (err:IGnomexErrorResponse) =>{
+                this.dialogsService.alert(err.gError.message);
             });
         }
         else if (type === DATATRACKFOLDER) {
 
-            this.dataTrackService.deleteDataTrackFolder(params).subscribe((response: Response) => {
+            this.dataTrackService.deleteDataTrackFolder(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
+            },(err:IGnomexErrorResponse) => {
+                this.dialogsService.alert(err.gError.message);
             });
         }
         else if (type === GENOMEBUILD) {
 
-            this.dataTrackService.deleteGenomeBuild(params).subscribe((response: Response) => {
+            this.dataTrackService.deleteGenomeBuild(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.GENOME_BUILD);
+            },(err:IGnomexErrorResponse) =>{
+                this.dialogsService.alert(err.gError.message);
             });
         }
         else if (type === ORGANISM) {
 
-            this.dataTrackService.deleteOrganism(params).subscribe((response: Response) => {
+            this.dataTrackService.deleteOrganism(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.ORGANISM);
+            }, (err:IGnomexErrorResponse) =>{
+                this.dialogsService.alert(err.gError.message);
             });
         }
     }
@@ -164,7 +175,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         var level: string = "";
         var confirmString: string = "";
         var type: string;
-        var params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
 
         if (this.selectedNode.data.idDataTrack) {
             let dialogRef: MatDialogRef<DeleteDataTrackComponent> = this.dialog.open(DeleteDataTrackComponent, {
@@ -186,12 +197,12 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     level = "Confirm";
                     confirmString = "Remove organism " + this.selectedNode.data.label + "?";
                     type = ORGANISM;
-                    params.set("idOrganism", this.selectedNode.data.idOrganism);
+                    params = params.set("idOrganism", this.selectedNode.data.idOrganism);
                 }
             }
             else if (this.selectedNode.data.isDataTrackFolder) {
                 type = DATATRACKFOLDER;
-                params.set("idDataTrackFolder", this.selectedNode.data.idDataTrackFolder);
+                params = params.set("idDataTrackFolder", this.selectedNode.data.idDataTrackFolder);
                 if (this.selectedNode.data.DataTrack || this.selectedNode.data.DataTrackFolder) {
                     // TODO
                     level = "Warning";
@@ -212,7 +223,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     level = "Confirm";
                     confirmString = "Remove genome build " + this.selectedNode.data.label + "?";
                     type = GENOMEBUILD;
-                    params.set("idGenomeBuild", this.selectedNode.data.idGenomeBuild);
+                    params = params.set("idGenomeBuild", this.selectedNode.data.idGenomeBuild);
                 }
             }
 
@@ -321,9 +332,9 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                         }
                     });
                 }
-            } else {
-                this.handleControllerError(result, "getting estimated size of download");
             }
+        }, (err:IGnomexErrorResponse) => {
+            this.handleControllerError(err.gError, "getting estimated size of download");
         });
     }
 

@@ -12,6 +12,8 @@ import {GridOptions} from "ag-grid-community/main";
 import {URLSearchParams} from "@angular/http"
 import {AnalysisService} from "../../services/analysis.service";
 import {GnomexStringUtilService} from "../../services/gnomex-string-util.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -251,13 +253,15 @@ export class AnalysisVisibleTabComponent implements OnInit{
             }
         }
 
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
         let strBody:string = JSON.stringify(dirtyRequests);
-        params.set("visibilityXMLString", strBody );
+        params = params.set("visibilityXMLString", strBody );
 
         this.analysisService.saveVisibility(params).subscribe(resp =>{
             this.saveSuccess.emit();
             this.analysisService.getAnalysisGroupList_fromBackend(this.analysisService.analysisPanelParams,true);
+        },(err:IGnomexErrorResponse) => {
+            this.dialogService.alert(err.gError.message);
         });
     }
 

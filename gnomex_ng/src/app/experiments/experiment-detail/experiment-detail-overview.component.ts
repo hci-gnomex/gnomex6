@@ -30,6 +30,7 @@ import {CreateAnalysisComponent} from "../../analysis/create-analysis.component"
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {BasicEmailDialogComponent} from "../../util/basic-email-dialog.component";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 export const TOOLTIPS = Object.freeze({
     PRINT_EXPERIMENT_ORDER: "Create PDF form for this experiment order",
@@ -287,27 +288,22 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public handleDownloadFiles(): void {
         if (this.experiment && this.experiment.idRequest) {
             this.experimentService.getRequestDownloadList(this.experiment.idRequest).subscribe((result: any) => {
-                if (result && result.Request) {
-                    let config: MatDialogConfig = new MatDialogConfig();
-                    config.panelClass = "no-padding-dialog";
-                    config.data = {
-                        showCreateSoftLinks: true,
-                        downloadListSource: result.Request,
-                        cacheDownloadListFn: this.fileService.cacheExperimentFileDownloadList,
-                        fdtDownloadFn: this.fileService.getFDTDownloadExperimentServlet,
-                        makeSoftLinksFn: this.fileService.makeSoftLinks,
-                        downloadURL: "DownloadFileServlet.gx",
-                        suggestedFilename: "gnomex-data",
-                    };
-                    config.disableClose = true;
-                    this.dialog.open(DownloadFilesComponent, config);
-                } else {
-                    let message: string = "";
-                    if (result && result.message) {
-                        message = ": " + result.message;
-                    }
-                    this.dialogsService.alert("An error occurred while retrieving download list" + message, null);
-                }
+                let config: MatDialogConfig = new MatDialogConfig();
+                config.panelClass = "no-padding-dialog";
+                config.data = {
+                    showCreateSoftLinks: true,
+                    downloadListSource: result.Request,
+                    cacheDownloadListFn: this.fileService.cacheExperimentFileDownloadList,
+                    fdtDownloadFn: this.fileService.getFDTDownloadExperimentServlet,
+                    makeSoftLinksFn: this.fileService.makeSoftLinks,
+                    downloadURL: "DownloadFileServlet.gx",
+                    suggestedFilename: "gnomex-data",
+                };
+                config.disableClose = true;
+                this.dialog.open(DownloadFilesComponent, config);
+
+            },(err:IGnomexErrorResponse) => {
+                this.dialogsService.alert("An error occurred while retrieving download list " + err.gError.message );
             });
         }
     }
@@ -375,7 +371,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                     data.toAddress = coreFacility.contactEmail;
                 }
 
-                    let params: HttpParams = new HttpParams()
+                let params: HttpParams = new HttpParams()
                     .set("body", data.body)
                     .set("format", data.format)
                     .set("senderAddress", data.fromAddress)
@@ -386,19 +382,17 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 this.experimentService.emailServlet(params).pipe(first()).subscribe(resp => {
                     let email = <BasicEmailDialogComponent>this.contactCoreEmailDialogRef.componentInstance;
                     email.showSpinner = false;
-                    if(resp && resp.result === "SUCCESS") {
-                        this.contactCoreEmailDialogRef.close();
 
-                        this.snackBar.open("Email successfully sent", "Contact Core", {
-                            duration: 2000
-                        });
+                    this.contactCoreEmailDialogRef.close();
 
-                    } else if(resp && resp.message) {
-                        this.dialogsService.alert("Error sending email" + ": " + resp.message);
-                    }
+                    this.snackBar.open("Email successfully sent", "Contact Core", {
+                        duration: 2000
+                    });
 
-                }, error => {
-                    this.dialogsService.alert(error);
+
+
+                }, (err:IGnomexErrorResponse) => {
+                    this.dialogsService.alert("Error sending email" + ": " + err.gError.message);
                 });
             };
 
