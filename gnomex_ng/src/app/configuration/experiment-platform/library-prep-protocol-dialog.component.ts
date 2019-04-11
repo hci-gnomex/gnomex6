@@ -9,6 +9,7 @@ import {HttpParams} from "@angular/common/http";
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 
@@ -141,7 +142,9 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
                     this.formGroup.get('adapterSequenceFivePrime').setValue(resp.adapterSequenceFivePrime ? resp.adapterSequenceFivePrime : '');
                     this.formGroup.markAsPristine();
                 }
-            },err =>{this.dialogService.alert(err)});
+            },(err:IGnomexErrorResponse) =>{
+                this.dialogService.stopAllSpinnerDialogs();
+                this.dialogService.alert(err.gError.message)});
         }
 
     }

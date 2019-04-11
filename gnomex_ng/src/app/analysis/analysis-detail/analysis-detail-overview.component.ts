@@ -20,6 +20,7 @@ import {FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {GnomexService} from "../../services/gnomex.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -193,15 +194,10 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 if (result && result.result && result.result === "SUCCESS") {
 
                     // TODO refresh download list of analysis files
-
                     this.dialogsService.alert("Data tracks created for all applicable files");
-                } else {
-                    let message: string = "";
-                    if (result && result.message) {
-                        message = ": " + result.message;
-                    }
-                    this.dialogsService.confirm("An error occurred while creating data tracks" + message, null);
                 }
+            },(err:IGnomexErrorResponse) => {
+                this.dialogsService.alert("An error occurred while creating data tracks\n" + err.gError.message);
             });
         }
     }
@@ -247,12 +243,11 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 if(resp.idAnalysis) {
                     this.gnomexService.navByNumber("A" + resp.idAnalysis);
                     this.dialogsService.stopAllSpinnerDialogs();
-                } else if (resp.message) {
-                    this.dialogsService.stopAllSpinnerDialogs();
-                    this.dialogsService.alert(resp.message);
-
                 }
             }
+        },(err:IGnomexErrorResponse) =>{
+            this.dialogsService.stopAllSpinnerDialogs();
+            this.dialogsService.alert(err.gError.message);
         });
 
     }

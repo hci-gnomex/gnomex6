@@ -35,6 +35,8 @@ import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {DictionaryService} from "../services/dictionary.service";
 import {PropertyService} from "../services/property.service";
 import {GnomexService} from "../services/gnomex.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpParams} from "@angular/common/http";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -275,13 +277,14 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.navInitSubscription = this.gnomexService.navInitBrowseExperimentSubject.subscribe( orderInitObj => {
             if (orderInitObj) {
                 console.log("Nav mode: true");
-                let ids: URLSearchParams = new URLSearchParams;
+
                 let idProject = this.gnomexService.orderInitObj.idProject;
 
-                ids.set("idProject", idProject);
-                ids.set("showEmptyProjectFolders", "Y");
-                ids.set("showCategory", "N");
-                ids.set("showSamples", "N");
+                let ids: HttpParams = new HttpParams()
+                    .set("idProject", idProject)
+                    .set("showEmptyProjectFolders", "Y")
+                    .set("showCategory", "N")
+                    .set("showSamples", "N");
                 this.experimentsService.browsePanelParams = ids;
                 this.experimentsService.getProjectRequestList_fromBackend(ids);
             }
@@ -624,6 +627,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 } else {
                     this.disableDeleteExperiment = true;
                 }
+            },(err:IGnomexErrorResponse) => {
+                this.dialogsService.alert(err.gError.message);
             });
 
         }

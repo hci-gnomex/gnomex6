@@ -47,6 +47,8 @@ import {UserModule} from "./hci-user/user.module";
 import {AUTHENTICATED_USER_ENDPOINT, UserService} from "./hci-user/user.service";
 import {AngularSplitModule} from "angular-split";
 import {RegisterUserModule} from "./account/register-user/register-user.module";
+import {HTTP_INTERCEPTORS} from "@angular/common/http";
+import {ErrorHandlerInterceptor} from "./services/interceptors/error-handler.interceptor";
 
 
 
@@ -103,6 +105,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
         {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 240},
         {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
+        {provide:HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
         {provide: Window, useValue: window},
         UserService,
         AuthenticationService,

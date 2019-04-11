@@ -8,6 +8,7 @@ import {GridApi, GridReadyEvent, RowNode, RowSelectedEvent} from "ag-grid-commun
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {DataTrackService} from "../../services/data-track.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     template: `
@@ -107,9 +108,9 @@ export class ManagePedFileWindowComponent implements OnInit {
                 if (result && result.Analysis) {
                     this.gatherInfo(result);
                     this.initializeFromPedFile(result.Analysis);
-                } else {
-                    this.handleControllerError(result, "retrieving file download list");
                 }
+            },(err:IGnomexErrorResponse) =>{
+                this.handleControllerError(err.gError,"retrieving file download list")
             });
         } else {
             this.dialogsService.alert("No analysis found");
@@ -277,9 +278,9 @@ export class ManagePedFileWindowComponent implements OnInit {
         this.dataTrackService.makeGENELink(params).subscribe((result: any) => {
             if (result && result.urlsToLink) {
                 window.open(result.urlsToLink, "_blank");
-            } else {
-                this.handleControllerError(result, "launching gene.iobio.io");
             }
+        }, (err:IGnomexErrorResponse) =>{
+            this.handleControllerError(err.gError,"launching gene.iobio.io" );
         });
     }
 

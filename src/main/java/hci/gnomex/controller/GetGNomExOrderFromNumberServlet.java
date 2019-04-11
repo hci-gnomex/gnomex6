@@ -222,7 +222,8 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
             res.addHeader("message", e.getMessage());
 
             JsonObject value = Json.createObjectBuilder()
-                    .add("ERROR", e.getMessage())
+                    .add("result","ERROR")
+                    .add("message", e.getMessage())
                     .build();
             JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 

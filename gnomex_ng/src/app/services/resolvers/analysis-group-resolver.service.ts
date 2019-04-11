@@ -1,5 +1,5 @@
-import {Injectable} from "@angular/core";
-import {Resolve, ActivatedRouteSnapshot} from "@angular/router";
+import {Injectable} from '@angular/core'
+import {Resolve, ActivatedRouteSnapshot} from '@angular/router'
 import {AnalysisService} from "../analysis.service";
 import {HttpParams} from "@angular/common/http";
 
@@ -15,7 +15,7 @@ export class AnalysisGroupResolverService implements Resolve<any> {
         // then it calls subscribe
         let ids: HttpParams = new HttpParams();
 
-        let idAnalysisGroup = route.params["idAnalysisGroup"]
+        let idAnalysisGroup = route.params["idAnalysisGroup"];
 
         ids = ids.set("idAnalysisGroup", idAnalysisGroup );
         if(idAnalysisGroup) {

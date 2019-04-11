@@ -16,6 +16,7 @@ import {BrowseOrderValidateService} from "../../services/browse-order-validate.s
 import {first} from "rxjs/operators";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -369,10 +370,10 @@ export class AnalysisExperimentTabComponent implements OnInit{
                 }
                 this.showSpinner = false;
 
+            }, (err:IGnomexErrorResponse) => {
+                this.showSpinner = false;
+                this.dialogService.alert(err.gError.message);
             });
-
-
-
     }
 
     // tree methods

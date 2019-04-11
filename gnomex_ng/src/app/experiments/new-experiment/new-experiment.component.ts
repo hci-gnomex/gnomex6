@@ -27,6 +27,7 @@ import {TabVisibilityComponent} from "./tab-visibility.component";
 
 import {Experiment} from "../../util/models/experiment.model";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-experiment',
@@ -493,6 +494,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     temp.unsubscribe();
                 });
             }
+        }, (err:IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
+            this.dialogService.alert(err.gError.message);
         });
     }
 

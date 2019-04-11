@@ -96,9 +96,9 @@ export class FileService {
     getAnalysisOrganizeFilesObservable(): Observable<any>{
         return this.organizeFilesSubject.pipe( flatMap(params => {
 
-            let analysisParams : URLSearchParams =  new URLSearchParams();
-            analysisParams.append('idAnalysis',params.idAnalysis);
-            analysisParams.append('showUploads','Y');
+            let analysisParams : HttpParams =  new HttpParams()
+                .append('idAnalysis',params.idAnalysis)
+                .append('showUploads','Y');
             let downloadParams:HttpParams = new HttpParams()
                 .set('idAnalysis',params.idAnalysis)
                 .set('includeUploadStagingDir', 'N')

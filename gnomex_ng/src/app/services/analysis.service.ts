@@ -1,10 +1,12 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {BehaviorSubject, Observable, Subject,throwError} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
-import {map} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import {AbstractControl, FormGroup} from "@angular/forms";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Injectable()
 export class AnalysisService {
@@ -17,20 +19,21 @@ export class AnalysisService {
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private analysisGroupListSubject: Subject<any[]> = new Subject();
     private _haveLoadedAnalysisGroupList: boolean = false;
-    private _previousURLParams: URLSearchParams = null;
-    private _analysisPanelParams: URLSearchParams;
-    private _analysisList: Array<any> = [];
-    private analysisOverviewListSubject: BehaviorSubject<any> = new BehaviorSubject([]);
-    private filteredAnalysisListSubject: Subject<any> = new Subject();
-    private createAnalysisDataSubject: Subject<any> = new Subject();
-    private saveManagerSubject: Subject<any> = new Subject();
+    private _previousURLParams: HttpParams = null;
+    private _analysisPanelParams:HttpParams;
+    private _analysisList:Array<any> =[];
+    private analysisOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
+    private filteredAnalysisListSubject:Subject<any> = new Subject();
+    private createAnalysisDataSubject:Subject<any> = new Subject();
+    private saveManagerSubject:Subject<any> = new Subject();
 
     private _analysisOverviewForm: FormGroup;
     private _createdAnalysis: any;
 
 
-    constructor(private http: Http, private httpClient: HttpClient,
-                private cookieUtilService: CookieUtilService) {
+    constructor(private http: Http, private httpClient:HttpClient,
+                private cookieUtilService:CookieUtilService,
+                private dialogService:DialogsService) {
         this._analysisOverviewForm = new FormGroup({});
     }
 
@@ -49,21 +52,19 @@ export class AnalysisService {
         this._analysisList = data;
     }
 
-    get analysisPanelParams(): URLSearchParams {
+    get analysisPanelParams(): HttpParams{
         return this._analysisPanelParams;
     }
-    set analysisPanelParams(data: URLSearchParams) {
+    set analysisPanelParams(data:HttpParams){
         this._analysisPanelParams = data;
     }
 
-    getAnalysis(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetAnalysis.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    getAnalysis(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetAnalysis.gx", {params: params})
+            .pipe(catchError((err:IGnomexErrorResponse) =>{
+                this.dialogService.alert(err.gError.message);
+                return throwError(err);
+            }));
     }
 
     saveAnalysis(params: HttpParams): Observable<any> {
@@ -72,34 +73,19 @@ export class AnalysisService {
     }
 
     getAnalysisGroup(params: HttpParams): Observable<any> {
-        return this.httpClient.get("/gnomex/GetAnalysisGroup.gx", {params: params}).pipe(map((response) => {
-            if (response["AnalysisGroup"]) {
-                return response;
-            } else {
-                throw new Error("Error in getting AnalysisGroup: " + response["message"]);
-            }
-        }));
+        return this.httpClient.get("/gnomex/GetAnalysisGroup.gx", {params: params})
+            .pipe(catchError((err:IGnomexErrorResponse) =>{
+                this.dialogService.alert(err.gError.message);
+                return throwError(err);
+            }));
     }
 
-    getAnalysisGroupList(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetAnalysisGroupList.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                this.analysisGroupList = response.json().Lab;
-                return this.analysisGroupList;
-            } else {
-                throw new Error("Error");
-            }
-        }));
-    }
-
-    getAnalysisLabList(): Observable<any> {
-        return this.http.get("/gnomex/GetAnalysisGroupList.gx").pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    getAnalysisGroupList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetAnalysisGroupList.gx", {params: params})
+            .pipe(map((resp:any) =>{ return  resp.Lab}),catchError((err:IGnomexErrorResponse) =>{
+                this.dialogService.alert(err.gError.message);
+                return throwError(err);
+            }));
     }
 
     emitAnalysisGroupList(agList?: any): void {
@@ -114,7 +100,7 @@ export class AnalysisService {
     getAnalysisGroupListObservable(): Observable<any> {
         return this.analysisGroupListSubject.asObservable();
     }
-    getAnalysisGroupList_fromBackend(params: URLSearchParams, allowRefresh?: boolean): void {
+    getAnalysisGroupList_fromBackend(params: HttpParams,allowRefresh?:boolean): void {
         this.startSearchSubject.next(true);
 
         if (this._haveLoadedAnalysisGroupList && this._previousURLParams === params && !allowRefresh) {
@@ -124,72 +110,48 @@ export class AnalysisService {
             this._haveLoadedAnalysisGroupList = true;
             this._previousURLParams = params;
 
-            this.http.get("/gnomex/GetAnalysisGroupList.gx", {
-                withCredentials: true,
-                search: params
-            }).subscribe((response: Response) => {
-                console.log("GetRequestList called");
-
-                if (response.status === 200) {
-                    this.analysisGroupList = response.json().Lab;
+            this.httpClient.get("/gnomex/GetAnalysisGroupList.gx", {params: params })
+                .pipe(map((resp:any) =>{return resp.Lab}))
+                .subscribe((response:any) => {
+                    this.analysisGroupList = response;
                     this.emitAnalysisGroupList();
-                } else {
-                    throw new Error("Error");
-                }
-            });
+                },(err:IGnomexErrorResponse) => {
+                    this.dialogService.stopAllSpinnerDialogs();
+                    this.dialogService.alert(err.gError.message);
+                });
         }
     }
 
     refreshAnalysisGroupList_fromBackend(): void {
         this.startSearchSubject.next(true);
 
-        this.http.get("/gnomex/GetAnalysisGroupList.gx", {
-            withCredentials: true,
-            search: this._previousURLParams
-        }).subscribe((response: Response) => {
-            console.log("GetAnalysisGroupList called");
-
-            if (response.status === 200) {
-                this.analysisGroupList = response.json().Lab;
-                this.emitAnalysisGroupList();
-                //return response.json().Request;
-            } else {
-                throw new Error("Error");
-            }
-        });
+        this.httpClient.get("/gnomex/GetAnalysisGroupList.gx", {params: this._previousURLParams})
+            .pipe(map((resp:any) => {return resp.Lab}))
+            .subscribe((response:any) => {
+            this.analysisGroupList = response;
+            this.emitAnalysisGroupList();
+        }, (err:IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs();
+                this.dialogService.alert(err.gError.message);
+            });
     }
 
     saveAnalysisGroup(params: HttpParams):  Observable<any> {
-        let headers : HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/SaveAnalysisGroup.gx", params.toString(), {headers: headers})
-            .pipe(map((response) => {
-                if(response["idAnalysisGroup"]) {
-                    return response;
-                } else {
-                    throw new Error("Error in saving AnalysisGroup: " + response["message"]);
-                }
-            }));
-    }
+        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+        return this.httpClient.post("/gnomex/SaveAnalysisGroup.gx", params.toString(),{headers: headers});
 
-    deleteAnalysis(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/DeleteAnalysis.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error("Error");
-            }
-        }));
 
     }
 
-    deleteAnalysisGroup(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/DeleteAnalysisGroup.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    deleteAnalysis(params: HttpParams):  Observable<any> {
+        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+        return this.httpClient.post("/gnomex/DeleteAnalysis.gx", params.toString(),{headers: headers});
+
+    }
+
+    deleteAnalysisGroup(params: HttpParams):  Observable<any> {
+        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+        return this.httpClient.post("/gnomex/DeleteAnalysisGroup.gx", params.toString(),{headers: headers});
 
     }
 
@@ -240,14 +202,10 @@ export class AnalysisService {
         return this.saveManagerSubject.asObservable();
     }
 
-    saveVisibility(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveVisibilityAnalysis.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error("Error: In SaveVisibility");
-            }
-        }));
+    saveVisibility(params:HttpParams): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveVisibilityAnalysis.gx", params.toString(), {headers: headers});
     }
 
     getExperimentPickList(params: HttpParams): Observable<any> {

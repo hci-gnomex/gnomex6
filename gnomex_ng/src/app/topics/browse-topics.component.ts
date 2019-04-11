@@ -34,6 +34,8 @@ import {DataTrackService} from "../services/data-track.service";
 import {DictionaryService} from "../services/dictionary.service";
 import { transaction } from 'mobx';
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpParams} from "@angular/common/http";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -49,7 +51,7 @@ const actionMapping:IActionMapping = {
     selector: "analysis",
     templateUrl: "./browse-topics.component.html",
     styles: [`
-        
+
         mat-form-field.formField {
             margin: 0 2.0%;
             width: 20%
@@ -65,32 +67,32 @@ const actionMapping:IActionMapping = {
 
 
         .absolute { position: absolute; }
-        
+
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
 
         .vertical-spacer { height: 0.3em; }
-        
+
         .border { border: #C8C8C8 solid thin; }
         .major-border {
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
-        
+
         .padded { padding: 0.3em; }
-        
+
         .top-padded { padding-top: 0.3em; }
-        
+
         .left-right-padded {
             padding-left:  0.3em;
             padding-right: 0.3em;
-        } 
-        
+        }
+
         .small-font { font-size: small; }
-        
+
         .no-overflow  { overflow:    hidden; }
         .no-word-wrap { white-space: nowrap; }
-        
+
     `]
 })
 
@@ -146,7 +148,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     private idExperiment: string = "";
     private emptyLab = {idLab: "0",
         name: ""};
-    private previousURLParams: URLSearchParams;
+    private previousURLParams: HttpParams;
     private resetExperiment: boolean = false;
     private resetAnalysis: boolean = false;
     private resetDatatrack: boolean = false;
@@ -305,8 +307,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this.navInitSubsciption = this.gnomexService.navInitBrowseTopicSubject
             .subscribe(orderInitObj =>{
-            this.topicService.refreshTopicsList_fromBackend();
-        });
+                this.topicService.refreshTopicsList_fromBackend();
+            });
 
 
 
@@ -716,7 +718,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 return false;
             });
             if (this.datatrackLab) {
-            this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, "");
+                this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, "");
             } else {
                 this.getDatatracks("", this.organism.idOrganism, "");
             }
@@ -878,7 +880,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             if (this.previousOrganismMatOption) {
                 this.previousOrganismMatOption.setInactiveStyles();
             }
-        this.dtOrgAutocomplete.options.first.setActiveStyles();
+            this.dtOrgAutocomplete.options.first.setActiveStyles();
             this.previousOrganismMatOption = this.dtOrgAutocomplete.options.first;
         }
     }
@@ -953,39 +955,38 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     getExperiments(idLab: string, frame: any) {
-        var params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
 
-        params.set("idLab", idLab);
+        params = params.set("idLab", idLab);
 
-        params.set("allExperiments", 'Y');
-        params.set("excludeClinicResearch", 'Y');
-        params.set("isBioanalyzer", 'N');
-        params.set("isMicroarray", 'N');
-        params.set("isNextGenSeq", 'N');
+        params = params.set("allExperiments", 'Y');
+        params = params.set("excludeClinicResearch", 'Y');
+        params = params.set("isBioanalyzer", 'N');
+        params = params.set("isMicroarray", 'N');
+        params = params.set("isNextGenSeq", 'N');
         switch(frame) {
             case "In last week": {
-                params.set("lastWeek", 'Y');
+                params = params.set("lastWeek", 'Y');
                 break;
             }
             case "month": {
-                params.set("lastMonth", 'Y');
+                params = params.set("lastMonth", 'Y');
                 break;
             }
             case "3 months": {
-                params.set("lastThreeMonths", 'Y');
+                params = params.set("lastThreeMonths", 'Y');
                 break;
             }
             case "year": {
-                params.set("lastYear", 'Y');
+                params = params.set("lastYear", 'Y');
                 break;
             }
         }
-        params.set("publicExperimentsInOtherGroups", 'Y');
-        params.set("showCategory", 'N');
-        params.set("showMyLabsAlways", 'N');
-        params.set("showSamples", 'N');
-        this.experimentsService.getProjectRequestList(params).subscribe(response => {
-            console.log("requestlist");
+        params = params.set("publicExperimentsInOtherGroups", 'Y');
+        params = params.set("showCategory", 'N');
+        params = params.set("showMyLabsAlways", 'N');
+        params = params.set("showSamples", 'N');
+        this.experimentsService.getProjectRequestList(params).subscribe((response:any) => {
             this.buildExperimentsTree(response);
             this.experimentTreeModel = this.experimentTreeComponent.treeModel;
 
@@ -997,53 +998,54 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     let id:string = "t" + this.gnomexService.orderInitObj.idTopic
 
                 }
-
-
             });
             this.previousExpTimeFrame = frame;
+        },(err:IGnomexErrorResponse) =>{
+            this.dialogService.stopAllSpinnerDialogs();
+            this.dialogService.alert(err.gError.message);
         });
     }
 
     getAnalysis(idLab: string, frame: any) {
-        var params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
 
-        params.set("allAnalysis", 'Y');
-        params.set("labkeys", '');
-        params.set("isBioanalyzer", 'N');
-        params.set("isMicroarray", 'N');
-        params.set("isNextGenSeq", 'N');
+        params = params.set("allAnalysis", 'Y');
+        params = params.set("labkeys", '');
+        params = params.set("isBioanalyzer", 'N');
+        params = params.set("isMicroarray", 'N');
+        params = params.set("isNextGenSeq", 'N');
         switch(frame) {
             case "In last week": {
-                params.set("lastWeek", 'Y');
-                params.set("lastMonth", 'N');
-                params.set("lastThreeMonths", 'N');
-                params.set("lastYear", 'N');
+                params = params.set("lastWeek", 'Y');
+                params = params.set("lastMonth", 'N');
+                params = params.set("lastThreeMonths", 'N');
+                params = params.set("lastYear", 'N');
                 break;
             }
             case "month": {
-                params.set("lastWeek", 'N');
-                params.set("lastMonth", 'Y');
-                params.set("lastThreeMonths", 'N');
-                params.set("lastYear", 'N');
+                params = params.set("lastWeek", 'N');
+                params = params.set("lastMonth", 'Y');
+                params = params.set("lastThreeMonths", 'N');
+                params = params.set("lastYear", 'N');
                 break;
             }
             case "3 months": {
-                params.set("lastWeek", 'N');
-                params.set("lastMonth", 'N');
-                params.set("lastThreeMonths", 'Y');
-                params.set("lastYear", 'N');
+                params = params.set("lastWeek", 'N');
+                params = params.set("lastMonth", 'N');
+                params = params.set("lastThreeMonths", 'Y');
+                params = params.set("lastYear", 'N');
                 break;
             }
             case "year": {
-                params.set("lastWeek", 'N');
-                params.set("lastMonth", 'N');
-                params.set("lastThreeMonths", 'N');
-                params.set("lastYear", 'Y');
+                params = params.set("lastWeek", 'N');
+                params = params.set("lastMonth", 'N');
+                params = params.set("lastThreeMonths", 'N');
+                params = params.set("lastYear", 'Y');
                 break;
             }
         }
-        params.set("showMyLabsAlways", 'N');
-        params.set("idLab", idLab);
+        params = params.set("showMyLabsAlways", 'N');
+        params = params.set("idLab", idLab);
 
         this.analysisService.getAnalysisGroupList(params).subscribe(response => {
             this.buildAnalysisTree(response);
@@ -1056,19 +1058,21 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.expandChildNodes(this.analysisTreeModel);
             });
             this.previousAnalTimeFrame = frame;
+        },(err:IGnomexErrorResponse) =>{
+            this.dialogService.stopAllSpinnerDialogs();
+            this.dialogService.alert(err.gError.message);
         });
     }
 
     getDatatracks(idLab: string, idOrganism: string, idGenomeBuild: string ) {
-        var params: URLSearchParams = new URLSearchParams();
-
-        params.set("isVisibilityInstitute", 'Y');
-        params.set("isVisibilityPublic", 'Y');
-        params.set("isVisibilityOwner", 'Y');
-        params.set("isVisibilityMembers", 'Y');
-        params.set("idOrganism", idOrganism);
-        params.set("idGenomeBuild", idGenomeBuild);
-        params.set("idLab", idLab);
+        let params: HttpParams = new HttpParams()
+            .set("isVisibilityInstitute", 'Y')
+            .set("isVisibilityPublic", 'Y')
+            .set("isVisibilityOwner", 'Y')
+            .set("isVisibilityMembers", 'Y')
+            .set("idOrganism", idOrganism)
+            .set("idGenomeBuild", idGenomeBuild)
+            .set("idLab", idLab);
         if (!(params === this.previousURLParams)) {
             this.datatrackService.getDataTrackList(params).subscribe(response => {
                 this.buildDatatracksTree(response);
@@ -1080,6 +1084,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 setTimeout(() => {
                     this.expandChildNodes(this.datatrackTreeModel);
                 });
+            }, (err: IGnomexErrorResponse) =>{
+                this.dialogService.stopAllSpinnerDialogs();
+                this.dialogService.alert(err.gError.message);
             });
         }
     }
@@ -1165,11 +1172,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.analysisLabs = [];
         this.analysisItems = [].concat(null);
 
-        if (response && response.Lab){
-            if (!this.createSecurityAdvisorService.isArray(response.Lab)) {
-                this.analysisItems = [response.Lab];
+        if (response){
+            if (!this.createSecurityAdvisorService.isArray(response)) {
+                this.analysisItems = [response];
             } else {
-                this.analysisItems = response.Lab;
+                this.analysisItems = response;
             }
 
             this.analysisLabs = this.analysisLabs.concat(this.analysisItems);

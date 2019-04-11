@@ -5,6 +5,7 @@ import {DataTrackService} from "../../../services/data-track.service";
 import {DialogsService} from "../../../util/popup/dialogs.service";
 import {MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -112,6 +113,8 @@ export class DatatracksGenomeBuildComponent implements OnInit {
 
             this.dtService.saveGenomeBuild(params).subscribe(() => {
                  this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
+            },(err:IGnomexErrorResponse) => {
+                this.dialogService.alert(err.gError.message);
             });
         }
 

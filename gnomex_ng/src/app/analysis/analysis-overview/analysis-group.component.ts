@@ -12,6 +12,7 @@ import {AnalysisService} from "../../services/analysis.service";
 import {Subscription} from "rxjs";
 import {distinctUntilChanged, first} from "rxjs/operators";
 import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
 
 
@@ -39,7 +40,7 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
     constructor(protected fb: FormBuilder,
                 private analysisService: AnalysisService,
                 private route: ActivatedRoute,
-                private dialogsService: DialogsService) {
+                private dialogService: DialogsService) {
     }
 
     ngOnInit() {
@@ -89,17 +90,18 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
 
         let idLab = this.route.snapshot.paramMap.get("idLab");
         let idAnalysisGroup = this.route.snapshot.paramMap.get("idAnalysisGroup");
-        getParams = getParams.set("idLab", idLab)
-            .set("idAnalysisGroup", idAnalysisGroup);
+        getParams = getParams.set("idLab",idLab);
+        getParams = getParams.set("idAnalysisGroup",idAnalysisGroup);
 
 
         this.project.name = this.projectBrowseForm.controls["name"].value;
         this.project.description = this.projectBrowseForm.controls["description"].value;
 
-        saveParams = saveParams.set("idLab", idLab)
-            .set("idAnalysisGroup", idAnalysisGroup)
-            .set("name", this.project.name)
-            .set("description", this.project.description);
+        saveParams = saveParams.set("idLab", idLab);
+        saveParams = saveParams.set("idAnalysisGroup",idAnalysisGroup);
+        saveParams = saveParams.set("name",this.project.name);
+        saveParams = saveParams.set("description", this.project.description);
+
 
         this.analysisService.saveAnalysisGroup(saveParams).pipe(first()).subscribe(response => {
             this.analysisService.refreshAnalysisGroupList_fromBackend();
@@ -109,12 +111,12 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
             this.analysisService.getAnalysisGroup(getParams).pipe(first()).subscribe(response => {
                 this.projectBrowseForm.get("name").setValue(response["AnalysisGroup"].name);
                 this.projectBrowseForm.get("description").setValue(response["AnalysisGroup"].description);
-            }, (error) => {
-                this.dialogsService.alert("An error occurred please contact GNomEx Support. " + error.message, "Error");
+            }, (err:IGnomexErrorResponse) => {
+                this.dialogService.alert("An error occurred please contact GNomEx Support. " + err.gError.message, "Error");
             });
-        }, (error) => {
+        }, (err:IGnomexErrorResponse) => {
             this.saveSuccess.emit(false);
-            this.dialogsService.alert("An error occurred please contact GNomEx Support. " + error.message, "Error");
+            this.dialogService.alert("An error occurred please contact GNomEx Support. " + err.gError.message);
         });
 
     }

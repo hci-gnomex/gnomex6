@@ -7,6 +7,8 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {jqxComboBoxComponent} from "../../assets/jqwidgets-ts/angular_jqxcombobox";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {first} from "rxjs/operators";
 
 @Component({
     selector: "create-project-dialog",
@@ -103,19 +105,18 @@ export class CreateProjectComponent implements OnInit, AfterViewInit {
         project.name = this.createProjectForm.controls["projectName"].value;
         project.projectDescription = this.createProjectForm.controls["projectDescription"].value;
         stringifiedProject = JSON.stringify(project);
-        params = params.set("projectXMLString", stringifiedProject)
-                       .set("parseEntries", "Y");
-        this.experimentsService.saveProject(params).subscribe((response) => {
-            if(response && response.idProject) {
-                this.newProjectId = response.idProject;
-                if(this.items.length === 0) {
-                    this.dialogRef.close();
-                } else {
-                    this.refreshProjectRequestList();
-                }
+        params = params.set("projectXMLString", stringifiedProject);
+        params = params.set("parseEntries", "Y");
+
+        this.experimentsService.saveProject(params).pipe(first()).subscribe(response => {
+            this.newProjectId = response.idProject;
+            if(this.items.length === 0) {
+                this.dialogRef.close();
+            } else {
+                this.refreshProjectRequestList();
             }
-        }, (error) => {
-            this.dialogsService.alert( error.message, "Error");
+        },(err:IGnomexErrorResponse) => {
+            this.dialogsService.alert(err.gError.message);
             this.showSpinner = false;
         });
     }
@@ -137,18 +138,10 @@ export class CreateProjectComponent implements OnInit, AfterViewInit {
             .set("idLab", this.selectedProjectLabItem.idLab)
             .set("idProject", idProject);
 
-        this.experimentsService.getProject(params).subscribe((response) => {
-            if(response && response.Project) {
-                this.saveProject(response.Project);
-            } else {
-                let message: string = "";
-                if(response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.alert("Failed in getting Project" + message, "Error");
-            }
-        }, (error) => {
-            this.dialogsService.alert("Failed in getting Project" + error.message, "Error");
+        this.experimentsService.getProject(params).pipe(first()).subscribe(response => {
+            this.saveProject(response.Project);
+        },(err: IGnomexErrorResponse) => {
+            this.dialogsService.alert(err.gError.message);
         });
     }
 

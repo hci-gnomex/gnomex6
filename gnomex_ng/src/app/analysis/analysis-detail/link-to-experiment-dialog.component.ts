@@ -13,6 +13,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {Router} from "@angular/router";
 import {debounceTime, distinctUntilChanged, first} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -152,19 +153,10 @@ export class LinkToExperimentDialogComponent implements OnInit{
                 }else{
                     this.rowData = Array.isArray(resp.Request) ? resp.Request : [resp.Request];
                 }
-
-
-            }else{
-
-                let message: string = "";
-                if (resp && resp.message) {
-                    message = ": " + resp.message;
-                    this.dialogService.alert(message + ": Error getting RequestList");
-                }else{
-                    this.dialogService.alert("Error getting RequestList");
-                }
-
             }
+        }, (err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogService.alert(err.gError.message)
         });
     }
 
@@ -206,17 +198,14 @@ export class LinkToExperimentDialogComponent implements OnInit{
 
             this.analysisService.linkExpToAnalysis(params).pipe(first())
                 .subscribe(resp =>{
-                    if(resp && resp.result && resp.result === "SUCCESS"){
+                    if(resp && resp.result){
                         this.dialogService.alert("Analysis was successfully linked");
                         this.dialogRef.close();
                         this.router.navigate(['/analysis',{outlets:{'analysisPanel':[this.idAnalysis]}}]);
 
-                    }else if(resp && resp.message){
-                        this.dialogService.alert(resp.message + ": Error during linking");
-
-                    }else{
-                        this.dialogService.alert("Error during linking");
                     }
+                },(err:IGnomexErrorResponse) =>{
+                    this.dialogService.alert(err.gError.message);
                 })
         }
     }

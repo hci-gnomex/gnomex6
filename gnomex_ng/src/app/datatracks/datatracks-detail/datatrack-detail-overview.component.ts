@@ -18,6 +18,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {first} from "rxjs/operators";
 import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 import {UtilService} from "../../services/util.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     templateUrl: "./datatrack-detail-overview.component.html",
@@ -201,17 +202,8 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.showSpinner = true;
 
         let IGVLinkCallBack = (resp): void => {
-            console.log("I am the response ", resp);
             if (resp && resp.result && resp.result === "SUCCESS") {
                 this.dialogService.confirm(resp.igvURL, null);
-
-            } else {
-                let message: string = "";
-                if (resp && resp.message) {
-                    message = ": " + resp.message;
-                }
-                this.dialogService.confirm("An error occurred while making link. " + message, null);
-
             }
             this.showSpinner = false;
         };
@@ -223,12 +215,18 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                     "Paste the link into IGV's Data Registry URL field.  If new data tracks are added, a new repository must be created, but the " +
                     "link will remain valid.", "Do you wish to continue?").pipe(first()).subscribe((answer: boolean) => {
                     if (answer) {
-                        this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack);
+                        this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack, (err: IGnomexErrorResponse) => {
+                            this.showSpinner = false;
+                            this.dialogService.confirm("An error occurred while making link. " + err.gError.message, null);
+                        });
                     }
                 });
             }
         }
-        this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack);
+        this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack,(err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogService.confirm("An error occurred while making link. " + err.gError.message, null);
+        });
     }
 
     makeIOBIOLink() {
@@ -240,14 +238,10 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             if (resp && resp.result && resp.result === "SUCCESS") {
                 window.open(resp.urlsToLink, "_blank");
 
-            } else {
-                let message: string = "";
-                if (resp && resp.message) {
-                    message = ": " + resp.message;
-                }
-                this.dialogService.confirm("An error occurred while making link. " + message, null);
             }
+        },(err:IGnomexErrorResponse) =>{
             this.showSpinner = false;
+            this.dialogsService.alert("An error occurred while making link.\n" + err.gError.message)
         });
     }
 
@@ -259,15 +253,10 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.dataTrackService.makeURLLink(params).pipe(first()).subscribe(resp => {
             if (resp && resp.result && resp.result === "SUCCESS") {
                 this.dialogService.confirm(resp.urlsToLink, null);
-
-            } else {
-                let message: string = "";
-                if (resp && resp.message) {
-                    message = ": " + resp.message;
-                }
-                this.dialogService.confirm("An error occurred while making link. " + message, null);
             }
+        }, (err:IGnomexErrorResponse) => {
             this.showSpinner = false;
+            this.dialogsService.alert("An error occurred while making link.\n" +  err.gError.message);
         });
     }
 
@@ -277,11 +266,10 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             .subscribe(resp => {
                 if (resp && resp.result && resp.result === "SUCCESS") {
                     this.dialogService.confirm("All Links Destroyed.", null);
-
-                } else {
-                    this.dialogService.confirm("Failed to delete links. Contact site admin.", null);
                 }
+            },(err:IGnomexErrorResponse) =>{
                 this.showSpinner = false;
+                this.dialogService.confirm("Failed to delete links. Contact site admin.\n" + err.gError.message, null);
             });
     }
 
@@ -347,27 +335,23 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         }
 
         this.dataTrackService.saveDataTrack(params).subscribe((response: any) => {
-                this.showSaveSpinner = false;
-
-                if (response && response.result &&  response.result === "SUCCESS") {
-                    this.dtOverviewForm.markAsPristine();
-                    let treeNode = this.dataTrackService.datatrackListTreeNode;
-                    if (treeNode) {
-                        this.gnomexService.orderInitObj = {};
-                        this.gnomexService.orderInitObj.idDataTrack = treeNode.idDataTrack;
-                        this.gnomexService.orderInitObj.idGenomeBuild = treeNode.idGenomeBuild;
-                        this.gnomexService.orderInitObj.idOrganism = treeNode.idOrganism;
-                        this.gnomexService.orderInitObj.idLab = idLab;
-                        this.gnomexService.navInitBrowseDatatrackSubject.next(this.gnomexService.orderInitObj);
-                    }
-                } else {
-                    let message: string = "";
-                    if (response && response.message) {
-                        message = ": " + response.message;
-                    }
-                    this.dialogsService.confirm("An error occurred while saving data track" + message, null);
+            this.showSaveSpinner = false;
+            if (response && response.result &&  response.result === "SUCCESS") {
+                this.dtOverviewForm.markAsPristine();
+                let treeNode = this.dataTrackService.datatrackListTreeNode;
+                if (treeNode) {
+                    this.gnomexService.orderInitObj = {};
+                    this.gnomexService.orderInitObj.idDataTrack = treeNode.idDataTrack;
+                    this.gnomexService.orderInitObj.idGenomeBuild = treeNode.idGenomeBuild;
+                    this.gnomexService.orderInitObj.idOrganism = treeNode.idOrganism;
+                    this.gnomexService.orderInitObj.idLab = idLab;
+                    this.gnomexService.navInitBrowseDatatrackSubject.next(this.gnomexService.orderInitObj);
                 }
-            });
+            }
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogsService.alert("An error occurred while saving data track\n" +err.gError.message);
+        });
     }
 
     tabChanged(event: MatTabChangeEvent) {

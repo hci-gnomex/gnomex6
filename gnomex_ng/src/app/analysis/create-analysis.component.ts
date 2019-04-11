@@ -18,6 +18,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import jqxComboBox = jqwidgets.jqxComboBox;
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "create-analysis-dialog",
@@ -205,9 +206,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
                     }
 
                 } else {
-                    let ids: URLSearchParams = new URLSearchParams;
-
-                    ids.set("idLab", this.idLabString);
+                    let ids: HttpParams = new HttpParams().set("idLab", this.idLabString);
                     this.analysisService.getAnalysisGroupList(ids).subscribe((response: any) => {
                         if (response && response.AnalysisGroup) {
                             if (!this.isArray(response.AnalysisGroup)) {
@@ -216,6 +215,9 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
                                 this.analysisGroupList = response.AnalysisGroup;
                             }
                         }
+                    }, (err:IGnomexErrorResponse) => {
+                        this.dialogsService.stopAllSpinnerDialogs();
+                        this.dialogsService.alert(err.gError.message);
                     });
 
                 }

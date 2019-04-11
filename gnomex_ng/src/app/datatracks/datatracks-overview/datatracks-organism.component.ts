@@ -1,11 +1,13 @@
 import {Component, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {PrimaryTab} from "../../util/tabs/primary-tab.component";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {URLSearchParams} from "@angular/http";
 import {specialChars} from "../../util/validators/special-characters.validator";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 
 @Component({
@@ -87,7 +89,7 @@ import {specialChars} from "../../util/validators/special-characters.validator";
         }
     `]
 })
-export class DatatracksOrganismComponent extends PrimaryTab implements OnInit {
+export class DatatracksOrganismComponent implements OnInit {
     //Override
 
     public showSpinner: boolean = false;
@@ -96,9 +98,9 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit {
     public canWrite: boolean = false;
 
 
-    constructor(protected fb: FormBuilder, private dtService: DataTrackService,
-                private route: ActivatedRoute, public secAdvisor: CreateSecurityAdvisorService) {
-        super(fb);
+    constructor(private fb: FormBuilder, private dtService: DataTrackService,
+                private route: ActivatedRoute, public secAdvisor: CreateSecurityAdvisorService,
+                private dialogService: DialogsService) {
     }
 
 
@@ -135,23 +137,27 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit {
     save(): void {
         this.showSpinner = true;
 
-        let params: URLSearchParams = new URLSearchParams();
-        let isActiveStr = this.orgFormGroup.get("isActive").value ? "Y" : "N";
+
+        let isActiveStr = this.orgFormGroup.get("isActive").value ? 'Y': 'N';
         let idOrganism = this.dtService.datatrackListTreeNode.idOrganism;
 
+        let params:HttpParams = new HttpParams()
+            .set('das2Name',this.orgFormGroup.get("name").value)
+            .set('isActive',isActiveStr)
+            .set('binomialName',this.orgFormGroup.get("binomialName").value)
+            .set('organism',this.orgFormGroup.get("commonName").value)
+            .set('idOrganism',idOrganism);
 
-        params.set("das2Name", this.orgFormGroup.get("name").value);
-        params.set("isActive", isActiveStr);
-        params.set("binomialName", this.orgFormGroup.get("binomialName").value);
-        params.set("organism", this.orgFormGroup.get("commonName").value);
-        params.set("idOrganism", idOrganism);
 
+        this.dtService.saveOrganism(params).subscribe(resp =>{
+            this.showSpinner = false;
+            this.orgFormGroup.markAsPristine();
+            this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogService.alert(err.gError.message)
 
-        this.dtService.saveOrganism(params).subscribe(resp => {
-                this.showSpinner = false;
-                this.orgFormGroup.markAsPristine();
-                this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
-            });
+        });
 
 
     }

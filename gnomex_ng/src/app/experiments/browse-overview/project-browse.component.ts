@@ -4,10 +4,11 @@ import {PrimaryTab} from "../../util/tabs/primary-tab.component";
 import {ExperimentsService} from "../experiments.service";
 import {ActivatedRoute} from "@angular/router";
 import {Subscription} from "rxjs";
-import {distinctUntilChanged} from "rxjs/operators";
+import {distinctUntilChanged, first} from "rxjs/operators";
 import {HttpParams} from "@angular/common/http";
-import {DialogsService} from "../../util/popup/dialogs.service";
 import {ConstantsService} from "../../services/constants.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 
 @Component({
@@ -111,20 +112,20 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
             .set("projectXMLString", stringifiedProject)
             .set("parseEntries", "Y");
 
-        this.experimentsService.saveProject(saveParams).subscribe(response => {
+        this.experimentsService.saveProject(saveParams).pipe(first()).subscribe(response =>{
             this.experimentsService.refreshProjectRequestList_fromBackend();
             this.saveSuccess.emit(true);
             this.formInit = false;
 
-            this.experimentsService.getProject(getParams).subscribe(response => {
-                this.projectBrowseForm.get("projectName").setValue(response["Project"].name);
-                this.projectBrowseForm.get("description").setValue(response["Project"].description);
-            }, (error) => {
-                this.dialogsService.alert("An error occurred please contact GNomEx Support. " + error.message, "Error");
+            this.experimentsService.getProject(getParams).pipe(first()).subscribe(response =>{
+                this.projectBrowseForm.get("projectName").setValue( response["Project"].name);
+                this.projectBrowseForm.get("description").setValue( response["Project"].description);
+            }, (err:IGnomexErrorResponse) => {
+                this.dialogsService.alert(err.gError.message);
             });
-        }, (error) => {
+        },(err:IGnomexErrorResponse) => {
             this.saveSuccess.emit(false);
-            this.dialogsService.alert( "An error occurred please contact GNomEx Support. " + error.message, "Error");
+            this.dialogsService.alert(err.gError.message);
         });
 
     }

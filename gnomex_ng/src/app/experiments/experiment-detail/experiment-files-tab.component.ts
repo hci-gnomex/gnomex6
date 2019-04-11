@@ -9,6 +9,7 @@ import {MatDialog, MatDialogConfig} from "@angular/material";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {Subscription} from "rxjs";
 import {DownloadFilesComponent} from "../../util/download-files.component";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'experiment-files-tab',
@@ -106,24 +107,18 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
                 this.request = data.experiment.Request;
                 this.canUpdate = this.request.canUpdate && this.request.canUpdate === 'Y';
                 this.experimentsService.getRequestDownloadList(data.experiment.Request.idRequest).subscribe((result: any) => {
-                    if (result && result.Request) {
-                        this.getRequestDownloadListResult = result;
-                        this.gridData = [result.Request];
-                        setTimeout(() => {
-                            this.determineFileCount();
-                        });
-                    } else {
-                        let message: string = "";
-                        if (result && result.message) {
-                            message = ": " + result.message;
-                        }
-                        this.dialogsService.alert("An error occurred while retrieving download list" + message, null);
-                    }
+                    this.getRequestDownloadListResult = result;
+                    this.gridData = [result.Request];
+                    setTimeout(() => {
+                        this.determineFileCount();
+                    });
+                },(err:IGnomexErrorResponse) => {
+                    this.dialogsService.alert("An error occurred while retrieving download list " + err.gError.message);
                 });
             }
         });
         this.updateFileSubscription = this.fileService.getUpdateFileTabObservable().subscribe(data =>{
-           this.gridData = data;
+            this.gridData = data;
             setTimeout(() => {
                 this.determineFileCount();
             });

@@ -20,6 +20,8 @@ import {MatDialog, MatDialogConfig} from "@angular/material";
 import {Validators} from "@angular/forms";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GnomexService} from "../../services/gnomex.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
@@ -363,8 +365,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 
 		this.enableChanges = this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin;
 
-		let params: URLSearchParams = new URLSearchParams();
-		params.append("status", "SUBMITTED");
+		let params: HttpParams = new HttpParams().append("status", "SUBMITTED");
 
 
         setTimeout(() => {
@@ -523,11 +524,13 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
         }
 
 	    let stringified: string = JSON.stringify(formattingRemovedSelectedRows);
-        let parameters: URLSearchParams = new URLSearchParams();
-        parameters.set('requestsToDeleteXMLString', stringified);
+        let parameters: HttpParams = new HttpParams()
+            .set('requestsToDeleteXMLString', stringified);
 
         this.experimentsService.deleteExperiment(parameters).subscribe((response) => {
         	this.experimentsService.repeatGetExperiments_fromBackend();
+        },(err:IGnomexErrorResponse) => {
+            this.dialogService.alert(err.gError.message);
         });
 	}
 

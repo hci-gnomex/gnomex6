@@ -2,6 +2,8 @@ import {Inject, Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject} from "rxjs";
 import {Observable} from "rxjs";
+import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
+import {DialogsService} from "../popup/dialogs.service";
 
 @Injectable()
 export class EmailRelatedUsersService {
@@ -9,7 +11,8 @@ export class EmailRelatedUsersService {
 	private emailSentSuccess:boolean;
 	private emailSentSubject:Subject<boolean> = new Subject();
 
-	constructor(private _http:Http) {	}
+	constructor(private _http:Http,
+				private dialogService:DialogsService) {	}
 
 	getEmailSentSubscription(): Observable<boolean> {
 		return this.emailSentSubject.asObservable();
@@ -42,11 +45,11 @@ export class EmailRelatedUsersService {
 			if (response.status === 200) {
 				this.emailSentSuccess = true;
 				this.emitEmailToRequestRelatedUsersResults();
-			} else {
-				this.emailSentSuccess = false;
-				this.emitEmailToRequestRelatedUsersResults();
-				throw new Error("Error");
 			}
+		}, (err:IGnomexErrorResponse) => {
+			this.emailSentSuccess = false;
+			this.emitEmailToRequestRelatedUsersResults();
+			this.dialogService.alert(err.gError.message);
 		});
 	}
 

@@ -2,11 +2,12 @@ import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {
     AfterViewInit, ChangeDetectorRef, Component, Inject, OnInit, Output, ViewChild,
 } from "@angular/core";
-import { HttpParams } from "@angular/common/http";
 import {AnalysisService} from "../services/analysis.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {ConstantsService} from "../services/constants.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {first} from "rxjs/operators";
 import {DialogsService} from "../util/popup/dialogs.service";
 
@@ -110,8 +111,8 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
                     this.analysisService.refreshAnalysisGroupList_fromBackend();
                 });
             }
-        }, (error) => {
-            this.dialogsService.alert(error.message, "Error");
+        }, (err:IGnomexErrorResponse) => {
+            this.dialogsService.alert(err.gError.message, "Error");
             this.dialogsService.stopAllSpinnerDialogs();
             this.showSpinner = false;
         });

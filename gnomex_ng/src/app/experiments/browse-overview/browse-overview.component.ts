@@ -9,6 +9,7 @@ import {Subscription} from "rxjs";
 import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 
 @Component({
@@ -150,17 +151,16 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
     }
 
+    refreshProgress(data?:any):void{
+        let params:HttpParams = this.experimentsService.browsePanelParams;
+        if(params){
 
-    refreshProgress(data?: any): void {
-        let params: URLSearchParams = this.experimentsService.browsePanelParams;
-        if(params) {
-
-            if(data) {//when user selects from the tree
-                let idProject = data["idProject"];
-                params.set("idProject", idProject);
-            } else {// Use when user changes to tab to progress
-                let idProject = this.route.snapshot.paramMap.get("idProject");
-                params.set("idProject", idProject);
+            if(data){//when user selects from the tree
+                let idProject = data['idProject'];
+                params = params.set('idProject',idProject);
+            }else{// Use when user changes to tab to progress
+                let idProject = this.route.snapshot.paramMap.get('idProject');
+                params = params.set('idProject',idProject);
             }
 
             if(!this.initialized) {

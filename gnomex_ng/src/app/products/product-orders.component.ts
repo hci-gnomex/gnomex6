@@ -12,6 +12,7 @@ import {MatSnackBar} from "@angular/material";
 import {ITreeOptions, TreeComponent} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'product-orders',
@@ -210,19 +211,19 @@ export class ProductOrdersComponent implements OnInit {
                         this.productOrderLineItemList = result;
                     } else if (result.LineItem) {
                         this.productOrderLineItemList = [result.LineItem];
-                    } else {
-                        let message: string = "";
-                        if (result && result.message) {
-                            message = ": " + result.message;
-                        }
-                        this.dialogsService.confirm("An error occurred while retrieving the product order line item list" + message, null);
                     }
                 }
 
                 if (lab) {
                     this.selectTreeNode(lab, idProductOrder);
                 }
+            } ,(err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
+                this.dialogsService.alert("An error occurred while retrieving the product order line item list " + err.gError.message);
             });
+        } ,(err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogsService.alert(err.gError.message);
         });
     }
 
@@ -342,15 +343,11 @@ export class ProductOrdersComponent implements OnInit {
 
     private getProductOrder(idProductOrder: string): void {
         this.productsService.getProductOrder(idProductOrder).subscribe((response: any) => {
-            if (response && response.idProductOrder) {
-                this.currentProductOrder = response;
-            } else {
-                let message: string = "";
-                if (response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.confirm("An error occurred while retrieving product order" + message, null);
-            }
+            this.currentProductOrder = response;
+
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
+            this.dialogsService.alert("An error occurred while retrieving product order " + err.gError.message )
         });
     }
 

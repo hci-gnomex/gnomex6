@@ -8,6 +8,9 @@ import {URLSearchParams} from "@angular/http";
 import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
 import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 
 @Component({
@@ -30,6 +33,7 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
 
     constructor(protected fb: FormBuilder, public dtService: DataTrackService,
                 private route: ActivatedRoute, public secAdvisor: CreateSecurityAdvisorService,
+                private dialogService: DialogsService,
                 public prefService: UserPreferencesService) {
         super(fb);
     }
@@ -73,18 +77,23 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
 
     save(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
+
         let idDataTrackFolder = this.dtService.datatrackListTreeNode.idDataTrackFolder;
         let name = this.folderFormGroup.get("folderName").value;
 
-        params.set("idDataTrackFolder", idDataTrackFolder);
-        params.set("description", this.description);
-        params.set("name", name);
-        params.set("idLab", this.idLabString);
-        this.dtService.saveFolder(params).subscribe(resp => {
+        let params:HttpParams = new HttpParams()
+            .set('idDataTrackFolder', idDataTrackFolder)
+            .set('description', this.description)
+            .set('name', name)
+            .set('idLab',this.idLabString);
+
+        this.dtService.saveFolder(params).subscribe(resp =>{
             this.folderFormGroup.markAsPristine();
             this.showSpinner = false;
             this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
+        },(err:IGnomexErrorResponse) =>{
+            this.showSpinner = false;
+            this.dialogService.alert(err.gError.message);
         });
     }
 
