@@ -1,11 +1,9 @@
 import {Injectable} from '@angular/core'
-import {Resolve, ActivatedRouteSnapshot, ActivatedRoute} from '@angular/router'
-import {ExperimentsService} from '../../experiments/experiments.service'
-import {Http, URLSearchParams} from "@angular/http";
+import {Resolve, ActivatedRouteSnapshot} from '@angular/router'
 import {AnalysisService} from "../analysis.service";
 import {HttpParams} from "@angular/common/http";
 
-/* This service will be used in experiment.routes.ts and when injecting ActivateRoute  into browse-overview.component.ts
+/* This service will be used in analysis.routes.ts and when injecting ActivateRoute  into analysis-overview.component.ts
  we can get the project json off the route */
 
 @Injectable()
@@ -19,8 +17,8 @@ export class AnalysisGroupResolverService implements Resolve<any> {
 
         let idAnalysisGroup = route.params["idAnalysisGroup"];
 
-        ids = ids.set('idAnalysisGroup',idAnalysisGroup );
-        if(idAnalysisGroup){
+        ids = ids.set("idAnalysisGroup", idAnalysisGroup );
+        if(idAnalysisGroup) {
             return this.analysisService.getAnalysisGroup(ids);
         }
 

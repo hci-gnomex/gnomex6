@@ -329,7 +329,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 });
 
                 if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
-                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this.tabIndexToInsertAnnotations, this.emToPxConversionRate);
+                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this.tabIndexToInsertAnnotations, this.emToPxConversionRate, TabSamplesIlluminaComponent.STATE_NEW);
                 }
             }
         }

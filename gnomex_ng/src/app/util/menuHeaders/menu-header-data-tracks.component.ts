@@ -1,8 +1,8 @@
-import {Component, Inject, Input, OnInit, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChanges} from "@angular/core";
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewGenomeBuildComponent} from "../new-genome-build.component";
-import {MatDialogRef, MatDialog, MatDialogConfig} from '@angular/material';
+import {MatDialogRef, MatDialog, MatDialogConfig} from "@angular/material";
 import {NewOrganismComponent} from "../new-organism.component";
 import {NewDataTrackFolderComponent} from "../../datatracks/new-datatrackfolder.component";
 import {DialogsService} from "../popup/dialogs.service";
@@ -26,13 +26,22 @@ const DATATRACKFOLDER = "DATATRACKFOLDER";
 const ORGANISM = "ORGANISM";
 
 @Component({
-    selector: 'menu-header-data-tracks',
+    selector: "menu-header-data-tracks",
     templateUrl: "./menu-header-data-tracks.component.html"
 })
 
 export class MenuHeaderDataTracksComponent implements OnInit {
     @Input() selectedNode: any;
     @Input() allActiveNodes: ITreeNode[];
+    @Output() onDataTrackFolderCreated: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onDataTrackCreated: EventEmitter<string> = new EventEmitter<string>();
+
+    public newDTisDisabled: boolean = true;
+    public newGenomeBuildisDisabled: boolean = true;
+    public duplicateDTisDisabled: boolean = true;
+    public removeDisabled: boolean = true;
+    public disableAll: boolean = false;
+
     private _showMenuItemNewGenomeBuild: boolean = false;
     private _showMenuItemRemove: boolean = false;
     public get showMenuItemNewGenomeBuild(): boolean {
@@ -42,11 +51,9 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     public get showMenuItemNewOrganism(): boolean {
         return this._showMenuItemNewOrganism;
     }
-    public newDTisDisabled: boolean = true;
-    public newGenomeBuildisDisabled: boolean = true;
-    public duplicateDTisDisabled: boolean = true;
-    public removeDisabled: boolean = true;
-    public disableAll: boolean = false;
+
+    private isAdminState: boolean = false;
+
 
     constructor(private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
@@ -59,9 +66,9 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     ngOnInit() {
-        let isAdminState: boolean = this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin;
+        this.isAdminState = this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin;
 
-        if (isAdminState) {
+        if (this.isAdminState) {
             this._showMenuItemNewGenomeBuild = true;
             this._showMenuItemNewOrganism = true;
             this._showMenuItemRemove = true;
@@ -74,18 +81,28 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     ngOnChanges(changes: SimpleChanges) {
         if (this.selectedNode) {
-            this.removeDisabled = false;
+            if(this.isAdminState) {
+                this.removeDisabled = false;
+            } else {
+                if(this.selectedNode.data.canWrite === "Y") {
+                    this.removeDisabled = false;
+                } else {
+                    this.removeDisabled = true;
+                }
+            }
+
             if (this.selectedNode.data.idDataTrack) {
                 this.duplicateDTisDisabled = false;
-            }
-            else {
+            } else {
                 this.duplicateDTisDisabled = true;
             }
+
             if (this.selectedNode.data.idDataTrack || this.selectedNode.data.isDataTrackFolder) {
                 this.newDTisDisabled = false;
             } else {
                 this.newDTisDisabled = true;
             }
+
             if (this.selectedNode.data.idDataTrack || this.selectedNode.data.isDataTrackFolder || this.selectedNode.data.genomeBuildName) {
                 this.newGenomeBuildisDisabled = false;
             } else {
@@ -98,20 +115,30 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     public makeNewDataTrack(): void {
         let dialogRef: MatDialogRef<NewDataTrackComponent> = this.dialog.open(NewDataTrackComponent, {
-            height: '390px',
-            width: '300px',
+            height: "23em",
+            width: "40em",
             data: {
                 selectedItem: this.selectedNode
+            }
+        });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.onDataTrackCreated.emit(result);
             }
         });
     }
 
     public makeNewFolder(): void {
         let dialogRef: MatDialogRef<NewDataTrackFolderComponent> = this.dialog.open(NewDataTrackFolderComponent, {
-            height: '350px',
-            width: '300px',
+            height: "18em",
+            width: "40em",
             data: {
                 selectedItem: this.selectedNode
+            }
+        });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.onDataTrackFolderCreated.emit(result);
             }
         });
     }
@@ -137,8 +164,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             }, (err:IGnomexErrorResponse) =>{
                 this.dialogsService.alert(err.gError.message);
             });
-        }
-        else if (type === DATATRACKFOLDER) {
+        } else if (type === DATATRACKFOLDER) {
 
             this.dataTrackService.deleteDataTrackFolder(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
@@ -146,8 +172,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             },(err:IGnomexErrorResponse) => {
                 this.dialogsService.alert(err.gError.message);
             });
-        }
-        else if (type === GENOMEBUILD) {
+        } else if (type === GENOMEBUILD) {
 
             this.dataTrackService.deleteGenomeBuild(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
@@ -157,8 +182,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             },(err:IGnomexErrorResponse) =>{
                 this.dialogsService.alert(err.gError.message);
             });
-        }
-        else if (type === ORGANISM) {
+        } else if (type === ORGANISM) {
 
             this.dataTrackService.deleteOrganism(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
@@ -179,47 +203,42 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
         if (this.selectedNode.data.idDataTrack) {
             let dialogRef: MatDialogRef<DeleteDataTrackComponent> = this.dialog.open(DeleteDataTrackComponent, {
-                height: '210px',
-                width: '300px',
+                height: "210px",
+                width: "300px",
                 data: {
                     selectedItem: this.selectedNode
                 }
             });
-        }
-        else {
+        } else {
             if (this.selectedNode.data.binomialName) {
                 if (this.selectedNode.data.GenomeBuild) {
                     level = "Unable to remove organism. Please remove the genome builds for organism "
                         + this.selectedNode.data.label + " first.";
                     confirmString = "";
-                }
-                else {
+                } else {
                     level = "Confirm";
                     confirmString = "Remove organism " + this.selectedNode.data.label + "?";
                     type = ORGANISM;
                     params = params.set("idOrganism", this.selectedNode.data.idOrganism);
                 }
-            }
-            else if (this.selectedNode.data.isDataTrackFolder) {
+            } else if (this.selectedNode.data.isDataTrackFolder) {
                 type = DATATRACKFOLDER;
                 params = params.set("idDataTrackFolder", this.selectedNode.data.idDataTrackFolder);
                 if (this.selectedNode.data.DataTrack || this.selectedNode.data.DataTrackFolder) {
                     // TODO
                     level = "Warning";
                     confirmString = "Removing folder " + this.selectedNode.data.name + " will also remove all descendant folders and dataTracks.";
-                    confirmString += " Are you sure you want to delete the folder and all of its contents?"
+                    confirmString += " Are you sure you want to delete the folder and all of its contents?";
                 } else {
                     level = "Confirm";
                     confirmString = "Removing DataTrack Folder " + this.selectedNode.data.name + "?";
                 }
-            }
-            else if (this.selectedNode.level === 2) {
+            } else if (this.selectedNode.level === 2) {
                 if (this.selectedNode.data.DataTrack || this.selectedNode.data.DataTrackFolder) {
                     level = "Please remove folders and data tracks for the " + this.selectedNode.data.label;
                     level += " first.";
                     confirmString = "";
-                }
-                else {
+                } else {
                     level = "Confirm";
                     confirmString = "Remove genome build " + this.selectedNode.data.label + "?";
                     type = GENOMEBUILD;
@@ -237,30 +256,6 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     }
                 );
         }
-    }
-
-    private makeNewGenomeBuild(): void {
-        let dialogRef: MatDialogRef<NewGenomeBuildComponent> = this.dialog.open(NewGenomeBuildComponent, {
-            height: '24em',
-            width: '30em',
-            data: {
-                selectedItem: this.selectedNode
-            }
-        });
-    }
-
-    private makeNewOrganism(): void {
-        let dialogRef: MatDialogRef<NewOrganismComponent> = this.dialog.open(NewOrganismComponent, {
-            height: '24em',
-            width: '30em',
-        });
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.dictionaryService.reloadAndRefresh(() => {
-                    this.dataTrackService.refreshDatatracksList_fromBackend();
-                }, null, DictionaryService.ORGANISM);
-            }
-        });
     }
 
     public doDownload(): void {
@@ -349,11 +344,35 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     private getChildDataTracks(item: any, children: any[]): void {
         for (let child of item.items) {
             if (child.idDataTrack) {
-                children.push(child)
+                children.push(child);
             } else {
                 this.getChildDataTracks(child, children);
             }
         }
+    }
+
+    private makeNewGenomeBuild(): void {
+        let dialogRef: MatDialogRef<NewGenomeBuildComponent> = this.dialog.open(NewGenomeBuildComponent, {
+            height: "24em",
+            width: "30em",
+            data: {
+                selectedItem: this.selectedNode
+            }
+        });
+    }
+
+    private makeNewOrganism(): void {
+        let dialogRef: MatDialogRef<NewOrganismComponent> = this.dialog.open(NewOrganismComponent, {
+            height: "24em",
+            width: "30em",
+        });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.dictionaryService.reloadAndRefresh(() => {
+                    this.dataTrackService.refreshDatatracksList_fromBackend();
+                }, null, DictionaryService.ORGANISM);
+            }
+        });
     }
 
 }

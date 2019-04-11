@@ -26,6 +26,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {URLSearchParams} from "@angular/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {UtilService} from "../services/util.service";
 import {HttpParams} from "@angular/common/http";
 
 const actionMapping:IActionMapping = {
@@ -127,6 +128,9 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     private navDatatrackList: any;
     private labListSubscription: Subscription;
 
+    private idDataTrackFolderToSelect: string = null;
+    private idDataTrackToSelect: string = null;
+
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
         this.labListService.getLabList_FromBackEnd();
@@ -181,6 +185,17 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                         }
                         this.gnomexService.orderInitObj = null;
                     }
+                } else if (this.idDataTrackToSelect || this.idDataTrackFolderToSelect) {
+                    let attribute = this.idDataTrackToSelect ? "idDataTrack" : "idDataTrackFolder";
+                    let value = this.idDataTrackToSelect ? this.idDataTrackToSelect : this.idDataTrackFolderToSelect;
+                    let node: ITreeNode = UtilService.findTreeNode(this.treeModel, attribute, value);
+                    if (node) {
+                        node.ensureVisible();
+                        node.setIsActive(true);
+                        node.scrollIntoView();
+                    }
+                    this.idDataTrackToSelect = null;
+                    this.idDataTrackFolderToSelect = null;
                 }
             });
 
@@ -489,6 +504,20 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.router.navigate(navArray);
 
 
+    }
+
+    public onDataTrackFolderCreated(idDataTrackFolder: string): void {
+        if (idDataTrackFolder) {
+            this.idDataTrackFolderToSelect = idDataTrackFolder;
+            this.datatracksService.refreshDatatracksList_fromBackend();
+        }
+    }
+
+    public onDataTrackCreated(idDataTrack: string): void {
+        if (idDataTrack) {
+            this.idDataTrackToSelect = idDataTrack;
+            this.datatracksService.refreshDatatracksList_fromBackend();
+        }
     }
 
     expandClicked() {

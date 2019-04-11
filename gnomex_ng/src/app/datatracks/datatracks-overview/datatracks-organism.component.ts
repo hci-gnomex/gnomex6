@@ -1,7 +1,5 @@
-
-import {Component, OnInit, ViewChild,AfterViewInit} from "@angular/core";
-import {FormGroup,FormBuilder,Validators } from "@angular/forms"
-import {PrimaryTab} from "../../util/tabs/primary-tab.component"
+import {Component, OnInit} from "@angular/core";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -10,7 +8,6 @@ import {specialChars} from "../../util/validators/special-characters.validator";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
-
 
 
 @Component({
@@ -74,7 +71,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
                 </p>
 
             </div>
-            <save-footer [disableSave]="orgFormGroup.invalid || secAdvisor.isGuest"
+            <save-footer [disableSave]="orgFormGroup.invalid || secAdvisor.isGuest || !canWrite"
                          [showSpinner]="showSpinner"
                          [dirty]="orgFormGroup.dirty">
             </save-footer>
@@ -92,39 +89,39 @@ import {DialogsService} from "../../util/popup/dialogs.service";
         }
     `]
 })
-export class DatatracksOrganismComponent extends PrimaryTab implements OnInit{
+export class DatatracksOrganismComponent extends PrimaryTab implements OnInit {
     //Override
 
-    public showSpinner:boolean = false;
-    public dirty= false;
-    private orgFormGroup: FormGroup;
-    private idOrganism:string;
+    public showSpinner: boolean = false;
+    public dirty = false;
+    public orgFormGroup: FormGroup;
+    public canWrite: boolean = false;
 
 
-    constructor(protected fb: FormBuilder,private dtService: DataTrackService,
-                private dialogService: DialogsService,
-                private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService){
+    constructor(protected fb: FormBuilder, private dtService: DataTrackService,
+                private route: ActivatedRoute, public secAdvisor: CreateSecurityAdvisorService,
+                private dialogService: DialogsService) {
         super(fb);
     }
 
 
-    ngOnInit():void{ // Note this hook runs once if route changes to another organism you don't recreate component
+    ngOnInit(): void { // Note this hook runs once if route changes to another organism you don't recreate component
 
 
-        this.orgFormGroup=  this.fb.group({
-            commonName:[{value:''  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(100)],
-            binomialName:[{value:''  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(200)],
-            name:[{value:'',disabled: this.secAdvisor.isGuest},[Validators.maxLength(200), Validators.required, specialChars()]],
-            NCBITaxID:[{value:''  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(45)],
-            isActive:[{value:false  , disabled: this.secAdvisor.isGuest}]
+       this.orgFormGroup =  this.fb.group({
+           commonName: [{value: ""  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(100)],
+           binomialName: [{value: ""  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(200)],
+           name: [{value: "", disabled: this.secAdvisor.isGuest}, [Validators.maxLength(200), Validators.required, specialChars()]],
+           NCBITaxID: [{value: ""  , disabled: this.secAdvisor.isGuest}, Validators.maxLength(45)],
+           isActive: [{value: false  , disabled: this.secAdvisor.isGuest}]
 
-        });
-        this.route.paramMap.forEach(params =>{
+       });
+        this.route.paramMap.forEach(params => {
             let commonName = this.dtService.datatrackListTreeNode.commonName;
             let binomialName = this.dtService.datatrackListTreeNode.binomialName;
             let name = this.dtService.datatrackListTreeNode.name;
-            let NCBITaxID =this.dtService.datatrackListTreeNode.NCBITaxID;
-            let isActive : boolean = this.dtService.datatrackListTreeNode.isActive  === 'Y';
+            let NCBITaxID = this.dtService.datatrackListTreeNode.NCBITaxID;
+            let isActive : boolean = this.dtService.datatrackListTreeNode.isActive  === "Y";
             this.orgFormGroup.get("commonName").setValue(commonName);
             this.orgFormGroup.get("binomialName").setValue(binomialName);
             this.orgFormGroup.get("name").setValue(name);
@@ -132,13 +129,13 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit{
             this.orgFormGroup.get("isActive").setValue(isActive);
             this.orgFormGroup.markAsPristine();
 
-
+            this.canWrite = this.dtService.datatrackListTreeNode.canWrite === "Y";
         });
 
 
     }
 
-    save():void{
+    save(): void {
         this.showSpinner = true;
 
 
@@ -146,10 +143,10 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit{
         let idOrganism = this.dtService.datatrackListTreeNode.idOrganism;
 
         let params:HttpParams = new HttpParams()
-            .set('das2Name',this.orgFormGroup.get("name").value)
-            .set('isActive',isActiveStr)
-            .set('binomialName',this.orgFormGroup.get("binomialName").value)
-            .set('organism',this.orgFormGroup.get("commonName").value)
+            .set('das2Name',this.orgFormGroup.get("name").value);
+            .set('isActive',isActiveStr);
+            .set('binomialName',this.orgFormGroup.get("binomialName").value);
+            .set('organism',this.orgFormGroup.get("commonName").value);
             .set('idOrganism',idOrganism);
 
 
@@ -161,7 +158,7 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit{
             this.showSpinner = false;
             this.dialogService.alert(err.gError.message)
 
-        })
+        });
 
 
     }

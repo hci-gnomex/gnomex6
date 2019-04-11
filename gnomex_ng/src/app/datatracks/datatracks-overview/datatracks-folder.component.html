@@ -47,5 +47,7 @@
 
 
     </div>
-    <save-footer [disableSave]="this.secAdvisor.isGuest" [dirty]="folderFormGroup.dirty" [showSpinner]="this.showSpinner" ></save-footer>
+    <save-footer [disableSave]="this.secAdvisor.isGuest || !canWrite" [dirty]="folderFormGroup.dirty"
+                 [showSpinner]="this.showSpinner">
+    </save-footer>
 </form>

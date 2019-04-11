@@ -72,7 +72,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
     public selectedOrganism: string;
     public selectedLab: string;
 
-    private items: any[];
+    private readonly items: any[];
     private idLabString: string;
     private idAnalysisGroup: string;
     private idAppUser: string = "";
@@ -84,7 +84,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
     private genomBuilds: any[] = [];
     private analysisGroup: any[] = [];
     private codeVisibility: string;
-    private parentComponent: string = "";
+    private readonly parentComponent: string = "";
 
     constructor(private dialogRef: MatDialogRef<CreateAnalysisComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private dictionaryService: DictionaryService,
@@ -292,7 +292,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
         if (event.args && event.args.item && event.args.item.value) {
 
             this.organism = event.args.item;
-            var genomeBuild = {"idGenomeBuild": event.args.item.value,
+            let genomeBuild = {"idGenomeBuild": event.args.item.value,
                 "display": event.args.item.label};
             this.genomBuilds[this.genomBuilds.length] = genomeBuild;
         }
@@ -341,14 +341,15 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
 
                 if(this.parentComponent === "Experiment") {
                     this.dialogsService.stopAllSpinnerDialogs();
+                    this.dialogRef.close();
                     this.gnomexService.navByNumber("A" + resp.idAnalysis);
                 } else if(this.parentComponent === "Analysis") {
-                    this.dialogsService.stopAllSpinnerDialogs();
                     this.analysisService.createdAnalysis = resp.idAnalysis;
-                    this.analysisService.refreshAnalysisGroupList_fromBackend();
+                    setTimeout(() => {
+                        this.analysisService.refreshAnalysisGroupList_fromBackend();
+                    });
                 }
 
-                this.dialogRef.close();
 
             } else if(resp && resp.message) {
                 this.dialogsService.alert(resp.message);

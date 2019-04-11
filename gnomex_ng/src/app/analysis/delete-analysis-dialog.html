@@ -1,9 +1,8 @@
 <h6 mat-dialog-title>Delete Analysis</h6>
 <div mat-dialog-content>
-    <p>The following items will be deleted:</p>
-    <div>
+    <p>The following items will be deleted:<br>
         {{_nodesString}}
-    </div>
+    </p>
     <div *ngIf="hasAnalysisGroup">
         <p>One or more analysis groups have been selected.
             Any analysis contained within

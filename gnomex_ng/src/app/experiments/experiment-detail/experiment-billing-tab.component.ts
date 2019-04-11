@@ -41,7 +41,7 @@ import {FormControl} from "@angular/forms";
 export class ExperimentBillingTabComponent implements OnInit {
 
     public getNodeChildDetails;
-    private gridColDefs: any[] = [];
+    public gridColDefs: any[] = [];
     public gridData: any[] = [];
 
     private request: any;

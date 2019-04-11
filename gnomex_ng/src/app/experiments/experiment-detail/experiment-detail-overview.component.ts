@@ -14,7 +14,7 @@ import {
 } from "@angular/material";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {Subscription} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
 
 import {Experiment} from "../../util/models/experiment.model";
@@ -261,9 +261,17 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
         }
     }
 
+    public modeSubject: BehaviorSubject<string> = new BehaviorSubject<string>('VIEW');
+
     changeEditMode() {
         // TODO: Here needs to save the changes first when save() function is implemented, or
         // TODO: we can change the logic to not be saved first when change editMode but only when click the save button.
+
+        if (!this.isEditMode) {
+            this.modeSubject.next('EDIT');
+        } else {
+            this.modeSubject.next('VIEW');
+        }
 
         this.experimentService.setEditMode(!this.isEditMode);
         this.experimentService.modeChangedExperiment = this.experiment;

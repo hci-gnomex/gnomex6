@@ -1,15 +1,14 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {Http, URLSearchParams} from "@angular/http";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 import {ExperimentsService} from "./experiments.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {jqxComboBoxComponent} from "../../assets/jqwidgets-ts/angular_jqxcombobox";
 import {HttpParams} from "@angular/common/http";
-import {first} from "rxjs/operators";
-import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {first} from "rxjs/operators";
 
 @Component({
     selector: "create-project-dialog",
@@ -31,11 +30,11 @@ export class CreateProjectComponent implements OnInit, AfterViewInit {
     @ViewChild("labComboBox") labComboBox: jqxComboBoxComponent;
 
     public createProjectForm: FormGroup;
-    public newProjectName: string;
+    public newProjectId: string = "";
     public showSpinner: boolean = false;
     public labList: any[];
     private items: any[];
-    private selectedLab: any;
+    private readonly selectedLab: any;
     private idLabString: string;
     private projectDescription: string;
     private selectedProjectLabItem: any;
@@ -45,7 +44,7 @@ export class CreateProjectComponent implements OnInit, AfterViewInit {
     constructor(private dialogRef: MatDialogRef<CreateProjectComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private experimentsService: ExperimentsService,
                 private formBuilder: FormBuilder,
-                private dialogService: DialogsService,
+                private dialogsService: DialogsService,
                 public prefService: UserPreferencesService,
     ) {
         this.labList = data.labList;
@@ -103,7 +102,6 @@ export class CreateProjectComponent implements OnInit, AfterViewInit {
         let params: HttpParams = new HttpParams();
         let stringifiedProject: string;
 
-        this.newProjectName = this.createProjectForm.controls["projectName"].value;
         project.name = this.createProjectForm.controls["projectName"].value;
         project.projectDescription = this.createProjectForm.controls["projectDescription"].value;
         stringifiedProject = JSON.stringify(project);
@@ -111,15 +109,16 @@ export class CreateProjectComponent implements OnInit, AfterViewInit {
         params = params.set("parseEntries", "Y");
 
         this.experimentsService.saveProject(params).pipe(first()).subscribe(response => {
+            this.newProjectId = response.idProject;
             if(this.items.length === 0) {
                 this.dialogRef.close();
             } else {
                 this.refreshProjectRequestList();
             }
         },(err:IGnomexErrorResponse) => {
-            this.dialogService.alert(err.gError.message);
+            this.dialogsService.alert(err.gError.message);
+            this.showSpinner = false;
         });
-
     }
 
     /**
@@ -142,7 +141,7 @@ export class CreateProjectComponent implements OnInit, AfterViewInit {
         this.experimentsService.getProject(params).pipe(first()).subscribe(response => {
             this.saveProject(response.Project);
         },(err: IGnomexErrorResponse) => {
-            this.dialogService.alert(err.gError.message);
+            this.dialogsService.alert(err.gError.message);
         });
     }
 

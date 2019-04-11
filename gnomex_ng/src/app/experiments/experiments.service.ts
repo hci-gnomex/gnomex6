@@ -5,9 +5,10 @@ import {Observable} from "rxjs";
 import {BehaviorSubject} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {catchError, map} from "rxjs/operators";
+import {first,catchError, map} from "rxjs/operators";
 import {Experiment} from "../util/models/experiment.model";
 import {CookieUtilService} from "../services/cookie-util.service";
+import {element} from "@angular/core/src/render3";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 

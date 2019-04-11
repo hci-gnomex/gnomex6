@@ -1,8 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {Observable, throwError} from "rxjs";
-import {Subject} from "rxjs";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, Subject,throwError} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {catchError, map} from "rxjs/operators";
@@ -12,7 +10,12 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 
 @Injectable()
 export class AnalysisService {
+    public isDeleteFromGrid: boolean = false;
     public analysisGroupList: any[];
+    // for the save button on right pane
+    public invalid: boolean = false;
+    public dirty: boolean = false;
+
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private analysisGroupListSubject: Subject<any[]> = new Subject();
     private _haveLoadedAnalysisGroupList: boolean = false;
@@ -23,9 +26,7 @@ export class AnalysisService {
     private filteredAnalysisListSubject:Subject<any> = new Subject();
     private createAnalysisDataSubject:Subject<any> = new Subject();
     private saveManagerSubject:Subject<any> = new Subject();
-    // for the save button on right pane
-    public invalid:boolean = false;
-    public dirty:boolean = false;
+
     private _analysisOverviewForm: FormGroup;
     private _createdAnalysis: any;
 
@@ -44,10 +45,10 @@ export class AnalysisService {
         this._createdAnalysis = data;
     }
 
-    get analysisList(): Array<any>{
+    get analysisList(): Array<any> {
         return this._analysisList;
     }
-    set analysisList(data:Array<any>){
+    set analysisList(data: Array<any>) {
         this._analysisList = data;
     }
 
@@ -67,8 +68,8 @@ export class AnalysisService {
     }
 
     saveAnalysis(params: HttpParams): Observable<any> {
-        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
-        return this.httpClient.post("/gnomex/SaveAnalysis.gx", params.toString(),{headers: headers});
+        let headers : HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveAnalysis.gx", params.toString(), {headers: headers});
     }
 
     getAnalysisGroup(params: HttpParams): Observable<any> {
@@ -87,10 +88,10 @@ export class AnalysisService {
             }));
     }
 
-    emitAnalysisGroupList(agList?:any): void {
-        if(agList){
+    emitAnalysisGroupList(agList?: any): void {
+        if(agList) {
             this.analysisGroupListSubject.next(agList);
-        }else{
+        } else {
             this.analysisGroupListSubject.next(this.analysisGroupList);
         }
 
@@ -170,34 +171,34 @@ export class AnalysisService {
         return this.httpClient.post("/gnomex/MoveAnalysis.gx", params.toString(), {headers: headers});
     }
 
-    resetAnalysisOverviewListSubject(){
+    resetAnalysisOverviewListSubject() {
         this.analysisOverviewListSubject = new BehaviorSubject([]);
     }
 
-    emitAnalysisOverviewList(data:any):void{
+    emitAnalysisOverviewList(data: any): void {
         this.analysisOverviewListSubject.next(data);
     }
-    getAnalysisOverviewListSubject():BehaviorSubject<any>{
+    getAnalysisOverviewListSubject(): BehaviorSubject<any> {
         return this.analysisOverviewListSubject;
     }
 
-    emitFilteredOverviewList(data:any):void{
+    emitFilteredOverviewList(data: any): void {
         this.filteredAnalysisListSubject.next(data);
     }
-    getFilteredOverviewListObservable():Observable<any>{
+    getFilteredOverviewListObservable(): Observable<any> {
         return this.filteredAnalysisListSubject.asObservable();
     }
 
-    emitCreateAnalysisDataSubject(data:any):void{
+    emitCreateAnalysisDataSubject(data: any): void {
         this.createAnalysisDataSubject.next(data);
     }
-    getCreateAnaylsisDataSubject():Subject<any>{
+    getCreateAnaylsisDataSubject(): Subject<any> {
         return this.createAnalysisDataSubject;
     }
-    emitSaveManger(type:string):void{
+    emitSaveManger(type: string): void {
         this.saveManagerSubject.next(type);
     }
-    getSaveMangerObservable():Observable<any>{
+    getSaveMangerObservable(): Observable<any> {
         return this.saveManagerSubject.asObservable();
     }
 
@@ -207,16 +208,16 @@ export class AnalysisService {
         return this.httpClient.post("/gnomex/SaveVisibilityAnalysis.gx", params.toString(), {headers: headers});
     }
 
-    getExperimentPickList(params:HttpParams):Observable<any>{
-        return this.httpClient.get("/gnomex/GetExperimentPickList.gx",{params: params});
+    getExperimentPickList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetExperimentPickList.gx", {params: params});
     }
     //for link to experiment
-    getRequestList(params:HttpParams):Observable<any>{
-        return this.httpClient.get("/gnomex/GetRequestList.gx",{params:params});
+    getRequestList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetRequestList.gx", {params: params});
     }
-    linkExpToAnalysis(params:HttpParams):Observable<any>{
+    linkExpToAnalysis(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/LinkExpToAnalysis.gx",null,{params:params});
+        return this.httpClient.post("/gnomex/LinkExpToAnalysis.gx", null, {params: params});
     }
 
     public getAnalysisDownloadList(idAnalysis: string): Observable<any> {
@@ -235,19 +236,19 @@ export class AnalysisService {
             .set("Content-Type", "application/x-www-form-urlencoded");
         return this.httpClient.post("/gnomex/ManagePedFile.gx", params.toString(), {headers: headers});
     }
-    get analysisOverviewForm():FormGroup{
+    get analysisOverviewForm(): FormGroup {
         return this._analysisOverviewForm;
     }
 
-    public addAnalysisOverviewFormMember(control: AbstractControl, name:string,afterControlAddedfn?:any):void{
-        setTimeout(() =>{
+    public addAnalysisOverviewFormMember(control: AbstractControl, name: string, afterControlAddedfn?: any): void {
+        setTimeout(() => {
             this._analysisOverviewForm.addControl(name, control);
-            if(afterControlAddedfn){
+            if(afterControlAddedfn) {
                 afterControlAddedfn();
             }
         });
     }
-    public clearAnalysisOverviewForm():void{
+    public clearAnalysisOverviewForm(): void {
         this._analysisOverviewForm = new FormGroup({});
     }
 
