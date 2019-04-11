@@ -98,21 +98,19 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
 
     save() {
 
-        let saveParams: HttpParams = new HttpParams();
-        let getParams: HttpParams = new HttpParams();
-
-
         let idLab = this.route.snapshot.paramMap.get("idLab");
         let idProject = this.route.snapshot.paramMap.get("idProject");
-        getParams = getParams.set("idLab",idLab);
-        getParams = getParams.set("idProject",idProject);
+        let getParams: HttpParams = new HttpParams()
+            .set("idLab", idLab)
+            .set("idProject", idProject);
 
 
         this.project.name = this.projectBrowseForm.controls["projectName"].value;
         this.project.description = this.projectBrowseForm.controls["description"].value;
         let stringifiedProject = JSON.stringify(this.project);
-        saveParams = saveParams.set("projectXMLString", stringifiedProject);
-        saveParams = saveParams.set("parseEntries", "Y");
+        let saveParams: HttpParams = new HttpParams()
+            .set("projectXMLString", stringifiedProject)
+            .set("parseEntries", "Y");
 
         this.experimentsService.saveProject(saveParams).pipe(first()).subscribe(response =>{
             this.experimentsService.refreshProjectRequestList_fromBackend();

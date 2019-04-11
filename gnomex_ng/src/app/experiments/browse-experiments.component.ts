@@ -282,7 +282,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
                 let ids: HttpParams = new HttpParams()
                     .set("idProject", idProject)
-                    .set("showEmptyProjectFolders", "N")
+                    .set("showEmptyProjectFolders", "Y")
                     .set("showCategory", "N")
                     .set("showSamples", "N");
                 this.experimentsService.browsePanelParams = ids;

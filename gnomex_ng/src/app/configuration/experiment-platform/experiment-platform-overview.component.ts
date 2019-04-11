@@ -23,6 +23,7 @@ import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.compon
 import {FormGroup} from "@angular/forms";
 import {DictionaryService} from "../../services/dictionary.service";
 import {first} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -131,8 +132,9 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 this.expPlatformService.expPlatformOverviewForm.markAsPristine();
                 this.expPlatformService.expPlatformOverviewForm.markAsUntouched();
                 this.showSpinner = false;
-            }, err => {
-                this.dialogService.alert(err);
+            }, (err:IGnomexErrorResponse) => {
+                this.showSpinner = false;
+                this.dialogService.alert(err.gError.message);
             });
     }
 

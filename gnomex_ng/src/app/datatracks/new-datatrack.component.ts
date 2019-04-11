@@ -96,7 +96,6 @@ export class NewDataTrackComponent implements OnInit {
             this.showSpinner = false;
             if (response && response.result && response.result === 'SUCCESS') {
                 this.dialogRef.close(response.idDataTrack);
-                this.dataTrackService.refreshDatatracksList_fromBackend();
             }
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;

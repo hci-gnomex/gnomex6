@@ -89,7 +89,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
         }
     `]
 })
-export class DatatracksOrganismComponent extends PrimaryTab implements OnInit {
+export class DatatracksOrganismComponent implements OnInit {
     //Override
 
     public showSpinner: boolean = false;
@@ -98,10 +98,9 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit {
     public canWrite: boolean = false;
 
 
-    constructor(protected fb: FormBuilder, private dtService: DataTrackService,
+    constructor(private fb: FormBuilder, private dtService: DataTrackService,
                 private route: ActivatedRoute, public secAdvisor: CreateSecurityAdvisorService,
                 private dialogService: DialogsService) {
-        super(fb);
     }
 
 
@@ -143,10 +142,10 @@ export class DatatracksOrganismComponent extends PrimaryTab implements OnInit {
         let idOrganism = this.dtService.datatrackListTreeNode.idOrganism;
 
         let params:HttpParams = new HttpParams()
-            .set('das2Name',this.orgFormGroup.get("name").value);
-            .set('isActive',isActiveStr);
-            .set('binomialName',this.orgFormGroup.get("binomialName").value);
-            .set('organism',this.orgFormGroup.get("commonName").value);
+            .set('das2Name',this.orgFormGroup.get("name").value)
+            .set('isActive',isActiveStr)
+            .set('binomialName',this.orgFormGroup.get("binomialName").value)
+            .set('organism',this.orgFormGroup.get("commonName").value)
             .set('idOrganism',idOrganism);
 
 

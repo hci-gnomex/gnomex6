@@ -3,14 +3,8 @@
  */
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import { URLSearchParams } from "@angular/http";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../../services/data-track.service";
-import {ActivatedRoute} from "@angular/router";
-import { ProgressBarModule } from "../../../../modules/progressbar.module";
-import {jqxProgressBarComponent} from "../../../../assets/jqwidgets-ts/angular_jqxprogressbar";
-import {Subscription} from "rxjs";
-import {BehaviorSubject} from "rxjs";
 import {ProgressService} from "../../../home/progress.service";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";

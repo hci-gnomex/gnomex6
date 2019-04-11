@@ -84,7 +84,7 @@ export class NewDataTrackFolderComponent implements OnInit {
 
         },(err: IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogService.alert(err.gError.message);
+            this.dialogsService.alert(err.gError.message);
         });
     }
 

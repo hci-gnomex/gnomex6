@@ -112,7 +112,7 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
                 this.projectBrowseForm.get("name").setValue(response["AnalysisGroup"].name);
                 this.projectBrowseForm.get("description").setValue(response["AnalysisGroup"].description);
             }, (err:IGnomexErrorResponse) => {
-                this.dialogsService.alert("An error occurred please contact GNomEx Support. " + err.gError.message, "Error");
+                this.dialogService.alert("An error occurred please contact GNomEx Support. " + err.gError.message, "Error");
             });
         }, (err:IGnomexErrorResponse) => {
             this.saveSuccess.emit(false);
