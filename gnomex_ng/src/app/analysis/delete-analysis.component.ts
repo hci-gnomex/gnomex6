@@ -78,7 +78,6 @@ export class DeleteAnalysisComponent {
                 this.analysisService.deleteAnalysis(params).pipe(first()).subscribe(response => {
                     this.deleteAnalysis();
                 },(err:IGnomexErrorResponse) => {
-                    this.dialogService.alert( err.gError.message);
                 });
                 this.analysisService.isDeleteFromGrid = true; // Flag used to refresh AnalysisOverviewList
             }
@@ -87,7 +86,6 @@ export class DeleteAnalysisComponent {
                 this.analysisService.deleteAnalysis(params).pipe(first()).subscribe(response => {
                     this.deleteAnalysis();
                 },(err:IGnomexErrorResponse) => {
-                    this.dialogService.alert( err.gError.message);
                 });
 
             }
@@ -96,7 +94,6 @@ export class DeleteAnalysisComponent {
                 this.analysisService.deleteAnalysisGroup(params).pipe(first()).subscribe(response => {
                     this.deleteAnalysis();
                 },(err:IGnomexErrorResponse) => {
-                    this.dialogService.alert( err.gError.message);
                 });
 
             }

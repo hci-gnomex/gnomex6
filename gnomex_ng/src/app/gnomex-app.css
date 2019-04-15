@@ -652,6 +652,10 @@ fieldset {
     border: 0;
 }
 
+display-white-space{
+    white-space: pre-line;
+}
+
 legend {
     display: block;
     width: 100%;

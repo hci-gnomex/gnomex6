@@ -43,7 +43,6 @@ export class DeleteExperimentComponent {
             .subscribe(response => {
                 this.experimentsService.refreshProjectRequestList_fromBackend();
             },(err:IGnomexErrorResponse) => {
-                this.dialogService.alert(err.gError.message);
             })
     }
 }

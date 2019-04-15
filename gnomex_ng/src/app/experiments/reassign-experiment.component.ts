@@ -96,7 +96,6 @@ export class ReassignExperimentComponent {
                 console.log("saveprojectrequest " + response);
             }, (err:IGnomexErrorResponse) => {
                 this.showSpinner = false;
-                this.dialogService.alert(err.gError.message);
             });
 
     }

@@ -197,7 +197,6 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                     this.dialogsService.alert("Data tracks created for all applicable files");
                 }
             },(err:IGnomexErrorResponse) => {
-                this.dialogsService.alert("An error occurred while creating data tracks\n" + err.gError.message);
             });
         }
     }
@@ -247,7 +246,6 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
             }
         },(err:IGnomexErrorResponse) =>{
             this.dialogsService.stopAllSpinnerDialogs();
-            this.dialogsService.alert(err.gError.message);
         });
 
     }

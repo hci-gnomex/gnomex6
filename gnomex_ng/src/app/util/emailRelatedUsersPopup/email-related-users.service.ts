@@ -49,7 +49,6 @@ export class EmailRelatedUsersService {
 		}, (err:IGnomexErrorResponse) => {
 			this.emailSentSuccess = false;
 			this.emitEmailToRequestRelatedUsersResults();
-			this.dialogService.alert(err.gError.message);
 		});
 	}
 

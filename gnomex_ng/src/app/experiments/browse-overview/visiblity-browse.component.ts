@@ -271,7 +271,6 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
                 this.saveSuccess.emit();
                 this.experimentService.getProjectRequestList_fromBackend(this.experimentService.browsePanelParams);
             },(err:IGnomexErrorResponse) => {
-                this.dialogService.alert(err.gError.message);
             });
     }
 

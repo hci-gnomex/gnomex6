@@ -576,7 +576,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 }
             }
         }, (err:IGnomexErrorResponse) => {
-            this.dialogsService.confirm("An error occurred while dragging-and-dropping" + err.gError.message, null);
         });
     }
 }

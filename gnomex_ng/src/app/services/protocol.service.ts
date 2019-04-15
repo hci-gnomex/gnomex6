@@ -51,7 +51,6 @@ export class ProtocolService {
             this.protocolSubject.next(result);
         }, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
     }
 
@@ -75,12 +74,10 @@ export class ProtocolService {
         if(params){
             this.httpClient.get('gnomex/GetProtocolList.gx',{params: params}).subscribe(protocolCallBackFn, (err:IGnomexErrorResponse) =>{
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             })
         }else{
             this.httpClient.get('gnomex/GetProtocolList.gx').subscribe(protocolCallBackFn, (err:IGnomexErrorResponse) =>{
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
         }
 

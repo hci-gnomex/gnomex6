@@ -134,7 +134,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 this.showSpinner = false;
             }, (err:IGnomexErrorResponse) => {
                 this.showSpinner = false;
-                this.dialogService.alert(err.gError.message);
             });
     }
 

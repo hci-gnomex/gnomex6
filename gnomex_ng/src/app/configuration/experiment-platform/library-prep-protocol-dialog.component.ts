@@ -144,7 +144,7 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
                 }
             },(err:IGnomexErrorResponse) =>{
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message)});
+                });
         }
 
     }

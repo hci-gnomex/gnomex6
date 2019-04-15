@@ -42,7 +42,6 @@ export class SampleUploadService {
             }
         },(err:IGnomexErrorResponse) => {
             this.dialogService.stopAllSpinnerDialogs();
-            this.dialogService.alert(err.gError.message)
         });
     }
 
@@ -90,12 +89,10 @@ export class SampleUploadService {
 
                     },(err:IGnomexErrorResponse) => {
                     this.dialogService.stopAllSpinnerDialogs();
-                    this.dialogService.alert(err.gError.message)
                 });
             }
         },(err:IGnomexErrorResponse) => {
             this.dialogService.stopAllSpinnerDialogs();
-            this.dialogService.alert(err.gError.message)
         });
 
         if (!this.bulkUploadSubject) {

@@ -46,7 +46,6 @@ export class DataTrackService {
     getDataTrack(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetDataTrack.gx", {params: params})
             .pipe(catchError((err: IGnomexErrorResponse) => {
-                this.dialogService.alert(err.gError.message);
                 return throwError(err);
             }));
     }
@@ -132,7 +131,6 @@ export class DataTrackService {
                 this.emitDatatracksList();
             },(err:IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
 
     }
@@ -146,14 +144,12 @@ export class DataTrackService {
                 this.emitDatatracksList();
             }, (err:IGnomexErrorResponse) =>{
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
     }
 
     getGenomeBuild(params:HttpParams):Observable<any>{
         return this.httpClient.get("/gnomex/GetGenomeBuild.gx", {params: params})
             .pipe(catchError((err:IGnomexErrorResponse) =>{
-                this.dialogService.alert(err.gError.message);
                 return throwError(err);
             }));
 

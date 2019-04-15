@@ -93,7 +93,6 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
             this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
         },(err:IGnomexErrorResponse) =>{
             this.showSpinner = false;
-            this.dialogService.alert(err.gError.message);
         });
     }
 

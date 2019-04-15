@@ -45,7 +45,6 @@ export class DeleteProjectComponent {
             this.experimentsService.refreshProjectRequestList_fromBackend();
         },(err:IGnomexErrorResponse)=>{
             this.showSpinner = false;
-            this.dialogService.alert(err.gError.message);
         });
 
     }

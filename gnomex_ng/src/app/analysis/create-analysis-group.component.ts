@@ -112,7 +112,6 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
                 });
             }
         }, (err:IGnomexErrorResponse) => {
-            this.dialogsService.alert(err.gError.message, "Error");
             this.dialogsService.stopAllSpinnerDialogs();
             this.showSpinner = false;
         });

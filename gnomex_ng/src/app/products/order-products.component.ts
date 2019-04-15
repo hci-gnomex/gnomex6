@@ -192,10 +192,8 @@ export class OrderProductsComponent implements OnInit {
                         }
                     }
                 },(err:IGnomexErrorResponse) => {
-                    this.dialogsService.alert("An error occurred while retrieving the product list " + err.gError.message);
                 });
             }, (err:IGnomexErrorResponse) => {
-                this.dialogsService.alert(err.gError.message);
             });
         }
     }

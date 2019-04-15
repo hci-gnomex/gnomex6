@@ -156,7 +156,6 @@ export class LinkToExperimentDialogComponent implements OnInit{
             }
         }, (err:IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogService.alert(err.gError.message)
         });
     }
 
@@ -205,7 +204,6 @@ export class LinkToExperimentDialogComponent implements OnInit{
 
                     }
                 },(err:IGnomexErrorResponse) =>{
-                    this.dialogService.alert(err.gError.message);
                 })
         }
     }

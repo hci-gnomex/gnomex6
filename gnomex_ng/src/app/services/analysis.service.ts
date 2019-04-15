@@ -62,7 +62,6 @@ export class AnalysisService {
     getAnalysis(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysis.gx", {params: params})
             .pipe(catchError((err:IGnomexErrorResponse) =>{
-                this.dialogService.alert(err.gError.message);
                 return throwError(err);
             }));
     }
@@ -75,7 +74,6 @@ export class AnalysisService {
     getAnalysisGroup(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysisGroup.gx", {params: params})
             .pipe(catchError((err:IGnomexErrorResponse) =>{
-                this.dialogService.alert(err.gError.message);
                 return throwError(err);
             }));
     }
@@ -83,7 +81,6 @@ export class AnalysisService {
     getAnalysisGroupList(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysisGroupList.gx", {params: params})
             .pipe(map((resp:any) =>{ return  resp.Lab}),catchError((err:IGnomexErrorResponse) =>{
-                this.dialogService.alert(err.gError.message);
                 return throwError(err);
             }));
     }
@@ -117,7 +114,6 @@ export class AnalysisService {
                     this.emitAnalysisGroupList();
                 },(err:IGnomexErrorResponse) => {
                     this.dialogService.stopAllSpinnerDialogs();
-                    this.dialogService.alert(err.gError.message);
                 });
         }
     }
@@ -132,7 +128,6 @@ export class AnalysisService {
             this.emitAnalysisGroupList();
         }, (err:IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
     }
 

@@ -113,7 +113,6 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
                         this.determineFileCount();
                     });
                 },(err:IGnomexErrorResponse) => {
-                    this.dialogsService.alert("An error occurred while retrieving download list " + err.gError.message);
                 });
             }
         });

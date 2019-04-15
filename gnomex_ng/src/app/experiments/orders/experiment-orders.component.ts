@@ -530,7 +530,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
         this.experimentsService.deleteExperiment(parameters).subscribe((response) => {
         	this.experimentsService.repeatGetExperiments_fromBackend();
         },(err:IGnomexErrorResponse) => {
-            this.dialogService.alert(err.gError.message);
         });
 	}
 

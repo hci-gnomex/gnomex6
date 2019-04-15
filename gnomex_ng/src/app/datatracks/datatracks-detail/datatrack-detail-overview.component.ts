@@ -217,7 +217,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                     if (answer) {
                         this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack, (err: IGnomexErrorResponse) => {
                             this.showSpinner = false;
-                            this.dialogService.confirm("An error occurred while making link. " + err.gError.message, null);
                         });
                     }
                 });
@@ -225,7 +224,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         }
         this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack,(err: IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogService.confirm("An error occurred while making link. " + err.gError.message, null);
         });
     }
 
@@ -241,7 +239,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             }
         },(err:IGnomexErrorResponse) =>{
             this.showSpinner = false;
-            this.dialogsService.alert("An error occurred while making link.\n" + err.gError.message)
         });
     }
 
@@ -256,7 +253,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             }
         }, (err:IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert("An error occurred while making link.\n" +  err.gError.message);
         });
     }
 
@@ -269,7 +265,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 }
             },(err:IGnomexErrorResponse) =>{
                 this.showSpinner = false;
-                this.dialogService.confirm("Failed to delete links. Contact site admin.\n" + err.gError.message, null);
             });
     }
 
@@ -350,7 +345,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             }
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert("An error occurred while saving data track\n" +err.gError.message);
         });
     }
 

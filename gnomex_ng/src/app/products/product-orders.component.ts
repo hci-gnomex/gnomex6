@@ -219,11 +219,9 @@ export class ProductOrdersComponent implements OnInit {
                 }
             } ,(err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
-                this.dialogsService.alert("An error occurred while retrieving the product order line item list " + err.gError.message);
             });
         } ,(err: IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert(err.gError.message);
         });
     }
 
@@ -347,7 +345,6 @@ export class ProductOrdersComponent implements OnInit {
 
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert("An error occurred while retrieving product order " + err.gError.message )
         });
     }
 

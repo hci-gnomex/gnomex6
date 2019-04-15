@@ -31,7 +31,6 @@ export class MoveTopicComponent {
     }
 
     public doCancel(): void {
-        console.log("");
         this.noButton = true;
     }
 
