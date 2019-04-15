@@ -151,7 +151,6 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         this.dataTrackService.duplicateDataTrack(params).subscribe((response: any) => {
             this.dataTrackService.refreshDatatracksList_fromBackend();
         }, (err:IGnomexErrorResponse) => {
-            this.dialogsService.alert(err.gError.message)
         });
     }
 
@@ -162,7 +161,6 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             }, (err:IGnomexErrorResponse) =>{
-                this.dialogsService.alert(err.gError.message);
             });
         } else if (type === DATATRACKFOLDER) {
 
@@ -170,7 +168,6 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             },(err:IGnomexErrorResponse) => {
-                this.dialogsService.alert(err.gError.message);
             });
         } else if (type === GENOMEBUILD) {
 
@@ -180,7 +177,6 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.GENOME_BUILD);
             },(err:IGnomexErrorResponse) =>{
-                this.dialogsService.alert(err.gError.message);
             });
         } else if (type === ORGANISM) {
 
@@ -190,7 +186,6 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.ORGANISM);
             }, (err:IGnomexErrorResponse) =>{
-                this.dialogsService.alert(err.gError.message);
             });
         }
     }

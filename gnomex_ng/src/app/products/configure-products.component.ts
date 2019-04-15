@@ -145,7 +145,6 @@ export class ConfigureProductsComponent implements OnInit {
                 this.dialogsService.confirm("An error occurred while retrieving the product list" + message, null);
             }
         }, (err:IGnomexErrorResponse) =>{
-            this.dialogsService.alert(err.gError.message)
         });
     }
 

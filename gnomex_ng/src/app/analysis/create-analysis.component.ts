@@ -217,7 +217,6 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
                         }
                     }, (err:IGnomexErrorResponse) => {
                         this.dialogsService.stopAllSpinnerDialogs();
-                        this.dialogsService.alert(err.gError.message);
                     });
 
                 }

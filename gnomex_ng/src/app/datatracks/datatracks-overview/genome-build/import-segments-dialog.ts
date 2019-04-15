@@ -82,7 +82,6 @@ export class ImportSegmentsDialog implements OnInit {
                 this.parseImport(segs);
             })
         },(err:IGnomexErrorResponse) => {
-            this.dialogService.alert(err.gError.message);
         });
 
 

@@ -218,7 +218,6 @@ export class BrowseDictionaryComponent implements OnInit {
                 }
             }
         },(err:IGnomexErrorResponse) =>{
-            this.dialogsService.alert("An error occurred while retrieving dictionary meta data " + err.gError.message)
         });
     }
 

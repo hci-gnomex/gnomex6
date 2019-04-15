@@ -77,7 +77,6 @@ export class ExperimentsService {
                 this.emitProjectRequestList();
             }, (err:IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
     }
 
@@ -95,7 +94,6 @@ export class ExperimentsService {
 
             },(err:IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
     }
 
@@ -167,7 +165,6 @@ export class ExperimentsService {
                 this.emitProjectRequestList();
             }, (err:IGnomexErrorResponse) =>{
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
     }
 
@@ -183,7 +180,6 @@ export class ExperimentsService {
         let params:HttpParams = new HttpParams().set('idRequest',id);
         return this.httpClient.get("/gnomex/GetRequest.gx", {params: params})
             .pipe(catchError((err:IGnomexErrorResponse) =>{
-                this.dialogService.alert(err.gError.message);
                 return throwError(err);
             }));
     }
@@ -279,7 +275,6 @@ export class ExperimentsService {
     getProject(params: HttpParams):  Observable<any> {
         return this.httpClient.get("/gnomex/GetProject.gx", {params: params})
             .pipe(catchError((err:IGnomexErrorResponse) =>{
-                this.dialogService.alert(err.gError.message);
                 return throwError(err);
             }));
     }
@@ -300,7 +295,6 @@ export class ExperimentsService {
     getProjectRequestList(params: HttpParams) {
         return this._http.get("/gnomex/GetProjectRequestList.gx", {params:params})
             .pipe(catchError((err:IGnomexErrorResponse) =>{
-                this.dialogService.alert(err.gError.message);
                 return throwError(err);
             }));
     }
@@ -312,7 +306,6 @@ export class ExperimentsService {
         this.httpClient.get("/gnomex/GetRequestProgressList.gx",{params:params})
             .subscribe((response: any)=> {this.requestProgressList.next(response);}
                 ,(err:IGnomexErrorResponse) => {
-                    this.dialogService.alert(err.gError.message);
                 });
     }
 
@@ -324,7 +317,6 @@ export class ExperimentsService {
             .subscribe((response: any)=> {
                 this.requestProgressSolexaList.next(response);
             }, (err:IGnomexErrorResponse) => {
-                this.dialogService.alert(err.gError.message);
             });
 
     }
@@ -336,7 +328,6 @@ export class ExperimentsService {
         this.httpClient.get("/gnomex/GetRequestProgressDNASeqList.gx",{params:params})
             .subscribe((response: any)=> {this.requestProgressDNASeqList.next(response);}
                 ,(err: IGnomexErrorResponse) => {
-                    this.dialogService.alert(err.gError.message);
                 });
     }
     emitExperimentOverviewList(data:any):void{

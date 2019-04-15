@@ -99,7 +99,6 @@ export class NewDataTrackComponent implements OnInit {
             }
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert("An error occurred while saving data track\n" + err.gError.message);
         });
     }
 

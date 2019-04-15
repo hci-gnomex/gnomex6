@@ -972,7 +972,6 @@ export class GnomexService {
             initOrderSubject.next(this.orderInitObj);
 
         },err =>{
-            this.dialogService.alert(err.gError.message);
 
         });
     }

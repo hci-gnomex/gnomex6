@@ -496,7 +496,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             }
         }, (err:IGnomexErrorResponse) => {
             this.dialogService.stopAllSpinnerDialogs();
-            this.dialogService.alert(err.gError.message);
         });
     }
 

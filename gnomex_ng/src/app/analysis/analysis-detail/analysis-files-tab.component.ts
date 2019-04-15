@@ -128,7 +128,6 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                         });
                     }
                 },(err:IGnomexErrorResponse) =>{
-                    this.dialogsService.alert("An error occurred while retrieving download list" + err.gError.message);
                 });
             }
         });

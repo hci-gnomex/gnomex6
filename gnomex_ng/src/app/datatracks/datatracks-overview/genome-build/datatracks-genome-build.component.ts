@@ -114,7 +114,6 @@ export class DatatracksGenomeBuildComponent implements OnInit {
             this.dtService.saveGenomeBuild(params).subscribe(() => {
                  this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
             },(err:IGnomexErrorResponse) => {
-                this.dialogService.alert(err.gError.message);
             });
         }
 

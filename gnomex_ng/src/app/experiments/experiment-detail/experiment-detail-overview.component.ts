@@ -311,7 +311,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 this.dialog.open(DownloadFilesComponent, config);
 
             },(err:IGnomexErrorResponse) => {
-                this.dialogsService.alert("An error occurred while retrieving download list " + err.gError.message );
             });
         }
     }
@@ -400,7 +399,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
 
 
                 }, (err:IGnomexErrorResponse) => {
-                    this.dialogsService.alert("Error sending email" + ": " + err.gError.message);
                 });
             };
 

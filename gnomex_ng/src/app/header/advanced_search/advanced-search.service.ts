@@ -233,7 +233,6 @@ export class AdvancedSearchService implements OnDestroy {
             }, (err: IGnomexErrorResponse) => {
                 console.error("ERROR : " + err);
                 this.isAwaitingGetSearchMetaInformationResponse = false;
-                this.dialogService.alert(err.gError.message);
             });
         }
     }

@@ -42,7 +42,6 @@ export class MoveDataTrackComponent {
     }
 
     public doCancel(): void {
-        console.log("");
         this.noButton = true;
     }
 
@@ -67,7 +66,6 @@ export class MoveDataTrackComponent {
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             },(err:IGnomexErrorResponse) =>{
                 this.showSpinner = false;
-                this.dialogsService.alert(err.gError.message);
             });
         } else {
             params = params.set("idDataTrack", this.currentItem.idDataTrack);
@@ -79,7 +77,6 @@ export class MoveDataTrackComponent {
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             },(err:IGnomexErrorResponse) =>{
                 this.showSpinner = false;
-                this.dialogsService.alert(err.gError.message);
             });
         }
     }

@@ -1002,7 +1002,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.previousExpTimeFrame = frame;
         },(err:IGnomexErrorResponse) =>{
             this.dialogService.stopAllSpinnerDialogs();
-            this.dialogService.alert(err.gError.message);
         });
     }
 
@@ -1060,7 +1059,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.previousAnalTimeFrame = frame;
         },(err:IGnomexErrorResponse) =>{
             this.dialogService.stopAllSpinnerDialogs();
-            this.dialogService.alert(err.gError.message);
         });
     }
 
@@ -1086,7 +1084,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 });
             }, (err: IGnomexErrorResponse) =>{
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(err.gError.message);
             });
         }
     }

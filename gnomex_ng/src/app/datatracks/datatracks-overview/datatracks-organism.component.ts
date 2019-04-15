@@ -155,8 +155,6 @@ export class DatatracksOrganismComponent implements OnInit {
             this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogService.alert(err.gError.message)
-
         });
 
 

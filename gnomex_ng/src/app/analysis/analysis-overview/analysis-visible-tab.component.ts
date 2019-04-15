@@ -261,7 +261,6 @@ export class AnalysisVisibleTabComponent implements OnInit{
             this.saveSuccess.emit();
             this.analysisService.getAnalysisGroupList_fromBackend(this.analysisService.analysisPanelParams,true);
         },(err:IGnomexErrorResponse) => {
-            this.dialogService.alert(err.gError.message);
         });
     }
 

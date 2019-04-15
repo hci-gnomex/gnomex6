@@ -169,7 +169,6 @@ export class ProductLedgerComponent implements OnInit {
             }
         },(err: IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert("An error occurred while retrieving the product list " + err.gError.message);
         });
         this.loadLedger();
     }
@@ -198,7 +197,6 @@ export class ProductLedgerComponent implements OnInit {
             }
         },(err: IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert(err.gError.message);
         });
     }
 
@@ -238,7 +236,6 @@ export class ProductLedgerComponent implements OnInit {
                 this.sizeColumnsToFit();
             },(err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
-                this.dialogsService.alert(err.gError.message);
             });
         }
     }

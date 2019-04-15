@@ -362,7 +362,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                             }
                         } else {
                             project.isEmptyFolder = true;
-                            console.log("");
                         }
                     }
                 }
@@ -628,7 +627,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     this.disableDeleteExperiment = true;
                 }
             },(err:IGnomexErrorResponse) => {
-                this.dialogsService.alert(err.gError.message);
             });
 
         }

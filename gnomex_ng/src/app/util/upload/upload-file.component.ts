@@ -114,7 +114,6 @@ export class UploadFileComponent implements OnInit {
             }
         },(err:IGnomexErrorResponse) =>{
             this.dialogService.stopAllSpinnerDialogs();
-            this.dialogService.alert(err.gError.message);
         });
 
 

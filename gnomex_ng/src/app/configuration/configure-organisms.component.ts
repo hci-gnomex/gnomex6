@@ -120,7 +120,6 @@ export class ConfigureOrganismsComponent implements OnInit {
             }
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert(err.gError.message);
         });
     }
 

@@ -372,7 +372,6 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
             }, (err:IGnomexErrorResponse) => {
                 this.showSpinner = false;
-                this.dialogService.alert(err.gError.message);
             });
     }
 

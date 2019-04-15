@@ -79,7 +79,6 @@ export class DeleteDataTrackComponent {
                 });
             },(err:IGnomexErrorResponse) =>{
                 this.showSpinner = false;
-                this.dialogsService.alert(err.gError.message);
             });
         } else {
             this.showSpinner = true;
@@ -96,7 +95,6 @@ export class DeleteDataTrackComponent {
             this.dataTrackService.refreshDatatracksList_fromBackend();
         },(err: IGnomexErrorResponse) =>{
             this.showSpinner = false;
-            this.dialogsService.alert(err.gError.message);
         });
 
     }

@@ -70,7 +70,6 @@ export class NewGenomeBuildComponent {
         this.organismService.getDas2OrganismList().subscribe((response: any[]) => {
             this.das2OrganismList = response;
         },(err:IGnomexErrorResponse) =>{
-            this.dialogsService.alert(err.gError.message);
         });
     }
 
@@ -118,7 +117,6 @@ export class NewGenomeBuildComponent {
             }
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
-            this.dialogsService.alert("An error occurred while saving genome build\n" + err.gError.message);
         });
     }
 

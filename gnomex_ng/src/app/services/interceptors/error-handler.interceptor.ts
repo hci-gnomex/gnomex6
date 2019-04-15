@@ -9,21 +9,22 @@ import {
 import {Injectable, Injector} from "@angular/core";
 import {Observable, throwError} from "rxjs";
 import {catchError, map} from "rxjs/operators";
-import {Http} from "@angular/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
-import {error} from "selenium-webdriver";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Injectable()
 export class ErrorHandlerInterceptor implements HttpInterceptor {
 
-    constructor(){
+    constructor(private dialogService:DialogsService){
     }
 
     private errHandler = (error:IGnomexErrorResponse) : Observable<never>  => {
         let errorMessage= '';
         if(error.error instanceof ErrorEvent){
             errorMessage  ="Client side Error: " +  error.error.message;
-            error.gError = {message: errorMessage}
+            error.gError = {message: errorMessage};
+            console.error(error);
+            this.dialogService.alert(errorMessage, null);
 
         }else if(error.error && !error.gError){
             errorMessage  = `Server Side Error: ${error.status}\nMessage: ${error.message}`;
@@ -32,8 +33,14 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                 result: error.error,
                 status: error.status,
                 url: error.url
-            }
+            };
+            console.error(error);
+            this.dialogService.alert(errorMessage, null);
 
+        }else{
+            errorMessage = error.gError.message;
+            console.warn(error.gError);
+            this.dialogService.alert(errorMessage, error.gError.result)
         }
 
         return throwError(error);

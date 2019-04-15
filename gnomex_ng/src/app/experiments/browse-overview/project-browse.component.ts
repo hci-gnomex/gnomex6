@@ -121,11 +121,9 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
                 this.projectBrowseForm.get("projectName").setValue( response["Project"].name);
                 this.projectBrowseForm.get("description").setValue( response["Project"].description);
             }, (err:IGnomexErrorResponse) => {
-                this.dialogsService.alert(err.gError.message);
             });
         },(err:IGnomexErrorResponse) => {
             this.saveSuccess.emit(false);
-            this.dialogsService.alert(err.gError.message);
         });
 
     }
