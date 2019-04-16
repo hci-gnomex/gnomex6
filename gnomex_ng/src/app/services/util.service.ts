@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ITreeModel, ITreeNode} from "angular-tree-component/dist/defs/api";
+import {Subscription} from "rxjs";
 
 @Injectable()
 export class UtilService {
@@ -51,6 +52,12 @@ export class UtilService {
         }
 
         return null;
+    }
+
+    public static safelyUnsubscribe(subscription: Subscription): void {
+        if (subscription) {
+            subscription.unsubscribe();
+        }
     }
 
 }
