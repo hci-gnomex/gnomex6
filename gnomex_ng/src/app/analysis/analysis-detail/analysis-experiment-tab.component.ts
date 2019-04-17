@@ -1,5 +1,4 @@
-
-import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input} from "@angular/core";
+import {Component, Input, OnInit} from "@angular/core";
 import {Subscription} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -21,7 +20,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 
 @Component({
     selector: "analysis-experiment-tab",
-    templateUrl:"./analysis-experiment-tab.component.html",
+    templateUrl: "./analysis-experiment-tab.component.html",
     styles: [`
 
         mat-radio-group.filter {
@@ -68,65 +67,42 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 
     `]
 })
-export class AnalysisExperimentTabComponent implements OnInit{
-    public readonly selectType:string = "mutiple";
+export class AnalysisExperimentTabComponent implements OnInit {
     private selectedTreeNodeSubscript: Subscription;
-    private gridOpt:GridOptions = {};
-    public currentLab:any;
-    public showSpinner:boolean = false;
-    public labList:any[] = [];
-    public analysis:any;
-    public analysisTreeNode:any;
-    public options:ITreeOptions;
+    private gridOpt: GridOptions = {};
+    public currentLab: any;
+    public showSpinner: boolean = false;
+    public labList: any[] = [];
+    public analysis: any;
+    public analysisTreeNode: any;
+    public options: ITreeOptions;
     public items: any[] = [];
 
-    private _seqProtocolDataProvider:any[];
-    private _genomeBuildDataProvider:any[];
+    private _seqProtocolDataProvider: any[];
+    private _genomeBuildDataProvider: any[];
 
-    public hybsList:any[] = [];
-    public lanesList:any[] = [];
-    public sampleList:any[] = [];
-    public readonly HYBS:string  ="Hybridization";
-    public readonly SAMPLE:string = "Sample";
-    public readonly SEQ_LANES:string = "SequenceLane";
-    public gridRaidoOpt:string = "Hybridization";
+    public hybsList: any[] = [];
+    public lanesList: any[] = [];
+    public sampleList: any[] = [];
+    public readonly HYBS: string = "Hybridization";
+    public readonly SAMPLE: string = "Sample";
+    public readonly SEQ_LANES: string = "SequenceLane";
+    public gridRaidoOpt: string = "Hybridization";
     private _tabVisible: boolean = false;
-    private formGroup:FormGroup;
+    private formGroup: FormGroup;
 
-    @Input() set tabVisible(val:boolean){
+    @Input() set tabVisible(val: boolean) {
         this._tabVisible = val;
-        if(val && this.currentLab){
+        if (val && this.currentLab) {
             this.selectLab(this.currentLab);
         }
     }
-    get tabVisible():boolean{
+    get tabVisible(): boolean {
         return this._tabVisible;
     }
 
-
-
-    @Input() edit:boolean = true; // true should not be default when all of analysis detail  tabs are implemented
-                                  // this is for demonstration till that is implemented
-
-    get seqProtocolDataProvider():any[]{
-        if(!this._seqProtocolDataProvider){
-            this._seqProtocolDataProvider=  this.dictionaryService.getEntries(DictionaryService.NUMBER_SEQUENCING_CYCLES_ALLOWED);
-            return this._seqProtocolDataProvider
-        }
-        return this._seqProtocolDataProvider;
-    }
-    get genomeBuildDataProvider():any[] {
-        if(!this._genomeBuildDataProvider){
-            this._genomeBuildDataProvider = this.dictionaryService.getEntries(DictionaryService.GENOME_BUILD);
-            return this._genomeBuildDataProvider;
-        }
-        return this._genomeBuildDataProvider;
-    }
-
-    colDefs:Array<any> =[];
-
-
-    hybColDefs :any[] =
+    colDefs: Array<any> = [];
+    hybColDefs: any[] =
         [
             {
                 headerName: "ID",
@@ -172,8 +148,24 @@ export class AnalysisExperimentTabComponent implements OnInit{
             }
         ];
 
+    get seqProtocolDataProvider(): any[] {
+        if (!this._seqProtocolDataProvider) {
+            this._seqProtocolDataProvider = this.dictionaryService.getEntries(DictionaryService.NUMBER_SEQUENCING_CYCLES_ALLOWED);
+            return this._seqProtocolDataProvider;
+        }
+        return this._seqProtocolDataProvider;
+    }
 
-    seqLaneColDefs:any[] =
+    get genomeBuildDataProvider(): any[] {
+        if (!this._genomeBuildDataProvider) {
+            this._genomeBuildDataProvider = this.dictionaryService.getEntries(DictionaryService.GENOME_BUILD);
+            return this._genomeBuildDataProvider;
+        }
+        return this._genomeBuildDataProvider;
+    }
+
+
+    seqLaneColDefs: any[] =
         [
             {
                 headerName: "ID",
@@ -266,21 +258,21 @@ export class AnalysisExperimentTabComponent implements OnInit{
             }
         ];
 
-    rowData:Array<any> =[];
+    rowData: Array<any> = [];
 
-    constructor(private analysisService:AnalysisService,
+    constructor(private analysisService: AnalysisService,
                 private gnomexService: GnomexService,
                 private orderValidateService: BrowseOrderValidateService,
                 private secAdvisor: CreateSecurityAdvisorService,
-                private constService:ConstantsService,
+                private constService: ConstantsService,
                 private dialogService: DialogsService,
-                private fb:FormBuilder,
-                private route:ActivatedRoute,
+                private fb: FormBuilder,
+                private route: ActivatedRoute,
                 private dictionaryService: DictionaryService,
                 public prefService: UserPreferencesService) {
     }
 
-    ngOnInit(){
+    ngOnInit() {
 
         // rowdata  changes based off of grid selected. default is illumnia or longest array size?
         this.formGroup = this.fb.group({
@@ -294,29 +286,29 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
         this.labList = this.gnomexService.labList;
         this.options = {
-            displayField: 'label',
-            allowDrag: (node: any) =>{return node.level > 1 && this.edit}
+            displayField: "label",
+            allowDrag: (node: any) => {return node.level > 1 && this.analysisService.getEditMode(); }
         };
 
 
         this.selectedTreeNodeSubscript = this.analysisService.getAnalysisOverviewListSubject()
-            .subscribe(data =>{
+            .subscribe(data => {
                 this.analysisTreeNode = data;
             });
 
-        this.route.data.forEach((data: any) =>{
-            if(data && data.analysis){
+        this.route.data.forEach((data: any) => {
+            if(data && data.analysis) {
                 if (!data.analysis.Analysis) {
                     return;
                 }
 
                 this.analysis = data.analysis.Analysis;
 
-                let expItems:Array<any> = Array.isArray(this.analysis.experimentItems) ? this.analysis.experimentItems:  [this.analysis.experimentItems];
+                let expItems: Array<any> = Array.isArray(this.analysis.experimentItems) ? this.analysis.experimentItems : [this.analysis.experimentItems];
 
-                this.hybsList = this.gnomexService.getTargetNodeList(this.HYBS,expItems);
+                this.hybsList = this.gnomexService.getTargetNodeList(this.HYBS, expItems);
                 this.lanesList = this.gnomexService.getTargetNodeList(this.SEQ_LANES, expItems);
-                this.sampleList = this.gnomexService.getTargetNodeList(this.SAMPLE,expItems);
+                this.sampleList = this.gnomexService.getTargetNodeList(this.SAMPLE, expItems);
 
                 this.formGroup.get("hybsJSONString").setValue(this.hybsList);
                 this.formGroup.get("lanesJSONString").setValue(this.lanesList);
@@ -325,12 +317,12 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
                 this.onGridTypeChange();
 
-                let lab = this.labList.filter( lab =>{
-                    return lab.idLab === this.analysis.idLab
+                let lab = this.labList.filter( lab => {
+                    return lab.idLab === this.analysis.idLab;
                 });
-                if(lab && lab.length === 1){
+                if(lab && lab.length === 1) {
                     this.currentLab =  lab[0];
-                    if(this.tabVisible){
+                    if(this.tabVisible) {
                         this.selectLab(this.currentLab);
                     }
                 }
@@ -340,53 +332,53 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
     // lab combo methods
     compareByID(itemOne, itemTwo) {
-        return itemOne && itemTwo && itemOne.idLab == itemTwo.idLab;
+        return itemOne && itemTwo && itemOne.idLab === itemTwo.idLab;
     }
-    selectLab($event:any){
+    selectLab($event: any) {
         this.showSpinner = true;
-        let idLab:string = '';
-        if($event.value ){
-            idLab = $event.value.idLab ? $event.value.idLab : '';
-        }else{
-            idLab = $event.idLab ? $event.idLab : '';
+        let idLab: string = "";
+        if($event.value ) {
+            idLab = $event.value.idLab ? $event.value.idLab : "";
+        } else {
+            idLab = $event.idLab ? $event.idLab : "";
         }
 
 
 
-        let params:HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams()
             .set("idLab", idLab )
-            .set("showSamples",'N')
-            .set("showCategory",'N')
-            .set("showMyLabsAlways",'N')
-            .set("searchPublicProjects",'N');
+            .set("showSamples", "N")
+            .set("showCategory", "N")
+            .set("showMyLabsAlways", "N")
+            .set("searchPublicProjects", "N");
 
 
         this.analysisService.getExperimentPickList(params).pipe(first())
-            .subscribe(resp =>{
+            .subscribe(resp => {
                 this.items = [];
-                if(resp){
-                    let projects:any[] = Array.isArray(resp) ? resp : resp.Project ? [resp.Project] : [];
-                    this.buildTree(projects)
+                if(resp) {
+                    let projects: any[] = Array.isArray(resp) ? resp : resp.Project ? [resp.Project] : [];
+                    this.buildTree(projects);
                 }
                 this.showSpinner = false;
 
-            }, (err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
     }
 
     // tree methods
 
-    buildTree(projects: any[]){
-        for(let p of projects ){
-            let requests:any[] = Array.isArray(p.Request) ? p.Request : p.Request ? [p.Request] : [];
+    buildTree(projects: any[]) {
+        for (let p of projects) {
+            let requests: any[] = Array.isArray(p.Request) ? p.Request : p.Request ? [p.Request] : [];
             p.icon = this.constService.ICON_FOLDER;
             p.children = requests;
-            for(let req of requests){
-                if(!req.icon){
-                    this.constService.getTreeIcon(req,"Request")
+            for (let req of requests) {
+                if (!req.icon) {
+                    this.constService.getTreeIcon(req, "Request");
                 }
-                let sampItems : any[] = Array.isArray(req.Item) ? req.Item : req.Item ? [req.Item] : [];
+                let sampItems: any[] = Array.isArray(req.Item) ? req.Item : req.Item ? [req.Item] : [];
                 req.children = sampItems;
 
             }
@@ -394,36 +386,35 @@ export class AnalysisExperimentTabComponent implements OnInit{
         this.items = projects;
     }
 
-    treeOnSelect(event:any){
-
+    treeOnSelect(event: any) {
     }
 
-    prepareExperimentItem(items:any[]):void{
-        let lastAddedItemType:string = this.gridRaidoOpt;
+    prepareExperimentItem(items: any[]): void {
+        let lastAddedItemType: string = this.gridRaidoOpt;
 
-        for(let item of items){
-            if(item.type === this.HYBS){
-                item.number = item.itemNumber ? item.itemNumber : '';
-                if(!(this.hybsList.find((h)=> h.number === item.number ))){
+        for (let item of items) {
+            if (item.type === this.HYBS) {
+                item.number = item.itemNumber ? item.itemNumber : "";
+                if (!(this.hybsList.find((h) => h.number === item.number))) {
                     this.hybsList.push(item);
                     lastAddedItemType = this.HYBS;
                 }
 
-            }else if(item.type === this.SEQ_LANES){
+            } else if (item.type === this.SEQ_LANES) {
                 item.idOrganism = ""; //backend populates value
                 item.createDate = "";
                 item.idSample = "";
-                item.number = item.itemNumber ? item.itemNumber : '';
-                if(!(this.lanesList.find((l) => l.number === item.number ))){
+                item.number = item.itemNumber ? item.itemNumber : "";
+                if (!(this.lanesList.find((l) => l.number === item.number))) {
                     this.lanesList.push(item);
                     lastAddedItemType = this.SEQ_LANES;
                 }
 
 
-            }else if(item.type === this.SAMPLE){
+            } else if (item.type === this.SAMPLE) {
                 item.createDate = "";
-                item.number = item.itemNumber ? item.itemNumber : '';
-                if(!(this.sampleList.find((s) => s.number === item.number ))){
+                item.number = item.itemNumber ? item.itemNumber : "";
+                if (!(this.sampleList.find((s) => s.number === item.number))) {
                     this.sampleList.push(item);
                     lastAddedItemType = this.SAMPLE;
                 }
@@ -433,14 +424,15 @@ export class AnalysisExperimentTabComponent implements OnInit{
         this.onGridTypeChange();
 
     }
-    onDrop(event:any){
+
+    onDrop(event: any) {
         let items = event.element.data;
-        if(items.Item){
+        if (items.Item) {
             items = Array.isArray(items.Item) ? items.Item : [items.Item];
-        }else if(items){
-            items =  Array.isArray(items) ? items : [items];
-        }else{
-            items =[];
+        } else if (items) {
+            items = Array.isArray(items) ? items : [items];
+        } else {
+            items = [];
         }
 
         this.prepareExperimentItem(items);
@@ -448,40 +440,41 @@ export class AnalysisExperimentTabComponent implements OnInit{
 
 
     }
-    allowDrop(element){
+
+    allowDrop(element) {
         return true;
     }
     // grid methods
-    navigateToRequest(event:any){
+    navigateToRequest(event: any) {
         let idHyb = event.data.idHybridization;
-        if(idHyb){
-            let expItems:Array<any> = Array.isArray(this.analysis.experimentItems) ? this.analysis.experimentItems:  [this.analysis.experimentItems];
-            let allHybs:Array<any> = expItems.concat(this.hybsList);
+        if (idHyb) {
+            let expItems: Array<any> = Array.isArray(this.analysis.experimentItems) ? this.analysis.experimentItems : [this.analysis.experimentItems];
+            let allHybs: Array<any> = expItems.concat(this.hybsList);
             let hybItem = allHybs.find(ei => ei.idHybridization === idHyb);
             this.gnomexService.navByNumber(hybItem.idRequest + "R", true);
-        }else{
+        } else {
             let idReq = event.data.idRequest;
-            if(idReq){
-                this.gnomexService.navByNumber(idReq +"R", true);
+            if (idReq) {
+                this.gnomexService.navByNumber(idReq + "R", true);
             }
 
         }
     }
 
-    onGridTypeChange(){
-        if(this.gridRaidoOpt === this.HYBS){
+    onGridTypeChange() {
+        if (this.gridRaidoOpt === this.HYBS) {
             this.colDefs = this.hybColDefs;
             this.rowData = this.hybsList;
-        }else if(this.gridRaidoOpt === this.SEQ_LANES){
+        } else if (this.gridRaidoOpt === this.SEQ_LANES) {
             this.colDefs = this.seqLaneColDefs;
             this.rowData = this.lanesList;
-        }else if(this.gridRaidoOpt === this.SAMPLE){
+        } else if (this.gridRaidoOpt === this.SAMPLE) {
             this.colDefs = this.sampleColDefs;
             this.rowData = this.sampleList;
         }
 
 
-        if(this.gridOpt.api){
+        if (this.gridOpt.api) {
             this.gridOpt.api.setColumnDefs(this.colDefs);
             this.gridOpt.api.setRowData(this.rowData);
             this.gridOpt.api.sizeColumnsToFit();
@@ -491,47 +484,49 @@ export class AnalysisExperimentTabComponent implements OnInit{
     onGridReady(params) {
         this.onGridTypeChange();
     }
-    adjustColumnSize(event:any){
-        if(this.gridOpt.api){
+
+    adjustColumnSize(event: any) {
+        if (this.gridOpt.api) {
             this.gridOpt.api.sizeColumnsToFit();
         }
     }
 
-    clearAllItems(){
-        if(this.gridRaidoOpt === this.HYBS ){
+    clearAllItems() {
+        if (this.gridRaidoOpt === this.HYBS) {
             this.hybsList = [];
             this.formGroup.get("hybsJSONString").setValue(this.hybsList);
-            this.gridOpt.api.setRowData( this.hybsList);
-        }else if(this.gridRaidoOpt === this.SEQ_LANES){
+            this.gridOpt.api.setRowData(this.hybsList);
+        } else if (this.gridRaidoOpt === this.SEQ_LANES) {
             this.lanesList = [];
             this.formGroup.get("lanesJSONString").setValue(this.lanesList);
             this.gridOpt.api.setRowData(this.lanesList);
-        }else if(this.gridRaidoOpt === this.SAMPLE ){
+        } else if (this.gridRaidoOpt === this.SAMPLE) {
             this.sampleList = [];
             this.formGroup.get("samplesJSONString").setValue(this.sampleList);
             this.gridOpt.api.setRowData(this.sampleList);
         }
         this.formGroup.markAsDirty();
     }
+
     removeItems() {
         let tmpRowData: Array<any> = [];
 
-        this.gridOpt.api.forEachNode(node=> {
-            if(!node.isSelected()){
+        this.gridOpt.api.forEachNode(node => {
+            if (!node.isSelected()) {
                 tmpRowData.push(node.data);
             }
         });
 
 
-        if(this.gridRaidoOpt === this.HYBS ){
+        if (this.gridRaidoOpt === this.HYBS) {
             this.hybsList = tmpRowData;
             this.formGroup.get("hybsJSONString").setValue(this.hybsList);
-            this.gridOpt.api.setRowData( this.hybsList);
-        }else if(this.gridRaidoOpt === this.SEQ_LANES){
+            this.gridOpt.api.setRowData(this.hybsList);
+        } else if (this.gridRaidoOpt === this.SEQ_LANES) {
             this.lanesList = tmpRowData;
             this.formGroup.get("lanesJSONString").setValue(this.lanesList);
             this.gridOpt.api.setRowData(this.lanesList);
-        }else if(this.gridRaidoOpt === this.SAMPLE ){
+        } else if (this.gridRaidoOpt === this.SAMPLE) {
             this.sampleList = tmpRowData;
             this.formGroup.get("samplesJSONString").setValue(this.sampleList);
             this.gridOpt.api.setRowData(this.sampleList);
@@ -541,8 +536,7 @@ export class AnalysisExperimentTabComponent implements OnInit{
     }
 
 
-
-    ngOnDestroy():void{
+    ngOnDestroy(): void {
         this.selectedTreeNodeSubscript.unsubscribe();
     }
 
