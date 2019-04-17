@@ -6,7 +6,8 @@
         </label>
         <div>
             <button mat-button color="link" *ngIf="showEdit" (click)="startEdit($event)">
-                <img class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
+                <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
+                <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
                 {{isEditMode ? "View" : "Edit"}}
             </button>
             <button mat-button (click)="this.handleDownloadFiles()">
