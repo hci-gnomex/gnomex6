@@ -25,6 +25,7 @@ export class DictionaryService {
     public static readonly BILLING_SLIDE_SERVICE_CLASS: string = "hci.gnomex.model.BillingSlideServiceClass";
     public static readonly BILLING_STATUS: string = "hci.gnomex.model.BillingStatus";
     public static readonly BIOANALYZER_CHIP_TYPE: string = "hci.gnomex.model.BioanalyzerChipType";
+    public static readonly COLUMN_PROPERTIES: string = "hci.gnomex.model.ColumnProperties";
     public static readonly CONCENTRATION_UNIT: string = "hci.gnomex.model.ConcentrationUnit";
     public static readonly CONTEXT_SENSITIVE_HELP: string = "hci.gnomex.model.ContextSensitiveHelp";
     public static readonly CORE_FACILITY: string = "hci.gnomex.model.CoreFacility";

@@ -2,18 +2,32 @@
     <form [formGroup]="form" class="full-width full-height">
         <div class="full-width full-height">
             <ol class="full-width three-depth-numbering">
+                <li *ngIf="showSampleQualityExperimentType" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select a sample quality Experiment Type.
+                        </div>
+                        <div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedDna"
+                                             (change)="onDnaChange($event)">
+                                <div *ngFor="let app of filteredApplications">
+                                    <mat-radio-button [value]="app">
+                                        <div class="short-width">
+                                            {{app.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
                             How many samples will be sequenced in this experiment order?
                         </div>
                         <mat-form-field>
-                            <!--<input matInput-->
-                                   <!--[(ngModel)]="numberOfSamples"-->
-                                   <!--placeholder="Number of samples."-->
-                                   <!--formControlName="numSamples"-->
-                                   <!--maxlength="4"-->
-                                   <!--required>-->
                             <input matInput
                                    placeholder="Number of samples."
                                    formControlName="numSamples"
@@ -76,7 +90,7 @@
                         </textarea>
                     </mat-form-field>
                 </li>
-                <li class="full-width align-baseline">
+                <li *ngIf="showOrganism" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
                             Which organism is the source for these samples?
@@ -96,7 +110,7 @@
                         </mat-form-field>
                     </div>
                 </li>
-                <li class="full-width align-baseline">
+                <li *ngIf="showSamplePurification" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
                             Please provide details on Sample Purification methods:
@@ -135,7 +149,7 @@
                         </ol>
                     </div>
                 </li>
-                <li class="full-width align-baseline">
+                <li *ngIf="showKeepSample" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
                             Would you like to retrieve leftover sample from the core facility following completion of the work?
@@ -149,10 +163,14 @@
                 <li *ngIf="showSamplePrepContainer" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
-                            Specify the nucleic acid extraction method.
+                            Specify the nucleic acid extraction method. {{ requireSamplePrepContainer ? ' (required)' : '' }}
                         </div>
                         <mat-form-field class="moderate-width" [floatLabel]="auto">
-                            <input matInput formControlName="elution" placeholder="Elution">
+                            <input matInput
+                                   formControlName="extractionMethod"
+                                   placeholder="Extraction Method"
+                                   [required]="requireSamplePrepContainer"
+                                   (change)="onExtractionMethodChanged($event)">
                         </mat-form-field>
                     </div>
                 </li>

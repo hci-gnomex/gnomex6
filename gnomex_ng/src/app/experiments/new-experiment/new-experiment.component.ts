@@ -347,19 +347,26 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'QCState' :
                 this.newExperimentService.currentState = 'QCExternalState';
 
-            let sampleSetupTab = {
+            this.tabs.push({
                 label: "Sample Details",
                 disabled: true,
                 component: TabSampleSetupViewComponent
-            };
-            let visibilityTab = {
+            });
+            this.tabs.push({
+                label: "Samples",
+                disabled: true,
+                component: TabSamplesIlluminaComponent
+            });
+            this.tabs.push({
                 label: "Visibility",
                 disabled: true,
                 component: TabVisibilityComponent
-            };
-
-            this.tabs.push(sampleSetupTab);
-            this.tabs.push(visibilityTab);
+            });
+            this.tabs.push({
+                label: "Confirm",
+                disabled: true,
+                component: TabConfirmIlluminaComponent
+            });
         } else if (category.type === this.newExperimentService.TYPE_GENERIC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'GenericState' :
                 this.newExperimentService.currentState = 'GenericExternalState';

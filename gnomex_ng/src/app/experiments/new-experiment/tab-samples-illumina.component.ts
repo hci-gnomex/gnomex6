@@ -76,6 +76,20 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         let newExperiment: boolean = (this._experiment !== value);
 
+        this.dictionaryService.reloadAndRefresh(() => {
+            this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
+
+            if (this.columnProperties) {
+                this.columnProperties = this.columnProperties.filter((a) => {
+                    return a.codeRequestCategory === this._experiment.codeRequestCategory;
+                });
+            } else {
+                this.columnProperties = [];
+            }
+        }, () => {
+            this.dialogService.alert("Error refreshing data from server.", "ERROR:")
+        }, DictionaryService.COLUMN_PROPERTIES);
+
         this._experiment = value;
 
         if (this._stateChangeSubject && this._stateChangeSubject.value !== TabSamplesIlluminaComponent.STATE_NEW) {
@@ -145,7 +159,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             });
         }
 
-        this.bioanalyzerChipType = this.dictionaryService.getEntries("hci.gnomex.model.BioanalyzerChipType").filter((a) => {
+        this.bioanalyzerChipType = this.dictionaryService.getEntries(DictionaryService.BIOANALYZER_CHIP_TYPE).filter((a) => {
             return a.codeApplication === this._experiment.codeApplication;
         });
 
@@ -153,7 +167,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.loadSampleTypes();
         this.loadSeqLibProtocol();
     }
-
 
     @Input('stateChangeSubject') set stateChangeSubject(value: BehaviorSubject<string>) {
         if (value) {
@@ -192,6 +205,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public static readonly STATE_NEW: string  = 'NEW';
     public static readonly STATE_EDIT: string = 'EDIT';
     public static readonly STATE_VIEW: string = 'VIEW';
+
+    public static readonly TEXT: string = 'text';
+    public static readonly TEXT_RIGHT: string = 'text-right';
+    public static readonly OPTION: string = 'option';
+    public static readonly MULTIOPTION: string = 'multioption';
 
     public get STATE_NEW(): string {
         return TabSamplesIlluminaComponent.STATE_NEW;
@@ -409,6 +427,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     private propertyList: any[] = [];
 
+    private columnProperties: any[] = [];
+
 
     private get defaultSampleColumnDefinitions(): any[] {
         let temp: any[] = [];
@@ -420,32 +440,38 @@ export class TabSamplesIlluminaComponent implements OnInit {
             maxWidth: 2 * this.emToPxConversionRate,
             minWidth: 2 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignRightMiddleRenderer,
-            suppressSizeToFit: true
+            suppressSizeToFit: true,
+            pinned: "left",
+            sortOrder: 5
         });
 
-        temp.push({
-            headerName: "Multiplex Group",
-            editable: true,
-            field: "multiplexGroupNumber",
-            width:    6.5 * this.emToPxConversionRate,
-            minWidth: 4 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate,
-            suppressSizeToFit: true,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup',
-            validators: [
-                Validators.required,
-                Validators.pattern(/^\d*$/)
-            ],
-            errorNameErrorMessageMap: [
-                { errorName: 'required', errorMessage: 'Multiplex Group required' },
-                { errorName: 'pattern',  errorMessage: 'Multiplex Group must be numeric' }
-            ],
-            outerForm: this.form,
-            formName:  "gridFormGroup"
-        });
+        if (this.usingMultiplexGroupGroups) {
+            temp.push({
+                headerName: "Multiplex Group",
+                editable: true,
+                field: "multiplexGroupNumber",
+                width:    6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                validators: [
+                    Validators.required,
+                    Validators.pattern(/^\d*$/)
+                ],
+                errorNameErrorMessageMap: [
+                    { errorName: 'required', errorMessage: 'Multiplex Group required' },
+                    { errorName: 'pattern',  errorMessage: 'Multiplex Group must be numeric' }
+                ],
+                outerForm: this.form,
+                formName:  "gridFormGroup",
+                pinned: "left",
+                sortOrder: 10
+            });
+        }
 
         temp.push({
             headerName: "Sample Name",
@@ -459,34 +485,82 @@ export class TabSamplesIlluminaComponent implements OnInit {
             validators: [ Validators.required ],
             errorNameErrorMessageMap: [
                 { errorName: 'required', errorMessage: 'Sample Name required' }
-            ]
+            ],
+            pinned: "left",
+            sortOrder: 15
         });
-        temp.push({
-            headerName: "Conc. (ng/ul)",
-            field: "concentration",
-            width:    7.5 * this.emToPxConversionRate,
-            minWidth: 4 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate,
-            suppressSizeToFit: true,
-            editable: true,
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
-        temp.push({
-            headerName: "Vol. (ul)",
-            field: "sampleVolume",
-            width:    7.5 * this.emToPxConversionRate,
-            minWidth: 4 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate,
-            suppressSizeToFit: true,
-            editable: true,
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
+
+
+        for (let columnProperty of this.columnProperties) {
+
+            if (columnProperty.showInNewMode && columnProperty.showInNewMode === 'Y') {
+                let editable: boolean = columnProperty.editableNewMode && columnProperty.editableNewMode === 'Y';
+                let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
+
+                let newColumn: any = {
+                    headerName: columnProperty.header,
+                    field: columnProperty.field,
+                    width: (+columnProperty.width) * this.emToPxConversionRate,
+                    minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
+                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: editable,
+
+                    showFillButton: showFillButton,
+                    fillGroupAttribute: columnProperty.fillGroupAttribute,
+                    sortOrder: columnProperty.sortOrder,
+                    validators: [],
+                    errorNameErrorMessageMap: []
+                };
+
+                if (columnProperty.requiredInNewMode && columnProperty.requiredInNewMode === 'Y') {
+                    newColumn.validators.push(Validators.required);
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'required', errorMessage: 'Multiplex Group required' });
+                }
+
+                if (columnProperty.patternToMatch) {
+                    let message: string = (columnProperty.patternToMatchErrorMessage ? '' + columnProperty.patternToMatchErrorMessage : '');
+
+                    newColumn.validators.push(Validators.pattern(columnProperty.patternToMatch));
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'pattern', errorMessage: message });
+                }
+
+                switch(columnProperty.columnType) {
+                    case TabSamplesIlluminaComponent.TEXT_RIGHT:
+                        newColumn.cellRendererFramework = TextAlignRightMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignRightMiddleEditor;
+                        break;
+                    case TabSamplesIlluminaComponent.OPTION:
+                        newColumn.cellRendererFramework = SelectRenderer;
+                        newColumn.cellEditorFramework   = SelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            newColumn.selectOptions = this.dictionaryService.getEntries('' + columnProperty.fullDictionaryModelPathToLoad);
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    // case TabSamplesIlluminaComponent.MULTIOPTION:
+                    //     break;
+
+                    case TabSamplesIlluminaComponent.TEXT:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                        break;
+                    default:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                }
+
+                temp.push(newColumn);
+            }
+        }
+
         temp.push({
             headerName: "CC Number",
             field: "ccNumber",
@@ -502,75 +576,26 @@ export class TabSamplesIlluminaComponent implements OnInit {
             hide: this.hideCCNum
         });
 
-        this._tabIndexToInsertAnnotations = temp.length;
+        this._tabIndexToInsertAnnotations = 150;
 
-        temp.push({
-            headerName: "Prepped by Core?",
-            editable: false,
-            width:    5 * this.emToPxConversionRate,
-            minWidth: 5 * this.emToPxConversionRate,
-            field: "seqPrepByCore",
-            cellRendererFramework: TextAlignLeftMiddleRenderer
-        });
+        if (this.usingMultiplexGroupGroups) {
+            temp.push({
+                headerName: "# Seq Lanes",
+                field: "numberSequencingLanes",
+                width: 6.5 * this.emToPxConversionRate,
+                minWidth: 5 * this.emToPxConversionRate,
+                maxWidth: 8 * this.emToPxConversionRate,
+                editable: true,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                headerTooltip: "This is the number of times(1 or greater) that you want to sequence this sample.",
+                cellStyle: {color: 'black', 'background-color': 'LightGreen'},
+                sortOrder: 200
+            });
+        }
 
-        temp.push({
-            headerName: "# Seq Lanes",
-            field: "numberSequencingLanes",
-            width:    6.5 * this.emToPxConversionRate,
-            minWidth: 5 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
-            editable: true,
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup',
-            headerTooltip: "This is the number of times(1 or greater) that you want to sequence this sample.",
-            cellStyle: {color: 'black', 'background-color': 'LightGreen'}
-        });
-        temp.push({
-            headerName: "Sample Type",
-            editable: true,
-            width:    13 * this.emToPxConversionRate,
-            minWidth: 9 * this.emToPxConversionRate,
-            field: "idSampleType",
-            cellRendererFramework: SelectRenderer,
-            cellEditorFramework: SelectEditor,
-            selectOptions: this.sampleTypes,
-            selectOptionsDisplayField: "sampleType",
-            selectOptionsValueField: "idSampleType",
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
-        temp.push({
-            headerName: "Organism",
-            editable: true,
-            width:    13 * this.emToPxConversionRate,
-            minWidth: 9  * this.emToPxConversionRate,
-            field: "idOrganism",
-            cellRendererFramework: SelectRenderer,
-            cellEditorFramework: SelectEditor,
-            selectOptions: this.organisms,
-            selectOptionsDisplayField: "display",
-            selectOptionsValueField: "idOrganism",
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup',
-            validators: [Validators.required],
-            errorNameErrorMessageMap: [
-                {errorName: 'required', errorMessage: 'Multiplex Group required'}
-            ]
-        });
-        temp.push({
-            headerName: "Seq Lib Protocol",
-            editable: false,
-            width:    20 * this.emToPxConversionRate,
-            minWidth: 9  * this.emToPxConversionRate,
-            field: "idSeqLibProtocol",
-            cellRendererFramework: SelectRenderer,
-            cellEditorFramework: SelectEditor,
-            selectOptions: this.seqLibProtocols,
-            selectOptionsDisplayField: "display",
-            selectOptionsValueField: "idSeqLibProtocol"
-        });
         if (this._experiment
             && this._experiment.seqPrepByCore_forSamples
             && this._experiment.seqPrepByCore_forSamples === 'N') {
@@ -591,7 +616,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 validators: [Validators.required],
                 errorNameErrorMessageMap: [
                     {errorName: 'required', errorMessage: 'Index Tag A required'}
-                ]
+                ],
+                sortOrder: 300
             });
             temp.push({
                 headerName: "Index Tag Sequence A",
@@ -600,9 +626,17 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 minWidth: 6.5 * this.emToPxConversionRate,
                 maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
-                editable: false
+                editable: false,
+                sortOrder: 305
             });
-            if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
+
+            let permittedBarcodes: any[] = [];
+
+            if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
+                permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
+            }
+
+            if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
                 temp.push({
                     headerName: "Index Tag B",
                     editable: true,
@@ -619,7 +653,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     validators: [Validators.required],
                     errorNameErrorMessageMap: [
                         {errorName: 'required', errorMessage: 'Index Tag B required'}
-                    ]
+                    ],
+                    sortOrder: 310
                 });
             } else {
                 temp.push({
@@ -634,7 +669,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     selectOptions: this._barCodes,
                     selectOptionsDisplayField: "display",
                     selectOptionsValueField: "idOligoBarcodeB",
-                    indexTagLetter: 'B'
+                    indexTagLetter: 'B',
+                    sortOrder: 310
                 });
             }
 
@@ -646,6 +682,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
+                sortOrder: 315
             });
         }
 
@@ -664,6 +701,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             suppressSizeToFit: true,
             editable: false,
+            sortOrder: 5,
             pinned: "left"
         });
 
@@ -690,6 +728,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 ],
                 outerForm: this.form,
                 formName: "gridFormGroup",
+                sortOrder: 10,
                 pinned: "left"
             });
         }
@@ -706,6 +745,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             errorNameErrorMessageMap: [
                 { errorName: 'required', errorMessage: 'Sample Name required' }
             ],
+            sortOrder: 15,
             pinned: "left"
         });
         temp.push({
@@ -721,69 +761,78 @@ export class TabSamplesIlluminaComponent implements OnInit {
             errorNameErrorMessageMap: [
                 { errorName: 'required', errorMessage: 'Sample Name required' }
             ],
+            sortOrder: 20,
             pinned: "left"
         });
 
-        if (!this.showConcentrationUnitColumn) {
-            temp.push({
-                headerName: "Conc. (ng/ul)",
-                field: "concentration",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: true,
-                cellRendererFramework: TextAlignRightMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        } else {
-            temp.push({
-                headerName: "Concentration",
-                field: "concentration",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: true,
-                cellRendererFramework: TextAlignRightMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-            temp.push({
-                headerName: "Units",
-                field: "codeConcentrationUnit",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: true,
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.concentrationUnits,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "value",
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
+        for (let columnProperty of this.columnProperties) {
 
-        if (this.showVolumeColumn) {
-            temp.push({
-                headerName: "Vol. (ul)",
-                field: "sampleVolume",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: true,
-                cellRendererFramework: TextAlignRightMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
+            if (columnProperty.showInEditMode && columnProperty.showInEditMode === 'Y') {
+                let editable: boolean = columnProperty.editableEditMode && columnProperty.editableEditMode === 'Y';
+                let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
+
+                let newColumn: any = {
+                    headerName: columnProperty.header,
+                    field: columnProperty.field,
+                    width: (+columnProperty.width) * this.emToPxConversionRate,
+                    minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
+                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: editable,
+
+                    showFillButton: showFillButton,
+                    fillGroupAttribute: columnProperty.fillGroupAttribute,
+                    sortOrder: columnProperty.sortOrder,
+                    validators: [],
+                    errorNameErrorMessageMap: []
+                };
+
+                if (columnProperty.requiredInEditMode && columnProperty.requiredInEditMode === 'Y') {
+                    newColumn.validators.push(Validators.required);
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'required', errorMessage: 'Multiplex Group required' });
+                }
+
+                if (columnProperty.patternToMatch) {
+                    let message: string = (columnProperty.patternToMatchErrorMessage ? '' + columnProperty.patternToMatchErrorMessage : '');
+
+                    newColumn.validators.push(Validators.pattern(columnProperty.patternToMatch));
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'pattern', errorMessage: message });
+                }
+
+                switch(columnProperty.columnType) {
+                    case TabSamplesIlluminaComponent.TEXT_RIGHT:
+                        newColumn.cellRendererFramework = TextAlignRightMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignRightMiddleEditor;
+                        break;
+                    case TabSamplesIlluminaComponent.OPTION:
+                        newColumn.cellRendererFramework = SelectRenderer;
+                        newColumn.cellEditorFramework   = SelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            newColumn.selectOptions = this.dictionaryService.getEntries('' + columnProperty.fullDictionaryModelPathToLoad);
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    // case TabSamplesIlluminaComponent.MULTIOPTION:
+                    //     break;
+
+                    case TabSamplesIlluminaComponent.TEXT:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                        break;
+                    default:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                }
+
+                temp.push(newColumn);
+            }
         }
 
         temp.push({
@@ -798,191 +847,176 @@ export class TabSamplesIlluminaComponent implements OnInit {
             cellEditorFramework: TextAlignLeftMiddleEditor,
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
-            hide: this.hideCCNum
+            hide: this.hideCCNum,
+            sortOrder: 140
         });
 
-        this._tabIndexToInsertAnnotations = temp.length;
+        this._tabIndexToInsertAnnotations = 150;
 
-        temp.push({
-            headerName: "Sample Type",
-            editable: true,
-            width:    13 * this.emToPxConversionRate,
-            minWidth: 9 * this.emToPxConversionRate,
-            field: "idSampleType",
-            cellRendererFramework: SelectRenderer,
-            cellEditorFramework: SelectEditor,
-            selectOptions: this.sampleTypes,
-            selectOptionsDisplayField: "sampleType",
-            selectOptionsValueField: "idSampleType",
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
+        // if (this.showNucleicAcidExtractionMethod) {
+        //     temp.push({
+        //         headerName: "Nucl. acid extraction meth.",
+        //         field: "otherSamplePrepMethod",
+        //         width:    7.5 * this.emToPxConversionRate,
+        //         minWidth: 4 * this.emToPxConversionRate,
+        //         maxWidth: 9 * this.emToPxConversionRate,
+        //         suppressSizeToFit: true,
+        //         editable: true,
+        //         cellRendererFramework: TextAlignLeftMiddleRenderer,
+        //         cellEditorFramework: TextAlignLeftMiddleEditor,
+        //         showFillButton: true,
+        //         fillGroupAttribute: 'frontEndGridGroup'
+        //     });
+        // }
 
-        if (this.showNucleicAcidExtractionMethod) {
+        // if (this.showAssayColumn) {
+        //     temp.push({
+        //         headerName: "Assay",
+        //         editable: true,
+        //         width:    13 * this.emToPxConversionRate,
+        //         minWidth: 9 * this.emToPxConversionRate,
+        //         field: "codeBioanalyzerChipType",
+        //         cellRendererFramework: SelectRenderer,
+        //         cellEditorFramework: SelectEditor,
+        //         selectOptions: this.bioanalyzerChipType,
+        //         selectOptionsDisplayField: "display",
+        //         selectOptionsValueField: "value",
+        //         showFillButton: true,
+        //         fillGroupAttribute: 'frontEndGridGroup'
+        //     });
+        // }
+        //
+        // temp.push({
+        //     headerName: "QC Status",
+        //     field: "qualStatus",
+        //     width:    8.5 * this.emToPxConversionRate,
+        //     minWidth: 8.5 * this.emToPxConversionRate,
+        //     maxWidth: 10 * this.emToPxConversionRate,
+        //     cellRendererFramework: SelectRenderer,
+        //     cellEditorFramework: SelectEditor,
+        //     selectOptions: this.workflowStatus,
+        //     selectOptionsDisplayField: "display",
+        //     selectOptionsValueField: "value",
+        //     suppressSizeToFit: true,
+        //     editable: true,
+        //     showFillButton: true,
+        //     fillGroupAttribute: 'frontEndGridGroup'
+        // });
+        //
+        // if (this.showSeqLibPrepStatus) {
+        //     temp.push({
+        //         headerName: "Seq Lib Prep Status",
+        //         field: "seqPrepStatus",
+        //         width:    8.5 * this.emToPxConversionRate,
+        //         minWidth: 8.5 * this.emToPxConversionRate,
+        //         maxWidth: 10 * this.emToPxConversionRate,
+        //         cellRendererFramework: TextAlignLeftMiddleRenderer,
+        //         cellEditorFramework: TextAlignLeftMiddleEditor,
+        //         suppressSizeToFit: true,
+        //         editable: true,
+        //         showFillButton: true,
+        //         fillGroupAttribute: 'frontEndGridGroup'
+        //     });
+        // }
+
+        if (this._experiment
+            && this._experiment.seqPrepByCore_forSamples
+            && this._experiment.seqPrepByCore_forSamples === 'N') {
+
             temp.push({
-                headerName: "Nucl. acid extraction meth.",
-                field: "otherSamplePrepMethod",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
+                headerName: "Index Tag A",
                 editable: true,
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
-
-        if (this.showAssayColumn) {
-            temp.push({
-                headerName: "Assay",
-                editable: true,
-                width:    13 * this.emToPxConversionRate,
-                minWidth: 9 * this.emToPxConversionRate,
-                field: "codeBioanalyzerChipType",
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                maxWidth: 20 * this.emToPxConversionRate,
+                field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.bioanalyzerChipType,
+                cellEditorFramework: BarcodeSelectEditor,
+                selectOptions: this._barCodes,
                 selectOptionsDisplayField: "display",
-                selectOptionsValueField: "value",
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
-
-        if (this.showOrganism) {
-            temp.push({
-                headerName: "Organism",
-                editable: true,
-                width:    13 * this.emToPxConversionRate,
-                minWidth: 9  * this.emToPxConversionRate,
-                field: "idOrganism",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.organisms,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOrganism",
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup',
+                selectOptionsValueField: "idOligoBarcode",
+                indexTagLetter: 'A',
                 validators: [Validators.required],
                 errorNameErrorMessageMap: [
-                    {errorName: 'required', errorMessage: 'Multiplex Group required'}
-                ]
+                    {errorName: 'required', errorMessage: 'Index Tag A required'}
+                ],
+                sortOrder: 300
             });
-        }
-
-        temp.push({
-            headerName: "QC Conc. (ng/uL)",
-            editable: true,
-            width:    9 * this.emToPxConversionRate,
-            minWidth: 9  * this.emToPxConversionRate,
-            field: "qualCalcConcentration",
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            cellEditorFramework: TextAlignRightMiddleEditor,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
-
-        if (this.showQC260_230) {
             temp.push({
-                headerName: "QC 260/230",
-                editable: true,
-                width:    9 * this.emToPxConversionRate,
-                minWidth: 9  * this.emToPxConversionRate,
-                field: "qual260nmTo230nmRatio",
-                cellRendererFramework: TextAlignRightMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
-
-        temp.push({
-            headerName: "QC RIN",
-            editable: true,
-            width:    9 * this.emToPxConversionRate,
-            minWidth: 9  * this.emToPxConversionRate,
-            field: "qualRINNumber",
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            cellEditorFramework: TextAlignRightMiddleEditor,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
-
-        if (this.showSeqLibProtocol) {
-            temp.push({
-                headerName: "Seq Lib Protocol",
-                editable: true,
-                width:    20 * this.emToPxConversionRate,
-                minWidth: 9  * this.emToPxConversionRate,
-                field: "idSeqLibProtocol",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.seqLibProtocols,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idSeqLibProtocol"
-            });
-        }
-
-        if (this.showAverageInsertSizeColumn) {
-            temp.push({
-                headerName: "Ave Insert Size",
-                field: "meanLibSizeActual",
+                headerName: "Index Tag Sequence A",
+                field: "barcodeSequence",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
                 maxWidth: 10 * this.emToPxConversionRate,
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
+                suppressSizeToFit: true,
+                editable: false,
+                sortOrder: 301
+            });
+            if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
+                temp.push({
+                    headerName: "Index Tag B",
+                    editable: true,
+                    width:    12 * this.emToPxConversionRate,
+                    minWidth: 12 * this.emToPxConversionRate,
+                    maxWidth: 20 * this.emToPxConversionRate,
+                    field: "idOligoBarcodeB",
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: BarcodeSelectEditor,
+                    selectOptions: this._barCodes,
+                    selectOptionsDisplayField: "display",
+                    selectOptionsValueField: "idOligoBarcodeB",
+                    indexTagLetter: 'B',
+                    validators: [Validators.required],
+                    errorNameErrorMessageMap: [
+                        {errorName: 'required', errorMessage: 'Index Tag B required'}
+                    ],
+                    sortOrder: 302
+                });
+            } else {
+                temp.push({
+                    headerName: "Index Tag B",
+                    editable: false,
+                    width:    12 * this.emToPxConversionRate,
+                    minWidth: 12 * this.emToPxConversionRate,
+                    maxWidth: 20 * this.emToPxConversionRate,
+                    field: "idOligoBarcodeB",
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: BarcodeSelectEditor,
+                    selectOptions: this._barCodes,
+                    selectOptionsDisplayField: "display",
+                    selectOptionsValueField: "idOligoBarcodeB",
+                    indexTagLetter: 'B',
+                    sortOrder: 302
+                });
+            }
+
+            temp.push({
+                headerName: "Index Tag Sequence B",
+                field: "barcodeSequenceB",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: true,
+                sortOrder: 303
             });
-        }
-
-        temp.push({
-            headerName: "QC Frag Size (from)",
-            field: "qualFragmentSizeFrom",
-            width:    8.5 * this.emToPxConversionRate,
-            minWidth: 8.5 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            suppressSizeToFit: true,
-            editable: true,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
-        temp.push({
-            headerName: "QC Frag Size (to)",
-            field: "qualFragmentSizeTo",
-            width:    8.5 * this.emToPxConversionRate,
-            minWidth: 8.5 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            suppressSizeToFit: true,
-            editable: true,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
-        temp.push({
-            headerName: "QC Status",
-            field: "qualStatus",
-            width:    8.5 * this.emToPxConversionRate,
-            minWidth: 8.5 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
-            cellRendererFramework: SelectRenderer,
-            cellEditorFramework: SelectEditor,
-            selectOptions: this.workflowStatus,
-            selectOptionsDisplayField: "display",
-            selectOptionsValueField: "value",
-            suppressSizeToFit: true,
-            editable: true,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup'
-        });
-
-        if (this.showSeqLibPrepStatus) {
+            temp.push({
+                headerName: "QC Status",
+                field: "qualStatus",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.workflowStatus,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
+                suppressSizeToFit: true,
+                editable: true,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                sortOrder: 500
+            });
             temp.push({
                 headerName: "Seq Lib Prep Status",
                 field: "seqPrepStatus",
@@ -994,7 +1028,26 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 suppressSizeToFit: true,
                 editable: true,
                 showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
+                fillGroupAttribute: 'frontEndGridGroup',
+                sortOrder: 505
+            });
+        } else {
+            temp.push({
+                headerName: "QC Status",
+                field: "qualStatus",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.workflowStatus,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
+                suppressSizeToFit: true,
+                editable: true,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                sortOrder: 500
             });
         }
 
@@ -1046,66 +1099,61 @@ export class TabSamplesIlluminaComponent implements OnInit {
             pinned: 'left'
         });
 
-        if (!this.showConcentrationUnitColumn) {
-            temp.push({
-                headerName: "Conc. (ng/ul)",
-                field: "concentration",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                cellRendererFramework: TextAlignRightMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        } else {
-            temp.push({
-                headerName: "Concentration",
-                field: "concentration",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: true,
-                cellRendererFramework: TextAlignRightMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-            temp.push({
-                headerName: "Units",
-                field: "codeConcentrationUnit",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: true,
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.concentrationUnits,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "value",
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
+        // Add all configurable columns for this RequestCategory.
+        for (let columnProperty of this.columnProperties) {
 
-        if (this.showVolumeColumn) {
-            temp.push({
-                headerName: "Vol. (ul)",
-                field: "sampleVolume",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                cellRendererFramework: TextAlignRightMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
+            if (columnProperty.showInViewMode && columnProperty.showInViewMode === 'Y') {
+                let editable: boolean = false;
+                let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
+
+                let newColumn: any = {
+                    headerName: columnProperty.header,
+                    field: columnProperty.field,
+                    width: (+columnProperty.width) * this.emToPxConversionRate,
+                    minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
+                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: editable,
+
+                    showFillButton: showFillButton,
+                    fillGroupAttribute: columnProperty.fillGroupAttribute,
+                    sortOrder: columnProperty.sortOrder
+                };
+
+                switch(columnProperty.columnType) {
+                    case TabSamplesIlluminaComponent.TEXT_RIGHT:
+                        newColumn.cellRendererFramework = TextAlignRightMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignRightMiddleEditor;
+                        break;
+                    case TabSamplesIlluminaComponent.OPTION:
+                        newColumn.cellRendererFramework = SelectRenderer;
+                        newColumn.cellEditorFramework   = SelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            newColumn.selectOptions = this.dictionaryService.getEntries('' + columnProperty.fullDictionaryModelPathToLoad);
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    // case TabSamplesIlluminaComponent.MULTIOPTION:
+                    //     break;
+
+                    case TabSamplesIlluminaComponent.TEXT:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                        break;
+                    default:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                }
+
+                temp.push(newColumn);
+            }
         }
 
         temp.push({
@@ -1120,150 +1168,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
             cellEditorFramework: TextAlignLeftMiddleEditor,
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
-            hide: this.hideCCNum
+            hide: this.hideCCNum,
+            sortOrder: 140
         });
 
-        this._tabIndexToInsertAnnotations = temp.length;
-
-        if (this.showPreppedByCorePositionMiddle) {
-            temp.push({
-                headerName: "Prepped by Core?",
-                editable: false,
-                width:    5 * this.emToPxConversionRate,
-                minWidth: 5 * this.emToPxConversionRate,
-                field: "seqPrepByCore",
-                cellRendererFramework: TextAlignLeftMiddleRenderer
-            });
-        }
-
-        if (this.showSampleTypeInViewMode) {
-            temp.push({
-                headerName: "Sample Type",
-                editable: false,
-                width:    13 * this.emToPxConversionRate,
-                minWidth: 9 * this.emToPxConversionRate,
-                field: "idSampleType",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.sampleTypes,
-                selectOptionsDisplayField: "sampleType",
-                selectOptionsValueField: "idSampleType",
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
-
-        if (this.showNucleicAcidExtractionMethod) {
-            temp.push({
-                headerName: "Nucl. acid extraction meth.",
-                field: "otherSamplePrepMethod",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: true,
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
-
-        if (this.showAssayColumn) {
-            temp.push({
-                headerName: "Assay",
-                editable: false,
-                width:    13 * this.emToPxConversionRate,
-                minWidth: 9 * this.emToPxConversionRate,
-                field: "codeBioanalyzerChipType",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.bioanalyzerChipType,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "value",
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
-
-        if (this.showOrganism) {
-            temp.push({
-                headerName: "Organism",
-                editable: false,
-                width:    13 * this.emToPxConversionRate,
-                minWidth: 9  * this.emToPxConversionRate,
-                field: "idOrganism",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.organisms,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOrganism",
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup',
-                validators: [Validators.required],
-                errorNameErrorMessageMap: [
-                    {errorName: 'required', errorMessage: 'Multiplex Group required'}
-                ]
-            });
-        }
-
-        temp.push({
-            headerName: "QC Conc. (ng/uL)",
-            editable: false,
-            width:    9 * this.emToPxConversionRate,
-            minWidth: 9  * this.emToPxConversionRate,
-            field: "qualCalcConcentration",
-            cellRendererFramework: TextAlignRightMiddleRenderer
-        });
-
-        if (this.showQC260_230) {
-            temp.push({
-                headerName: "QC 260/230",
-                editable: true,
-                width:    9 * this.emToPxConversionRate,
-                minWidth: 9  * this.emToPxConversionRate,
-                field: "qual260nmTo230nmRatio",
-                cellRendererFramework: TextAlignRightMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup'
-            });
-        }
-
-        temp.push({
-            headerName: "QC RIN",
-            editable: false,
-            width:    9 * this.emToPxConversionRate,
-            minWidth: 9  * this.emToPxConversionRate,
-            field: "qualRINNumber",
-            cellRendererFramework: TextAlignRightMiddleRenderer
-        });
-
-        if (this.showSeqLibProtocol) {
-            temp.push({
-                headerName: "Seq Lib Protocol",
-                editable: false,
-                width:    20 * this.emToPxConversionRate,
-                minWidth: 9  * this.emToPxConversionRate,
-                field: "idSeqLibProtocol",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.seqLibProtocols,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idSeqLibProtocol"
-            });
-        }
-
-        if (this.showPreppedByCorePositionLast) {
-            temp.push({
-                headerName: "Prepped by Core?",
-                editable: false,
-                width:    5 * this.emToPxConversionRate,
-                minWidth: 5 * this.emToPxConversionRate,
-                field: "seqPrepByCore",
-                cellRendererFramework: TextAlignLeftMiddleRenderer
-            });
-        }
+        // This is used as the sortOrder basis for the sample annotations.
+        this._tabIndexToInsertAnnotations = 150;
 
         if (this._experiment
             && this._experiment.seqPrepByCore_forSamples
@@ -1285,7 +1195,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 validators: [Validators.required],
                 errorNameErrorMessageMap: [
                     {errorName: 'required', errorMessage: 'Index Tag A required'}
-                ]
+                ],
+                sortOrder: 300
             });
             temp.push({
                 headerName: "Index Tag Sequence A",
@@ -1294,7 +1205,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 minWidth: 8.5 * this.emToPxConversionRate,
                 maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
-                editable: false
+                editable: false,
+                sortOrder: 301
             });
             if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
                 temp.push({
@@ -1313,7 +1225,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     validators: [Validators.required],
                     errorNameErrorMessageMap: [
                         {errorName: 'required', errorMessage: 'Index Tag B required'}
-                    ]
+                    ],
+                    sortOrder: 302
                 });
             } else {
                 temp.push({
@@ -1328,7 +1241,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     selectOptions: this._barCodes,
                     selectOptionsDisplayField: "display",
                     selectOptionsValueField: "idOligoBarcodeB",
-                    indexTagLetter: 'B'
+                    indexTagLetter: 'B',
+                    sortOrder: 302
                 });
             }
 
@@ -1340,37 +1254,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
-            });
-
-            if (this.showAverageInsertSizeColumn) {
-                temp.push({
-                    headerName: "Ave Insert Size",
-                    field: "meanLibSizeActual",
-                    width:    8.5 * this.emToPxConversionRate,
-                    minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
-                    suppressSizeToFit: true,
-                    editable: false,
-                });
-            }
-
-            temp.push({
-                headerName: "QC Frag Size (from)",
-                field: "qualFragmentSizeFrom",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-            });
-            temp.push({
-                headerName: "QC Frag Size (to)",
-                field: "qualFragmentSizeTo",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
+                sortOrder: 303
             });
             temp.push({
                 headerName: "QC Status",
@@ -1409,7 +1293,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: false,
             });
         } else {
-
             if (this.showQCStatus) {
                 temp.push({
                     headerName: "QC Status",
@@ -1421,7 +1304,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     editable: false,
                 });
             }
-
             if (this.showLinkToCCNumber) {
                 temp.push({
                     headerName: "CC Number",
@@ -1532,7 +1414,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private loadBarcodes(): void {
         this._barCodes = [];
 
-        let allBarcodes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcode");
+        let allBarcodes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.OLIGO_BARCODE);
         for (let code of allBarcodes) {
             code.idOligoBarcodeB = code.idOligoBarcode;
             this._barCodes.push(code);
@@ -1542,14 +1424,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private loadSampleTypes(): void {
         let types: any[] = [];
 
-        for (let sampleType of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+        for (let sampleType of this.dictionaryService.getEntriesExcludeBlank(DictionaryService.SAMPLE_TYPE)) {
             if (sampleType.isActive === 'N'
                 || (sampleType.codeNucleotideType !== "RNA" && sampleType.codeNucleotideType !== "DNA")) {
 
                 continue;
             }
 
-            let requestCategories = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleTypeRequestCategory").filter(sampleRequestCategory =>
+            let requestCategories = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.SAMPLE_TYPE_REQUEST_CATEGORY).filter(sampleRequestCategory =>
                 sampleRequestCategory.value !== "" && sampleRequestCategory.idSampleType === sampleType.value
             );
 
@@ -1566,7 +1448,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private seqLibProtocols: any[];
 
     private loadSeqLibProtocol(): void {
-        this.seqLibProtocols = this.dictionaryService.getEntries('hci.gnomex.model.SeqLibProtocol').sort((a, b) => {
+        this.seqLibProtocols = this.dictionaryService.getEntries(DictionaryService.SEQ_LIB_PROTOCOL).sort((a, b) => {
             if (!a && !b) {
                 return 0;
             } else if (!a) {
@@ -1597,6 +1479,33 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
 
+    public static sortColumns(temp: any[]): any[] {
+        if (temp && Array.isArray(temp)) {
+            temp = temp.sort((a: any, b: any) => {
+                if (a.sortOrder && b.sortOrder) {
+                    return (+a.sortOrder) - (+b.sortOrder);
+                } else if (a.sortOrder && !b.sortOrder) {
+                    return -1;
+                } else if (!a.sortOrder && b.sortOrder) {
+                    return 1;
+                } else {
+                    if (a.headerName && b.headerName) {
+                        return (+a.headerName) - (+b.headerName);
+                    } else if (a.headerName && !b.headerName) {
+                        return -1;
+                    } else if (!a.headerName && b.headerName) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+        }
+
+        return temp;
+    }
+
+
     public requireReconfirmation(): void {
         if (this.form && !this.form.contains('invalidateWithoutConfirmation')) {
             this.form.addControl(
@@ -1624,6 +1533,17 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     private rebuildColumnDefinitions(): void {
+        this.columnProperties = [];
+        this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
+
+        if (this.columnProperties) {
+            this.columnProperties = this.columnProperties.filter((a) => {
+                return a.codeRequestCategory === this._experiment.codeRequestCategory;
+            });
+        } else {
+            this.columnProperties = [];
+        }
+
         let temp: any[]  = this.defaultSampleColumnDefinitions;
 
         if (this._experiment) {
@@ -1633,7 +1553,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 });
 
                 if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
-                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this._tabIndexToInsertAnnotations, this.emToPxConversionRate, this._state);
+                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], true, this._tabIndexToInsertAnnotations, this.emToPxConversionRate, this._state, false);
                 }
             }
         }
@@ -1904,12 +1824,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
         let temp: any[] = [];
 
         if (this.samplesGridApi) {
+
+            let annotationFieldsAreEditable: boolean = true;
+
             if (this._state === TabSamplesIlluminaComponent.STATE_NEW) {
                 temp = this.defaultSampleColumnDefinitions;
             } else if (this._state === TabSamplesIlluminaComponent.STATE_EDIT) {
                 temp = this.editSampleColumnDefinitions;
             } else if (this._state === TabSamplesIlluminaComponent.STATE_VIEW) {
                 temp = this.viewSampleColumnDefinitions;
+                annotationFieldsAreEditable = false;
             }
 
             if (temp && this._experiment) {
@@ -1919,10 +1843,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     });
 
                     if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
-                        TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this._tabIndexToInsertAnnotations, this.emToPxConversionRate, this._state);
+                        TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], annotationFieldsAreEditable, this._tabIndexToInsertAnnotations, this.emToPxConversionRate, this._state, false);
                     }
                 }
             }
+
+            temp = TabSamplesIlluminaComponent.sortColumns(temp);
 
             this.samplesGridApi.setColumnDefs(temp);
             this.samplesGridApi.redrawRows();
@@ -2096,14 +2022,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public download(): void {
-
+        console.log("Hello world");
     }
 
     public onClickShowInstructions(): void {
         this.showInstructions = !this.showInstructions;
     }
 
-    public static addColumnToColumnDef(columnDefs: any[], annot: any, tabIndexToInsertAnnotations: number, emToPxConversionRate: number, state: string): void {
+    public static addColumnToColumnDef(columnDefs: any[], annot: any, editable: boolean, sortOrder: number, emToPxConversionRate: number, state: string, noColor: boolean): void {
         if (!annot || !annot.idProperty) {
             return;
         }
@@ -2111,44 +2037,53 @@ export class TabSamplesIlluminaComponent implements OnInit {
         let column: any;
         switch(annot.codePropertyType) {
             case annotType.CHECK :
-                column = TabSamplesIlluminaComponent.createCheckColumn(annot, emToPxConversionRate);
+                column = TabSamplesIlluminaComponent.createCheckColumn(annot, emToPxConversionRate, editable);
                 break;
             case annotType.MOPTION :
-                column = TabSamplesIlluminaComponent.createMoptionColumn(annot, emToPxConversionRate);
+                column = TabSamplesIlluminaComponent.createMoptionColumn(annot, emToPxConversionRate, editable);
                 break;
             case annotType.OPTION :
-                column = TabSamplesIlluminaComponent.createOptionColumn(annot, emToPxConversionRate);
+                column = TabSamplesIlluminaComponent.createOptionColumn(annot, emToPxConversionRate, editable);
                 break;
             case annotType.URL :
                 column = TabSamplesIlluminaComponent.createUrlColumn(annot, emToPxConversionRate);
                 break;
             case annotType.TEXT :
-                column = TabSamplesIlluminaComponent.createTextColumn(annot, emToPxConversionRate);
+                column = TabSamplesIlluminaComponent.createTextColumn(annot, emToPxConversionRate, editable);
                 break;
             default:
-                column = TabSamplesIlluminaComponent.createTextColumn(annot, emToPxConversionRate);
+                column = TabSamplesIlluminaComponent.createTextColumn(annot, emToPxConversionRate, editable);
         }
 
-        if (annot.isRequired && annot.isRequired === 'Y' && state === TabSamplesIlluminaComponent.STATE_NEW) {
-            column.cellStyle = {color: 'black', 'background-color': 'yellow'};
+        if (noColor) {
+            // column.cellStyle = {color: 'black', 'background-color': 'white'};
+        }
+        else if (annot.isRequired && annot.isRequired === 'Y') {
+            if (state === TabSamplesIlluminaComponent.STATE_NEW) {
+                column.cellStyle = {color: 'black', 'background-color': 'yellow'};
+            } else if (state === TabSamplesIlluminaComponent.STATE_EDIT) {
+                column.cellStyle = {color: 'black', 'background-color': '#DFFFCF'};
+            }
         }
 
         if (!columnDefs || !Array.isArray(columnDefs)) {
             columnDefs = [];
         }
 
-        if (!tabIndexToInsertAnnotations) {
-            tabIndexToInsertAnnotations = columnDefs.length;
+        if (!sortOrder) {
+            sortOrder = 999999;
         }
 
-        columnDefs.splice(tabIndexToInsertAnnotations, 0, column);
+        column.sortOrder = sortOrder++;
+
+        columnDefs.push(column);
     }
 
-    public static createCheckColumn(annot: any, emToPxConversionRate: number) {
+    public static createCheckColumn(annot: any, emToPxConversionRate: number, editable: boolean) {
         return {
             headerName: annot.display,
             editable: false,
-            checkboxEditable: true,
+            checkboxEditable: editable,
             idProperty: annot.idProperty,
             width:    10 * emToPxConversionRate,
             minWidth: 7 * emToPxConversionRate,
@@ -2158,10 +2093,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         };
     }
 
-    public static createMoptionColumn(annot: any, emToPxConversionRate: number): any{
+    public static createMoptionColumn(annot: any, emToPxConversionRate: number, editable: boolean): any{
         return {
             headerName: annot.display,
-            editable: true,
+            editable: editable,
             width:    10 * emToPxConversionRate,
             minWidth: 7 * emToPxConversionRate,
             suppressSizeToFit: true,
@@ -2178,10 +2113,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     }
 
-    public static createOptionColumn(annot: any, emToPxConversionRate: number): any {
+    public static createOptionColumn(annot: any, emToPxConversionRate: number, editable: boolean): any {
         return {
             headerName: annot.display,
-            editable: true,
+            editable: editable,
             width:    10 * emToPxConversionRate,
             minWidth: 7 * emToPxConversionRate,
             suppressSizeToFit: true,
@@ -2197,7 +2132,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         };
     }
 
-    public static createTextColumn(annot: any, emToPxConversionRate: number): any {
+    public static createTextColumn(annot: any, emToPxConversionRate: number, editable: boolean): any {
         return {
             headerName: annot.display,
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
@@ -2209,7 +2144,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             cellEditorFramework: TextAlignLeftMiddleEditor,
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
-            editable: true
+            editable: editable
         };
     }
 
