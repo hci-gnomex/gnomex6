@@ -196,6 +196,10 @@ div.mainnav {
     width: 100%;
 }
 
+.half-width {
+    width: 50%;
+}
+
 .max-height {
     max-height: 100%
 }
@@ -650,6 +654,10 @@ fieldset {
     padding: 0;
     margin: 0;
     border: 0;
+}
+
+display-white-space{
+    white-space: pre-line;
 }
 
 legend {

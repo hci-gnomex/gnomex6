@@ -27,6 +27,7 @@ import {URLSearchParams} from "@angular/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UtilService} from "../services/util.service";
+import {HttpParams} from "@angular/common/http";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -203,15 +204,15 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         this.navInitSubscription = this.gnomexService.navInitBrowseDatatrackSubject.subscribe( orderInitObj => {
             if(orderInitObj){
-                let ids: URLSearchParams = new URLSearchParams;
-                ids.set("number", this.gnomexService.orderInitObj.dataTrackNumber);
-                ids.set("idOrganism", this.gnomexService.orderInitObj.idOrganism);
-                ids.set("idLab", this.gnomexService.orderInitObj.idLab);
-                ids.set("idGenomeBuild",this.gnomexService.orderInitObj.idGenomeBuild);
+                let ids: HttpParams = new HttpParams()
+                    .set("number", this.gnomexService.orderInitObj.dataTrackNumber)
+                    .set("idOrganism", this.gnomexService.orderInitObj.idOrganism)
+                    .set("idLab", this.gnomexService.orderInitObj.idLab)
+                    .set("idGenomeBuild",this.gnomexService.orderInitObj.idGenomeBuild);
                 this.datatracksService.previousURLParams = ids;
                 this.datatracksService.getDatatracksList_fromBackend(ids);
             }else{
-                this.datatracksService.getDatatracksList_fromBackend(new URLSearchParams());
+                this.datatracksService.getDatatracksList_fromBackend(new HttpParams());
             }
         });
 

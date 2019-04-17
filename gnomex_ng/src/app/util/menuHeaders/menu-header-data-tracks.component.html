@@ -1,9 +1,23 @@
 <div>
-    <button mat-button [disabled]="newDTisDisabled || this.disableAll" (click)="makeNewDataTrack()"><img class="icon" src="../../../assets/datatrack_new.png">New Data Track</button>
-    <button mat-button [disabled]="newGenomeBuildisDisabled || this.disableAll" (click)="makeNewFolder()"><img class="icon" src="../../../assets/folder_new.png">New Folder</button>
-    <button *ngIf="showMenuItemNewGenomeBuild" [disabled]="this.disableAll" mat-button (click)="makeNewGenomeBuild()"><img class="icon" src="../../../assets/genome_build_new.png">New Genome Build</button>
-    <button *ngIf="showMenuItemNewOrganism" [disabled]="this.disableAll" mat-button (click)="makeNewOrganism()"><img class="icon" src="../../../assets/organism_new.png">New Organism</button>
-    <button mat-button [disabled]="duplicateDTisDisabled || this.disableAll" (click)="doDuplicate()"><img class="icon" src="../../../assets/duplicate.png">Duplicate</button>
-    <button mat-button [disabled]="removeDisabled || this.disableAll" (click)="doRemove()"><img class="icon" src="../../../assets/crossout.png">Remove</button>
-    <button mat-button [disabled]="this.disableAll" (click)="this.doDownload()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download</button>
+    <button mat-button [disabled]="newDTisDisabled || this.disableAll" (click)="makeNewDataTrack()">
+        <img class="icon" [src]="this.constantsService.ICON_DATATRACK_NEW">New Data Track
+    </button>
+    <button mat-button [disabled]="newGenomeBuildisDisabled || this.disableAll" (click)="makeNewFolder()">
+        <img class="icon" [src]="this.constantsService.ICON_FOLDER_NEW">New Folder
+    </button>
+    <button *ngIf="showMenuItemNewGenomeBuild" [disabled]="this.disableAll" mat-button (click)="makeNewGenomeBuild()">
+        <img class="icon" [src]="this.constantsService.ICON_GENOME_BUILD_NEW">New Genome Build
+    </button>
+    <button *ngIf="showMenuItemNewOrganism" [disabled]="this.disableAll" mat-button (click)="makeNewOrganism()">
+        <img class="icon" [src]="this.constantsService.ICON_ORGANISM_NEW">New Organism
+    </button>
+    <button mat-button [disabled]="duplicateDTisDisabled || this.disableAll" (click)="doDuplicate()">
+        <img class="icon" [src]="this.constantsService.ICON_DUPLICATE">Duplicate
+    </button>
+    <button mat-button [disabled]="removeDisabled || this.disableAll" (click)="doRemove()">
+        <img class="icon" [src]="this.constantsService.ICON_CROSSOUT">Remove
+    </button>
+    <button mat-button [disabled]="this.disableAll" (click)="this.doDownload()">
+        <img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download
+    </button>
 </div>

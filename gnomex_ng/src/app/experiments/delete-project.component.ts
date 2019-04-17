@@ -6,6 +6,9 @@ import {Component, Inject} from "@angular/core";
 import { URLSearchParams } from "@angular/http";
 import {ProjectService} from "../services/project.service";
 import {ExperimentsService} from "./experiments.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Component({
     selector: 'delete-project-dialog',
@@ -18,6 +21,7 @@ export class DeleteProjectComponent {
 
     constructor(private dialogRef: MatDialogRef<DeleteProjectComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private projectService: ProjectService,
+                private dialogService: DialogsService,
                 private experimentsService: ExperimentsService) {
         this.selectedItem = data.selectedItem;
     }
@@ -34,12 +38,13 @@ export class DeleteProjectComponent {
      */
     deleteProject() {
         this.showSpinner = true;
-        var params: URLSearchParams = new URLSearchParams();
-        params.set("idProject", this.selectedItem.data.idProject);
+        let params: HttpParams = new HttpParams()
+            .set("idProject", this.selectedItem.data.idProject);
 
-        var lPromise = this.projectService.deleteProject(params).toPromise();
-        lPromise.then( response => {
+        this.projectService.deleteProject(params).subscribe( response => {
             this.experimentsService.refreshProjectRequestList_fromBackend();
+        },(err:IGnomexErrorResponse)=>{
+            this.showSpinner = false;
         });
 
     }

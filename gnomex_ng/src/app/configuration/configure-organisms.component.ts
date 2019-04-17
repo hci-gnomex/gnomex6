@@ -12,6 +12,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'configure-organisms',
@@ -117,6 +118,8 @@ export class ConfigureOrganismsComponent implements OnInit {
                     });
                 }
             }
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

@@ -6,7 +6,6 @@ import {
     OnInit,
     ViewChild,
 } from "@angular/core";
-import {URLSearchParams} from "@angular/http";
 import {
     ITreeOptions,
     TREE_ACTIONS,
@@ -27,6 +26,8 @@ import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {GnomexService} from "../services/gnomex.service";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -146,31 +147,58 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             this.buildTree(response);
             if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
-                this.dialogsService.stopAllSpinnerDialogs();
                 this.createAnalysisDialogRef.close();
+                this.createAnalysisDialogRef = null;
             }
             if (this.deleteAnalysisDialogRef && this.deleteAnalysisDialogRef.componentInstance) {
                 if (this.deleteAnalysisDialogRef.componentInstance.showSpinner) {
                     this.deleteAnalysisDialogRef.componentInstance.showSpinner = false;
-                    if (this.parentProject) {
-                        this.parentProject.collapseAll();
-                    }
+                }
+                if(this.parentProject) {
+                    this.analysisService.setActiveNodeId = this.parentProject.data.id;
                 }
                 this.deleteAnalysisDialogRef.close();
+                this.deleteAnalysisDialogRef = null;
             }
             if (this.createAnalysisGroupDialogRef && this.createAnalysisGroupDialogRef.componentInstance) {
                 if (this.createAnalysisGroupDialogRef.componentInstance.showSpinner) {
                     this.createAnalysisGroupDialogRef.componentInstance.showSpinner = false;
                 }
+                if(this.createAnalysisGroupDialogRef.componentInstance.newAnalysisGroupId) {
+                    this.analysisService.setActiveNodeId = "p" + this.createAnalysisGroupDialogRef.componentInstance.newAnalysisGroupId;
+                }
                 this.createAnalysisGroupDialogRef.close();
+                this.createAnalysisGroupDialogRef = null;
             }
 
-            this.analysisService.emitAnalysisOverviewList(response);
-            if( this.analysisService.analysisPanelParams && this.analysisService.analysisPanelParams["refreshParams"]) { // if user is searching
+            if(this.analysisService.createdAnalysis) {
+                this.analysisService.setActiveNodeId = "a" + this.analysisService.createdAnalysis;
+                this.analysisService.createdAnalysis = null;
+            }
 
-                let navArray: any[] = ["/analysis", {outlets: {"analysisPanel": "overview"}}];
-                this.router.navigate(navArray);
+
+            if (this.analysisService.analysisPanelParams && this.analysisService.analysisPanelParams["refreshParams"]) { // If user is searching or removing from grid
+                if (this.treeModel && this.treeModel.getActiveNode()) {
+                    if (this.analysisService.isDeleteFromGrid) { // When removing analysis from a selected group, remain stay in the group after removed
+                        this.analysisService.setActiveNodeId = this.treeModel.getActiveNode().data.id;
+                        this.analysisService.isDeleteFromGrid = false;
+                    } else { // Refresh to initial state when search button clicked
+                        this.treeModel.getActiveNode().setIsActive(false);
+                        this.treeModel.setFocusedNode(null);
+                    }
+                }
+
+                if (!this.treeModel.getActiveNode()) {
+                    this.analysisService.emitAnalysisOverviewList(response);
+                    let navArray: any[] = ["/analysis", {outlets: {"analysisPanel": "overview"}}];
+                    this.router.navigate(navArray);
+                    this.disableNewAnalysis = true;
+                    this.disableNewAnalysisGroup = true;
+                    this.disableDelete = true;
+                }
+
                 this.analysisService.analysisPanelParams["refreshParams"] = false;
+
             }
 
 
@@ -179,31 +207,39 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
                     let id: string = "" + this.gnomexService.orderInitObj.idAnalysis;
                     if(this.treeModel && id) {
-                        let node = this.findNodeByIdAnalysis(id);
+                        let node = this.findNodeById("a" + id);
                         if(node) {
                             node.setIsActive(true);
                             node.scrollIntoView();
                             this.gnomexService.orderInitObj = null;
                         }
                     }
-                } else if (this.analysisService.createdAnalysis) {
-                    this.selectNode(this.treeModel.getFirstRoot().children);
-                    this.analysisService.createdAnalysis = "";
+                } else if(this.analysisService.setActiveNodeId) {
+                    let node: TreeNode;
+                    node = this.findNodeById(this.analysisService.setActiveNodeId);
+                    this.analysisService.setActiveNodeId = null;
+
+                    if (node) {
+                        node.setIsActive(true);
+                        node.scrollIntoView();
+                    }
                 }
+
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         });
 
         this.navAnalysisGroupListSubscription = this.gnomexService.navInitBrowseAnalysisSubject.subscribe( orderInitObj => {
             if(orderInitObj) {
-                let ids: URLSearchParams = new URLSearchParams;
+
                 let idLab = this.gnomexService.orderInitObj.idLab;
                 let idAnalysisGroup = this.gnomexService.orderInitObj.idAnalysisGroup;
-
-                ids.set("idLab", idLab);
-                ids.set("searchPublicProjects", "Y");
-                ids.set("showCategory", "N");
-                ids.set("idAnalysisGroup", idAnalysisGroup);
-                ids.set("showSamples", "N");
+                let ids: HttpParams = new HttpParams()
+                    .set("idLab", idLab)
+                    .set("searchPublicProjects", "Y")
+                    .set("showCategory", "N")
+                    .set("idAnalysisGroup", idAnalysisGroup)
+                    .set("showSamples", "N");
 
                 this.analysisService.analysisPanelParams = ids;
                 this.analysisService.getAnalysisGroupList_fromBackend(ids);
@@ -213,21 +249,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     ngAfterViewInit() {
-    }
-
-    selectNode(nodes: any) {
-        for (let node of nodes) {
-            if (node.data.idAnalysis && node.data.idAnalysis === this.analysisService.createdAnalysis) {
-                let newAnalysisNode = this.findNodeByIdAnalysis(node.data.idAnalysis);
-                if(newAnalysisNode) {
-                    newAnalysisNode.setIsActive(true);
-                    newAnalysisNode.scrollIntoView();
-                }
-                break;
-            } else if (node.hasChildren) {
-                this.selectNode(node.children);
-            }
-        }
     }
 
     constructor(private analysisService: AnalysisService, private router: Router,
@@ -247,7 +268,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
         this.analysisService.startSearchSubject.subscribe((value) => {
             if (value) {
-                // this.showSpinner = true;
                 setTimeout(() => {
                     this.dialogsService.startDefaultSpinnerDialog();
                 });
@@ -329,7 +349,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     treeUpdateData(event) {
         if (this.analysisService.startSearchSubject.getValue() === true) {
             this.dialogsService.stopAllSpinnerDialogs();
-            // this.showSpinner = false;
             this.analysisService.startSearchSubject.next(false);
             this.changeDetectorRef.detectChanges();
         }
@@ -424,7 +443,10 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = "40em";
-            configuration.data = { labList: useThisLabList };
+            configuration.data = {
+                labList: useThisLabList,
+                selectedLab: this.selectedIdLab,
+            };
 
             this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration);
         }
@@ -449,11 +471,13 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
 
         let analysisGroupListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
+        this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
         let navArray: Array<any> = [];
 
 
             //Lab
         if (this.selectedItem.level === 1) {
+            this.analysisService.selectedNodeId = event.node.data.id;
             this.disableNewAnalysis = false;
             this.disableNewAnalysisGroup = false;
             this.disableDelete = true;
@@ -462,6 +486,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             //AnalysisGroup
         } else if (this.selectedItem.level === 2) {
+            this.parentProject = event.node.parent;
+            this.analysisService.selectedNodeId = event.node.data.id;
             this.selectedIdAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
             this.disableNewAnalysis = false;
             this.disableDelete = false;
@@ -477,17 +503,19 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
-            var params: URLSearchParams = new URLSearchParams();
-            params.set("idAnalysis", idAnalysis);
+            let params: HttpParams = new HttpParams()
+                .set("idAnalysis", idAnalysis);
             this.analysisService.getAnalysis(params).subscribe((response) => {
                 if (response.Analysis.canDelete === "Y") {
                     this.disableDelete = false;
                 } else {
                     this.disableDelete = true;
                 }
+            }, (err: IGnomexErrorResponse) => {
+                console.log(err);
             });
         }
-        this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
+
         this.router.navigate(navArray);
 
     }
@@ -499,15 +527,27 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.labListSubscription.unsubscribe();
     }
 
-    private findNodeByIdAnalysis(idAnalysis: string): TreeNode {
+    private findNodeById(id: string): TreeNode {
         if (this.treeModel && this.treeModel.roots) {
             for (let lab of this.treeModel.roots) {
-                if (lab.hasChildren) {
-                    for (let analysisGroup of lab.children) {
-                        if (analysisGroup.hasChildren) {
-                            for (let analysis of analysisGroup.children) {
-                                if (analysis.data.idAnalysis === idAnalysis) {
-                                    return analysis;
+                if(id.substr(0, 1) === "l") {
+                    if(lab.data.id === id) {
+                        return lab;
+                    }
+                } else {
+                    if (lab.hasChildren) {
+                        for (let analysisGroup of lab.children) {
+                            if(id.substr(0, 1) === "p") {
+                                if (analysisGroup.data.id === id) {
+                                    return analysisGroup;
+                                }
+                            } else if (id.substr(0, 1) === "a") {
+                                if (analysisGroup.hasChildren) {
+                                    for (let analysis of analysisGroup.children) {
+                                        if (analysis.data.id === id) {
+                                            return analysis;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -533,13 +573,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 if (result.invalidPermission) {
                     this.dialogsService.alert(result.invalidPermission, "Warning");
                 }
-            } else {
-                let message: string = "";
-                if (result && result.message) {
-                    message = ": " + result.message;
-                }
-                this.dialogsService.confirm("An error occurred while dragging-and-dropping" + message, null);
             }
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 }

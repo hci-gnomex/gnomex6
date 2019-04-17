@@ -9,6 +9,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'configure-product-types',
@@ -135,6 +136,8 @@ export class ConfigureProductTypesComponent implements OnInit {
                 }
                 this.dialogsService.confirm("An error occurred while retrieving price categories" + message, null);
             }
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

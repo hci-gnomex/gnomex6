@@ -9,6 +9,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {ConstantsService} from "../services/constants.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-datatrack-folder',
@@ -95,13 +96,9 @@ export class NewDataTrackComponent implements OnInit {
             this.showSpinner = false;
             if (response && response.result && response.result === 'SUCCESS') {
                 this.dialogRef.close(response.idDataTrack);
-            } else {
-                let message: string = "";
-                if (response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.confirm("An error occurred while saving data track" + message, null);
             }
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

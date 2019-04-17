@@ -20,6 +20,7 @@ import {FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {GnomexService} from "../../services/gnomex.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -30,6 +31,15 @@ import {GnomexService} from "../../services/gnomex.service";
         .mat-tab-group-border{
             border: 1px solid #e8e8e8;
             width:100%;
+        }
+
+        .label-title{
+            margin-top: 0.2rem;
+            margin-bottom: 0;
+        }
+
+        .label-title-width {
+            width: 25rem;
         }
     `]
 })
@@ -47,6 +57,8 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     public showLinkToExp: boolean = false;
     public showAutoDistributeDataTracks: boolean = false;
     public showManagePEDFile: boolean = false;
+    public showEdit: boolean = false;
+    public isEditMode: boolean = false;
 
     public analysisTreeNode: any;
     private analysisTreeNodeSubscription: Subscription;
@@ -71,6 +83,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
         this.analysisTreeNodeSubscription = this.analysisService.getAnalysisOverviewListSubject().subscribe(node => {
             this.analysisTreeNode = node;
+            this.analysisService.setEditMode(false);
         });
 
         this.route.data.forEach((data: any) => {
@@ -81,6 +94,8 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 let annots = this.analysis.AnalysisProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);
                 this.showLinkToExp = !this.secAdvisor.isGuest && this.analysis.canRead === "Y";
+                this.showEdit = this.analysis.canUpdate === "Y";
+                this.isEditMode = this.analysisService.getEditMode();
 
                 if(annots) {
                     this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
@@ -193,15 +208,9 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 if (result && result.result && result.result === "SUCCESS") {
 
                     // TODO refresh download list of analysis files
-
                     this.dialogsService.alert("Data tracks created for all applicable files");
-                } else {
-                    let message: string = "";
-                    if (result && result.message) {
-                        message = ": " + result.message;
-                    }
-                    this.dialogsService.confirm("An error occurred while creating data tracks" + message, null);
                 }
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }
@@ -247,21 +256,34 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 if(resp.idAnalysis) {
                     this.gnomexService.navByNumber("A" + resp.idAnalysis);
                     this.dialogsService.stopAllSpinnerDialogs();
-                } else if (resp.message) {
-                    this.dialogsService.stopAllSpinnerDialogs();
-                    this.dialogsService.alert(resp.message);
-
                 }
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
+    }
+
+    editButtonClicked(element: Element) {
+        if(this.isEditMode) {
+            let warningMessage: string = "Your changes haven't been saved. Continue anyway?";
+            this.dialogsService.yesNoDialog(warningMessage, this, "changeEditMode", null, "Changing EditMode");
+        } else {
+            this.changeEditMode();
+        }
+    }
+
+    changeEditMode() {
+        this.analysisService.setEditMode(!this.isEditMode);
+        this.analysisService.modeChangedAnalysis = this.analysis;
+        this.isEditMode = this.analysisService.getEditMode();
     }
 
     ngOnDestroy() {
         this.analysisTreeNodeSubscription.unsubscribe();
         this.analysisService.clearAnalysisOverviewForm();
+        this.analysisService.setEditMode(false);
     }
-
 
 }
 

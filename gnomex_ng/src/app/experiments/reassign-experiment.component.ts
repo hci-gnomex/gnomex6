@@ -7,6 +7,10 @@ import { URLSearchParams } from "@angular/http";
 import {ProjectService} from "../services/project.service";
 import {ExperimentsService} from "./experiments.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {HttpParams} from "@angular/common/http";
+import {first} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Component({
     selector: 'reassign-experiment-dialog',
@@ -30,6 +34,7 @@ export class ReassignExperimentComponent {
 
     constructor(private dialogRef: MatDialogRef<ReassignExperimentComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private experimentsService: ExperimentsService,
+                private dialogService: DialogsService,
                 private formBuilder: FormBuilder) {
         this.selectedItem = data.selectedItem;
         this.currentItemId = data.currentItemId;
@@ -62,16 +67,16 @@ export class ReassignExperimentComponent {
      */
     reassignYesButtonClicked() {
         this.noButton = false;
-        var params: URLSearchParams = new URLSearchParams();
-        params.set("idRequest", this.currentItem.idRequest);
-        params.set("idProject", this.targetItem.idProject);
-        params.set("isExtermal", this.currentItem.isExternal);
-        params.set("idAppUser", this.selectedOwnerItem.idAppUser);
-        var idBillingAccount =  null;
+        let params: HttpParams = new HttpParams()
+            .set("idRequest", this.currentItem.idRequest)
+            .set("idProject", this.targetItem.idProject)
+            .set("isExtermal", this.currentItem.isExternal)
+            .set("idAppUser", this.selectedOwnerItem.idAppUser);
+        let idBillingAccount =  null;
         if (this.showBillingCombo === true) {
             idBillingAccount = this.selectedBillingItem.idBillingAccount;
         }
-        params.set("idBillingAccount", idBillingAccount);
+        params = params.set("idBillingAccount", idBillingAccount);
         this.saveRequestProject(params);
 
     }
@@ -83,13 +88,15 @@ export class ReassignExperimentComponent {
      * Save the project request created in the reassign dialog
      * @param {URLSearchParams} params
      */
-    saveRequestProject(params: URLSearchParams) {
+    saveRequestProject(params: HttpParams) {
         this.showSpinner = true;
-        var lPromise = this.experimentsService.saveRequestProject(params).toPromise();
-        lPromise.then(response => {
-            this.experimentsService.refreshProjectRequestList_fromBackend();
-            console.log("saveprojectrequest " + response);
-        });
+        this.experimentsService.saveRequestProject(params).pipe(first())
+            .subscribe(response => {
+                this.experimentsService.refreshProjectRequestList_fromBackend();
+                console.log("saveprojectrequest " + response);
+            }, (err:IGnomexErrorResponse) => {
+                this.showSpinner = false;
+            });
 
     }
 
@@ -116,6 +123,6 @@ export class ReassignExperimentComponent {
 
     save(formData:any){
 //    console.log(formData);
-}
+    }
 
 }

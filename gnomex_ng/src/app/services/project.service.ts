@@ -11,14 +11,8 @@ export class ProjectService {
                 private httpClient: HttpClient) {
     }
 
-    deleteProject(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/DeleteProject.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    deleteProject(params: HttpParams):  Observable<any> {
+        return this.httpClient.get("/gnomex/DeleteProject.gx", {params: params});
 
     }
 

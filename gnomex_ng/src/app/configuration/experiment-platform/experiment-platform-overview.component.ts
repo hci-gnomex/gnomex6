@@ -23,6 +23,7 @@ import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.compon
 import {FormGroup} from "@angular/forms";
 import {DictionaryService} from "../../services/dictionary.service";
 import {first} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -116,27 +117,22 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         this.platformListSubscription = this.expPlatformService.getExperimentPlatformListObservable()
             .subscribe(resp =>{
                 if(resp){
-                    if(resp.message){
-                        this.dialogService.alert(resp.message);
-                    }else{
-                        this.allExpPlatorms = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
-                        this.filterExperimentPlatform();
-                        for(let row of this.allExpPlatorms){
-                            this.constService.getTreeIcon(row,'RequestCategory');
-                        }
-                        if(this.selectRowIndex > -1){
-                            this.gridOpt.api.forEachNode(node=> {
-                                return node.rowIndex === this.selectRowIndex  ? node.setSelected(true) : -1;
-                            });
-                        }
 
-
+                    this.allExpPlatorms = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
+                    this.filterExperimentPlatform();
+                    for(let row of this.allExpPlatorms){
+                        this.constService.getTreeIcon(row,'RequestCategory');
                     }
-                }else{
-                    this.dialogService.alert("An error has occurred getting ExperimentPlatformList");
+                    if(this.selectRowIndex > -1){
+                        this.gridOpt.api.forEachNode(node=> {
+                            return node.rowIndex === this.selectRowIndex  ? node.setSelected(true) : -1;
+                        });
+                    }
                 }
                 this.expPlatformService.expPlatformOverviewForm.markAsPristine();
                 this.expPlatformService.expPlatformOverviewForm.markAsUntouched();
+                this.showSpinner = false;
+            }, (err:IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
     }

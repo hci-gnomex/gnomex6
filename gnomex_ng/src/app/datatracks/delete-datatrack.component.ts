@@ -2,11 +2,13 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {Component, Inject} from "@angular/core";
-import {Response, URLSearchParams} from "@angular/http";
+import {Http, Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {DataTrackService} from "../services/data-track.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: "delete-data-track",
@@ -42,10 +44,10 @@ export class DeleteDataTrackComponent {
 
     public delete(): void {
         if (this.hasLink) {
-            let params: URLSearchParams = new URLSearchParams();
+            let params: HttpParams = new HttpParams();
             let dString: string = "";
 
-            params.set("idDataTrack", this.selectedItem.data.idDataTrack);
+            params = params.set("idDataTrack", this.selectedItem.data.idDataTrack);
             this.dataTrackService.getDataTrack(params).subscribe((response: any) => {
                 let dataTrackFolders = response.DataTrackFolders.filter(folder => folder.name.indexOf(this.selectedItem.parent.data.name) === -1);
                 for (var d of dataTrackFolders) {
@@ -53,10 +55,10 @@ export class DeleteDataTrackComponent {
                     dString = dString.concat(",");
                 }
                 dString = dString.substring(0, dString.lastIndexOf(","));
-                params = new URLSearchParams();
-                params.set("idDataTrack", this.selectedItem.data.idDataTrack);
-                params.set("idDataTrackFolder", this.selectedItem.data.idDataTrackFolder);
-                params.set("idGenomeBuild", this.selectedItem.data.idGenomeBuild);
+                params = new HttpParams()
+                    .set("idDataTrack", this.selectedItem.data.idDataTrack)
+                    .set("idDataTrackFolder", this.selectedItem.data.idDataTrackFolder)
+                    .set("idGenomeBuild", this.selectedItem.data.idGenomeBuild);
 
                 this.dataTrackService.unlinkDataTrack(params).subscribe((response: Response) => {
 
@@ -75,6 +77,8 @@ export class DeleteDataTrackComponent {
                             }
                         );
                 });
+            },(err:IGnomexErrorResponse) =>{
+                this.showSpinner = false;
             });
         } else {
             this.showSpinner = true;
@@ -83,12 +87,14 @@ export class DeleteDataTrackComponent {
     }
 
     deleteDataTrack() {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idDataTrack", this.selectedItem.data.idDataTrack);
+        let params: HttpParams = new HttpParams()
+            .set("idDataTrack", this.selectedItem.data.idDataTrack);
         this.dataTrackService.deleteDataTrack(params).subscribe((response: Response) => {
             this.showSpinner = false;
             this.dialogRef.close();
             this.dataTrackService.refreshDatatracksList_fromBackend();
+        },(err: IGnomexErrorResponse) =>{
+            this.showSpinner = false;
         });
 
     }

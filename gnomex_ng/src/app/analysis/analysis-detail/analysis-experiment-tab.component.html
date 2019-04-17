@@ -5,7 +5,7 @@
             <mat-select [compareWith]="compareByID"
                         [(ngModel)]="this.currentLab"
                         placeholder="Lab Filter"
-                        [disabled]="!edit"
+                        [disabled]="!this.analysisService.getEditMode()"
                         (selectionChange)="selectLab($event)">
                 <mat-option *ngFor="let lab of labList" [value]="lab">
                     {{ lab[this.prefService.labDisplayField] }}
@@ -23,10 +23,10 @@
     <div style="display:flex; margin-top:2em;">
         <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
         <div style="margin-left:auto; font-size:small;">
-            <button color="primary" mat-button [disabled]="!edit" (click)="removeItems()" >
+            <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="removeItems()" >
                 <img class="icon" [src]="this.constService.ICON_DELETE"> remove
             </button>
-            <button color="primary" mat-button [disabled]="!edit" (click)="clearAllItems()" >
+            <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="clearAllItems()" >
                 <img class="icon" [src]="this.constService.ICON_FOLDER_DELETE"> Clear all
             </button>
 

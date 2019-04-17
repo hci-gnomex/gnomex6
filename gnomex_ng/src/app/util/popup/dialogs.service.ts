@@ -24,7 +24,8 @@ export class DialogsService {
 
     public alert(message: string, title?: string): Observable<boolean> {
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '20em';
+        configuration.maxWidth = '40em';
+        configuration.minWidth = '10em';
 
         let dialogRef: MatDialogRef<AlertDialogComponent>;
 

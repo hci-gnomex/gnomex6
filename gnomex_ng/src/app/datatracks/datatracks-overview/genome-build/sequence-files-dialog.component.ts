@@ -3,16 +3,13 @@
  */
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import { URLSearchParams } from "@angular/http";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../../services/data-track.service";
-import {ActivatedRoute} from "@angular/router";
-import { ProgressBarModule } from "../../../../modules/progressbar.module";
-import {jqxProgressBarComponent} from "../../../../assets/jqwidgets-ts/angular_jqxprogressbar";
-import {Subscription} from "rxjs";
-import {BehaviorSubject} from "rxjs";
 import {ProgressService} from "../../../home/progress.service";
 import {first} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../../../util/popup/dialogs.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     templateUrl:'./sequence-files-dialog.component.html',
@@ -108,6 +105,7 @@ export class SequenceFilesDialog implements OnInit{
 
     constructor(private dialogRef: MatDialogRef<SequenceFilesDialog>,
                 @Inject(MAT_DIALOG_DATA) private data: any, private fb: FormBuilder,
+                private dialogService: DialogsService,
                 private datatrackService: DataTrackService, private progressService: ProgressService) {
         this.setSeqGridFunc = data.setRowDataFn;
         this.idGenomeBuild = data.idGenomeBuild;
@@ -175,8 +173,8 @@ export class SequenceFilesDialog implements OnInit{
 
         }
         else if( idx == this.fileInfoList.length){
-            let params:URLSearchParams = new URLSearchParams();
-            params.set("idGenomeBuild", this.idGenomeBuild);
+            let params:HttpParams = new HttpParams()
+                .set("idGenomeBuild", this.idGenomeBuild);
             this.datatrackService.getGenomeBuild(params).pipe(first()).subscribe( resp =>{
                 let seqFiles = Array.isArray(resp.SequenceFiles.Dir.File) ? resp.SequenceFiles.Dir.File
                     : [ resp.SequenceFiles.Dir.File];

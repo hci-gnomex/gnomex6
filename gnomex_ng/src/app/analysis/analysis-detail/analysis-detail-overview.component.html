@@ -1,9 +1,14 @@
 <div style="display:flex; flex-direction:column ; height:100%; width:100%;">
     <div style="display:flex; font-size:small; " >
-        <label>
+        <label class="label-title label-title-width">
             <img class="icon" [src]="analysisTreeNode?.icon">
             Analysis {{analysisTreeNode?.number}}
         </label>
+        <button mat-button color="link" *ngIf="showEdit" (click)="editButtonClicked($event)">
+            <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
+            <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
+            {{isEditMode ? "View" : "Edit"}}
+        </button>
         <button mat-button *ngIf="this.showAutoDistributeDataTracks" (click)="this.autoDistributeDataTracks()"><img class="icon" [src]="constService.ICON_DATATRACK_NEW">Auto Distribute All Data Tracks</button>
         <button mat-button *ngIf="this.showManagePEDFile" (click)="this.showManagePEDFileWindow()"><img class="icon" [src]="constService.ICON_CHART_ORGANIZATION">Manage Ped File</button>
         <button mat-button (click)="this.shareWebLink()"><img class="icon" [src]="constService.GLOBE_LINK">Share URL</button>
@@ -19,13 +24,13 @@
     <div style="display:flex; flex: 9">
         <mat-tab-group class="mat-tab-group-border"  (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Info">
-                <analysis-info-tab></analysis-info-tab>
+                <analysis-info-tab [isEditMode]="isEditMode"></analysis-info-tab>
             </mat-tab>
             <mat-tab label="Description">
-                <analysis-description-tab [isEditMode]="true"></analysis-description-tab>
+                <analysis-description-tab [isEditMode]="isEditMode"></analysis-description-tab>
             </mat-tab>
             <mat-tab label="Annotations">
-                <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.ANALYSIS"> </annotation-tab>
+                <annotation-tab [annotations]="annotations" [disabled]="!isEditMode" [orderType]="types.ANALYSIS"> </annotation-tab>
             </mat-tab>
             <mat-tab  label="Experiment" style="height:100%;">
                <analysis-experiment-tab [tabVisible]="showExpAnalysisTab"> </analysis-experiment-tab>
@@ -42,7 +47,7 @@
     </div>
     <div style="flex:1;">
         <save-footer (saveClicked)="save()"
-                     [disableSave]="this.analysisService.analysisOverviewForm.invalid"
+                     [disableSave]="this.analysisService.analysisOverviewForm.invalid || !isEditMode"
                      [dirty]="this.analysisService.analysisOverviewForm.dirty">
         </save-footer>
     </div>

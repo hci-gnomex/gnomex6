@@ -8,6 +8,9 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {first} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../../../util/popup/dialogs.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     templateUrl:'./import-segments-dialog.html',
@@ -42,8 +45,8 @@ export class ImportSegmentsDialog implements OnInit {
 
     constructor(private dialogRef: MatDialogRef<ImportSegmentsDialog>,
                 @Inject(MAT_DIALOG_DATA) private data: any, private fb: FormBuilder,
-                private datatrackService: DataTrackService
-    ) {
+                private datatrackService: DataTrackService,
+                private dialogService: DialogsService) {
          this.parseImport = data.importFn;
          this.idGenomeBuild = data.idGenomeBuild;
 
@@ -66,18 +69,19 @@ export class ImportSegmentsDialog implements OnInit {
         let valueStr:string = value.segTextArea;
         let splitValue:Array<string> =  valueStr.split("\n");
         let formattedValue:string = splitValue.join(" ");
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idGenomeBuild", this.idGenomeBuild);
-        params.set("chromosomeInfo", valueStr );
+        let params: HttpParams = new HttpParams()
+            .set("idGenomeBuild", this.idGenomeBuild)
+            .set("chromosomeInfo", valueStr );
 
 
         this.datatrackService.getImportSegments(params).pipe(first()).subscribe(resp => {
-            let params:URLSearchParams = new URLSearchParams();
-            params.set("idGenomeBuild", resp.idGenomeBuild);
-            this.datatrackService.getGenomeBuild(params).pipe(first()).subscribe( resp =>{
+            let genomeParams:HttpParams = new HttpParams()
+                .set("idGenomeBuild", resp.idGenomeBuild);
+            this.datatrackService.getGenomeBuild(genomeParams).pipe(first()).subscribe( resp =>{
                 let segs:Array<any> = <Array<any>>resp.Segments;
                 this.parseImport(segs);
             })
+        },(err:IGnomexErrorResponse) => {
         });
 
 
@@ -86,13 +90,6 @@ export class ImportSegmentsDialog implements OnInit {
             this.showSpinner = true;
         }
         this.dialogRef.close();
-        //idGenomeBuild:82
-        //chromosomeInfo:dfasdf 3234
-        //this.datatrackService.getGenomeBuild()
-        // http post to ImportSegments.gx then subscribe
-        //in subscribe call GetGenomeBuild.gx using the response of importSeg's idGenomeBuild
-        // in the GetGB subscribe set response's Segements array to this.rowData
-
     }
 
 }

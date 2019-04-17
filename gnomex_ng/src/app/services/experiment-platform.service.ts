@@ -9,6 +9,8 @@ import {EpSampleTypeTabComponent} from "../configuration/experiment-platform/ep-
 import {DictionaryService} from "./dictionary.service";
 import {Subject} from "rxjs";
 import {AbstractControl, FormGroup} from "@angular/forms";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Injectable()
 export class ExperimentPlatformService implements OnDestroy{
@@ -26,7 +28,9 @@ export class ExperimentPlatformService implements OnDestroy{
 
     constructor(private cookieUtilService: CookieUtilService,
                 private httpClient: HttpClient,
-                private dictionaryService:DictionaryService) {
+                private dictionaryService:DictionaryService,
+                private dialogService: DialogsService
+    ) {
         this._expPlatformOverviewForm = new FormGroup({});
     }
 
@@ -153,6 +157,8 @@ export class ExperimentPlatformService implements OnDestroy{
         return this.httpClient.get("/gnomex/GetExperimentPlatformList.gx")
             .subscribe(resp =>{
                 this.emitExperimentPlatformList(resp);
+            },(error:IGnomexErrorResponse) =>{
+                this.dialogService.alert(error.error.message);
             })
     }
 

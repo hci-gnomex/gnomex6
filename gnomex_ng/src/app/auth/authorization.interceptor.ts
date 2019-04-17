@@ -39,8 +39,7 @@ export class AuthorizationInterceptor implements HttpInterceptor {
         return next.handle(reqClone).pipe(
             catchError((error) => {
                 if (isDevMode()) {
-                    console.error("AuthorizationInterceptor.error");
-                    console.error(error);
+
                 }
 
                 /**

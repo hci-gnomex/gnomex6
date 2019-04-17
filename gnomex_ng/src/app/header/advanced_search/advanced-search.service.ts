@@ -7,6 +7,8 @@ import {Subject} from "rxjs";
 import {Subscription} from "rxjs";
 import {AdvancedSearchComponent} from "./advanced-search.component";
 import {CookieUtilService} from "../../services/cookie-util.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Injectable()
 export class AdvancedSearchService implements OnDestroy {
@@ -61,7 +63,8 @@ export class AdvancedSearchService implements OnDestroy {
     private _searchResultSubject: Subject<any[]> = new Subject();
 
     constructor(private cookieUtilService: CookieUtilService,
-                private httpClient: HttpClient) { }
+                private httpClient: HttpClient,
+                private dialogService: DialogsService) { }
 
     ngOnDestroy(): void {
         this._allObjectSearchListSubscription.unsubscribe();
@@ -227,8 +230,8 @@ export class AdvancedSearchService implements OnDestroy {
             this._getSearchMetaInformationSubscription = this.httpClient.get('gnomex/GetSearchMetaInformation.gx', {}).subscribe((response) => {
                 this._getSearchMetaInformationSubject.next(response);
                 this.isAwaitingGetSearchMetaInformationResponse = false;
-            }, (error) => {
-                console.log("ERROR : " + error);
+            }, (err: IGnomexErrorResponse) => {
+                console.error("ERROR : " + err);
                 this.isAwaitingGetSearchMetaInformationResponse = false;
             });
         }

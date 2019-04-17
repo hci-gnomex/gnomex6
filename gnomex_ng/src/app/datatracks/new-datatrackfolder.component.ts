@@ -8,6 +8,7 @@ import {ConstantsService} from "../services/constants.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-datatrack-folder',
@@ -79,15 +80,10 @@ export class NewDataTrackFolderComponent implements OnInit {
 
         this.dataTrackService.saveDataTrackFolder(params).subscribe((response: any) => {
             this.showSpinner = false;
-            if (response && response.result && response.result === "SUCCESS") {
-                this.dialogRef.close(response.idDataTrackFolder);
-            } else {
-                let message: string = "";
-                if (response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.alert("An error occurred while adding data track folder" + message);
-            }
+            this.dialogRef.close(response.idDataTrackFolder);
+
+        },(err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

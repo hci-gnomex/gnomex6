@@ -12,6 +12,7 @@ import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
 import {AddLedgerEntryComponent} from "./add-ledger-entry.component";
 import {HttpParams} from "@angular/common/http";
 import {AddProductWindowComponent} from "./add-product-window.component";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'product-ledger',
@@ -165,13 +166,9 @@ export class ProductLedgerComponent implements OnInit {
                     }
                     return false;
                 });
-            } else {
-                let message: string = "";
-                if (response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.confirm("An error occurred while retrieving the product list" + message, null);
             }
+        },(err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
         this.loadLedger();
     }
@@ -198,6 +195,8 @@ export class ProductLedgerComponent implements OnInit {
             if (selectedProduct) {
                 this.selectNode(selectedProduct.idLab, selectedProduct.idProduct);
             }
+        },(err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 
@@ -235,6 +234,8 @@ export class ProductLedgerComponent implements OnInit {
                     }
                 }
                 this.sizeColumnsToFit();
+            },(err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }

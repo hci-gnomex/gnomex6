@@ -4,6 +4,7 @@ import {URLSearchParams} from "@angular/http";
 import {AnalysisService} from "../analysis.service";
 import {GnomexService} from "../gnomex.service";
 import {DataTrackService} from "../data-track.service";
+import {HttpParams} from "@angular/common/http";
 
 /* This service will be used in experiment.routes.ts and when injecting ActivateRoute  into browse-overview.component.ts
  we can get the project json off the route */
@@ -16,10 +17,10 @@ export class DatatrackListResolverService implements Resolve<any> {
 
     resolve(route: ActivatedRouteSnapshot) { // resolve is good with asyncrous data, it waits to load component till data is ready
         // then it calls subscribe
-        let ids: URLSearchParams = new URLSearchParams;
+
 
         let idGenomeBuild= route.params["idGenomeBuild"];
-        ids.set("idGenomeBuild", idGenomeBuild);
+        let ids: HttpParams = new HttpParams().set("idGenomeBuild", idGenomeBuild);
 
 
         if(this.gnomexService.orderInitObj){

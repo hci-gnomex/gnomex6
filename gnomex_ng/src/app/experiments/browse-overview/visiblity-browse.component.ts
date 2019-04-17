@@ -11,6 +11,7 @@ import {ActivatedRoute} from "@angular/router";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {GridOptions} from "ag-grid-community/main";
 import {URLSearchParams} from "@angular/http"
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -269,6 +270,7 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
             .subscribe(resp =>{
                 this.saveSuccess.emit();
                 this.experimentService.getProjectRequestList_fromBackend(this.experimentService.browsePanelParams);
+            },(err:IGnomexErrorResponse) => {
             });
     }
 
