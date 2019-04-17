@@ -39,16 +39,22 @@ import {DictionaryService} from "../../services/dictionary.service";
         super.agInit(params);
         this.indexTagLetter = params.column.colDef.indexTagLetter;
         this.idSeqLibProtocol = params.node.data.idSeqLibProtocol;
+
+        this.options = BarcodeSelectEditor.getPermittedBarcodes(this.indexTagLetter, this.idSeqLibProtocol, this.dictionaryService);
+    }
+
+    public static getPermittedBarcodes(indexTagLetter: string, idSeqLibProtocol: string, dictionaryService: DictionaryService): any[] {
+
+        let schemes = dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcodeScheme");
+        let allowedSchemes = dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcodeSchemeAllowed");
         let barcodes: any[] = [];
-        let sortedBarcodes: any[] = [];
-        let schemes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcodeScheme");
-        let allowedSchemes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcodeSchemeAllowed");
+
         for (let scheme of schemes) {
             let keepScheme: boolean = false;
             for (let allowed of allowedSchemes) {
                 if (scheme.idOligoBarcodeScheme === allowed.idOligoBarcodeScheme) {
-                    if (((this.indexTagLetter === 'A' && allowed.isIndexGroupB ==='N') || (this.indexTagLetter === 'B' && allowed.isIndexGroupB === 'Y')) &&
-                        (this.idSeqLibProtocol === '' || allowed.idSeqLibProtocol === this.idSeqLibProtocol)) {
+                    if (((indexTagLetter === 'A' && allowed.isIndexGroupB ==='N') || (indexTagLetter === 'B' && allowed.isIndexGroupB === 'Y')) &&
+                        (idSeqLibProtocol === '' || allowed.idSeqLibProtocol === idSeqLibProtocol)) {
                         keepScheme = true;
                         break;
                     }
@@ -58,12 +64,13 @@ import {DictionaryService} from "../../services/dictionary.service";
             if (!keepScheme) {
                 continue;
             }
-            let codes = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcode").filter(c =>
-                        c.isActive === 'Y' && c.idOligoBarcodeScheme === scheme.value)
+            let codes = dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.OligoBarcode").filter(c =>
+                c.isActive === 'Y' && c.idOligoBarcodeScheme === scheme.value);
             barcodes = barcodes.concat(codes);
 
         }
-        sortedBarcodes = barcodes.sort((obj1, obj2) => {
+
+        return barcodes.sort((obj1, obj2) => {
             if (obj1 == null && obj2 == null) {
                 return 0;
             } else if (obj1 == null) {
@@ -88,9 +95,7 @@ import {DictionaryService} from "../../services/dictionary.service";
                     }
                 }
             }
-
         });
-        this.options = sortedBarcodes;
     }
 
 }

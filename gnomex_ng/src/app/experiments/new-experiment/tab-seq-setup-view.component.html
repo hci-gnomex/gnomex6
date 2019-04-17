@@ -68,16 +68,16 @@
                     </div>
                     <div class="full-width flex-container-row">
                         <mat-radio-group class="long-width" formControlName="appPrice" (change)="onAppPriceChanged($event)" >
-                            <div class="full-width t">
-                                <div *ngFor="let appPrice of appPrices; let index=index; let odd=odd; let even=even;" class="tr" [ngClass]="{ odd: odd, even: even }">
-                                    <div class="full-width td padded">
+                            <div class="full-width">
+                                <div *ngFor="let appPrice of appPrices; let index=index; let odd=odd; let even=even;" class="flex-container-row" [ngClass]="{ odd: odd, even: even }">
+                                    <div class="flex-grow">
                                         <mat-radio-button [value]="appPrice">
                                         <span>
                                             {{ appPrice.display }}
                                         </span>
                                         </mat-radio-button>
                                     </div>
-                                    <div class="td padded right-align">
+                                    <div class="padded right-align">
                                         <span *ngIf="!this.form.get('seqPrepByCore').value || this.form.get('seqPrepByCore').value !== NO">
                                             {{ ('' + appPrice?.price).startsWith('$') ? appPrice?.price : ( appPrice?.price ? '$' + appPrice?.price : '') }}
                                         </span>

@@ -61,11 +61,16 @@ import {GnomexService} from "../../services/gnomex.service";
 export class ExperimentBioinformaticsTabComponent {
 
     @Input('experiment') set experiment(experiment: any) {
-        this._experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService,
-            this.gnomexService,
-            this.propertyService,
-            this.createSecurityAdvisorService,
-            experiment);
+
+        if (experiment instanceof Experiment) {
+            this._experiment = experiment;
+        } else {
+            this._experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService,
+                this.gnomexService,
+                this.propertyService,
+                this.createSecurityAdvisorService,
+                experiment);
+        }
 
         if (this._experiment && this._experiment.sequenceLanes) {
 

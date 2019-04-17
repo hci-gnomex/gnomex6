@@ -2065,6 +2065,42 @@
         <property name="sampleBatchSize" column="sampleBatchSize" type="integer"/>
         <property name="idProductType" column="idProductType" type="integer"/>
         <property name="associatedWithAnalysis" column="associatedWithAnalysis" type="string"/>
+        <set name="columnProperties" table="ColumnProperties" lazy="false" cascade="delete">
+            <key column="codeRequestCategory"/>
+            <one-to-many class="hci.gnomex.model.ColumnProperties"/>
+        </set>
+    </class>
+
+    <!-- hci.gnomex.model.ColumnProperties -->
+    <class name="hci.gnomex.model.ColumnProperties" table="ColumnProperties">
+        <id name="idColumnProperties" column="idColumnProperties" type="integer">
+            <generator class="native"/>
+        </id>
+        <property name="codeRequestCategory" column="codeRequestCategory" type="string" />
+        <property name="gridType" column="gridType" type="string" />
+        <property name="columnType" column="columnType" type="string" />
+        <property name="header" column="header" type="string" />
+        <property name="field" column="field" type="string" />
+        <property name="nameField" column="nameField" type="string" />
+        <property name="valueField" column="valueField" type="string" />
+        <property name="nameFrontEndDictionaryToUse" column="nameFrontEndDictionaryToUse" type="string" />
+        <property name="fullDictionaryModelPathToLoad" column="fullDictionaryModelPathToLoad" type="string" />
+        <property name="editableEditMode" column="editableEditMode" type="string" />
+        <property name="editableNewMode" column="editableNewMode" type="string" />
+        <property name="showFillButton" column="showFillButton" type="string" />
+        <property name="fillGroupAttribute" column="fillGroupAttribute" type="string" />
+        <property name="sortOrder" column="sortOrder" type="integer" />
+        <property name="showInNewMode" column="showInNewMode" type="string" />
+        <property name="showInNewSummaryMode" column="showInNewSummaryMode" type="string" />
+        <property name="showInViewMode" column="showInViewMode" type="string" />
+        <property name="showInEditMode" column="showInEditMode" type="string" />
+        <property name="requiredInNewMode" column="requiredInNewMode" type="string" />
+        <property name="requiredInEditMode" column="requiredInEditMode" type="string" />
+        <property name="patternToMatch" column="patternToMatch" type="string" />
+        <property name="patternToMatchErrorMessage" column="patternToMatchErrorMessage" type="string" />
+        <property name="width" column="width" type="string" />
+        <property name="minWidth" column="minWidth" type="string" />
+        <property name="maxWidth" column="maxWidth" type="string" />
     </class>
 
     <!-- hci.gnomex.model.RequestCategoryApplication -->

@@ -1,6 +1,9 @@
 package hci.gnomex.model;
 
+import java.util.Set;
+
 import java.io.Serializable;
+import java.util.TreeSet;
 
 import hci.dictionary.model.DictionaryEntry;
 import hci.gnomex.utility.DictionaryHelper;
@@ -60,6 +63,8 @@ public class RequestCategory extends DictionaryEntry implements Comparable, Seri
   private Integer               sampleBatchSize;
   private Integer				idProductType;
   private String				associatedWithAnalysis;
+
+  private Set columnProperties = new TreeSet();
 
   public static boolean isMicroarrayRequestCategory(String codeRequestCategory) {
     DictionaryHelper dh = DictionaryHelper.getInstance(null);
@@ -372,5 +377,13 @@ public class RequestCategory extends DictionaryEntry implements Comparable, Seri
 
   public void setAssociatedWithAnalysis(String associatedWithAnalysis) {
     this.associatedWithAnalysis = associatedWithAnalysis;
+  }
+
+  public Set getColumnProperties() {
+    return columnProperties;
+  }
+
+  public void setColumnProperties(Set columnProperties) {
+    this.columnProperties = columnProperties;
   }
 }
