@@ -32,12 +32,6 @@ import {UtilService} from "../services/util.service";
             display: flex;
             flex-grow: 1;
         }
-        /*For achieving wrap around column header*/
-        ::ng-deep .ag-header-cell-text {
-            text-overflow: clip !important;
-            overflow: visible !important;
-            white-space: normal !important;
-        }
     `]
 })
 

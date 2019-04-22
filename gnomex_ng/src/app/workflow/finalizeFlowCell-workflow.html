@@ -1,102 +1,108 @@
-<div class="flex-column-container-outlet">
-<as-split style="background-color: white">
-    <as-split-area size="50">
-        <div class="flex-column-container-workflow">
-            <div class="flex-row-container">
-                <img src="../../assets/DNA_diag.png" height="16" width="16" style="margin-top: .65em">
-                <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
+<div class="flex-column-container-outlet small-font">
+    <as-split (dragEnd)="sizeGridColumn($event)" style="background-color: white">
+        <as-split-area size="50">
+            <div class="flex-column-container-workflow padded">
+                <div class="flex-row-container">
+                    <img src="../../assets/DNA_diag.png" height="16" width="16" style="margin-top: .65em">
+                    <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
+                </div>
+                <div class="fill-flex-row">
+                </div>
+                <div class="flex-row-container-margin">
+                    Assembled Flow Cells
+                    <span class="normal-text">&nbsp;{{assmFlowCellNumber}}</span>
+                </div>
+                <div class="row-one" style="width: 100%;">
+                    <ag-grid-angular id="flowTable" style="font-size: .85rem" class="ag-theme-balham full-width"
+                                     [gridOptions]="gridOptions"
+                                     [rowData]="workingWorkItemList"
+                                     [columnDefs]="columnDefs"
+                                     (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                                     (rowSelected)="selectedRow($event)"
+                                     [rowSelection]="'single'"
+                                     (gridReady)="onGridReady($event)"
+                                     [enableSorting]="true"
+                                     [rowClassRules]="this.workflowService.assmGridRowClassRules"
+                                     [enableFilter]="true"
+                                     [enableColResize]="true">
+                    </ag-grid-angular>
+                </div>
             </div>
-            <div class="fill-flex-row">
+        </as-split-area>
+        <as-split-area size="50">
+            <div class="flex-column-container-workflow padded">
+                <div class="flex-row-container" style="justify-content: flex-end" >
+                    <button mat-button matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img class="icon" src="../../assets/action_refresh.gif">Refresh</button>
+                </div>
+                <div class="flex-row-container-itailic">
+                    Flow Cell to Finalize
+                    <span class="normal-text">&nbsp;{{flowCellNumber}}</span>
+                </div>
+                <div class="flex-row-container spaced-children-margin">
+                    <mat-form-field >
+                        <input matInput placeholder="Barcode" (change)="createFlowCellFileName()" [formControl]="this.barcodeFC">
+                        <mat-error *ngIf="this.barcodeFC.hasError('required')">Required</mat-error>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input matInput placeholder="Run #" (change)="createFlowCellFileName()" [formControl]="this.runFC">
+                        <mat-error *ngIf="this.runFC.hasError('required')">Required</mat-error>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input matInput [matDatepicker]="createDatePicker" placeholder="Create Date" (change)="createFlowCellFileName()" [formControl]="this.createDateFC">
+                        <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="flex-row-container spaced-children-margin">
+                    <mat-form-field class="formField">
+                        <mat-select placeholder="Instrument" (selectionChange)="createFlowCellFileName()" [formControl]="this.instrumentFC">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let instrument of instrumentList" [value]="instrument">{{instrument.instrument}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field style="width:25em;">
+                        <mat-select placeholder="Protocol" (selectionChange)="createFlowCellFileName()" [formControl]="this.protocolFC">
+                            <mat-option>Choose a protocol...</mat-option>
+                            <mat-option *ngFor="let protocol of filteredProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex-row-container-margin">
+                    Filename
+                    <span class="normal-text">&nbsp;{{flowCellRunFolder}}</span>
+                </div>
+                <div class="row-one" style="width: 100%;height: 90%">
+                    <ag-grid-angular id="assmTable" style="font-size: .85rem" class="ag-theme-balham full-width"
+                                     [rowData]="assmItemList"
+                                     [columnDefs]="assmColumnDefs"
+                                     (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                                     [rowSelection]="'single'"
+                                     (gridReady)="onAssmGridReady($event)"
+                                     [enableSorting]="true"
+                                     [enableFilter]="true"
+                                     (cellValueChanged) = "onCellValueChanged($event)"
+                                     [enableColResize]="true"
+                                     [rowClassRules]="this.workflowService.assmGridRowClassRules">
+                    </ag-grid-angular>
+                </div>
+
             </div>
-            <div class="flex-row-container-margin">
-                Assembled Flow Cells
-                <span class="normal-text">&nbsp;{{assmFlowCellNumber}}</span>
-            </div>
-            <div class="row-one" style="width: 100%;height: 90%">
-                <ag-grid-angular id="flowTable" style="font-size: .85rem" class="ag-theme-balham full-width"
-                                 [gridOptions]="gridOptions"
-                                 [rowData]="workingWorkItemList"
-                                 [columnDefs]="columnDefs"
-                                 (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                                 (rowSelected)="selectedRow($event)"
-                                 [rowSelection]="'single'"
-                                 (gridReady)="onGridReady($event)"
-                                 [enableSorting]="true"
-                                 [rowClassRules]="this.workflowService.assmGridRowClassRules"
-                                 [enableFilter]="true"
-                                 [enableColResize]="true">
-                </ag-grid-angular>
-            </div>
-        </div>
-    </as-split-area>
-    <as-split-area size="50">
-        <div class="flex-column-container-workflow">
-            <div class="flex-row-container" style="justify-content: flex-end" >
-                <button mat-button matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img class="icon" src="../../assets/action_refresh.gif">Refresh</button>
-            </div>
-            <div class="flex-row-container-itailic">
-                Flow Cell to Finalize
-                <span class="normal-text">&nbsp;{{flowCellNumber}}</span>
-            </div>
-            <div class="flex-row-container">
-                <mat-form-field class="formField">
-                    <input matInput placeholder="Barcode" (change)="createFlowCellFileName()" [formControl]="this.barcodeFC">
-                    <mat-error *ngIf="this.barcodeFC.hasError('required')">Required</mat-error>
-                </mat-form-field>
-                <mat-form-field class="formField">
-                    <input matInput placeholder="Run #" (change)="createFlowCellFileName()" [formControl]="this.runFC">
-                    <mat-error *ngIf="this.runFC.hasError('required')">Required</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <input matInput [matDatepicker]="createDatePicker" placeholder="Create Date" (change)="createFlowCellFileName()" [formControl]="this.createDateFC">
-                    <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
-                    <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
-                </mat-form-field>
-            </div>
-            <div class="flex-row-container">
-                <mat-form-field class="formField">
-                    <mat-select placeholder="Instrument" (selectionChange)="createFlowCellFileName()" [formControl]="this.instrumentFC">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let instrument of instrumentList" [value]="instrument">{{instrument.instrument}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="formField">
-                    <mat-select placeholder="Protocol" (selectionChange)="createFlowCellFileName()" [formControl]="this.protocolFC">
-                        <mat-option>Choose a protocol...</mat-option>
-                        <mat-option *ngFor="let protocol of filteredProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <div class="flex-row-container-margin">
-                Filename
-                <span class="normal-text">&nbsp;{{flowCellRunFolder}}</span>
-            </div>
-            <div class="row-one" style="width: 100%;height: 90%">
-                <ag-grid-angular id="assmTable" style="font-size: .85rem" class="ag-theme-balham full-width"
-                                 [gridOptions]="assmGridOptions"
-                                 [rowData]="assmItemList"
-                                 [columnDefs]="assmColumnDefs"
-                                 (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                                 [rowSelection]="'single'"
-                                 (gridReady)="onAssmGridReady($event)"
-                                 [enableSorting]="true"
-                                 [enableFilter]="true"
-                                 (cellValueChanged) = "onCellValueChanged($event)"
-                                 [enableColResize]="true"
-                                 [rowClassRules]="this.workflowService.assmGridRowClassRules">
-                </ag-grid-angular>
-            </div>
+        </as-split-area>
+    </as-split>
+    <div class="flex-row-container-end">
+        <div class="flex-container-row justify-center">
+            <save-footer (saveClicked)="save()"
+                         [disableSave]="!this.allFG.valid||this.assmItemList.length===0"
+                         [dirty]="this.allFG.dirty"
+                         [showSpinner]="this.showSpinner">
+            </save-footer>
+            <button mat-button [disabled]="this.selectedFlowCell.length===0"
+                    matTooltip="Delete selected Flow Cell" (click)="deleteFlowCell($event)">
+                <img src="../../assets/delete.png">Delete
+            </button>
 
         </div>
-    </as-split-area>
-</as-split>
-<div class="flex-row-container-end">
-    <button mat-button [disabled]="this.selectedFlowCell.length===0" style="margin-top: 1.2em" matTooltip="Delete selected Flow Cell" (click)="deleteFlowCell($event)"><img src="../../assets/delete.png">Delete</button>
-    <save-footer (saveClicked)="save()"
-                 [disableSave]="!this.allFG.valid||this.assmItemList.length===0"
-                 [dirty]="this.allFG.dirty"
-                 [showSpinner]="this.showSpinner">
-    </save-footer>
-</div>
+
+    </div>
 </div>
 
