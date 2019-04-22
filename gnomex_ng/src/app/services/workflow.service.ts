@@ -2,7 +2,7 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, Headers, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
@@ -284,8 +284,8 @@ export class WorkflowService {
     }
 
     saveFlowCell(params: HttpParams): Observable<any> {
-        this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/SaveFlowCell.gx", null, {params: params});
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveFlowCell.gx", params.toString(), {headers: headers});
 
     }
     deleteFlowCell(params: HttpParams): Observable<any> {

@@ -3,7 +3,7 @@ import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {MatAutocomplete, MatDialog, MatOption} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions} from "ag-grid-community";
+import {GridOptions, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -15,6 +15,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {FillLikeEditor} from "../util/grid-editors/filllike-select.editor";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'finalizeFlowCell-workflow',
@@ -24,7 +25,7 @@ import {UtilService} from "../services/util.service";
             display: flex;
             flex-direction: column;
             background-color: white;
-            height: 100%;
+            height: 94%;
             width: 100%;
         }
         .flex-column-container-outlet {
@@ -49,7 +50,7 @@ import {UtilService} from "../services/util.service";
             flex-direction: row;
             margin-bottom: .5em;
             font-style: italic;
-            color: #1601db;        
+            color: #1601db;
         }
         .normal-text {
             font-style: normal;
@@ -59,6 +60,7 @@ import {UtilService} from "../services/util.service";
             display: flex;
             flex-direction: row;
             justify-content: flex-end;
+            justify-items: center;
             margin-top: 1.2em;
         }
         .fill-flex-row {
@@ -69,10 +71,6 @@ import {UtilService} from "../services/util.service";
         .row-one {
             display: flex;
             flex-grow: 1;
-        }
-        mat-form-field.formField {
-            width: 50%;
-            margin: 0 0.5%;
         }
         /* Needed to style split-gutter white */
         ::ng-deep split-gutter {
@@ -99,9 +97,9 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     private assmColumnDefs;
     private showSpinner: boolean = false;
     private workItem: any;
-    private gridApi;
+    private gridApi:GridApi;
     private gridColumnApi;
-    private assmGridApi;
+    private assmGridApi: GridApi;
     private assmGridColumnApi;
     private label = "Illumina Finalize Flow Cell";
     private searchText: string;
@@ -402,7 +400,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         }
         for (let flow of this.assmItemList) {
             flow.seqADisplay = this.workflowService.lookupOligoBarcode(flow);
-            flow.seqBdisplay = this.workflowService.lookupOligoBarcodeB(flow);
+            flow.seqBDisplay = this.workflowService.lookupOligoBarcodeB(flow);
         }
 
         let showConc = this.gnomexService.getCoreFacilityProperty(this.flowCell.idCoreFacility, this.gnomexService.PROPERTY_SHOW_SAMPLE_CONC_PM);
@@ -462,6 +460,13 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             rLanes.push(obj);
         }
         this.lanes = rLanes;
+    }
+
+    sizeGridColumn(event):void{
+        if(this.gridApi){
+            this.gridApi.sizeColumnsToFit();
+            this.assmGridApi.sizeColumnsToFit();
+        }
     }
 
     onGridReady(params) {
@@ -577,48 +582,41 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
     saveWorkItems() {
         let params: HttpParams = new HttpParams().set("barcode" ,this.barcodeFC.value)
-        .set("codeSequencingPlatform", this.codeSequencingPlatform)
-        .set("createDate", WorkflowService.convertDate(this.createDateFC.value))
-        .set("idCoreFacility", this.flowCell.idCoreFacility)
-        .set("idFlowCell", this.flowCell.idFlowCell)
-        .set("idInstrument", this.instrumentFC.value.idInstrument)
-        .set("idNumberSequencingCycles", this.protocolFC.value.idNumberSequencingCycles)
-        .set("idNumberSequencingCyclesAllowed", this.protocolFC.value.idNumberSequencingCyclesAllowed)
-        .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
-        .set("notes", this.flowCell.notes)
-        .set("number", this.flowCell.number)
-        .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesActual)
-        .set("runFolder", this.flowCellRunFolder)
-        .set("runNumber", this.runFC.value);
+            .set("codeSequencingPlatform", this.codeSequencingPlatform)
+            .set("createDate", WorkflowService.convertDate(this.createDateFC.value))
+            .set("idCoreFacility", this.flowCell.idCoreFacility)
+            .set("idFlowCell", this.flowCell.idFlowCell)
+            .set("idInstrument", this.instrumentFC.value.idInstrument)
+            .set("idNumberSequencingCycles", this.protocolFC.value.idNumberSequencingCycles)
+            .set("idNumberSequencingCyclesAllowed", this.protocolFC.value.idNumberSequencingCyclesAllowed)
+            .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
+            .set("notes", this.flowCell.notes)
+            .set("number", this.flowCell.number)
+            .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesDisplay)
+            .set("runFolder", this.flowCellRunFolder)
+            .set("runNumber", this.runFC.value)
+            .set("side","A")
+            .set("noJSONToXMLConversionNeeded", "Y");
         for (let seqLane of this.assmItemList) {
             this.buildChannel(seqLane);
         }
 
-        params = params.set("channelsXMLString", JSON.stringify(this.flowCellChannels));
+        params = params.set("channelsJSONString", JSON.stringify(this.flowCellChannels));
 
         this.showSpinner = true;
         this.workflowService.saveFlowCell(params).subscribe((response: any) => {
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.allFG.markAsPristine();
-                    if (!responseJSON.flowCellNumber) {
-                        responseJSON.flowCellNumber = "";
-                    }
-                    this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " created", null);
-                    this.assmItemList = [];
-                    this.initialize();
-                } else {
-                    let message: string = "";
-                    if (responseJSON && responseJSON.message) {
-                        message = ": " + responseJSON.message;
-                    }
-                    this.dialogsService.confirm("An error occurred while saving" + message, null);
-                }
-            } else {
-                this.dialogsService.confirm("An error occurred while saving " + response.status, null);
-
+            this.allFG.markAsPristine();
+            if (!response.flowCellNumber) {
+                response.flowCellNumber = "";
             }
+            this.dialogsService.confirm("Flowcell " + response.flowCellNumber + " created", null);
+            this.assmItemList = [];
+            this.initialize();
+
+
+
+            this.showSpinner = false;
+        },(err:IGnomexErrorResponse) =>{
             this.showSpinner = false;
         });
 
@@ -730,6 +728,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             let runNumberPlus: number = Number(this.runFC.value) + 10000;
             runFolder += runNumberPlus.toString().substring(1,5);
             runFolder += "_";
+            runFolder +="A";
             runFolder += this.barcodeFC.value;
 
         }
