@@ -16,6 +16,7 @@ import {DateRange} from "./date-range-filter.component";
 import {Subscription} from "rxjs";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'browse-filter',
@@ -431,8 +432,12 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.idLabString = event.args.item.value;
                 if (this.showOwnerComboBox) {
                     this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
-                        this.ownerList = response.Lab.historicalOwnersAndSubmitters;
-                        this.ownerList.sort(this.prefService.createUserDisplaySortFunction());
+                        if (response.Lab.historicalOwnersAndSubmitters) {
+                            this.ownerList = UtilService.getJsonArray(response.Lab.historicalOwnersAndSubmitters, response.Lab.historicalOwnersAndSubmitters.AppUser)
+                                .sort(this.prefService.createUserDisplaySortFunction());
+                        } else {
+                            this.ownerList = [];
+                        }
                     });
                 }
                 if (this.showBillingAccountComboBox && this.mode === this.BILLING_BROWSE) {

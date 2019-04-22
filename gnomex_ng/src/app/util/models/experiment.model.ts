@@ -179,6 +179,20 @@ export class Experiment {
         }
     }
 
+    public extractionMethod_forSamples:        string = "";
+    public get extractionMethod(): string {
+        // The sample should always return "", but save what the choice was in case we
+        // save more samples, because samples save this information individually (???)
+        return "";
+    }
+    public set extractionMethod(value: string) {
+        this.extractionMethod_forSamples = value ? value : '';
+
+        for (let sample of this.samples) {
+            sample.otherSamplePrepMethod = this.extractionMethod_forSamples;
+        }
+    }
+
     public adminNotes:                         string = "";
     public archived:                           string = "";
 
@@ -581,7 +595,7 @@ export class Experiment {
         experiment.cloneProperty("billingItems", value);
         experiment.cloneProperty("SeqLibTreatmentEntries", value);
         experiment.cloneProperty("protocols", value);
-        experiment.cloneProperty("sequenceLanes", value);
+        experiment.clonePropertyOnlyIfExists("sequenceLanes", value);
         experiment.cloneProperty("PropertyEntries", value);
         experiment.cloneProperty("organism", value);
         experiment.cloneProperty("sequencingOption", value);

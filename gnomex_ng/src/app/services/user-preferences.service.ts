@@ -56,7 +56,7 @@ export class UserPreferencesService {
         return formattedName;
     }
 
-    private createDisplaySortFunction(displayField: string): (a: any, b: any) => number {
+    public createDisplaySortFunction(displayField: string): (a: any, b: any) => number {
         return (a: any, b: any) => {
             if (a && b) {
                 let aDisplay: string = a[displayField];

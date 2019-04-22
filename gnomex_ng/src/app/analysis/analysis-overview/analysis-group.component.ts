@@ -39,8 +39,7 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
 
     constructor(protected fb: FormBuilder,
                 private analysisService: AnalysisService,
-                private route: ActivatedRoute,
-                private dialogService: DialogsService) {
+                private route: ActivatedRoute) {
     }
 
     ngOnInit() {
@@ -90,30 +89,25 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
 
         let idLab = this.route.snapshot.paramMap.get("idLab");
         let idAnalysisGroup = this.route.snapshot.paramMap.get("idAnalysisGroup");
-        getParams = getParams.set("idLab",idLab);
-        getParams = getParams.set("idAnalysisGroup",idAnalysisGroup);
+        getParams = getParams.set("idLab", idLab);
+        getParams = getParams.set("idAnalysisGroup", idAnalysisGroup);
 
 
         this.project.name = this.projectBrowseForm.controls["name"].value;
         this.project.description = this.projectBrowseForm.controls["description"].value;
 
         saveParams = saveParams.set("idLab", idLab);
-        saveParams = saveParams.set("idAnalysisGroup",idAnalysisGroup);
-        saveParams = saveParams.set("name",this.project.name);
+        saveParams = saveParams.set("idAnalysisGroup", idAnalysisGroup);
+        saveParams = saveParams.set("name", this.project.name);
         saveParams = saveParams.set("description", this.project.description);
 
 
         this.analysisService.saveAnalysisGroup(saveParams).pipe(first()).subscribe(response => {
-            this.analysisService.refreshAnalysisGroupList_fromBackend();
             this.saveSuccess.emit(true);
             this.formInit = false;
-
-            this.analysisService.getAnalysisGroup(getParams).pipe(first()).subscribe(response => {
-                this.projectBrowseForm.get("name").setValue(response["AnalysisGroup"].name);
-                this.projectBrowseForm.get("description").setValue(response["AnalysisGroup"].description);
-            }, (err:IGnomexErrorResponse) => {
-            });
-        }, (err:IGnomexErrorResponse) => {
+            this.analysisService.setActiveNodeId = "p" + idAnalysisGroup;
+            this.analysisService.getAnalysisGroupList_fromBackend(this.analysisService.analysisPanelParams, true);
+        }, (err: IGnomexErrorResponse) => {
             this.saveSuccess.emit(false);
         });
 

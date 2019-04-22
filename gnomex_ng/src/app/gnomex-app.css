@@ -196,6 +196,10 @@ div.mainnav {
     width: 100%;
 }
 
+.half-width {
+    width: 50%;
+}
+
 .max-height {
     max-height: 100%
 }

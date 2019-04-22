@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
-import {BehaviorSubject, Observable, Subject,throwError} from "rxjs";
+import {BehaviorSubject, Observable, Subject, throwError} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {catchError, map} from "rxjs/operators";
@@ -16,24 +16,29 @@ export class AnalysisService {
     public invalid: boolean = false;
     public dirty: boolean = false;
 
+    public setActiveNodeId: string;
+    public selectedNodeId: string;
+    public modeChangedAnalysis: any;
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
     private analysisGroupListSubject: Subject<any[]> = new Subject();
     private _haveLoadedAnalysisGroupList: boolean = false;
     private _previousURLParams: HttpParams = null;
-    private _analysisPanelParams:HttpParams;
-    private _analysisList:Array<any> =[];
-    private analysisOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
-    private filteredAnalysisListSubject:Subject<any> = new Subject();
-    private createAnalysisDataSubject:Subject<any> = new Subject();
-    private saveManagerSubject:Subject<any> = new Subject();
+    private _analysisPanelParams: HttpParams;
+    private _analysisList: Array<any> = [];
+    private analysisOverviewListSubject: BehaviorSubject<any> = new BehaviorSubject([]);
+    private filteredAnalysisListSubject: Subject<any> = new Subject();
+    private createAnalysisDataSubject: Subject<any> = new Subject();
+    private saveManagerSubject: Subject<any> = new Subject();
 
     private _analysisOverviewForm: FormGroup;
     private _createdAnalysis: any;
+    private editMode: boolean = false;
 
 
-    constructor(private http: Http, private httpClient:HttpClient,
-                private cookieUtilService:CookieUtilService,
-                private dialogService:DialogsService) {
+    constructor(private http: Http, private httpClient: HttpClient,
+                private cookieUtilService: CookieUtilService,
+                private dialogService: DialogsService) {
         this._analysisOverviewForm = new FormGroup({});
     }
 
@@ -52,16 +57,16 @@ export class AnalysisService {
         this._analysisList = data;
     }
 
-    get analysisPanelParams(): HttpParams{
+    get analysisPanelParams(): HttpParams {
         return this._analysisPanelParams;
     }
-    set analysisPanelParams(data:HttpParams){
+    set analysisPanelParams(data: HttpParams) {
         this._analysisPanelParams = data;
     }
 
     getAnalysis(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysis.gx", {params: params})
-            .pipe(catchError((err:IGnomexErrorResponse) =>{
+            .pipe(catchError((err: IGnomexErrorResponse) => {
                 return throwError(err);
             }));
     }
@@ -73,14 +78,14 @@ export class AnalysisService {
 
     getAnalysisGroup(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysisGroup.gx", {params: params})
-            .pipe(catchError((err:IGnomexErrorResponse) =>{
+            .pipe(catchError((err: IGnomexErrorResponse) => {
                 return throwError(err);
             }));
     }
 
     getAnalysisGroupList(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetAnalysisGroupList.gx", {params: params})
-            .pipe(map((resp:any) =>{ return  resp.Lab}),catchError((err:IGnomexErrorResponse) =>{
+            .pipe(map((resp: any) => { return  resp.Lab; }), catchError((err: IGnomexErrorResponse) =>{
                 return throwError(err);
             }));
     }
@@ -247,7 +252,12 @@ export class AnalysisService {
         this._analysisOverviewForm = new FormGroup({});
     }
 
+    public setEditMode(editMode: boolean): void {
+        this.editMode = editMode;
+    }
 
-
+    public getEditMode(): boolean {
+        return this.editMode;
+    }
 
 }

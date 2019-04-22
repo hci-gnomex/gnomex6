@@ -6,27 +6,27 @@
                     <div class="heading">
                         Select a Sequencing Protocol
                     </div>
-                    <div class="flex-grow">
-                        <mat-radio-group class="long-width" formControlName="selectedProto" (change)="onProtoChange()">
-                            <div class="t">
-                                <div *ngFor="let proto of filteredNumberSequencingCyclesAllowedList; let index=index; let odd=odd; let even=even;"
-                                     class="tr"
-                                     [ngClass]="{ odd: odd, even: even }">
-                                    <div class="td padded">
-                                        <mat-radio-button [value]="proto">
-                                            <span>
-                                                {{ proto.display }}
-                                            </span>
-                                        </mat-radio-button>
-                                    </div>
-                                    <div class="td padded right-align major-padded-left">
+                    <div class="flex-grow flex-container-row">
+                        <mat-radio-group formControlName="selectedProto" (change)="onProtoChange()">
+                            <div *ngFor="let proto of filteredNumberSequencingCyclesAllowedList; let index=index; let odd=odd; let even=even;"
+                                 class="flex-container-row"
+                                 [ngClass]="{ odd: odd, even: even }">
+                                <div class="flex-grow padded">
+                                    <mat-radio-button [value]="proto">
                                         <span>
-                                            {{ ('' + proto?.price).startsWith('$') ? proto?.price : ( proto?.price ? '$' + proto?.price : '') }}
+                                            {{ proto.display }}
                                         </span>
-                                    </div>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="padded right-align major-padded-left">
+                                    <span>
+                                        {{ ('' + proto?.price).startsWith('$') ? proto?.price : ( proto?.price ? '$' + proto?.price : '') }}
+                                    </span>
                                 </div>
                             </div>
                         </mat-radio-group>
+                        <div class="flex-grow">
+                        </div>
                     </div>
                 </div>
             </li>

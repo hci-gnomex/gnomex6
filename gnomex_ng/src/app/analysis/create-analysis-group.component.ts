@@ -36,7 +36,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
     public labList: any[];
     public showSpinner: boolean = false;
     public newAnalysisGroupId: string = "";
-    private readonly selectedLad: any;
+    private readonly selectedLab: any;
     private idLabString: string;
 
 
@@ -51,7 +51,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
                 public prefService: UserPreferencesService) {
 
         this.labList = data.labList;
-        this.selectedLad = data.selectedLad;
+        this.selectedLab = data.selectedLab;
     }
 
     ngOnInit() {
@@ -65,8 +65,8 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        if(this.selectedLad) {
-            this.labComboBox.selectItem(this.selectedLad);
+        if(this.selectedLab) {
+            this.labComboBox.selectItem(this.selectedLab);
         }
 
         this.changeDetectorRef.detectChanges();
@@ -111,7 +111,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
                     this.analysisService.refreshAnalysisGroupList_fromBackend();
                 });
             }
-        }, (err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
             this.showSpinner = false;
         });

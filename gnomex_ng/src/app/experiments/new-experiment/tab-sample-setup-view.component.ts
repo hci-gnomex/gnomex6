@@ -132,11 +132,17 @@ export class TabSampleSetupViewComponent implements OnInit {
     private filteredSampleTypeListRna: any[] = [];
     private previousOrganismMatOption: MatOption;
     private showSampleNotes: boolean = false;
-    private showSamplePrepContainer: boolean = true;
+    public showSamplePrepContainer: boolean = true;
+    public showKeepSample: boolean = true;
+    public requireSamplePrepContainer: boolean = false;
+    public showSampleQualityExperimentType: boolean = false;
+    private showOrganism: boolean = true;
+    private showSamplePurification: boolean = true;
     private showRnaseBox: boolean = false;
     private showDnaseBox: boolean = false;
 
     private organisms: any[] = [];
+    private filteredApplications: any[] = [];
 
     get numberOfSamples(): number|string {
         return this._experiment.numberOfSamples;
@@ -162,18 +168,19 @@ export class TabSampleSetupViewComponent implements OnInit {
                 private fb: FormBuilder) {
 
         this.form = this.fb.group({
-                numSamples:      ['', [Validators.pattern(/^\d+$/)]],
-                selectedDna:     [''],
-                selectedRna:     [''],
-                sampleTypeNotes: [''],
-                organism:        [''],
-                reagent:         ['', [Validators.maxLength(100)]],
-                elution:         ['', [Validators.maxLength(100)]],
-                dnaseBox:        [''],
-                rnaseBox:        [''],
-                keepSample:      [''],
-                acid:            [''],
-                coreNotes:       ['', [Validators.maxLength(5000)]]
+                numSamples:       ['', [Validators.pattern(/^\d+$/)]],
+                selectedDna:      [''],
+                selectedRna:      [''],
+                sampleTypeNotes:  [''],
+                organism:         [''],
+                reagent:          ['', [Validators.maxLength(100)]],
+                elution:          ['', [Validators.maxLength(100)]],
+                extractionMethod: ['', [Validators.maxLength(100)]],
+                dnaseBox:         [''],
+                rnaseBox:         [''],
+                keepSample:       [''],
+                acid:             [''],
+                coreNotes:        ['', [Validators.maxLength(5000)]]
             },
             { validator: TabSampleSetupViewComponent.oneCategoryRequired }
         );
@@ -189,12 +196,15 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     ngOnInit() {
         this.organisms = this.gnomexService.activeOrganismList;
+        // this.filteredApplications = this.requestCategory;
 
         this.newExperimentService.currentState_onChangeObservable.subscribe((value) =>{
             if (value) {
                 this.buildSampleTypes();
             }
         });
+
+        this.setState();
 
         this.form.markAsPristine();
     }
@@ -278,6 +288,30 @@ export class TabSampleSetupViewComponent implements OnInit {
 
 
     private buildSampleTypes(): void {
+        if (this.filteredApplications.length === 0 && this.requestCategory) {
+            let temp: any[] = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.APPLICATION);
+            this.filteredApplications = [];
+
+            if (this.filteredApplications && Array.isArray(this.filteredApplications)) {
+                let bridge: any[] = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY_APPLICATION);
+
+                if (bridge && Array.isArray(bridge)) {
+                    bridge = bridge.filter((a: any) => {
+                        return a.codeRequestCategory && this._experiment && a.codeRequestCategory === this._experiment.codeRequestCategory;
+                    });
+
+                    for (let item of bridge) {
+                        for (let application of temp) {
+                            if (application.codeApplication === item.codeApplication) {
+                                this.filteredApplications.push(application);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if (this.filteredSampleTypeListDna.length === 0 && this.requestCategory) {
             this.filteredSampleTypeListDna = this.filterSampleType("DNA")
                 .sort(TabSampleSetupViewComponent.sortSampleTypes);
@@ -321,12 +355,29 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     private setState(): void {
         if (this.requestCategory) {
+            this.showSamplePrepContainer = true;
+            this.showKeepSample = true;
+            this.showSampleQualityExperimentType = false;
+            this.requireSamplePrepContainer = false;
+            this.showOrganism = true;
+            this.showSamplePurification = true;
+
             if (this.requestCategory.codeRequestCategory === "MDMISEQ") {
                 //TODO this.sampleSetupView.currentState = 'MDMiSeqState';
             }
             if (this.gnomexService.submitInternalExperiment()) {
                 this.showSamplePrepContainer = false;
             }
+
+            if (this.requestCategory.codeRequestCategory === "QC") {
+                this.showSamplePrepContainer = true;
+                this.showKeepSample = false;
+                this.showSampleQualityExperimentType = true;
+                this.requireSamplePrepContainer = true;
+                this.showOrganism = false;
+                this.showSamplePurification = false;
+            }
+
         }
     }
 
@@ -418,6 +469,10 @@ export class TabSampleSetupViewComponent implements OnInit {
 
     public onElutionChanged(event): void {
         this._experiment.elutionBuffer = this.form.get("elution").value;
+    }
+
+    public onExtractionMethodChanged(event): void {
+        this._experiment.extractionMethod = this.form.get("extractionMethod").value;
     }
 
     public onDnaseChanged(event): void {

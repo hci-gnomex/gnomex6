@@ -15,6 +15,9 @@ import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
 import {AnnotationService} from "../../services/annotation.service";
 import {TabSampleSetupViewComponent} from "./tab-sample-setup-view.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {TextAlignRightMiddleEditor} from "../../util/grid-editors/text-align-right-middle.editor";
+import {SelectEditor} from "../../util/grid-editors/select.editor";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -120,6 +123,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     private _barCodes: any[] = [];
 
+    private columnProperties: any[] = [];
+
     private sampleTypes: any[] = [];
 
     private experimentAnnotationsSubscription: Subscription;
@@ -202,6 +207,17 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     private buildColumnDefinitions(): void {
+        this.columnProperties = [];
+        this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
+
+        if (this.columnProperties) {
+            this.columnProperties = this.columnProperties.filter((a) => {
+                return a.codeRequestCategory === this._experiment.codeRequestCategory;
+            });
+        } else {
+            this.columnProperties = [];
+        }
+
         let temp: any[] = [];
 
         temp.push({
@@ -209,36 +225,104 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             editable: false,
             field: "multiplexGroupNumber",
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            width: 100
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate,
+            maxWidth: 12 * this.emToPxConversionRate,
+            sortOrder: 5
         });
         temp.push({
             headerName: "Sample ID",
             field: "sampleId",
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            width: 100,
-            editable: false
+            width:    6 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
+            maxWidth: 8 * this.emToPxConversionRate,
+            editable: false,
+            sortOrder: 10
         });
         temp.push({
             headerName: "Sample Name",
             field: "name",
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            width: 100,
-            editable: false
+            width:    8 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            editable: false,
+            sortOrder: 15
         });
-        temp.push({
-            headerName: "Conc. (ng/ul)",
-            field: "concentration",
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            width: 100,
-            editable: false
-        });
-        temp.push({
-            headerName: "Sample Volume (ul)",
-            field: "sampleVolume",
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            width: 100,
-            editable: false
-        });
+
+
+        for (let columnProperty of this.columnProperties) {
+
+            if (columnProperty.showInNewSummaryMode && columnProperty.showInNewSummaryMode === 'Y') {
+                let editable: boolean = false;
+                let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
+
+                let newColumn: any = {
+                    headerName: columnProperty.header,
+                    field: columnProperty.field,
+                    width: (+columnProperty.width) * this.emToPxConversionRate,
+                    minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
+                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: editable,
+
+                    showFillButton: showFillButton,
+                    fillGroupAttribute: columnProperty.fillGroupAttribute,
+                    sortOrder: columnProperty.sortOrder
+                };
+
+                switch(columnProperty.columnType) {
+                    case TabSamplesIlluminaComponent.TEXT_RIGHT:
+                        newColumn.cellRendererFramework = TextAlignRightMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignRightMiddleEditor;
+                        break;
+                    case TabSamplesIlluminaComponent.OPTION:
+                        newColumn.cellRendererFramework = SelectRenderer;
+                        newColumn.cellEditorFramework   = SelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            newColumn.selectOptions = this.dictionaryService.getEntries('' + columnProperty.fullDictionaryModelPathToLoad);
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    // case TabSamplesIlluminaComponent.MULTIOPTION:
+                    //     break;
+
+                    case TabSamplesIlluminaComponent.TEXT:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                        break;
+                    default:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                }
+
+                temp.push(newColumn);
+            }
+        }
+
+
+        // temp.push({
+        //     headerName: "Conc. (ng/ul)",
+        //     field: "concentration",
+        //     cellRendererFramework: TextAlignRightMiddleRenderer,
+        //     width: 100,
+        //     editable: false
+        // });
+        // temp.push({
+        //     headerName: "Sample Volume (ul)",
+        //     field: "sampleVolume",
+        //     cellRendererFramework: TextAlignRightMiddleRenderer,
+        //     width: 100,
+        //     editable: false
+        // });
 
         if (this._experiment
             && this._experiment.seqPrepByCore_forSamples
@@ -293,34 +377,38 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             });
         }
 
-        this.tabIndexToInsertAnnotations = temp.length;
+        this.tabIndexToInsertAnnotations = 150;
 
         temp.push({
             headerName: "# Seq Lanes",
             field: "numberSequencingLanes",
-            width: 100,
-            editable: false
-        });
-        temp.push({
-            headerName: "Sample Type",
+            width:    6 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate,
+            maxWidth: 8 * this.emToPxConversionRate,
             editable: false,
-            width: 175,
-            field: "idSampleType",
-            cellRendererFramework: SelectRenderer,
-            selectOptions: this.sampleTypes,
-            selectOptionsDisplayField: "sampleType",
-            selectOptionsValueField: "idSampleType"
+            sortOrder: 200
         });
-        temp.push({
-            headerName: "Organism",
-            editable: false,
-            width: 200,
-            field: "idOrganism",
-            cellRendererFramework: SelectRenderer,
-            selectOptions: this.organisms,
-            selectOptionsDisplayField: "display",
-            selectOptionsValueField: "idOrganism"
-        });
+
+        // temp.push({
+        //     headerName: "Sample Type",
+        //     editable: false,
+        //     width: 175,
+        //     field: "idSampleType",
+        //     cellRendererFramework: SelectRenderer,
+        //     selectOptions: this.sampleTypes,
+        //     selectOptionsDisplayField: "sampleType",
+        //     selectOptionsValueField: "idSampleType"
+        // });
+        // temp.push({
+        //     headerName: "Organism",
+        //     editable: false,
+        //     width: 200,
+        //     field: "idOrganism",
+        //     cellRendererFramework: SelectRenderer,
+        //     selectOptions: this.organisms,
+        //     selectOptionsDisplayField: "display",
+        //     selectOptionsValueField: "idOrganism"
+        // });
 
         if (this._experiment) {
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
@@ -329,10 +417,12 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 });
 
                 if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
-                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], this.tabIndexToInsertAnnotations, this.emToPxConversionRate, TabSamplesIlluminaComponent.STATE_NEW);
+                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], false, this.tabIndexToInsertAnnotations, this.emToPxConversionRate, TabSamplesIlluminaComponent.STATE_NEW, true);
                 }
             }
         }
+
+        temp = TabSamplesIlluminaComponent.sortColumns(temp);
 
         this.samplesGridConfirmColumnDefs = temp;
     }
@@ -440,7 +530,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 if (response.Request.BillingItem && Array.isArray(response.Request.BillingItem)) {
                     this.billingItems = response.Request.BillingItem
                 } else {
-                    this.billingItems = [response.Request.BillingItem.BillingItem];
+                    this.billingItems = [response.Request.BillingItem];
                 }
             });
         }
