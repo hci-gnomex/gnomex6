@@ -2,11 +2,13 @@ import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
+import {HttpClient, HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class AppUserListService {
 
-    constructor(private http: Http) {
+    constructor(private http: Http,
+                private httpClient: HttpClient) {
     }
 
     getAppUserList(params: URLSearchParams): Observable<any[]> {
@@ -26,6 +28,14 @@ export class AppUserListService {
             } else {
                 throw new Error("Error");
             }
+        }));
+    }
+
+    public getAppUserNew(idAppUser: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idAppUser", idAppUser);
+        return this.httpClient.get("/gnomex/GetAppUser.gx", {params: params}).pipe(map((response: any) => {
+            return response.AppUser;
         }));
     }
 

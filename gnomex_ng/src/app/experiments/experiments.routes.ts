@@ -12,6 +12,7 @@ import {SubRouteGuardService} from "../services/route-guards/sub-route-guard.ser
 import {ProjectListResolverService} from "../services/resolvers/project-list-resolver.service";
 import {ExperimentDetailOverviewComponent} from "./experiment-detail/experiment-detail-overview.component";
 import {NewExperimentComponent} from "./new-experiment/new-experiment.component";
+import {NewExternalExperimentComponent} from "./new-experiment/new-external-experiment.component";
 
 /**
  * A file defining and exporting the router configuration for the experiments module.
@@ -40,7 +41,8 @@ const ROUTES: Routes = [
     { path: "experiments-orders", component:ExperimentOrdersComponent},
     { path: "newProject", component: CreateProjectLauncherComponent, outlet: 'modal' },
     { path: "newExperiment", component: NewExperimentComponent, runGuardsAndResolvers: 'paramsOrQueryParamsChange' },
-    { path: "newExperiment/:idCoreFacility", component: NewExperimentComponent, runGuardsAndResolvers: 'paramsOrQueryParamsChange' }
+    { path: "newExperiment/:idCoreFacility", component: NewExperimentComponent, runGuardsAndResolvers: 'paramsOrQueryParamsChange' },
+    { path: "new-external-experiment", component: NewExternalExperimentComponent }
 
 ];
 
