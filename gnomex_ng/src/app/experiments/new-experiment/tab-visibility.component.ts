@@ -1,4 +1,4 @@
-import {Component,Input, OnDestroy} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -31,7 +31,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
         
     `]
 })
-export class TabVisibilityComponent implements OnDestroy{
+export class TabVisibilityComponent implements OnInit, OnDestroy{
 
     private _experiment: Experiment;
 
@@ -280,6 +280,12 @@ export class TabVisibilityComponent implements OnDestroy{
             privacyExp: null,
             collaborator: ''
         });
+    }
+
+    ngOnInit(): void {
+        if (this.experiment) {
+            this.experiment.refreshIdLab();
+        }
     }
 
     ngOnDestroy(){

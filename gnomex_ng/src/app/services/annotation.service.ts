@@ -40,7 +40,7 @@ export class AnnotationService {
         }
 
         let filterByPlatformApplication: boolean = false;
-        if (reqCategory != null && property) {
+        if (reqCategory && property) {
             if (property.platformApplications) {
                 if (!Array.isArray(property.platformApplications)) {
                     property.platformApplications = [property.platformApplications.PropertyPlatformApplication];
@@ -99,7 +99,7 @@ export class AnnotationService {
         }
 
         if (keep) {
-            if (reqCategory.idCoreFacility !== property.idCoreFacility) {
+            if (reqCategory && reqCategory.idCoreFacility !== property.idCoreFacility) {
                 keep = false;
             }
         }

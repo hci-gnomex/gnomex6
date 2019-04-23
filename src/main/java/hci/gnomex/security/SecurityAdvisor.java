@@ -866,6 +866,24 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             }
         }
 
+        //
+        // AppUser
+        //
+        else if (object instanceof AppUser) {
+            AppUser appUser = (AppUser) object;
+            // Admins
+            if (hasPermission(CAN_ACCESS_ANY_OBJECT)) {
+                canRead = true;
+            }
+            // GNomEx Users
+            else if (hasPermission(CAN_PARTICIPATE_IN_GROUPS)) {
+                // Can see yourself
+                if (isOwner(appUser.getIdAppUser())) {
+                    canRead = true;
+                }
+            }
+        }
+
         if (canRead) {
             // Property dictionaries are a special case of the a dictionary.
             // Super admins can read them, but admins should only see them
