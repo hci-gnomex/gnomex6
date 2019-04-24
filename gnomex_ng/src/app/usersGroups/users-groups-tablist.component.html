@@ -68,6 +68,7 @@
                                         <mat-checkbox [(ngModel)]="externalGroup" (change)="onExternalGroupChange($event)">External</mat-checkbox>
                                         <mat-form-field>
                                             <mat-select placeholder="Institution" (selectionChange)="searchInstitution($event)">
+                                                <mat-option>None</mat-option>
                                                 <mat-option *ngFor="let institute of this.institutions" [value]="institute.value">
                                                     {{institute.institution}}
                                                 </mat-option>
@@ -348,7 +349,7 @@
                                             <div class="height-auto flex-grow foreground border-padding">
                                                 <!--need flex row container-->
                                                 <div class="full-width full-height foreground flex-container-col">
-                                                    <label>Permission Level</label>
+                                                    <label>Pricing</label>
                                                     <div class="full-width flex-grow">
                                                         <mat-radio-group class="flex-container-col full-width" formControlName="pricing">
                                                             <mat-radio-button value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
@@ -366,6 +367,41 @@
                                                     <mat-checkbox *ngFor="let core of myCoreFacilities" [formControlName]="core.display">
                                                         {{core.display}}
                                                     </mat-checkbox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="full-width flex-container-row institution-div" *ngIf="showInstitutions">
+                                            <div class="height-auto flex-grow foreground border-padding">
+                                                <div class="full-width full-height foreground flex-container-col">
+                                                    <div class="flex-container-row align-center spaced-children-margin">
+                                                        <label>Institutions</label>
+                                                        <button mat-button (click)="onEditInstitutions()" class="color-blue">Edit...</button>
+                                                    </div>
+                                                    <div class="flex-container-row align-center spaced-children-margin">
+                                                        <lazy-loaded-select class="half-width" [control]="institutionToAddControl"
+                                                                            placeholder="Institution" [options]="institutions" [displayField]="'display'"
+                                                                            [allowNone]="true">
+                                                        </lazy-loaded-select>
+                                                        <div>
+                                                            <button mat-raised-button (click)="addInstitution()" [disabled]="!institutionToAddControl.value || !institutionToAddControl.value.idInstitution">
+                                                                <img [src]="constantsService.ICON_ADD">
+                                                            </button>
+                                                        </div>
+                                                        <div>
+                                                            <button mat-raised-button (click)="removeInstitution()" [disabled]="!institutionToRemove">
+                                                                <img [src]="constantsService.ICON_DELETE">
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="full-width flex-grow">
+                                                        <ag-grid-angular class="full-height full-width ag-theme-balham"
+                                                                         [columnDefs]="institutionGridColDefs"
+                                                                         [rowSelection]="'single'"
+                                                                         (gridSizeChanged)="onGridSizeChanged($event)"
+                                                                         (rowSelected)="onInstitutionGridRowSelected($event)"
+                                                                         (gridReady)="onInstitutionGridReady($event)">
+                                                        </ag-grid-angular>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
