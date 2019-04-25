@@ -1971,51 +1971,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         let showMenus: string[] = [];
         let hideMenus: string[] = [];
         for (let property of this.dictionaryService.getEntries("hci.gnomex.model.PropertyDictionary")) {
-            if (property.value === '') {
+            if (!property.value) {
                 continue;
             }
-            let menuToHideShow: string = "";
             if (property.propertyName.startsWith("menu_")) {
-                if (property.propertyValue === "hide" || property.propertyValue === "show") {
-                    if (property.idCoreFacility !== "" && !this.createSecurityAdvisorService.isSuperAdmin) {
-                        if (this.createSecurityAdvisorService.coreFacilitiesICanManage.length > 0) {
-                            // Only hide a menu for a core facility admin when
-                            // the menu_ property matches the core facility
-                            // the admin manages.
-                            for (let cf of this.createSecurityAdvisorService.coreFacilitiesICanManage) {
-                                if (property.idCoreFacility === cf.idCoreFacility) {
-                                    menuToHideShow = property.propertyName.substr(5);
-                                    break;
-                                }
-                            }
-                        } else {
-                            if (menuToHideShow === "") {
-                                // Only hide a menu when the menu_ property matches the
-                                // core facility and the user is only associated with ONE
-                                // core facility
-                                if (this.gnomexService.myCoreFacilities.length < 2) {
-                                    for  (let cf1 of this.gnomexService.myCoreFacilities) {
-                                        if (property.idCoreFacility === cf1.idCoreFacility) {
-                                            menuToHideShow = property.propertyName.substr(5);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (property.idCoreFacility === "") {
-                        menuToHideShow = property.propertyName.substr(5);
-                    }
-                } else if (property.propertyValue === "hide super" && this.createSecurityAdvisorService.isSuperAdmin) {
-                    menuToHideShow = property.propertyName.substr(5);
-                }
-            }
-            if (menuToHideShow !== "") {
-                if (property.propertyValue === "hide" || property.propertyValue === "hide super") {
-                    hideMenus.push(menuToHideShow);
-                } else if (property.propertyValue === "show") {
-                    showMenus.push(menuToHideShow);
-                }
+                this.parseMenuProperty(property, "show", "hide", "hide super", property.propertyName.substr(5), showMenus, hideMenus);
+            } else if (property.propertyName === PropertyService.PROPERTY_ALLOW_ADD_SEQUENCING_SERVICES) {
+                this.parseMenuProperty(property, "Y", "N", null, "Add Additional Illumina Sequencing Lanes", showMenus, hideMenus);
             }
         }
         for (let key of hideMenus) {
@@ -2038,6 +2000,48 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private parseMenuProperty(property: any, showValue: string, hideValue: string, hideSuperValue: string, menuName: string, showMenus: string[], hideMenus: string[]): void {
+        let menuToHideShow: string;
+        if (property.propertyValue === hideValue || property.propertyValue === showValue) {
+            if (property.idCoreFacility && !this.createSecurityAdvisorService.isSuperAdmin) {
+                if (this.createSecurityAdvisorService.coreFacilitiesICanManage.length > 0) {
+                    // Only hide a menu for a core facility admin when
+                    // the property matches the core facility
+                    // the admin manages.
+                    for (let cf of this.createSecurityAdvisorService.coreFacilitiesICanManage) {
+                        if (property.idCoreFacility === cf.idCoreFacility) {
+                            menuToHideShow = menuName;
+                            break;
+                        }
+                    }
+                } else {
+                    // Only hide a menu when the property matches the
+                    // core facility and the user is only associated with ONE
+                    // core facility
+                    if (this.gnomexService.myCoreFacilities.length < 2) {
+                        for (let cf1 of this.gnomexService.myCoreFacilities) {
+                            if (property.idCoreFacility === cf1.idCoreFacility) {
+                                menuToHideShow = menuName;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else if (!property.idCoreFacility) {
+                menuToHideShow = menuName;
+            }
+        } else if (hideSuperValue && property.propertyValue === hideSuperValue && this.createSecurityAdvisorService.isSuperAdmin) {
+            menuToHideShow = menuName;
+        }
+        if (menuToHideShow) {
+            if (property.propertyValue === hideValue || (hideSuperValue && property.propertyValue === hideSuperValue)) {
+                hideMenus.push(menuToHideShow);
+            } else if (property.propertyValue === showValue) {
+                showMenus.push(menuToHideShow);
             }
         }
     }
