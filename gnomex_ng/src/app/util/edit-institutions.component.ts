@@ -7,7 +7,7 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {DialogsService} from "./popup/dialogs.service";
 
 @Component({
-    selector: "edit-institutions-component",
+    selector: "edit-institutions",
     template: `
         <h6 mat-dialog-title>Edit Institutions</h6>
         <div mat-dialog-content class="content-div">

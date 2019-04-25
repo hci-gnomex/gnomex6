@@ -43,6 +43,7 @@ export class PropertyService {
     public static readonly PROPERTY_FDT_SUPPORTED: string = "fdt_supported";
     public static readonly PROPERTY_HELP_URL: string = "help_url";
     public static readonly PROPERTY_HIDE_INSTITUTIONS: string = "hide_institutions";
+    public static readonly PROPERTY_ALLOW_ADD_SEQUENCING_SERVICES: string = "allow_add_sequencing_services";
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
