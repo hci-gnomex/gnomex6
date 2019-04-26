@@ -202,10 +202,10 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
             this.rowData = this.analysisService.analysisList;
 
             if(this.analysisService.analysisGroupList) {
-                if(Array.isArray(this.analysisService.analysisGroupList)) {
-                    this.labs = this.analysisService.analysisGroupList;
+                if(Array.isArray(this.analysisService.analysisGroupList.Lab)) {
+                    this.labs = this.analysisService.analysisGroupList.Lab;
                 } else {
-                    this.labs = [this.analysisService.analysisGroupList];
+                    this.labs = [this.analysisService.analysisGroupList.Lab];
                 }
             }
 

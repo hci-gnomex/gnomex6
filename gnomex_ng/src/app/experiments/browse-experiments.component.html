@@ -14,8 +14,9 @@
                         <div class="full-height flex-container-col foreground">
                             <div class="full-width padding">
                                 <div class="flex-container-row align-center">
-                                    <div class="full-height flex-grow major-left-right-padding no-word-wrap">
-                                        {{experimentCount}} experiments
+                                    <div class="full-height flex-grow major-left-right-padding no-word-wrap flex-container-col align-center justify-center">
+                                        <label>{{experimentCount}} experiments</label>
+                                        <label style="font-size: 12px;">{{experimentCountMessage}}</label>
                                     </div>
                                     <div class="full-height">
                                         <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()" [disabled]="this.createSecurityAdvisorService.isGuest">
