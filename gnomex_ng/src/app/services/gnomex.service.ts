@@ -46,9 +46,6 @@ export class GnomexService {
     public iconDataTrackPublic = "assets/datatrack_world.png";
     public readonly PROPERTY_SHOW_SAMPLE_CONC_PM: string = "show_sample_conc_pm";
     public readonly PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT: string = "request_work_auth_link_text";
-    public readonly PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT: string = "access_auth_account_link_text";
-    public readonly PROPERTY_WORKAUTH_INSTRUCTIONS: string = "workauth_instructions";
-    public readonly PROPERTY_AUTH_ACCOUNTS_DESCRIPTION: string = "auth_accounts_description";
     public readonly PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD: string = "hiseq_run_type_label_standard";
     public readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string = "analysis_assistance_group";
     public readonly PROPERTY_CONTACT_EMAIL_BIOINFORMATICS: string = "contact_email_bioinformatics";
