@@ -59,6 +59,9 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
         .no-padding-dialog {
             padding: 0;
         }
+        .small-font {
+            font-size: 12px;
+        }
     `]
 })
 
@@ -75,7 +78,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     public labMembers: any;
 
-    public analysisCount: number = 0;
+    public analysisCount: string = "0";
+    public analysisCountMessage: string = "";
     public deleteAnalysisDialogRef: MatDialogRef<DeleteAnalysisComponent>;
     public disabled: boolean = true;
     public disableNewAnalysis: boolean = true;
@@ -145,7 +149,15 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 return;
             }
 
-            this.buildTree(response);
+            if (response && response.analysisCount) {
+                this.analysisCount = response.analysisCount;
+                this.analysisCountMessage = response.message ? "(" + response.message + ")" : "";
+            } else {
+                this.analysisCount = "0";
+                this.analysisCountMessage = "";
+            }
+
+            this.buildTree(response.Lab);
             if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
                 this.createAnalysisDialogRef.close();
                 this.createAnalysisDialogRef = null;
@@ -189,7 +201,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 }
 
                 if (!this.treeModel.getActiveNode()) {
-                    this.analysisService.emitAnalysisOverviewList(response);
+                    this.analysisService.emitAnalysisOverviewList(response.Lab);
                     let navArray: any[] = ["/analysis", {outlets: {"analysisPanel": "overview"}}];
                     this.router.navigate(navArray);
                     this.disableNewAnalysis = true;
@@ -281,7 +293,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     @param
      */
     buildTree(response: any[]) {
-        this.analysisCount = 0;
         this.labs = [];
         this.items = [].concat(null);
 
@@ -319,7 +330,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                             for (var a of p.items) {
                                 if (a) {
                                     if (a.label) {
-                                        this.analysisCount++;
                                         var labelString: string = a.number;
                                         labelString = labelString.concat(" (");
                                         labelString = labelString.concat(a.label);
