@@ -47,6 +47,8 @@ export class PropertyService {
     public static readonly PROPERTY_WORKAUTH_INSTRUCTIONS: string = "workauth_instructions";
     public static readonly PROPERTY_AUTH_ACCOUNTS_DESCRIPTION: string = "auth_accounts_description";
     public static readonly PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT: string = "access_auth_account_link_text";
+    public static readonly PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT: string = "account_number_account_default";
+    public static readonly PROPERTY_CONFIGURABLE_BILLING_ACCOUNTS: string = "configurable_billing_accounts";
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
