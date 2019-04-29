@@ -31,8 +31,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 export class NewBillingAccountLauncher {
 
 	constructor(private dialog: MatDialog, private router: Router,
-				public createSecurityAdvisorService: CreateSecurityAdvisorService,
-				public prefService: UserPreferencesService) {
+				public createSecurityAdvisorService: CreateSecurityAdvisorService) {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = '60em';
         config.panelClass = 'no-padding-dialog';
@@ -163,7 +162,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 
 	showField: string = this.CHARTFIELD;
 
-	usesCustomChartfields: string = '';
+	usesCustomChartfields: boolean;
 
 	accountName_Chartfield: string = '';
 	accountNameFormControl_Chartfield = new FormControl('', []);
@@ -206,7 +205,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	accountNumberProjectFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
 	accountNumberProjectStateMatcher_chartfield = new NewBillingAccountStateMatcher();
 
-	accountNumberAccount_Chartfield: string = '64300';
+	accountNumberAccount_Chartfield: string = '';
 	accountNumberAccountFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
 	accountNumberAccountStateMatcher_chartfield = new NewBillingAccountStateMatcher();
 
@@ -425,9 +424,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		this.usesCustomChartfields = this.propertyService.getExactProperty('configurable_billing_accounts').propertyValue;
+		this.usesCustomChartfields = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CONFIGURABLE_BILLING_ACCOUNTS);
 
-		if (this.usesCustomChartfields === 'Y') {
+		if (this.usesCustomChartfields) {
 			for (let i = 0; i < 5; i++) {
 				this.InternalCustomFieldsFormControl[i] = new FormControl('', []);
 				this.InternalCustomFieldsStateMatcher[i] = new NewBillingAccountStateMatcher();
@@ -444,6 +443,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 					});
 
 			this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
+		} else {
+            this.accountNumberAccount_Chartfield = this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT);
 		}
 	}
 
@@ -578,7 +579,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		let accountNumberProject: string = '';
 		let accountNumberAccount: string = '';
 
-		if (this.usesCustomChartfields === 'Y') {
+		if (this.usesCustomChartfields) {
 			if (this.internalAccountFieldsConfiguration) {
 				for (let i: number = 0; i < this.internalAccountFieldsConfiguration.length; i++) {
 					switch(this.internalAccountFieldsConfiguration[i].fieldName) {
@@ -622,7 +623,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		if (!!this.selectedFundingAgency_chartfield && (this.showFundingAgencies && this.usesCustomChartfields !== 'Y' || this.includeInCustomField_fundingAgency)) {
+		if (!!this.selectedFundingAgency_chartfield && (this.showFundingAgencies && !this.usesCustomChartfields || this.includeInCustomField_fundingAgency)) {
 			idFundingAgency = this.selectedFundingAgency_chartfield;
 		}
 
@@ -769,7 +770,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 			this.errorMessage += '- Error with short account name\n';
 		}
 
-		if (this.usesCustomChartfields !== 'Y') {
+		if (!this.usesCustomChartfields) {
 			if (this.accountNumberBusFormControl_chartfield.invalid) {
 				errorFound = errorFound || true;
 				this.errorMessage += '- "Bus" must be 2 digits\n';
@@ -812,13 +813,13 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		}
 
 		if ((!(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''))
-						&& (this.usesCustomChartfields !== 'Y' || this.includeInCustomField_startDate)) {
+						&& (!this.usesCustomChartfields || this.includeInCustomField_startDate)) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
 		if ((!(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() != ''))
-				&& ((this.usesCustomChartfields !== 'Y' ||   this.includeInCustomField_startDate)  && this.includeInCustomField_expirationDate)
-				&& ((this.usesCustomChartfields  == 'Y' && (!this.includeInCustomField_startDate)) && this.includeInCustomField_expirationDate)) {
+				&& ((!this.usesCustomChartfields ||   this.includeInCustomField_startDate)  && this.includeInCustomField_expirationDate)
+				&& ((this.usesCustomChartfields && (!this.includeInCustomField_startDate)) && this.includeInCustomField_expirationDate)) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
