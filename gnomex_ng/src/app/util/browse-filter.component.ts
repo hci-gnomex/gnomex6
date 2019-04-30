@@ -17,6 +17,7 @@ import {Subscription} from "rxjs";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
+import {PropertyService} from "../services/property.service";
 
 @Component({
     selector: 'browse-filter',
@@ -209,6 +210,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
                 private dictionaryService: DictionaryService, private billingService: BillingService,
                 private dialogService: DialogsService,
+                private propertyService: PropertyService,
                 public prefService: UserPreferencesService) {
         this.showMore = false;
         this.resetFields();
@@ -254,9 +256,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         this.showLabComboBox = true;
                     }
                 });
-                this.appUserListService.getMembersOnly().subscribe((response: any[]) => {
-                    this.labMembersList = response;
-                    this.labMembersList.sort(this.prefService.createUserDisplaySortFunction());
+                this.appUserListService.getMembersOnly().subscribe((response: any) => {
+                    this.labMembersList = UtilService.getJsonArray(response, response.AppUser)
+                        .sort(this.prefService.createUserDisplaySortFunction());
                 });
             }
             this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
@@ -376,7 +378,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     resetFields(): void {
         this.allFlag = false;
-        this.experimentsRadioString = "myLab";
+        this.setExperimentDefaultView();
         this.analysesRadioString = "myLab";
         this.workflowStateString = "SUBMITTED";
         this.redosFlag = false;
@@ -405,6 +407,25 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         this.experimentNumberString = "";
         this.invoiceNumberString = "";
         this.idBillingPeriodString = "";
+    }
+
+    private setExperimentDefaultView(): void {
+        let propertyDefaultValue: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_EXPERIMENT_DEFAULT_VIEW).toLowerCase();
+        if (propertyDefaultValue) {
+            if (propertyDefaultValue.includes("experiments")) {
+                this.experimentsRadioString = "myExperiments";
+            } else if (propertyDefaultValue.includes("lab")) {
+                this.experimentsRadioString = "myLab";
+            } else if (propertyDefaultValue.includes("collaborations")) {
+                this.experimentsRadioString = "myCollaborations";
+            } else if (propertyDefaultValue.includes("public")) {
+                this.experimentsRadioString = "publicData";
+            } else {
+                this.experimentsRadioString = "all";
+            }
+        } else {
+            this.experimentsRadioString = "myLab";
+        }
     }
 
     toggleShowMore(): void {
@@ -784,11 +805,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     getBillingRequestListParameters(): URLSearchParams {
-        // TODO Need to look up property for excludeNewRequest parameter
-        //<excludeNewRequests>{coreFacilityCombo.selectedItem != null &amp;&amp;parentApplication.getCoreFacilityProperty(coreFacilityCombo.selectedItem.@value, parentApplication.PROPERTY_EXCLUDE_NEW_REQUESTS) == "Y" ? 'Y' : 'N'}</excludeNewRequests>
+        let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, this.idCoreFacilityString);
 
         let params: URLSearchParams = new URLSearchParams();
-
         if (this.showLabComboBox && !(this.idLabString === "")) {
             params.set("idLab", this.idLabString);
         }
@@ -800,17 +819,15 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         }
         params.set("excludeInactiveBillingTemplates", "Y");
         params.set("deepSortResults", "Y");
-        params.set("excludeNewRequests", "N");
+        params.set("excludeNewRequests", excludeNewRequests ? "Y" : "N");
 
         return params;
     }
 
     getBillingItemListParameters(): URLSearchParams {
-        // TODO Need to look up property for excludeNewRequest parameter
-        //<excludeNewRequests>{coreFacilityCombo.selectedItem != null &amp;&amp;parentApplication.getCoreFacilityProperty(coreFacilityCombo.selectedItem.@value, parentApplication.PROPERTY_EXCLUDE_NEW_REQUESTS) == "Y" ? 'Y' : 'N'}</excludeNewRequests>
+        let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, this.idCoreFacilityString);
 
         let params: URLSearchParams = new URLSearchParams();
-
         if (this.showExperimentNumberInput && !(this.experimentNumberString === "")) {
             params.set("requestNumber", this.experimentNumberString);
         }
@@ -831,18 +848,16 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         }
         params.set("excludeInactiveBillingTemplates", "Y");
         params.set("sortResults", "N");
-        params.set("excludeNewRequests", "N");
+        params.set("excludeNewRequests", excludeNewRequests ? "Y" : "N");
 
         return params;
     }
 
     getBillingInvoiceListParameters(): URLSearchParams {
-        // TODO Need to look up property for excludeNewRequest parameter
-        //<excludeNewRequests>{coreFacilityCombo.selectedItem != null &amp;&amp;parentApplication.getCoreFacilityProperty(coreFacilityCombo.selectedItem.@value, parentApplication.PROPERTY_EXCLUDE_NEW_REQUESTS) == "Y" ? 'Y' : 'N'}</excludeNewRequests>
+        let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, this.idCoreFacilityString);
 
         let params: URLSearchParams = new URLSearchParams();
         let noRequestOrInvoiceNumber: boolean = this.experimentNumberString === "" && this.invoiceNumberString === "";
-
         if (this.showExperimentNumberInput && !(this.experimentNumberString === "")) {
             params.set("requestNumber", this.experimentNumberString);
         }
@@ -855,7 +870,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         if (((this.showCoreFacilityComboBox && !(this.idCoreFacilityString === "")) || this.coreFacilityList.length === 1) && noRequestOrInvoiceNumber) {
             params.set("idCoreFacility", this.idCoreFacilityString);
         }
-        params.set("excludeNewRequests", "N");
+        params.set("excludeNewRequests", excludeNewRequests ? "Y" : "N");
 
         return params;
     }

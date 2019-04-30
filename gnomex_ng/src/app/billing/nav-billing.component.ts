@@ -333,7 +333,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.invoiceMap = {};
 
         this.hideEmptyRequests = this.propertyService.getProperty("hide_requests_with_no_billing_items", event.idCoreFacility) === 'Y';
-        let excludeNewRequests: boolean = event.idCoreFacility && this.propertyService.getProperty("exclude_new_requests", event.idCoreFacility) === 'Y';
+        let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, event.idCoreFacility);
 
         let billingRequestListParams: HttpParams = new HttpParams();
         if (event && event.requestNumber) {
@@ -401,7 +401,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.billingItemList = [];
         this.billingItemGridData = [];
 
-        let excludeNewRequests: boolean = event.idCoreFacility && this.propertyService.getProperty("exclude_new_requests", event.idCoreFacility) === 'Y';
+        let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, event.idCoreFacility);
 
         let params: HttpParams = new HttpParams()
             .set("showOtherBillingItems", this.showRelatedCharges ? 'Y' : 'N')

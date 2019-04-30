@@ -53,7 +53,7 @@ export class AppUserListService {
         }));
     }
 
-    getMembersOnly(): Observable<any[]> {
+    getMembersOnly(): Observable<any> {
         let params: URLSearchParams = new URLSearchParams();
         params.set("membersOnly", "Y");
         return this.getAppUserList(params);
