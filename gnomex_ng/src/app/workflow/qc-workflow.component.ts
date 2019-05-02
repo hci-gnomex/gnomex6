@@ -3,7 +3,7 @@ import {WorkflowService, qcModes} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {MatAutocomplete, MatAutocompleteTrigger, MatInput, MatOption, MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions} from "ag-grid-community";
+import {GridOptions, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -12,6 +12,8 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {GridColumnValidateService} from "../services/grid-column-validate.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UtilService} from "../services/util.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'qc-workflow',
@@ -32,10 +34,6 @@ import {UtilService} from "../services/util.service";
             width: 20%;
             margin: 0 0.5%;
         }
-        .row-one {
-            display: flex;
-            flex-grow: 1;
-        }
     `]
 })
 
@@ -49,22 +47,22 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     @Input() mode: string;
 
     private workItemList: any[] = [];
-    private workingWorkItemList: any[] = [];
+    public workingWorkItemList: any[] = [];
     private coreIds: any[] = [];
     private cores: any[] = [];
     private requestIds: any[] = [];
     private filteredQcProtocolList: any[] = [];
     private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
     private changedRowMap: Map<string, any> = new Map<string, any>();
-    private columnDefs;
+    public columnDefs;
     private emptyRequest = {requestNumber: ""};
-    private dirty: boolean = false;
-    private showSpinner: boolean = false;
-    private workItem: any;
-    private core: any;
+    public dirty: boolean = false;
+    public showSpinner: boolean = false;
+    public workItem: any;
+    public core: any;
     private previousRequestMatOption: MatOption;
     private hide260230: boolean = true;
-    private gridApi;
+    private gridApi:GridApi;
     private gridColumnApi;
     private label: string = "Combined Sample Quality";
     private codeStepNext: string = "ALL";
@@ -103,8 +101,9 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     initialize() {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("codeStepNext", this.workflowService.QC);
+        this.dialogsService.startDefaultSpinnerDialog();
+        let params: HttpParams = new HttpParams()
+            .set("codeStepNext", this.workflowService.QC);
         this.cores = [];
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
@@ -224,10 +223,16 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 }
 
             ];
+            this.gridApi.setColumnDefs(this.columnDefs);
+            this.gridApi.sizeColumnsToFit();
+
             this.requestIds = Array.from(this.workingWorkItemList.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
             this.requestIds.unshift(this.emptyRequest);
+            this.dialogsService.stopAllSpinnerDialogs();
             // TODO Need to get hide260230 and hide that column appropriately
             // var hide260230:String = parentApplication.getCoreFacilityProperty(selectedIdCoreFacility, parentApplication.PROPERTY_HIDE_260_230_QC_WORKFLOW);
+        },(err:IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
@@ -341,7 +346,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     filterCores(): any[] {
-        this.coreFacilityInput.nativeElement.blur();
         return this.cores;
     }
 
@@ -358,17 +362,9 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    highlightFirstCoreOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.autoCoreComplete.options.first) {
-            this.autoCoreComplete.options.first.setActiveStyles();
-        }
-    }
 
-    displayCore(core) {
-        return core ? core.display : core;
+    compareByID(core1,core2) {
+        return core1 && core2 && core1.idCoreFacility == core2.idCoreFacility;
     }
 
     selectRequestOption(event) {
@@ -410,7 +406,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        params.api.sizeColumnsToFit();
         this.initialize();
     }
 
@@ -437,13 +432,13 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     save() {
         this.gridApi.stopEditing();
         setTimeout(() => {
-            let params: URLSearchParams = new URLSearchParams();
+            let params: HttpParams = new HttpParams();
             let workItems: any[] = [];
             for(let value of Array.from( this.changedRowMap.values()) ) {
                 this.setQualCodeApplication(value);
                 workItems.push(value);
             }
-            params.set("workItemXMLString", JSON.stringify(workItems));
+            params = params.set("workItemXMLString", JSON.stringify(workItems));
             this.showSpinner = true;
             this.workflowService.saveCombinedWorkItemQualityControl(params).subscribe((response: Response) => {
                 this.showSpinner = false;
@@ -451,6 +446,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 this.dirty = false;
                 this.workItem = "";
                 this.initialize();
+            }, (err:IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         })
 

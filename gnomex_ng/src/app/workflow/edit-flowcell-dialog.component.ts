@@ -61,14 +61,6 @@ import {DialogsService} from "../util/popup/dialogs.service";
             display: flex;
             flex-direction: row;
         }
-        .row-one {
-            display: flex;
-            flex-grow: 1;
-        }
-        mat-form-field.formField {
-            width: 50%;
-            margin: 0 0.5%;
-        }
         mat-form-field.formField {
             width: 50%;
             margin: 0 0.5%;

@@ -1,8 +1,8 @@
 <div class="flex-column-container-workflow">
     <div class="flex-row-container">
         <img src="../../assets/flask.png" height="16" width="16" style="margin-top: .65em">
-        <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
-        <mat-label style="justify-content: flex-end;margin-left: 40em;margin-top: .4em;">{{requestIds.length-1}} requests in worklist</mat-label>
+        <mat-label style="margin-left: .4em;margin-top: .4em;">{{ label }}</mat-label>
+        <mat-label style="justify-content: flex-end;margin-left: 40em;margin-top: .4em;">{{ requestIds.length > 0 ? requestIds.length - 1  : 0 }} requests in worklist</mat-label>
 
     </div>
     <div class="flex-row-container">
@@ -15,22 +15,21 @@
             </mat-autocomplete>
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput #coreFacility placeholder="Core facility" aria-label="Core" [matAutocomplete]="autoCore"
-                   [(ngModel)]="core" (keyup.enter)="chooseFirstCoreOption()" (keyup)="highlightFirstCoreOption($event)">
-            <mat-autocomplete #autoCore="matAutocomplete" [displayWith]="displayCore">
-                <mat-option (onSelectionChange)="selectCoreOption($event)" *ngFor="let cor of filterCores()" [value]="cor">{{cor.display}}</mat-option>
-            </mat-autocomplete>
+            <mat-select (selectionChange)="selectCodeOption($event)" [(ngModel)]="codeStepNext" placeholder="Experiment Type"
+                        aria-label="Experiment Type" [compareWith]="compareByID">
+                <mat-option  *ngFor="let code of this.codeStepArray"
+                             [value]="code.codeStepNext">{{code.label}}</mat-option>
+            </mat-select>
         </mat-form-field>
     </div>
-    <div class="row-one" style="width: 100%;height: 90%">
-        <ag-grid-angular id="userTable" class="ag-theme-balham full-width"
+    <div class="flex-grow">
+        <ag-grid-angular id="userTable" class="ag-theme-balham full-height full-width"
                          [rowData]="workingWorkItemList"
-                         [columnDefs]="columnDefs"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                         [rowSelection]="rowSelection"
                          (gridReady)="onGridReady($event)"
                          [enableSorting]="true"
                          (cellValueChanged) = "onCellValueChanged($event)"
+                         [stopEditingWhenGridLosesFocus]="true"
                          [rowClassRules]="this.workflowService.assmGridRowClassRules"
                          [enableFilter]="true"
                          [enableColResize]="true">

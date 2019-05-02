@@ -2,7 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions} from "ag-grid-community";
+import {GridOptions, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -12,39 +12,24 @@ import {HttpParams} from "@angular/common/http";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {GridColumnValidateService} from "../services/grid-column-validate.service";
 import {UtilService} from "../services/util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'pipeline-workflow',
     templateUrl: 'pipeline-workflow.html',
-    styles: [`
-        .flex-column-container-workflow {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 94%;
-            width: 100%;
-        }
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-        .row-one {
-            display: flex;
-            flex-grow: 1;
-        }
-    `]
+    styles: []
 })
 
 export class PipelineWorkflowComponent implements OnInit {
     private workItemList: any[] = [];
     public workingWorkItemList: any[] = [];
     private changedRowMap: Map<string, any> = new Map<string, any>();
-    public columnDefs;
+    public columnDefs: any;
     private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
     private core: any;
-    public gridApi;
+    public gridApi: GridApi;
     private gridColumnApi;
     private pipelineProtoList: any[] = [];
 
@@ -60,8 +45,9 @@ export class PipelineWorkflowComponent implements OnInit {
     }
 
     initialize() {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("codeStepNext", this.workflowService.ILLSEQ_DATA_PIPELINE);
+        this.dialogsService.startDefaultSpinnerDialog();
+        let params: HttpParams = new HttpParams()
+            .set("codeStepNext", this.workflowService.ILLSEQ_DATA_PIPELINE);
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
             this.workingWorkItemList = this.workItemList;
@@ -147,7 +133,13 @@ export class PipelineWorkflowComponent implements OnInit {
                 }
 
             ];
+            this.gridApi.setColumnDefs(this.columnDefs);
+            this.gridApi.sizeColumnsToFit();
+
             this.workflowService.assignBackgroundColor(this.workingWorkItemList, "flowCellNumber");
+            this.dialogsService.stopAllSpinnerDialogs();
+        },(err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
@@ -204,7 +196,6 @@ export class PipelineWorkflowComponent implements OnInit {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
         params.api.setHeaderHeight(50);
-        params.api.sizeColumnsToFit();
         this.initialize();
     }
 
@@ -224,18 +215,21 @@ export class PipelineWorkflowComponent implements OnInit {
                     if (response.message) {
                         this.dialogsService.confirm(response.message, null);
                     }
-                } else {
-                    let message: string = "";
-                    if (response && response.message) {
-                        message = ": " + response.message;
-                    }
-                    this.dialogsService.confirm("An error occurred while saving the flow cell" + message, null);
                 }
                 this.showSpinner = false;
                 this.changedRowMap = new Map<string, any>();
                 this.dirty = false;
                 this.workItem = "";
                 this.initialize();
+            },(err:IGnomexErrorResponse) => {
+                // just warning that it couldn't send an email still saved
+                if(err.gError.result === "SUCCESS"){
+                    this.changedRowMap = new Map<string, any>();
+                    this.dirty = false;
+                    this.workItem = "";
+                    this.initialize();
+                }
+                this.showSpinner = false;
             });
         })
     }

@@ -642,7 +642,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
         }
 
         this._experiment.idProject          = this.form.get("selectProject").value.idProject;
-        this._experiment.project            = JSON.stringify(this.form.get("selectProject").value);
+        this._experiment.project            = this.form.get("selectProject").value;
         this._experiment.projectName        = this.form.get("selectProject").value.display;
         this._experiment.projectDescription = this.form.get("selectProject").value.description;
     }

@@ -15,33 +15,35 @@
             </mat-autocomplete>
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput #coreFacility placeholder="Core facility" aria-label="Core" [matAutocomplete]="autoCore"
-                   [(ngModel)]="core" (keyup.enter)="chooseFirstCoreOption()" (keyup)="highlightFirstCoreOption($event)">
-            <mat-autocomplete #autoCore="matAutocomplete" [displayWith]="displayCore">
+            <mat-select [(ngModel)]="core" placeholder="Core facility" [compareWith]="compareByID">
                 <mat-option (onSelectionChange)="selectCoreOption($event)" *ngFor="let cor of filterCores()" [value]="cor">{{cor.display}}</mat-option>
-            </mat-autocomplete>
+            </mat-select>
         </mat-form-field>
     </div>
-    <div class="row-one" style="width: 100%;height: 90%">
-        <ag-grid-angular id="userTable" class="ag-theme-balham full-width"
+    <div class="flex-grow">
+        <ag-grid-angular class="ag-theme-balham full-height full-width"
                          [rowData]="workingWorkItemList"
-                         [columnDefs]="columnDefs"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                         [rowSelection]="rowSelection"
                          (rowSelected)="selectedRow($event)"
                          (gridReady)="onGridReady($event)"
                          [enableSorting]="true"
                          (cellValueChanged) = "onCellValueChanged($event)"
                          [enableFilter]="true"
+                         [stopEditingWhenGridLosesFocus]="true"
                          [rowClassRules]="this.workflowService.assmGridRowClassRules"
                          [enableColResize]="true">
         </ag-grid-angular>
     </div>
-    <div class="flex-row-container">
-        <button mat-button style="margin-top: 1.2em" matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img src="../../assets/action_refresh.gif">Refresh</button>
-        <save-footer style="width: 100%" (saveClicked)="save()"
-                 [dirty]="this.dirty"
-                 [showSpinner]="this.showSpinner">
-        </save-footer>
+    <div class="flex-row-container justify-center justify-space-between">
+        <button mat-button  matTooltip="Refresh worklist" (click)="refreshWorklist($event)">
+            <img src="../../assets/action_refresh.gif">Refresh
+        </button>
+        <div class="flex-grow">
+            <save-footer style="width: 100%" (saveClicked)="save()"
+                         [dirty]="this.dirty"
+                         [showSpinner]="this.showSpinner">
+            </save-footer>
+        </div>
+
     </div>
 </div>
