@@ -4,6 +4,7 @@ import {URLSearchParams} from "@angular/http";
 import {MatDialog, MatDialogConfig, MatDialogRef, MatSnackBar, MatSnackBarConfig} from "@angular/material";
 
 import {GridOptions} from "ag-grid-community/main";
+import {GridApi, GridReadyEvent, ColDef, RowSelectedEvent} from "ag-grid-community";
 
 import {Subscription} from "rxjs";
 
@@ -25,6 +26,11 @@ import {PasswordUtilService} from "../services/password-util.service";
 import {BillingAccountTabComponent} from "./billingAccountTab/billing-account-tab.component";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
+import {PropertyService} from "../services/property.service";
+import {UtilService} from "../services/util.service";
+import {ConstantsService} from "../services/constants.service";
+import {ConfigAnnotationDialogComponent} from "../util/config-annotation-dialog.component";
+import {EditInstitutionsComponent} from "../util/edit-institutions.component";
 
 /**
  * @title Basic tabs
@@ -55,6 +61,13 @@ import {HttpParams} from "@angular/common/http";
             margin: 3px;
         }
 
+        div.institution-div {
+            height: 18em;
+        }
+        
+        .color-blue {
+            color: blue;
+        }
 
         
         label {
@@ -131,6 +144,15 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     public readonly EXCOMM = "EXCOMM";
     public readonly INTERNAL = "INTERNAL";
 
+    public showInstitutions: boolean = false;
+    public institutionGridColDefs: ColDef[];
+    public institutionGridApi: GridApi;
+    public institutions: any[] = [];
+    public labInstitutions: any[] = [];
+    public institutionToAddControl: FormControl;
+    public institutionToRemove: any = null;
+    private institutionsChanged: boolean = false;
+
     private columnDefs;
     private labColumnDefs;
     private collColumnDefs;
@@ -151,7 +173,6 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     private idCoreFacility: string;
     private groupsData: any[] = [];
     public labs: any[] = [];
-    public institutions: any[] = [];
     public collaboratingLabs: any[] = [];
     public managingLabs: any[] = [];
     public myManagingLabs: any[] = [];
@@ -202,6 +223,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
     constructor(public secAdvisor: CreateSecurityAdvisorService,
                 public passwordUtilService: PasswordUtilService,
+                public constantsService: ConstantsService,
                 private appUserListService: AppUserListService,
                 private formBuilder: FormBuilder,
                 private snackBar: MatSnackBar,
@@ -211,6 +233,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
                 private dictionaryService: DictionaryService,
                 private changeRef:ChangeDetectorRef,
                 public prefService: UserPreferencesService,
+                private propertyService: PropertyService,
                 private dialog: MatDialog
                 ) {
         this.columnDefs = [
@@ -272,6 +295,17 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     }
 
     ngOnInit() {
+        this.showInstitutions = !this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_HIDE_INSTITUTIONS);
+        if (this.showInstitutions) {
+            this.institutionGridColDefs = [
+                {
+                    headerName: "Name",
+                    editable: false,
+                    field: "display"
+                }
+            ];
+            this.institutionToAddControl = new FormControl("");
+        }
         this.buildUsers();
         this.buildLabList();
         this.buildInstitutions();
@@ -618,6 +652,13 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
         this.getLabService.getLab(params).subscribe((response: any) => {
             this.selectedGroup = response.Lab;
+            if (this.showInstitutions) {
+                this.resetInstitutionControls();
+                this.labInstitutions = UtilService.getJsonArray(this.selectedGroup.institutions, this.selectedGroup.institutions.Institution);
+                if (this.institutionGridApi) {
+                    this.institutionGridApi.setRowData(this.labInstitutions);
+                }
+            }
             this.myCoreFacilities = this.buildGroupCoreControls();
             this.setLabPricing(this.selectedGroup);
             this.setGroupValues();
@@ -1278,11 +1319,18 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
 
         }
 
+        if (this.showInstitutions) {
+            params = params.set("institutionsJSONString", JSON.stringify(this.labInstitutions));
+        }
+
         params = params.set("noJSONToXMLConversionNeeded", "Y");
 
         this.labListService.saveLab(params).subscribe((responseJSON: any) => {
             if (responseJSON.result && responseJSON.result === "SUCCESS") {
                 this.groupForm.markAsPristine();
+                if (this.showInstitutions) {
+                    this.resetInstitutionControls();
+                }
                 this.touchGroupFields();
 
                 let config: MatSnackBarConfig = new MatSnackBarConfig();
@@ -1335,8 +1383,53 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     }
 
     buildInstitutions() {
-        this.institutions = this.dictionaryService.getEntries(DictionaryService.INSTITUTION);
+        this.institutions = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.INSTITUTION).sort(this.prefService.createDisplaySortFunction("display"));
+    }
 
+    public onInstitutionGridReady(event: GridReadyEvent): void {
+        this.institutionGridApi = event.api;
+        this.institutionGridApi.setRowData(this.labInstitutions);
+        this.institutionGridApi.sizeColumnsToFit();
+    }
+
+    public onInstitutionGridRowSelected(event: RowSelectedEvent): void {
+        this.institutionToRemove = event.data;
+    }
+
+    public addInstitution(): void {
+        if (this.institutionToAddControl.value) {
+            if (!this.labInstitutions.includes(this.institutionToAddControl.value)) {
+                this.labInstitutions.push(this.institutionToAddControl.value);
+                this.institutionGridApi.setRowData(this.labInstitutions);
+                this.institutionToRemove = null;
+                this.institutionsChanged = true;
+            }
+            this.institutionToAddControl.setValue("");
+        }
+    }
+
+    public removeInstitution(): void {
+        if (this.institutionToRemove) {
+            this.labInstitutions.splice(this.labInstitutions.indexOf(this.institutionToRemove), 1);
+            this.institutionGridApi.setRowData(this.labInstitutions);
+            this.institutionToRemove = null;
+            this.institutionsChanged = true;
+        }
+    }
+
+    public onEditInstitutions(): void {
+        let dialogRef: MatDialogRef<EditInstitutionsComponent> = this.dialog.open(EditInstitutionsComponent);
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.buildInstitutions();
+            }
+        });
+    }
+
+    private resetInstitutionControls(): void {
+        this.institutionToAddControl.setValue("");
+        this.institutionToRemove = null;
+        this.institutionsChanged = false;
     }
 
     searchInstitution(event) {
@@ -1412,6 +1505,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
             return true;
         }
         if (this.groupForm && this.groupForm.dirty) {
+            return true;
+        }
+        if (this.showInstitutions && this.institutionsChanged) {
             return true;
         }
         return false;

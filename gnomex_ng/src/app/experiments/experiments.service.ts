@@ -19,7 +19,7 @@ export let VIEW_EXPERIMENT_ENDPOINT = new InjectionToken("view_experiment_url");
 export class ExperimentsService {
 
     private experimentOrders: any[];
-    public projectRequestList: any[];
+    public projectRequestList: any;
     public selectedTreeNode:any;
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -27,7 +27,7 @@ export class ExperimentsService {
     private experimentOrdersSubject: Subject<any[]> = new Subject();
     private experimentOrdersMessageSubject: Subject<string> = new Subject();
     private experimentSubject: Subject<any> = new Subject();
-    private projectRequestListSubject: Subject<any[]> = new Subject();
+    private projectRequestListSubject: Subject<any> = new Subject<any>();
     private projectSubject:Subject<any> = new Subject();
 
     private haveLoadedExperimentOrders: boolean = false;
@@ -71,7 +71,6 @@ export class ExperimentsService {
     refreshProjectRequestList_fromBackend(): void {
         this.startSearchSubject.next(true);
         this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params: this.previousURLParams})
-            .pipe(map((resp:any) => { return resp.Lab}))
             .subscribe((response: any) => {
                 this.projectRequestList = response;
                 this.emitProjectRequestList();
@@ -138,13 +137,8 @@ export class ExperimentsService {
     }
 
 
-    emitProjectRequestList(projectRequestList?:any): void {
-        if(projectRequestList){
-            this.projectRequestListSubject.next(projectRequestList);
-        }else{
-            this.projectRequestListSubject.next(this.projectRequestList);
-        }
-
+    emitProjectRequestList(): void {
+        this.projectRequestListSubject.next(this.projectRequestList);
     }
 
     getProjectRequestList_fromBackend(params: HttpParams,allowRefresh?:boolean): void {
@@ -154,12 +148,6 @@ export class ExperimentsService {
         this.previousURLParams = params;
 
         this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params: params})
-            .pipe(map((resp:any) =>{
-                if(resp.Lab){
-                    return resp.Lab
-                }
-                return resp;
-            }))
             .subscribe((response: any) => {
                 this.projectRequestList = response;
                 this.emitProjectRequestList();

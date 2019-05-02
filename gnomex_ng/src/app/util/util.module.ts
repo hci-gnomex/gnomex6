@@ -42,6 +42,7 @@ import {DownloadFilesComponent} from "./download-files.component";
 import {AngularSplitModule} from "angular-split";
 import {TreeModule} from "angular-tree-component";
 import {LazyLoadedSelectComponent} from "./lazy-loaded-select.component";
+import {EditInstitutionsComponent} from "./edit-institutions.component";
 
 @NgModule({
     imports: [
@@ -91,6 +92,7 @@ import {LazyLoadedSelectComponent} from "./lazy-loaded-select.component";
         DownloadProgressComponent,
         DownloadFilesComponent,
         LazyLoadedSelectComponent,
+        EditInstitutionsComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -107,6 +109,7 @@ import {LazyLoadedSelectComponent} from "./lazy-loaded-select.component";
         DownloadPickerComponent,
         DownloadProgressComponent,
         DownloadFilesComponent,
+        EditInstitutionsComponent,
     ],
     exports: [
         BrowseFilterComponent,
@@ -138,6 +141,7 @@ import {LazyLoadedSelectComponent} from "./lazy-loaded-select.component";
         DownloadProgressComponent,
         DownloadFilesComponent,
         LazyLoadedSelectComponent,
+        EditInstitutionsComponent,
     ]
 })
 export class UtilModule {

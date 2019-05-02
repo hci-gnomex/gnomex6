@@ -326,4 +326,13 @@ export class DictionaryService {
         return JSON.parse(JSON.stringify(object));
     }
 
+    public saveInstitutions(institutions: any[]): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        let params: HttpParams = new HttpParams()
+            .set("institutions", JSON.stringify(institutions))
+            .set("noJSONToXMLConversionNeeded", "Y");
+        return this.httpClient.post("/gnomex/SaveInstitution.gx", params.toString(), {headers: headers});
+    }
+
 }

@@ -105,7 +105,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public showEmptyFolders: boolean = false;
     public items: any;
     public responseMsg: string = "";
-    public experimentCount: number = 0;
+    public experimentCount: string = "0";
+    public experimentCountMessage: string = "";
     public disableNewProject: boolean = true;
     public disableDeleteProject: boolean = true;
     public disableDeleteExperiment: boolean = true;
@@ -127,7 +128,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
     private reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
     private deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
-    private viewLimit: number = 999999;
     private navProjectReqList: any;
     private navInitSubscription: Subscription;
     private labListSubscription: Subscription;
@@ -162,9 +162,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.labList = response;
             this.experimentsService.labList = this.labList;
         });
-        if (this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS) != null) {
-            this.viewLimit = this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS).propertyValue;
-        }
         if (this.createSecurityAdvisorService.isGuest) {
             this.disableAll = true;
         }
@@ -192,7 +189,14 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labs = [];
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
-            this.buildTree(response);
+            this.buildTree(response.Lab);
+            if (response && response.experimentCount) {
+                this.experimentCount = response.experimentCount;
+                this.experimentCountMessage = response.message ? "(" + response.message + ")" : "";
+            } else {
+                this.experimentCount = "0";
+                this.experimentCountMessage = "";
+            }
             if (this.createProjectDialogRef && this.createProjectDialogRef.componentInstance) {
                 if(this.createProjectDialogRef.componentInstance.showSpinner === true) {
                     this.createProjectDialogRef.componentInstance.showSpinner = false;
@@ -233,7 +237,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
 
             if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
-                this.experimentsService.emitExperimentOverviewList(response);
+                this.experimentsService.emitExperimentOverviewList(response.Lab);
 
                 this.showEmptyFolders = this.experimentsService.browsePanelParams.get("showEmptyProjectFolders") === "Y" ? true : false;
                 let navArray: any[] = ["/experiments"];
@@ -308,7 +312,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     buildTree(response: any[]) {
         this.labs = [];
-        this.experimentCount = 0;
         this.experimentsService.filteredLabs = [];
 
         if (response) {
@@ -347,10 +350,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                                 if (request) {
                                     if (request.label) {
                                         request.label = request.requestNumber + "-" + request.name;
-                                        this.experimentCount++;
-                                        if (this.experimentCount >= this.viewLimit) {
-                                            return;
-                                        }
                                         request.id = "r" + request.idRequest;
                                         request.parentid = project.id;
                                     } else {

@@ -114,6 +114,9 @@ export class Experiment {
         }
         this.onChange_idLab.next(this._idLab);
     }
+    public refreshIdLab(): void {
+        this.onChange_idLab.next(this._idLab);
+    }
 
     public _labName_notReturned:               string = "";
     public get labName(): string {
@@ -141,7 +144,7 @@ export class Experiment {
             this.submitterInstitution = value.institution;
         } else {
             // TODO replace check with typing
-            throw { message: 'Bad experiment owner!!!' };
+            //throw { message: 'Bad experiment owner!!!' };
             this._experimentOwner = null;
             this.idAppUser = null;
         }
@@ -352,6 +355,9 @@ export class Experiment {
         this.onChange_PropertyEntries.next(this.PropertyEntries);
     }
     public onChange_PropertyEntries: BehaviorSubject<any[]> = new BehaviorSubject<any[]>(this.PropertyEntries);
+    public refreshPropertyEntries(): void {
+        this.onChange_PropertyEntries.next(this.PropertyEntries);
+    }
 
     private _PropertyEntries_original: any[];
 
@@ -392,6 +398,18 @@ export class Experiment {
         }
     }
     public onChange_organism: BehaviorSubject<any> = new BehaviorSubject<any>(this.organism);
+
+    private _topics: any[] = [];
+    public get topics(): any[] {
+        return this._topics;
+    }
+    public set topics(value: any[]) {
+        if (value && Array.isArray(value)) {
+            this._topics = value;
+        } else {
+            this._topics = [];
+        }
+    }
 
     private _sequencingOption: any;
     public get sequencingOption(): any {
@@ -600,6 +618,7 @@ export class Experiment {
         experiment.cloneProperty("organism", value);
         experiment.cloneProperty("sequencingOption", value);
         experiment.cloneProperty("RequestProperties", value);
+        experiment.cloneProperty("topics", value);
 
         experiment._PropertyEntries_original = experiment.PropertyEntries;
 
@@ -870,6 +889,7 @@ export class Experiment {
             seqLibTreatments:         this.seqLibTreatments,
             sequenceLanes:            this.sequenceLanes,
             workItems:                this.workItems,
+            topics:                   this.topics,
         };
 
         return temp;

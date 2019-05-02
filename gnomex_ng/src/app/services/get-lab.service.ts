@@ -147,6 +147,26 @@ export class GetLabService {
         return this.httpClient.get("/gnomex/GetLab.gx", {params: params});
     }
 
+    public getLabProjects(idLab: string): Observable<any[]> {
+        let params: HttpParams = new HttpParams()
+            .set("idLab", idLab)
+            .set("includeBillingAccounts", "N")
+            .set("includeProductCounts", "N")
+            .set("includeProjects", "Y")
+            .set("includeCoreFacilities", "N")
+            .set("includeHistoricalOwnersAndSubmitters", "N")
+            .set("includeInstitutions", "N")
+            .set("includeSubmitters", "N")
+            .set("includeMoreCollaboratorInfo", "N");
+        return this.getLabNew(params).pipe(map((response: any) => {
+            if (response && response.Lab && response.Lab.projects) {
+                return UtilService.getJsonArray(response.Lab.projects, response.Lab.projects.Project);
+            } else {
+                return [];
+            }
+        }));
+    }
+
     deleteLab(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/DeleteLab.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {

@@ -67,7 +67,6 @@ import {TabSamplesIlluminaComponent} from "./new-experiment/tab-samples-illumina
 import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer";
 import {UrlAnnotRenderer} from "../util/grid-renderers/url-annot-renderer";
 import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
-import {RouterModule} from "@angular/router";
 import {TabConfirmIlluminaComponent} from "./new-experiment/tab-confirm-illumina.component";
 import {UploadModule} from "../upload/upload.module";
 import {NewExperimentSetupComponent} from "./new-experiment/new-experiment-setup.component";
@@ -88,6 +87,9 @@ import {ManageFilesModule} from "../util/upload/manage-files.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {ExperimentBillingTabComponent} from "./experiment-detail/experiment-billing-tab.component";
 import {LinkButtonRenderer} from "../util/grid-renderers/link-button.renderer";
+import {NewExternalExperimentComponent} from "./new-experiment/new-external-experiment.component";
+import {TabExternalSetupComponent} from "./new-experiment/tab-external-setup.component";
+import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-description.component";
 
 @NgModule({
     imports: [
@@ -179,7 +181,10 @@ import {LinkButtonRenderer} from "../util/grid-renderers/link-button.renderer";
         MaterialsMethodsTabComponent,
         ProtocolDialogComponent,
         ExperimentSequenceLanesTab,
-        ExperimentBillingTabComponent
+        ExperimentBillingTabComponent,
+        NewExternalExperimentComponent,
+        TabExternalSetupComponent,
+        TabExternalDescriptionComponent,
     ],
     entryComponents: [
         CreateProjectComponent,
@@ -202,6 +207,8 @@ import {LinkButtonRenderer} from "../util/grid-renderers/link-button.renderer";
         CollaboratorsDialogComponent,
         ManageFilesDialogComponent,
         ProtocolDialogComponent,
+        TabExternalSetupComponent,
+        TabExternalDescriptionComponent,
     ],
     exports:[
         CreateProjectComponent,
@@ -219,7 +226,10 @@ import {LinkButtonRenderer} from "../util/grid-renderers/link-button.renderer";
         TabAnnotationViewComponent,
         TabSamplesIlluminaComponent,
         TabConfirmIlluminaComponent,
-        TabVisibilityComponent
+        TabVisibilityComponent,
+        NewExternalExperimentComponent,
+        TabExternalSetupComponent,
+        TabExternalDescriptionComponent,
     ]
 })
 export class ExperimentsModule { }
