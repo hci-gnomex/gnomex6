@@ -1,4 +1,4 @@
-import {AfterViewChecked, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {URLSearchParams} from "@angular/http";
 import {MatDialog, MatDialogConfig, MatDialogRef, MatSnackBar, MatSnackBarConfig} from "@angular/material";
@@ -127,7 +127,7 @@ import {EditInstitutionsComponent} from "../util/edit-institutions.component";
 
     `]
 })
-export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
+export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, OnDestroy {
 
     @ViewChild("billingAccountTab") billingAccountTab: BillingAccountTabComponent;
     @ViewChild("billingAdminTab") billingAdminTab: BillingAdminTabComponent;
@@ -234,6 +234,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
                 private changeRef:ChangeDetectorRef,
                 public prefService: UserPreferencesService,
                 private propertyService: PropertyService,
+                private utilService: UtilService,
                 private dialog: MatDialog
                 ) {
         this.columnDefs = [
@@ -295,6 +296,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
     }
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeRef);
         this.showInstitutions = !this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_HIDE_INSTITUTIONS);
         if (this.showInstitutions) {
             this.institutionGridColDefs = [
@@ -1522,4 +1524,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit{
             return false;
         }
     }
+
+    ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeRef);
+    }
+
 }

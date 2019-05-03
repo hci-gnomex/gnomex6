@@ -28,6 +28,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
 
 
 @Component({
@@ -101,6 +102,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private labListSubscription: Subscription;
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
         this.options = {
             idField: "analysisTreeId",
@@ -267,6 +269,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
                 private route: ActivatedRoute,
+                private utilService: UtilService,
                 private gnomexService: GnomexService,
                 private labListService: LabListService,
                 private changeDetectorRef: ChangeDetectorRef,
@@ -531,6 +534,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.analysisGroupListSubscription.unsubscribe();
         this.navAnalysisGroupListSubscription.unsubscribe();
         this.gnomexService.navInitBrowseAnalysisSubject.next(null);

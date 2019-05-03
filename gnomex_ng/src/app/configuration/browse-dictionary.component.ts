@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
 
 import {TreeComponent, ITreeOptions, TreeNode} from "angular-tree-component";
@@ -11,6 +11,7 @@ import {FormControl, FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: "browse-dictionary",
@@ -129,7 +130,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     `],
 })
 
-export class BrowseDictionaryComponent implements OnInit {
+export class BrowseDictionaryComponent implements OnInit, OnDestroy {
 
     @ViewChild("treeComponent") private treeComponent: TreeComponent;
     public treeOptions: ITreeOptions = {
@@ -157,12 +158,20 @@ export class BrowseDictionaryComponent implements OnInit {
     private gridApi: GridApi;
 
     constructor(private dictionaryService: DictionaryService,
+                private changeDetector: ChangeDetectorRef,
+                private utilService: UtilService,
                 private dialogsService: DialogsService) {
     }
 
+
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.entryForm = new FormGroup({});
         this.buildTree();
+    }
+
+    ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetector);
     }
 
     private buildTree(): void {

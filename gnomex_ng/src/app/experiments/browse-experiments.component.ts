@@ -37,6 +37,7 @@ import {PropertyService} from "../services/property.service";
 import {GnomexService} from "../services/gnomex.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
+import {UtilService} from "../services/util.service";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -136,6 +137,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
         this.options = {
             displayField: "label",
@@ -172,6 +174,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     constructor(public experimentsService: ExperimentsService,
                 private changeDetectorRef: ChangeDetectorRef,
+                private utilService: UtilService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
@@ -668,6 +671,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.navInitSubscription.unsubscribe();
         this.gnomexService.navInitBrowseExperimentSubject.next(null);
         this.projectRequestListSubscription.unsubscribe();
