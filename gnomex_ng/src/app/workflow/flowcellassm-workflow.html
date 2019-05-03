@@ -1,116 +1,117 @@
-<div class="flex-column-container-outlet">
-<as-split style="background-color: white">
-    <as-split-area size="50">
-        <div class="flex-column-container-workflow">
-            <div class="flex-row-container">
-                <img src="../../assets/DNA_diag.png" height="16" width="16" style="margin-top: .65em">
-                <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
-            </div>
-            <div class="flex-row-container-margin">
-                <mat-label style="margin-top: .4em">Pending Sequence Lanes</mat-label>
-                <mat-label class="justify-label-left">{{workingWorkItemList.length}} experiments</mat-label>
-            </div>
-            <div class="flex-row-container">
-                <mat-form-field style="width: 100%">
-                    <mat-select placeholder="Protocol" [(ngModel)]="protocol" (selectionChange)="onSeqListSelection($event)">
-                        <mat-option *ngFor="let protocol of sequenceProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
+<div class="flex-container-col full-height full-width small-font">
+    <as-split (dragEnd)="onDragEnd($event)" style="background-color: white">
+        <as-split-area size="50">
+            <div class="flex-container-col full-height full-width padded">
+                <div class="flex-container-row">
+                    <img src="../../assets/DNA_diag.png" height="16" width="16" style="margin-top: .65em">
+                    <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
+                </div>
+                <div class="flex-container-row">
+                    <mat-label style="margin-top: .4em">Pending Sequence Lanes</mat-label>
+                    <mat-label class="justify-label-left">{{workingWorkItemList.length}} experiments</mat-label>
+                </div>
+                <div class="flex-container-row">
+                    <mat-form-field style="width:25em;">
+                        <mat-select placeholder="Protocol" [(ngModel)]="protocol" (selectionChange)="onSeqListSelection($event)">
+                            <mat-option>Choose a protocol...</mat-option>
+                            <mat-option *ngFor="let protocol of sequenceProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
 
-            <div class="flex-row-container">
-                <mat-form-field class="formField">
-                    <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Experiment #">
-                </mat-form-field>
-                <mat-form-field class="formField">
-                    <input #labInput matInput placeholder="Lab" aria-label="Lab" [matAutocomplete]="autoLab"
-                           [(ngModel)]="selectedLab" (keyup.enter)="chooseFirstLabOption()" (keyup)="highlightFirstLabOption($event)"  >
-                    <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
-                        <mat-option (onSelectionChange)="selectLabOption($event)" *ngFor="let lab of  filterLabList(this.selectedLab)" [value]="lab">
-                            {{lab[this.prefService.labDisplayField] }}
-                        </mat-option>
-                    </mat-autocomplete>
-                </mat-form-field>
+                <div class="flex-container-row spaced-children-margin">
+                    <mat-form-field>
+                        <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Experiment #">
+                    </mat-form-field>
+                    <lazy-loaded-select class="formField" placeholder="Lab" [options]="this.labList"
+                                        valueField="idLab" [displayField]="this.prefService.labDisplayField" [allowNone]="true"
+                                        [control]="this.selectedLab">
+                    </lazy-loaded-select>
+                </div>
+                <div class="flex-grow">
+                    <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                     [gridOptions]="gridOptions"
+                                     [rowData]="workingWorkItemList"
+                                     (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                                     (rowSelected)="selectedRow($event)"
+                                     [rowSelection]="'multiple'"
+                                     (gridReady)="onGridReady($event)"
+                                     [enableSorting]="true"
+                                     [stopEditingWhenGridLosesFocus]="true"
+                                     (cellValueChanged) = "onCellValueChanged($event)"
+                                     [rowClassRules]="this.workflowService.assmGridRowClassRules"
+                                     [enableFilter]="true"
+                                     [enableColResize]="true">
 
+                    </ag-grid-angular>
+                </div>
             </div>
-            <div class="row-one" style="width: 100%;height: 90%">
-                <ag-grid-angular id="flowTable" style="font-size: .85rem" class="ag-theme-balham full-width"
-                                 [gridOptions]="gridOptions"
-                                 [rowData]="workingWorkItemList"
-                                 [columnDefs]="columnDefs"
-                                 (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                                 (rowSelected)="selectedRow($event)"
-                                 [rowSelection]="'multiple'"
-                                 (gridReady)="onGridReady($event)"
-                                 [enableSorting]="true"
-                                 (cellValueChanged) = "onCellValueChanged($event)"
-                                 [rowClassRules]="this.workflowService.assmGridRowClassRules">
+        </as-split-area>
+        <as-split-area size="50">
+            <form [formGroup]="this.allFG" class="flex-container-col full-height full-width padded">
+                <div class="flex-container-row justify-flex-end">
+                    <button mat-button matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img class="icon" src="../../assets/action_refresh.gif">Refresh</button>
+                </div>
+                <div class="flex-row-container-margin">
+                    <mat-label>Flow Cell to Assemble</mat-label>
+                </div>
+                <div class="flex-container-row spaced-children-margin">
+                    <mat-form-field>
+                        <input matInput placeholder="Barcode" [formControl]="this.barcodeFC">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input matInput placeholder="Run #" [formControl]="this.runFC">
+                        <mat-error *ngIf="this.runFC.hasError('pattern')"> field only accepts numbers </mat-error>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input matInput [matDatepicker]="createDatePicker" placeholder="Create Date" [formControl]="this.createDateFC">
+                        <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="flex-container-row spaced-children-margin">
+                    <mat-form-field >
+                        <mat-select placeholder="Instrument" [formControl]="this.instrumentFC">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let instrument of instrumentList" [value]="instrument">{{instrument.instrument}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="this.instrumentFC.hasError('required')"> This field is required </mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="width:25em;">
+                        <mat-select placeholder="Protocol" [formControl]="this.protocolFC">
+                            <mat-option>Choose a protocol...</mat-option>
+                            <mat-option *ngFor="let protocol of filteredProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="flex-grow">
+                    <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                     [rowData]="assmItemList"
+                                     (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                                     (gridReady)="onAssmGridReady($event)"
+                                     [stopEditingWhenGridLosesFocus]="true"
+                                     [enableSorting]="true"
+                                     [enableFilter]="true"
+                                     [enableColResize]="true">
+                    </ag-grid-angular>
+                </div>
 
-                [enableFilter]="true"
-                                 [enableColResize]="true">
-                </ag-grid-angular>
-            </div>
+            </form>
+        </as-split-area>
+    </as-split>
+    <div class="flex-container-row justify-center">
+        <button mat-button [disabled]="this.selectedSeqlanes.length===0" matTooltip="Delete selected sequence lanes" (click)="deleteWorkItem($event)">
+            <img class="icon" src="../../assets/delete.png">Delete
+        </button>
+        <div class="flex-grow">
+            <save-footer (saveClicked)="save()"
+                         [disableSave]="!this.allFG.valid||this.assmItemList.length===0"
+                         [dirty]="this.allFG.dirty"
+                         [showSpinner]="this.showSpinner">
+            </save-footer>
+
         </div>
-    </as-split-area>
-    <as-split-area size="50">
-        <div class="flex-column-container-workflow">
-            <div class="flex-row-container" style="justify-content: flex-end" >
-                <button mat-button matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img class="icon" src="../../assets/action_refresh.gif">Refresh</button>
-            </div>
-            <div class="flex-row-container-margin">
-                <mat-label>Flow Cell to Assemble</mat-label>
-            </div>
-            <div class="flex-row-container">
-                <mat-form-field class="formField">
-                    <input matInput placeholder="Barcode" [formControl]="this.barcodeFC">
-                    <mat-error *ngIf="this.barcodeFC.hasError('required')">Required</mat-error>
-                </mat-form-field>
-                <mat-form-field class="formField">
-                    <input matInput placeholder="Run #" [formControl]="this.runFC">
-                    <mat-error *ngIf="this.runFC.hasError('required')">Required</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <input matInput [matDatepicker]="createDatePicker" placeholder="Create Date" [formControl]="this.createDateFC">
-                    <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
-                    <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
-                </mat-form-field>
-            </div>
-            <div class="flex-row-container">
-                <mat-form-field class="formField">
-                    <mat-select placeholder="Instrument" [formControl]="this.instrumentFC">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let instrument of instrumentList" [value]="instrument">{{instrument.instrument}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="formField">
-                    <mat-select placeholder="Protocol" [formControl]="this.protocolFC">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let protocol of filteredProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <div class="row-one" style="width: 100%;height: 90%">
-                <ag-grid-angular id="assmTable" style="font-size: .85rem" class="ag-theme-balham full-width"
-                                 [rowData]="assmItemList"
-                                 [columnDefs]="assmColumnDefs"
-                                 (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                                 (gridReady)="onAssmGridReady($event)"
-                                 [enableSorting]="true"
-                                 [enableFilter]="true"
-                                 [enableColResize]="true">
-                </ag-grid-angular>
-            </div>
 
-        </div>
-    </as-split-area>
-</as-split>
-<div class="flex-row-container">
-    <button mat-button [disabled]="this.selectedSeqlanes.length===0" style="margin-top: 1.2em" matTooltip="Delete selected sequence lanes" (click)="deleteWorkItem($event)"><img src="../../assets/delete.png">Delete</button>
-    <save-footer style="width: 100%" (saveClicked)="save()"
-                 [disableSave]="!this.allFG.valid||this.assmItemList.length===0"
-                 [dirty]="this.allFG.dirty"
-                 [showSpinner]="this.showSpinner">
-    </save-footer>
-</div>
+    </div>
 </div>
 

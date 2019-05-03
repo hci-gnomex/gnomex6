@@ -1028,6 +1028,10 @@ public class RequestParser implements Serializable {
       initializeSample(n, sample, idSampleString, isNewSample, propertyHelper, true);
     } else if (requestCategory.getCategoryType() != null && requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ) && !isExternal) {
       initializeSample(n, sample, idSampleString, isNewSample, propertyHelper, true);
+    } else if (requestCategory.getCategoryType() != null && requestCategory.getType().equals(RequestCategoryType.TYPE_ILLSEQ) && !isExternal) {
+      initializeSample(n, sample, idSampleString, isNewSample, propertyHelper, true);
+    } else if (requestCategory.getCategoryType() != null && requestCategory.getType().equals(RequestCategoryType.TYPE_NOSEQ) && !isExternal) {
+      initializeSample(n, sample, idSampleString, isNewSample, propertyHelper, true);
     } else {
       initializeSample(n, sample, idSampleString, isNewSample, propertyHelper, false);
     }

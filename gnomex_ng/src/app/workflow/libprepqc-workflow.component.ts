@@ -3,7 +3,7 @@ import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {MatAutocomplete, MatAutocompleteTrigger, MatInput, MatOption, MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions} from "ag-grid-community";
+import {GridOptions, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -11,6 +11,8 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {DialogsService} from "../util/popup/dialogs.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UtilService} from "../services/util.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'libprepqc-workflow',
@@ -53,26 +55,29 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
 
     private workItemList: any[] = [];
     private workingWorkItemList: any[] = [];
-    private coreIds: any[] = [];
-    private cores: any[] = [];
     private requestIds: any[] = [];
-    private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
     private changedRowMap: Map<string, any> = new Map<string, any>();
     private columnDefs;
     private emptyRequest = {requestNumber: ""};
     private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
-    private core: any;
     private previousRequestMatOption: MatOption;
-    private gridApi;
+    private gridApi:GridApi;
     private gridColumnApi;
     private label: string = "Illumina Library Prep QC";
-    private codeStepNext: string = "ALL";
+    private codeStepNext: string;
     private libraryPrepQCProtocols: any[] =[];
-    private seqLibProtocols: any[] = [];
-    private barCodes: any[] = [];
     private coreAdmins: any[] = [];
+    // left to have nova, hi, mi until we phase them out
+    public readonly codeStepArray:any[] = [
+        { label:"Illumina Seq ", codeStepNext: this.workflowService.ILLSEQ_PREP_QC  },
+        { label:"Illumina NovaSeq", codeStepNext: "NOSEQPREPQC" },
+        { label:"Illumina HiSeq", codeStepNext: "HSEQPREPQC" },
+        { label:"Illumina MiSeq", codeStepNext:"MISEQPREPQC"}
+    ];
+
+
 
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
@@ -86,23 +91,12 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     initialize() {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("codeStepNext", this.workflowService.ILLSEQ_PREP_QC);
-        this.cores = [];
+        this.dialogsService.startDefaultSpinnerDialog();
+        let params: HttpParams = new HttpParams()
+            .set("codeStepNext", this.codeStepNext );
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
-
-            this.coreIds = [...new Set(this.workItemList.map(item => item.idCoreFacility))];
-            for (let coreId of this.coreIds) {
-                let coreObj = {idCoreFacility: coreId,
-                    display: this.gnomexService.getCoreFacilityName(coreId)};
-                this.cores.push(coreObj);
-                this.coreFacilityAppMap.set(coreId, this.gnomexService.getQCAppCodesForCore(coreId));
-            }
             this.workingWorkItemList = this.workItemList;
-            if (!this.core) {
-                this.core = this.cores[0];
-            }
             this.workingWorkItemList = this.filterWorkItems();
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
             this.libraryPrepQCProtocols = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.LibraryPrepQCProtocol");
@@ -162,14 +156,19 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
                 }
 
             ];
+            this.gridApi.setColumnDefs(this.columnDefs);
+            this.gridApi.sizeColumnsToFit();
+
             this.requestIds = Array.from(this.workingWorkItemList.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
             this.requestIds.unshift(this.emptyRequest);
+            this.dialogsService.stopAllSpinnerDialogs();
+        },(err:IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
 
     ngAfterViewInit() {
-
     }
 
     filterWorkItems(): any[] {
@@ -182,31 +181,10 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         } else {
             items = this.workItemList;
         }
-        if (this.core) {
-            items = items.filter(request =>
-                request.idCoreFacility === this.core.idCoreFacility
-            )
-
-        }
         this.workflowService.assignBackgroundColor(items, "idRequest");
         return items;
     }
 
-    buildRequestIds(items: any[], mode: string) {
-        let workItems: any[] = [];
-        if (mode === "main") {
-            if (this.core) {
-                workItems = items.filter(request =>
-                    request.idCoreFacility === this.core.idCoreFacility
-                )
-
-            }
-        } else {
-            workItems = items;
-        }
-        this.requestIds = Array.from(workItems.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
-        this.requestIds.unshift(this.emptyRequest);
-    }
 
     chooseFirstRequestOption() {
         if (this.autoRequestComplete.options.first) {
@@ -214,9 +192,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    chooseFirstCoreOption() {
-        this.autoCoreComplete.options.first.select();
-    }
 
     filterRequests(name: any): any[] {
         let fRequests: any[];
@@ -229,10 +204,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    filterCores(): any[] {
-        this.coreFacilityInput.nativeElement.blur();
-        return this.cores;
-    }
 
     highlightFirstRequestOption(event) {
         if (event.key == "ArrowDown" || event.key == "ArrowUp") {
@@ -247,17 +218,8 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    highlightFirstCoreOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.autoCoreComplete.options.first) {
-            this.autoCoreComplete.options.first.setActiveStyles();
-        }
-    }
-
-    displayCore(core) {
-        return core ? core.display : core;
+    compareByID(rc1,rc2) {
+        return rc1 && rc2 && rc1.codeNextStep == rc2.codeNextStep;
     }
 
     selectRequestOption(event) {
@@ -267,12 +229,8 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    selectCoreOption(event) {
-        if (event.source.selected) {
-            this.core = event.source.value;
-            this.workingWorkItemList = this.filterWorkItems();
-            this.buildRequestIds(this.workItemList, "main");
-        }
+    selectCodeOption(event) {
+        this.initialize();
     }
 
 
@@ -290,47 +248,19 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        params.api.sizeColumnsToFit();
+        this.codeStepNext = this.workflowService.ILLSEQ_PREP_QC;
         this.initialize();
-    }
-
-    onSelectionChanged(event) {
-
-    }
-
-    onGridSizeChanged(event) {
-
-    }
-
-    filterAppList(item: any): boolean {
-        let retVal: boolean = false;
-        if (item.value == "") {
-            retVal = true;
-        } else {
-            if (item.isActive === 'Y' && this.core) {
-                let appCodes: any[] = this.coreFacilityAppMap[this.core];
-                if (appCodes.length > 0) {
-                    for (var code of appCodes) {
-                        if (item.codeApplication.toString() === code) {
-                            retVal = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return retVal;
     }
 
     save() {
         this.gridApi.stopEditing();
         setTimeout(() => {
-            var params: URLSearchParams = new URLSearchParams();
+            let params: HttpParams = new HttpParams();
             let workItems: any[] = [];
             for(let value of Array.from( this.changedRowMap.values()) ) {
                 workItems.push(value);
             }
-            params.set("workItemXMLString", JSON.stringify(workItems));
+            params = params.set("workItemXMLString", JSON.stringify(workItems));
             this.showSpinner = true;
             this.workflowService.saveWorkItemSolexaPrepQC(params).subscribe((response: Response) => {
                 this.showSpinner = false;

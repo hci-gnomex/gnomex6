@@ -3,7 +3,7 @@ import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
 import {MatAutocomplete, MatDialog, MatDialogRef, MatOption} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions} from "ag-grid-community";
+import {GridOptions, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -15,33 +15,17 @@ import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
 import {DeleteSeqlaneDialogComponent} from "./delete-seqlane-dialog.component";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'flowcellassm-workflow',
     templateUrl: 'flowcellassm-workflow.html',
     styles: [`
-        .flex-column-container-workflow {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 99%;
-            width: 100%;
-        }
-        .flex-column-container-outlet {
-            width: 100%;
-            height: 86%;
-        }
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
         mat-form-field.formField {
             width: 20%;
             margin: 0 0.5%;
-        }
-        .row-one {
-            display: flex;
-            flex-grow: 1;
         }
         mat-form-field.formField {
             width: 50%;
@@ -76,18 +60,18 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     private static readonly OFFCOLOR = 'white';
     private workItemList: any[] = [];
     private assmItemList: any[] = [];
-    private workingWorkItemList: any[] = [];
+    public workingWorkItemList: any[] = [];
     private sequenceProtocolsList: any[] = [];
     private filteredProtocolsList: any[] = [];
     private instrumentList: any[] = [];
-    private columnDefs;
-    private assmColumnDefs;
+    public columnDefs;
+    public assmColumnDefs;
     private showSpinner: boolean = false;
-    private selectedLab: any;
+    public selectedLab:FormControl;
     private previousLabMatOption: MatOption;
-    private gridApi;
+    private gridApi:GridApi;
     private gridColumnApi;
-    private assmGridApi;
+    private assmGridApi:GridApi;
     private assmGridColumnApi;
     private barCodes: any[] = [];
     private label = "Illumina Flow Cell Assembly";
@@ -99,7 +83,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     private emptyLab = {idLab: "0",
         name: ""};
     private labList: any[] = [];
-    public assmGridRowClassRules: any;
     private selectedFlowcellRequestType: string;
     private firstSelectedFlowcellRequestType: boolean = true;
     public allFG: FormGroup;
@@ -108,6 +91,8 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     public createDateFC: FormControl;
     public instrumentFC: FormControl;
     public protocolFC: FormControl;
+    private labSubscription: Subscription;
+
 
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
@@ -117,7 +102,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 private dictionaryService: DictionaryService,
                 public prefService: UserPreferencesService) {
         this.barcodeFC = new FormControl("");
-        this.runFC = new FormControl("");
+        this.runFC = new FormControl("",Validators.pattern("^[0-9]*$"));
         this.createDateFC = new FormControl("");
         this.instrumentFC = new FormControl("");
         this.protocolFC = new FormControl("", Validators.required);
@@ -132,8 +117,9 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     initialize() {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("codeStepNext", this.workflowService.ILLSEQ_CLUSTER_GEN);
+        this.dialogsService.startDefaultSpinnerDialog();
+        let params: HttpParams = new HttpParams()
+            .set("codeStepNext", this.workflowService.ILLSEQ_CLUSTER_GEN);
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             if (response) {
                 this.workItemList = response;
@@ -221,6 +207,9 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                     },
 
                 ];
+                this.gridApi.setColumnDefs(this.columnDefs);
+                this.gridApi.sizeColumnsToFit();
+
                 this.assmColumnDefs = [
                     {
                         headerName: "Experiment",
@@ -298,9 +287,15 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                     },
 
                 ];
+                this.assmGridApi.setColumnDefs(this.assmColumnDefs);
+                this.assmGridApi.sizeColumnsToFit();
+
             } else {
                 this.workingWorkItemList = [];
             }
+            this.dialogsService.stopAllSpinnerDialogs();
+        },(err:IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
@@ -336,9 +331,17 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
             code.idOligoBarcodeB = code.idOligoBarcode;
             this.barCodes.push(code);
         }
-        this.labList.push(this.emptyLab);
         this.labList = this.labList.concat(this.gnomexService.labList);
+        this.selectedLab = new FormControl('');
+        this.labSubscription =  this.selectedLab.valueChanges.subscribe(val => {
+            this.filterWorkItemsByLab();
+        })
 
+    }
+
+    onDragEnd(event):void{
+        this.gridApi.sizeColumnsToFit();
+        this.assmGridApi.sizeColumnsToFit();
     }
 
     chooseFirstProtocolOption() {
@@ -353,34 +356,16 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    filterLabList(selectedLab: any): any[] {
-        let fLabs: any[];
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                if (selectedLab.idLab === "0") {
-                    this.initialize();
-                    this.selectedLab = null;
-                    this.labInput.nativeElement.blur();
-                } else {
-                    fLabs = this.labList.filter(lab =>
-                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                    return fLabs;
-                }
-            } else {
-                fLabs = this.labList.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.labList;
-        }
-
-    }
 
     onSeqListSelection(event: any): void {
-        this.workingWorkItemList = this.workingWorkItemList.filter(workItem =>
-            workItem.idNumberSequencingCyclesAllowed === event.value.idNumberSequencingCyclesAllowed
-        );
+        if(!event.value){
+            this.workingWorkItemList = this.workItemList.slice();
+        }else{
+            this.workingWorkItemList = this.workItemList.filter(workItem =>
+                 workItem.idNumberSequencingCyclesAllowed === event.value.idNumberSequencingCyclesAllowed
+            );
+        }
+
     }
 
 
@@ -407,8 +392,8 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     filterWorkItemsByLab() {
-        this.workingWorkItemList = this.workingWorkItemList.filter(workItem =>
-            workItem.idLab === this.selectedLab.idLab
+        this.workingWorkItemList = this.workItemList.filter(workItem =>
+            workItem.idLab === this.selectedLab.value
         )
     }
 
@@ -425,12 +410,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    selectLabOption(event) {
-        if (event.source.selected) {
-            this.selectedLab = event.source.value;
-            this.filterWorkItemsByLab();
-        }
-    }
 
     onNotifyGridRowDataChanged(event) {
         if (this.gridApi) {
@@ -480,7 +459,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        params.api.sizeColumnsToFit();
         this.initialize();
     }
 
@@ -579,41 +557,31 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     saveWorkItems() {
-        let params: URLSearchParams = new URLSearchParams();
-
-        params.set("codeStepNext", this.workflowService.ILLSEQ_FINALIZE_FC);
-        params.set("flowCellDate", WorkflowService.convertDate(this.createDateFC.value));
-        params.set("idInstrument", this.instrumentFC.value.idInstrument);
-        params.set("idNumberSequencingCyclesAllowed", this.protocolFC.value.idNumberSequencingCyclesAllowed);
-        params.set("idSeqRunType", this.protocolFC.value.idSeqRunType);
-        params.set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesDisplay);
-        params.set("runNumber", this.runFC.value);
-        params.set("flowCellBarcode", this.barcodeFC.value);
-        params.set("workItemXMLString", JSON.stringify(this.assmItemList));
+        let params: HttpParams = new HttpParams()
+            .set("codeStepNext", this.workflowService.ILLSEQ_FINALIZE_FC)
+            .set("flowCellDate", WorkflowService.convertDate(this.createDateFC.value))
+            .set("idInstrument", this.instrumentFC.value ? this.instrumentFC.value.idInstrument : "")
+            .set("idNumberSequencingCyclesAllowed", this.protocolFC.value ? this.protocolFC.value.idNumberSequencingCyclesAllowed : "")
+            .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
+            .set("numberSequencingCyclesActual", this.protocolFC.value ? this.protocolFC.value.numberSequencingCyclesDisplay : "" )
+            .set("runNumber", this.runFC.value)
+            .set("flowCellBarcode", this.barcodeFC.value)
+            .set("workItemXMLString", JSON.stringify(this.assmItemList));
 
         this.showSpinner = true;
         this.workflowService.saveWorkItemSolexaAssemble(params).subscribe((response: any) => {
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.allFG.markAsPristine();
-                    if (!responseJSON.flowCellNumber) {
-                        responseJSON.flowCellNumber = "";
-                    }
-                    this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " created", null);
-                    this.assmItemList = [];
-                    this.initialize();
-                } else {
-                    let message: string = "";
-                    if (responseJSON && responseJSON.message) {
-                        message = ": " + responseJSON.message;
-                    }
-                    this.dialogsService.confirm("An error occurred while saving" + message, null);
+            let responseJSON: any = response;
+            if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
+                this.allFG.markAsPristine();
+                if (!responseJSON.flowCellNumber) {
+                    responseJSON.flowCellNumber = "";
                 }
-            } else {
-                this.dialogsService.confirm("An error occurred while saving " + response.status, null);
-
+                this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " created", null);
+                this.assmItemList = [];
+                this.initialize();
             }
+            this.showSpinner = false;
+        },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
 
@@ -632,8 +600,8 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         let seqLanes: string = "";
         let laneString: string = "";
         this.selectedSeqlanes.forEach((item => {
-            seqLanes = seqLanes.concat(item.idWorkItem);
-            seqLanes = seqLanes.concat(',');
+                seqLanes = seqLanes.concat(item.idWorkItem);
+                seqLanes = seqLanes.concat(',');
             }
         ));
         seqLanes = seqLanes.substring(0, seqLanes.lastIndexOf(','));
@@ -707,6 +675,12 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
             }
         }
         return (uniqueBaseCount >= 3);
+    }
+
+    ngOnDestroy(){
+        if(this.labSubscription){
+            this.labSubscription.unsubscribe();
+        }
     }
 
 }

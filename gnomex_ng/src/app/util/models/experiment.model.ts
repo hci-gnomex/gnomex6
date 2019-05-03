@@ -158,7 +158,7 @@ export class Experiment {
     public application:                        string = "";
     public projectName:                        string = "";
     public idProject:                          string = ''; // "62962"
-    public project:                            string = "";
+    public project:                            any;
     public slideProduct:                       string = "";
     public isExternal:                         string = ''; // "N",
     public requestStatus:                      string = "";

@@ -20,25 +20,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'finalizeFlowCell-workflow',
     templateUrl: 'finalizeFlowCell-workflow.html',
-    styles: [`
-        .flex-column-container-workflow {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 94%;
-            width: 100%;
-        }
-        .flex-column-container-outlet {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 94%;
-            width: 100%;
-        }
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
+    styles: [`        
         .flex-row-container-itailic {
             display: flex;
             flex-direction: row;
@@ -67,10 +49,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             height: 10em;
             display: flex;
             flex-direction: row;
-        }
-        .row-one {
-            display: flex;
-            flex-grow: 1;
         }
         /* Needed to style split-gutter white */
         ::ng-deep split-gutter {
@@ -128,7 +106,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
                 private dialog: MatDialog,
                 private dictionaryService: DictionaryService) {
         this.barcodeFC = new FormControl("", Validators.required);
-        this.runFC = new FormControl("", Validators.required);
+        this.runFC = new FormControl("", [Validators.required, Validators.pattern("^[0-9]*$") ]);
         this.createDateFC = new FormControl("");
         this.instrumentFC = new FormControl("", Validators.required);
         this.protocolFC = new FormControl("", Validators.required);
@@ -143,6 +121,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     initialize() {
+        this.dialogsService.startDefaultSpinnerDialog();
         let params: HttpParams = new HttpParams();
 
         params = params.set("codeStepNext", this.workflowService.ILLSEQ_FINALIZE_FC);
@@ -213,9 +192,15 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
                     },
 
                 ];
+                this.gridApi.setColumnDefs(this.columnDefs);
+                this.gridApi.sizeColumnsToFit();
+
             } else {
                 this.workingWorkItemList = [];
             }
+            this.dialogsService.stopAllSpinnerDialogs();
+        },(err:IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
@@ -331,9 +316,13 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        this.sequenceProtocolsList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.NumberSequencingCyclesAllowed").filter(proto =>
-            (proto.codeRequestCategory ===  "HISEQ" || proto.codeRequestCategory === "MISEQ" || proto.codeRequestCategory === "NOSEQ") && proto.isActive === 'Y'
-        );
+        this.sequenceProtocolsList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.NumberSequencingCyclesAllowed")
+            .filter(proto =>
+            (proto.codeRequestCategory ===  "HISEQ" ||
+                proto.codeRequestCategory === "MISEQ" ||
+                proto.codeRequestCategory === "NOSEQ" ||
+                proto.codeRequestCategory === "ILLSEQ" ) && proto.isActive === 'Y');
+
         this.instrumentList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.Instrument").filter(instrument =>
             instrument.isActive === 'Y'
         );
@@ -371,6 +360,8 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         this.runFC.setValue(event.data.runNumber);
         this.createDateFC.setValue(event.data.createDate);
         this.instrumentFC.setValue(event.data.idInstrument);
+        UtilService.markChildrenAsTouched(this.allFG);
+
         for (let instrument of this.instrumentList) {
             if (instrument.idInstrument === event.data.idInstrument) {
                 this.instrumentFC.setValue(instrument);
@@ -410,6 +401,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         let columnDefs = this.initializeAssm();
         this.assmColumnDefs = columnDefs;
         this.assmGridApi.setColumnDefs(columnDefs);
+        this.assmGridApi.sizeColumnsToFit();
 
 
         this.assmGridApi.setRowData(this.assmItemList);
@@ -472,7 +464,6 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        params.api.sizeColumnsToFit();
         this.initialize();
     }
 

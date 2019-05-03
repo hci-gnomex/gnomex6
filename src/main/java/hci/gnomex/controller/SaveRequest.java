@@ -519,7 +519,9 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						String codeStepNext = "";
 						if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
 							codeStepNext = Step.HISEQ_CLUSTER_GEN;
-						} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
+						}  else if (requestCategory.getType().equals(RequestCategoryType.TYPE_ILLSEQ)) {
+                            codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
+                        }  else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
 							codeStepNext = Step.MISEQ_CLUSTER_GEN;
 						} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_NOSEQ)) {
 							codeStepNext = Step.NOSEQ_CLUSTER_GEN;
