@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-
-foundStatus=0
+foundStatus=1
 avatarStatus=0
 pDataPath="/home/u0566434/parser_data/"
 
@@ -46,8 +45,8 @@ if [ $foundStatus -eq 0 ] && [ $avatarStatus -eq 0 ]; then
 else
     if [ $foundStatus -eq 0 ]; then
         bash register_files.sh -all -doNotSendMail
-        bash LinkData.sh -dataSource 2R -requests $foundRequestList
-        bash LinkFastqData.sh -debug -analysis $foundAnalysisList
+        bash linkData.sh -dataSource 2R -requests $foundRequestList
+        bash linkFastqData.sh -debug -analysis $foundAnalysisList
         bash index_gnomex.sh
     else
         echo need to notify by email foundation failed importing
@@ -55,14 +54,12 @@ else
 
     if [ $avatarStatus -eq 0 ]; then
         bash register_files.sh -all -doNotSendMail
-        bash LinkData.sh -dataSource 4R -requests $avaRequestList
-        bash LinkFastqData.sh -debug -analysis $avaAnalysisList
+        bash linkData.sh -dataSource 4R -requests $avaRequestList
+        bash linkFastqData.sh -debug -analysis $avaAnalysisList
+        bash index_gnomex.sh
     else
         echo need to notify by email avatar failed importing
     fi
 
 
 fi
-
-
-
