@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {Subscription} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -13,9 +13,10 @@ import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {first} from "rxjs/operators";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../../services/util.service";
 
 
 @Component({
@@ -67,10 +68,9 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 
     `]
 })
-export class AnalysisExperimentTabComponent implements OnInit {
+export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
     private selectedTreeNodeSubscript: Subscription;
     private gridOpt: GridOptions = {};
-    public currentLab: any;
     public showSpinner: boolean = false;
     public labList: any[] = [];
     public analysis: any;
@@ -91,10 +91,14 @@ export class AnalysisExperimentTabComponent implements OnInit {
     private _tabVisible: boolean = false;
     private formGroup: FormGroup;
 
+    public currentLabFC: FormControl;
+    private currentLabSubscription: Subscription;
+    private editModeSubscription: Subscription;
+
     @Input() set tabVisible(val: boolean) {
         this._tabVisible = val;
-        if (val && this.currentLab) {
-            this.selectLab(this.currentLab);
+        if (val && this.currentLabFC.value) {
+            this.selectLab(this.currentLabFC.value);
         }
     }
     get tabVisible(): boolean {
@@ -281,6 +285,20 @@ export class AnalysisExperimentTabComponent implements OnInit {
             samplesJSONString: this.sampleList
         });
 
+        this.currentLabFC = new FormControl({value: "", disabled: !this.analysisService.getEditMode()});
+        this.editModeSubscription = this.analysisService.editMode.subscribe(() => {
+            if (this.analysisService.getEditMode()) {
+                this.currentLabFC.enable();
+            } else {
+                this.currentLabFC.disable();
+            }
+        });
+        this.currentLabSubscription = this.currentLabFC.valueChanges.subscribe(() => {
+            if (this.tabVisible) {
+                this.selectLab(this.currentLabFC.value);
+            }
+        });
+
         this.analysisService.addAnalysisOverviewFormMember(this.formGroup, this.constructor.name);
 
 
@@ -321,10 +339,7 @@ export class AnalysisExperimentTabComponent implements OnInit {
                     return lab.idLab === this.analysis.idLab;
                 });
                 if(lab && lab.length === 1) {
-                    this.currentLab =  lab[0];
-                    if(this.tabVisible) {
-                        this.selectLab(this.currentLab);
-                    }
+                    this.currentLabFC.setValue(lab[0]);
                 }
             }
         });
@@ -538,6 +553,8 @@ export class AnalysisExperimentTabComponent implements OnInit {
 
     ngOnDestroy(): void {
         this.selectedTreeNodeSubscript.unsubscribe();
+        UtilService.safelyUnsubscribe(this.currentLabSubscription);
+        UtilService.safelyUnsubscribe(this.editModeSubscription);
     }
 
 }

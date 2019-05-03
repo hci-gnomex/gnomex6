@@ -33,7 +33,7 @@ export class AnalysisService {
 
     private _analysisOverviewForm: FormGroup;
     private _createdAnalysis: any;
-    private editMode: boolean = false;
+    public editMode: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
 
     constructor(private http: Http, private httpClient: HttpClient,
@@ -246,11 +246,11 @@ export class AnalysisService {
     }
 
     public setEditMode(editMode: boolean): void {
-        this.editMode = editMode;
+        this.editMode.next(editMode);
     }
 
     public getEditMode(): boolean {
-        return this.editMode;
+        return this.editMode.getValue();
     }
 
 }

@@ -36,6 +36,7 @@ import { transaction } from 'mobx';
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
+import {UtilService} from "../services/util.service";
 
 const actionMapping:IActionMapping = {
     mouse: {
@@ -273,6 +274,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     private topicListSubscription: Subscription;
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.treeModel = this.treeComponent.treeModel;
         // this.showSpinner = true;
         setTimeout(() => {
@@ -346,6 +348,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 public experimentsService: ExperimentsService,
                 public dictionaryService: DictionaryService,
                 private analysisService: AnalysisService,
+                private utilService: UtilService,
+                private changeDetector: ChangeDetectorRef,
                 public prefService: UserPreferencesService) {
 
 
@@ -653,6 +657,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetector);
         this.topicListSubscription.unsubscribe();
         this.navInitSubsciption.unsubscribe();
     }

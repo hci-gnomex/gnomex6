@@ -132,6 +132,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     private idDataTrackToSelect: string = null;
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
         this.labListService.getLabList_FromBackEnd();
         this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
@@ -150,6 +151,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 private dialog: MatDialog,
                 private gnomexService:GnomexService,
                 private changeDetectorRef: ChangeDetectorRef,
+                private utilService: UtilService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService) {
 
 
@@ -533,6 +535,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.dataTracksListSubscription.unsubscribe();
         this.navInitSubscription.unsubscribe();
         this.labListSubscription.unsubscribe();
