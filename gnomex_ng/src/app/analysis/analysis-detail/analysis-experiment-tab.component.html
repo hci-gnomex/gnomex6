@@ -1,18 +1,9 @@
 <div class="full-height full-width flex-column-container">
     <div class="align-center flex-row-container justify-space-between flex-grow">
-
-        <mat-form-field style="width:30%;">
-            <mat-select [compareWith]="compareByID"
-                        [(ngModel)]="this.currentLab"
-                        placeholder="Lab Filter"
-                        [disabled]="!this.analysisService.getEditMode()"
-                        (selectionChange)="selectLab($event)">
-                <mat-option *ngFor="let lab of labList" [value]="lab">
-                    {{ lab[this.prefService.labDisplayField] }}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
-
+        <lazy-loaded-select style="width:30%;" placeholder="Lab Filter" [options]="this.labList"
+                            [displayField]="this.prefService.labDisplayField" [allowNone]="true"
+                            [control]="this.currentLabFC">
+        </lazy-loaded-select>
         <mat-radio-group [(ngModel)]="gridRaidoOpt" class="filter" (change)="onGridTypeChange()">
             <mat-radio-button [value]="HYBS" class="filterOption" > Microarray Hybridizations{{"(" + this.hybsList.length + ")"}}</mat-radio-button>
             <mat-radio-button [value]="SEQ_LANES" class="filterOption" > Illumina Sequencing{{"(" + this.lanesList.length + ")"}} </mat-radio-button>

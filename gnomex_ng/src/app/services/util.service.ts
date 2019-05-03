@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {ChangeDetectorRef, Injectable} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ITreeModel, ITreeNode} from "angular-tree-component/dist/defs/api";
 import {Subscription} from "rxjs";
@@ -6,8 +6,45 @@ import {Subscription} from "rxjs";
 @Injectable()
 export class UtilService {
 
+    private changeDetectors: ChangeDetectorRef[] = [];
+    private keyBeingHeld: boolean = false;
+
     constructor() {
     }
+
+    public registerChangeDetectorRef(cd: ChangeDetectorRef): void {
+        this.changeDetectors.push(cd);
+        if (this.changeDetectors.length === 1) {
+            window.addEventListener("keydown", this.onKeydown);
+            window.addEventListener("keyup", this.onKeyup);
+        }
+    }
+
+    public removeChangeDetectorRef(cd: ChangeDetectorRef): void {
+        this.changeDetectors.splice(this.changeDetectors.indexOf(cd), 1);
+        if (this.changeDetectors.length === 0) {
+            window.removeEventListener("keydown", this.onKeydown);
+            window.removeEventListener("keyup", this.onKeyup);
+        }
+    }
+
+    private onKeydown:(event: KeyboardEvent) => void = (event: KeyboardEvent) => {
+        if (!this.keyBeingHeld && event.repeat) {
+            this.keyBeingHeld = true;
+            for (let cd of this.changeDetectors) {
+                cd.detach();
+            }
+        }
+    };
+
+    private onKeyup:(event: KeyboardEvent) => void = (event: KeyboardEvent) => {
+        if (this.keyBeingHeld) {
+            for (let cd of this.changeDetectors) {
+                cd.reattach();
+            }
+            this.keyBeingHeld = false;
+        }
+    };
 
     public static markChildrenAsTouched(group: FormGroup): void {
         group.markAsTouched();

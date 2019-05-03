@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
 import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
@@ -8,6 +8,7 @@ import {Observable} from "rxjs";
 import {DialogsService} from "./popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {DownloadProgressComponent} from "./download-progress.component";
+import {UtilService} from "../services/util.service";
 
 @Component({
     template: `
@@ -80,7 +81,7 @@ import {DownloadProgressComponent} from "./download-progress.component";
         }
     `]
 })
-export class DownloadFilesComponent implements OnInit {
+export class DownloadFilesComponent implements OnInit, OnDestroy {
 
     @ViewChild("availableFilesTreeComponent") private availableFilesTreeComponent: TreeComponent;
     public availableFilesNodes: any[] = [];
@@ -105,12 +106,15 @@ export class DownloadFilesComponent implements OnInit {
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 public constantsService: ConstantsService,
                 private propertyService: PropertyService,
+                private changeDetector: ChangeDetectorRef,
+                private utilService: UtilService,
                 private fileService: FileService,
                 private dialogsService: DialogsService,
                 private dialog: MatDialog) {
     }
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.filesOptions = {
             idField: 'fileTreeID',
             displayField: 'displayName',
@@ -146,6 +150,10 @@ export class DownloadFilesComponent implements OnInit {
         }
 
         this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
+    }
+
+    ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetector);
     }
 
     private updateFilesToDownloadTree(): void {
