@@ -82,7 +82,7 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
     @ViewChild(MatTabGroup) tabs: MatTabGroup;
     @ViewChild(TabContainer) tabView: TabContainer;
     state: string = TabContainer.VIEW;
-    project: any;
+    public project: any;
     public nodeTitle: string = "";
     public orderedExperimentIds: Array<string> = [];
     public showSpinner: boolean = false;
@@ -105,7 +105,8 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
         // This 'data' observable fires when tree node changes because url will change.
         this.route.data.forEach((data) => {
-            this.project = data["project"]; // this data is carried on route look at browse-experiments.component.ts
+            this.project = data["project"] && data["project"].Project ? data["project"].Project : null; // this data is carried on route look at browse-experiments.component.ts
+            this.experimentsService.updateCanDeleteProject(this.project && this.project.canDelete === 'Y');
         });
 
         this.refreshOverviewData();

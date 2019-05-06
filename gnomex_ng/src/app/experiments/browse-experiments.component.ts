@@ -134,6 +134,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private labListSubscription: Subscription;
     private parentProject: any;
     private setActiveNodeId: string;
+    private canDeleteProjectSubscription: Subscription;
 
 
     ngOnInit() {
@@ -167,6 +168,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         if (this.createSecurityAdvisorService.isGuest) {
             this.disableAll = true;
         }
+
+        this.canDeleteProjectSubscription = this.experimentsService.canDeleteProjectSubject.subscribe((canDelete: boolean) => {
+            setTimeout(() => {
+                this.disableDeleteProject = !canDelete;
+            });
+        });
     }
 
     ngAfterViewInit() {}
@@ -596,12 +603,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
         let navArray: Array<any> = [];
 
+        this.disableDeleteProject = true;
 
         //Lab
         if (this.selectedItem.level === 1) {
 
-            this.disableNewProject = false;
-            this.disableDeleteProject = true;
+            this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
              navArray = ["/experiments", {outlets: {"browsePanel": "overview"}}];
@@ -609,8 +616,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             //Project
         } else if (this.selectedItem.level === 2) {
             this.parentProject = event.node.parent;
-            this.disableNewProject = false;
-            this.disableDeleteProject = false;
+            this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
             navArray = ["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
@@ -620,7 +626,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             navArray = ["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
             this.parentProject = event.node.parent;
             this.disableNewProject = true;
-            this.disableDeleteProject = true;
             this.experimentsService.getExperiment(this.selectedItem.data.idRequest).subscribe((response: any) => {
                 this.selectedExperiment = response.Request;
                 if (response.Request.canDelete === "Y") {
@@ -679,6 +684,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.navProjectReqList = null;
         this.experimentsService.filteredLabs = undefined;
         this.experimentsService.labList = [];
+        UtilService.safelyUnsubscribe(this.canDeleteProjectSubscription);
     }
 
     onShowEmptyFolders(event: MatCheckboxChange): void {
