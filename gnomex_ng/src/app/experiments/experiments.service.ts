@@ -29,6 +29,7 @@ export class ExperimentsService {
     private experimentSubject: Subject<any> = new Subject();
     private projectRequestListSubject: Subject<any> = new Subject<any>();
     private projectSubject:Subject<any> = new Subject();
+    public canDeleteProjectSubject: Subject<boolean> = new Subject<boolean>();
 
     private haveLoadedExperimentOrders: boolean = false;
     private previousURLParams: HttpParams = null;
@@ -107,6 +108,10 @@ export class ExperimentsService {
 
     getChangeExperimentStatusObservable(): Observable<any> {
         return this.changeStatusSubject.asObservable();
+    }
+
+    public updateCanDeleteProject(canDelete: boolean): void {
+        this.canDeleteProjectSubject.next(canDelete);
     }
 
     changeExperimentStatus(idRequest: string, codeRequestStatus: string): void {

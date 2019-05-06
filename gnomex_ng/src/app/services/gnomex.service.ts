@@ -17,6 +17,7 @@ import {AuthenticationService} from "../auth/authentication.service";
 import {first} from "rxjs/operators";
 import {UserPreferencesService} from "./user-preferences.service";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {UtilService} from "./util.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -713,7 +714,7 @@ export class GnomexService {
                         forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
                             .pipe(first()).subscribe((response: any[]) => {
                             this.progressService.displayLoader(45);
-                            this.appUserList = response[0];
+                            this.appUserList = UtilService.getJsonArray(response[0], response[0].AppUser);
                             this.labList = response[1];
                             this.progressService.displayLoader(60);
                             this.myCoreFacilities = this.dictionaryService.coreFacilities();
@@ -1000,6 +1001,10 @@ export class GnomexService {
         return result;
     }
 
-
+    public canSubmitRequests(idLab: string): boolean {
+        return this.submitRequestLabList ? this.submitRequestLabList.filter((lab) => {
+            return lab.idLab === idLab;
+        }).length > 0 : false;
+    }
 
 }
