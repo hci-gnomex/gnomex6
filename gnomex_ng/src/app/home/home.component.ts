@@ -1,29 +1,65 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {Component, OnInit, ViewChild, ViewEncapsulation, AfterViewInit, OnDestroy} from "@angular/core";
 import {URLSearchParams} from "@angular/http";
 import {Router} from "@angular/router";
-
 import {BehaviorSubject} from "rxjs";
-import {Observable} from "rxjs";
 import {Subscription} from "rxjs";
-
-import {jqxProgressBarComponent} from "../../assets/jqwidgets-ts/angular_jqxprogressbar"; //jqwidgets-framework
-
+import {jqxProgressBarComponent} from "../../assets/jqwidgets-ts/angular_jqxprogressbar";
 import {GnomexService} from "../services/gnomex.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
 import {ProgressService} from "./progress.service";
 import {first} from "rxjs/operators";
 import {AuthenticationService} from "../auth/authentication.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {PropertyService} from "../services/property.service";
 
 @Component({
     selector: "gnomex-home",
-    template: require("./home.component.html"),
-    // template: require("./home.component.html"),
-    styles: [`
-        
+    template: `
+        <div class="full-width full-height horizontal-center">
+            <div *ngIf="hideLoader | async; else loading"
+                 class="full-width full-height flex-container-col">
+                <div class="flex-grow">
+                </div>
+                <div class="horizontal-center">
+                    <img [src]="site_splash" alt="">
+                </div>
+                <div class="flex-grow-large flex-container-col">
+                    <div class="flex-grow multiline flex-container-col justify-center">
+                        <h2>{{ this.bulletin }}</h2>
+                    </div>
+                    <div class="flex-container-row full-width">
+                        <div class="flex-grow"></div>
+                        <div class="small-font padded major-padded-right">{{ firstLastName }}</div>
+                        <div class="small-font padded multiline">{{ permissionsText }}</div>
+                    </div>
+                </div>
+            </div>
+            <ng-template #loading>
+                <div class="full-width full-height flex-container-col">
+                    <div class="flex-grow">
+                    </div>
+                    <div class="flex-container-row">
+                        <div class="flex-grow">
+                        </div>
+                        <div #loadingWindow class="gnomex-splash">
+                            <div class="horizontal-center">
+                                <img [src]=site_logo alt="">
+                            </div>
+                            <div class="full-width progress-bar-container">
+                                <jqxProgressBar #loadingProgress [width]="270" [height]="15" [value]="10" [colorRanges]="colorRanges">
+                                </jqxProgressBar>
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                        </div>
+                    </div>
+                    <div class="flex-grow">
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    `,
+    styles: [`        
         .horizontal-center { text-align: center; }
         
         .flex-grow-large { flex: 4; }
@@ -31,7 +67,6 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
         .multiline { white-space: pre-line; }
         
         .major-padded-right { padding-right: 1em; }
-        
         
         .progress-bar-container {
             position: absolute;
@@ -42,29 +77,29 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
             background-image: url(../gnomex/assets/gnomex_splash_credits.png);
             width: 19em;
             height: 15em;
-            padding-bottom: 1em;
-            padding-left: 1em;
-            padding-right: 1em;
-            padding-top: 1em;
+            padding: 1em;
             position: relative;
             background-repeat: no-repeat;
         }
-        
     `],
     encapsulation: ViewEncapsulation.None
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild("loadingProgress") loadingProgress: jqxProgressBarComponent;
-    private showProgressSubscription:Subscription;
-    private hideLoader: BehaviorSubject<boolean>;
-    private colorRanges = [{ stop: 100, color: '#3fca15' }];
-    private launchProperties: any;
-    private site_splash: string;
 
-    private site_logo:string;
+    private showProgressSubscription: Subscription;
+    public hideLoader: BehaviorSubject<boolean>;
+    public colorRanges = [{ stop: 100, color: '#3fca15' }];
+    private launchProperties: any;
+    public site_splash: string;
+
+    public site_logo:string;
+    public bulletin: string = "";
 
     public firstLastName: string = '';
     public permissionsText: string = '';
+
+    public searchText: string;
 
     constructor(private launchPropertiesService: LaunchPropertiesService,
                 private progressService: ProgressService,
@@ -72,6 +107,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 private createSecurityAdvisor: CreateSecurityAdvisorService,
                 private router:Router,
                 private authService: AuthenticationService,
+                private propertyService: PropertyService
     ) {
         // Do instance configuration here
     }
@@ -83,9 +119,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.progressService.hideLoaderStatus(true);
 
                     this.setupUserAndPermissionsStrings();
+                    this.setBulletin();
                 }
             }
-        })
+        });
     }
     ngOnInit() {
 
@@ -96,18 +133,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             this.hideLoader = this.progressService.hideLoader;
         }
 
-
         let params: URLSearchParams = new URLSearchParams();
 
         this.launchPropertiesService.getLaunchProperties(params).pipe(first()).subscribe((response: any) => {
             this.launchProperties = response;
             this.getProps(response);
             this.gnomexService.coreFacilityList = response.CoreFacilities;
-            console.log("launch properties");
             this.progressService.displayLoader(10);
 
         });
-
 
         if(!this.gnomexService.isLoggedIn){
 
@@ -122,23 +156,29 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
                 this.gnomexService.initApp();
             }
-
         }
 
-
-        this.gnomexService.isAppInitCompleteObservable().pipe(first()).subscribe(complete =>{
-            if(this.gnomexService.redirectURL){
-                console.log(this.router.parseUrl(this.gnomexService.redirectURL));
+        this.gnomexService.isAppInitCompleteObservable().pipe(first()).subscribe(() =>{
+            if (this.gnomexService.redirectURL) {
                 this.router.navigateByUrl("/" + this.gnomexService.redirectURL);
             }
         });
 
         this.setupUserAndPermissionsStrings();
+        this.setBulletin();
+    }
+
+    private setBulletin(): void {
+        this.bulletin = "";
+        let bulletinProperty: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_BULLETIN);
+        if (bulletinProperty) {
+            this.bulletin = "Bulletin\n" + bulletinProperty;
+        }
     }
 
     getProps(response: any) {
 
-        for (var p of response.Property) {
+        for (let p of response.Property) {
             switch(p.name) {
                 case "site_splash" : {
                     this.site_splash = p.value;
@@ -196,22 +236,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.permissionsText = 'Restricted access - Please contact GNomEx support or a core facility director.';
             }
         }
-    }
-
-    public myInput: string;
-    public searchText: string;
-
-    public myErrorStateMatcher(): boolean {
-        return true;
-    }
-    public searchNumber() {
-        console.log(this.myInput);
-    }
-    public searchByText() {
-        console.log(this.searchText);
-    }
-    public browseExp() {
-        console.log('Browse Experiments selected');
     }
 
     ngOnDestroy(): void {
