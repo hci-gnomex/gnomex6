@@ -28,6 +28,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
 
 
 @Component({
@@ -59,6 +60,9 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
         .no-padding-dialog {
             padding: 0;
         }
+        .small-font {
+            font-size: 12px;
+        }
     `]
 })
 
@@ -75,7 +79,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     public labMembers: any;
 
-    public analysisCount: number = 0;
+    public analysisCount: string = "0";
+    public analysisCountMessage: string = "";
     public deleteAnalysisDialogRef: MatDialogRef<DeleteAnalysisComponent>;
     public disabled: boolean = true;
     public disableNewAnalysis: boolean = true;
@@ -97,6 +102,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private labListSubscription: Subscription;
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
         this.options = {
             idField: "analysisTreeId",
@@ -145,7 +151,15 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 return;
             }
 
-            this.buildTree(response);
+            if (response && response.analysisCount) {
+                this.analysisCount = response.analysisCount;
+                this.analysisCountMessage = response.message ? "(" + response.message + ")" : "";
+            } else {
+                this.analysisCount = "0";
+                this.analysisCountMessage = "";
+            }
+
+            this.buildTree(response.Lab);
             if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
                 this.createAnalysisDialogRef.close();
                 this.createAnalysisDialogRef = null;
@@ -189,7 +203,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 }
 
                 if (!this.treeModel.getActiveNode()) {
-                    this.analysisService.emitAnalysisOverviewList(response);
+                    this.analysisService.emitAnalysisOverviewList(response.Lab);
                     let navArray: any[] = ["/analysis", {outlets: {"analysisPanel": "overview"}}];
                     this.router.navigate(navArray);
                     this.disableNewAnalysis = true;
@@ -255,6 +269,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
                 private route: ActivatedRoute,
+                private utilService: UtilService,
                 private gnomexService: GnomexService,
                 private labListService: LabListService,
                 private changeDetectorRef: ChangeDetectorRef,
@@ -281,7 +296,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     @param
      */
     buildTree(response: any[]) {
-        this.analysisCount = 0;
         this.labs = [];
         this.items = [].concat(null);
 
@@ -319,7 +333,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                             for (var a of p.items) {
                                 if (a) {
                                     if (a.label) {
-                                        this.analysisCount++;
                                         var labelString: string = a.number;
                                         labelString = labelString.concat(" (");
                                         labelString = labelString.concat(a.label);
@@ -521,6 +534,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.analysisGroupListSubscription.unsubscribe();
         this.navAnalysisGroupListSubscription.unsubscribe();
         this.gnomexService.navInitBrowseAnalysisSubject.next(null);

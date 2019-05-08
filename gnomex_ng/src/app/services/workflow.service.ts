@@ -2,7 +2,7 @@
 import {Injectable} from "@angular/core";
 import {Http, Response, Headers, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
@@ -20,12 +20,12 @@ export enum qcModes
 export class WorkflowService {
     // TODO - This is a temporary fix for the Alpha Demo with Brian
     // Using ILLSEQ instead of HSEQ does not return the correct data from the back-end
-    public readonly ILLUMINA_SEQQC = "HSEQQC";
-    public readonly ILLSEQ_PREP = "HSEQPREP";
-    public readonly ILLSEQ_PREP_QC = "HSEQPREPQC";
-    public readonly ILLSEQ_CLUSTER_GEN = "HSEQASSEM";
-    public readonly ILLSEQ_FINALIZE_FC = "HSEQFINFC";
-    public readonly ILLSEQ_DATA_PIPELINE = "HSEQPIPE";
+    public readonly ILLUMINA_SEQQC = "ILLSEQQC";
+    public readonly ILLSEQ_PREP = "ILLSEQPREP";
+    public readonly ILLSEQ_PREP_QC = "ILLSEQPREPQC";
+    public readonly ILLSEQ_CLUSTER_GEN = "ILLSEQASSEM";
+    public readonly ILLSEQ_FINALIZE_FC = "ILLSEQFINFC";
+    public readonly ILLSEQ_DATA_PIPELINE = "ILLSEQPIPE";
     public readonly FLOWCELL = "FLOWCELL";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";
@@ -208,95 +208,58 @@ export class WorkflowService {
 
 
 
-    getWorkItemList(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/GetWorkItemList.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    getWorkItemList(params: HttpParams):  Observable<any> {
+        return this.httpClient.get("/gnomex/GetWorkItemList.gx", {params: params});
+    }
+
+    saveCombinedWorkItemQualityControl(params: HttpParams):  Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveCombinedWorkItemQualityControl.gx",params.toString(), {headers: headers});
 
     }
 
-    saveCombinedWorkItemQualityControl(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveCombinedWorkItemQualityControl.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    saveWorkItemSolexaPrepQC(params: HttpParams):  Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveWorkItemSolexaPrepQC.gx", params.toString(), {headers: headers});
 
     }
 
-    saveWorkItemSolexaPrepQC(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveWorkItemSolexaPrepQC.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    saveWorkItemSolexaPrep(params: HttpParams):  Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveWorkItemSolexaPrep.gx", params.toString(), {headers: headers});
+    }
+
+    deleteWorkItem(params: HttpParams):  Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/DeleteWorkItem.gx",params.toString(), {headers: headers});
 
     }
 
-    saveWorkItemSolexaPrep(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/SaveWorkItemSolexaPrep.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    getCoreAdmins(params: HttpParams):  Observable<any> {
+        return this.httpClient.get("/gnomex/GetCoreAdmins.gx", {params: params});
 
     }
 
-    deleteWorkItem(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/DeleteWorkItem.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
-
-    }
-
-    getCoreAdmins(params: URLSearchParams):  Observable<any> {
-        return this.http.get("/gnomex/GetCoreAdmins.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
-
-    }
-
-    saveWorkItemSolexaAssemble(params: URLSearchParams):  Observable<any> {
-        this.cookieUtilService.formatXSRFCookie();
-
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/SaveWorkItemSolexaAssemble.gx", params.toString(), {headers: headers});
+    saveWorkItemSolexaAssemble(params: HttpParams):  Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveWorkItemSolexaAssemble.gx", params.toString(), {headers: headers});
 
     }
 
     saveFlowCell(params: HttpParams): Observable<any> {
-        this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/SaveFlowCell.gx", null, {params: params});
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveFlowCell.gx", params.toString(), {headers: headers});
 
     }
     deleteFlowCell(params: HttpParams): Observable<any> {
-        this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/DeleteFlowCell.gx", null, {params: params});
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/DeleteFlowCell.gx", params.toString(), {headers: headers});
 
     }
 
     SaveWorkItemSolexaPipeline(params: HttpParams): Observable<any> {
-        this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/SaveWorkItemSolexaPipeline.gx", null, {params: params});
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveWorkItemSolexaPipeline.gx", params.toString(), {headers: headers});
 
     }
 }

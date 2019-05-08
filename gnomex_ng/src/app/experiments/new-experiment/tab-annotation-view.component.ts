@@ -41,7 +41,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
 
         if (this._experiment && !this.experimentSubscription) {
             this.experimentSubscription = value.onChange_PropertyEntries.subscribe((value) =>{
-                if (value && this.addAnnotationGridApi) {
+                if (value && this.addAnnotationGridApi && this.removeAnnotationGridApi) {
                     // this.annotations = this._experiment.PropertyEntries;
                     let allPreviouslySelectedData: any[] = this.addAnnotationGridApi.getSelectedRows();
 
@@ -151,12 +151,18 @@ export class TabAnnotationViewComponent implements OnDestroy {
         this.addAnnotationGridApi = params.api;
         this.addAnnotationGridApi.setColumnDefs(this.addAnnotationColumnDefs);
         this.addAnnotationGridApi.sizeColumnsToFit();
+        if (this._experiment && this.removeAnnotationGridApi) {
+            this._experiment.refreshPropertyEntries();
+        }
     }
 
     public onRemoveAnnotationGridReady(params: any): void {
         this.removeAnnotationGridApi = params.api;
         this.removeAnnotationGridApi.setColumnDefs(this.removeAnnotationColumnDefs);
         this.removeAnnotationGridApi.sizeColumnsToFit();
+        if (this._experiment && this.addAnnotationGridApi) {
+            this._experiment.refreshPropertyEntries();
+        }
     }
 
     public onAddAnnotationGridRowSelected(event: any): void {

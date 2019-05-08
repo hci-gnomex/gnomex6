@@ -14,37 +14,45 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Differ {
-	
-	
+
+
 	private String remote;
 	private String local;
 	private String outputPath;
+	private String matchByName;
 	private Map<String,String> fileMap;
 	private List<String> uniqueByName;
 	private List<String> uniqueByChecksum;
-	
-	
 
-	
-	public Differ(String remote, String local){
-		this.remote = remote;
-		this.local = local;
-		this.outputPath = "";
-		this.fileMap = new TreeMap<String,String>();
-		this.uniqueByName = new ArrayList<String>();
-		this.uniqueByChecksum = new ArrayList<String>();
-	}
-	
-	public Differ(String remote, String local,String outputPath){
-		this.remote = remote;
-		this.local = local;
+
+
+	public Differ(String[] args) {
 		this.outputPath = outputPath;
-		this.fileMap = new TreeMap<String,String>();
+		this.fileMap = new TreeMap<String, String>();
 		this.uniqueByName = new ArrayList<String>();
 		this.uniqueByChecksum = new ArrayList<String>();
+
+
+		for (int i = 0; i < args.length; i++) {
+			args[i] = args[i].toLowerCase();
+
+			if (args[i].equals("-remote")) {
+				remote = args[++i];
+			} else if (args[i].equals("-local")) {
+				local = args[++i];
+			} else if (args[i].equals("-outputPath")) {
+				outputPath = args[++i];
+			} else if (args[i].equals("-matchbyname")) {
+				this.matchByName = args[++i];
+			}else if (args[i].equals("-help")) {
+				//printUsage();
+				System.exit(0);
+			}
+
+		}
 	}
-	
-	
+
+
 	public void findDifference(){
 		Map<String,String> fileMap = new TreeMap<String,String>();
 		List<String> uniqueFiles = new ArrayList<String>();
@@ -62,7 +70,7 @@ public class Differ {
 
 			simpleDiff = deterimineFileType(sampleLine);
 			diffFile(buffReader,simpleDiff);
-			
+
 			if(!simpleDiff) {
 				List<String> inclusionList = getInclusionList();
 				writeDiffToFile(inclusionList,"inclusion.out" );
@@ -89,14 +97,14 @@ public class Differ {
 				e.printStackTrace();
 			}
 		}
-		
-	
-		
+
+
+
 
 	}
-	
+
 	private boolean deterimineFileType(String sampleLine) throws Exception{
-		
+
 		int len = (sampleLine.split("  ")).length;
 		if(len == 1) {
 			return true;
@@ -105,16 +113,21 @@ public class Differ {
 		}else {
 			throw new Exception("Can't determine file type in diffParser " + sampleLine );
 		}
-		
-		
-		
-		
+
+
+
+
 	}
-	
-	
+
+
 	private void diffFile(BufferedReader buff, boolean simpleFileType) throws IOException {
 		String[]  filePath = null;
 		String[] fileAndChecksum = null;
+		Pattern p  = null;
+		if(matchByName != null){
+			p = Pattern.compile(matchByName);
+		}
+
 
 
 		String line = "";
@@ -131,11 +144,19 @@ public class Differ {
 				String fileName = filePath[filePath.length - 1];
 				fileMap.put(fileName, checkSum);
 			}else {
-				String[] pathWithFile = line.split("/");
-				String fileName = pathWithFile[pathWithFile.length -1];
-				fileMap.put(fileName, line);
+				if(matchByName != null){
+					Matcher m = p.matcher(line);
+					if(m.matches()){
+						String fileName = m.group(1);
+						fileMap.put(fileName, line );
+					}else{ // doesn't have to match name so get file plus extension
+						this.addToLocalMap(line);
+					}
+				}else{
+					this.addToLocalMap(line);
+				}
 
-			}	
+			}
 
 		}
 		buff.close();
@@ -164,41 +185,63 @@ public class Differ {
 					}
 				}
 
-				
-				
-			}else {
-				
-				String[] pathWithFile = line1.split("/");
-				fileName = pathWithFile[pathWithFile.length -1];
-				
-				if(fileMap.get(fileName) == null) { // diff
-					uniqueByName.add(line1);
-				}
-			}
-			
 
+
+			}else {
+				if(matchByName != null){
+					Matcher m = p.matcher(line1);
+					if(m.matches()){
+						fileName = m.group(1);
+						if(fileMap.get(fileName) == null ){
+							uniqueByName.add(line1);
+						}
+					}else{
+						addUniqueName(fileName, line1);
+					}
+				}else{
+					addUniqueName(fileName, line1);
+				}
+
+			}
 		}
 	}
-	
+
+	private void  addToLocalMap(String line){
+		String[] pathWithFile = line.split("/");
+		String fileName = pathWithFile[pathWithFile.length -1];
+		fileMap.put(fileName, line);
+	}
+
+	private void addUniqueName(String fileName, String line){
+		String[] pathWithFile = line.split("/");
+		fileName = pathWithFile[pathWithFile.length -1];
+
+		if(fileMap.get(fileName) == null) { // diff
+			uniqueByName.add(line);
+		}
+	}
+
+
+
 	public List<String> getInclusionList(){
-		
+
 		List<String>excludeByNameOrchecksumList = new ArrayList<String>();
 		excludeByNameOrchecksumList.addAll(this.uniqueByName);
 		excludeByNameOrchecksumList.addAll(this.uniqueByChecksum);
 		List<String>inclusionList = new ArrayList<String>();
-		
-		
+
+
 		for(int i=0; i < excludeByNameOrchecksumList.size(); i++) {
 			this.fileMap.remove(excludeByNameOrchecksumList.get(i));
 		}
-		
-		
+
+
 		for(String key: this.fileMap.keySet()) {
 			inclusionList.add(key);
 		}
 		return inclusionList;
-		
-		
+
+
 	}
 
 	public void writeDiffToFile(List<String> uniqueFiles){ // use if you want to do std.out
@@ -206,12 +249,12 @@ public class Differ {
 		writer = new PrintWriter(System.out);
 
 		for(String file: uniqueFiles) {
-				System.out.println(file);
-			}
+			System.out.println(file);
+		}
 
 		writer.close();
 	}
-	
+
 	public void writeDiffToFile(List<String> uniqueFiles,String fileName){
 		PrintWriter writer = null;
 
@@ -220,18 +263,18 @@ public class Differ {
 			for(String file: uniqueFiles) {
 				writer.println(file);
 			}
-			
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			writer.close();
 		}
-		
-	}
-	
 
-	
-	
+	}
+
+
+
+
 
 }

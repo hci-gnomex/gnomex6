@@ -6,31 +6,22 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.jdom2.Attribute;
-import org.jdom2.Comment;
-import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.EntityRef;
 import org.jdom2.JDOMException;
-import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.util.IteratorIterable;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
@@ -138,8 +129,6 @@ public class XMLParser {
 
 				String key = entry.getKey();
 				TreeMap<String, List<PersonEntry>> AvatarList = entry.getValue(); // all SL number for that patient
-
-
 
 				//String query = "//book/author";//[@name='TRF89342']";
 				List<Element> sampleList = queryXML(query,doc);
@@ -471,7 +460,7 @@ public class XMLParser {
 			//executeCMDCommands(cmdCommands);
 		}else {
 			executeCommands(importRequestCommands, appendedPathOnly + IMPORT_EXPERIMENT_ERROR);
-			String requestID = readInLastRequestEntry(pathOnly + "tempRequestList.out" );
+			String requestID = readInLastEntry(pathOnly + "tempRequestList.out" );
 			System.out.print("This is the request Id I retrieved from the file " + requestID);
 
 
@@ -483,26 +472,36 @@ public class XMLParser {
 
 				System.out.println(importAnalysisCommands.get(0));
 				executeCommands(importAnalysisCommands,appendedPathOnly  + IMPORT_ANALYSIS_ERROR);
+				analysisID = new Integer(readInLastEntry(pathOnly + "tempAnalysisList.out" ));
 
 			}else{ // existing analysis
 				if(analysisID != null && !requestID.equals("")){
-					linkExperimentToAnalysis.add("bash LinkExpToAnal.sh -request " + requestID + " -analysis " + analysisID + " -add");
 
-					System.out.println(linkExperimentToAnalysis.get(0));
-					executeCommands(linkExperimentToAnalysis,appendedPathOnly  + LINK_EXP_ANAL_ERROR);
+					if(!q.hasLinkAnalysisExperiment( analysisID, new Integer(requestID))){
+						linkExperimentToAnalysis.add("bash LinkExpToAnal.sh -request " + requestID + " -analysis " + analysisID + " -add");
+						System.out.println(linkExperimentToAnalysis.get(0));
+						executeCommands(linkExperimentToAnalysis,appendedPathOnly  + LINK_EXP_ANAL_ERROR);
+
+					}
+
 				}
 
 				saveAnalysisID(pathOnly + "tempAnalysisList.out",analysisID);
 			}
+
+			/*CollaboratorPermission cp = new CollaboratorPermission(this.avEntriesMap.get(name),analysisID,q);
+			List<String> irbAssocationList = cp.getIRAAssociation();
+			cp.assignAnalysisPermissionToCollabs(irbAssocationList);*/
+
 		}
 
 		q.closeConnection();
 
 	}
 
-	private String readInLastRequestEntry(String fileName) {
+	private String readInLastEntry(String fileName) {
 		BufferedReader bf = null;
-		String requestID = "";
+		String id = "";
 
 		try {
 			bf = new BufferedReader(new FileReader(fileName));
@@ -511,7 +510,7 @@ public class XMLParser {
 			while((line= bf.readLine()) != null){
 				String[] idList  = line.split(" ");
 				if(idList.length > 0){
-					requestID = idList[idList.length - 1];
+					id = idList[idList.length - 1];
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -532,7 +531,7 @@ public class XMLParser {
 			}
 		}
 
-		return requestID;
+		return id;
 
 	}
 

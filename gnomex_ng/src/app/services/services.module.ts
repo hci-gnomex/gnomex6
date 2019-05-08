@@ -53,6 +53,7 @@ import {FileService} from "./file.service";
 import {UploadFileService} from "./upload-file.service";
 import {UtilService} from "./util.service";
 import {UserPreferencesService} from "./user-preferences.service";
+import {NewExternalExperimentService} from "./new-external-experiment.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -116,6 +117,7 @@ import {UserPreferencesService} from "./user-preferences.service";
         UploadFileService,
         UtilService,
         UserPreferencesService,
+        NewExternalExperimentService,
     ]})
 export class ServicesModule {
 }

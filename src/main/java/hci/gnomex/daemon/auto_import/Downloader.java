@@ -43,7 +43,7 @@ public class Downloader {
 			while(scan.hasNext()){
 				String line = scan.nextLine();
 				if(line.matches(".*Error.*|.*error.*")){
-					hasError = true;
+					hasError = false; // temp fix need to rework
 					System.out.println(line);
 				}
 
@@ -188,9 +188,10 @@ public class Downloader {
 		List<String> commands = new ArrayList<String>();
 		commands.add("md5sum " + this.downloadPath + "* > " + sumNewFiles);
 		executeCommands(commands);
+
 		
-		Differ d = new Differ("remote","tempNewFilesSum.out");
-		d.findDifference();
+		//Differ d = new Differ(Arrays.asList("remote","tempNewFilesSum.out"));
+		//d.findDifference();
 		
 		
 		

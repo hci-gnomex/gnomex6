@@ -23,25 +23,11 @@ import {UtilService} from "../services/util.service";
 @Component({
     selector: 'flowcell-workflow',
     templateUrl: 'flowcell-workflow.html',
-    styles: [`
-        .flex-column-container-workflow {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 94%;
-            width: 100%;
-        }
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
+    styles: [`        
+        
         mat-form-field.formField {
             width: 20%;
             margin: 0 0.5%;
-        }
-        .row-one {
-            display: flex;
-            flex-grow: 1;
         }
         .row-one-right {
             display: flex;

@@ -1,42 +1,47 @@
-<div class="flex-column-container-workflow">
-<div class="flex-row-container">
+<div class="flex-container-col full-width full-height">
+    <div class="flex-container-row">
         <img src="../../assets/flask.png" height="16" width="16" style="margin-top: .65em">
-        <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
-        <mat-label style="justify-content: flex-end;margin-left: 40em;margin-top: .4em;">{{requestIds.length-1}} requests in worklist</mat-label>
+        <mat-label style="margin-left: .4em;margin-top: .4em;">{{ label }}</mat-label>
+        <mat-label style="justify-content: flex-end;margin-left: 40em;margin-top: .4em;">{{ requestIds.length > 0 ? requestIds.length - 1  : 0 }}
+            requests in worklist
+        </mat-label>
 
     </div>
-    <div class="flex-row-container">
+    <div class="flex-container-row">
         <mat-form-field class="formField">
             <input #requestInput matInput placeholder="Request #" aria-label="Request #" [matAutocomplete]="autoRequest"
-                   [(ngModel)]="workItem" (keyup.enter)="chooseFirstRequestOption()" (keyup)="highlightFirstRequestOption($event)">
+                   [(ngModel)]="workItem" (keyup.enter)="chooseFirstRequestOption()"
+                   (keyup)="highlightFirstRequestOption($event)">
             <mat-autocomplete #autoRequest="matAutocomplete">
-                <mat-option (onSelectionChange)="selectRequestOption($event)" *ngFor="let request of filterRequests(this.workItem)" [value]="request.requestNumber">{{request.requestNumber}}</mat-option>
+                <mat-option (onSelectionChange)="selectRequestOption($event)"
+                            *ngFor="let request of filterRequests(this.workItem)"
+                            [value]="request.requestNumber">{{request.requestNumber}}</mat-option>
             </mat-autocomplete>
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput #coreFacility placeholder="Core facility" aria-label="Core" [matAutocomplete]="autoCore"
-                   [(ngModel)]="core" (keyup.enter)="chooseFirstCoreOption()" (keyup)="highlightFirstCoreOption($event)">
-            <mat-autocomplete #autoCore="matAutocomplete" [displayWith]="displayCore">
-                <mat-option (onSelectionChange)="selectCoreOption($event)" *ngFor="let cor of filterCores(this.core)" [value]="cor">{{cor.display}}</mat-option>
-            </mat-autocomplete>
+            <mat-select (selectionChange)="selectCodeOption($event)" [(ngModel)]="codeStepNext" placeholder="Experiment Type" [compareWith]="compareByID">
+                <mat-option *ngFor="let code of this.codeStepArray"
+                            [value]="code.codeStepNext">{{code.label}}</mat-option>
+            </mat-select>
         </mat-form-field>
     </div>
-    <div class="row-one" style="width: 100%;height: 90%">
-        <ag-grid-angular id="userTable" class="ag-theme-balham full-width"
+    <div class="flex-grow">
+        <ag-grid-angular class="ag-theme-balham full-height"
                          [rowData]="workingWorkItemList"
-                         [columnDefs]="columnDefs"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                         [rowSelection]="rowSelection"
                          (gridReady)="onGridReady($event)"
                          [enableSorting]="true"
-                         (cellValueChanged) = "onCellValueChanged($event)"
+                         (cellValueChanged)="onCellValueChanged($event)"
                          [enableFilter]="true"
+                         [stopEditingWhenGridLosesFocus]="true"
                          [rowClassRules]="this.workflowService.assmGridRowClassRules"
                          [enableColResize]="true">
         </ag-grid-angular>
     </div>
-    <div class="flex-row-container">
-        <button mat-button style="margin-top: 1.2em" matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img src="../../assets/action_refresh.gif">Refresh</button>
+    <div class="flex-container-row justify-center">
+        <button mat-button  matTooltip="Refresh worklist" (click)="refreshWorklist($event)">
+            <img src="../../assets/action_refresh.gif">Refresh
+        </button>
         <save-footer style="width: 100%" (saveClicked)="areAandBTagsUnique()"
                      [dirty]="this.dirty"
                      [showSpinner]="this.showSpinner">

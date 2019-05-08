@@ -1,5 +1,5 @@
 import {
-    AfterViewInit, ChangeDetectorRef, Component, ComponentFactoryResolver, ElementRef, OnInit, ViewChild
+    AfterViewInit, ChangeDetectorRef, Component, ComponentFactoryResolver, ComponentRef, ElementRef, OnInit, ViewChild
 } from "@angular/core";
 import {MatSidenav} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -27,19 +27,12 @@ import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
         .sidenav-container {
             height: 100%;
         }
-        .workflow {
-            display: flex;
-            height: 94%;
-        }
-        .sidebutton {
-            height: 5%;
-            background-color: white;
-        }
         #groupTabGroup ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
             width: 25%;
             min-width: 0;
             padding: 3px;
             margin: 3px;
+            
         }
     `]
 })
@@ -58,6 +51,7 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     private resetTab = 0;
     private microarrayDisabled: boolean = true;
     private combinedQCTabItems: any[] = [];
+    private workflowComponent:any;
     workflowOutlet: any = LibprepWorkflowComponent;
     private isATabChange: boolean = true;
     inputs = {
@@ -80,6 +74,10 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
             });
         this.buildCombinedQCTabItems();
         this.routeToWorkflow();
+    }
+
+    onCreatedComponent(compRef:ComponentRef<any>){
+        this.workflowComponent = compRef.instance;
     }
 
     buildCombinedQCTabItems() {
@@ -164,6 +162,9 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
                 break;
 
         }
+        // if(this.codeStepNext !== this.workflowService.QC){
+        //     this.selectedTab = 1;
+        // }
 
     }
 
@@ -227,6 +228,9 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
             this.routeToWorkflow();
         } else {
             this.isATabChange = true;
+        }
+        if(this.selectedTab === 1){
+
         }
     }
 

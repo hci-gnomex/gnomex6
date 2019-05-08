@@ -5,6 +5,8 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {WorkflowService} from "../services/workflow.service";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'delete-seqlane-dialog',
@@ -32,13 +34,15 @@ export class DeleteSeqlaneDialogComponent implements OnInit{
 
     public delete(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("workItemIds", this.seqLanes);
+        let params: HttpParams = new HttpParams()
+            .set("workItemIds", this.seqLanes);
 
         this.workflowService.deleteWorkItem(params).subscribe((response: Response) => {
             this.showSpinner = false;
             this.rebuildSeqlanes = true;
             this.dialogRef.close();
+        },(err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

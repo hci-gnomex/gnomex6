@@ -4,13 +4,13 @@
             <div class="instructions-background bordered padded minimal">
                 <ol class="no-margin">
                     <li>
-                        Please confirm the information below. Click the "Back" button or a tab to modify the request.
+                        Please confirm the information below. Click the "Back" button or a tab to modify the experiment.
                     </li>
-                    <li>
+                    <li *ngIf="experiment?.isExternal !== 'Y'">
                         Agree to estimated charges by clicking the "I authorize" checkbox.
                     </li>
                     <li>
-                        Approve the work request by clicking the "Submit" button.
+                        Submit the experiment information by clicking the "Submit" button.
                     </li>
                 </ol>
             </div>
@@ -24,7 +24,7 @@
                     Name :
                 </div>
                 <div class="flex-grow">
-                    {{ submitterName }}
+                    {{ experiment && experiment.experimentOwner ? experiment.experimentOwner[this.prefService.userDisplayField] : '' }}
                 </div>
             </div>
             <div class="full-width flex-container-row padded">
@@ -51,7 +51,7 @@
                 Library Prepared By Client
             </div>
         </div>
-        <div class="top-margin font-bold">
+        <div class="top-margin font-bold" *ngIf="experiment?.isExternal !== 'Y'">
             Estimated Charges : {{ totalEstimatedCharges }}
         </div>
         <div class="padded heavily-left-padded">

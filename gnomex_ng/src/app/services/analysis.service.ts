@@ -11,7 +11,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Injectable()
 export class AnalysisService {
     public isDeleteFromGrid: boolean = false;
-    public analysisGroupList: any[];
+    public analysisGroupList: any;
     // for the save button on right pane
     public invalid: boolean = false;
     public dirty: boolean = false;
@@ -21,7 +21,7 @@ export class AnalysisService {
     public modeChangedAnalysis: any;
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-    private analysisGroupListSubject: Subject<any[]> = new Subject();
+    private analysisGroupListSubject: Subject<any> = new Subject<any>();
     private _haveLoadedAnalysisGroupList: boolean = false;
     private _previousURLParams: HttpParams = null;
     private _analysisPanelParams: HttpParams;
@@ -33,7 +33,7 @@ export class AnalysisService {
 
     private _analysisOverviewForm: FormGroup;
     private _createdAnalysis: any;
-    private editMode: boolean = false;
+    public editMode: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
 
     constructor(private http: Http, private httpClient: HttpClient,
@@ -90,13 +90,8 @@ export class AnalysisService {
             }));
     }
 
-    emitAnalysisGroupList(agList?: any): void {
-        if(agList) {
-            this.analysisGroupListSubject.next(agList);
-        } else {
-            this.analysisGroupListSubject.next(this.analysisGroupList);
-        }
-
+    emitAnalysisGroupList(): void {
+        this.analysisGroupListSubject.next(this.analysisGroupList);
     }
 
     getAnalysisGroupListObservable(): Observable<any> {
@@ -113,7 +108,6 @@ export class AnalysisService {
             this._previousURLParams = params;
 
             this.httpClient.get("/gnomex/GetAnalysisGroupList.gx", {params: params })
-                .pipe(map((resp:any) =>{return resp.Lab}))
                 .subscribe((response:any) => {
                     this.analysisGroupList = response;
                     this.emitAnalysisGroupList();
@@ -127,7 +121,6 @@ export class AnalysisService {
         this.startSearchSubject.next(true);
 
         this.httpClient.get("/gnomex/GetAnalysisGroupList.gx", {params: this._previousURLParams})
-            .pipe(map((resp:any) => {return resp.Lab}))
             .subscribe((response:any) => {
             this.analysisGroupList = response;
             this.emitAnalysisGroupList();
@@ -253,11 +246,11 @@ export class AnalysisService {
     }
 
     public setEditMode(editMode: boolean): void {
-        this.editMode = editMode;
+        this.editMode.next(editMode);
     }
 
     public getEditMode(): boolean {
-        return this.editMode;
+        return this.editMode.getValue();
     }
 
 }

@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -40,8 +41,7 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger(SaveFlowCell.class);
 
-  private String						channelsXMLString;
-  private Document					channelsDoc;
+  private JsonArray                     channelsArray;
   private FlowCellChannelParser		channelParser;
   private FlowCell					fc;
   private boolean						isNewFlowCell = false;
@@ -73,21 +73,18 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
       isNewFlowCell = true;
     }
 
-    if (request.getParameter("channelsXMLString") != null
-        && !request.getParameter("channelsXMLString").equals("")) {
-      channelsXMLString = request.getParameter("channelsXMLString");
-    }
 
-    StringReader reader = new StringReader(channelsXMLString);
-    try {
-      SAXBuilder sax = new SAXBuilder();
-      channelsDoc = sax.build(reader);
-      channelParser = new FlowCellChannelParser(channelsDoc);
+    try{
+      channelsArray = Util.readJSONArray(request, "channelsJSONString");
+      if(channelsArray.size() > 0){
+        channelParser = new FlowCellChannelParser(channelsArray);
+      }
+
     }
-    catch (JDOMException je) {
-      LOG.error("Cannot parse channelsXMLString", je);
-      this.addInvalidField("channelsXMLString", "Invalid channelsXMLString");
-      this.errorDetails = Util.GNLOG(LOG,"Cannot parse channelsXMLString", je);
+    catch (Exception e) {
+      LOG.error("Cannot parse channelsXMLString", e);
+      this.addInvalidField("channelsJSONString", "Invalid channelsJSONString");
+      this.errorDetails = Util.GNLOG(LOG,"Cannot parse channelsJSONString", e);
     }
   }
 

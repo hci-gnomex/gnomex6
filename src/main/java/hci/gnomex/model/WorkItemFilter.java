@@ -391,6 +391,8 @@ public class WorkItemFilter extends DetailObject {
       queryBuf.append("    s.idLibPrepPerformedBy ");
     } else if(this.codeStepNext.equals(Step.SEQ_PREP_QC) ||
             this.codeStepNext.equals(Step.HISEQ_PREP_QC) ||
+            this.codeStepNext.equals(Step.ILLSEQ_PREP_QC) ||
+            this.codeStepNext.equals(Step.NOSEQ_PREP_QC) ||
             this.codeStepNext.equals(Step.ALL_PREP_QC) ||
             this.codeStepNext.equals(Step.MISEQ_PREP_QC) ||
       this.codeStepNext.equals(Step.ILLSEQ_PREP_QC)){
@@ -410,8 +412,9 @@ public class WorkItemFilter extends DetailObject {
       queryBuf.append("    s.seqPrepStockBypassed ");
     }  else if (this.codeStepNext.equals(Step.SEQ_CLUSTER_GEN) ||
                  this.codeStepNext.equals(Step.HISEQ_CLUSTER_GEN) ||
-            this.codeStepNext.equals(Step.MISEQ_CLUSTER_GEN) ||
-      this.codeStepNext.equals(Step.ILLSEQ_CLUSTER_GEN)) {
+            this.codeStepNext.equals(Step.ILLSEQ_CLUSTER_GEN) ||
+            this.codeStepNext.equals(Step.NOSEQ_CLUSTER_GEN) ||
+                 this.codeStepNext.equals(Step.MISEQ_CLUSTER_GEN)) {
       queryBuf.append("      , ");
       queryBuf.append("    l.idSequenceLane, ");
       queryBuf.append("    l.idSeqRunType, ");
@@ -427,14 +430,16 @@ public class WorkItemFilter extends DetailObject {
       queryBuf.append("    s.barcodeSequenceB, ");
       queryBuf.append("	   l.idNumberSequencingCyclesAllowed ");
     } else if (this.codeStepNext.equals(Step.SEQ_RUN) ||
-            this.codeStepNext.equals(Step.HISEQ_RUN) ||
-      this.codeStepNext.equals(Step.ILLSEQ_RUN)) {
+            this.codeStepNext.equals(Step.NOSEQ_RUN) ||
+            this.codeStepNext.equals(Step.ILLSEQ_RUN) ||
+                this.codeStepNext.equals(Step.HISEQ_RUN)) {
       queryBuf.append("      , ");
       queryBuf.append("    fc, ");
       queryBuf.append("    ch ");
 
 
     } else if (this.codeStepNext.equals(Step.SEQ_DATA_PIPELINE) ||
+            this.codeStepNext.equals(Step.NOSEQ_DATA_PIPELINE) ||
                 this.codeStepNext.equals(Step.HISEQ_DATA_PIPELINE) ||
             this.codeStepNext.equals(Step.MISEQ_DATA_PIPELINE) ||
             this.codeStepNext.equals(Step.ILLSEQ_DATA_PIPELINE)) {
@@ -530,15 +535,19 @@ public class WorkItemFilter extends DetailObject {
       if(this.codeStepNext.equals(Step.QUALITY_CONTROL_STEP) ||
           this.codeStepNext.equals(Step.SEQ_QC) ||
           this.codeStepNext.equals(Step.HISEQ_QC) ||
+              this.codeStepNext.equals(Step.ILLSEQ_QC) ||
+              this.codeStepNext.equals(Step.NOSEQ_QC) ||
           this.codeStepNext.equals(Step.MISEQ_QC)) {
         // Sample Quality lists are now combined
         queryBuf.append(" (wi.codeStepNext = '" + Step.QUALITY_CONTROL_STEP + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.SEQ_QC + "' OR");
+        queryBuf.append(" wi.codeStepNext = '" + Step.NOSEQ_QC + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.HISEQ_QC + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.ILLSEQ_QC + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.MISEQ_QC + "')");
       } else if(this.codeStepNext.equals(Step.ALL_PREP)){
         queryBuf.append(" (wi.codeStepNext = '" + Step.SEQ_PREP + "' OR");
+        queryBuf.append(" wi.codeStepNext = '" + Step.NOSEQ_PREP + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.HISEQ_PREP + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.ILLSEQ_PREP + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.MISEQ_PREP + "')");
@@ -546,6 +555,7 @@ public class WorkItemFilter extends DetailObject {
         queryBuf.append(" (wi.codeStepNext = '" + Step.SEQ_PREP_QC + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.HISEQ_PREP_QC + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.ILLSEQ_PREP_QC + "' OR");
+        queryBuf.append(" wi.codeStepNext = '" + Step.NOSEQ_PREP_QC + "' OR");
         queryBuf.append(" wi.codeStepNext = '" + Step.MISEQ_PREP_QC + "')");
       } else {
         queryBuf.append(" wi.codeStepNext = '");

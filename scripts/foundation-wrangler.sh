@@ -6,7 +6,8 @@ fScriptsPath=$scriptsPath"foundation/" # where the scripts live
 remoteDataPath="/mnt/win/Results/"   #"/home/u0566434/FoundationData/"
 foundationPath="/Repository/PersonData/2017/2R/Foundation/"
 
-regex="^(TRF[0-9]+)(\.|_).*"  #"^(TRF[0-9]+)_(\wNA)(.*)" # Match TRF and its type (DNA/RNA) and then the file extension
+#regex="^(.*RF[0-9]+)(\.|_).*"  #"^(TRF[0-9]+)_(\wNA)(.*)" # Match TRF and its type (DNA/RNA) and then the file extension
+regex="^.*([CQT]RF[0-9]+)(.|_)(.*)"
 
 TOMCAT_HOME=../../../
 COMMON_LIB=$TOMCAT_HOME/lib
@@ -27,7 +28,6 @@ do
 done
 export CLASSPATH
 
-CLASSPATH="./gnomex2.jar:$CLASSPATH"
 export CLASSPATH
 
 
@@ -39,41 +39,35 @@ fileList=""
 verifiedTrfInfo=""
 idStr=""
 
-:<<'END'
-
+#java hci.gnomex.daemon.auto_import.FileMover -accountFilesMoved $foundationPath
 tree "$foundationPath" --noreport > "$pDataPath"localFoundationTree.out
 java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localFoundationTree.out "$pDataPath"localFoundationPath.out
-
-ls $remoteDataPath*TRF* > "$pDataPath"remoteFoundationPath.out
-java hci.gnomex.daemon.auto_import.DiffParser  "$pDataPath"localFoundationPath.out  "$pDataPath"remoteFoundationPath.out > "$pDataPath"uniqueFilesToMove.out
-
-
+ls $remoteDataPath*RF* > "$pDataPath"remoteFoundationPath.out
+java hci.gnomex.daemon.auto_import.DiffParser -local "$pDataPath"localFoundationPath.out -remote "$pDataPath"remoteFoundationPath.out > "$pDataPath"uniqueFilesToMove.out
 if [ "$flaggedIDParam" = "normal"  ]; then
+
     bash "$scriptsPath"makeReattemptList.sh $remoteDataPath ".*RF.*"  "$pDataPath"reattemptFileList.out
     # Filter file order of types  params: in, out, path, out, out
-    java hci.gnomex.daemon.auto_import.FilterFile "$pDataPath"uniqueFilesToMove.out "$pDataPath"remoteChecksums.out "$pDataPath"localChecksums.out "$pDataPath"remoteFileList.out "$pDataPath"hci-creds.properties "$pDataPath"filteredOutList.out
-    java hci.gnomex.daemon.auto_import.DiffParser "$pDataPath"localChecksums.out  "$pDataPath"remoteChecksums.out "$pDataPath"
+    java hci.gnomex.daemon.auto_import.FilterFile "$pDataPath"uniqueFilesToMove.out "$pDataPath"fileList.out "$pDataPath"hci-creds.properties "$pDataPath"filteredOutList.out
 
-
-    cat "$pDataPath"inclusion.out "$pDataPath"reattemptFileList.out "$pDataPath"remoteFileList.out > "$pDataPath"importableFileList.out
+    #java hci.gnomex.daemon.auto_import.DiffParser "$pDataPath"localChecksums.out  "$pDataPath"remoteChecksums.out "$pDataPath"
+    #cat "$pDataPath"inclusion.out "$pDataPath"reattemptFileList.out "$pDataPath"fileList.out > "$pDataPath"importableFileList.out
+    cat "$pDataPath"reattemptFileList.out "$pDataPath"fileList.out > "$pDataPath"importableFileList.out
     fileList="$pDataPath"importableFileList.out
-    #cat "$pDataPath"inclusion.out "$pDataPath"reattemptFileList.out > "$pDataPath"foundFileList.out
 
-    cat "$pDataPath"remoteChecksums.out
-    cat "$pDataPath"localChecksums.out
-    rm "$pDataPath"*Checksums.out
-
+    #cat "$pDataPath"remoteChecksums.out
+    #cat "$pDataPath"localChecksums.out
+    #rm "$pDataPath"*Checksums.out
 else
     # occur when user has verified the data and wants to intervene by supplying a file to use over database query
     find $remoteDataPath"Flagged/" -regextype sed -regex ".*RF.*"  -printf '%f\n' > $remoteDataPath"Flagged/"tempFilesToVerify.out
+    cat "$pDataPath"uniqueFilesToVerify.out
     bash "$scriptsPath"makeVerifiedList.sh $flaggedIDParam  $remoteDataPath"Flagged/"tempFilesToVerify.out "$pDataPath"verifiedFoundList.out $idColumn
     fileList="$pDataPath"verifiedFoundList.out
     echo else
 fi
 
 echo hello out there from foundation
-
-
 
 while read fileName; do
         if [[ $fileName =~ $regex ]]; then
@@ -87,14 +81,12 @@ while read fileName; do
                 fi
                                 #echo $id
         fi
-done < $fileList # has all file names that have never been imported plus reattempts
-
+done < $fileList # has all new file names to import plus reattempts files
 echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder > "$pDataPath"tempStr.out
 echo The temp str:
 
 cat "$pDataPath"tempStr.out
 
-END
 
 if [ "$flaggedIDParam" = "normal"  ]; then
     java  hci.gnomex.daemon.auto_import.Linker "$pDataPath"tempStr.out "$pDataPath"hci-creds.properties "$pDataPath"trfInfo.out foundation
@@ -104,13 +96,12 @@ else
 fi
 
 
+
 rm "$pDataPath"tempStr.out
 
 java hci.gnomex.daemon.auto_import.XMLParserMain -file $verifiedTrfInfo -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"tempRequest.xml -importMode foundation
 java hci.gnomex.daemon.auto_import.FileMover -file $fileList  -root $foundationPath -downloadPath $remoteDataPath -flaggedFile "$pDataPath"flaggedIDs.out -mode foundation
-
 #rm "$pDataPath"tempAnalysisList.out
-
 echo ------------------------------------------------------------------------------------------------------------
 #cat matched.txt | java -jar fileNavParser.jar
 #rm ../Data/matched.txt

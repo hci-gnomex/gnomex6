@@ -11,6 +11,7 @@ import {MatDialog, MatDialogConfig} from "@angular/material";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentsService} from "../experiments.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {UtilService} from "../../services/util.service";
 
 
 @Component({
@@ -485,7 +486,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
                 this.lab = result;
 
                 if (result.Lab) {
-                    this.projectsDictionary = result.Lab.projects;
+                    this.projectsDictionary = UtilService.getJsonArray(result.Lab.projects, result.Lab.projects.Project);
                     this.isReady_projectsDictionary = true;
 
                     this.compilePossibleOwners();
@@ -716,7 +717,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
         }
 
         if (this.lab.Lab.members) {
-            let temp: any[] = this.lab.Lab.members;
+            let temp: any[] = UtilService.getJsonArray(this.lab.Lab.members, this.lab.Lab.members.AppUser);
 
             for (let member of temp) {
                 this.possibleOwnersForLabDictionary.push(member);

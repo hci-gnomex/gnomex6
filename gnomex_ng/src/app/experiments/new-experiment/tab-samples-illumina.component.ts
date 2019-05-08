@@ -27,6 +27,7 @@ import {AnnotationService} from "../../services/annotation.service";
 import {TextAlignRightMiddleEditor} from "../../util/grid-editors/text-align-right-middle.editor";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
+import {GridApi} from "ag-grid-community";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -199,6 +200,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.loadSampleTypes();
         this.loadSeqLibProtocol();
     }
+    public get experiment() {
+        return this._experiment;
+    }
 
     @Input('stateChangeSubject') set stateChangeSubject(value: BehaviorSubject<string>) {
         if (value) {
@@ -257,7 +261,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         return this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'Y';
+            && this._experiment.requestCategory.isIlluminaType === 'Y'
+            && this._experiment.isExternal !== 'Y';
     };
 
     public get showConcentrationUnitColumn(): boolean {
@@ -451,7 +456,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private gridColumnApi;
     public showInstructions: boolean = false;
 
-    private samplesGridApi: any;
+    private samplesGridApi: GridApi;
 
     public nodeChildDetails: any;
 
@@ -800,7 +805,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             sortOrder: 20,
             outerForm: this.form,
             formName:  "gridFormGroup",
-            pinned: "left"
+            pinned:    "left"
         });
 
         for (let columnProperty of this.columnProperties) {
@@ -2073,6 +2078,17 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     public onClickShowInstructions(): void {
         this.showInstructions = !this.showInstructions;
+    }
+
+    public onAddSample(): void {
+        let newSample: Sample = Sample.createSampleObjectFromAny(this.dictionaryService, null);
+        newSample.index = this.experiment.samples.length + 1;
+        if (this.experiment.idOrganism) {
+            newSample.idOrganism = this.experiment.idOrganism;
+        }
+
+        this.experiment.samples.push(newSample);
+        this.experiment.numberOfSamples = this.experiment.samples.length;
     }
 
     public static addColumnToColumnDef(columnDefs: any[], annot: any, editable: boolean, sortOrder: number, emToPxConversionRate: number, state: string, noColor: boolean): void {

@@ -20,14 +20,18 @@ import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+
 public class FlowCellChannelParser extends DetailObject implements Serializable
 {
 
-  private Document doc;
+  private JsonArray flowCellArray;
   private Map      channelMap = new HashMap();
 
-  public FlowCellChannelParser(Document doc) {
-    this.doc = doc;
+  public FlowCellChannelParser(JsonArray flowCellArray) {
+    this.flowCellArray = flowCellArray;
   }
 
   public void init() {
@@ -39,14 +43,14 @@ public class FlowCellChannelParser extends DetailObject implements Serializable
   // we need to manage their work items individually and not just delete the sequence lanes when they are removed from a channel
   public void parse(Session sess) throws Exception {
     FlowCellChannel channel = new FlowCellChannel();
-    Element root = this.doc.getRootElement();
 
-    for (Iterator i = root.getChildren("FlowCellChannel").iterator(); i.hasNext();) {
+
+    for (int i = 0; i <   this.flowCellArray.size(); i++) {
       Boolean isNewChannel = false;
       Map sequenceLaneMap = new HashMap();
-      Element node = (Element) i.next();
+      JsonObject node = this.flowCellArray.getJsonObject(i);
 
-      String idFlowCellChannelString = node.getAttributeValue("idFlowCellChannel");
+      String idFlowCellChannelString =  Util.getJsonStringSafeNonNull(node,"idFlowCellChannel");
       // Is this HISEQ or MISEQ?
       String codeStepNext = "";
       // What is the core?
@@ -60,7 +64,7 @@ public class FlowCellChannelParser extends DetailObject implements Serializable
       }
 
       if (idFlowCellChannelString.startsWith("FlowCellChannel")
-          || idFlowCellChannelString.equals("")) {
+              || idFlowCellChannelString.equals("")) {
 
         isNewChannel = true;
         channel = new FlowCellChannel();
@@ -69,48 +73,46 @@ public class FlowCellChannelParser extends DetailObject implements Serializable
       } else {
         isNewChannel = false;
         channel = (FlowCellChannel) sess.get(FlowCellChannel.class,
-            Integer.parseInt(idFlowCellChannelString));
+                Integer.parseInt(idFlowCellChannelString));
       }
 
       this.initializeFlowCellChannel(sess, node, channel);
 
-      if (node.getChild("sequenceLanes") != null
-          && !node.getChild("sequenceLanes").getChildren("SequenceLane").isEmpty()) {
+      JsonArray seqLaneArray = node.get("sequenceLanes") != null ? node.getJsonArray("sequenceLanes") : Json.createArrayBuilder().build();
 
-        for (Iterator i1 = node.getChild("sequenceLanes").getChildren(
-        "SequenceLane").iterator(); i1.hasNext();) {
-          Boolean isNewLane = false;
-          SequenceLane sl = new SequenceLane();
+      for (int i1 = 0 ; i1 < seqLaneArray.size(); i1++) {
+        Boolean isNewLane = false;
+        SequenceLane sl = new SequenceLane();
+        JsonObject sequenceLaneNode = seqLaneArray.getJsonObject(i1);
 
-          Element sequenceLaneNode = (Element) i1.next();
-          String idSequenceLaneString = sequenceLaneNode.getAttributeValue("idSequenceLane");
+        String idSequenceLaneString = Util.getJsonStringSafeNonNull(sequenceLaneNode, "idSequenceLane");
 
-          if (idSequenceLaneString.startsWith("SequenceLane")
-              || idSequenceLaneString.equals("")) {
+        if (idSequenceLaneString.startsWith("SequenceLane")
+                || idSequenceLaneString.equals("")) {
 
-            isNewLane = true;
-            sl = new SequenceLane();
-          } else {
-            isNewLane = false;
-            sl = (SequenceLane) sess.get(SequenceLane.class,
-                Integer.parseInt(idSequenceLaneString));
-          }
-
-          sl.setIdFlowCellChannel(channel.getIdFlowCellChannel());
-
-          if (isNewLane) {
-            sess.save(sl);
-            idSequenceLaneString = sl.getIdSequenceLane().toString();
-          }
-          sequenceLaneMap.put(idSequenceLaneString, sl);
+          isNewLane = true;
+          sl = new SequenceLane();
+        } else {
+          isNewLane = false;
+          sl = (SequenceLane) sess.get(SequenceLane.class,
+                  Integer.parseInt(idSequenceLaneString));
         }
+
+        sl.setIdFlowCellChannel(channel.getIdFlowCellChannel());
+
+        if (isNewLane) {
+          sess.save(sl);
+          idSequenceLaneString = sl.getIdSequenceLane().toString();
+        }
+        sequenceLaneMap.put(idSequenceLaneString, sl);
       }
+
 
       //
       // Remove lanes which have been deleted by the user
       //
       if (channel.getSequenceLanes() != null
-          || !channel.getSequenceLanes().isEmpty()) {
+              || !channel.getSequenceLanes().isEmpty()) {
 
         TreeSet lanesToDelete = new TreeSet(new LaneComparator());
         for (Iterator i2 = channel.getSequenceLanes().iterator(); i2.hasNext();) {
@@ -132,7 +134,7 @@ public class FlowCellChannelParser extends DetailObject implements Serializable
             wi.setIdCoreFacility(idCoreFacility);
           }
           if(codeStepNext.equals("HSEQFINFC") || codeStepNext.equals("HSEQPIPE")) {
-            wi.setCodeStepNext("HSEQASSEM");  
+            wi.setCodeStepNext("HSEQASSEM");
           } else if (codeStepNext.equals("MISEQFINFC") || codeStepNext.equals("MISEQPIPE")) {
             wi.setCodeStepNext("MISEQASSEM");
           } else if(codeStepNext.equals("NOSEQFINFC") || codeStepNext.equals("NOSEQPIPE")) {
@@ -140,7 +142,7 @@ public class FlowCellChannelParser extends DetailObject implements Serializable
           } else if(codeStepNext.equals("ILLSEQFINFC") || codeStepNext.equals("ILLSEQPIPE")) {
             wi.setCodeStepNext("ILLSEQASSEM");
           }
-          sess.save(wi);         
+          sess.save(wi);
         }
       }
 
@@ -154,13 +156,13 @@ public class FlowCellChannelParser extends DetailObject implements Serializable
         boolean exists = false;
         if (!isNewChannel) {
           if (channel.getSequenceLanes() != null
-              || !channel.getSequenceLanes().isEmpty()) {
+                  || !channel.getSequenceLanes().isEmpty()) {
 
             for (Iterator i3 = channel.getSequenceLanes().iterator(); i3.hasNext();) {
               SequenceLane existingLane = (SequenceLane) i3.next();
 
               if (existingLane.getIdSequenceLane().equals(
-                  sl.getIdSequenceLane())) {
+                      sl.getIdSequenceLane())) {
 
                 exists = true;
               }
@@ -191,149 +193,149 @@ public class FlowCellChannelParser extends DetailObject implements Serializable
     }
   }
 
-  protected void initializeFlowCellChannel(Session sess, Element n,
-      FlowCellChannel channel) throws Exception {
+  protected void initializeFlowCellChannel(Session sess, JsonObject n,
+                                           FlowCellChannel channel) throws Exception {
 
-    if (n.getAttributeValue("number") != null
-        && !n.getAttributeValue("number").equals("")) {
+    if (n.get("number") != null
+            && !n.getString("number").equals("")) {
 
-      channel.setNumber(new Integer(n.getAttributeValue("number")));
+      channel.setNumber(new Integer(n.getString("number")));
     } else {
       channel.setNumber(null);
     }
-    if (n.getAttributeValue("idFlowCell") != null
-        && !n.getAttributeValue("idFlowCell").equals("")) {
+    if (n.get("idFlowCell") != null
+            && !n.getString("idFlowCell").equals("")) {
 
-      channel.setIdFlowCell(new Integer(n.getAttributeValue("idFlowCell")));
+      channel.setIdFlowCell(new Integer(n.getString("idFlowCell")));
     }
-    if (n.getAttributeValue("idSequencingControl") != null
-        && !n.getAttributeValue("idSequencingControl").equals("")) {
+    if (n.get("idSequencingControl") != null
+            && !n.getString("idSequencingControl").equals("")) {
 
       channel.setIdSequencingControl(new Integer(
-          n.getAttributeValue("idSequencingControl")));
+              n.getString("idSequencingControl")));
     } else{
       channel.setIdSequencingControl(null);
     }
-    if (n.getAttributeValue("startDate") != null
-        && !n.getAttributeValue("startDate").equals("")){
+    if (n.get("startDate") != null
+            && !n.getString("startDate").equals("")){
 
-      channel.setStartDate(this.parseDate(n.getAttributeValue("startDate")));
+      channel.setStartDate(this.parseDate(n.getString("startDate")));
     } else {
       channel.setStartDate(null);
     }
-    if (n.getAttributeValue("firstCycleDate") != null
-        && !n.getAttributeValue("firstCycleDate").equals("")){
+    if (n.get("firstCycleDate") != null
+            && !n.getString("firstCycleDate").equals("")){
 
-      channel.setFirstCycleDate(this.parseDate(n.getAttributeValue("firstCycleDate")));
+      channel.setFirstCycleDate(this.parseDate(n.getString("firstCycleDate")));
     } else {
       channel.setFirstCycleDate(null);
     }
-    if (n.getAttributeValue("firstCycleDate") != null
-        && !n.getAttributeValue("firstCycleDate").equals("")){
+    if (n.get("firstCycleDate") != null
+            && !n.getString("firstCycleDate").equals("")){
 
-      channel.setFirstCycleDate(this.parseDate(n.getAttributeValue("firstCycleDate")));
+      channel.setFirstCycleDate(this.parseDate(n.getString("firstCycleDate")));
     } else {
       channel.setFirstCycleDate(null);
     }
-    if (n.getAttributeValue("firstCycleFailed") != null
-        && !n.getAttributeValue("firstCycleFailed").equals("")){
+    if (n.get("firstCycleFailed") != null
+            && !n.getString("firstCycleFailed").equals("")){
 
-      channel.setFirstCycleFailed(n.getAttributeValue("firstCycleFailed"));
+      channel.setFirstCycleFailed(n.getString("firstCycleFailed"));
     }
-    if (n.getAttributeValue("lastCycleDate") != null
-        && !n.getAttributeValue("lastCycleDate").equals("")){
+    if (n.get("lastCycleDate") != null
+            && !n.getString("lastCycleDate").equals("")){
 
-      channel.setLastCycleDate(this.parseDate(n.getAttributeValue("lastCycleDate")));
+      channel.setLastCycleDate(this.parseDate(n.getString("lastCycleDate")));
     } else {
       channel.setLastCycleDate(null);
     }
-    if (n.getAttributeValue("lastCycleFailed") != null
-        && !n.getAttributeValue("lastCycleFailed").equals("")){
+    if (n.get("lastCycleFailed") != null
+            && !n.getString("lastCycleFailed").equals("")){
 
-      channel.setLastCycleFailed(n.getAttributeValue("lastCycleFailed"));
+      channel.setLastCycleFailed(n.getString("lastCycleFailed"));
     }
-    if (n.getAttributeValue("clustersPerTile") != null
-        && !n.getAttributeValue("clustersPerTile").equals("")){
+    if (n.get("clustersPerTile") != null
+            && !n.getString("clustersPerTile").equals("")){
 
       channel.setClustersPerTile(new Integer(
-          n.getAttributeValue("clustersPerTile")));
+              n.getString("clustersPerTile")));
     } else {
       channel.setClustersPerTile(null);
     }
-    if (n.getAttributeValue("fileName") != null
-        && !n.getAttributeValue("fileName").equals("")){
+    if (n.get("fileName") != null
+            && !n.getString("fileName").equals("")){
 
-      channel.setFileName(n.getAttributeValue("fileName"));
+      channel.setFileName(n.getString("fileName"));
     }
-    if (n.getAttributeValue("sampleConcentrationpM") != null
-        && !n.getAttributeValue("sampleConcentrationpM").equals("")){
+    if (n.get("sampleConcentrationpM") != null
+            && !n.getString("sampleConcentrationpM").equals("")){
 
       channel.setSampleConcentrationpM(new BigDecimal(
-          n.getAttributeValue("sampleConcentrationpM")));
+              n.getString("sampleConcentrationpM")));
     } else {
       channel.setSampleConcentrationpM(null);
     }
-    if (n.getAttributeValue("numberSequencingCyclesActual") != null
-        && !n.getAttributeValue("numberSequencingCyclesActual").equals("")){
+    if (n.get("numberSequencingCyclesActual") != null
+            && !n.getString("numberSequencingCyclesActual").equals("")){
 
       channel.setNumberSequencingCyclesActual(new Integer(
-          n.getAttributeValue("numberSequencingCyclesActual")));
+              n.getString("numberSequencingCyclesActual")));
     } else {
       channel.setNumberSequencingCyclesActual(null);
     }
-    if (n.getAttributeValue("pipelineDate") != null
-        && !n.getAttributeValue("pipelineDate").equals("")){
+    if (n.get("pipelineDate") != null
+            && !n.getString("pipelineDate").equals("")){
 
-      channel.setPipelineDate(this.parseDate(n.getAttributeValue("pipelineDate")));
+      channel.setPipelineDate(this.parseDate(n.getString("pipelineDate")));
     } else {
       channel.setPipelineDate(null);
     }
-    if (n.getAttributeValue("pipelineFailed") != null
-        && !n.getAttributeValue("pipelineFailed").equals("")){
+    if (n.get("pipelineFailed") != null
+            && !n.getString("pipelineFailed").equals("")){
 
-      channel.setPipelineFailed(n.getAttributeValue("pipelineFailed"));
+      channel.setPipelineFailed(n.getString("pipelineFailed"));
     }
-    if (n.getAttributeValue("isControl") != null
-        && !n.getAttributeValue("isControl").equals("")){
+    if (n.get("isControl") != null
+            && !n.getString("isControl").equals("")){
 
-      channel.setIsControl(n.getAttributeValue("isControl"));
+      channel.setIsControl(n.getString("isControl"));
     }
-    if (n.getAttributeValue("phiXErrorRate") != null
-        && !n.getAttributeValue("phiXErrorRate").equals("")){
+    if (n.get("phiXErrorRate") != null
+            && !n.getString("phiXErrorRate").equals("")){
 
       channel.setPhiXErrorRate(new BigDecimal(
-          n.getAttributeValue("phiXErrorRate")));
+              n.getString("phiXErrorRate")));
     } else {
       channel.setPhiXErrorRate(null);
     }
-    if (n.getAttributeValue("read1ClustersPassedFilterM") != null
-        && !n.getAttributeValue("read1ClustersPassedFilterM").equals("")){
+    if (n.get("read1ClustersPassedFilterM") != null
+            && !n.getString("read1ClustersPassedFilterM").equals("")){
 
-      channel.setRead1ClustersPassedFilterM(new BigDecimal(n.getAttributeValue("read1ClustersPassedFilterM")));
+      channel.setRead1ClustersPassedFilterM(new BigDecimal(n.getString("read1ClustersPassedFilterM")));
     } else {
       channel.setRead1ClustersPassedFilterM(null);
     }
-    if (n.getAttributeValue("q30PercentForDisplay") != null
-        && !n.getAttributeValue("q30PercentForDisplay").equals("")){
+    if (n.get("q30PercentForDisplay") != null
+            && !n.getString("q30PercentForDisplay").equals("")){
 
-      channel.setQ30Percent(new BigDecimal(n.getAttributeValue("q30PercentForDisplay")).movePointLeft(2));
+      channel.setQ30Percent(new BigDecimal(n.getString("q30PercentForDisplay")).movePointLeft(2));
     } else {
       channel.setQ30Percent(null);
     }
 
-    if (n.getAttributeValue("sampleConcentrationpM") != null
-            && !n.getAttributeValue("sampleConcentrationpM").equals("")){
+    if (n.get("sampleConcentrationpM") != null
+            && !n.getString("sampleConcentrationpM").equals("")){
 
-      channel.setSampleConcentrationpM(new BigDecimal(n.getAttributeValue("sampleConcentrationpM")));
+      channel.setSampleConcentrationpM(new BigDecimal(n.getString("sampleConcentrationpM")));
     } else {
       channel.setSampleConcentrationpM(null);
     }
 
-    if (n.getAttributeValue("idPipelineProtocol") != null
-            && !n.getAttributeValue("idPipelineProtocol").equals("")){
+    if (n.get("idPipelineProtocol") != null
+            && !n.getString("idPipelineProtocol").equals("")){
 
       channel.setIdPipelineProtocol(new Integer(
-              n.getAttributeValue("idPipelineProtocol")));
+              n.getString("idPipelineProtocol")));
     } else {
       channel.setIdPipelineProtocol(null);
     }

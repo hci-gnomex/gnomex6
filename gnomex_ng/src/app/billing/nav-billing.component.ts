@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {BillingFilterEvent} from "./billing-filter.component";
 import {ITreeOptions, TreeComponent} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
@@ -28,6 +28,7 @@ import {Observable, Subscription} from "rxjs";
 import {PriceSheetViewComponent} from "./price-sheet-view.component";
 import {PriceCategoryViewComponent} from "./price-category-view.component";
 import {PriceViewComponent} from "./price-view.component";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'nav-billing',
@@ -165,6 +166,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 private dialogsService: DialogsService,
                 private constantsService: ConstantsService,
                 private propertyService: PropertyService,
+                private utilService: UtilService,
+                private changeDetector: ChangeDetectorRef,
                 private dictionaryService: DictionaryService,
                 private dialog: MatDialog) {
         this.billingPeriods = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD);
@@ -250,6 +253,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.billingItemsTreeOptions = {
             displayField: 'display',
         };
@@ -270,6 +274,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.utilService.removeChangeDetectorRef(this.changeDetector);
         this.onCoreCommentsWindowRequestSelected.unsubscribe();
         this.refreshSubscription.unsubscribe();
     }
@@ -333,7 +338,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.invoiceMap = {};
 
         this.hideEmptyRequests = this.propertyService.getProperty("hide_requests_with_no_billing_items", event.idCoreFacility) === 'Y';
-        let excludeNewRequests: boolean = event.idCoreFacility && this.propertyService.getProperty("exclude_new_requests", event.idCoreFacility) === 'Y';
+        let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, event.idCoreFacility);
 
         let billingRequestListParams: HttpParams = new HttpParams();
         if (event && event.requestNumber) {
@@ -401,7 +406,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.billingItemList = [];
         this.billingItemGridData = [];
 
-        let excludeNewRequests: boolean = event.idCoreFacility && this.propertyService.getProperty("exclude_new_requests", event.idCoreFacility) === 'Y';
+        let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, event.idCoreFacility);
 
         let params: HttpParams = new HttpParams()
             .set("showOtherBillingItems", this.showRelatedCharges ? 'Y' : 'N')

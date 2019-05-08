@@ -37,6 +37,7 @@ import {PropertyService} from "../services/property.service";
 import {GnomexService} from "../services/gnomex.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
+import {UtilService} from "../services/util.service";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -105,7 +106,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public showEmptyFolders: boolean = false;
     public items: any;
     public responseMsg: string = "";
-    public experimentCount: number = 0;
+    public experimentCount: string = "0";
+    public experimentCountMessage: string = "";
     public disableNewProject: boolean = true;
     public disableDeleteProject: boolean = true;
     public disableDeleteExperiment: boolean = true;
@@ -127,15 +129,16 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
     private reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
     private deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
-    private viewLimit: number = 999999;
     private navProjectReqList: any;
     private navInitSubscription: Subscription;
     private labListSubscription: Subscription;
     private parentProject: any;
     private setActiveNodeId: string;
+    private canDeleteProjectSubscription: Subscription;
 
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
         this.options = {
             displayField: "label",
@@ -162,12 +165,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.labList = response;
             this.experimentsService.labList = this.labList;
         });
-        if (this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS) != null) {
-            this.viewLimit = this.propertyService.getProperty(VIEW_LIMIT_EXPERIMENTS).propertyValue;
-        }
         if (this.createSecurityAdvisorService.isGuest) {
             this.disableAll = true;
         }
+
+        this.canDeleteProjectSubscription = this.experimentsService.canDeleteProjectSubject.subscribe((canDelete: boolean) => {
+            setTimeout(() => {
+                this.disableDeleteProject = !canDelete;
+            });
+        });
     }
 
     ngAfterViewInit() {}
@@ -175,6 +181,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     constructor(public experimentsService: ExperimentsService,
                 private changeDetectorRef: ChangeDetectorRef,
+                private utilService: UtilService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
@@ -192,7 +199,14 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labs = [];
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
-            this.buildTree(response);
+            this.buildTree(response.Lab);
+            if (response && response.experimentCount) {
+                this.experimentCount = response.experimentCount;
+                this.experimentCountMessage = response.message ? "(" + response.message + ")" : "";
+            } else {
+                this.experimentCount = "0";
+                this.experimentCountMessage = "";
+            }
             if (this.createProjectDialogRef && this.createProjectDialogRef.componentInstance) {
                 if(this.createProjectDialogRef.componentInstance.showSpinner === true) {
                     this.createProjectDialogRef.componentInstance.showSpinner = false;
@@ -233,7 +247,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
 
             if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
-                this.experimentsService.emitExperimentOverviewList(response);
+                this.experimentsService.emitExperimentOverviewList(response.Lab);
 
                 this.showEmptyFolders = this.experimentsService.browsePanelParams.get("showEmptyProjectFolders") === "Y" ? true : false;
                 let navArray: any[] = ["/experiments"];
@@ -308,7 +322,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     buildTree(response: any[]) {
         this.labs = [];
-        this.experimentCount = 0;
         this.experimentsService.filteredLabs = [];
 
         if (response) {
@@ -347,10 +360,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                                 if (request) {
                                     if (request.label) {
                                         request.label = request.requestNumber + "-" + request.name;
-                                        this.experimentCount++;
-                                        if (this.experimentCount >= this.viewLimit) {
-                                            return;
-                                        }
                                         request.id = "r" + request.idRequest;
                                         request.parentid = project.id;
                                     } else {
@@ -594,12 +603,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
         let navArray: Array<any> = [];
 
+        this.disableDeleteProject = true;
 
         //Lab
         if (this.selectedItem.level === 1) {
 
-            this.disableNewProject = false;
-            this.disableDeleteProject = true;
+            this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
              navArray = ["/experiments", {outlets: {"browsePanel": "overview"}}];
@@ -607,8 +616,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             //Project
         } else if (this.selectedItem.level === 2) {
             this.parentProject = event.node.parent;
-            this.disableNewProject = false;
-            this.disableDeleteProject = false;
+            this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
             navArray = ["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
@@ -618,7 +626,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             navArray = ["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
             this.parentProject = event.node.parent;
             this.disableNewProject = true;
-            this.disableDeleteProject = true;
             this.experimentsService.getExperiment(this.selectedItem.data.idRequest).subscribe((response: any) => {
                 this.selectedExperiment = response.Request;
                 if (response.Request.canDelete === "Y") {
@@ -669,6 +676,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.navInitSubscription.unsubscribe();
         this.gnomexService.navInitBrowseExperimentSubject.next(null);
         this.projectRequestListSubscription.unsubscribe();
@@ -676,6 +684,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.navProjectReqList = null;
         this.experimentsService.filteredLabs = undefined;
         this.experimentsService.labList = [];
+        UtilService.safelyUnsubscribe(this.canDeleteProjectSubscription);
     }
 
     onShowEmptyFolders(event: MatCheckboxChange): void {

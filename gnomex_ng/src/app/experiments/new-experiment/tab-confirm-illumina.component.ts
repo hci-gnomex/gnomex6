@@ -18,7 +18,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {TextAlignRightMiddleEditor} from "../../util/grid-editors/text-align-right-middle.editor";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
-import {NewExperimentService} from "../../services/new-experiment.service";
+import {UserPreferencesService} from "../../services/user-preferences.service";
+import {GridApi} from "ag-grid-community";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -110,13 +111,12 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     private agreeCheckboxLabel_subject: BehaviorSubject<string>;
 
-    private form: FormGroup;
-    private submitterName: string;
+    public form: FormGroup;
 
     private clientPrepString: string = "Library Prepared By Client";
     private clientPrepLib: boolean;
     private seqLaneTypeLabel: string;
-    private gridApi: any;
+    private gridApi: GridApi;
     private columnApi: any;
     private samplesGridConfirmColumnDefs: any;
     private requestPropsColumnDefs: any;
@@ -187,7 +187,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 private experimentService: ExperimentsService,
                 private gnomexService: GnomexService,
                 private billingService: BillingService,
-                private fb: FormBuilder) {
+                private fb: FormBuilder,
+                public prefService: UserPreferencesService) {
 
         this.requestPropsColumnDefs = [
             {
@@ -595,7 +596,9 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         this.buildColumnDefinitions();
 
-        this._getExperimentAnnotationsSubject.next({});
+        if (this._getExperimentAnnotationsSubject) {
+            this._getExperimentAnnotationsSubject.next({});
+        }
         this.setUpView();
 
         this.gridApi.setColumnDefs(this.samplesGridConfirmColumnDefs);
@@ -616,11 +619,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private setUpView() {
         this.getEstimatedBilling();
         this.getSequenceLanes();
-
-        this.submitterName = '';
-        if (this._experiment && this._experiment.experimentOwner && this._experiment.experimentOwner.firstLastDisplayName) {
-            this.submitterName = this._experiment.experimentOwner.firstLastDisplayName;
-        }
 
         this.clientPrepLib = false;
 
@@ -700,8 +698,16 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     private getSequenceLanes(): void {
-
-        if (this.useMultiplexLanes) {
+        if (this._experiment.isExternal === 'Y') {
+            let lanes = [];
+            for (let index = 0; index < this._experiment.samples.length; index++) {
+                let lane: any = this._experiment.samples[index].getJSONObjectRepresentation();
+                lane.sampleId = "X" + (index + 1);
+                lanes.push(lane);
+            }
+            this.sequenceLanes = lanes;
+            this.gridApi.setRowData(this.sequenceLanes);
+        } else if (this.useMultiplexLanes) {
             this.experimentService.getMultiplexLaneList(this._experiment).subscribe((response: any) => {
                 if (!response || !(Array.isArray(response) || response.MultiplexLane)) {
                     return;

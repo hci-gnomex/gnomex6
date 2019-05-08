@@ -2,21 +2,20 @@ package hci.gnomex.controller;
 
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -28,153 +27,148 @@ import org.jdom.output.XMLOutputter;
 
 public class GetAppUser extends GNomExCommand implements Serializable {
 
-// the static field for logging in Log4J
-private static Logger LOG = Logger.getLogger(GetAppUser.class);
+    // the static field for logging in Log4J
+    private static Logger LOG = Logger.getLogger(GetAppUser.class);
 
-private AppUser appUser;
+    private AppUser appUser;
 
-public void validate() {
-}
+    public void validate() {
+    }
 
-public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
+    public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
-	appUser = new AppUser();
-	HashMap errors = this.loadDetailObject(request, appUser);
-	this.addInvalidFields(errors);
+        appUser = new AppUser();
+        HashMap errors = this.loadDetailObject(request, appUser);
+        this.addInvalidFields(errors);
 
-	if (appUser.getIdAppUser() == null) {
-		this.addInvalidField("idAppUser required", "idAppUser required");
-	}
+        if (appUser.getIdAppUser() == null) {
+            this.addInvalidField("idAppUser required", "idAppUser required");
+        }
 
-	if (isValid()) {
-		setResponsePage(this.SUCCESS_JSP);
-	} else {
-		setResponsePage(this.ERROR_JSP);
-	}
+        if (isValid()) {
+            setResponsePage(this.SUCCESS_JSP);
+        } else {
+            setResponsePage(this.ERROR_JSP);
+        }
+    }
 
-}
+    public Command execute() throws RollBackCommandException {
 
-public Command execute() throws RollBackCommandException {
+        try {
+            Session sess = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername(), "GetAppUser");
 
-	try {
+            AppUser theAppUser = sess.get(AppUser.class, appUser.getIdAppUser());
 
-		Session sess = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername(), "GetAppUser");
+            if (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_USERS) || this.getSecAdvisor().canRead(theAppUser)) {
+                Hibernate.initialize(theAppUser.getLabs());
+                Hibernate.initialize(theAppUser.getCollaboratingLabs());
+                Hibernate.initialize(theAppUser.getManagingLabs());
 
-		AppUser theAppUser = (AppUser) sess.get(AppUser.class, appUser.getIdAppUser());
+                theAppUser.excludeMethodFromXML("getPasswordExternal");
 
-		if (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_USERS)) {
-			Hibernate.initialize(theAppUser.getLabs());
-			Hibernate.initialize(theAppUser.getCollaboratingLabs());
-			Hibernate.initialize(theAppUser.getManagingLabs());
+                Document doc = new Document(new Element("OpenAppUserList"));
+                doc.getRootElement().addContent(theAppUser.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement());
 
-			theAppUser.excludeMethodFromXML("getPasswordExternal");
+                getCoreFacilities(doc, theAppUser);
+                getCoreFacilitiesICanSubmitTo(doc, theAppUser);
 
-			Document doc = new Document(new Element("OpenAppUserList"));
-			doc.getRootElement().addContent(theAppUser.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement());
+                XMLOutputter out = new org.jdom.output.XMLOutputter();
+                this.xmlResult = out.outputString(doc);
 
-			getCoreFacilities(sess, doc, theAppUser);
-			getCoreFacilitiesICanSubmitTo(sess, doc, theAppUser);
+                setResponsePage(this.SUCCESS_JSP);
+            } else {
+                this.addInvalidField("insufficient permission", "Insufficient permission to access user details");
+            }
+        } catch (Exception e) {
+            this.errorDetails = Util.GNLOG(LOG, "An exception has occurred in GetAppUser ", e);
+            throw new RollBackCommandException(e.getMessage());
+        }
+        if (isValid()) {
+            setResponsePage(this.SUCCESS_JSP);
+        } else {
+            setResponsePage(this.ERROR_JSP);
+        }
 
-			XMLOutputter out = new org.jdom.output.XMLOutputter();
-			this.xmlResult = out.outputString(doc);
+        return this;
+    }
 
-			setResponsePage(this.SUCCESS_JSP);
+    private void getCoreFacilities(Document doc, AppUser theAppUser) {
+        Element facilitiesNode = new Element("managingCoreFacilities");
+        doc.getRootElement().addContent(facilitiesNode);
+        for (Iterator coreIter = DictionaryManager.getDictionaryEntries("hci.gnomex.model.CoreFacility").iterator(); coreIter.hasNext();) {
+            Object de = coreIter.next();
+            if (de instanceof NullDictionaryEntry) {
+                continue;
+            }
+            CoreFacility facility = (CoreFacility) de;
+            String selected = "N";
+            for (Iterator userIter = theAppUser.getManagingCoreFacilities().iterator(); userIter.hasNext();) {
+                CoreFacility userFacility = (CoreFacility) userIter.next();
+                if (userFacility.getIdCoreFacility().equals(facility.getIdCoreFacility())) {
+                    selected = "Y";
+                    break;
+                }
+            }
+            if (selected.equals("N") && (facility.getIsActive() == null || facility.getIsActive().equals("N"))) {
+                continue;
+            }
 
-		} else {
-			this.addInvalidField("insufficient permission", "Insufficient permission to access user details");
-		}
-	} catch (Exception e) {
-		this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in GetAppUser ", e);
-		throw new RollBackCommandException(e.getMessage());
-	}
-	if (isValid()) {
-		setResponsePage(this.SUCCESS_JSP);
-	} else {
-		setResponsePage(this.ERROR_JSP);
-	}
+            String name = facility.getFacilityName();
+            if (facility.getIsActive() == null || facility.getIsActive().equals("N")) {
+                name += " (inactive)";
+            }
+            Element facilityNode = new Element("coreFacility");
+            facilitiesNode.addContent(facilityNode);
+            facilityNode.setAttribute("value", facility.getIdCoreFacility().toString());
+            facilityNode.setAttribute("display", name);
+            facilityNode.setAttribute("selected", selected);
+        }
+    }
 
-	return this;
-}
+    private void getCoreFacilitiesICanSubmitTo(Document doc, AppUser theAppUser) {
+        Element facilitiesNode = new Element("coreFacilitiesICanSubmitTo");
+        doc.getRootElement().addContent(facilitiesNode);
 
-private void getCoreFacilities(Session sess, Document doc, AppUser theAppUser) {
-	Element facilitiesNode = new Element("managingCoreFacilities");
-	doc.getRootElement().addContent(facilitiesNode);
-	for (Iterator coreIter = DictionaryManager.getDictionaryEntries("hci.gnomex.model.CoreFacility").iterator(); coreIter
-			.hasNext();) {
-		Object de = coreIter.next();
-		if (de instanceof NullDictionaryEntry) {
-			continue;
-		}
-		CoreFacility facility = (CoreFacility) de;
-		String selected = "N";
-		for (Iterator userIter = theAppUser.getManagingCoreFacilities().iterator(); userIter.hasNext();) {
-			CoreFacility userFacility = (CoreFacility) userIter.next();
-			if (userFacility.getIdCoreFacility().equals(facility.getIdCoreFacility())) {
-				selected = "Y";
-				break;
-			}
-		}
-		if (selected.equals("N") && (facility.getIsActive() == null || facility.getIsActive().equals("N"))) {
-			continue;
-		}
+        Set coresToCheck;
+        if (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES)) {
+            coresToCheck = DictionaryManager.getDictionaryEntries("hci.gnomex.model.CoreFacility");
+        } else {
+            coresToCheck = this.getSecAdvisor().getCoreFacilitiesIManage();
+        }
 
-		String name = facility.getFacilityName();
-		if (facility.getIsActive() == null || facility.getIsActive().equals("N")) {
-			name += " (inactive)";
-		}
-		Element facilityNode = new Element("coreFacility");
-		facilitiesNode.addContent(facilityNode);
-		facilityNode.setAttribute("value", facility.getIdCoreFacility().toString());
-		facilityNode.setAttribute("display", name);
-		facilityNode.setAttribute("selected", selected);
-	}
-}
+        for (Iterator coreIter = coresToCheck.iterator(); coreIter.hasNext(); ) {
+            Object de = coreIter.next();
+            if (de instanceof NullDictionaryEntry) {
+                continue;
+            }
+            CoreFacility facility = (CoreFacility) de;
+            String selected = "N";
+            String allowed = "N";
+            if (this.getSecAdvisor().coreAllowsGlobalSubmission(facility.getIdCoreFacility())) {
+                allowed = "Y";
+                for (Iterator userIter = theAppUser.getCoreFacilitiesICanSubmitTo().iterator(); userIter.hasNext();) {
+                    CoreFacility userFacility = (CoreFacility) userIter.next();
+                    if (userFacility.getIdCoreFacility().equals(facility.getIdCoreFacility())) {
+                        selected = "Y";
+                        break;
+                    }
+                }
+            }
 
-private void getCoreFacilitiesICanSubmitTo(Session sess, Document doc, AppUser theAppUser) {
-	Element facilitiesNode = new Element("coreFacilitiesICanSubmitTo");
-	doc.getRootElement().addContent(facilitiesNode);
-	PropertyDictionaryHelper pdh = PropertyDictionaryHelper.getInstance(sess);
+            if (selected.equals("N") && (facility.getIsActive() == null || facility.getIsActive().equals("N"))) {
+                continue;
+            }
 
-	Set coresToCheck = new TreeSet();
-	if (this.getSecAdvisor().hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES)) {
-		coresToCheck = DictionaryManager.getDictionaryEntries("hci.gnomex.model.CoreFacility");
-	} else {
-		coresToCheck = this.getSecAdvisor().getCoreFacilitiesIManage();
-	}
-
-	for (Iterator coreIter = coresToCheck.iterator(); coreIter.hasNext();) {
-		Object de = coreIter.next();
-		if (de instanceof NullDictionaryEntry) {
-			continue;
-		}
-		CoreFacility facility = (CoreFacility) de;
-		String selected = "N";
-		String allowed = "N";
-		if (this.getSecAdvisor().coreAllowsGlobalSubmission(facility.getIdCoreFacility())) {
-			allowed = "Y";
-			for (Iterator userIter = theAppUser.getCoreFacilitiesICanSubmitTo().iterator(); userIter.hasNext();) {
-				CoreFacility userFacility = (CoreFacility) userIter.next();
-				if (userFacility.getIdCoreFacility().equals(facility.getIdCoreFacility())) {
-					selected = "Y";
-					break;
-				}
-			}
-		}
-
-		if (selected.equals("N") && (facility.getIsActive() == null || facility.getIsActive().equals("N"))) {
-			continue;
-		}
-
-		String name = facility.getFacilityName();
-		if (facility.getIsActive() == null || facility.getIsActive().equals("N")) {
-			name += " (inactive)";
-		}
-		Element facilityNode = new Element("coreFacility");
-		facilitiesNode.addContent(facilityNode);
-		facilityNode.setAttribute("value", facility.getIdCoreFacility().toString());
-		facilityNode.setAttribute("display", name);
-		facilityNode.setAttribute("selected", selected);
-		facilityNode.setAttribute("allowed", allowed);
-	}
-}
+            String name = facility.getFacilityName();
+            if (facility.getIsActive() == null || facility.getIsActive().equals("N")) {
+                name += " (inactive)";
+            }
+            Element facilityNode = new Element("coreFacility");
+            facilitiesNode.addContent(facilityNode);
+            facilityNode.setAttribute("value", facility.getIdCoreFacility().toString());
+            facilityNode.setAttribute("display", name);
+            facilityNode.setAttribute("selected", selected);
+            facilityNode.setAttribute("allowed", allowed);
+        }
+    }
 }

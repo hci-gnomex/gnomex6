@@ -19,6 +19,7 @@ import {WorkAuthorizationTypeSelectorDialogComponent} from "../../products/work-
 import {Experiment} from "../../util/models/experiment.model";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {ExperimentsService} from "../experiments.service";
+import {PropertyService} from "../../services/property.service";
 
 @Component({
     selector: "new-experiment-setup",
@@ -207,6 +208,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     private workAuthInstructions: string;
     private accessAuthorizedBillingAccountInstructions: string;
+    public accessAuthorizedBillingAccountLinkText: string = "Show Other Billing Accounts";
 
 
     private possibleSubmitters_loaded: boolean = false;
@@ -307,6 +309,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 private getLabService: GetLabService,
                 private gnomexService: GnomexService,
                 private newExperimentService: NewExperimentService,
+                private propertyService: PropertyService,
                 public prefService: UserPreferencesService) {
 
         this.form = this.formBuilder.group({
@@ -439,9 +442,9 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
         this.checkForOtherAccounts();
 
-        this.workAuthInstructions = this.gnomexService.getProperty(this.gnomexService.PROPERTY_WORKAUTH_INSTRUCTIONS);
-        this.accessAuthorizedBillingAccountInstructions = this.gnomexService.getProperty(this.gnomexService.PROPERTY_AUTH_ACCOUNTS_DESCRIPTION);
-
+        this.workAuthInstructions = this.propertyService.getPropertyValue(PropertyService.PROPERTY_WORKAUTH_INSTRUCTIONS);
+        this.accessAuthorizedBillingAccountInstructions = this.propertyService.getPropertyValue(PropertyService.PROPERTY_AUTH_ACCOUNTS_DESCRIPTION);
+        this.accessAuthorizedBillingAccountLinkText = this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT);
     }
 
     public selectDefaultUserProject(): void {
@@ -535,7 +538,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 // this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
 
                 this.workButtonText   = this.gnomexService.getCoreFacilityProperty(this._experiment.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
-                // this.accessAuthLabel = this.gnomexService.getCoreFacilityProperty(this.newExperimentService.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT);
             }
         }
 
@@ -667,7 +669,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
         }
 
         this._experiment.idProject          = this.form.get("selectProject").value.idProject;
-        this._experiment.project            = JSON.stringify(this.form.get("selectProject").value);
+        this._experiment.project            = this.form.get("selectProject").value;
         this._experiment.projectName        = this.form.get("selectProject").value.display;
         this._experiment.projectDescription = this.form.get("selectProject").value.description;
     }

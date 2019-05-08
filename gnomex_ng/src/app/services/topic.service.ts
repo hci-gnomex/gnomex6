@@ -6,6 +6,7 @@ import {Subject} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
+import {UtilService} from "./util.service";
 
 @Injectable()
 export class TopicService {
@@ -104,6 +105,25 @@ export class TopicService {
         return this.httpClient.post("/gnomex/EmailTopicOwner.gx",null,{params:params});
     }
 
+    public getTopics(): Observable<any[]> {
+        return this.httpClient.get("/gnomex/GetTopicList.gx").pipe(map((response: any) => {
+            let topics: any[] = [];
+            if (response && response.Folder && response.Folder) {
+                this.recursivelyAddChildrenTopics(response.Folder, topics);
+            }
+            return topics;
+        }));
+    }
+
+    private recursivelyAddChildrenTopics(node: any, topicList: any[]): void {
+        if (node.Topic) {
+            let children: any[] = UtilService.getJsonArray(node.Topic, node.Topic);
+            for (let child of children) {
+                topicList.push(child);
+                this.recursivelyAddChildrenTopics(child, topicList);
+            }
+        }
+    }
 
 
 }
