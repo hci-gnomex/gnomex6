@@ -82,9 +82,11 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         experimentAnnotations: new BehaviorSubject<any[]>([]),
         getExperimentAnnotationsSubject: new BehaviorSubject<any>({}),
         agreeCheckboxLabelSubject: new BehaviorSubject<string>(''),
+        QCChipPriceListSubject: new BehaviorSubject<string>(''),
         experiment: {
             idCoreFacility: '',
             PropertyEntries: [],
+            codeRequestCategory: '',
             requestCategory: {
                 display: '',
                 isIlluminaType: '',
@@ -234,7 +236,30 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                             && annotation.idCoreFacility === params.idCoreFacility;
                     });
 
+                    // TODO: figure out why this is not pulling all the different records - it's causing failures.
+                    let annotationsOnlyAllowedForRequestCategories: any = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PROPERTY_PLATFORM_APPLICATION_DICTIONARY);
+
                     this.annotationInputs.annotations = this.annotations;
+
+                    experiment.onChange_codeRequestCategory.subscribe((codeRequestCategory: string) => {
+                        this.annotationInputs.annotations = [];
+                        this.annotationInputs.annotations = this.annotations.filter((a:any) => {
+                            let result: boolean = true;
+
+                            for (let annotation of annotationsOnlyAllowedForRequestCategories) {
+                                if (annotation.idProperty === a.idProperty) {
+                                    result = false;
+
+                                    if (annotation.codeRequestCategory === codeRequestCategory) {
+                                        result = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            return result;
+                        });
+                    });
 
                     this.inputs.experiment = experiment;
                 });
@@ -343,7 +368,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.tabs.push(visibilityTab);
             this.tabs.push(bioTab);
             this.tabs.push(confirmTab);
-        } else if (category.type === this.newExperimentService.TYPE_QC) {
+        } else if (category.type === NewExperimentService.TYPE_QC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'QCState' :
                 this.newExperimentService.currentState = 'QCExternalState';
 
@@ -367,28 +392,60 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 disabled: true,
                 component: TabConfirmIlluminaComponent
             });
-        } else if (category.type === this.newExperimentService.TYPE_GENERIC) {
+        } else if (category.type === NewExperimentService.TYPE_GENERIC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'GenericState' :
                 this.newExperimentService.currentState = 'GenericExternalState';
-        } else if (category.type === this.newExperimentService.TYPE_CAP_SEQ) {
+        } else if (category.type === NewExperimentService.TYPE_CAP_SEQ) {
             this.newExperimentService.currentState = "CapSeqState";
-        } else if (category.type === this.newExperimentService.TYPE_FRAG_ANAL) {
+        } else if (category.type === NewExperimentService.TYPE_FRAG_ANAL) {
             this.newExperimentService.currentState = "FragAnalState";
-        } else if (category.type === this.newExperimentService.TYPE_MIT_SEQ) {
+        } else if (category.type === NewExperimentService.TYPE_MIT_SEQ) {
             this.newExperimentService.currentState = "MitSeqState";
-        } else if (category.type === this.newExperimentService.TYPE_CHERRY_PICK) {
+        } else if (category.type === NewExperimentService.TYPE_CHERRY_PICK) {
             this.newExperimentService.currentState = "CherryPickState";
-        } else if (category.type === this.newExperimentService.TYPE_ISCAN) {
+        } else if (category.type === NewExperimentService.TYPE_ISCAN) {
             this.newExperimentService.currentState = "IScanState";
-        } else if (category.type === this.newExperimentService.TYPE_SEQUENOM) {
+        } else if (category.type === NewExperimentService.TYPE_SEQUENOM) {
             this.newExperimentService.currentState = "SequenomState";
-        } else if (category.type === this.newExperimentService.TYPE_ISOLATION) {
+        } else if (category.type === NewExperimentService.TYPE_ISOLATION) {
             this.newExperimentService.currentState = "IsolationState";
-        } else if (category.type === this.newExperimentService.TYPE_NANOSTRING) {
+
+            this.tabs.push({
+                label: "Sample Details",
+                disabled: true,
+                component: TabSampleSetupViewComponent
+            });
+            if (this.annotationInputs
+                && this.annotationInputs.annotations
+                && Array.isArray(this.annotationInputs.annotations)
+                && this.annotationInputs.annotations.length) {
+
+                this.tabs.push({
+                    label: "Other Details",
+                    disabled: true,
+                    component: AnnotationTabComponent
+                });
+            }
+            this.tabs.push({
+                label: "Annotations",
+                disabled: true,
+                component: TabAnnotationViewComponent
+            });
+            this.tabs.push({
+                label: "Samples",
+                disabled: true,
+                component: TabSamplesIlluminaComponent
+            });
+            this.tabs.push({
+                label: "Confirm",
+                disabled: true,
+                component: TabConfirmIlluminaComponent
+            });
+        } else if (category.type === NewExperimentService.TYPE_NANOSTRING) {
             this.newExperimentService.currentState = "NanoStringState";
-        } else if (category.type === this.newExperimentService.TYPE_CLINICAL_SEQUENOM) {
+        } else if (category.type === NewExperimentService.TYPE_CLINICAL_SEQUENOM) {
             this.newExperimentService.currentState = "ClinicalSequenomState";
-        } else if (category.type === this.newExperimentService.TYPE_MICROARRAY) {
+        } else if (category.type === NewExperimentService.TYPE_MICROARRAY) {
             this.gnomexService.submitInternalExperiment()
                 ? this.newExperimentService.currentState = 'MicroarrayState'
                 : this.newExperimentService.currentState = 'MicroarrayExternalState';

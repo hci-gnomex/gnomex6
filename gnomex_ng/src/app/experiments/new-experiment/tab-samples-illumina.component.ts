@@ -111,7 +111,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (newExperiment && this.onChange_selectedProtocolSubscription) {
             this.onChange_selectedProtocolSubscription.unsubscribe();
         }
-
+        if (newExperiment && this.onChange_codeBioanalyzerChipTypeSubscription) {
+            this.onChange_codeBioanalyzerChipTypeSubscription.unsubscribe();
+        }
+        if (newExperiment && this.onChange_idSampleSourceSubscription) {
+            this.onChange_idSampleSourceSubscription.unsubscribe();
+        }
 
         if (!this.onChange_numberOfSamplesSubscription) {
             this.onChange_numberOfSamplesSubscription = this._experiment.onChange_numberOfSamples.subscribe((value) =>{
@@ -145,19 +150,46 @@ export class TabSamplesIlluminaComponent implements OnInit {
             });
         }
         if (!this.onChange_codeApplicationSubscription) {
-            this._experiment.onChange_codeApplication.subscribe((value) => {
+            this.onChange_codeApplicationSubscription = this._experiment.onChange_codeApplication.subscribe((value) => {
                 if (value && this.samplesGridApi) {
                     this.changeCode();
+                }
+
+                this.bioanalyzerChips = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BIOANALYZER_CHIP_TYPE);
+
+                if (this.bioanalyzerChips && Array.isArray(this.bioanalyzerChips)) {
+                    this.bioanalyzerChips = this.bioanalyzerChips.filter((a) => {
+                        return a.codeApplication && a.codeApplication === value;
+                    });
                 }
             });
         }
         if (!this.onChange_selectedProtocolSubscription) {
-            this._experiment.onChange_selectedProtocol.subscribe((value) => {
+            this.onChange_selectedProtocolSubscription = this._experiment.onChange_selectedProtocol.subscribe((value) => {
                 if (value && this.samplesGridApi) {
                     this.updateRows();
                 }
             });
         }
+        if (newExperiment && this.onChange_codeBioanalyzerChipTypeSubscription) {
+            this.onChange_codeBioanalyzerChipTypeSubscription = this._experiment.onChange_codeBioanalyzerChipType.subscribe((value) => {
+                if (this._experiment && this._experiment.samples && Array.isArray(this._experiment.samples)) {
+                    for (let sample of this._experiment.samples) {
+                        sample.codeBioanalyzerChipType = value;
+                    }
+                }
+            });
+        }
+        if (!this.onChange_idSampleSourceSubscription) {
+            this.onChange_idSampleSourceSubscription = this._experiment.onChange_idSampleSource.subscribe((value) => {
+                if (this.samplesGridApi) {
+                    // this.samplesGridApi.setRowData(this._experiment.samples);
+                    this.samplesGridApi.redrawRows();
+                }
+                this.requireReconfirmation();
+            });
+        }
+
 
         this.bioanalyzerChipType = this.dictionaryService.getEntries(DictionaryService.BIOANALYZER_CHIP_TYPE).filter((a) => {
             return a.codeApplication === this._experiment.codeApplication;
@@ -354,6 +386,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private onChange_organismSubscription: Subscription;
     private onChange_codeApplicationSubscription: Subscription;
     private onChange_selectedProtocolSubscription: Subscription;
+    private onChange_codeBioanalyzerChipTypeSubscription: Subscription;
+    private onChange_idSampleSourceSubscription: Subscription;
 
     public static readonly ANNOTATION_ATTRIBUTE_NAME_PREFIX :string = "ANNOT";
 
@@ -378,6 +412,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public organisms: any[] = [];
     public concentrationUnits: any[] = [];
     public bioanalyzerChipType: any[] = [];
+    public bioanalyzerChips: any[] = [];
 
     private get workflowStatus(): any[] {
         let temp: any[] = [];
@@ -414,7 +449,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     private hideCCNum: boolean = true;
     private gridColumnApi;
-
     public showInstructions: boolean = false;
 
     private samplesGridApi: any;
@@ -436,9 +470,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "",
             field: "index",
-            width:    2 * this.emToPxConversionRate,
-            maxWidth: 2 * this.emToPxConversionRate,
-            minWidth: 2 * this.emToPxConversionRate,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             suppressSizeToFit: true,
             pinned: "left",
@@ -487,6 +521,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 { errorName: 'required', errorMessage: 'Sample Name required' }
             ],
             pinned: "left",
+            outerForm: this.form,
+            formName:  "gridFormGroup",
             sortOrder: 15
         });
 
@@ -695,9 +731,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         temp.push({
             headerName: "",
             field: "counter",
-            width:    2 * this.emToPxConversionRate,
-            maxWidth: 2 * this.emToPxConversionRate,
-            minWidth: 2 * this.emToPxConversionRate,
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             suppressSizeToFit: true,
             editable: false,
@@ -762,6 +798,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 { errorName: 'required', errorMessage: 'Sample Name required' }
             ],
             sortOrder: 20,
+            outerForm: this.form,
+            formName:  "gridFormGroup",
             pinned: "left"
         });
 
@@ -1096,6 +1134,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
             errorNameErrorMessageMap: [
                 { errorName: 'required', errorMessage: 'Sample Name required' }
             ],
+            outerForm: this.form,
+            formName:  "gridFormGroup",
             pinned: 'left'
         });
 
@@ -1344,8 +1384,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 private gnomexService: GnomexService,
                 private fb: FormBuilder,
                 private dialog: MatDialog,
-                private propertyService: PropertyService) {
+                private propertyService: PropertyService) { }
 
+    ngOnInit() {
         this.organisms = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
         this.concentrationUnits = this.dictionaryService.getEntries(DictionaryService.CONCENTRATION_UNIT);
 
@@ -1355,10 +1396,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
             'invalidateWithoutSamples',
             new FormControl('', (control: AbstractControl) => {
                 if (control
-                && control.parent
-                && control.parent.controls
-                && control.parent.controls['gridFormGroup']
-                && control.parent.controls['gridFormGroup'].controls) {
+                    && control.parent
+                    && control.parent.controls
+                    && control.parent.controls['gridFormGroup']
+                    && control.parent.controls['gridFormGroup'].controls) {
                     return null;
                 } else {
                     return { message: 'Grid is not populated yet' };
@@ -1379,9 +1420,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
             this.dialogService.stopAllSpinnerDialogs();
         });
-    }
 
-    ngOnInit() {
         // this.sampleTypes = this.samplesService.filterSampleTypes(this.dictionaryService.getEntries("hci.gnomex.model.SampleType"), null);
         this.loadSampleTypes();
         this.showHideColumns();
@@ -1404,6 +1443,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
         if (this.onChange_selectedProtocolSubscription) {
             this.onChange_selectedProtocolSubscription.unsubscribe();
+        }
+        if (this.onChange_codeBioanalyzerChipTypeSubscription) {
+            this.onChange_codeBioanalyzerChipTypeSubscription.unsubscribe();
         }
 
         if (this._stateChangeSubscription) {
@@ -1538,7 +1580,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         if (this.columnProperties) {
             this.columnProperties = this.columnProperties.filter((a) => {
-                return a.codeRequestCategory === this._experiment.codeRequestCategory;
+                return this._experiment && a.codeRequestCategory === this._experiment.codeRequestCategory;
             });
         } else {
             this.columnProperties = [];
@@ -1560,24 +1602,26 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         // clear out data for annotations that have been removed since last rebuild
         let foundAllOldColumns = true;
-        for (let oldColumn of this.samplesGridColumnDefs) {
-            let foundOldColumn: boolean = false;
-            for (let newColumn of temp) {
-                if (newColumn.field && oldColumn.field && ('' + newColumn.field).localeCompare('' + oldColumn.field) === 0) {
-                    foundOldColumn = true;
-                    break;
+        if (this.samplesGridColumnDefs && Array.isArray(this.samplesGridColumnDefs)) {
+            for (let oldColumn of this.samplesGridColumnDefs) {
+                let foundOldColumn: boolean = false;
+                for (let newColumn of temp) {
+                    if (newColumn.field && oldColumn.field && ('' + newColumn.field).localeCompare('' + oldColumn.field) === 0) {
+                        foundOldColumn = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!foundOldColumn) {
-                foundAllOldColumns = false;
-                // the old column was removed, remove the values from the samples.
-                for (let sample of this._experiment.samples) {
-                    // Delete is important here, as it actually removes the attribute in question.
-                    if (oldColumn.field && ('' + oldColumn.field).startsWith(TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX)) {
-                        delete sample[oldColumn.field];
-                    } else {
-                        sample[oldColumn.field] = '';
+                if (!foundOldColumn) {
+                    foundAllOldColumns = false;
+                    // the old column was removed, remove the values from the samples.
+                    for (let sample of this._experiment.samples) {
+                        // Delete is important here, as it actually removes the attribute in question.
+                        if (oldColumn.field && ('' + oldColumn.field).startsWith(TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX)) {
+                            delete sample[oldColumn.field];
+                        } else {
+                            sample[oldColumn.field] = '';
+                        }
                     }
                 }
             }
@@ -1767,6 +1811,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     obj.idNumberSequencingCyclesAllowed = idNumberSequencingCyclesAllowed;
                     obj.idSeqRunType = idSeqRunType;
                     obj.numberSequencingLanes = numberSequencingLanes;
+                    obj.idSampleSource = this._experiment.idSampleSource;
                     obj.idSampleType = idSampleType;
                     obj.idSeqLibProtocol = protocol.idSeqLibProtocol;
                     obj.seqPrepByCore = seqPrepByCore;
@@ -1775,6 +1820,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     obj.otherOrganism = '';
                     obj.treatment = '';
                     obj.frontEndGridGroup = '0';
+                    obj.codeBioanalyzerChipType = this._experiment.codeBioanalyzerChipType;
 
                     this._experiment.samples.push(obj);
                 }
@@ -1836,7 +1882,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 annotationFieldsAreEditable = false;
             }
 
-            if (temp && this._experiment) {
+            if (temp && this._experiment && this._experiment.requestCategory && this._experiment.requestCategory.type !== "QC") {
                 for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
                     let fullProperty = this.propertyList.filter((value: any) => {
                         return value.idProperty === sampleAnnotation.idProperty;

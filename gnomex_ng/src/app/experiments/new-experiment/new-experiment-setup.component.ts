@@ -3,7 +3,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {URLSearchParams} from "@angular/http";
 import {MatAutocomplete, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 
-import {Subscription} from "rxjs/index";
+import {BehaviorSubject, Subscription} from "rxjs/index";
 import {first} from "rxjs/internal/operators";
 
 import {NewExperimentService} from "../../services/new-experiment.service";
@@ -18,6 +18,7 @@ import {WorkAuthorizationTypeSelectorDialogComponent} from "../../products/work-
 
 import {Experiment} from "../../util/models/experiment.model";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {ExperimentsService} from "../experiments.service";
 
 @Component({
     selector: "new-experiment-setup",
@@ -132,6 +133,12 @@ export class NewExperimentSetupComponent implements OnDestroy {
         this._experiment = value;
     }
 
+    @Input("QCChipPriceListSubject") set QCChipPriceListSubject (value: BehaviorSubject<any[]>) {
+        if (value) {
+            this.QCChipPriceList = value;
+        }
+    }
+
     @Input("idCoreFacility") set idCoreFacility (value: any) {
         this.requestCategories = [];
         this.newExperimentService.components = [];
@@ -193,6 +200,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     private adminState: string;
     private currentIdLab: string;
+
+    private QCChipPriceList: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 
     private workButtonText: string;
 
@@ -293,6 +302,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 private dialog: MatDialog,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
+                private experimentService: ExperimentsService,
                 private formBuilder: FormBuilder,
                 private getLabService: GetLabService,
                 private gnomexService: GnomexService,
@@ -544,6 +554,21 @@ export class NewExperimentSetupComponent implements OnDestroy {
             if (!value.idLab) {
                 return;
             }
+
+            if (this._experiment && this._experiment.codeRequestCategory) {
+                this.QCChipPriceList.next([]);
+
+                this.experimentService.GetQCChipTypePriceList(this._experiment.codeRequestCategory, value.idLab).pipe(first()).subscribe((result) => {
+                    if (result) {
+                        if (Array.isArray(result)) {
+                            this.QCChipPriceList.next(result);
+                        } else {
+                            this.QCChipPriceList.next([ result ]);
+                        }
+                    }
+                });
+            }
+
             if (this.currentIdLab !== value.idLab) {
                 this.currentIdLab = value.idLab;
                 this.onChangeLab.emit(value);
@@ -660,7 +685,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
             return;
         }
 
-        this.description             = this.form.get("description").value;
+        this.description = this.form.get("description").value;
     }
 
     public chooseFirstLabOption(): void {

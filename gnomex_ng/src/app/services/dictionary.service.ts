@@ -58,6 +58,7 @@ export class DictionaryService {
     public static readonly PRODUCT_ORDER_STATUS: string = "hci.gnomex.model.ProductOrderStatus";
     public static readonly PRODUCT_TYPE: string = "hci.gnomex.model.ProductType";
     public static readonly PROPERTY_DICTIONARY: string = "hci.gnomex.model.PropertyDictionary";
+    public static readonly PROPERTY_PLATFORM_APPLICATION_DICTIONARY: string = "hci.gnomex.model.PropertyPlatformApplication";
     public static readonly REACTION_TYPE: string = "hci.gnomex.model.ReactionType";
     public static readonly REQUEST_CATEGORY: string = "hci.gnomex.model.RequestCategory";
     public static readonly REQUEST_CATEGORY_APPLICATION: string = "hci.gnomex.model.RequestCategoryApplication";

@@ -537,8 +537,5 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
             this.form.controls["genomeBuildToAdd"].disable();
 
         }
-
-        this.form.valueChanges.subscribe(() => {
-        });
     }
 }

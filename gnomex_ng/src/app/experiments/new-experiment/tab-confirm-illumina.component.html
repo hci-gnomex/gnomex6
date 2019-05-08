@@ -81,6 +81,22 @@
                 </div>
             </div>
         </div>
+        <div *ngIf="showExperimentDescription" class="top-margin font-bold">
+            Experiment Description :
+        </div>
+        <div *ngIf="showExperimentDescription" class="padded heavily-left-padded">
+            <div class="full-width flex-container-row padded">
+                {{ _experiment.description }}
+            </div>
+        </div>
+        <div *ngIf="showNotesForCoreFacility" class="top-margin font-bold">
+            Notes for Core Facility :
+        </div>
+        <div *ngIf="showNotesForCoreFacility" class="padded heavily-left-padded">
+            <div class="full-width flex-container-row padded">
+                {{ _experiment.corePrepInstructions }}
+            </div>
+        </div>
         <div class="top-margin font-bold">
             Request Properties :
         </div>
@@ -89,8 +105,8 @@
                 <div class="wide-display">
                     {{ experimentAnnotation.name }}
                 </div>
-                <div class="flex-grow">
-                    {{ experimentAnnotation.value }}
+                <div class="flex-grow multiline-strings">
+                    {{ displayAnnotationValue(experimentAnnotation) }}
                 </div>
             </div>
         </div>
@@ -102,6 +118,7 @@
             <ag-grid-angular class="ag-theme-fresh full-height full-width"
                              [columnDefs]="this.samplesGridConfirmColumnDefs"
                              [enableColResize]="true"
+                             [suppressDragLeaveHidesColumns]="true"
                              (gridReady)="this.onGridReady($event)">
             </ag-grid-angular>
         </div>

@@ -38,20 +38,20 @@ export class NewExperimentService {
     private _requestCategory: any;
     private _components: any[] = [];
 
-    public readonly TYPE_MICROARRAY: string = 'MICROARRAY';
-    public readonly TYPE_HISEQ: string = 'HISEQ';  // I think these were wrapped into an ILLSEQ state?
-    public readonly TYPE_MISEQ: string = 'MISEQ';  // I think these were wrapped into an ILLSEQ state?
-    public readonly TYPE_QC: string = 'QC';
-    public readonly TYPE_CAP_SEQ: string = "CAPSEQ";
-    public readonly TYPE_FRAG_ANAL: string = "FRAGANAL";
-    public readonly TYPE_MIT_SEQ: string = "MITSEQ";
-    public readonly TYPE_CHERRY_PICK: string = "CHERRYPICK";
-    public readonly TYPE_ISCAN: string = "ISCAN";
-    public readonly TYPE_ISOLATION: string = "ISOLATION";
-    public readonly TYPE_CLINICAL_SEQUENOM: string = "CLINSEQ";
-    public readonly TYPE_SEQUENOM: string = "SEQUENOM";
-    public readonly TYPE_NANOSTRING: string = "NANOSTRING";
-    public readonly TYPE_GENERIC: string = "GENERIC";
+    public static readonly TYPE_MICROARRAY: string = 'MICROARRAY';
+    public static readonly TYPE_HISEQ: string = 'HISEQ';  // I think these were wrapped into an ILLSEQ state?
+    public static readonly TYPE_MISEQ: string = 'MISEQ';  // I think these were wrapped into an ILLSEQ state?
+    public static readonly TYPE_QC: string = 'QC';
+    public static readonly TYPE_CAP_SEQ: string = "CAPSEQ";
+    public static readonly TYPE_FRAG_ANAL: string = "FRAGANAL";
+    public static readonly TYPE_MIT_SEQ: string = "MITSEQ";
+    public static readonly TYPE_CHERRY_PICK: string = "CHERRYPICK";
+    public static readonly TYPE_ISCAN: string = "ISCAN";
+    public static readonly TYPE_ISOLATION: string = "ISOLATION";
+    public static readonly TYPE_CLINICAL_SEQUENOM: string = "CLINSEQ";
+    public static readonly TYPE_SEQUENOM: string = "SEQUENOM";
+    public static readonly TYPE_NANOSTRING: string = "NANOSTRING";
+    public static readonly TYPE_GENERIC: string = "GENERIC";
 
 
     constructor() { }
@@ -85,7 +85,7 @@ export class NewExperimentService {
 
     public isMicroarrayState(): boolean {
         return this.requestCategory
-            && this.requestCategory.type === this.TYPE_MICROARRAY;
+            && this.requestCategory.type === NewExperimentService.TYPE_MICROARRAY;
     }
 
     public isQCState(): boolean {

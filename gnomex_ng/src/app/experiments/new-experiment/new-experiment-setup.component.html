@@ -150,14 +150,14 @@
                         </div>
                     </div>
                     <mat-form-field class="long-width">
-                                    <textarea matInput
-                                              matTextareaAutosize
-                                              placeholder="Experimental Details"
-                                              formControlName="description"
-                                              matAutosizeMinRows="1"
-                                              matAutosizeMaxRows="5"
-                                              (input)="onInputExperimentalDetails($event)">
-                                    </textarea>
+                        <textarea matInput
+                                  matTextareaAutosize
+                                  placeholder="Experimental Details"
+                                  formControlName="description"
+                                  matAutosizeMinRows="1"
+                                  matAutosizeMaxRows="5"
+                                  (input)="onInputExperimentalDetails($event)">
+                        </textarea>
                         <mat-error *ngIf="form?.get('description')?.hasError('maxlength')">Details can be at most 5000 characters</mat-error>
                     </mat-form-field>
                 </div>

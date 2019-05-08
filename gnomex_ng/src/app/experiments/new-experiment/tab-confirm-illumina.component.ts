@@ -18,6 +18,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {TextAlignRightMiddleEditor} from "../../util/grid-editors/text-align-right-middle.editor";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
+import {NewExperimentService} from "../../services/new-experiment.service";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -27,6 +28,8 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 
         .no-height { height: 0;  }
         .single-em { width: 1em; }
+
+        .multiline-strings { white-space: pre-line; }
         
         .bordered { border: solid silver 1px; }
         
@@ -40,8 +43,8 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
         
         
         .wide-display { 
-            min-width: 30em; 
-            width: 30%; 
+            min-width: 15em; 
+            width: 15%; 
         }
         
         
@@ -89,6 +92,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this.agreeCheckboxLabel_subject = subject;
     }
 
+    @Input("requestCategory") set requestCategory(requestCategory: any) {
+        this.useMultiplexLanes = requestCategory.isIlluminaType === 'Y';
+    }
+
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
@@ -117,6 +124,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     private isCheckboxChecked: boolean;
     private disable_agreeCheckbox: boolean;
+    private useMultiplexLanes: boolean;
 
     private requestPropBox: boolean;
     public billingItems: any[] = [];
@@ -126,6 +134,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private columnProperties: any[] = [];
 
     private sampleTypes: any[] = [];
+
+    private bioanalyzerChips: any[] = [];
 
     private experimentAnnotationsSubscription: Subscription;
 
@@ -162,6 +172,13 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this._experiment.billingAccountNumber = value;
     }
 
+
+    public get showExperimentDescription(): boolean {
+        return true;
+    }
+    public get showNotesForCoreFacility(): boolean {
+        return true;
+    }
 
 
     constructor(private annotationService: AnnotationService,
@@ -207,6 +224,14 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     private buildColumnDefinitions(): void {
+        if (this.useMultiplexLanes) {
+            this.buildMultiplexLaneColumnDefinitions();
+        } else {
+            this.buildNonmultiplexLaneColumnDefinitions();
+        }
+    }
+
+    private buildMultiplexLaneColumnDefinitions(): void {
         this.columnProperties = [];
         this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
 
@@ -308,22 +333,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             }
         }
 
-
-        // temp.push({
-        //     headerName: "Conc. (ng/ul)",
-        //     field: "concentration",
-        //     cellRendererFramework: TextAlignRightMiddleRenderer,
-        //     width: 100,
-        //     editable: false
-        // });
-        // temp.push({
-        //     headerName: "Sample Volume (ul)",
-        //     field: "sampleVolume",
-        //     cellRendererFramework: TextAlignRightMiddleRenderer,
-        //     width: 100,
-        //     editable: false
-        // });
-
         if (this._experiment
             && this._experiment.seqPrepByCore_forSamples
             && this._experiment.seqPrepByCore_forSamples === 'N') {
@@ -389,26 +398,170 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             sortOrder: 200
         });
 
-        // temp.push({
-        //     headerName: "Sample Type",
-        //     editable: false,
-        //     width: 175,
-        //     field: "idSampleType",
-        //     cellRendererFramework: SelectRenderer,
-        //     selectOptions: this.sampleTypes,
-        //     selectOptionsDisplayField: "sampleType",
-        //     selectOptionsValueField: "idSampleType"
-        // });
-        // temp.push({
-        //     headerName: "Organism",
-        //     editable: false,
-        //     width: 200,
-        //     field: "idOrganism",
-        //     cellRendererFramework: SelectRenderer,
-        //     selectOptions: this.organisms,
-        //     selectOptionsDisplayField: "display",
-        //     selectOptionsValueField: "idOrganism"
-        // });
+        if (this._experiment) {
+            for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
+                let fullProperty = this.propertyList.filter((value: any) => {
+                    return value.idProperty === sampleAnnotation.idProperty;
+                });
+
+                if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
+                    TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], false, this.tabIndexToInsertAnnotations, this.emToPxConversionRate, TabSamplesIlluminaComponent.STATE_NEW, true);
+                }
+            }
+        }
+
+        temp = TabSamplesIlluminaComponent.sortColumns(temp);
+
+        this.samplesGridConfirmColumnDefs = temp;
+    }
+
+    private buildNonmultiplexLaneColumnDefinitions(): void {
+        this.columnProperties = [];
+        this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
+
+        if (this.columnProperties) {
+            this.columnProperties = this.columnProperties.filter((a) => {
+                return a.codeRequestCategory === this._experiment.codeRequestCategory;
+            });
+        } else {
+            this.columnProperties = [];
+        }
+
+        let temp: any[] = [];
+
+        temp.push({
+            headerName: "",
+            field: "index",
+            width:    4 * this.emToPxConversionRate,
+            maxWidth: 4 * this.emToPxConversionRate,
+            minWidth: 4 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            suppressSizeToFit: true,
+            pinned: "left",
+            sortOrder: 5
+        });
+        temp.push({
+            headerName: "Sample Name",
+            field: "name",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            width:    8 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            maxWidth: 10 * this.emToPxConversionRate,
+            editable: false,
+            sortOrder: 15
+        });
+
+
+        for (let columnProperty of this.columnProperties) {
+
+            if (columnProperty.showInNewSummaryMode && columnProperty.showInNewSummaryMode === 'Y') {
+                let editable: boolean = false;
+                let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
+
+                let newColumn: any = {
+                    headerName: columnProperty.header,
+                    field: columnProperty.field,
+                    width: (+columnProperty.width) * this.emToPxConversionRate,
+                    minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
+                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: editable,
+
+                    showFillButton: showFillButton,
+                    fillGroupAttribute: columnProperty.fillGroupAttribute,
+                    sortOrder: columnProperty.sortOrder
+                };
+
+                switch(columnProperty.columnType) {
+                    case TabSamplesIlluminaComponent.TEXT_RIGHT:
+                        newColumn.cellRendererFramework = TextAlignRightMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignRightMiddleEditor;
+                        break;
+                    case TabSamplesIlluminaComponent.OPTION:
+                        newColumn.cellRendererFramework = SelectRenderer;
+                        newColumn.cellEditorFramework   = SelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            newColumn.selectOptions = this.dictionaryService.getEntries('' + columnProperty.fullDictionaryModelPathToLoad);
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    // case TabSamplesIlluminaComponent.MULTIOPTION:
+                    //     break;
+
+                    case TabSamplesIlluminaComponent.TEXT:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                        break;
+                    default:
+                        newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                        newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
+                }
+
+                temp.push(newColumn);
+            }
+        }
+
+        if (this._experiment
+            && this._experiment.seqPrepByCore_forSamples
+            && this._experiment.seqPrepByCore_forSamples === 'N') {
+
+            temp.push({
+                headerName: "Index Tag A",
+                editable: false,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                maxWidth: 20 * this.emToPxConversionRate,
+                field: "idOligoBarcode",
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this._barCodes,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOligoBarcode",
+                indexTagLetter: 'A',
+                errorNameErrorMessageMap: [
+                    {errorName: 'required', errorMessage: 'Index Tag A required'}
+                ]
+            });
+            temp.push({
+                headerName: "Index Tag Sequence A",
+                field: "barcodeSequence",
+                width:    7.5 * this.emToPxConversionRate,
+                minWidth: 6.5 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false
+            });
+            temp.push({
+                headerName: "Index Tag B",
+                editable: false,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                maxWidth: 20 * this.emToPxConversionRate,
+                field: "idOligoBarcodeB",
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this._barCodes,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idOligoBarcodeB",
+                indexTagLetter: 'B'
+            });
+            temp.push({
+                headerName: "Index Tag Sequence B",
+                field: "barcodeSequenceB",
+                width:    7 * this.emToPxConversionRate,
+                minWidth: 6.5 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
+        }
+
+        this.tabIndexToInsertAnnotations = 150;
 
         if (this._experiment) {
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
@@ -430,6 +583,14 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     public tabDisplayed(): void {
         if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
             this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        this.bioanalyzerChips = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BIOANALYZER_CHIP_TYPE);
+
+        if (this.bioanalyzerChips && Array.isArray(this.bioanalyzerChips)) {
+            this.bioanalyzerChips = this.bioanalyzerChips.filter((a) => {
+                return a.codeApplication && this._experiment.codeApplication;
+            });
         }
 
         this.buildColumnDefinitions();
@@ -527,10 +688,12 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
                 this.billingItems = [];
 
-                if (response.Request.BillingItem && Array.isArray(response.Request.BillingItem)) {
-                    this.billingItems = response.Request.BillingItem
-                } else {
-                    this.billingItems = [response.Request.BillingItem];
+                if (response.Request.BillingItem){
+                    if (Array.isArray(response.Request.BillingItem)) {
+                        this.billingItems = response.Request.BillingItem
+                    } else {
+                        this.billingItems = [response.Request.BillingItem];
+                    }
                 }
             });
         }
@@ -538,44 +701,48 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     private getSequenceLanes(): void {
 
-        this.experimentService.getMultiplexLaneList(this._experiment).subscribe((response: any) => {
-            if (!response || !(Array.isArray(response) || response.MultiplexLane)) {
-                return;
-            }
+        if (this.useMultiplexLanes) {
+            this.experimentService.getMultiplexLaneList(this._experiment).subscribe((response: any) => {
+                if (!response || !(Array.isArray(response) || response.MultiplexLane)) {
+                    return;
+                }
 
-            let multiplexLanes: any[] = [];
+                let multiplexLanes: any[] = [];
 
-            if (Array.isArray(response)) {
-                multiplexLanes = response;
-            } else {
-                multiplexLanes = [response.MultiplexLane];
-            }
+                if (Array.isArray(response)) {
+                    multiplexLanes = response;
+                } else {
+                    multiplexLanes = [response.MultiplexLane];
+                }
 
-            let sequenceLanes = [];
+                let sequenceLanes = [];
 
-            for (let sample of this._experiment.samples) {
-                sequenceLanes.push(sample.getJSONObjectRepresentation());
-            }
+                for (let sample of this._experiment.samples) {
+                    sequenceLanes.push(sample.getJSONObjectRepresentation());
+                }
 
-            let sampleNumber: number = 0;
+                let sampleNumber: number = 0;
 
-            for (let multiplexLane of multiplexLanes) {
-                let multiplexNumber = multiplexLane.number;
+                for (let multiplexLane of multiplexLanes) {
+                    let multiplexNumber = multiplexLane.number;
 
-                if (multiplexLane.SequenceLane) {
-                    if (Array.isArray(multiplexLane.SequenceLane)) {
-                        for (let lane of multiplexLane.SequenceLane) {
-                            sequenceLanes[sampleNumber].sampleId = 'X' + ++sampleNumber;
+                    if (multiplexLane.SequenceLane) {
+                        if (Array.isArray(multiplexLane.SequenceLane)) {
+                            for (let lane of multiplexLane.SequenceLane) {
+                                sequenceLanes[sampleNumber].sampleId = 'X' + ++sampleNumber;
+                            }
+                        } else {
+                            sequenceLanes[sampleNumber].sampleId        = 'X' + ++sampleNumber;
                         }
-                    } else {
-                        sequenceLanes[sampleNumber].sampleId        = 'X' + ++sampleNumber;
                     }
                 }
-            }
 
-            this.sequenceLanes = sequenceLanes;
-            this.gridApi.setRowData(this.sequenceLanes);
-        });
+                this.sequenceLanes = sequenceLanes;
+                this.gridApi.setRowData(this.sequenceLanes);
+            });
+        } else {
+            this.sequenceLanes = this._experiment.samples;
+        }
     }
 
     private loadSampleTypes(): void {
@@ -600,6 +767,28 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         }
 
         this.sampleTypes = types.sort(TabSampleSetupViewComponent.sortSampleTypes);
+    }
+
+    public displayAnnotationValue(annotation: any): string {
+        if (annotation && annotation.codePropertyType) {
+            switch (annotation.codePropertyType) {
+                case 'TEXT'    : return annotation.value ? annotation.value : '';
+                case 'OPTION'  :
+                case 'MOPTION' :
+                    let temp: string = '';
+
+                    if (annotation.PropertyOption && Array.isArray(annotation.PropertyOption) && annotation.PropertyOption.length > 0) {
+                        for (let option of annotation.PropertyOption) {
+                            if (option.name && option.selected && option.selected === 'Y') {
+                                temp += option.name + '\n';
+                            }
+                        }
+
+                    }
+
+                    return temp;
+            }
+        }
     }
 
     public onGridReady(params: any): void {
