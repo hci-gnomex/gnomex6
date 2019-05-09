@@ -85,6 +85,7 @@ export class ConstantsService {
         " color | ul ol | outdent indent";
     public readonly ICON_SAVE: string = "assets/save.png";
     public readonly GLOBE_LINK: string = "assets/globe_link.png";
+    public readonly ICON_MAGNIFIER:string ="assets/magnifier.png";
     public readonly ICON_TABLE_LINK: string = "assets/table_link.png";
     public readonly EMAIL_GO_LINK: string = "assets/email_go.png";
     public readonly ICON_UCSC: string = "assets/ucscFavicon.png";

@@ -18,14 +18,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'qc-workflow',
     templateUrl: 'qc-workflow.html',
-    styles: [`
-        .flex-column-container-workflow {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 94%;
-            width: 100%;
-        }
+    styles: [`        
         .flex-row-container {
             display: flex;
             flex-direction: row;
