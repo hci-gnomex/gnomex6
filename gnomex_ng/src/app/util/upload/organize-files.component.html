@@ -5,13 +5,13 @@
         </button>
         <button mat-button
                 color="primary"
-                [disabled]="disableRemove()"
+                [disabled]="disableRemove"
                 (click)="attemptRemove()" >
             <img [src]="constService.ICON_DELETE" >
             Remove (from file system)
         </button>
         <button mat-button color="primary"
-                [disabled]="disableRename()"
+                [disabled]="disableRename"
                 (click)="rename()"  >
             <img [src]="constService.SEGMENT_IMPORT" >
             Rename file </button>
