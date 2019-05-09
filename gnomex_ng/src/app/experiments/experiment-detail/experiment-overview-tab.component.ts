@@ -486,7 +486,7 @@ import {UtilService} from "../../services/util.service";
                 this.lab = result;
 
                 if (result.Lab) {
-                    this.projectsDictionary = result.Lab.projects;
+                    this.projectsDictionary = UtilService.getJsonArray(result.Lab.projects, result.Lab.projects.Project);
                     this.isReady_projectsDictionary = true;
 
                     this.compilePossibleOwners();
