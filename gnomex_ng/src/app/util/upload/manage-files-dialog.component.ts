@@ -15,6 +15,7 @@ import {HttpParams} from "@angular/common/http";
 import {OrganizeFilesComponent} from "./organize-files.component";
 import {DialogsService} from "../popup/dialogs.service";
 import {UploadFileComponent} from "./upload-file.component";
+import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 
 
 
@@ -183,34 +184,28 @@ export class ManageFilesDialogComponent implements OnInit{
         if(this.manageData.type === 'a'){
             this.fileService.organizeAnalysisUploadFiles(params).subscribe(resp => {
                 this.dialogService.stopAllSpinnerDialogs();
-                if(resp && resp.result && resp.result === "SUCCESS"){
-                    if(resp.warning){
-                        this.dialogService.alert(resp.warning);
-                    }
-                    this.fileService.getManageFilesForm().markAsPristine();
-                    this.fileService.emitGetAnalysisOrganizeFiles({idAnalysis : this.manageData.id.idAnalysis});
-
-                }else if(resp.message){
-                    this.dialogService.alert(resp.message)
+                if(resp.warning){
+                    this.dialogService.alert(resp.warning);
                 }
+                this.fileService.getManageFilesForm().markAsPristine();
+                this.fileService.emitGetAnalysisOrganizeFiles({idAnalysis : this.manageData.id.idAnalysis});
+            },(err:IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs();
             });
 
         }else{
             this.fileService.organizeExperimentFiles(params).subscribe( resp => {
-                if(resp && resp.result && resp.result === "SUCCESS"){
-                    if(resp.warning){
-                        this.dialogService.alert(resp.warning);
-                    }
-                    this.fileService.getManageFilesForm().markAsPristine();
-                    this.fileService.emitGetRequestOrganizeFiles({idRequest: this.manageData.id.idRequest });
-                    if(this.showLinkedSampleTab){
-                        this.fileService.emitGetLinkedSampleFiles({idRequest: this.manageData.id.idRequest});
-                    }
-
-                }else if(resp.message){
-                    this.dialogService.alert(resp.message);
-                    this.dialogService.stopAllSpinnerDialogs();
+                if(resp.warning){
+                    this.dialogService.alert(resp.warning);
                 }
+                this.fileService.getManageFilesForm().markAsPristine();
+                this.fileService.emitGetRequestOrganizeFiles({idRequest: this.manageData.id.idRequest });
+                if(this.showLinkedSampleTab){
+                    this.fileService.emitGetLinkedSampleFiles({idRequest: this.manageData.id.idRequest});
+                }
+
+            },(err:IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs();
             });
 
         }
@@ -225,7 +220,8 @@ export class ManageFilesDialogComponent implements OnInit{
 
 
         let group = this.fileService.getManageFilesForm().controls;
-        let params =  null;
+        let paramsObj =  null;
+        let params:HttpParams = new HttpParams();
 
         for(let g in group){
             let control = (<FormGroup>group[g]).controls;
@@ -233,16 +229,16 @@ export class ManageFilesDialogComponent implements OnInit{
             for(let c in control){
                 let cVal = (<FormControl>control[c]).value;
                 if(c.endsWith("Params")){
-                    params = params ? {...params, ...cVal } : {...cVal}
+                    paramsObj = paramsObj ? {...paramsObj, ...cVal } : {...cVal}
                 }
             }
         }
 
+        for(let p in paramsObj){
+            params = params.set(p , paramsObj[p]);
+        }
 
         this.executeSave(params);
-
-        console.log(params);
-
     }
 
     ngOnDestroy(){
