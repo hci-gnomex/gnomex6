@@ -142,6 +142,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         if(this.data.type === 'a'){
 
             this.manageFileSubscript = this.fileService.getAnalysisOrganizeFilesObservable().subscribe( (resp) => {
+                this.disableRename = true;
+                this.disableRemove = true;
                 this.dialogService.stopAllSpinnerDialogs();
                 if(resp && Array.isArray(resp)){
                     let respList = (<any[]>resp);
@@ -175,6 +177,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
             this.manageFileSubscript = this.fileService.getRequestOrganizeFilesObservable().subscribe(resp =>{
                 this.dialogService.stopAllSpinnerDialogs();
+                this.disableRename = true;
+                this.disableRemove = true;
                 this.uploadFiles = resp[0];
                 this.organizeFiles = resp[1];
                 this.fileService.emitUpdateFileTab(this.organizeFiles);
