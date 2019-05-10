@@ -14,10 +14,10 @@ import {LabListService} from "../services/lab-list.service";
     template: `
         <h6 mat-dialog-title><img [src]="this.constantsService.ICON_FOLDER_ADD" class="icon">{{this.isEditMode ? 'Edit' : 'New'}} Project</h6>
         <div mat-dialog-content class="content-div">
-            <lazy-loaded-select class="half-width" placeholder="Lab" [options]="this.labList"
-                                valueField="idLab" [displayField]="this.prefService.labDisplayField" [allowNone]="true"
-                                [control]="this.form.get('idLab')">
-            </lazy-loaded-select>
+            <custom-combo-box class="half-width" placeholder="Lab" [options]="this.labList"
+                                valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                [formControl]="this.form.get('idLab')">
+            </custom-combo-box>
             <mat-form-field class="full-width">
                 <input matInput placeholder="Project name" [formControl]="this.form.get('name')">
                 <mat-error *ngIf="this.form.get('name').hasError('required')">Project name is <strong>required</strong></mat-error>

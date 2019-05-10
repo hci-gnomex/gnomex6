@@ -73,10 +73,10 @@
             </div>
             <div class="full-width flex-container-row flex-one align-center">
                 <div class="forty-percent-width">
-                    <lazy-loaded-select placeholder="Owner" [options]="this.appUserList"
-                                        valueField="idAppUser" displayField="display" [allowNone]="true"
-                                        [control]="this.ownerFC" class="full-height full-width">
-                    </lazy-loaded-select>
+                    <custom-combo-box placeholder="Owner" [options]="this.appUserList"
+                                        valueField="idAppUser" displayField="display"
+                                        [formControl]="this.ownerFC" class="full-height full-width">
+                    </custom-combo-box>
                 </div>
             </div>
             <div class="full-width flex-container-row flex-one align-center justify-end">

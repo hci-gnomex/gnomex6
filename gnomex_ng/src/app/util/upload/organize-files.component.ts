@@ -1,5 +1,14 @@
 
-import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input} from "@angular/core";
+import {
+    Component,
+    OnInit,
+    ViewChild,
+    AfterViewInit,
+    EventEmitter,
+    Output,
+    Input,
+    ChangeDetectorRef
+} from "@angular/core";
 import {Subscription} from "rxjs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../popup/dialogs.service";
@@ -61,6 +70,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     public removedChildren: Set<string> = new Set();
     public splitOrgSize:number;
     public showFileTrees: boolean =  false;
+    public disableRemove:boolean = true;
+    public disableRename:boolean = true;
 
 
     @ViewChild('organizeTree')
@@ -81,6 +92,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 private fb:FormBuilder,
                 private fileService: FileService,
                 public constService:ConstantsService,
+                private changeDetector: ChangeDetectorRef,
                 private dialogService: DialogsService,
                 private dialog:MatDialog) {
     }
@@ -130,6 +142,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         if(this.data.type === 'a'){
 
             this.manageFileSubscript = this.fileService.getAnalysisOrganizeFilesObservable().subscribe( (resp) => {
+                this.disableRename = true;
+                this.disableRemove = true;
                 this.dialogService.stopAllSpinnerDialogs();
                 if(resp && Array.isArray(resp)){
                     let respList = (<any[]>resp);
@@ -163,6 +177,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
             this.manageFileSubscript = this.fileService.getRequestOrganizeFilesObservable().subscribe(resp =>{
                 this.dialogService.stopAllSpinnerDialogs();
+                this.disableRename = true;
+                this.disableRemove = true;
                 this.uploadFiles = resp[0];
                 this.organizeFiles = resp[1];
                 this.fileService.emitUpdateFileTab(this.organizeFiles);
@@ -270,9 +286,11 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         }
 
         this.uploadSelectedNode = <ITreeNode>event.node;
+        this.disableRemove = false;
     }
     uploadTreeOnUnselect(event:any){
         this.uploadSelectedNode = null;
+        this.disableRemove = !this.organizeSelectedNode ? true : false;
     }
 
     organizeTreeOnSelect(event:any){
@@ -281,10 +299,16 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             otherTreeFocusedNode.setIsActive(false);
         }
         this.organizeSelectedNode = <ITreeNode>event.node;
+        let isRoot = this.organizeSelectedNode.isRoot;
+        this.disableRename = isRoot;
+        this.disableRemove = isRoot;
+
 
     }
     organizeTreeOnUnselect(event:any){
         this.organizeSelectedNode = null;
+        this.disableRemove = !this.uploadSelectedNode ? true : false;
+        this.disableRename = true;
     }
 
     private renameCallBack = (data) => {
@@ -336,6 +360,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
                         });
                         this.organizeTree.treeModel.update();
+                        this.organizeSelectedNode =  this.organizeTree.treeModel.getActiveNodes()[0];
                         this.formGroup.markAsDirty();
                     }
                 }
@@ -479,17 +504,6 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         this.closeDialog.emit();
     }
 
-    disableRename():boolean{
-        let treeSelected: boolean = !!(!this.organizeSelectedNode );
-        let isOrganizeRoot:boolean =  this.organizeSelectedNode ? this.organizeSelectedNode.isRoot : false;
-        return treeSelected || isOrganizeRoot;
-    }
-
-    disableRemove():boolean{
-        let treeSelected: boolean = !!(!this.organizeSelectedNode && !this.uploadSelectedNode);
-        let isOrganizeRoot:boolean =  this.organizeSelectedNode ? this.organizeSelectedNode.isRoot : false;
-        return treeSelected || isOrganizeRoot;
-    }
     expandFolders(){
         if(this.organizeSelectedNode){
             this.organizeSelectedNode.expandAll();

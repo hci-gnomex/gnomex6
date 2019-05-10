@@ -265,7 +265,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     }
 
     editButtonClicked(element: Element) {
-        if(this.isEditMode) {
+        if(this.isEditMode && this.analysisService.analysisOverviewForm.dirty) {
             let warningMessage: string = "Your changes haven't been saved. Continue anyway?";
             this.dialogsService.yesNoDialog(warningMessage, this, "changeEditMode", null, "Changing EditMode");
         } else {
@@ -277,6 +277,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
         this.analysisService.setEditMode(!this.isEditMode);
         this.analysisService.modeChangedAnalysis = this.analysis;
         this.isEditMode = this.analysisService.getEditMode();
+        this.analysisService.analysisOverviewForm.markAsPristine();
     }
 
     ngOnDestroy() {
