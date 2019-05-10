@@ -26,10 +26,10 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
                     <input matInput placeholder="Lab Group" [formControlName]="'labName'">
                 </mat-form-field>
                 <span></span>
-                <lazy-loaded-select placeholder="Owner" [options]="this.labUsers"
-                                    valueField="idAppUser" [displayField]="this.prefService.userDisplayField" [allowNone]="true"
-                                    [control]="this.form.get('idAppUser')">
-                </lazy-loaded-select>
+                <custom-combo-box placeholder="Owner" [options]="this.labUsers"
+                                    valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
+                                    [formControlName]="'idAppUser'">
+                </custom-combo-box>
             </div>
             <div class="form-row-children">
                 <mat-form-field>
@@ -42,10 +42,10 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
             </div>
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
-                    <lazy-loaded-select placeholder="Analysis Type" [options]="this.analysisTypes"
-                                        valueField="value" displayField="display" [allowNone]="true"
-                                        [control]="this.form.get('idAnalysisType')">
-                    </lazy-loaded-select>
+                    <custom-combo-box placeholder="Analysis Type" [options]="this.analysisTypes"
+                                        valueField="value" displayField="display"
+                                        [formControlName]="'idAnalysisType'">
+                    </custom-combo-box>
                     <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditAnalysisType()">New/Edit</button>
                 </div>
                 <span></span>
@@ -55,10 +55,10 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
             </div>
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
-                    <lazy-loaded-select placeholder="Analysis Protocol" [options]="this.protocolList"
-                                        valueField="id" displayField="label" [allowNone]="true"
-                                        [control]="this.form.get('idAnalysisProtocol')">
-                    </lazy-loaded-select>
+                    <custom-combo-box placeholder="Analysis Protocol" [options]="this.protocolList"
+                                        valueField="id" displayField="label"
+                                        [formControlName]="'idAnalysisProtocol'">
+                    </custom-combo-box>
                     <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditAnalysisProtocol()">New/Edit</button>
                 </div>
                 <span></span>
@@ -77,10 +77,10 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
             </div>
             <div class="form-row-children">
                 <div class="flex-container-row form-entry-children">
-                    <lazy-loaded-select placeholder="Organism" [options]="this.organismList"
-                                        valueField="value" displayField="display" [allowNone]="true"
-                                        [control]="this.form.get('idOrganism')">
-                    </lazy-loaded-select>
+                    <custom-combo-box placeholder="Organism" [options]="this.organismList"
+                                        valueField="value" displayField="display"
+                                        [formControlName]="'idOrganism'">
+                    </custom-combo-box>
                     <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditOrganism()">New/Edit</button>
                 </div>
                 <span></span>
@@ -157,7 +157,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
             flex: 1;
         }
         .form-entry-children > mat-form-field,
-        .form-entry-children > lazy-loaded-select {
+        .form-entry-children > custom-combo-box {
             flex: 4;
         }
         .form-entry-children > button {
@@ -308,7 +308,8 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
             this.lab = null;
             this.institutionList = [];
 
-            let owner: any = {idAppUser: this.analysis.idAppUser, displayName: this.analysis.ownerName};
+            let owner: any = {idAppUser: this.analysis.idAppUser};
+            owner[this.prefService.userDisplayField] = this.analysis.ownerName;
             this.labUsers = [owner];
             if (this.canUpdate && this.canWriteAnyObject) {
                 let params: HttpParams = new HttpParams()
@@ -537,8 +538,5 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
             this.form.controls["genomeBuildToAdd"].disable();
 
         }
-
-        this.form.valueChanges.subscribe(() => {
-        });
     }
 }

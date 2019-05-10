@@ -1,9 +1,9 @@
 <div class="full-height full-width flex-column-container">
     <div class="align-center flex-row-container justify-space-between flex-grow">
-        <lazy-loaded-select style="width:30%;" placeholder="Lab Filter" [options]="this.labList"
-                            [displayField]="this.prefService.labDisplayField" [allowNone]="true"
-                            [control]="this.currentLabFC">
-        </lazy-loaded-select>
+        <custom-combo-box style="width:30%;" placeholder="Lab Filter" [options]="this.labList"
+                            [displayField]="this.prefService.labDisplayField"
+                            [formControl]="this.currentLabFC">
+        </custom-combo-box>
         <mat-radio-group [(ngModel)]="gridRaidoOpt" class="filter" (change)="onGridTypeChange()">
             <mat-radio-button [value]="HYBS" class="filterOption" > Microarray Hybridizations{{"(" + this.hybsList.length + ")"}}</mat-radio-button>
             <mat-radio-button [value]="SEQ_LANES" class="filterOption" > Illumina Sequencing{{"(" + this.lanesList.length + ")"}} </mat-radio-button>

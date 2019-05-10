@@ -77,12 +77,10 @@
                         <mat-checkbox [(ngModel)]="item.alignToGenomeBuild" (change)="onCheckboxChanged(item, $event)">Yes, align to genome build</mat-checkbox>
                     </div>
                     <div class="margin">
-                        <mat-form-field class="medium-width">
-                            <mat-select [(ngModel)]="item.idGenomeBuildAlignTo" [disabled]="!item.alignToGenomeBuild" (selectionChange)="onSelectChanged(item, $event)">
-                                <mat-option [value]=""> -- </mat-option>
-                                <mat-option *ngFor="let option of item.dictionary" [value]="option.value">{{ option.display }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                        <custom-combo-box class="medium-width" [(ngModel)]="item.idGenomeBuildAlignTo" [options]="item.dictionary"
+                                          [disabled]="!item.alignToGenomeBuild" (optionSelected)="onSelectChanged(item, $event)"
+                                          valueField="value" displayField="display">
+                        </custom-combo-box>
                     </div>
                 </div>
             </div>

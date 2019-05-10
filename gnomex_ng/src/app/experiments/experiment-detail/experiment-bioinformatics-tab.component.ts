@@ -185,7 +185,7 @@ export class ExperimentBioinformaticsTabComponent {
             });
 
             for (let lanes of lanesToChange) {
-                lanes.idGenomeBuildAlignTo = event.value ? event.value : '';
+                lanes.idGenomeBuildAlignTo = event ? event : '';
             }
         }
     }
