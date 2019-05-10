@@ -2,13 +2,9 @@
     <div class="users-groups-row-one">
         <div class="flex-column-container" style="width: 100%">
             <div style="display: flex;">
-                <mat-form-field class="formField">
-                    <input matInput placeholder="Core facility" aria-label="Core" [formControl]="this.coreFacilityFC" [matAutocomplete]="auto"
-                           [(ngModel)]="core" (keyup.enter)="chooseFirstOption()" (keyup)="highlightFirstOption($event)">
-                    <mat-autocomplete #auto="matAutocomplete">
-                        <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let cor of filterCores(this.core)" [value]="cor.display">{{cor.display}}</mat-option>
-                    </mat-autocomplete>
-                </mat-form-field>
+                <custom-combo-box class="formField" placeholder="Core facility" [formControl]="this.coreFacilityFC" valueField="idCoreFacility"
+                                  (optionSelected)="selectOption()" [options]="filterCores(this.core)" displayField="display">
+                </custom-combo-box>
                 <context-help name="coreFacilityHelp" label="Help me choose" popupTitle="Core Facility Information"
                               [isEditMode]="this.secAdvisor.isSuperAdmin" tooltipPosition="right"></context-help>
             </div>

@@ -19,19 +19,19 @@ import {Experiment} from "../../util/models/experiment.model";
     selector: 'tab-external-setup',
     template: `
         <div class="full-height full-width flex-container-col padded">
-            <lazy-loaded-select placeholder="Lab group" [options]="this.labList" class="half-width"
-                                [displayField]="this.prefService.labDisplayField" [allowNone]="true"
-                                [control]="this.form.get('lab')">
-            </lazy-loaded-select>
-            <lazy-loaded-select *ngIf="this.showUserSelection" placeholder="Submitter" [options]="this.userList" class="half-width"
-                                [displayField]="this.prefService.userDisplayField" [allowNone]="true"
-                                [control]="this.form.get('appUser')">
-            </lazy-loaded-select>
+            <custom-combo-box placeholder="Lab group" [options]="this.labList" class="half-width"
+                                [displayField]="this.prefService.labDisplayField"
+                                [formControl]="this.form.get('lab')">
+            </custom-combo-box>
+            <custom-combo-box *ngIf="this.showUserSelection" placeholder="Submitter" [options]="this.userList" class="half-width"
+                                [displayField]="this.prefService.userDisplayField"
+                                [formControl]="this.form.get('appUser')">
+            </custom-combo-box>
             <div class="flex-container-row align-center">
-                <lazy-loaded-select placeholder="Project folder for organizing experiments" [options]="this.projectList" class="half-width"
-                                    valueField="idProject" [displayField]="'name'" [allowNone]="true"
-                                    [control]="this.form.get('idProject')">
-                </lazy-loaded-select>
+                <custom-combo-box placeholder="Project folder for organizing experiments" [options]="this.projectList" class="half-width"
+                                    valueField="idProject" [displayField]="'name'"
+                                    [formControl]="this.form.get('idProject')">
+                </custom-combo-box>
                 <div>
                     <button mat-button [disabled]="!this.form.get('idProject').value" (click)="this.editProject()">Edit</button>
                 </div>
@@ -51,10 +51,10 @@ import {Experiment} from "../../util/models/experiment.model";
                     <button mat-button (click)="this.toggleShowLinkToTopic()"><img [src]="this.constantsService.ICON_TOPIC" class="icon">{{showLinkToTopic ? 'Hide' : 'Show'}} Link to Topic</button>
                 </div>
             </div>
-            <lazy-loaded-select placeholder="Organism" [options]="this.organismList" class="half-width"
-                                [displayField]="'display'" [allowNone]="true"
-                                [control]="this.form.get('organism')">
-            </lazy-loaded-select>
+            <custom-combo-box placeholder="Organism" [options]="this.organismList" class="half-width"
+                                [displayField]="'display'"
+                                [formControl]="this.form.get('organism')">
+            </custom-combo-box>
             <div class="flex-container-row full-width align-center">
                 <label class="margin-right">Experiment platform</label>
                 <mat-radio-group class="flex-container-col" [formControl]="this.form.get('requestCategory')">
@@ -66,10 +66,10 @@ import {Experiment} from "../../util/models/experiment.model";
                     </mat-radio-button>
                 </mat-radio-group>
             </div>
-            <lazy-loaded-select placeholder="Experiment type" [options]="this.requestApplicationList" class="half-width"
-                                [displayField]="'display'" [allowNone]="true"
-                                [control]="this.form.get('application')">
-            </lazy-loaded-select>
+            <custom-combo-box placeholder="Experiment type" [options]="this.requestApplicationList" class="half-width"
+                                [displayField]="'display'"
+                                [formControl]="this.form.get('application')">
+            </custom-combo-box>
         </div>
     `,
     styles: [`

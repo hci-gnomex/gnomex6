@@ -20,10 +20,10 @@
                         <mat-error *ngIf="topicForm.get('name').hasError('required')">Name is required</mat-error>
                     </mat-form-field>
                     <div *ngIf="this.topicForm.enabled" class="flex-container-row">
-                        <lazy-loaded-select class="formField" placeholder="Lab" [options]="this.labList"
-                                            valueField="idLab" [displayField]="this.prefService.labDisplayField" [allowNone]="true"
-                                            [control]="this.topicForm.get('idLab')">
-                        </lazy-loaded-select>
+                        <custom-combo-box class="formField" placeholder="Lab" [options]="this.labList"
+                                            valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                            [formControl]="this.topicForm.get('idLab')">
+                        </custom-combo-box>
                         <mat-form-field class="formField">
                             <mat-select placeholder="Owner" formControlName="idAppUser">
                                 <mat-option>None</mat-option>

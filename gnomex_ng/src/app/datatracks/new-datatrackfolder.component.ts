@@ -22,10 +22,10 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
                     </mat-form-field>
                 </div>
                 <div class="dialogDiv">
-                    <lazy-loaded-select class="full-width" placeholder="Lab" [options]="this.labList"
-                                        valueField="idLab" [displayField]="this.prefService.labDisplayField" [allowNone]="true"
-                                        [control]="this.form.get('idLab')">
-                    </lazy-loaded-select>
+                    <custom-combo-box class="full-width" placeholder="Lab" [options]="this.labList"
+                                        valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                        [formControl]="this.form.get('idLab')">
+                    </custom-combo-box>
                 </div>
             </form>
         </mat-dialog-content>
