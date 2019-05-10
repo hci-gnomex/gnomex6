@@ -123,6 +123,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.onChange_numberOfSamplesSubscription = this._experiment.onChange_numberOfSamples.subscribe((value) =>{
                 if (value && this.samplesGridApi) {
                     if (+(this._experiment.numberOfSamples) > 0) {
+                        if (this.experiment.samples
+                            && Array.isArray(this.experiment.samples)
+                            && this.experiment.samples.length > (+value)) {
+
+                            this.experiment.samples.splice((+value), this.experiment.samples.length - (+value));
+                        }
+
                         this.buildInitialRows();
                     }
                 }
@@ -453,6 +460,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public form: FormGroup;
 
     private hideCCNum: boolean = true;
+    private ccNumberIsCurrentlyHidden: boolean = true;
+
     private gridColumnApi;
     public showInstructions: boolean = false;
 
@@ -614,7 +623,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
             cellEditorFramework: TextAlignLeftMiddleEditor,
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
-            hide: this.hideCCNum
+            hide: this.hideCCNum,
+            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden
         });
 
         this._tabIndexToInsertAnnotations = 150;
@@ -891,6 +901,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
             hide: this.hideCCNum,
+            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
             sortOrder: 140
         });
 
@@ -1214,6 +1225,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
             hide: this.hideCCNum,
+            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
             sortOrder: 140
         });
 
@@ -1360,6 +1372,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     editable: false,
                     cellRendererFramework: LinkButtonRenderer,
                     onClickButton: 'onClickCCNumberLink',
+                    ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
                     buttonValueLabel: 'ccNumber'
                 });
             }
@@ -1593,7 +1606,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         let temp: any[]  = this.defaultSampleColumnDefinitions;
 
-        if (this._experiment) {
+        if (temp && this._experiment && this._experiment.requestCategory && this._experiment.requestCategory.type !== "QC") {
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
                 let fullProperty = this.propertyList.filter((value: any) => {
                     return value.idProperty === sampleAnnotation.idProperty;
@@ -1745,97 +1758,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         if (this._experiment && this._experiment.numberOfSamples) {
 
-            let idSampleType: string = '';
-            let idOrganism: string = '';
-            let idNumberSequencingCycles: string = '';
-            let idNumberSequencingCyclesAllowed: string = '';
-            let idSeqRunType: string = '';
-            let protocol: any = '';
-            let numberSequencingLanes: string = this._experiment.isRapidMode === 'Y' ? '2' : '1';
-            let seqPrepByCore: any = '';
-
-            if (this.gnomexService.submitInternalExperiment() && this._experiment.sampleType) {
-                idSampleType = this._experiment.sampleType.idSampleType;
-            } else if (this._experiment.idSampleTypeDefault != null) {
-                idSampleType = this._experiment.idSampleTypeDefault
-            } else {
-                // do nothing, leave idSampleType as default.
-            }
-
-            if (this.gnomexService.submitInternalExperiment() && this._experiment.organism) {
-                idOrganism = this._experiment.organism.idOrganism;
-            } else if (this._experiment.idOrganismSampleDefault != null) {
-                idOrganism = this._experiment.idOrganismSampleDefault;
-            } else {
-                // do nothing, leave idOrganism as default.
-            }
-
-            if (this.gnomexService.submitInternalExperiment() && this._experiment.selectedProtocol) {
-                idNumberSequencingCycles = this._experiment.selectedProtocol.idNumberSequencingCycles;
-            }
-
-            if (this.gnomexService.submitInternalExperiment() && this._experiment.selectedProtocol) {
-                idNumberSequencingCyclesAllowed = this._experiment.selectedProtocol.idNumberSequencingCyclesAllowed
-            }
-
-            if (this.gnomexService.submitInternalExperiment() && this._experiment.selectedProtocol) {
-                idSeqRunType = this._experiment.selectedProtocol.idSeqRunType
-            }
-
-            if (this._experiment.codeApplication) {
-                protocol = this.dictionaryService.getProtocolFromApplication(this._experiment.codeApplication)
-            }
-
-            if (this._experiment && this._experiment.seqPrepByCore_forSamples) {
-                seqPrepByCore = this._experiment.seqPrepByCore_forSamples;
-            }
-
-            let index = +(this._experiment.numberOfSamples) - this._experiment.samples.length;
-
-            if (index > 0) {
-                for (let i = 0; i < index; i++) {
-                    let obj: Sample = new Sample(this.dictionaryService);
-
-                    obj.index = this._experiment.samples.length + 1;
-                    obj.idSample = 'Sample' + this.getNextSampleId().toString();
-                    obj.multiplexGroupNumber = "";
-                    obj.name = "";
-                    obj.canChangeSampleName = 'Y';
-                    obj.canChangeSampleType = 'Y';
-                    obj.canChangeSampleConcentration = 'Y';
-                    obj.canChangeSampleSource = 'Y';
-                    obj.canChangeNumberSequencingCycles = 'Y';
-                    obj.canChangeNumberSequencingLanes = 'Y';
-                    obj.concentration = "";
-                    obj.label = '';
-                    obj.idOligoBarcode = '';
-                    obj.barcodeSequence = '';
-                    obj.idOligoBarcodeB = '';
-                    obj.barcodeSequenceB = '';
-                    obj.idNumberSequencingCycles = idNumberSequencingCycles;
-                    obj.idNumberSequencingCyclesAllowed = idNumberSequencingCyclesAllowed;
-                    obj.idSeqRunType = idSeqRunType;
-                    obj.numberSequencingLanes = numberSequencingLanes;
-                    obj.idSampleSource = this._experiment.idSampleSource;
-                    obj.idSampleType = idSampleType;
-                    obj.idSeqLibProtocol = protocol.idSeqLibProtocol;
-                    obj.seqPrepByCore = seqPrepByCore;
-                    obj.idOrganism = idOrganism;
-                    obj.prepInstructions = '';
-                    obj.otherOrganism = '';
-                    obj.treatment = '';
-                    obj.frontEndGridGroup = '0';
-                    obj.codeBioanalyzerChipType = this._experiment.codeBioanalyzerChipType;
-
-                    this._experiment.samples.push(obj);
-                }
-            } else if (index < 0) {
-                this._experiment.samples.splice(-1, Math.abs(index));
-            }
+            Sample.createNewSamplesForExperiment(this._experiment, this.dictionaryService, this.gnomexService);
 
             this.createColumnsBasedOnState(this._state);
             this.assignRowDataBasedOnState(this._state); // REMEMBER
-            // this.samplesGridApi.setRowData(this._experiment.samples);
             this.samplesGridApi.sizeColumnsToFit();
 
             if (this.form && this.form.get('invalidateWithoutSamples')) {
@@ -1976,9 +1902,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
             if (temp.length > 0) {
                 this.gridColumnApi.setColumnVisible(temp[0].colId, event.checked);
+                this.ccNumberIsCurrentlyHidden = event.checked;
             }
 
-            this.form.get('invalidateWithoutSamples').setValue(true);
+            if (this.form && this.form.get('invalidateWithoutSamples')) {
+                this.form.get('invalidateWithoutSamples').setValue(true);
+            }
         }
     }
 
@@ -2056,7 +1985,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public upload(): void {
         let data = {
             sampleColumns: this.samplesGridColumnDefs,
-            rowData: this._experiment.samples
+            ccNumberColumnIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+            experiment: this._experiment
         };
 
         let config: MatDialogConfig = new MatDialogConfig();
@@ -2068,6 +1998,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         let dialogRef = this.dialog.open(UploadSampleSheetComponent, config);
 
         dialogRef.afterClosed().subscribe((result) => {
+            if (result && Array.isArray(result)) {
+                this._experiment.numberOfSamples = '' + result.length;
+            }
+
             this.samplesGridApi.refreshCells();
         });
     }

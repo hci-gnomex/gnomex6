@@ -1,4 +1,6 @@
 import {DictionaryService} from "../../services/dictionary.service";
+import {Experiment} from "./experiment.model";
+import {GnomexService} from "../../services/gnomex.service";
 
 export class Sample {
     public idSample:                        string = ''; // "Sample0";
@@ -163,6 +165,105 @@ export class Sample {
         return sample;
     }
 
+    public static createNewSamplesForExperiment(experiment: Experiment, dictionaryService: DictionaryService, gnomexService: GnomexService): void {
+        if (!experiment) {
+            return;
+        }
+
+        if (experiment && experiment.numberOfSamples) {
+
+            let idSampleType: string = '';
+            let idOrganism: string = '';
+            let idNumberSequencingCycles: string = '';
+            let idNumberSequencingCyclesAllowed: string = '';
+            let idSeqRunType: string = '';
+            let protocol: any = '';
+            let numberSequencingLanes: string = experiment.isRapidMode === 'Y' ? '2' : '1';
+            let seqPrepByCore: any = '';
+
+            if (gnomexService.submitInternalExperiment() && experiment.sampleType) {
+                idSampleType = experiment.sampleType.idSampleType;
+            } else if (experiment.idSampleTypeDefault != null) {
+                idSampleType = experiment.idSampleTypeDefault
+            } else {
+                // do nothing, leave idSampleType as default.
+            }
+
+            if (gnomexService.submitInternalExperiment() && experiment.organism) {
+                idOrganism = experiment.organism.idOrganism;
+            } else if (experiment.idOrganismSampleDefault != null) {
+                idOrganism = experiment.idOrganismSampleDefault;
+            } else {
+                // do nothing, leave idOrganism as default.
+            }
+
+            if (gnomexService.submitInternalExperiment() && experiment.selectedProtocol) {
+                idNumberSequencingCycles = experiment.selectedProtocol.idNumberSequencingCycles;
+            }
+
+            if (gnomexService.submitInternalExperiment() && experiment.selectedProtocol) {
+                idNumberSequencingCyclesAllowed = experiment.selectedProtocol.idNumberSequencingCyclesAllowed
+            }
+
+            if (gnomexService.submitInternalExperiment() && experiment.selectedProtocol) {
+                idSeqRunType = experiment.selectedProtocol.idSeqRunType
+            }
+
+            if (experiment.codeApplication) {
+                protocol = dictionaryService.getProtocolFromApplication(experiment.codeApplication)
+            }
+
+            if (experiment && experiment.seqPrepByCore_forSamples) {
+                seqPrepByCore = experiment.seqPrepByCore_forSamples;
+            }
+
+            let index = +(experiment.numberOfSamples) - experiment.samples.length;
+
+            if (index > 0) {
+                for (let i = 0; i < index; i++) {
+                    let obj: Sample = new Sample(dictionaryService);
+
+                    obj.index = experiment.samples.length + 1;
+                    obj.idSample = 'Sample' + Sample.getNextSampleId(experiment).toString();
+                    obj.multiplexGroupNumber = "";
+                    obj.name = "";
+                    obj.canChangeSampleName = 'Y';
+                    obj.canChangeSampleType = 'Y';
+                    obj.canChangeSampleConcentration = 'Y';
+                    obj.canChangeSampleSource = 'Y';
+                    obj.canChangeNumberSequencingCycles = 'Y';
+                    obj.canChangeNumberSequencingLanes = 'Y';
+                    obj.concentration = "";
+                    obj.label = '';
+                    obj.idOligoBarcode = '';
+                    obj.barcodeSequence = '';
+                    obj.idOligoBarcodeB = '';
+                    obj.barcodeSequenceB = '';
+                    obj.idNumberSequencingCycles = idNumberSequencingCycles;
+                    obj.idNumberSequencingCyclesAllowed = idNumberSequencingCyclesAllowed;
+                    obj.idSeqRunType = idSeqRunType;
+                    obj.numberSequencingLanes = numberSequencingLanes;
+                    obj.idSampleSource = experiment.idSampleSource;
+                    obj.idSampleType = idSampleType;
+                    obj.idSeqLibProtocol = protocol.idSeqLibProtocol;
+                    obj.seqPrepByCore = seqPrepByCore;
+                    obj.idOrganism = idOrganism;
+                    obj.prepInstructions = '';
+                    obj.otherOrganism = '';
+                    obj.treatment = '';
+                    obj.frontEndGridGroup = '0';
+                    obj.codeBioanalyzerChipType = experiment.codeBioanalyzerChipType;
+
+                    experiment.samples.push(obj);
+                }
+            }
+        }
+
+        if (experiment && experiment.samples && ((Array.isArray(experiment.samples) ? experiment.samples.length : 0) !== (+experiment.numberOfSamples))) {
+            experiment.numberOfSamples = '' + (Array.isArray(experiment.samples) ? experiment.samples.length : 0);
+        }
+    }
+
     private cloneProperty(propertyName: string, source: any): void {
         if (source && source[propertyName]) {
             this[propertyName] = source[propertyName];
@@ -231,5 +332,21 @@ export class Sample {
         }
 
         return temp;
+    }
+
+    protected static getNextSampleId(experiment: Experiment): number {
+        let lastId: number = -1;
+
+        for (let sample of experiment.samples) {
+            if (sample.idSample.indexOf("Sample") === 0) {
+                let id: number = +(sample.idSample.toString().substr(6));
+                if (id > lastId) {
+                    lastId = id;
+                }
+            }
+        }
+
+        lastId++;
+        return lastId;
     }
 }

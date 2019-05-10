@@ -46,6 +46,12 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
             padding-right: 2em;
         }
         
+        .horizontal-center { text-align: center; }
+        
+        .major-padding { padding: 1em; }
+        
+        .blue { color: blue; }
+        
         
         ol.three-depth-numbering {
             padding: 0;
@@ -136,11 +142,16 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
 export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     @Input() requestCategory: any;
 
+    @Input() idCoreFacility: string;
+
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
 
         if (this.onChange_codeRequestCategorySubscription) {
             this.onChange_codeRequestCategorySubscription.unsubscribe();
+        }
+        if (this.onChange_numberOfSamples_Subscription) {
+            this.onChange_numberOfSamples_Subscription.unsubscribe();
         }
 
         this.onChange_codeRequestCategorySubscription = this._experiment.onChange_codeRequestCategory.subscribe((value) => {
@@ -165,6 +176,12 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
             if (this.form && this.form.get("hasIsolationTypes")) {
                 this.form.get("hasIsolationTypes").setValue(false);
+            }
+        });
+
+        this.onChange_numberOfSamples_Subscription = this._experiment.onChange_numberOfSamples.subscribe((value: string) => {
+            if (this.form && this.form.get("numSamples")) {
+                this.form.get("numSamples").setValue(value);
             }
         });
     };
@@ -219,8 +236,11 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
     private gridApi;
 
+    public noBioanalyzerChipTypesMessage = '';
+
     private QCChipPriceListSubscription: Subscription;
 
+    private onChange_numberOfSamples_Subscription: Subscription;
     private onChange_codeRequestCategorySubscription: Subscription;
 
 
@@ -348,14 +368,6 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         );
     }
 
-    // private validator_elution_requiredIfVisible(formControl: FormControl): any {
-    //     if (this.showElution && (!formControl || !formControl.value)) {
-    //         return { 'requiredIfVisible': true };
-    //     } else {
-    //         return null;
-    //     }
-    // }
-
     ngOnInit() {
         this.organisms = this.gnomexService.activeOrganismList;
 
@@ -377,7 +389,11 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         if (this.onChange_codeRequestCategorySubscription) {
             this.onChange_codeRequestCategorySubscription.unsubscribe();
         }
+        if (this.onChange_numberOfSamples_Subscription) {
+            this.onChange_numberOfSamples_Subscription.unsubscribe();
+        }
     }
+
 
     private static validatorWrapper(group: FormGroup): { [s:string]: boolean } {
         let temp: { [s:string]: boolean } = TabSampleSetupViewComponent.oneCategoryRequired(group);
@@ -642,6 +658,14 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
             if (this.gridApi) {
                 this.gridApi.setRowData(this.bioanalyzerChips);
+            }
+        }
+
+        if (this.requestCategory) {
+            let property = this.propertyService.getProperty('qc_instructions', this.idCoreFacility, this.requestCategory.codeRequestCategory);
+
+            if (property) {
+                this.noBioanalyzerChipTypesMessage = property.propertyValue;
             }
         }
     }
