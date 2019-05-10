@@ -1902,7 +1902,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
             if (temp.length > 0) {
                 this.gridColumnApi.setColumnVisible(temp[0].colId, event.checked);
-                this.ccNumberIsCurrentlyHidden = event.checked;
+                this.ccNumberIsCurrentlyHidden = !event.checked;
             }
 
             if (this.form && this.form.get('invalidateWithoutSamples')) {
