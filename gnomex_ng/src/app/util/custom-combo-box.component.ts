@@ -16,7 +16,7 @@ import {debounceTime} from "rxjs/operators";
                 <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">{{this.displayField ? opt[this.displayField] : opt}}</mat-option>
                 <mat-option *ngIf="this.isLoading">Loading...</mat-option>
             </mat-autocomplete>
-            <mat-error *ngIf="this.innerControl.hasError('required')">{{this.placeholder}} is required</mat-error>l
+            <mat-error *ngIf="this.innerControl.hasError('required')">{{this.placeholder}} is required</mat-error>
         </mat-form-field>
     `,
     providers: [{
