@@ -23,6 +23,7 @@ public class Differ {
 	private Map<String,String> fileMap;
 	private List<String> uniqueByName;
 	private List<String> uniqueByChecksum;
+	private String onlyMatchOn; // for regex to match on either local or remote or both
 
 
 
@@ -31,6 +32,7 @@ public class Differ {
 		this.fileMap = new TreeMap<String, String>();
 		this.uniqueByName = new ArrayList<String>();
 		this.uniqueByChecksum = new ArrayList<String>();
+		this.onlyMatchOn = "all";
 
 
 		for (int i = 0; i < args.length; i++) {
@@ -43,6 +45,10 @@ public class Differ {
 			} else if (args[i].equals("-outputPath")) {
 				outputPath = args[++i];
 			} else if (args[i].equals("-matchbyname")) {
+				String command = args[i+1].toLowerCase();
+				if(command.equals("-l") || command.equals("-r")){
+					onlyMatchOn = args[++i];
+				}
 				this.matchByName = args[++i];
 			}else if (args[i].equals("-help")) {
 				//printUsage();
@@ -133,7 +139,6 @@ public class Differ {
 		String line = "";
 		String line1 = "";
 
-		//
 		while((line = buff.readLine()) != null) { // 1st file local 'put' into map
 
 			if(!simpleFileType) {
@@ -144,7 +149,7 @@ public class Differ {
 				String fileName = filePath[filePath.length - 1];
 				fileMap.put(fileName, checkSum);
 			}else {
-				if(matchByName != null){
+				if(matchByName != null && !onlyMatchOn.equals("-r")){
 					Matcher m = p.matcher(line);
 					if(m.matches()){
 						String fileName = m.group(1);
@@ -188,7 +193,7 @@ public class Differ {
 
 
 			}else {
-				if(matchByName != null){
+				if(matchByName != null && !onlyMatchOn.equals("-l")){
 					Matcher m = p.matcher(line1);
 					if(m.matches()){
 						fileName = m.group(1);
