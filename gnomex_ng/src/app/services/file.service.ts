@@ -109,14 +109,9 @@ export class FileService {
         }));
     }
 
-    organizeExperimentFiles(params:any):Observable<any>{
-        let httpParams = new HttpParams();
-        for(let key in params ){
-           httpParams = httpParams.append(key,params[key]);
-        }
-
+    organizeExperimentFiles(params:HttpParams):Observable<any>{
         let headers: HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
-        return this.httpClient.post("/gnomex/OrganizeExperimentUploadFiles.gx",httpParams.toString(),{headers: headers });
+        return this.httpClient.post("/gnomex/OrganizeExperimentUploadFiles.gx",params.toString(),{headers: headers });
     }
 
     organizeAnalysisUploadFiles(params:HttpParams): Observable<any>{

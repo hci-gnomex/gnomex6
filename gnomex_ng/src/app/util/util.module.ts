@@ -41,8 +41,8 @@ import {DownloadProgressComponent} from "./download-progress.component";
 import {DownloadFilesComponent} from "./download-files.component";
 import {AngularSplitModule} from "angular-split";
 import {TreeModule} from "angular-tree-component";
-import {LazyLoadedSelectComponent} from "./lazy-loaded-select.component";
 import {EditInstitutionsComponent} from "./edit-institutions.component";
+import {CustomComboBoxComponent} from "./custom-combo-box.component";
 
 @NgModule({
     imports: [
@@ -91,8 +91,8 @@ import {EditInstitutionsComponent} from "./edit-institutions.component";
         DownloadPickerComponent,
         DownloadProgressComponent,
         DownloadFilesComponent,
-        LazyLoadedSelectComponent,
         EditInstitutionsComponent,
+        CustomComboBoxComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -140,8 +140,8 @@ import {EditInstitutionsComponent} from "./edit-institutions.component";
         DownloadPickerComponent,
         DownloadProgressComponent,
         DownloadFilesComponent,
-        LazyLoadedSelectComponent,
         EditInstitutionsComponent,
+        CustomComboBoxComponent,
     ]
 })
 export class UtilModule {
