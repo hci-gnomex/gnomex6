@@ -28,7 +28,6 @@ public class PropertyPlatformApplication extends DictionaryEntry implements Comp
     return display;
   }
 
-
   public Integer getIdPlatformApplication() {
     return idPlatformApplication;
   }
@@ -70,9 +69,8 @@ public class PropertyPlatformApplication extends DictionaryEntry implements Comp
   }
 
   public String getValue() {
-    return getCodeRequestCategory();
+    return "" + this.idPlatformApplication;
   }
-
   
   public String getCodeRequestCategory() {
     return codeRequestCategory;
@@ -81,5 +79,4 @@ public class PropertyPlatformApplication extends DictionaryEntry implements Comp
   public void setCodeRequestCategory(String codeRequestCategory) {
     this.codeRequestCategory = codeRequestCategory;
   }
-
 }

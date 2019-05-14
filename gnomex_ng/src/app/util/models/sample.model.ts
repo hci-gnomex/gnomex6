@@ -43,6 +43,7 @@ export class Sample {
     }
     private _sampleType: any;
 
+    public idSampleSource:                  string = '';
     public idSeqLibProtocol:                string = ''; // "361";
     public seqPrepByCore:                   string = ''; // "Y";
     public idOrganism:                      string = ''; // "204";
@@ -137,6 +138,7 @@ export class Sample {
         sample.cloneProperty("codeConcentrationUnit", source);
         sample.cloneProperty("idSampleType", source);
         sample.cloneProperty("sampleType", source);
+        sample.cloneProperty("idSampleSource", source);
         sample.cloneProperty("idSeqLibProtocol", source);
         sample.cloneProperty("seqPrepByCore", source);
         sample.cloneProperty("idOrganism", source);
@@ -207,6 +209,7 @@ export class Sample {
             numberSequencingLanes:           this.numberSequencingLanes,
             codeConcentrationUnit:           this.codeConcentrationUnit,
             idSampleType:                    this.idSampleType,
+            idSampleSource:                  this.idSampleSource,
             idSeqLibProtocol:                this.idSeqLibProtocol,
             seqPrepByCore:                   this.seqPrepByCore,
             idOrganism:                      this.idOrganism,

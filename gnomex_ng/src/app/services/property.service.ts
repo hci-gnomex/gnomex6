@@ -59,6 +59,8 @@ export class PropertyService {
     public static readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string  = "request_bio_analysis_note";
     public static readonly PROPERTY_EXPERIMENT_FILE_SAMPLE_LINKING_ENABLED:string = "experiment_file_sample_linking_enabled";
 
+    public static readonly PROPERTY_QC_INSTRUCTIONS: string = "qc_instructions";
+
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
                 private cookieUtilService: CookieUtilService) {}
