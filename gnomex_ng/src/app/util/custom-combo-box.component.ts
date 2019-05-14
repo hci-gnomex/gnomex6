@@ -41,9 +41,10 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     private outerControl: AbstractControl = new FormControl();
     public innerControl: FormControl = new FormControl(null);
     private innerControlSubscription: Subscription;
+    private noNgControl: boolean = false;
 
-    private onChangeFn: (val: any) => void;
-    private onTouchedFn: () => void;
+    private onChangeFn: (val: any) => void = () => {};
+    private onTouchedFn: () => void = () => {};
 
     @Output() optionSelected: EventEmitter<any> = new EventEmitter<any>();
 
@@ -62,6 +63,8 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
             setTimeout(() => {
                 this.loadOnlyCurrentValue();
             });
+        } else {
+            this.noNgControl = true;
         }
 
         this.innerControlSubscription = this.innerControl.valueChanges.pipe(debounceTime(300)).subscribe(() => {
@@ -148,6 +151,9 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
 
     public selectOption(opt: any): void {
         let newVal: any = opt ? (this.valueField ? opt[this.valueField] : opt) : null;
+        if (this.noNgControl) {
+            this.outerControl.setValue(newVal);
+        }
         this.onChangeFn(newVal);
         this.optionSelected.emit(newVal);
     }
