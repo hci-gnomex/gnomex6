@@ -25,10 +25,11 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
         .no-height { height: 0;  }
         .single-em { width: 1em; }
 
+
+        .horizontal-center { text-align: center; }
         
-        .green {
-            color: green;
-        }
+        .green { color: green; }
+        .blue  { color: blue;  }
         
         .minimum-height-grid {
             min-height: 12em;
@@ -47,10 +48,6 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
         }
         
         .horizontal-center { text-align: center; }
-        
-        .major-padding { padding: 1em; }
-        
-        .blue { color: blue; }
         
         
         ol.three-depth-numbering {
@@ -236,7 +233,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
     private gridApi;
 
-    public noBioanalyzerChipTypesMessage = '';
+    // public noBioanalyzerChipTypesMessage = '';
 
     private QCChipPriceListSubscription: Subscription;
 
@@ -661,13 +658,13 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             }
         }
 
-        if (this.requestCategory) {
-            let property = this.propertyService.getProperty('qc_instructions', this.idCoreFacility, this.requestCategory.codeRequestCategory);
-
-            if (property) {
-                this.noBioanalyzerChipTypesMessage = property.propertyValue;
-            }
-        }
+        // if (this.requestCategory) {
+        //     let property = this.propertyService.getProperty('qc_instructions', this.idCoreFacility, this.requestCategory.codeRequestCategory);
+        //
+        //     if (property) {
+        //         this.noBioanalyzerChipTypesMessage = property.propertyValue;
+        //     }
+        // }
     }
 
     private static onChangeBioanalyzer(event): void {
@@ -797,14 +794,13 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             }
 
             if (this._experiment) {
-                let qcInstText: string = this.propertyService.getExactProperty(this._experiment.idCoreFacility, this._experiment.codeRequestCategory, PropertyService.PROPERTY_QC_INSTRUCTIONS);
+                let qcInstText: any = this.propertyService.getProperty(PropertyService.PROPERTY_QC_INSTRUCTIONS, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
 
-                if (qcInstText != null && qcInstText != '') {
-                    this.qcInstructions = qcInstText;
-                    this.showQcInstructions = true;
+                if (qcInstText && qcInstText.propertyValue && qcInstText.propertyValue !== '') {
+                    this.qcInstructions = qcInstText.propertyValue;
+                    this.showQcInstructions = this.newExperimentService.isQCState();
                 }
             }
-
         }
     }
 
