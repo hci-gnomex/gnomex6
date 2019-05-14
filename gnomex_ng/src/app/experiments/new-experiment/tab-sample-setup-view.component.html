@@ -173,13 +173,6 @@
                                    (change)="onExtractionMethodChanged($event)">
                         </mat-form-field>
                     </div>
-                    <div *ngIf="showQcInstructions" class="full-width flex-container-row align-baseline">
-                        <div class="minor-heading">
-                        </div>
-                        <div class="flex-grow">
-                            {{ qcInstructions }}
-                        </div>
-                    </div>
                 </li>
                 <li *ngIf="showBioAnalyzerChipTypeGrid" class="full-width align-baseline">
                     <div class="full-width flex-container-row">
@@ -199,6 +192,11 @@
                         </div>
                     </div>
                 </li>
+                <div *ngIf="showQcInstructions" class="full-width flex-container-row align-baseline">
+                    <div class="flex-grow double-padded horizontal-center blue">
+                        {{ qcInstructions }}
+                    </div>
+                </div>
                 <li class="full-width align-baseline">
                     <div class="full-width">
                         <div class="full-width flex-container-row align-baseline">
