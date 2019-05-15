@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {PasswordUtilService} from "../services/password-util.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {ActivatedRoute, ParamMap, Router} from "@angular/router";
+import {GnomexService} from "../services/gnomex.service";
 
 @Component({
     selector: "change-password",
@@ -14,8 +15,8 @@ import {ActivatedRoute, ParamMap, Router} from "@angular/router";
                     <a [routerLink]="['/authenticate']">Sign in</a>
                     <span>|</span>
                     <a [routerLink]="['/reset-password']">Reset password</a>
-                    <span>|</span>
-                    <a [routerLink]="['/register-user']">Sign up for an account</a>
+                    <span *ngIf="!this.gnomexService.disableUserSignup">|</span>
+                    <a *ngIf="!this.gnomexService.disableUserSignup" [routerLink]="['/register-user']">Sign up for an account</a>
                 </div>
             </div>
             <div class="flex-container-col align-center flex-grow">
@@ -84,6 +85,7 @@ export class ChangePasswordComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private router: Router,
                 private route: ActivatedRoute,
+                public gnomexService: GnomexService,
                 private fb: FormBuilder) {
     }
 
@@ -93,6 +95,8 @@ export class ChangePasswordComponent implements OnInit {
             password: ['', [Validators.required, PasswordUtilService.validatePassword]],
             passwordConfirm: ['', [Validators.required, PasswordUtilService.validatePasswordConfirm()]],
         });
+
+        this.gnomexService.getLoginProperties();
 
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.guid = params.get("guid");
