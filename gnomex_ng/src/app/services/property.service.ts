@@ -52,6 +52,8 @@ export class PropertyService {
     public static readonly PROPERTY_EXPERIMENT_DEFAULT_VIEW: string = "experiment_default_view";
     public static readonly PROPERTY_EXCLUDE_NEW_REQUESTS: string = "exclude_new_requests";
     public static readonly PROPERTY_BULLETIN: string = "bulletin";
+    public static readonly PROPERTY_DISABLE_USER_SIGNUP: string = "disable_user_signup";
+    public static readonly PROPERTY_NO_GUEST_ACCESS: string = "no_guest_access";
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";

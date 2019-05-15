@@ -108,6 +108,8 @@ export class GnomexService {
     public seqLibProtocolsWithAppFilters: any[] = [];
 
 
+    public disableUserSignup: boolean = false;
+    public noGuestAccess: boolean = true;
 
 
     constructor(
@@ -1005,6 +1007,15 @@ export class GnomexService {
         return this.submitRequestLabList ? this.submitRequestLabList.filter((lab) => {
             return lab.idLab === idLab;
         }).length > 0 : false;
+    }
+
+    public getLoginProperties(): void {
+        this.http.get("/gnomex/GetLoginProperties.gx").subscribe((response: any) => {
+            if (response && response.result === "SUCCESS") {
+                this.disableUserSignup = response[PropertyService.PROPERTY_DISABLE_USER_SIGNUP];
+                this.noGuestAccess = response[PropertyService.PROPERTY_NO_GUEST_ACCESS];
+            }
+        });
     }
 
 }
