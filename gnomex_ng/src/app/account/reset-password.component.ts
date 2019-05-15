@@ -3,6 +3,7 @@ import {FormControl, Validators} from "@angular/forms";
 import {PasswordUtilService} from "../services/password-util.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {Router} from "@angular/router";
+import {GnomexService} from "../services/gnomex.service";
 
 @Component({
     selector: "reset-password",
@@ -12,8 +13,8 @@ import {Router} from "@angular/router";
                 <img src="../../assets/gnomex_logo.png">
                 <div class="spaced-children">
                     <a [routerLink]="['/authenticate']">Sign in</a>
-                    <span>|</span>
-                    <a [routerLink]="['/register-user']">Sign up for an account</a>
+                    <span *ngIf="!this.gnomexService.disableUserSignup">|</span>
+                    <a *ngIf="!this.gnomexService.disableUserSignup" [routerLink]="['/register-user']">Sign up for an account</a>
                 </div>
             </div>
             <div class="flex-container-col align-center flex-grow">
@@ -64,11 +65,14 @@ export class ResetPasswordComponent implements OnInit {
 
     constructor(private passwordUtilService: PasswordUtilService,
                 private dialogsService: DialogsService,
+                public gnomexService: GnomexService,
                 private router: Router) {
     }
 
     ngOnInit(): void {
         this.inputFC = new FormControl("", Validators.required);
+
+        this.gnomexService.getLoginProperties();
     }
 
     public submit(): void {

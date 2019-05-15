@@ -232,6 +232,13 @@
 	</servlet>
 
 	<servlet>
+		<servlet-name>GetLoginProperties</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.GetLoginProperties
+		</servlet-class>
+	</servlet>
+
+	<servlet>
 		<servlet-name>UploadSequenceURLServlet</servlet-name>
 		<servlet-class>
 			hci.gnomex.controller.UploadSequenceURLServlet
@@ -507,6 +514,10 @@
 	<servlet-mapping>
 		<servlet-name>GetNewAccountServlet</servlet-name>
 		<url-pattern>/GetNewAccountServlet.gx</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GetLoginProperties</servlet-name>
+		<url-pattern>/GetLoginProperties.gx</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UploadSequenceURLServlet</servlet-name>
