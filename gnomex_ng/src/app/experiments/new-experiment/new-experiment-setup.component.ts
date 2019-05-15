@@ -143,9 +143,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
     @Input("idCoreFacility") set idCoreFacility (value: any) {
         this.requestCategories = [];
         this.newExperimentService.components = [];
-        // this.newExperimentService.organisms = [];
-        // this.newExperimentService.componentRefs = [];
-        // this.newExperimentService.samplesGridRowData = [];
 
         if (value) {
             this._experiment.idCoreFacility = value;
@@ -171,7 +168,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
             this.filteredProjectList = this.gnomexService.projectList;
             this.checkSecurity();
             this.newExperimentService.components.push(this);
-            // this.newExperimentService.setupView = this;
         }
     }
 
@@ -220,12 +216,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     private submittersSubscription: Subscription;
 
-
-    // public get isValid(): boolean {
-    //     return this.form && this.form.valid;
-    // }
-
     private project: any;
+
 
     public get submitter(): any {
         if (this.form && this.form.get('selectName')) {
@@ -366,7 +358,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     refreshBillingAccounts() {
         this.checkForOtherAccounts();
-        // this.newExperimentService.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
         this._experiment.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
 
         let cat = this._experiment.requestCategory;
@@ -383,7 +374,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
                     );
             });
         }
-        // this.selectDefaultUserProject();
     }
 
     checkForOtherAccounts(): void {
@@ -394,9 +384,10 @@ export class NewExperimentSetupComponent implements OnDestroy {
             this.billingService.getAuthorizedBillingAccounts(authorizedBillingAccountsParams).subscribe((response: any) => {
                 this.showAccessAuthorizedAccountsLink = response && response.hasAccountsWithinCore && response.hasAccountsWithinCore === 'Y';
             });
-        } else if (this._experiment.idAppUser != null && this._experiment.idAppUser != '') {
-            let idCoreFacility: string = this._experiment.idCoreFacility;
         }
+        // else if (this._experiment.idAppUser != null && this._experiment.idAppUser != '') {
+        //     let idCoreFacility: string = this._experiment.idCoreFacility;
+        // }
     }
 
 
@@ -413,21 +404,17 @@ export class NewExperimentSetupComponent implements OnDestroy {
             }
 
             if (this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '' ) {
-                // this.newExperimentService.idAppUser = this.form.controls['selectName'].value.idAppUser;
-                this._experiment.idAppUser          = this.form.controls['selectName'].value.idAppUser;
+                this._experiment.idAppUser = this.form.controls['selectName'].value.idAppUser;
             } else {
-                // this.newExperimentService.idAppUser = "";
-                this._experiment.idAppUser          = "";
+                this._experiment.idAppUser = "";
             }
         } else if (this.gnomexService.hasPermission('canSubmitForOtherCores') && iCanSubmitToThisCoreFacility) {
             this.adminState = "AdminState";
 
             if (this.form.controls['selectName'].value && this.form.controls['selectName'].value.idAppUser !== '') {
-                // this.newExperimentService.idAppUser = this.form.controls['selectName'].value.idAppUser;
-                this._experiment.idAppUser          = this.form.controls['selectName'].value.idAppUser;
+                this._experiment.idAppUser = this.form.controls['selectName'].value.idAppUser;
             } else {
-                // this.newExperimentService.idAppUser = "";
-                this._experiment.idAppUser          = "";
+                this._experiment.idAppUser = "";
             }
         } else {
             if (this.gnomexService.submitInternalExperiment()) {
@@ -435,9 +422,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
             } else {
                 this.adminState = "ExternalExperimentState";
             }
-
-            // Not permissible?
-            // this.newExperimentService.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
         }
 
         this.checkForOtherAccounts();
@@ -523,7 +507,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
     onCategoryChange() {
         if (this.form && this.form.get("selectedCategory")) {
-            // this.newExperimentService.category = this.form.get("selectedCategory").value;
 
             let code = this.form.get("selectedCategory").value;
 
@@ -535,8 +518,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
             this._experiment.requestCategory = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', code.value);
 
             if (this._experiment.requestCategory) {
-                // this.label = "New " + this.newExperimentService.requestCategory.display + " Experiment for " + this.coreFacility.display;
-
                 this.workButtonText   = this.gnomexService.getCoreFacilityProperty(this._experiment.requestCategory.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT);
             }
         }
@@ -632,8 +613,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
             }
 
             this._experiment.lab = event.source.value;
-            // this.newExperimentService.getHiSeqPriceList();
-            // this.newExperimentService.request.idLab = this.newExperimentService.lab.idLab;
         }
 
         if (this.adminState !== "AdminState") {
@@ -655,12 +634,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
             return;
         }
 
-        // this._experiment.idBillingAccount     = this.form.get("selectAccount").value.idBillingAccount;
-        // this._experiment.billingAccountName   = this.form.get("selectAccount").value.billingAccountName;
-        // this._experiment.billingAccountNumber = this.form.get("selectAccount").value.billingAccountNumber;
-        //
         setTimeout(() => { this._experiment.billingAccount = this.form.get("selectAccount").value; });
-        // this.getFilteredApps();
     }
 
     public onProjectSelection(event: any): void {
@@ -723,11 +697,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
     public onClickNewProject(): void {
         //TODO: create dialog
     }
-
-    // getFilteredApps() {
-    //     this.newExperimentService.filteredApps = this.newExperimentService.filterApplication(this.newExperimentService.requestCategory, !this.showPool);
-    // }
-
 
     private static sortRequestCategory(obj1: any, obj2: any): number {
         if (obj1 === null && obj2 === null) {
