@@ -9,6 +9,8 @@ import {DialogsService} from "./popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {DownloadProgressComponent} from "./download-progress.component";
 import {UtilService} from "../services/util.service";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 
 @Component({
     template: `
@@ -102,6 +104,8 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
     private fdtDownloadFn: (emailAddress: string, showCommandLineInstructions: boolean) => Observable<any>;
     private makeSoftLinksFn: (files: any[]) => Observable<any>;
 
+    private email: string = "";
+
     constructor(private dialogRef: MatDialogRef<DownloadFilesComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 public constantsService: ConstantsService,
@@ -110,6 +114,7 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
                 private utilService: UtilService,
                 private fileService: FileService,
                 private dialogsService: DialogsService,
+                private securityAdvisor: CreateSecurityAdvisorService,
                 private dialog: MatDialog) {
     }
 
@@ -150,6 +155,30 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
         }
 
         this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
+
+        if (this.securityAdvisor.isGuest) {
+            setTimeout(() => {
+                let terms: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_GUEST_DOWNLOAD_TERMS);
+                if (terms) {
+                    let guestTermsConfig: MatDialogConfig = new MatDialogConfig();
+                    guestTermsConfig.panelClass = "no-padding-dialog";
+                    guestTermsConfig.width = "30em";
+                    guestTermsConfig.height = "30em";
+                    guestTermsConfig.data = {
+                        terms: terms,
+                    };
+                    guestTermsConfig.disableClose = true;
+                    let guestTermsDialog: MatDialogRef<GuestTermsDialogComponent> = this.dialog.open(GuestTermsDialogComponent, guestTermsConfig);
+                    guestTermsDialog.afterClosed().subscribe((result: any) => {
+                        if (result) {
+                            this.email = result;
+                        } else {
+                            this.dialogRef.close();
+                        }
+                    });
+                }
+            });
+        }
     }
 
     ngOnDestroy(): void {
@@ -268,7 +297,7 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
             if (result && result.result === 'SUCCESS') {
                 let downloadParams: HttpParams = new HttpParams()
                     .set("mode", "zip")
-                    .set("emailAddress", "");
+                    .set("emailAddress", this.email);
                 let progressWindowConfig: MatDialogConfig = new MatDialogConfig();
                 progressWindowConfig.data = {
                     url: this.downloadURL,
@@ -289,7 +318,7 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
         let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
         this.cacheDownloadListFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS') {
-                this.fdtDownloadFn("", true).subscribe((result: any) => {
+                this.fdtDownloadFn(this.email, true).subscribe((result: any) => {
                     if (!result || result.result !== 'SUCCESS') {
                         this.handleBackendError(result, "retrieving FDT command line instructions");
                     }
@@ -304,7 +333,7 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
         let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
         this.cacheDownloadListFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS') {
-                this.fdtDownloadFn("", false).subscribe((result: any) => {
+                this.fdtDownloadFn(this.email, false).subscribe((result: any) => {
                     if (!result || result.result !== 'SUCCESS') {
                         this.handleBackendError(result, "retrieving FDT Java file");
                     }
