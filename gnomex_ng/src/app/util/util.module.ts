@@ -43,6 +43,7 @@ import {AngularSplitModule} from "angular-split";
 import {TreeModule} from "angular-tree-component";
 import {EditInstitutionsComponent} from "./edit-institutions.component";
 import {CustomComboBoxComponent} from "./custom-combo-box.component";
+import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 
 @NgModule({
     imports: [
@@ -93,6 +94,7 @@ import {CustomComboBoxComponent} from "./custom-combo-box.component";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         CustomComboBoxComponent,
+        GuestTermsDialogComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -110,6 +112,7 @@ import {CustomComboBoxComponent} from "./custom-combo-box.component";
         DownloadProgressComponent,
         DownloadFilesComponent,
         EditInstitutionsComponent,
+        GuestTermsDialogComponent,
     ],
     exports: [
         BrowseFilterComponent,
@@ -142,6 +145,7 @@ import {CustomComboBoxComponent} from "./custom-combo-box.component";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         CustomComboBoxComponent,
+        GuestTermsDialogComponent,
     ]
 })
 export class UtilModule {
