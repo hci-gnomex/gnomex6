@@ -116,7 +116,6 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
             this.forceShowNone = true;
             this.loadedOptions = this.options;
         } else {
-            this.forceShowNone = false;
             let searchValue: string = "";
             if (typeof this.innerControl.value === "string") {
                 searchValue = this.innerControl.value.toLowerCase();
@@ -127,6 +126,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
                 let optDisplay: string = (this.displayField ? opt[this.displayField] : opt).toLowerCase();
                 return optDisplay.includes(searchValue);
             });
+            this.forceShowNone = this.loadedOptions.length === 0;
         }
     }
 
