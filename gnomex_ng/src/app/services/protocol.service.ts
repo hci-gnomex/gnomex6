@@ -16,6 +16,7 @@ export class ProtocolService {
     private saveExistingProtocolSubject: Subject<any> = new Subject();
     private deleteProtocolSubject: Subject<any> = new Subject();
     public static readonly ANALYSIS_PROTOCOL_CLASS_NAME: string  = "hci.gnomex.model.AnalysisProtocol";
+    private mainPaneTitle: string = "";
 
     constructor(private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService,
@@ -159,5 +160,13 @@ export class ProtocolService {
         this.httpClient.post('/gnomex/DeleteProtocol.gx', null, {params: params}).subscribe((result) => {
             this.deleteProtocolSubject.next(result);
         });
+    }
+
+    public getMainPaneTitle (): string {
+        return this.mainPaneTitle;
+    }
+
+    public setMainPaneTitle (mainPaneTitle: string): void {
+        this.mainPaneTitle = mainPaneTitle;
     }
 }
