@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import javax.json.Json;
+import javax.json.JsonReader;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,6 +53,8 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
   private RequestParser                 requestParser = null;
   private String                        labName = "";
   protected String errorDetails = "";
+
+  private boolean usingJSON = false;
  
   public void validate() {
   }
@@ -73,15 +77,29 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
       this.errorDetails = Util.GNLOG(LOG,"Cannot parse names", je);
     }
 
-    String requestXMLString = request.getParameter("requestXMLString");
-    StringReader requestReader = new StringReader(requestXMLString);
-    try {
-      SAXBuilder sax = new SAXBuilder();
-      Document doc = sax.build(requestReader);
-      requestParser = new RequestParser(doc, secAdvisor, true);
-    } catch (JDOMException je ) {
-      this.addInvalidField( "requestXMLString", "Invalid request xml");
-      this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestXMLString", je);
+    if (request.getParameter("requestJSONString") != null && request.getParameter("requestJSONString") != "") {
+      this.usingJSON = true;
+    }
+
+    if (!this.usingJSON) {
+      String       requestXMLString = request.getParameter("requestXMLString");
+      StringReader requestReader    = new StringReader(requestXMLString);
+      try {
+        SAXBuilder sax = new SAXBuilder();
+        Document   doc = sax.build(requestReader);
+        requestParser = new RequestParser(doc, secAdvisor, true);
+      }
+      catch (JDOMException je) {
+        this.addInvalidField("requestXMLString", "Invalid request xml");
+        this.errorDetails = Util.GNLOG(LOG, "Cannot parse requestXMLString", je);
+      }
+    } else {
+      try (JsonReader jsonReader = Json.createReader(new StringReader(request.getParameter("requestJSONString")))) {
+        requestParser = new RequestParser(jsonReader, this.secAdvisor);
+      } catch (Exception e) {
+        this.addInvalidField( "requestJSONString", "Invalid request xml");
+        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestJSONString", e);
+      }
     }
 
     today = new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());

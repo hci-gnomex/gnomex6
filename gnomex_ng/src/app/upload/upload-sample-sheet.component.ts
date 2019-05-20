@@ -13,6 +13,7 @@ import {Experiment} from "../util/models/experiment.model";
 import {Sample} from "../util/models/sample.model";
 import {DictionaryService} from "../services/dictionary.service";
 import {GnomexService} from "../services/gnomex.service";
+import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer";
 
 
 @Component({
@@ -189,9 +190,12 @@ import {GnomexService} from "../services/gnomex.service";
                     });
 
                     for (let row of this.mostRecentRowData) {
-                        if (row.selectOptions) {
+                        if (row.cellRendererFramework && row.cellRendererFramework === SelectRenderer) {
                             row.type = 'Dropdown (single sel.)';
                             row.typeCode = 'OPTION';
+                        } else if (row.cellRendererFramework && row.cellRendererFramework === MultiSelectRenderer) {
+                            row.type = 'Dropdown (multiple sel.)';
+                            row.typeCode = 'MOPTION';
                         } else {
                             row.type = 'Text';
                             row.typeCode = 'TEXT';
@@ -199,6 +203,7 @@ import {GnomexService} from "../services/gnomex.service";
 
                         row.columnNumber = "0";
 
+                        // This is to help with the transition between GNomEx versions 5 and 6, where the display name changed a bit.
                         if (row.headerName && row.headerName.toLowerCase() === 'multiplex group') {
                             for (let entry of this.headersDictionary) {
                                 if (entry.label && entry.label.toLowerCase() === 'multiplex #') {
@@ -404,6 +409,8 @@ import {GnomexService} from "../services/gnomex.service";
 
                         if (optionsFound == 0) {
                             writeThisField = false;
+                        } else {
+                            uploadColumnValue = constructedValue;
                         }
                     }
                     if (column.typeCode === "CHECK" ) {

@@ -25,9 +25,11 @@ module.exports = function (options) {
         },
 
         devServer: {
+            host: '0.0.0.0',
+            port: 8080,
             proxy: {
                 '/gnomex': {
-                    target: 'http://localhost:80',
+                    target: 'http://localhost',
                     secure: false
                 }
             },

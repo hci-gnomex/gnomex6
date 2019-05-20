@@ -216,11 +216,17 @@ export class ExperimentsService {
             return;
         }
 
+        let propertiesXML: string = JSON.stringify(experiment.RequestProperties);
+
+        if (!propertiesXML) {
+            propertiesXML = '';
+        }
+
         let params: HttpParams = new HttpParams()
             .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()))
             .set('description', experiment.description)
             .set('idProject', experiment.idProject)
-            .set('propertiesXML', JSON.stringify(experiment.RequestProperties));
+            .set('propertiesXML', propertiesXML);
         // .set('invoicePrice', '');
 
         let headers: HttpHeaders = new HttpHeaders()
