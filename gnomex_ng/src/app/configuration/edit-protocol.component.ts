@@ -1,16 +1,19 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from "@angular/core";
 import {ProtocolService} from "../services/protocol.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {Subscription} from "rxjs";
 import {SpinnerDialogComponent} from "../util/popup/spinner-dialog.component";
 import {MatDialogRef} from "@angular/material";
-import {FormControl} from "@angular/forms";
-import {ActivatedRoute, Router} from "@angular/router";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {ActivatedRoute} from "@angular/router";
 import {DictionaryService} from "../services/dictionary.service";
+import {AppUserListService} from "../services/app-user-list.service";
+import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
-    selector: 'edit-protocol',
-    templateUrl: 'edit-protocol.component.html',
+    selector: "edit-protocol",
+    templateUrl: "edit-protocol.component.html",
     styles: [`
         .flex-grow { flex: 1; }
 
@@ -63,103 +66,104 @@ import {DictionaryService} from "../services/dictionary.service";
             border: 1px lightgray solid;
             border-radius: 4px;
         }
+
+        :host /deep/ angular-editor#descEditor #editor {
+            resize: none;
+        }
+
+        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
     `]
 })
 export class EditProtocolComponent implements OnInit, OnDestroy {
 
-    @Output('protocolLoaded') protocolLoaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output("protocolLoaded") protocolLoaded: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
 
-    protected mainPaneTitle: string = 'Protocol:';
+    public form: FormGroup;
 
     protected selectedProtocol: any;
-
-    protected activeCheckBox: boolean = false;
     protected protocolId: string;
     protected protocolClassName: string;
-    protected selectedProtocolName: string;
-    protected selectedProtocolDescription: string;
-    protected selectedExperimentPlatformCodeRequestCategory: string;
-    protected selectedProtocolUrl: string;
-    protected selectedProtocolIdAnalysisType: string;
-    protected selectedProtocolIdAppUser: string;
-
-    protected accountNameFormControl         = new FormControl('', [ ]);
-    protected experimentPlatformFormControl  = new FormControl('', [ ]);
-    protected analysisTypeFormControl        = new FormControl('', [ ]);
-    protected ownerFormControl               = new FormControl('', [ ]);
-    protected activeFormControl              = new FormControl('', [ ]);
-    protected urlFormControl                 = new FormControl('', [ ]);
-    protected protocolDescriptionFormControl = new FormControl('', [ ]);
-
-
     protected analysisTypeList: any[];
     protected experimentPlatformList: any[];
     protected userList: any[];
 
     protected disableViewURLButton: boolean = true;
 
+    editorConfig: AngularEditorConfig = {
+        spellcheck: true,
+        height: "100%",
+        minHeight: "5em",
+        maxHeight: "100%",
+        width: "100%",
+        minWidth: "5em",
+        enableToolbar: true,
+        defaultFontName: "Arial",
+        defaultFontSize: "2",
+    };
+
     private routeParameterSubscription: Subscription;
     private protocolSubscription: Subscription;
     private saveExistingProtocolSubscription: Subscription;
+    private userListSubscription: Subscription;
 
     private spinnerRef: MatDialogRef<SpinnerDialogComponent>;
 
     constructor(private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
-                private protocolService: ProtocolService,
+                public protocolService: ProtocolService,
                 private route: ActivatedRoute,
-                private router: Router) { }
+                private appUserListService: AppUserListService,
+                public prefService: UserPreferencesService,
+                private fb: FormBuilder) { }
 
     ngOnInit(): void {
+        this.selectedProtocol = null;
+        this.userList = [];
+        this.analysisTypeList = [];
+        this.experimentPlatformList = [];
+
+        this.form = this.fb.group({
+            accountName: [{value: "", disabled: true}, [Validators.required, Validators.maxLength(200)]],
+            experimentPlatform: [{value: "", disabled: true}],
+            analysisType: [{value: "", disabled: true}],
+            owner: [{value: "", disabled: true}],
+            isActive: [{value: "", disabled: true}],
+            url: [{value: "", disabled: true}, Validators.maxLength(500)],
+            description: [{value: "", disabled: true}],
+        });
 
         if (!this.protocolSubscription) {
             this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {
                 this.selectedProtocol = result;
 
-                this.selectedProtocolName                          = !!result.name ? '' + result.name: '';
-                this.selectedProtocolDescription                   = !!result.description ? '' + result.description: '';
-                this.selectedExperimentPlatformCodeRequestCategory = result.codeRequestCategory;
-                this.selectedProtocolIdAppUser                     = !!result.idAppUser ? '' + result.idAppUser: '';
-                this.activeCheckBox                                = ('' + result.isActive).toLowerCase() === 'y';
-                this.selectedProtocolUrl                           = !!result.url  ? '' + result.url:  '';
+                this.form.get("accountName").setValue(result.name ? result.name : "");
+                this.form.get("experimentPlatform").setValue(result.codeRequestCategory ? result.codeRequestCategory : "");
+                this.form.get("isActive").setValue(result.isActive === "Y" ? true : false);
+                this.form.get("url").setValue(result.url ? result.url : "");
+                this.form.get("description").setValue(result.description ? result.description : "");
+                this.form.get("owner").setValue(result.idAppUser ? result.idAppUser : "");
+                this.form.get("analysisType").setValue(result.idAnalysisType ? result.idAnalysisType : "");
 
-                if (this.selectedProtocolUrl && this.selectedProtocolUrl !== "") {
-                    this.disableViewURLButton = false;
+                if (result.url) {
+                    this.disableViewURLButton = Array.isArray(result.url) && result.url.length === 0 ? true : false;
                 } else {
                     this.disableViewURLButton = true;
                 }
-                if (result.idAnalysisType && result.idAnalysisType !== '') {
-                    this.selectedProtocolIdAnalysisType = result.idAnalysisType;
+
+                if (result.canUpdate === "Y") {
+                    this.form.enable();
+                    this.editorConfig.showToolbar = true;
+                    this.editorConfig.editable = true;
                 } else {
-                    this.selectedProtocolIdAnalysisType = '';
+                    this.form.disable();
+                    this.editorConfig.showToolbar = false;
+                    this.editorConfig.editable = false;
                 }
 
-                this.accountNameFormControl.markAsPristine();
-                this.experimentPlatformFormControl.markAsPristine();
-                this.activeFormControl.markAsPristine();
-                this.urlFormControl.markAsPristine();
-                this.protocolDescriptionFormControl.markAsPristine();
-                this.ownerFormControl.markAsPristine();
-                this.analysisTypeFormControl.markAsPristine();
-
-                if (result.canUpdate === 'Y') {
-                    this.accountNameFormControl.enable();
-                    this.experimentPlatformFormControl.enable();
-                    this.activeFormControl.enable();
-                    this.urlFormControl.enable();
-                    this.protocolDescriptionFormControl.enable();
-                    this.ownerFormControl.enable();
-                    this.analysisTypeFormControl.enable();
-                } else {
-                    this.accountNameFormControl.disable();
-                    this.experimentPlatformFormControl.disable();
-                    this.activeFormControl.disable();
-                    this.urlFormControl.disable();
-                    this.protocolDescriptionFormControl.disable();
-                    this.ownerFormControl.disable();
-                    this.analysisTypeFormControl.disable();
-                }
-
+                this.form.markAsPristine();
                 this.protocolLoaded.emit(true);
 
                 this.dialogService.stopAllSpinnerDialogs();
@@ -177,13 +181,16 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
         this.analysisTypeList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
         this.experimentPlatformList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
         this.userList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.APP_USER);
+        this.userList.forEach((user => {
+            user[this.prefService.userDisplayField] = this.prefService.formatUserName(user.firstName, user.lastName);
+        }));
 
         if (this.route && this.route.params && !this.routeParameterSubscription) {
             this.routeParameterSubscription = this.route.params.subscribe((params) => {
 
                 setTimeout(() => {
-                    this.protocolId = params['id'];
-                    this.protocolClassName = params['modelName'];
+                    this.protocolId = params["id"];
+                    this.protocolClassName = params["modelName"];
 
                     this.dialogService.stopAllSpinnerDialogs();
 
@@ -208,6 +215,10 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
         if (this.routeParameterSubscription) {
             this.routeParameterSubscription.unsubscribe();
         }
+
+        if(this.userListSubscription) {
+            this.userListSubscription.unsubscribe();
+        }
     }
 
     private refresh(): void {
@@ -217,7 +228,7 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
         this.protocolService.getProtocolList();
     }
 
-    private checkToEnableViewURLButton(event: any) {
+    public checkToEnableViewURLButton(event: any): void {
         if (event && event.currentTarget && event.currentTarget.value && event.currentTarget.value !== "") {
             this.disableViewURLButton = false;
         } else {
@@ -225,34 +236,24 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
         }
     }
 
-    protected isAnyFieldNotPristine(): boolean {
-        return this.accountNameFormControl.dirty
-            || this.experimentPlatformFormControl.dirty
-            || this.analysisTypeFormControl.dirty
-            || this.ownerFormControl.dirty
-            || this.activeFormControl.dirty
-            || this.urlFormControl.dirty
-            || this.protocolDescriptionFormControl.dirty;
+    public onViewURLButtonClicked(): void {
+        window.open(this.form.get("url").value, "_blank");
     }
 
-    private onViewURLButtonClicked() {
-        window.open(this.selectedProtocolUrl, '_blank');
-    }
-
-    private onSaveButtonClicked() {
+    public onSaveButtonClicked(): void {
         if (this.selectedProtocol) {
             this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
 
             this.protocolService.saveExistingProtocol(
-                '' + this.selectedProtocolName,
-                '' + this.selectedProtocolDescription,
-                '' + this.selectedProtocolIdAnalysisType,
-                '' + this.protocolClassName,
-                '' + this.selectedExperimentPlatformCodeRequestCategory,
-                '' + this.selectedProtocolIdAppUser,
-                (this.activeCheckBox ? 'Y' : 'N'),
-                '' + this.protocolId,
-                '' + this.selectedProtocolUrl
+                this.form.get("accountName").value,
+                this.form.get("description").value,
+                this.form.get("analysisType").value,
+                this.protocolClassName,
+                this.form.get("experimentPlatform").value,
+                this.form.get("owner").value,
+                this.form.get("isActive").value ? "Y" : "N",
+                this.protocolId,
+                this.form.get("url").value
             );
         }
     }
