@@ -54,6 +54,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     types = OrderType;
 
+    public submitOrSaveButtonLabel: string = "Submit";
+
     public tabs: any[];
     public selectedIndex: number = 0;
     public currentTabComponent: any;
@@ -117,6 +119,23 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
             if (this.inputs.experiment.requestCategory) {
                 this.label = "New " + this.inputs.experiment.requestCategory.display + " Experiment for " + this.coreFacility.display;
+            }
+
+            let idCoreFacility: string = '';
+            let codeRequestCategory: string = '';
+
+            if (this.inputs && this.inputs.idCoreFacility) {
+                idCoreFacility = this.inputs.idCoreFacility
+            }
+            if (this.inputs && this.inputs.experiment && this.inputs.experiment.codeRequestCategory) {
+                codeRequestCategory = this.inputs.experiment.codeRequestCategory;
+            }
+
+            let property = this.propertyService.getProperty("new_request_save_before_submit", idCoreFacility, codeRequestCategory);
+            this.submitOrSaveButtonLabel = "Submit";
+
+            if (property && property.propertyValue && property.propertyValue === "Y") {
+                this.submitOrSaveButtonLabel = "Save";
             }
 
             this.showTabs();

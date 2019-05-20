@@ -73,7 +73,7 @@
                         [disabled]="!isCheckboxChecked || !onSubmitTab"
                         (click)="SaveNewExperiment()">
                     <img src="../../../assets/accept.png">
-                    Submit
+                    {{ submitOrSaveButtonLabel }}
                 </button>
             </div>
             <div *ngIf="onSubmitTab" class="padded-right">
