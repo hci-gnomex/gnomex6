@@ -244,6 +244,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
+    @Input("lab") set lab(value: any) {
+        this._lab = value;
+    }
+
     private _stateChangeSubject: BehaviorSubject<string>;
 
     public static readonly STATE_NEW: string  = 'NEW';
@@ -254,6 +258,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public static readonly TEXT_RIGHT: string = 'text-right';
     public static readonly OPTION: string = 'option';
     public static readonly MULTIOPTION: string = 'multioption';
+
+    private _lab: any;
 
     public get STATE_NEW(): string {
         return TabSamplesIlluminaComponent.STATE_NEW;
@@ -2009,9 +2015,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public download(): void {
-        console.log("Hello world");
+        let state: string = "";
 
-        this.sampleUploadService.downloadSampleSheet("", "", this.samplesGridColumnDefs, this._experiment);
+        if (this._state === TabSamplesIlluminaComponent.STATE_NEW) {
+            state = "new";
+        }
+
+        if (this._lab) {
+            this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
+        }
     }
 
     public onClickShowInstructions(): void {

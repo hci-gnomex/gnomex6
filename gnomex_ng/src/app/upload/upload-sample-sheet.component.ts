@@ -385,7 +385,7 @@ import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer"
                             let thisEntryFound = false;
 
                             for (let option of column.selectOptions) {
-                                if (option[column.selectOptionsDisplayField].toLowerCase() === value.toLowerCase()) {
+                                if (option[column.selectOptionsValueField].toLowerCase() === value.toLowerCase()) {
                                     thisEntryFound = true;
                                     if (optionsFound > 0) {
                                         constructedValue = constructedValue + ',';

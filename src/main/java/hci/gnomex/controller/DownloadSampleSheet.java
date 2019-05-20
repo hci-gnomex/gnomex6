@@ -77,7 +77,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
       this.errorDetails = Util.GNLOG(LOG,"Cannot parse names", je);
     }
 
-    if (request.getParameter("requestJSONString") != null && request.getParameter("requestJSONString") != "") {
+    if (request.getParameter("requestJSONString") != null && !request.getParameter("requestJSONString").equals("")) {
       this.usingJSON = true;
     }
 

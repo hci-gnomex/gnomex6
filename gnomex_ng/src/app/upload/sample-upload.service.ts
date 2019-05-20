@@ -164,7 +164,7 @@ export class SampleUploadService {
     }
 
     public downloadSampleSheet(labName: string, stateName: string, columnDefs: any[], experiment: Experiment): void {
-        if (!labName || !stateName || !columnDefs || !experiment) {
+        if (!labName || !columnDefs || !experiment) {
             return null;
         }
 
@@ -206,11 +206,33 @@ export class SampleUploadService {
         this.cookieUtilService.formatXSRFCookie();
 
         let today: Date = new Date();
-        let filename = labName + "_" + stateName + "_" + today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate() + ".txt";
+        let filename: string = "";
 
-        const request: HttpRequest<any> = new HttpRequest<any>("post", "/gnomex/DownloadSampleSheet.gx", {
+        let dateString: string = today.getFullYear() + "-";
+        let temp: string = "" + (today.getMonth() + 1);
+
+        if (temp.length === 1) {
+            temp = "0" + temp;
+        }
+
+        dateString += temp + "-";
+
+        temp = "" + today.getDate();
+
+        if (temp.length === 1) {
+            temp = "0" + temp;
+        }
+
+        dateString += temp;
+
+        if (stateName) {
+            filename = labName + "_" + stateName + "_" + dateString + ".txt";
+        } else {
+            filename = labName + "_" + today.getFullYear() + dateString + ".txt";
+        }
+
+        const request: HttpRequest<any> = new HttpRequest<any>("POST", "/gnomex/DownloadSampleSheet.gx", params.toString(), {
             headers: headers,
-            params: params,
             responseType: "blob"
         });
 
