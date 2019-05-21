@@ -4,6 +4,7 @@
 @import '~ag-grid-community/dist/styles/ag-theme-fresh.css';
 @import '~ag-grid-community/dist/styles/ag-theme-balham.css';
 
+
 html {
     position: relative;
     height: 100%;
@@ -265,8 +266,8 @@ img.icon {
     margin-right: 2em;
 }
 
-.no-padding {
-    padding: 0;
+.no-padding .mat-dialog-container {
+    padding: 0 !important;
 }
 
 .no-margin {

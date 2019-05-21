@@ -12,7 +12,7 @@ import {DialogsService} from "./popup/dialogs.service";
                 </div>
                 <div class="major-left-right-margin">
                     <button [disabled]="disableSave"  type="submit" mat-button  color="primary" (click)="notifySave()">
-                        <img src="../../../assets/action_save.gif">
+                        <img [src]="icon">
                         {{actionType}}
                     </button>
                 </div>
@@ -20,40 +20,41 @@ import {DialogsService} from "./popup/dialogs.service";
         </div>
     `,
     styles: [`
-        
+
         .padded { padding: 0.3em; }
-        
+
         .major-left-right-margin {
             margin-left:  1em;
             margin-right: 1em;
         }
-        
+
         .right-align {
             text-align: right;
             justify-content: flex-end;
         }
-        
-        
+
+
         .warning-background { background:#feec89; }
-        
+
     `]
 })
 export class SaveFooterComponent implements OnInit,OnDestroy {
 
     private _dirty:boolean;
 
+    @Input() icon:string = "../../../assets/action_save.gif";
     @Input() message:string = "Your changes have not been saved";
     @Input() actionType:string = "Save";
-    @Input() set dirty(data:boolean){
-      if(data){
-          this._dirty = data;
-      }else{
-          this._dirty = false;
-      }
+    @Input() set dirty(data:any){
+        if(data){
+            this._dirty = data;
+        }else{
+            this._dirty = false;
+        }
 
     }
     get dirty(){
-       return this._dirty;
+        return this._dirty;
     }
 
 

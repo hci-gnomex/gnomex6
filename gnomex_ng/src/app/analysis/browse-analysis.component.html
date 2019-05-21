@@ -21,6 +21,7 @@
                                     <img src="../../assets/information.png">
                                     Drag-and-drop hint
                                 </button>
+                                <button (click)="launchDialog($event)" > click me </button>
                             </div>
                         </div>
                         <div class="full-width flex-grow left-right-padded no-overflow">
@@ -44,21 +45,21 @@
                             <div class="t">
                                 <div class="tr">
                                     <div class="td">
-                                        <button mat-button [disabled]="disableNewAnalysis || this.disableAll" (click)="createAnalysisClicked()">
+                                        <button mat-button [disabled]="disableNewAnalysis || this.disableAll" (click)="createAnalysisClicked($event)">
                                             <img src="../../assets/map.png" alt="">
                                             New Analysis
                                         </button>
                                     </div>
                                     <div class="td">
-                                        <button mat-button [disabled]="disableDelete || this.disableAll" (click)="deleteAnalysisClicked()">
-                                            <img src="../../assets/delete.png" alt="">
+                                        <button mat-button [disabled]="disableDelete || this.disableAll" (click)="deleteAnalysisClicked($event)">
+                                            <img class="exit" src="../../assets/delete.png" alt="">
                                             Delete
                                         </button>
                                     </div>
                                 </div>
                                 <div class="tr">
                                     <div class="td">
-                                        <button mat-button [disabled]="disableNewAnalysisGroup || this.disableAll" (click)="createAnalysisGroupClicked()">
+                                        <button mat-button [disabled]="disableNewAnalysisGroup || this.disableAll" (click)="createAnalysisGroupClicked($event)">
                                             <img src="../../assets/folder_add.png">
                                             New analysis group
                                         </button>

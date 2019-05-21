@@ -1,7 +1,7 @@
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
 import {URLSearchParams} from "@angular/http";
 import {
-    AfterViewInit, ChangeDetectorRef, Component, Inject, OnInit, ViewChild,
+    AfterViewInit, ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild,
 } from "@angular/core";
 import {AnalysisService} from "../services/analysis.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
@@ -19,6 +19,7 @@ import jqxComboBox = jqwidgets.jqxComboBox;
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: "create-analysis-dialog",
@@ -48,7 +49,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     `]
 })
 
-export class CreateAnalysisComponent implements OnInit, AfterViewInit {
+export class CreateAnalysisComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit  {
     @ViewChild("labCombo") labCombo: jqxComboBox;
     @ViewChild("analysisGroupCombo") analysisGroupCombo: jqxComboBox;
     @ViewChild("organismCombo") organismCombo: jqxComboBox;
@@ -65,13 +66,13 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
     public ownerList: any[] = [];
     public newAnalysisGroup: boolean = false;
     public createAnalysisForm: FormGroup;
-    public showSpinner: boolean = false;
+    public dirty:()=>boolean;
+    public disable:()=>boolean;
     public newAnalysisName: string;
     public newAnalysisId: string;
     public selectedAnalysisGroup: string;
     public selectedOrganism: string;
     public selectedLab: string;
-
     private readonly items: any[];
     private idLabString: string;
     private idAnalysisGroup: string;
@@ -100,6 +101,7 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
                 private router: Router,
                 private gnomexService: GnomexService,
     ) {
+        super();
         this.labList = data.labList;
         this.items = data.items;
         this.selectedLab = data.selectedLab;
@@ -139,6 +141,10 @@ export class CreateAnalysisComponent implements OnInit, AfterViewInit {
     ngOnInit() {
         this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
         this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILITY);
+        this.disable = () =>(
+            this.createAnalysisForm.invalid
+        );
+
 
         this.activeOrganismList = this.organismList.filter(org =>
             org.isActive === "Y");

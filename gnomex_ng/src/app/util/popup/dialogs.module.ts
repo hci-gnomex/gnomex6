@@ -10,13 +10,18 @@ import { ConfirmDialog }   from './confirm-dialog.component';
 import { SpinnerDialogComponent } from "./spinner-dialog.component";
 import { YesNoDialogComponent } from "./yes-no-dialog.component";
 import {CustomDialogComponent} from "./custom-dialog.component";
+import {GenericContainerDialogComponent} from "./generic-container-dialog.component";
+import {DynamicModule} from "ng-dynamic-component";
+import {UtilModule} from "../util.module";
 
 @NgModule({
     imports: [
         AngularMaterialModule,
         MatDialogModule,
         MatButtonModule,
-        CommonModule
+        DynamicModule,
+        CommonModule,
+        UtilModule
     ],
     exports: [
         AlertDialogComponent,
@@ -30,17 +35,19 @@ import {CustomDialogComponent} from "./custom-dialog.component";
         ConfirmDialog,
         SpinnerDialogComponent,
         YesNoDialogComponent,
-        CustomDialogComponent
+        CustomDialogComponent,
+        GenericContainerDialogComponent
     ],
     providers: [
-        DialogsService,
+        DialogsService
     ],
     entryComponents: [
         AlertDialogComponent,
         ConfirmDialog,
         SpinnerDialogComponent,
         YesNoDialogComponent,
-        CustomDialogComponent
+        CustomDialogComponent,
+        GenericContainerDialogComponent
     ],
 })
 export class DialogsModule { }

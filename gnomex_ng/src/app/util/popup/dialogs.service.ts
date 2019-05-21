@@ -8,6 +8,8 @@ import { AlertDialogComponent } from "./alert-dialog.component";
 import { YesNoDialogComponent } from "./yes-no-dialog.component";
 import { SpinnerDialogComponent } from "./spinner-dialog.component";
 import {CustomDialogComponent} from "./custom-dialog.component";
+import {GenericContainerDialogComponent} from "./generic-container-dialog.component";
+import {GDActionConfig} from "../interfaces/generic-dialog-action.model";
 
 @Injectable()
 export class DialogsService {
@@ -58,7 +60,7 @@ export class DialogsService {
         }else{
             configuration.data = {templateRef:tempRef}
         }
-
+        configuration.maxHeight = "10vh";
         let dialogRef = this.dialog.open(CustomDialogComponent, configuration);
         return dialogRef.afterClosed();
     }
@@ -120,4 +122,32 @@ export class DialogsService {
             });
         }
     }
+
+    public genericDialogContainer(dialogContent:any,title:string,icon?:string,
+                                  config?:MatDialogConfig, actionConfig?:GDActionConfig):Observable<any> {
+        let configuration: MatDialogConfig = null;
+
+
+        if (!config) {
+            configuration = new MatDialogConfig();
+        } else {
+            configuration = config;
+        }
+        configuration.data = configuration.data ? configuration.data : {};
+        configuration.data["dialogContent"] = dialogContent;
+        configuration.data["title"] = title;
+        if(icon){
+            configuration.data["icon"] = icon;
+        }
+        if(actionConfig){
+            configuration.data["actionConfig"] = actionConfig;
+        }
+        configuration.panelClass = "no-padding";
+        configuration.disableClose = true;
+        let dialogRef = this.dialog.open(GenericContainerDialogComponent, configuration );
+
+        return dialogRef.afterClosed();
+    }
+
+
 }

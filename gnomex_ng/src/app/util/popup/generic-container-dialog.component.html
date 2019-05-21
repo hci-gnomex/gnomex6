@@ -1,0 +1,34 @@
+<div class="full-width header no-margin no-padding">
+    <div #topmostLeftmost mat-dialog-title (mousedown)="onMouseDownHeader($event)"
+         class="flex-container-row full-width padding {{ movingDialog ? 'grabbed' : 'grabbable' }}">
+        <div class="flex-container-row padded">
+            <img class="icon" *ngIf="icon" [src]="icon">
+            <h4>{{title}}</h4>
+        </div>
+        <div class="flex-grow"> </div>
+        <div class="padded" (click)="onClose($event)">
+            <img class="exit-size" [src]="this.constService.ICON_BLUE_EXIT">
+        </div>
+    </div>
+</div>
+<mat-dialog-content  class="flex-grow full-width no-margin no-padding">
+    <div class="flex-container-col full-height full-width padded">
+        <ndc-dynamic [ndcDynamicComponent]="this.dialogContentBluePrint" [ndcDynamicInputs]="this.data"
+                     (ndcDynamicCreated)="createdComponent($event)">
+        </ndc-dynamic>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions class="flex-container-row no-margin no-padding">
+    <ng-container *ngFor="let action of actions" >
+        <div class="flex-grow">
+            <save-footer (saveClicked)="executeAction(action)"
+                         [disableSave]="this.dialogContent.disable()"
+                         [dirty]="this.dialogContent.dirty()"
+                         [actionType]="action.name"
+                         [showSpinner]="this.dialogContent.showSpinner">
+            </save-footer>
+        </div>
+
+    </ng-container>
+</mat-dialog-actions>
+

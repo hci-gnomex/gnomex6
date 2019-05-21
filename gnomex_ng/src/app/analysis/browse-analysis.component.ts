@@ -101,6 +101,11 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private navAnalysisGroupListSubscription: Subscription;
     private labListSubscription: Subscription;
 
+    launchDialog(event){
+        this.dialogsService.genericDialogContainer(CreateAnalysisComponent,"test",null,null, {actions: [
+                {name:"Save" , internalAction:"saveAnalysis",externalAction:()=>{ console.log("hello")}},
+            ]});
+    }
     ngOnInit() {
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
@@ -433,8 +438,12 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 selectedAnalysisGroup: this.selectedIdAnalysisGroup,
                 parentComponent: "Analysis",
             };
+            this.dialogsService.genericDialogContainer(CreateAnalysisComponent,"test",null,configuration,
+                { actions: [
+                    {name:"Save" , internalAction:"saveAnalysis",externalAction:()=>{ console.log("hello")}},
+                ]});
 
-            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
+           //this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
         }
     }
 
@@ -461,7 +470,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 selectedLab: this.selectedIdLab,
             };
 
-            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration);
+            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration,);
         }
     }
 
