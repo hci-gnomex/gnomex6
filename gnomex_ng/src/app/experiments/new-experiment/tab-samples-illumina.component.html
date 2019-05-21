@@ -14,7 +14,7 @@
                     <img class="icon" [src]="this.constService.ICON_INFORMATION" alt="">
                     Instructions
                 </button>
-                <button *ngIf="experiment?.isExternal === 'Y'" mat-button class="padded-right" (click)="onAddSample()">
+                <button *ngIf="experiment?.isExternal === 'Y'" [disabled]="!(_state === this.STATE_NEW || _state === this.STATE_EDIT)" mat-button class="padded-right" (click)="onAddSample()">
                     <img class="icon" [src]="this.constService.ICON_ADD" alt="">
                     Add sample
                 </button>

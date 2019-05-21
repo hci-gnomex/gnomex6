@@ -540,11 +540,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
             sortOrder: 15
         });
 
+        let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
 
         for (let columnProperty of this.columnProperties) {
 
             if (columnProperty.showInNewMode && columnProperty.showInNewMode === 'Y') {
-                let editable: boolean = columnProperty.editableNewMode && columnProperty.editableNewMode === 'Y';
+                if (isExternal && columnProperty.showForExternal === 'N') {
+                    continue;
+                }
+
+                let editable: boolean = (columnProperty.editableNewMode && columnProperty.editableNewMode === 'Y') || isExternal;
                 let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
 
                 let newColumn: any = {
@@ -818,10 +823,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
             pinned:    "left"
         });
 
+        let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
+
         for (let columnProperty of this.columnProperties) {
 
             if (columnProperty.showInEditMode && columnProperty.showInEditMode === 'Y') {
-                let editable: boolean = columnProperty.editableEditMode && columnProperty.editableEditMode === 'Y';
+                if (isExternal && columnProperty.showForExternal === 'N') {
+                    continue;
+                }
+
+                let editable: boolean = (columnProperty.editableEditMode && columnProperty.editableEditMode === 'Y') || isExternal;
                 let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
 
                 let newColumn: any = {
@@ -1085,7 +1096,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 fillGroupAttribute: 'frontEndGridGroup',
                 sortOrder: 505
             });
-        } else {
+        } else if (!isExternal) {
             temp.push({
                 headerName: "QC Status",
                 field: "qualStatus",
@@ -1155,10 +1166,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
             pinned: 'left'
         });
 
+        let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
+
         // Add all configurable columns for this RequestCategory.
         for (let columnProperty of this.columnProperties) {
 
             if (columnProperty.showInViewMode && columnProperty.showInViewMode === 'Y') {
+                if (isExternal && columnProperty.showForExternal === 'N') {
+                    continue;
+                }
+
                 let editable: boolean = false;
                 let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
 
@@ -2016,10 +2033,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     public onAddSample(): void {
         let newSample: Sample = Sample.createSampleObjectFromAny(this.dictionaryService, null);
+        newSample.idSample = "Sample" + this.experiment.samples.length;
         newSample.index = this.experiment.samples.length + 1;
         if (this.experiment.idOrganism) {
             newSample.idOrganism = this.experiment.idOrganism;
         }
+        newSample.numberSequencingLanes = "1";
 
         this.experiment.samples.push(newSample);
         this.experiment.numberOfSamples = this.experiment.samples.length;
