@@ -29,11 +29,11 @@ import {Experiment} from "../../util/models/experiment.model";
             </custom-combo-box>
             <div class="flex-container-row align-center">
                 <custom-combo-box placeholder="Project folder for organizing experiments" [options]="this.projectList" class="half-width"
-                                    valueField="idProject" [displayField]="'name'"
-                                    [formControl]="this.form.get('idProject')">
+                                    [displayField]="'name'"
+                                    [formControl]="this.form.get('project')">
                 </custom-combo-box>
                 <div>
-                    <button mat-button [disabled]="!this.form.get('idProject').value" (click)="this.editProject()">Edit</button>
+                    <button mat-button [disabled]="!this.form.get('project').value" (click)="this.editProject()">Edit</button>
                 </div>
                 <div>
                     <button mat-button (click)="this.newProject()">New</button>
@@ -114,7 +114,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
         this.form = this.formBuilder.group({
             lab: ["", [Validators.required]],
             appUser: ["", [Validators.required]],
-            idProject: ["", [Validators.required]],
+            project: ["", [Validators.required]],
             topic: ["", []],
             organism: ["", [Validators.required]],
             requestCategory: ["", [Validators.required]],
@@ -173,8 +173,8 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
             this.experiment.experimentOwner = this.form.get("appUser").value;
         }));
 
-        this.subscriptions.push(this.form.get("idProject").valueChanges.subscribe(() => {
-            this.experiment.idProject = this.form.get("idProject").value;
+        this.subscriptions.push(this.form.get("project").valueChanges.subscribe(() => {
+            this.experiment.projectObject = this.form.get("project").value;
         }));
 
         this.subscriptions.push(this.form.get("topic").valueChanges.subscribe(() => {
@@ -221,22 +221,22 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private preselectProject(attribute?: string, value?: string): void {
-        let newValue: string = "";
+        let newValue: any;
         if (attribute && value) {
             for (let proj of this.projectList) {
                 if (proj[attribute] === value) {
-                    newValue = proj.idProject;
+                    newValue = proj;
                     break;
                 }
             }
         }
-        this.form.get("idProject").setValue(newValue);
+        this.form.get("project").setValue(newValue);
     }
 
     public editProject(): void {
         let config: MatDialogConfig = new MatDialogConfig();
         config.data = {
-            idProject: this.form.get('idProject').value,
+            idProject: this.form.get('project').value.idProject,
         };
         let dialogRef: MatDialogRef<CreateProjectComponent> = this.dialog.open(CreateProjectComponent, config);
         dialogRef.afterClosed().subscribe((result: any) => {

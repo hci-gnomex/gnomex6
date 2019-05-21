@@ -94,7 +94,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     @Input("requestCategory") set requestCategory(requestCategory: any) {
-        this.useMultiplexLanes = requestCategory.isIlluminaType === 'Y';
+        this.useMultiplexLanes = requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
     }
 
 
@@ -452,10 +452,15 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             sortOrder: 15
         });
 
+        let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
 
         for (let columnProperty of this.columnProperties) {
 
             if (columnProperty.showInNewSummaryMode && columnProperty.showInNewSummaryMode === 'Y') {
+                if (isExternal && columnProperty.showForExternal === 'N') {
+                    continue;
+                }
+
                 let editable: boolean = false;
                 let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
 
@@ -698,10 +703,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     private getSequenceLanes(): void {
-        if (this._experiment.isExternal === 'Y') {
+        if (this.experiment.isExternal === 'Y') {
             let lanes = [];
-            for (let index = 0; index < this._experiment.samples.length; index++) {
-                let lane: any = this._experiment.samples[index].getJSONObjectRepresentation();
+            for (let index = 0; index < this.experiment.samples.length; index++) {
+                let lane: any = this.experiment.samples[index].getJSONObjectRepresentation();
                 lane.sampleId = "X" + (index + 1);
                 lanes.push(lane);
             }
