@@ -157,7 +157,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                         && this.requestCategory.type !== this.gnomexService.TYPE_MICROARRAY
                         && (this.requestCategory.type === this.gnomexService.TYPE_NANOSTRING
                             || (this.requestCategory.isIlluminaType === "Y" && this.gnomexService.submitInternalExperiment())
-                            || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"));
+                            || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"))
+                        && this.experiment.isExternal !== 'Y';
                 }
 
                 this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.requestCategory.isActive === "Y" && this.requestCategory.associatedWithAnalysis === "Y";

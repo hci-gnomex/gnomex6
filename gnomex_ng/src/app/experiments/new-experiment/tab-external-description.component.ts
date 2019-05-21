@@ -13,7 +13,9 @@ import {Experiment} from "../../util/models/experiment.model";
                 <input matInput placeholder="Experiment name (required)" [formControl]="this.form.get('name')">
             </mat-form-field>
             <label>Experiment description (required)</label>
-            <angular-editor [formControl]="this.form.get('description')" [config]="this.editorConfig"></angular-editor>
+            <div class="flex-grow overflow-auto">
+                <angular-editor [formControl]="this.form.get('description')" [config]="this.editorConfig"></angular-editor>
+            </div>
         </div>
     `,
     styles: [`
@@ -46,7 +48,7 @@ export class TabExternalDescriptionComponent implements OnInit, OnChanges, OnDes
     ngOnInit(): void {
         this.editorConfig = {
             spellcheck: true,
-            height: '35em',
+            height: '25em',
             editable: true,
             enableToolbar: true,
             showToolbar: true,

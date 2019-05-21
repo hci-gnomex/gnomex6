@@ -61,6 +61,15 @@ export class TopicService {
         }));
     }
 
+    public addItemToTopicNew(idTopic: string, attribute: string, attributeValue: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idTopic", idTopic)
+            .set(attribute, attributeValue);
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/AddItemToTopic.gx", params.toString(), {headers: headers});
+    }
+
     unlinkItemFromTopic(params: URLSearchParams): Observable<any> {
         return this.http.get("/gnomex/UnlinkItemFromTopic.gx", {search: params}).pipe(map((response: Response) => {
             if (response.status === 200) {

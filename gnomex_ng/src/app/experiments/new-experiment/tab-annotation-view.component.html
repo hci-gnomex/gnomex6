@@ -24,7 +24,7 @@
                 </mat-form-field>
             </div>
             <div class="padded-right">
-                <button mat-raised-button (click)="onCustomAnnot()">
+                <button mat-raised-button (click)="onCustomAnnot()" [disabled]="!this.form.get('customAnnot').value">
                     {{ customAnnotLabel }}
                 </button>
             </div>

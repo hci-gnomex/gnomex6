@@ -185,6 +185,23 @@ export class Experiment {
     public usedRnase:                          string = "";
     public keepSamples:                        string = ''; // "Y"
 
+    public get projectObject(): any {
+        return this.project;
+    }
+    public set projectObject(proj: any) {
+        if (proj) {
+            this.idProject          = proj.idProject ? proj.idProject : "";
+            this.project            = proj;
+            this.projectName        = proj.name ? proj.name : (proj.display ? proj.display : "");
+            this.projectDescription = proj.description ? proj.description : "";
+        } else {
+            this.idProject          = "";
+            this.project            = null;
+            this.projectName        = "";
+            this.projectDescription = "";
+        }
+    }
+
     public seqPrepByCore_forSamples:           string = "";
     public get seqPrepByCore(): string {
         // The sample should always return "", but save what the choice was in case we
