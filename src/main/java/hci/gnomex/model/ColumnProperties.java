@@ -31,6 +31,7 @@ public class ColumnProperties extends DictionaryEntry implements Serializable {
 	private String showInNewSummaryMode;
 	private String showInViewMode;
 	private String showInEditMode;
+	private String showForExternal;
 	private String requiredInNewMode;
 	private String requiredInEditMode;
 	private String patternToMatch;
@@ -179,6 +180,13 @@ public class ColumnProperties extends DictionaryEntry implements Serializable {
 	}
 	public void setShowInEditMode(String showInEditMode) {
 		this.showInEditMode = showInEditMode;
+	}
+
+	public String getShowForExternal() {
+		return this.showForExternal;
+	}
+	public void setShowForExternal(String showForExternal) {
+		this.showForExternal = showForExternal;
 	}
 
 	public String getShowInViewMode() {

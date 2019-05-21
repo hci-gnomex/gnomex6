@@ -1,0 +1,108 @@
+/*!
+ * Start of CSS styling from Mark Reynolds
+ */
+:root {
+    /* ----------------------------------------- 1ST LEVEL ----------------------------------------- */
+    --white-lightest: #ffffff;
+    --white-lighter: #f5f8fa;
+    --white-light: #edf0f2;
+
+    --black-dark: #2d3133;
+    --black-darker: #17191a;
+    --black-darkest: #000000;
+
+    --bluecoolvivid-lightest: #0055ff;
+    --bluecoolvivid-lighter: #004de6;
+    --bluecoolvivid-light: #0044cc;
+    --bluecoolvivid-medlight: #003cb3;
+
+    --bluecool-darker: #1f3766;
+    --bluecool-darkest: #0f244d;
+
+    --greycool-lightest: #f0f5ff;
+    --greycool-lighter: #e1e8f5;
+    --greycool-darker: #727780;
+    --greycool-darkest: #5b5f66;
+
+    --greywarm-lightest: #f0faff;
+    --greywarm-lighter: #e1eef5;
+    --greywarm-light: #cfdee6;
+    --greywarm-medlight: #c2d2d9;
+    --greywarm-medium: #b7c5cc;
+    --greywarm-meddark: #a1adb3;
+    --greywarm-dark: #8a9499;
+    --greywarm-darker: #727b80;
+    --greywarm-darkest: #5b6266;
+
+    --bluewarmvivid-lightest: #00aaff;
+    --bluewarmvivid-lighter: #0099e6;
+    --bluewarmvivid-light: #0088cc;
+    --bluewarmvivid-medlight: #0077b3;
+
+    --bluewarm-lightest: #e8f8ff;
+    --bluewarm-lighter: #def4ff;
+    --bluewarm-light: #cfecfc;
+    --bluewarm-medlight: #badff2;
+    --bluewarm-medium: #98c7e0;
+    --bluewarm-meddark: #6da9c7;
+    --bluewarm-dark: #3d7a99;
+    --bluewarm-darker: #1f4e66;
+    --bluewarm-darkest: #0f384d;
+
+    --cyanvivid-lightest: #00eaff;
+    --cyanvivid-lighter: #00d9ed;
+    --cyanvivid-light: #00cde0;
+    --cyanvivid-medlight: #00c0d2;
+
+    --unknown-footer-gray: #dfe4ed;
+    /* ----------------------------------------- 2ND LEVEL ----------------------------------------- */
+    /* --------------------------------------- DEFAULT THEME --------------------------------------- */
+
+    --base-background-color: var(--greywarm-light);
+    --base-background-color-document-view: var(--greycool-darkest);
+
+    --selected-color: var(--white-light);
+    --selected-background: var(--cyanvivid-lightest);
+
+    --base-text-color: var(--bluewarm-dark);
+    --base-text-color-links: var(--bluecoolvivid-lightest);
+    --base-text-color-editable: var(--black-darkest);
+
+    --base-border-color: var(--greywarm-darkest);
+    --base-box-shadow-color: var(--greycool-darkest);
+
+    --nav-header-background-color: var(--bluecool-darkest);
+    --nav-header-text-color: var(--bluewarm-lighter);
+    --header-background-color: var(--bluecool-darker);
+    --header-text-color: var(--bluewarm-lighter);
+
+    --sub-header-background-color: var(--bluewarm-medium);
+    --sub-header-text-color: var(--bluecool-darker);
+
+    --sidebar-background-color: var(--greywarm-lightest);
+    --sidebar-text-color: var(--bluewarm-dark);
+    --sidebar-header-background-color: var(--bluewarm-lighter);
+    --sidebar-footer-background-color: var(--bluewarm-lighter);
+
+    --outlet-background-color: var(--white-light);
+    --outlet-header-background-color: var(--bluewarm-light);
+    --outlet-footer-background-color: var(--greywarm-light);
+
+    --grid-background-color: var(--white-lightest);
+    --grid-header-odd-background-color: var(--bluewarm-dark);
+    --grid-header-even-background-color: var(--bluewarm-darker);
+    --grid-odd-odd-background-color: var(--white-lightest);
+    --grid-odd-even-background-color: var(--greywarm-lighter);
+    --grid-even-odd-background-color: var(--greywarm-lighter);
+    --grid-even-even-background-color: var(--greywarm-light);
+
+    --grid-selected-odd-odd-background-color: var(--cyanvivid-lightest);
+    --grid-selected-odd-even-background-color: var(--cyanvivid-lighter);
+    --grid-selected-even-odd-background-color: var(--cyanvivid-lighter);
+    --grid-selected-even-even-background-color: var(--cyanvivid-light);
+
+    --footer-background-color: var(--greycool-lighter);
+}
+/*!
+ * End of CSS styling from Mark Reynolds
+ */

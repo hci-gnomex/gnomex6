@@ -23,10 +23,10 @@
                     <mat-form-field>
                         <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Experiment #">
                     </mat-form-field>
-                    <lazy-loaded-select class="formField" placeholder="Lab" [options]="this.labList"
-                                        valueField="idLab" [displayField]="this.prefService.labDisplayField" [allowNone]="true"
-                                        [control]="this.selectedLab">
-                    </lazy-loaded-select>
+                    <custom-combo-box class="formField" placeholder="Lab" [options]="this.labList"
+                                        valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                        [formControl]="this.selectedLab">
+                    </custom-combo-box>
                 </div>
                 <div class="flex-grow">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"

@@ -205,7 +205,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
     public buildNavItems() {
         this.resetNavItems();
         this.createUserGuideRouterLink();
-        
+
         this.linkNavItems = [
             {
                 displayName: 'Report Problem',
@@ -400,7 +400,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Protocols',
                         iconName: '../../assets/brick.png',
-                        route: ''
+                        route: '/manage-protocols'
                     }
                 ]
             },
@@ -544,7 +544,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Protocols',
                         iconName: '../../assets/brick.png',
-                        route: ''
+                        route: '/manage-protocols'
                     }
                 ]
             },
@@ -651,7 +651,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Protocols',
                         iconName: '../../assets/brick.png',
-                        route: ''
+                        route: '/manage-protocols'
                     }
                 ]
             },
@@ -1334,7 +1334,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Manage Protocols',
                         iconName: '../../assets/page_white_wrench.png',
-                        route: ''
+                        route: '/manage-protocols'
                     }
 
                 ]
@@ -1625,7 +1625,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Manage Protocols',
                         iconName: '../../assets/brick.png',
-                        route: ''
+                        route: '/manage-protocols'
                     }
                 ]
             },
@@ -1719,7 +1719,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Protocols',
                         iconName: '../../assets/brick.png',
-                        route: ''
+                        route: '/manage-protocols'
                     }
                 ]
             },

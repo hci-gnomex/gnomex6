@@ -378,10 +378,9 @@
                                                         <button mat-button (click)="onEditInstitutions()" class="color-blue">Edit...</button>
                                                     </div>
                                                     <div class="flex-container-row align-center spaced-children-margin">
-                                                        <lazy-loaded-select class="half-width" [control]="institutionToAddControl"
-                                                                            placeholder="Institution" [options]="institutions" [displayField]="'display'"
-                                                                            [allowNone]="true">
-                                                        </lazy-loaded-select>
+                                                        <custom-combo-box class="half-width" [formControl]="institutionToAddControl"
+                                                                            placeholder="Institution" [options]="institutions" [displayField]="'display'">
+                                                        </custom-combo-box>
                                                         <div>
                                                             <button mat-raised-button (click)="addInstitution()" [disabled]="!institutionToAddControl.value || !institutionToAddControl.value.idInstitution">
                                                                 <img [src]="constantsService.ICON_ADD">
