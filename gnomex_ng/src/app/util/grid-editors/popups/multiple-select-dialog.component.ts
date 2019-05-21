@@ -47,6 +47,9 @@ export class MultipleSelectDialogComponent {
 
     displayField: string;
     valueField: string;
+    private gridValueField: string;
+
+    node: any;
 
     options: any[];
     optionName: string;
@@ -54,6 +57,7 @@ export class MultipleSelectDialogComponent {
     columnDefinitions: any[];
 
     gridApi: any;
+    original_gridApi: any;
     gridColumnApi: any;
 
     allowMultipleSelection: boolean = true;
@@ -69,10 +73,14 @@ export class MultipleSelectDialogComponent {
         this.allowMultipleSelection = true;
 
         if (this.data) {
-            this.value        = "" + this.data.value;
-            this.optionName   = "" + this.data.optionName;
+            this.value = "" + this.data.value;
+            this.optionName = "" + this.data.optionName;
             this.displayField = "" + this.data.displayField;
-            this.valueField   = "" + this.data.valueField;
+            this.valueField = "" + this.data.valueField;
+            this.gridValueField = "" + this.data.gridValueField;
+            this.original_gridApi = this.data.gridApi;
+
+            this.node = this.data.node;
 
             if ((typeof this.data.allowMultipleSelection) !== undefined && !this.data.allowMultipleSelection) {
                 this.allowMultipleSelection = false;
@@ -105,10 +113,10 @@ export class MultipleSelectDialogComponent {
                 shownGridData = [];
             }
 
+            this.selectRowData();
+
             this.gridApi.setColumnDefs(this.getColumnDefinitions());
             this.gridApi.setRowData(shownGridData);
-
-            this.selectRowData();
         }
     }
 
@@ -177,6 +185,10 @@ export class MultipleSelectDialogComponent {
         this.okWasClicked = true;
 
         this.value = this.getValue();
+        if (this.node && this.node.data && this.gridValueField && this.original_gridApi) {
+            this.node.data[this.gridValueField] = this.value;
+            this.original_gridApi.redrawRows();
+        }
 
         this.dialogRef.close();
     }

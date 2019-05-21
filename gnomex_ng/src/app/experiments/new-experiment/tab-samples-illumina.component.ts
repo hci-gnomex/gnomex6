@@ -28,6 +28,7 @@ import {TextAlignRightMiddleEditor} from "../../util/grid-editors/text-align-rig
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GridApi} from "ag-grid-community";
+import {SampleUploadService} from "../../upload/sample-upload.service";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -243,6 +244,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
+    @Input("lab") set lab(value: any) {
+        this._lab = value;
+    }
+
     private _stateChangeSubject: BehaviorSubject<string>;
 
     public static readonly STATE_NEW: string  = 'NEW';
@@ -253,6 +258,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public static readonly TEXT_RIGHT: string = 'text-right';
     public static readonly OPTION: string = 'option';
     public static readonly MULTIOPTION: string = 'multioption';
+
+    private _lab: any;
 
     public get STATE_NEW(): string {
         return TabSamplesIlluminaComponent.STATE_NEW;
@@ -1419,7 +1426,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 private gnomexService: GnomexService,
                 private fb: FormBuilder,
                 private dialog: MatDialog,
-                private propertyService: PropertyService) { }
+                private propertyService: PropertyService,
+                private sampleUploadService: SampleUploadService) { }
 
     ngOnInit() {
         this.organisms = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
@@ -2024,7 +2032,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public download(): void {
-        console.log("Hello world");
+        let state: string = "";
+
+        if (this._state === TabSamplesIlluminaComponent.STATE_NEW) {
+            state = "new";
+        }
+
+        if (this._lab) {
+            this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
+        }
     }
 
     public onClickShowInstructions(): void {
