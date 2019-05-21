@@ -153,6 +153,7 @@ public class Differ {
 					Matcher m = p.matcher(line);
 					if(m.matches()){
 						String fileName = m.group(1);
+						String fileID = m.group(2);
 						fileMap.put(fileName, line );
 					}else{ // doesn't have to match name so get file plus extension
 						this.addToLocalMap(line);
