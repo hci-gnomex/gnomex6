@@ -10,8 +10,7 @@ import {
 import {MatDialogRef, MatDialog, MAT_DIALOG_DATA, DialogPosition} from "@angular/material";
 
 import {Router} from "@angular/router";
-import {DialogsService} from "./dialogs.service";
-import {GDAction, GDActionConfig} from "../interfaces/generic-dialog-action.model";
+import {GDAction, GDActionConfig,ActionType} from "../interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "./base-generic-container-dialog";
 import {UtilService} from "../../services/util.service";
 import {ConstantsService} from "../../services/constants.service";
@@ -27,10 +26,7 @@ import {ConstantsService} from "../../services/constants.service";
         .no-margin{
             margin: 0;
         }
-        .header {
-            background-color: #84b278;
-            color: white;
-        }
+        
         
         .grabbable {
             cursor: move;
@@ -44,8 +40,12 @@ import {ConstantsService} from "../../services/constants.service";
             cursor: -moz-grabbing;
             cursor: -webkit-grabbing;
         }
-        .exit-size{
-            max-width: 25px;
+        .exit{
+            max-width: 20px;
+            cursor: pointer;
+        }
+        .force-flex-container-row{
+            display:flex !important;
         }
         
         
@@ -55,6 +55,7 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
 
     @ViewChild('topmostLeftmost') topmostLeftmost: ElementRef;
 
+    type = ActionType;
     title:string;
     icon:string;
     dialogContentBluePrint:any;

@@ -1,15 +1,22 @@
-import {BehaviorSubject, Subject} from "rxjs/index";
 import {Input} from "@angular/core";
+import {ActionType, GDAction} from "../interfaces/generic-dialog-action.model";
+import {FormGroup} from "@angular/forms";
 
 
 export abstract class BaseGenericContainerDialog {
-    public  disable: ()=>boolean = () =>{ return false};
+    public  primaryDisable: (action?:GDAction)=>boolean = (action) =>{
+        return false;
+    };
+    public  secondaryDisable: (action?:GDAction)=>boolean = (action) =>{
+        return false;
+    };
+
     public dirty: ()=>boolean = () =>{ return false};
     public showSpinner: boolean = false;
     @Input() inputData:any;
 
 
-    constructor(){
+    protected constructor(){
     }
 
 

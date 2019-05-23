@@ -20,6 +20,7 @@ import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: "create-analysis-dialog",
@@ -66,8 +67,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     public ownerList: any[] = [];
     public newAnalysisGroup: boolean = false;
     public createAnalysisForm: FormGroup;
-    public dirty:()=>boolean;
-    public disable:()=>boolean;
+    public primaryDisable:(action?:GDAction)=>boolean;
     public newAnalysisName: string;
     public newAnalysisId: string;
     public selectedAnalysisGroup: string;
@@ -141,10 +141,9 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     ngOnInit() {
         this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
         this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILITY);
-        this.disable = () =>(
-            this.createAnalysisForm.invalid
-        );
-
+        this.primaryDisable = (action) =>{
+            return this.createAnalysisForm.invalid;
+        }
 
         this.activeOrganismList = this.organismList.filter(org =>
             org.isActive === "Y");
@@ -417,6 +416,9 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
             height: "430px",
             width: "300px",
         });
+    }
+    cancel(){
+        this.dialogRef.close();
     }
 
 }

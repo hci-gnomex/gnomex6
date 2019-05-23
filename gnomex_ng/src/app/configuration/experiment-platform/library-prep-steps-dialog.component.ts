@@ -52,7 +52,7 @@ import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor
             <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
                 <div class="padded-inner flex-container-row" style="align-items:center" >
                     <div class="flex-grow">
-                        <save-footer [actionType]="applyText"
+                        <save-footer [name]="applyText"
                                      (saveClicked)="applyChanges()"
                                      [dirty]="formGroup.dirty" >
                         </save-footer>
