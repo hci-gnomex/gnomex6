@@ -2,7 +2,7 @@ import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChil
 import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode,} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {AnalysisService} from "../services/analysis.service";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
@@ -18,6 +18,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {UtilService} from "../services/util.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
+import {filter} from "rxjs/operators";
 
 
 @Component({
@@ -88,6 +89,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private selectedIdAnalysisGroup: any;
     private parentProject: any;
     private navAnalysisGroupListSubscription: Subscription;
+    private navEndSubscription:Subscription;
     private labListSubscription: Subscription;
 
     ngOnInit() {
@@ -249,6 +251,20 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             }
         });
 
+        this.navEndSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd))
+            .subscribe((event:NavigationEnd) =>{
+                if(this.route.snapshot.firstChild){
+                    let data = this.route.snapshot.firstChild.data;
+                    if(data.analysis && data.analysis.Analysis){
+                        let selectedAnalysis = data.analysis.Analysis;
+                        if (selectedAnalysis.canDelete === "Y") {
+                            this.disableDelete = false;
+                        } else {
+                            this.disableDelete = true;
+                        }
+                    }
+                }
+            });
     }
 
     ngAfterViewInit() {
@@ -514,15 +530,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysisGroup = false;
             let params: HttpParams = new HttpParams()
                 .set("idAnalysis", idAnalysis);
-            this.analysisService.getAnalysis(params).subscribe((response) => {
-                if (response.Analysis.canDelete === "Y") {
-                    this.disableDelete = false;
-                } else {
-                    this.disableDelete = true;
-                }
-            }, (err: IGnomexErrorResponse) => {
-                console.log(err);
-            });
+
         }
 
         this.router.navigate(navArray);
@@ -533,6 +541,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.analysisGroupListSubscription.unsubscribe();
         this.navAnalysisGroupListSubscription.unsubscribe();
+        this.navEndSubscription.unsubscribe();
         this.gnomexService.navInitBrowseAnalysisSubject.next(null);
         this.labListSubscription.unsubscribe();
     }
