@@ -2093,6 +2093,7 @@
         <property name="showInNewMode" column="showInNewMode" type="string" />
         <property name="showInNewSummaryMode" column="showInNewSummaryMode" type="string" />
         <property name="showInViewMode" column="showInViewMode" type="string" />
+        <property name="showForExternal" column="showForExternal" type="string" />
         <property name="showInEditMode" column="showInEditMode" type="string" />
         <property name="requiredInNewMode" column="requiredInNewMode" type="string" />
         <property name="requiredInEditMode" column="requiredInEditMode" type="string" />

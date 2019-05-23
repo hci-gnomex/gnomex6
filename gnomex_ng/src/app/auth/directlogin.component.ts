@@ -2,6 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {AuthenticationService} from "./authentication.service";
 import {AbstractControl, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Router} from "@angular/router";
+import {GnomexService} from "../services/gnomex.service";
 
 @Component({
     selector: "hci-login-form",
@@ -66,15 +67,15 @@ import {Router} from "@angular/router";
                                     <button class="flex-grow secondary-button padded" (click)="this.onResetPassword()">
                                         Reset Password
                                     </button>
-                                    <div class="full-height horizontal-spacer">
+                                    <div *ngIf="!this.gnomexService.disableUserSignup" class="full-height horizontal-spacer">
                                     </div>
-                                    <button class="flex-grow secondary-button padded" (click)="this.onNewAccount()">
+                                    <button *ngIf="!this.gnomexService.disableUserSignup" class="flex-grow secondary-button padded" (click)="this.onNewAccount()">
                                         New Account
                                     </button>
                                 </div>
-                                <div class="full-width vertical-spacer">
+                                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width vertical-spacer">
                                 </div>
-                                <div class="full-width flex-container-row">
+                                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width flex-container-row">
                                     <button class="full-width bold secondary-button padded" (click)="this.guestLogin()">
                                         Guest Login
                                     </button>
@@ -388,6 +389,7 @@ export class DirectLoginComponent implements OnInit {
 
     constructor(private _authenticationService: AuthenticationService,
                 private _formBuilder: FormBuilder,
+                public gnomexService: GnomexService,
                 private router: Router) {
     }
 
@@ -410,6 +412,8 @@ export class DirectLoginComponent implements OnInit {
             // username: ["", Validators.required],
             // password: ["", Validators.required]
         });
+
+        this.gnomexService.getLoginProperties();
 
         // This is needed due to a bug with angular adding items in components to surrounding forms.
         // this._loginForm.addControl(

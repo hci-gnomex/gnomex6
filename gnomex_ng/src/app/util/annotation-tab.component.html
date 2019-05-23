@@ -1,8 +1,9 @@
 <div style="display:flex">
     <form [formGroup]="form" style=" height:100%;width:100%; display:flex; flex-direction:column;">
-        <ng-container  [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations">
+        <div [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations" class="full-width full-height small-font padded">
+            <div class="display-white-space">{{ annot && annot.description ? annot.description : '' }}</div>
             <div *ngSwitchCase="'CHECK'" class="annot-control">
-                <label style="margin-right: 1em;"  >{{annot.name}}  </label>
+                <label>{{ annot && annot.name ? annot.name : "" }}</label>
                 <mat-checkbox  [formControl]="this.form.controls[annot.name]" >
                 </mat-checkbox>
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
@@ -10,17 +11,19 @@
                 </mat-error>
             </div>
             <mat-form-field *ngSwitchCase="'TEXT'" class="annot-control" >
+                <label>{{ annot && annot.name ? annot.name : "" }}</label>
                 <input matInput placeholder="{{annot.name}}" [formControl]="this.form.controls[annot.name]">
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
             </mat-form-field>
             <mat-form-field *ngSwitchCase="'MOPTION'" class="annot-control" >
+                <label>{{ annot && annot.name ? annot.name : "" }}</label>
                 <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.form.controls[annot.name]">
                     <mat-option *ngFor="let opt of annot.PropertyOption"
                                 #mOptRef
                                 (onSelectionChange)="selectOpt(mOptRef)"
-                                [value]="opt" > {{opt.name}}
+                                [value]="opt"> {{opt.name}}
                     </mat-option>
                 </mat-select>
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('selectRequired')">
@@ -28,14 +31,15 @@
                 </mat-error>
             </mat-form-field>
             <mat-form-field  *ngSwitchCase="'OPTION'" class="annot-control">
+                <label>{{ annot && annot.name ? annot.name : "" }}</label>
                 <mat-select (selectionChange)="selectChanged($event,annot)"
                             [compareWith]="compareByID"
-                            [placeholder]="annot.name"
+                            [placeholder]="annot && annot.name ? annot.name : ''"
                             [formControl]="this.form.controls[annot.name]">
-                    <mat-option
-                            *ngFor="let opt of annot.PropertyOption"
-                            #optRef
-                            [value]="opt" >{{opt.name}}
+                    <mat-option [value]="" >
+                    </mat-option>
+                    <mat-option *ngFor="let opt of annot.PropertyOption"#optRef [value]="opt" >
+                        {{opt.name}}
                     </mat-option>
                 </mat-select>
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('selectRequired')">
@@ -45,19 +49,11 @@
             <div *ngSwitchCase="'URL'" class="annot-control">
                 <url-annotation [formControl]="this.form.controls[annot.name]">  </url-annotation>
             </div>
-
-        </ng-container>
-
+        </div>
     </form>
-    <div *ngIf="showConfigureAnnotationsButton" style="flex:1">
+    <div *ngIf="showConfigureAnnotationsButton" class="flex-grow">
         <button mat-button color="primary" style="margin:1em" (click)="loadConfigAnnotations()"> Configure Annotations </button>
-
     </div>
-
-
-
-
-
 </div>
 
 

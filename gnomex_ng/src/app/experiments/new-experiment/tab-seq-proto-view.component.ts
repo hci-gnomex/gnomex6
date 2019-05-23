@@ -213,7 +213,7 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
     }
 
     private changePrices(): void {
-        if (this._experiment) {
+        if (this._experiment && this._experiment.idLab) {
             let appPriceListParams: HttpParams = new HttpParams()
                 .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
                 .set("idLab", this._experiment.idLab);

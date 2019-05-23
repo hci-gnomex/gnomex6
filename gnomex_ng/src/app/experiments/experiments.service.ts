@@ -216,17 +216,39 @@ export class ExperimentsService {
             return;
         }
 
+        let propertiesXML: string = JSON.stringify(experiment.RequestProperties);
+
+        if (!propertiesXML) {
+            propertiesXML = '';
+        }
+
         let params: HttpParams = new HttpParams()
             .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()))
             .set('description', experiment.description)
             .set('idProject', experiment.idProject)
-            .set('propertiesXML', '');
+            .set('propertiesXML', propertiesXML);
         // .set('invoicePrice', '');
 
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
 
         return this.httpClient.post("/gnomex/SaveRequest.gx", params.toString(), { headers: headers });
+    }
+
+    public GetQCChipTypePriceList(codeRequestCategory: string, idLab: string):  Observable<any> {
+
+        if (!codeRequestCategory || !idLab) {
+            return;
+        }
+
+        let params: HttpParams = new HttpParams()
+            .set('codeRequestCategory', codeRequestCategory)
+            .set('idLab', idLab);
+
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+
+        return this.httpClient.post("/gnomex/GetQCChipTypePriceList.gx", params.toString(), { headers: headers });
     }
 
     saveVisibility(body: any, idProject?: string): Observable<any> {

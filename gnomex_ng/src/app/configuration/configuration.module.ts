@@ -26,7 +26,7 @@ import {ManageProtocolsComponent} from "./manage-protocols.component";
 import {ConfigurationBrowsePanelComponent} from "./configuration-browse-panel.component";
 import {OverviewProtocolComponent} from "./overview-protocol.component";
 import {ExperimentPlatformModule} from "./experiment-platform/experiment-platform.module";
-
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 
 @NgModule({
@@ -47,7 +47,8 @@ import {ExperimentPlatformModule} from "./experiment-platform/experiment-platfor
         RichEditorModule,
         ReactiveFormsModule,
         AngularSplitModule,
-        ExperimentPlatformModule
+        ExperimentPlatformModule,
+        AngularEditorModule
     ],
     declarations: [
         BrowseDictionaryComponent,

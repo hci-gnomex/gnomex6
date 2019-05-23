@@ -93,10 +93,10 @@
                         </mat-form-field>
                     </div>
                     <div class="tabRow" style="width: 65%;">
-                        <lazy-loaded-select placeholder="Owner" [options]="this.appUserList"
-                                            valueField="idAppUser" displayField="display" [allowNone]="true"
-                                            [control]="this.ownerFC" class="full-height full-width">
-                        </lazy-loaded-select>
+                        <custom-combo-box placeholder="Owner" [options]="this.appUserList"
+                                            valueField="idAppUser" displayField="display"
+                                            [formControl]="this.ownerFC" class="full-height full-width">
+                        </custom-combo-box>
                     </div>
                     <div class="tabRow" style="align-items: flex-start; height: 30%; flex: 3;">
                         <label style="margin-right: 4%;">Type</label>
@@ -209,10 +209,10 @@
                         <label>Only show for these users (only applies to non-required sample annotations)</label>
                         <div style="display: flex; flex-direction: row;">
                             <div style="width: 30%; margin-right: 2%;">
-                                <lazy-loaded-select placeholder="User" [options]="this.appUserList"
-                                                    displayField="display" [allowNone]="true"
-                                                    [control]="this.appliesToUser" class="full-height full-width">
-                                </lazy-loaded-select>
+                                <custom-combo-box placeholder="User" [options]="this.appUserList"
+                                                    displayField="display"
+                                                    [formControl]="this.appliesToUser" class="full-height full-width">
+                                </custom-combo-box>
                             </div>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToUser.value == null" (click)="this.addUser()"><img class="icon" src="../../assets/add.png"></button>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedUserIndex == null" (click)="this.deleteUser()"><img class="icon" src="../../assets/delete.png"></button>

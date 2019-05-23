@@ -1,8 +1,9 @@
 <div class="flex-container-col full-width full-height padded-left-right border">
     <div class="full-width no-overflow padded-top-bottom">
-        {{ mainPaneTitle }}
+        {{ this.protocolService.getMainPaneTitle() }}
     </div>
     <div class="full-width flex-grow no-overflow">
+        <form [formGroup]="this.form" class="full-width full-height">
         <div class="full-width full-height border">
             <div *ngIf="!!selectedProtocol" class="full-width full-height padded">
 
@@ -10,67 +11,38 @@
                     <div class="flex-grow padded">
                         <mat-form-field class="full-width">
                             <input  matInput
-                                    placeholder="Account Name"
-                                    [(ngModel)]="selectedProtocolName"
-                                    [formControl]="accountNameFormControl"
-                                    required>
+                                    placeholder="Account Name*"
+                                    [formControl]="this.form.get('accountName')" matTooltip="Account Name is required">
+                            <mat-error *ngIf="this.form.get('accountName').hasError('required')">
+                                Account Name is required
+                            </mat-error>
+                            <mat-error *ngIf="this.form.get('accountName').hasError('maxLength')">
+                                Account Name exceeded the 200 character limit
+                            </mat-error>
                         </mat-form-field>
                     </div>
                     <div class="flex-grow padded">
                         <div *ngIf="protocolClassName && protocolClassName !== 'hci.gnomex.model.AnalysisProtocol'"
                              class="full-width full-height">
-                            <mat-form-field class="full-width font-small">
-                                <mat-select
-                                        class="full-width"
-                                        placeholder="Experiment Platform"
-                                        [(ngModel)]="selectedExperimentPlatformCodeRequestCategory"
-                                        [formControl]="experimentPlatformFormControl">
-                                    <mat-option [value]="">
-                                        --
-                                    </mat-option>
-                                    <mat-option *ngFor="let experimentPlatform of experimentPlatformList"
-                                                [value]="experimentPlatform.codeRequestCategory">
-                                        {{ experimentPlatform.display }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box class="full-width font-small" placeholder="Experiment Platform" [options]="this.experimentPlatformList"
+                                              valueField="codeRequestCategory" displayField="display"
+                                              [formControl]="this.form.get('experimentPlatform')">
+                            </custom-combo-box>
                         </div>
 
                         <div *ngIf="protocolClassName && protocolClassName === 'hci.gnomex.model.AnalysisProtocol'"
                              class="full-width full-height flex-container-row">
                             <div class="flex-grow padded-left-right">
-                                <mat-form-field class="full-width font-small">
-                                    <mat-select
-                                            class="full-width"
-                                            placeholder="Analysis Type:"
-                                            [(ngModel)]="selectedProtocolIdAnalysisType"
-                                            [formControl]="analysisTypeFormControl">
-                                        <mat-option [value]="">
-                                            --
-                                        </mat-option>
-                                        <mat-option *ngFor="let analysisType of analysisTypeList"
-                                                    [value]="analysisType.idAnalysisType">
-                                            {{ analysisType.display }}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
+                                <custom-combo-box class="full-width font-small" placeholder="Analysis Type:" [options]="this.analysisTypeList"
+                                                  valueField="idAnalysisType" displayField="display"
+                                                  [formControl]="this.form.get('analysisType')">
+                                </custom-combo-box>
                             </div>
                             <div class="flex-grow padded-left-right">
-                                <mat-form-field class="full-width font-small">
-                                    <mat-select
-                                            class="full-width"
-                                            placeholder="Owner:"
-                                            [(ngModel)]="selectedProtocolIdAppUser"
-                                            [formControl]="ownerFormControl">
-                                        <mat-option [value]="">
-                                            --
-                                        </mat-option>
-                                        <mat-option *ngFor="let user of userList"
-                                                    [value]="user.idAppUser">
-                                            {{ user.display }}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
+                                <custom-combo-box class="full-width font-small" placeholder="Owner:" [options]="this.userList"
+                                                  valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
+                                                  [formControl]="this.form.get('owner')">
+                                </custom-combo-box>
                             </div>
                         </div>
                     </div>
@@ -78,8 +50,7 @@
                         <div class="tr">
                             <div class="td">
                                 <div class="inline-block checkbox-container">
-                                    <mat-checkbox [(ngModel)]="activeCheckBox"
-                                                  [formControl]="activeFormControl"></mat-checkbox>
+                                    <mat-checkbox [formControl]="this.form.get('isActive')"></mat-checkbox>
                                 </div>
                             </div>
                             <div class="td">
@@ -97,8 +68,10 @@
                             <input  matInput
                                     placeholder="URL"
                                     (input)="checkToEnableViewURLButton($event)"
-                                    [(ngModel)]="selectedProtocolUrl"
-                                    [formControl]="urlFormControl">
+                                    [formControl]="this.form.get('url')">
+                            <mat-error *ngIf="this.form.get('url').hasError('maxLength')">
+                                URL exceeded the 500 character limit
+                            </mat-error>
                         </mat-form-field>
                     </div>
                     <div class="special-button-text-alignment-padding">
@@ -110,30 +83,29 @@
                     </div>
                 </div>
 
-                <mat-form-field class="full-width padded">
-                    <textarea
-                            matInput
-                            placeholder="Protocol Description"
-                            [(ngModel)]="selectedProtocolDescription"
-                            [formControl]="protocolDescriptionFormControl"
-                            matTextareaAutosize
-                            matAutosizeMinRows="14"
-                            matAutosizeMaxRows="14">
-                    </textarea>
-                </mat-form-field>
+                <div class="full-width flex-container-row">
+                    <div class="flex-grow padded">
+                    <label class="gx-label" for="descEditor">Protocol Description</label>
+                    <angular-editor #descEditorRef id="descEditor"
+                                    formControlName="description"
+                                    [config]="editorConfig">
+                    </angular-editor>
+                    </div>
+                </div>
             </div>
         </div>
+        </form>
     </div>
     <div class="full-width no-overflow padded-top-bottom right-align">
         <div class="inline-block minimize padded-left-right ">
-            <div *ngIf="isAnyFieldNotPristine()" class="inline-block padded warning-block">Your changes have not been saved</div>
+            <div *ngIf="this.form.dirty" class="inline-block padded warning-block">Your changes have not been saved</div>
         </div>
         <div class="inline-block minimize padded-left-right">
             <button mat-button
-                    [disabled]="!isAnyFieldNotPristine()"
+                    [disabled]="!this.form.dirty || this.form.invalid"
                     (click)="onSaveButtonClicked()">
-                <img *ngIf="isAnyFieldNotPristine()" src="../../assets/save.png" alt="" />
-                <img *ngIf="!isAnyFieldNotPristine()" src="../../assets/save_disable.png" alt="" /> Save
+                <img [src]="this.form.dirty && this.form.valid ? '../../assets/save.png' : '../../assets/save_disable.png'"/>
+                Save
             </button>
         </div>
     </div>

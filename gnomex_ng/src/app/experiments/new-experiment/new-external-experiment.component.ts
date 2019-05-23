@@ -8,7 +8,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {Subscription} from "rxjs";
+import {forkJoin, Observable, Subscription} from "rxjs";
 import {UtilService} from "../../services/util.service";
 import {TabExternalDescriptionComponent} from "./tab-external-description.component";
 import {TabExternalSetupComponent} from "./tab-external-setup.component";
@@ -18,6 +18,7 @@ import {TabVisibilityComponent} from "./tab-visibility.component";
 import {DynamicComponent} from "ng-dynamic-component";
 import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
 import {ConstantsService} from "../../services/constants.service";
+import {TopicService} from "../../services/topic.service";
 
 @Component({
     selector: 'new-external-experiment',
@@ -27,7 +28,7 @@ import {ConstantsService} from "../../services/constants.service";
                 <img *ngIf="newEEService.experiment?.requestCategory" [src]="newEEService.experiment?.requestCategory.icon" class="icon">
                 Upload {{newEEService.experiment?.requestCategory ? newEEService.experiment?.requestCategory.display + ' ' : ''}}experiment data from a third party facility
             </div>
-            <div class="full-width flex-grow">
+            <div class="full-width flex-grow padding-light">
                 <mat-tab-group class="full-height full-width" [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="this.onTabChange()">
                     <mat-tab *ngFor="let tab of this.tabs; let i = index" class="full-height full-width overflow-auto" [label]="tab.label"
                              [disabled]="this.checkTabDisabled(i)">
@@ -56,6 +57,9 @@ import {ConstantsService} from "../../services/constants.service";
         </div>
     `,
     styles: [`
+        .padding-light {
+            padding: 0.5em;
+        }
     `]
 })
 
@@ -77,6 +81,7 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
                 private router: Router,
+                private topicService: TopicService,
                 private experimentService: ExperimentsService) {
     }
 
@@ -181,12 +186,33 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
     }
 
     public save(): void {
+        let sequenceLanes: any[] = [];
+        for (let sample of this.newEEService.experiment.samples) {
+            sequenceLanes.push(NewExternalExperimentService.createSequenceLane(sample));
+        }
+        this.newEEService.experiment.sequenceLanes = sequenceLanes;
+
         this.experimentService.saveRequest(this.newEEService.experiment).subscribe((result: any) => {
-            if (result && result.requestNumber) {
-                this.dialogsService.alert("Experiment #" + result.requestNumber + " has been added to the GNomEx repository", "Experiment Saved");
-                this.gnomexService.navByNumber(result.requestNumber);
+            if (result && result.idRequest) {
+                let topicsToLinkTo: any[] = this.newEEService.experiment.topics;
+                if (topicsToLinkTo && topicsToLinkTo.length > 0) {
+                    let linkingCalls: Observable<any>[] = [];
+                    for (let topic of topicsToLinkTo) {
+                        linkingCalls.push(this.topicService.addItemToTopicNew(topic.idTopic, "idRequest0", result.idRequest));
+                    }
+                    forkJoin(linkingCalls).subscribe(() => {
+                        this.saveFinished(result.requestNumber);
+                    });
+                } else {
+                    this.saveFinished(result.requestNumber);
+                }
             }
         });
+    }
+
+    private saveFinished(requestNumber: string): void {
+        this.dialogsService.alert("Experiment #" + requestNumber + " has been added to the GNomEx repository", "Experiment Saved");
+        this.gnomexService.navByNumber(requestNumber);
     }
 
     public promptToCancel(): void {

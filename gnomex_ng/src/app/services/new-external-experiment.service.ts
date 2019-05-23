@@ -44,4 +44,16 @@ export class NewExternalExperimentService {
         this.form.setControl(tabLabel, form);
     }
 
+    public static createSequenceLane(sample: any): any {
+        return {
+            idSequenceLane: "SequenceLane",
+            notes: "",
+            idSeqRunType: "",
+            idNumberSequencingCycles: "",
+            idNumberSequencingCyclesAllowed: "",
+            idSample: sample.idSample,
+            idGenomeBuildAlignTo: ""
+        };
+    }
+
 }

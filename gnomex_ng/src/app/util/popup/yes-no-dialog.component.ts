@@ -5,6 +5,8 @@ import { MatDialogRef } from '@angular/material';
     selector: "yes-no-dialog",
     templateUrl: "yes-no-dialog.component.html",
     styles: [`
+        .display-white-space { white-space: pre-line; }
+        
         .full-width  { width:  100%; } 
         .full-height { height: 100%; } 
         

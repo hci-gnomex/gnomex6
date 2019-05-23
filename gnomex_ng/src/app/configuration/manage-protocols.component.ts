@@ -1,12 +1,10 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
 
 import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 
 import {Subscription} from "rxjs";
-
-import {SpinnerDialogComponent} from "../util/popup/spinner-dialog.component";
 
 import {DialogsService} from "../util/popup/dialogs.service";
 import {DictionaryService} from "../services/dictionary.service";
@@ -80,10 +78,8 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private saveProtocolSubscription: Subscription;
     private deleteProtocolSubscription: Subscription;
 
-    private selectedProtocol: any;
     private protocolList: any[];
 
-    protected mainPaneTitle: string = 'Protocol:';
     protected protocolType: string = '';
     protected protocolName: string = '';
 
@@ -105,8 +101,8 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private mostRecentlyDisplayedProtocolId: string;
     private mostRecentlyDisplayedProtocolProtocolClassName: string;
 
-    public disableDelete: boolean = false;
-    public disableNew: boolean = false;
+    public disableDelete: boolean = true;
+    public disableNew: boolean = true;
 
     constructor(private dialog: MatDialog,
                 private dialogService: DialogsService,
@@ -118,11 +114,6 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
 
     ngOnInit(): void {
         this.treeModel = this.treeComponent.treeModel;
-
-        if (this.createSecurityAdvisorService.isGuest) {
-            this.disableDelete = true;
-            this.disableNew = true;
-        }
 
         if (!this.protocolSubscription) {
             this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {
@@ -163,10 +154,8 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             this.deleteProtocolSubscription = this.protocolService.getDeleteProtocolObservable().subscribe((result) => {
                 this.dialogService.stopAllSpinnerDialogs();
 
-                this.selectedProtocol = null;
-                this.mainPaneTitle = 'Protocol:';
+                this.protocolService.setMainPaneTitle("Protocol:");
                 this.mostRecentlyDisplayedProtocolId = '';
-                this.mostRecentlyDisplayedProtocolProtocolClassName = '';
 
                 this.refresh();
 
@@ -196,7 +185,6 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
 
     private prepareTreeNodes(list: any[]) {
         this.protocolList = list;
-        this.mostRecentlySelectedTreeItem = null;
 
         if (this.protocolList) {
             for (let protocolFolder of this.protocolList) {
@@ -208,6 +196,8 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
 
                 if (!this.mostRecentlySelectedTreeItem) {
                     this.mostRecentlySelectedTreeItem = protocolFolder;
+                    this.mostRecentlyDisplayedProtocolId = "";
+                    this.mostRecentlyDisplayedProtocolProtocolClassName = this.mostRecentlySelectedTreeItem.protocolClassName;
                 }
 
                 if(!!protocolFolder.Protocol) {
@@ -229,13 +219,34 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     }
 
     private treeOnSelect(event: any): void {
+        this.disableNew = true;
+        this.disableDelete = true;
+
+        let protocolClassName = event.node.data.protocolClassName;
+        if(protocolClassName) {
+            if(this.createSecurityAdvisorService.hasPermission(CreateSecurityAdvisorService.CAN_WRITE_DICTIONARIES)
+                || (!this.createSecurityAdvisorService.isGuest && protocolClassName === ProtocolService.ANALYSIS_PROTOCOL_CLASS_NAME)) {
+                this.disableNew = false;
+            }
+        }
+
         if (event
             && event.node
             && event.node.data
             && event.node.data.id
             && event.node.data.protocolClassName
-            && event.node.data.isProtocol
-            && event.node.data.isProtocol === 'Y') {
+            && event.node.data.isProtocol) {
+
+            this.disableDelete = event.node.data.canDelete === "Y" ? false : true;
+
+            if (event.node.parent
+                && event.node.parent.data
+                && event.node.data
+                && event.node.data.label) {
+                this.protocolType = event.node.parent.data.label;
+                this.protocolName = event.node.data.label;
+                this.protocolService.setMainPaneTitle("" + event.node.parent.data.label + ": " + event.node.data.label);
+            }
 
             if (this.mostRecentlyDisplayedProtocolId === event.node.data.id
                 && this.mostRecentlyDisplayedProtocolProtocolClassName === event.node.data.protocolClassName) {
@@ -246,16 +257,6 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
 
             this.mostRecentlyDisplayedProtocolId                = event.node.data.id;
             this.mostRecentlyDisplayedProtocolProtocolClassName = event.node.data.protocolClassName;
-
-            if (event.node.parent
-                && event.node.parent.data
-                && event.node.data
-                && event.node.data.label
-                && event.node.data.label !== '') {
-                this.protocolType = event.node.parent.data.label;
-                this.protocolName = event.node.data.label;
-                this.mainPaneTitle = '' + event.node.parent.data.label + ': ' + event.node.data.label;
-            }
 
             setTimeout(() => {
                 this.router.navigate([
@@ -268,7 +269,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 ]);
             });
         } else {
-            this.mainPaneTitle = 'Protocol:'
+            this.protocolService.setMainPaneTitle("Protocol:");
+            this.mostRecentlyDisplayedProtocolId = "";
+            this.mostRecentlyDisplayedProtocolProtocolClassName = event.node.data.protocolClassName;
+            this.router.navigate(['/manage-protocols', { outlets: { 'browsePanel': ['overview'] } }]);
         }
 
         if (event && event.node && event.node.data) {
@@ -279,10 +283,6 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private programaticallySelectTreeNode(idProtocol: string, protocolClassName: string): void {
         setTimeout(() => {
             if (this.treeModel && this.treeModel.getNodeById('' + idProtocol + protocolClassName)) {
-                // this.mostRecentlyDisplayedProtocolId                = idProtocol;
-                // this.mostRecentlyDisplayedProtocolProtocolClassName = protocolClassName;
-
-                // this.treeModel.getNodeById('' + this.mostRecentlyDisplayedProtocolId + this.mostRecentlyDisplayedProtocolProtocolClassName).setIsActive(true, false);
                 this.treeModel.getNodeById('' + idProtocol + protocolClassName).setIsActive(true, false);
             }
         });
@@ -311,9 +311,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             if (result
                 && result.reloadTree
                 && result.idProtocol
-                && result.idProtocol !== ''
-                && result.protocolClassName
-                && result.protocolClassName !== '') {
+                && result.protocolClassName) {
 
                 this.mostRecentlyDisplayedProtocolId = result.idProtocol;
                 this.mostRecentlyDisplayedProtocolProtocolClassName = result.protocolClassName;
@@ -323,11 +321,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             }
         });
     }
+
     private onDeleteProtocolButtonClicked() {
         if (this.mostRecentlyDisplayedProtocolId
-            && this.mostRecentlyDisplayedProtocolId !== ''
-            && this.mostRecentlyDisplayedProtocolProtocolClassName
-            && this.mostRecentlyDisplayedProtocolProtocolClassName !== '') {
+            && this.mostRecentlyDisplayedProtocolProtocolClassName) {
 
             let lines: string[] = [
                 "Are you sure you want to delete the ",
@@ -335,14 +332,13 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 "" + this.protocolName + "?"
             ];
 
-            this.dialogService.yesNoDialog(lines, this, "onConfirmDelete")
+            this.dialogService.yesNoDialog(lines, this, "onConfirmDelete");
         }
     }
+
     private onConfirmDelete() {
         if (this.mostRecentlyDisplayedProtocolId
-            && this.mostRecentlyDisplayedProtocolId !== ''
-            && this.mostRecentlyDisplayedProtocolProtocolClassName
-            && this.mostRecentlyDisplayedProtocolProtocolClassName !== '') {
+            && this.mostRecentlyDisplayedProtocolProtocolClassName) {
             this.dialogService.startDefaultSpinnerDialog();
             setTimeout(() => {
                 this.protocolService.deleteProtocol(this.mostRecentlyDisplayedProtocolId, this.mostRecentlyDisplayedProtocolProtocolClassName);
@@ -351,6 +347,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             this.dialogService.alert("Error : No selected protocol");
         }
     }
+
     private onRefreshButtonClicked() {
         this.refresh();
     }

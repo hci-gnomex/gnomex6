@@ -193,5 +193,10 @@
 	<Dictionary displayName="Column Properties" className="hci.gnomex.model.ColumnProperties" editable="N" >
 		<Filter className="hci.gnomex.model.RequestCategory" filterField="codeRequestCategory"/>
 	</Dictionary>
+	<Dictionary displayName="SampleAnnotations" className="hci.gnomex.model.PropertyPlatformApplication" editable="N" >
+		<Filter className="hci.gnomex.model.RequestCategory" filterField="codeRequestCategory"/>
+		<Filter className="hci.gnomex.model.Application" filterField="codeApplication"/>
+		<Filter className="hci.gnomex.model.Property" filterField="idProperty"/>
+	</Dictionary>
 </Dictionaries>
 	

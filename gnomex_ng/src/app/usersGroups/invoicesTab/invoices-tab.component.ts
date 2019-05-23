@@ -41,7 +41,7 @@ import {DOCUMENT} from "@angular/common";
             display: flex;
             flex-grow: 1;
         }
-    mat-form-field.formField {
+    .formField {
         width: 50%;
         margin: 0 0.5%;
     }
@@ -56,7 +56,6 @@ export class InvoicesTabComponent implements OnInit {
     @Input() label = '';
 
     @ViewChild(MatAutocomplete) matAutocomplete: MatAutocomplete;
-    private core: any;
     private cores: any[];
     private monthInputCtrl: FormControl = new FormControl(new Date(2020,0,1));
     private billingPeriods: any[] = [];
@@ -66,7 +65,6 @@ export class InvoicesTabComponent implements OnInit {
     private billingPeriodComplete: boolean = false;
     private complete: BehaviorSubject<boolean> = new BehaviorSubject<boolean> (false);
     private selectedBillingPeriod: any;
-    private selectedCore: any;
     private billingAccounts: any[] = [];
     private selectedAccounts: any[] = [];
     private invoiceBillingAccountList: string = "";
@@ -102,10 +100,10 @@ export class InvoicesTabComponent implements OnInit {
         });
         this.complete.subscribe((value) => {
             if (value) {
-                if (this.selectedBillingPeriod && this.selectedCore) {
+                if (this.selectedBillingPeriod && this.coreFacilityFC.value) {
                     let params: URLSearchParams = new URLSearchParams();
                     params.set("idBillingPeriod", this.selectedBillingPeriod.value);
-                    params.set("idCoreFacility", this.selectedCore.idCoreFacility);
+                    params.set("idCoreFacility", this.coreFacilityFC.value);
                     params.set("idLab", this.memberGroup.idLab);
                     this.billingService.getBillingAccountListForPeriodAndCore(params).subscribe((response: any) => {
                         if (response) {
@@ -141,23 +139,9 @@ export class InvoicesTabComponent implements OnInit {
         this.monthInputCtrl.setValue(this.max);
     }
 
-    chooseFirstOption(): void {
-        this.matAutocomplete.options.first.select();
-    }
-
-    highlightFirstOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.matAutocomplete.options.first) {
-            this.matAutocomplete.options.first.setActiveStyles();
-        }
-    }
-
-    selectOption(event) {
-        this.selectedCore = this.cores.filter((cor => cor.facilityName === event.source.value))[0];
+    selectOption() {
         this.billingPeriodComplete = true;
-        if (this.coreFacilityComplete && this.billingPeriodComplete && event.source.selected) {
+        if (this.coreFacilityComplete && this.billingPeriodComplete && this.coreFacilityFC.value) {
             this.billingAccounts = [];
             this.complete.next(true);
         }
@@ -221,7 +205,7 @@ export class InvoicesTabComponent implements OnInit {
         let url: string = this.document.location.href;
         url += "/ShowBillingInvoiceForm.gx?idBillingPeriod=" + this.selectedBillingPeriod.idBillingPeriod;
         url += "&idLabs=" + this.invoiceLabList;
-        url += "&idCoreFacility=" + this.selectedCore.idCoreFacility;
+        url += "&idCoreFacility=" + this.coreFacilityFC.value;
         url += "&idBillingAccounts=" + this.invoiceBillingAccountList;
         window.open(url, "_blank");
     }
