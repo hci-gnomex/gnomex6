@@ -17,7 +17,7 @@
                                 <label class="small-font">{{analysisCountMessage}}</label>
                             </div>
                             <div>
-                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()" [disabled]="this.createSecurityAdvisorService.isGuest">
+                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked($event)" [disabled]="this.createSecurityAdvisorService.isGuest">
                                     <img src="../../assets/information.png">
                                     Drag-and-drop hint
                                 </button>

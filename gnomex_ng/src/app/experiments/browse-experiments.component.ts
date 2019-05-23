@@ -22,7 +22,7 @@ import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angu
 import {BrowseFilterComponent} from "../util/browse-filter.component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
 import {MatCheckboxChange, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
@@ -38,6 +38,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
+import {filter} from "rxjs/operators";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -99,7 +100,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     @ViewChild(BrowseFilterComponent)
 
     /**
-    angular2-tree options
+     angular2-tree options
      */
     public options: ITreeOptions;
     public state: ITreeState;
@@ -132,6 +133,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private navProjectReqList: any;
     private navInitSubscription: Subscription;
     private labListSubscription: Subscription;
+    private navEndSubscription: Subscription;
     private parentProject: any;
     private setActiveNodeId: string;
     private canDeleteProjectSubscription: Subscription;
@@ -174,6 +176,23 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.disableDeleteProject = !canDelete;
             });
         });
+
+
+        this.navEndSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd))
+            .subscribe((event:NavigationEnd) =>{
+                if(this.route.snapshot.firstChild) {
+                    let data = this.route.snapshot.firstChild.data;
+                    if (data.experiment && data.experiment.Request) {
+                        this.selectedExperiment = data.experiment.Request;
+                        if (this.selectedExperiment.canDelete === "Y") {
+                            this.disableDeleteExperiment = false;
+                        } else {
+                            this.disableDeleteExperiment = true;
+                        }
+                    }
+                }
+            });
+
     }
 
     ngAfterViewInit() {}
@@ -317,8 +336,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     /**
-    Build the tree data
-    @param
+     Build the tree data
+     @param
      */
     buildTree(response: any[]) {
         this.labs = [];
@@ -393,7 +412,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
     /**
-    Start of Ng2 tree
+     Start of Ng2 tree
      */
     onMoveNode($event) {
         console.log(
@@ -409,8 +428,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     /**
-        Determine if the object is an array
-        @param what
+     Determine if the object is an array
+     @param what
      */
     isArray(what) {
         return Object.prototype.toString.call(what) === "[object Array]";
@@ -611,7 +630,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
-             navArray = ["/experiments", {outlets: {"browsePanel": "overview"}}];
+            navArray = ["/experiments", {outlets: {"browsePanel": "overview"}}];
 
             //Project
         } else if (this.selectedItem.level === 2) {
@@ -626,19 +645,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             navArray = ["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
             this.parentProject = event.node.parent;
             this.disableNewProject = true;
-            this.experimentsService.getExperiment(this.selectedItem.data.idRequest).subscribe((response: any) => {
-                this.selectedExperiment = response.Request;
-                if (response.Request.canDelete === "Y") {
-                    this.disableDeleteExperiment = false;
-                } else {
-                    this.disableDeleteExperiment = true;
-                }
-            },(err:IGnomexErrorResponse) => {
-            });
+
 
         }
 
         this.router.navigate(navArray);
+
 
     }
 
@@ -678,6 +690,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     ngOnDestroy(): void {
         this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.navInitSubscription.unsubscribe();
+        this.navEndSubscription.unsubscribe();
         this.gnomexService.navInitBrowseExperimentSubject.next(null);
         this.projectRequestListSubscription.unsubscribe();
         this.labListSubscription.unsubscribe();
