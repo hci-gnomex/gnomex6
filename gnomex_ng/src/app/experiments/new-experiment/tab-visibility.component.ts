@@ -103,7 +103,9 @@ export class TabVisibilityComponent implements OnInit, OnDestroy{
                         }
 
                         this.collabGridRowData         = this.addNameToCollabs(currentCollaborators);
-                        this._experiment.collaborators = this.collabGridRowData;
+                        this._experiment.collaborators = this.collabGridRowData.filter((value:any) => {
+                            return value && value.canView_frontEndOnly && value.canView_frontEndOnly === 'Y';
+                        });
 
                         if (this.currentLab) {
                             this.updateCollaborators();
@@ -364,7 +366,9 @@ export class TabVisibilityComponent implements OnInit, OnDestroy{
             this.visibilityForm.get("privacyExp").setValue(new Date());
         }
 
-        this._experiment.collaborators = this.collabGridRowData;
+        this._experiment.collaborators = this.collabGridRowData.filter((value:any) => {
+            return value && value.canView_frontEndOnly && value.canView_frontEndOnly === 'Y';
+        });
 
         this.collabDropdown = prepCollabsList;
     }

@@ -842,7 +842,15 @@ public class Util {
     }
 
     public static String getLabDisplayName(Lab labToPrint, UserPreferences userPreferences) {
-        return userPreferences.getFormatNamesFirstLast() ? labToPrint.getNameFirstLast() : labToPrint.getName();
+        if (labToPrint == null) {
+            return "";
+        }
+
+        if (userPreferences != null) {
+            return userPreferences.getFormatNamesFirstLast() ? labToPrint.getNameFirstLast() : labToPrint.getName();
+        } else {
+            return labToPrint.getName();
+        }
     }
 
     public static String formatLabDisplayName(String firstName, String lastName, UserPreferences userPreferences) {

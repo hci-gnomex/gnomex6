@@ -160,7 +160,13 @@ export class Sample {
         sample.cloneProperty("prepInstructions", source);
         sample.cloneProperty("frontEndGridGroup", source);
 
-        // Todo : use keyset to get annotations
+        if (source) {
+            for (let attribute of Object.keys(source)) {
+                if (attribute.startsWith("ANNOT")) {
+                    sample.cloneProperty(attribute, source);
+                }
+            }
+        }
 
         return sample;
     }

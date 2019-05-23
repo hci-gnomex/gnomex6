@@ -28,6 +28,7 @@ import {TextAlignRightMiddleEditor} from "../../util/grid-editors/text-align-rig
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GridApi} from "ag-grid-community";
+import {SampleUploadService} from "../../upload/sample-upload.service";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -243,6 +244,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
+    @Input("lab") set lab(value: any) {
+        this._lab = value;
+    }
+
     private _stateChangeSubject: BehaviorSubject<string>;
 
     public static readonly STATE_NEW: string  = 'NEW';
@@ -253,6 +258,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public static readonly TEXT_RIGHT: string = 'text-right';
     public static readonly OPTION: string = 'option';
     public static readonly MULTIOPTION: string = 'multioption';
+
+    private _lab: any;
 
     public get STATE_NEW(): string {
         return TabSamplesIlluminaComponent.STATE_NEW;
@@ -540,11 +547,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
             sortOrder: 15
         });
 
+        let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
 
         for (let columnProperty of this.columnProperties) {
 
             if (columnProperty.showInNewMode && columnProperty.showInNewMode === 'Y') {
-                let editable: boolean = columnProperty.editableNewMode && columnProperty.editableNewMode === 'Y';
+                if (isExternal && columnProperty.showForExternal === 'N') {
+                    continue;
+                }
+
+                let editable: boolean = (columnProperty.editableNewMode && columnProperty.editableNewMode === 'Y') || isExternal;
                 let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
 
                 let newColumn: any = {
@@ -818,10 +830,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
             pinned:    "left"
         });
 
+        let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
+
         for (let columnProperty of this.columnProperties) {
 
             if (columnProperty.showInEditMode && columnProperty.showInEditMode === 'Y') {
-                let editable: boolean = columnProperty.editableEditMode && columnProperty.editableEditMode === 'Y';
+                if (isExternal && columnProperty.showForExternal === 'N') {
+                    continue;
+                }
+
+                let editable: boolean = (columnProperty.editableEditMode && columnProperty.editableEditMode === 'Y') || isExternal;
                 let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
 
                 let newColumn: any = {
@@ -1085,7 +1103,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 fillGroupAttribute: 'frontEndGridGroup',
                 sortOrder: 505
             });
-        } else {
+        } else if (!isExternal) {
             temp.push({
                 headerName: "QC Status",
                 field: "qualStatus",
@@ -1155,10 +1173,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
             pinned: 'left'
         });
 
+        let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
+
         // Add all configurable columns for this RequestCategory.
         for (let columnProperty of this.columnProperties) {
 
             if (columnProperty.showInViewMode && columnProperty.showInViewMode === 'Y') {
+                if (isExternal && columnProperty.showForExternal === 'N') {
+                    continue;
+                }
+
                 let editable: boolean = false;
                 let showFillButton: boolean = columnProperty.showFillButton && columnProperty.showFillButton === 'Y';
 
@@ -1402,7 +1426,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 private gnomexService: GnomexService,
                 private fb: FormBuilder,
                 private dialog: MatDialog,
-                private propertyService: PropertyService) { }
+                private propertyService: PropertyService,
+                private sampleUploadService: SampleUploadService) { }
 
     ngOnInit() {
         this.organisms = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
@@ -2007,7 +2032,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public download(): void {
-        console.log("Hello world");
+        let state: string = "";
+
+        if (this._state === TabSamplesIlluminaComponent.STATE_NEW) {
+            state = "new";
+        }
+
+        if (this._lab) {
+            this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
+        }
     }
 
     public onClickShowInstructions(): void {
@@ -2016,10 +2049,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     public onAddSample(): void {
         let newSample: Sample = Sample.createSampleObjectFromAny(this.dictionaryService, null);
+        newSample.idSample = "Sample" + this.experiment.samples.length;
         newSample.index = this.experiment.samples.length + 1;
         if (this.experiment.idOrganism) {
             newSample.idOrganism = this.experiment.idOrganism;
         }
+        newSample.numberSequencingLanes = "1";
 
         this.experiment.samples.push(newSample);
         this.experiment.numberOfSamples = this.experiment.samples.length;

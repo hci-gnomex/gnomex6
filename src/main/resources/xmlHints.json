@@ -343,6 +343,18 @@
           "elementheader": "someEntry3"
         }
       ]
+    },
+    {
+      "command": "DownloadSampleSheet",
+      "parameter": "names",
+      "nodeheader": "NameList",
+      "nodeprefix": "FieldItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
     }
   ]
 }
