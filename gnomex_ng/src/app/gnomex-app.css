@@ -3,6 +3,8 @@
 @import '~ag-grid-community/dist/styles/ag-grid.css';
 @import '~ag-grid-community/dist/styles/ag-theme-fresh.css';
 @import '~ag-grid-community/dist/styles/ag-theme-balham.css';
+@import './gnomex-app-color.css';
+
 
 html {
     position: relative;
@@ -265,8 +267,8 @@ img.icon {
     margin-right: 2em;
 }
 
-.no-padding {
-    padding: 0;
+.no-padding .mat-dialog-container {
+    padding: 0 !important;
 }
 
 .no-margin {
@@ -373,6 +375,14 @@ button.mat-button.link-button {
     background-color: #84b278;
     color: white;
 }
+.generic-dialog-header-colors{
+    background-color: var(--bluewarmvivid-medlight);
+    color: white;
+}
+.generic-dialog-footer-colors{
+    background-color: var(--sidebar-footer-background-color);
+}
+
 
 label.mat-radio-label {
     margin-top: 0.15em !important;

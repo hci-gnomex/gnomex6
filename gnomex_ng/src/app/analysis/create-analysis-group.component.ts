@@ -61,6 +61,7 @@ export class CreateAnalysisGroupComponent implements OnInit, AfterViewInit {
                                      Validators.maxLength(this.constantsService.MAX_LENGTH_500)]],
             description: ["", [Validators.maxLength(this.constantsService.MAX_LENGTH_500)]],
         });
+        this.createAnalysisGroupForm.markAsPristine();
 
     }
 

@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {URLSearchParams} from "@angular/http";
 import {DialogsService} from "./popup/dialogs.service";
+import {ActionType} from "./interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'save-footer',
@@ -11,49 +12,65 @@ import {DialogsService} from "./popup/dialogs.service";
                     {{this.message}}
                 </div>
                 <div class="major-left-right-margin">
-                    <button [disabled]="disableSave"  type="submit" mat-button  color="primary" (click)="notifySave()">
-                        <img src="../../../assets/action_save.gif">
-                        {{actionType}}
+                    <button mat-raised-button [disabled]="disableSave" 
+                            [color]="actionType" (click)="notifySave()"
+                            [ngClass]="{'primary-action': actionType === type.PRIMARY,
+                                        'secondary-action': actionType === type.SECONDARY && !disableSave }">
+                            <img *ngIf="icon" [src]="icon"> {{name}}
                     </button>
                 </div>
             </div>
         </div>
     `,
     styles: [`
-        
-        .padded { padding: 0.3em; }
-        
-        .major-left-right-margin {
-            margin-left:  1em;
-            margin-right: 1em;
+        .primary-action{
+            background-color: var(--bluewarmvivid-medlight);
+            font-weight: bolder;
+            color: white;
         }
-        
+        .secondary-action{
+            background-color: white;
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
+        }
+
+        .padded { padding: 0.3em; }
+
+        .major-left-right-margin {
+            margin-left:  0.5em;
+            margin-right: 0.5em;
+        }
+
         .right-align {
             text-align: right;
             justify-content: flex-end;
         }
-        
-        
+
+
         .warning-background { background:#feec89; }
-        
+
     `]
 })
 export class SaveFooterComponent implements OnInit,OnDestroy {
 
     private _dirty:boolean;
 
+
+    @Input() actionType:ActionType = ActionType.PRIMARY;
+    @Input() icon:string;
     @Input() message:string = "Your changes have not been saved";
-    @Input() actionType:string = "Save";
-    @Input() set dirty(data:boolean){
-      if(data){
-          this._dirty = data;
-      }else{
-          this._dirty = false;
-      }
+    @Input() name:string = "Save";
+    @Input() set dirty(data:any){
+        if(data){
+            this._dirty = data;
+        }else{
+            this._dirty = false;
+        }
 
     }
     get dirty(){
-       return this._dirty;
+        return this._dirty;
     }
 
 
@@ -70,6 +87,7 @@ export class SaveFooterComponent implements OnInit,OnDestroy {
 
     @Input() disableSave = false;
     @Output() saveClicked = new EventEmitter<any>();
+    type = ActionType;
 
     constructor(private dialogsService: DialogsService) { }
 

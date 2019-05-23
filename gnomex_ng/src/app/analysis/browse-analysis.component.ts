@@ -1,18 +1,5 @@
-import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component,
-    OnDestroy,
-    OnInit,
-    ViewChild,
-} from "@angular/core";
-import {
-    ITreeOptions,
-    TREE_ACTIONS,
-    TreeComponent,
-    TreeModel,
-    TreeNode,
-} from "angular-tree-component";
+import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from "@angular/core";
+import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode,} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -29,6 +16,8 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 
 @Component({
@@ -269,6 +258,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
                 private route: ActivatedRoute,
+                private constService:ConstantsService,
                 private utilService: UtilService,
                 private gnomexService: GnomexService,
                 private labListService: LabListService,
@@ -434,7 +424,13 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 parentComponent: "Analysis",
             };
 
-            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
+
+            this.dialogsService.genericDialogContainer(CreateAnalysisComponent,"Create Analysis",null,configuration, {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name:"Save" , internalAction:"saveAnalysis",externalAction:()=>{ console.log("hello")}},
+                    {type: ActionType.SECONDARY,  name:"Cancel", internalAction:"cancel"}
+                ]});
+
+            //this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
         }
     }
 
@@ -461,7 +457,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 selectedLab: this.selectedIdLab,
             };
 
-            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration);
+            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration,);
         }
     }
 
@@ -488,7 +484,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         let navArray: Array<any> = [];
 
 
-            //Lab
+        //Lab
         if (this.selectedItem.level === 1) {
             this.analysisService.selectedNodeId = event.node.data.id;
             this.disableNewAnalysis = false;
