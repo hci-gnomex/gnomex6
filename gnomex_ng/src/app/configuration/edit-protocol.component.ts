@@ -153,18 +153,20 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
                     this.disableViewURLButton = true;
                 }
 
-                if (result.canUpdate === "Y") {
-                    this.form.enable();
-                    this.editorConfig.showToolbar = true;
-                    this.editorConfig.editable = true;
-                } else {
-                    this.form.disable();
-                    this.editorConfig.showToolbar = false;
-                    this.editorConfig.editable = false;
-                }
-
                 this.form.markAsPristine();
                 this.protocolLoaded.emit(true);
+
+                setTimeout(() => {
+                    if (result.canUpdate === "Y") {
+                        this.form.enable();
+                        this.descEditor.editorToolbar.showToolbar = true;
+                        this.editorConfig.editable = true;
+                    } else {
+                        this.form.disable();
+                        this.descEditor.editorToolbar.showToolbar = false;
+                        this.editorConfig.editable = false;
+                    }
+                });
 
                 this.dialogService.stopAllSpinnerDialogs();
             });

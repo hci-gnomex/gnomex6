@@ -13,6 +13,8 @@ import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
 
 @Component({
     selector: 'configure-organisms',
@@ -39,7 +41,7 @@ export class ConfigureOrganismsComponent implements OnInit {
     public genomeBuildGridApi: GridApi;
     public genomeBuildGridColumnDefs: any[];
     public genomeBuildList: any[];
-    private genomeBuildSelectedIndex: any;
+    public genomeBuildSelectedIndex: any;
 
     public selectedOrganism: any;
     public showSpinner: boolean;
@@ -60,7 +62,13 @@ export class ConfigureOrganismsComponent implements OnInit {
         this.organismGridColumnDefs = [ {headerName: "Organism", field: "organism", width: 10} ];
         this.genomeBuildSelectedIndex = null;
         this.genomeBuildGridColumnDefs = [
-            {headerName: "Name", field: "genomeBuildName", width: 10, editable: this.determineEditable},
+            {headerName: "Name", field: "genomeBuildName", width: 10, editable: this.determineEditable,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                validators: [ Validators.required ],
+                errorNameErrorMessageMap: [
+                    { errorName: "required", errorMessage: "Name is required" }
+                ]},
             {headerName: "Das2Name", field: "das2Name", width: 10, editable: this.determineEditable},
             {headerName: "Build Date", field: "buildDate", width: 10, cellRendererFramework: DateRenderer,
                 cellEditorFramework: DateEditor, dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -118,7 +126,7 @@ export class ConfigureOrganismsComponent implements OnInit {
                     });
                 }
             }
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }
@@ -187,13 +195,18 @@ export class ConfigureOrganismsComponent implements OnInit {
                 return;
             }
 
+            if (!this.checkGenomeBuildNames()) {
+                this.dialogsService.confirm("Genome build name is required. Please specify a name for each genome build", null);
+                return;
+            }
+
             if (this.das2NameFC.value === "" || this.binomialNameFC.value === "") {
                 this.dialogsService.confirm("If binomial name or das2Name are left blank they will not be displayed in the Data Tracks View. Save Anyway?", " ").subscribe((response: boolean) => {
                     if (response) {
                         this.saveOrganism();
                     }
                 });
-            } else if (!this.checkGenomeBuildNames()) {
+            } else if (!this.checkGenomeBuildDas2Names()) {
                 this.dialogsService.confirm("You have left the das2Name field blank in the Genome Build grid. If you leave this field blank it will not be displayed in the Data Tracks View. Save Anyway?", " ").subscribe((response: boolean) => {
                     if (response) {
                         this.saveOrganism();
@@ -206,6 +219,15 @@ export class ConfigureOrganismsComponent implements OnInit {
     }
 
     private checkGenomeBuildNames(): boolean {
+        for (let build of this.genomeBuildList) {
+            if (build.genomeBuildName === "") {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private checkGenomeBuildDas2Names(): boolean {
         for (let build of this.genomeBuildList) {
             if (build.das2Name === "") {
                 return false;
@@ -248,13 +270,9 @@ export class ConfigureOrganismsComponent implements OnInit {
                 config.duration = 2000;
                 this.snackBar.open("Organism Saved", "Configure Organisms", config);
                 this.loadOrganismList(name);
-            } else {
-                let message: string = "";
-                if (result && result.message) {
-                    message = ": " + result.message;
-                }
-                this.dialogsService.confirm("An error occurred while saving the organism" + message, null);
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 
@@ -289,6 +307,7 @@ export class ConfigureOrganismsComponent implements OnInit {
             this.ownerFC.setValue("");
             this.genomeBuildList = [];
         }
+        this.genomeBuildSelectedIndex = null;
         this.showSpinner = false;
         UtilService.markChildrenAsTouched(this.formGroup);
     }
@@ -320,9 +339,9 @@ export class ConfigureOrganismsComponent implements OnInit {
         if (this.canUpdateSelectedOrganism) {
             let gb: any = {};
             gb.idGenomeBuild = "GenomeBuild" + this.genomeBuildList.length;
-            gb.das2Name = "Enter das2Name...";
+            gb.das2Name = "";
             gb.buildDate = ConfigureOrganismsComponent.formatTodaysDate();
-            gb.genomeBuildName = "Enter Name...";
+            gb.genomeBuildName = "";
             gb.isActive = "Y";
             gb.isLatestBuild = "N";
             gb.canUpdate = "Y";
