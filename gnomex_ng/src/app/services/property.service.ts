@@ -63,6 +63,8 @@ export class PropertyService {
     public static readonly PROPERTY_EXPERIMENT_FILE_SAMPLE_LINKING_ENABLED:string = "experiment_file_sample_linking_enabled";
 
     public static readonly PROPERTY_QC_INSTRUCTIONS: string = "qc_instructions";
+    public static readonly PROPERTY_BST_LINKAGE_SUPPORTED: string = "bst_linkage_supported";
+    public static readonly PROPERTY_CAN_ACCESS_BSTX: string = "can_access_bstx";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,

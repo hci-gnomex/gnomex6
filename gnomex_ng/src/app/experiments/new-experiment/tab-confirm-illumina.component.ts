@@ -37,15 +37,15 @@ import {GridApi} from "ag-grid-community";
         .heavily-left-padded { padding-left: 1.5em; }
         .heavily-right-padded { padding-right: 1.5em; }
         
-        .moderate-width { 
+        .moderate-width {
             width: 5em;
             min-width: 5em;
         }
         
         
-        .wide-display { 
-            min-width: 15em; 
-            width: 15%; 
+        .wide-display {
+            min-width: 15em;
+            width: 15%;
         }
         
         
@@ -94,7 +94,9 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     @Input("requestCategory") set requestCategory(requestCategory: any) {
-        this.useMultiplexLanes = requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
+        setTimeout(() => {
+            this.useMultiplexLanes = requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
+        });
     }
 
 

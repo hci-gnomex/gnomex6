@@ -229,10 +229,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 this.createColumnsBasedOnState(state);
                 this.assignRowDataBasedOnState(state);
 
-                if (this.showCcCheckbox
-                    && (this._state === TabSamplesIlluminaComponent.STATE_EDIT
-                        || this._state === TabSamplesIlluminaComponent.STATE_VIEW)) {
-
+                if (this.showCcCheckbox) {
                     setTimeout(() => {
                         if (this.ccCheckbox) {
                             this.ccCheckbox.checked = true;
@@ -288,15 +285,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showCcCheckbox(): boolean {
-        let search1: any = this.propertyService.getProperty("bst_linkage_supported");
-        let search2: any = this.propertyService.getProperty("can_access_bstx");
+        let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
+        let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
 
         return this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
             && this._experiment.requestCategory.isIlluminaType === 'N'
-            && search1 && search1.propertyValue
-            && search2 && search2.propertyValue;
+            && isBSTLinkageSupported
+            && canAccessBSTX;
     }
 
     public get showNucleicAcidExtractionMethod(): boolean {
