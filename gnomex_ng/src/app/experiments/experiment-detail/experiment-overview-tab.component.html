@@ -1,3 +1,4 @@
+<form [formGroup]="this.overviewTabForm">
 <div class="full-height full-width padded small-font">
     <div class="full-width flex-container-col">
         <div class="full-width flex-container-row">
@@ -17,8 +18,7 @@
                     <div class="flex-grow">
                         <div [matTooltip]="_experiment?.labName">
                             <mat-form-field class="full-width">
-                                <mat-select [(value)]="_experiment.idLab"
-                                            [disabled]="!isEditMode || !(isAdmin || _experiment.canUpdate === 'Y')"
+                                <mat-select [(value)]="_experiment.idLab" formControlName="idLab"
                                             (selectionChange)="onChange_lab($event)">
                                     <mat-option [value]="">
                                         {{ '' }}
@@ -38,8 +38,7 @@
                     <div class="flex-grow">
                         <div [matTooltip]="_experiment?.project?.Project?.name">
                             <mat-form-field class="full-width">
-                                <mat-select [(value)]="_experiment.idProject"
-                                            [disabled]="!isEditMode || !(isAdmin || _experiment.canUpdate === 'Y')"
+                                <mat-select [(value)]="_experiment.idProject" formControlName="idProject"
                                             (selectionChange)="onChange_project($event)">
                                     <mat-option *ngFor="let project of projectsDictionary" [value]="project.idProject">
                                         {{ project.name }}
@@ -76,8 +75,7 @@
                             <div [matTooltip]="_experiment?.application?.Application?.display">
                                 <mat-form-field class="full-width">
                                     <mat-select
-                                            [(value)]="_experiment.codeApplication"
-                                            [disabled]="!isEditMode || !(isAdmin || (_experiment.canUpdate === 'Y' && _experiment.isExternal =='Y'))"
+                                            [(value)]="_experiment.codeApplication" formControlName="codeApplication"
                                             (selectionChange)="onChange_application($event)" >
                                         <mat-option [value]="">
                                             {{ '' }}
@@ -135,9 +133,8 @@
                         <div [matTooltip]="_experiment?.ownerName">
                             <mat-form-field class="full-width">
                                 <mat-select
-                                        [(value)]="_experiment.idAppUser"
-                                        (selectionChange)="onChange_owner($event)"
-                                        [disabled]="!isEditMode || !(isAdmin || _experiment.canUpdate === 'Y')">
+                                        [(value)]="_experiment.idAppUser" formControlName="idAppUser"
+                                        (selectionChange)="onChange_owner($event)">
                                     <mat-option [value]="">
                                         {{ '' }}
                                     </mat-option>
@@ -157,9 +154,8 @@
                         <div [matTooltip]="_experiment?.submitterName">
                             <mat-form-field class="full-width">
                                 <mat-select
-                                        [(value)]="_experiment.idSubmitter"
-                                        (selectionChange)="onChange_submitter($event)"
-                                        [disabled]="!isEditMode || !isAdmin">
+                                        [(value)]="_experiment.idSubmitter" formControlName="idSubmitter"
+                                        (selectionChange)="onChange_submitter($event)">
                                     <mat-option [value]="">
                                         {{ '' }}
                                     </mat-option>
@@ -187,68 +183,69 @@
                         {{ _experiment?.phone }}
                     </div>
                 </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Institution
-                    </div>
-                    <div class="flex-grow">
-                        {{ institutionName }}
-                    </div>
-                </div>
-                <div class="field-width flex-container-row padded">
-                    <div class="label label-width flex-container-col">
-                        Visibility
-                        <context-help name="visibilityLevel" [isEditMode]="isAdmin && isEditMode"
-                                      popupTitle="Visibility Level Help"
-                                      [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
-                    </div>
-                    <div class="flex-grow flex-container-row align-center">
-                        <mat-radio-group class="flex-container-col"  [(value)]="_experiment.codeVisibility" (change)="onUpdateVisibility($event)" >
-                            <mat-radio-button
-                                    *ngFor="let rad of visibilityOptions"
-                                    [value]="rad.value"
-                                    [disabled]="!isEditMode || !isAdmin"
-                                    [matTooltip]="rad.tooltip">
-                                <img [src]="rad.icon">
-                                {{ rad.display }}
-                            </mat-radio-button>
-                        </mat-radio-group>
-                        <div class="full-height horizontal-spacing">
-                        </div>
-                        <div *ngIf="isPrivacyExpSupported && _experiment.codeVisibility !== 'PUBLIC'" class="flex-grow">
-                            <mat-form-field class="short-input"
-                                            matTooltip="Date of Public Visibility &#13;(Visibility automatically changes to public on this date)">
-                                <input matInput
-                                       [(value)]="privacyExp"
-                                       placeholder="Privacy Expiration"
-                                       [matDatepicker]="privacyPicker"
-                                       [min]="this.today">
-                                <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
-                                <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
-                            </mat-form-field>
-                            <context-help name="visibilityPrivacyExpiration" [isEditMode]="isAdmin && isEditMode"
-                                          popupTitle="Visibility Privacy Expiration Help"
-                                          [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
-                        </div>
-                    </div>
-                </div>
-                <div class="field-width flex-container-row padded">
-                    <div class="label label-width padded">
-                        <button mat-button
-                                class="label underline minimize limit-width"
-                                style="padding-left: 0;"
-                                [disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"
-                                (click)="onClickCollaborators()">
-                            Collaborators
-                        </button>
-                    </div>
-                    <context-help name="visibilityCollaborators" [isEditMode]="isAdmin && isEditMode"
-                                  popupTitle="Visibility Collaborator Help"
-                                  [idCoreFacility]="this._experiment.idCoreFacility"></context-help>
-                    <div class="flex-grow flex-container-col multi-line max-height padded">
-                        {{ currentCollaboratorsDisplay }}
-                    </div>
-                </div>
+                <!--<div class="field-width align-center flex-container-row padded">-->
+                    <!--<div class="label label-width">-->
+                        <!--Institution-->
+                    <!--</div>-->
+                    <!--<div class="flex-grow">-->
+                        <!--{{ institutionName }}-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--Commented Visibility and Collaborators as we moved them to Visibility tab-->
+                <!--<div class="field-width flex-container-row padded">-->
+                    <!--<div class="label label-width flex-container-col">-->
+                        <!--Visibility-->
+                        <!--<context-help name="visibilityLevel" [isEditMode]="isAdmin && isEditMode"-->
+                                      <!--popupTitle="Visibility Level Help"-->
+                                      <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
+                    <!--</div>-->
+                    <!--<div class="flex-grow flex-container-row align-center">-->
+                        <!--<mat-radio-group class="flex-container-col"  [(value)]="_experiment.codeVisibility" (change)="onUpdateVisibility($event)" >-->
+                            <!--<mat-radio-button-->
+                                    <!--*ngFor="let rad of visibilityOptions"-->
+                                    <!--[value]="rad.value"-->
+                                    <!--[disabled]="!isEditMode || !isAdmin"-->
+                                    <!--[matTooltip]="rad.tooltip">-->
+                                <!--<img [src]="rad.icon">-->
+                                <!--{{ rad.display }}-->
+                            <!--</mat-radio-button>-->
+                        <!--</mat-radio-group>-->
+                        <!--<div class="full-height horizontal-spacing">-->
+                        <!--</div>-->
+                        <!--<div *ngIf="isPrivacyExpSupported && _experiment.codeVisibility !== 'PUBLIC'" class="flex-grow">-->
+                            <!--<mat-form-field class="short-input"-->
+                                            <!--matTooltip="Date of Public Visibility &#13;(Visibility automatically changes to public on this date)">-->
+                                <!--<input matInput-->
+                                       <!--[(value)]="privacyExp"-->
+                                       <!--placeholder="Privacy Expiration"-->
+                                       <!--[matDatepicker]="privacyPicker"-->
+                                       <!--[min]="this.today">-->
+                                <!--<mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>-->
+                                <!--<mat-datepicker #privacyPicker disabled="false"></mat-datepicker>-->
+                            <!--</mat-form-field>-->
+                            <!--<context-help name="visibilityPrivacyExpiration" [isEditMode]="isAdmin && isEditMode"-->
+                                          <!--popupTitle="Visibility Privacy Expiration Help"-->
+                                          <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="field-width flex-container-row padded">-->
+                    <!--<div class="label label-width padded">-->
+                        <!--<button mat-button-->
+                                <!--class="label underline minimize limit-width"-->
+                                <!--style="padding-left: 0;"-->
+                                <!--[disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"-->
+                                <!--(click)="onClickCollaborators()">-->
+                            <!--Collaborators-->
+                        <!--</button>-->
+                    <!--</div>-->
+                    <!--<context-help name="visibilityCollaborators" [isEditMode]="isAdmin && isEditMode"-->
+                                  <!--popupTitle="Visibility Collaborator Help"-->
+                                  <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
+                    <!--<div class="flex-grow flex-container-col multi-line max-height padded">-->
+                        <!--{{ currentCollaboratorsDisplay }}-->
+                    <!--</div>-->
+                <!--</div>-->
             </div>
         </div>
         <div *ngIf="processedWorkflowSteps && processedWorkflowSteps.length > 0" class="full-width max-width bordered padded margin-top-bottom">
@@ -316,3 +313,4 @@
         </div>
     </div>
 </div>
+</form>
