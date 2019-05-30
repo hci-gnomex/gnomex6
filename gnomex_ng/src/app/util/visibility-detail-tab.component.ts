@@ -13,6 +13,7 @@ import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {MatSelectChange} from "@angular/material";
 import {first} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: 'visibility-detail-tab',
@@ -236,13 +237,15 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
             this.visibilityForm.get("codeVisibility").setValue(this.currentOrder.codeVisibility);
 
-            let labParams: URLSearchParams = new URLSearchParams();
+
 
             let idLab = this.currentOrder.idLab;
             if(idLab !== null  && idLab !== undefined) { //empty string is valid
-                labParams.set('idLab', idLab);
-                labParams.set('includeBillingAccounts', 'N');
-                labParams.set('includeProductCounts','N');
+                let labParams: HttpParams = new HttpParams()
+                    .set('idLab', idLab)
+                    .set('includeBillingAccounts', 'N')
+                    .set('includeProductCounts','N');
+
                 this.getLabService.getLab(labParams).pipe(first()).subscribe( data =>{
                     this.currentLab = data.Lab ? data.Lab : data;
                     this.memCollaborators = this.formatCollabList(this.currentLab.membersCollaborators);

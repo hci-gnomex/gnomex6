@@ -43,11 +43,11 @@ const actionMapping:IActionMapping = {
     selector: "datatracks",
     templateUrl: "./browse-datatracks.component.html",
     styles: [`
-        
+
         .short-width { width: 10em; }
-        
+
         .padded { padding: 0.3em; }
-        
+
         .left-right-padded {
             padding-left:  0.3em;
             padding-right: 0.3em;
@@ -58,23 +58,23 @@ const actionMapping:IActionMapping = {
         }
 
         .vertical-spacer { height: 0.3em; }
-        
+
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
-        
+
         .border { border: #C8C8C8 solid thin; }
-        
+
         .major-border {
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
-        
+
         .small-font      { font-size: small; }
-        
+
         .no-overflow { overflow: hidden; }
-        
+
         .no-word-wrap { white-space: nowrap; }
-        
+
     `]
 })
 
@@ -162,7 +162,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
             this.buildTree(response);
-            let id = null;
 
             if(this.datatracksService.previousURLParams && this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
                 let navArray:any[] = ['/datatracks', { outlets: { datatracksPanel: null }}];
@@ -173,17 +172,20 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             }
 
 
-
             setTimeout(_ => {
                 //this.treeModel.expandAll();
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
-                    let id: string = "d" + this.gnomexService.orderInitObj.idDataTrack;
-                    if (this.treeModel && id) {
-                        let dtNode: ITreeNode = this.treeModel.getNodeById(id);
+                    let idDataTrack: string = this.gnomexService.orderInitObj.idDataTrack;
+                    if (this.treeModel && idDataTrack) {
+                        let dtNode: ITreeNode = this.treeModel.getNodeById("d"+idDataTrack);
                         if(dtNode){
                             dtNode.ensureVisible();
                             dtNode.setIsActive(true);
                             dtNode.scrollIntoView();
+                        }else{
+                            this.disableDelete = false;
+                            let navArray = ['/datatracks',  {outlets:{'datatracksPanel':[idDataTrack]}}];
+                            this.router.navigate(navArray);
                         }
                         this.gnomexService.orderInitObj = null;
                     }
@@ -202,6 +204,10 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             });
 
         });
+
+
+
+
 
 
         this.navInitSubscription = this.gnomexService.navInitBrowseDatatrackSubject.subscribe( orderInitObj => {
@@ -539,7 +545,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.dataTracksListSubscription.unsubscribe();
         this.navInitSubscription.unsubscribe();
         this.labListSubscription.unsubscribe();
-        //this.gnomexService.navInitBrowseDatatrackSubject.next(null);
+        this.gnomexService.navInitBrowseDatatrackSubject.next(null);
         this.navDatatrackList = null;
     }
 }

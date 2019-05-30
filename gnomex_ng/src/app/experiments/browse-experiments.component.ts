@@ -39,6 +39,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {filter} from "rxjs/operators";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -130,7 +131,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
     private reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
     private deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
-    private navProjectReqList: any;
     private navInitSubscription: Subscription;
     private labListSubscription: Subscription;
     private navEndSubscription: Subscription;
@@ -290,9 +290,18 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 if(this.gnomexService.orderInitObj) {
                     let id: string = "r" + this.gnomexService.orderInitObj.idRequest;
                     if(this.treeModel && id) {
-                        this.treeModel.getNodeById(id).setIsActive(true);
-                        this.treeModel.getNodeById(id).scrollIntoView();
+                        let node:ITreeNode = this.treeModel.getNodeById(id);
+                        if(node){
+                            this.treeModel.getNodeById(id).setIsActive(true);
+                            this.treeModel.getNodeById(id).scrollIntoView();
+                            this.gnomexService.orderInitObj = null;
+                        }else{
+                            let navArray = ["/experiments",  {outlets: {"browsePanel": [this.gnomexService.orderInitObj.idRequest]}}];
+                            this.disableNewProject = true;
+                            this.router.navigate(navArray);
+                        }
                         this.gnomexService.orderInitObj = null;
+
                     }
                 } else if(this.setActiveNodeId) {
                     let node: TreeNode;
@@ -694,7 +703,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.gnomexService.navInitBrowseExperimentSubject.next(null);
         this.projectRequestListSubscription.unsubscribe();
         this.labListSubscription.unsubscribe();
-        this.navProjectReqList = null;
         this.experimentsService.filteredLabs = undefined;
         this.experimentsService.labList = [];
         UtilService.safelyUnsubscribe(this.canDeleteProjectSubscription);

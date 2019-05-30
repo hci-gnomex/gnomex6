@@ -646,11 +646,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     onGroupsSelectionChanged(event?: any) {
         this.dialogsService.startDefaultSpinnerDialog();
 
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
         let selectedRows = this.groupsGridOptions.api.getSelectedRows();
         this.idLab = selectedRows[0].idLab;
         this.myCoreFacilities = [];
-        params.set("idLab", this.idLab);
+        params = params.set("idLab", this.idLab);
 
         this.getLabService.getLab(params).subscribe((response: any) => {
             this.selectedGroup = response.Lab;

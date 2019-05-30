@@ -14,6 +14,7 @@ import {Subscription} from "rxjs/index";
 
 import {Experiment} from "../../util/models/experiment.model";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: 'tab-visibility',
@@ -70,16 +71,17 @@ export class TabVisibilityComponent implements OnInit, OnDestroy{
         }
 
 
-        let labParams: URLSearchParams = new URLSearchParams();
+
 
         if (!this.idLabSubscription) {
             this.idLabSubscription = this._experiment.onChange_idLab.subscribe((value: string) => {
                 let idLab = this.currentOrder.idLab;
 
                 if(idLab !== null  && idLab !== undefined) { //empty string is valid
-                    labParams.set('idLab', idLab);
-                    labParams.set('includeBillingAccounts', 'N');
-                    labParams.set('includeProductCounts','N');
+                    let labParams: HttpParams = new HttpParams()
+                        .set('idLab', idLab)
+                        .set('includeBillingAccounts', 'N')
+                        .set('includeProductCounts','N');
                     this.getLabService.getLab(labParams).pipe(first()).subscribe( data =>{
                         this.currentLab = data.Lab ? data.Lab : data;
 
