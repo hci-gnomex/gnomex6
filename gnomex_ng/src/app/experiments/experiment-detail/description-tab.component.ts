@@ -133,7 +133,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
     @ViewChild("adminNotesEditorRef") adminNotesEditor: AngularEditorComponent;
     
     public showProjectDesc: boolean = false;
-    public showNotesForCoreFacility: boolean = false;
+    public showCorePrepInstructions: boolean = false;
     public showAdminNotes: boolean = false;
     
     descriptionForm:FormGroup;
@@ -207,32 +207,33 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
 
     ngOnInit(){
         this.descriptionForm = this.fb.group({
-            expName: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_200)],
+            name: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_200)],
             description: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
-            projectDesc: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_4000)],
-            notesForCoreFacility: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
+            projectDescription: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_4000)],
+            corePrepInstructions: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
             adminNotes: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
         });
-        
+        this.experimentService.addExperimentOverviewFormMember(this.descriptionForm, this.constructor.name);
+
         this.route.data.forEach(data => {
             let exp = data.experiment;
             if(exp && exp.Request){
                 this.experiment = exp.Request;
-                this.descriptionForm.get("expName").setValue( this.experiment.name);
+                this.descriptionForm.get("name").setValue( this.experiment.name);
                 this.descriptionForm.get("description").setValue( this.experiment.description);
-    
-                this.showNotesForCoreFacility = false;
+
+                this.showCorePrepInstructions = false;
                 if(this.experiment.isExternal === "Y" && this.experiment.corePrepInstructions !== "") {
-                    this.showNotesForCoreFacility = false;
+                    this.showCorePrepInstructions = false;
                 } else {
-                    this.showNotesForCoreFacility = true;
-                    this.descriptionForm.get("notesForCoreFacility").setValue( this.experiment.corePrepInstructions);
+                    this.showCorePrepInstructions = true;
+                    this.descriptionForm.get("corePrepInstructions").setValue( this.experiment.corePrepInstructions);
                 }
     
                 this.showProjectDesc = false;
                 if(this.experiment.projectDescription && this.experiment.projectDescription !== "") {
                     this.showProjectDesc = true;
-                    this.descriptionForm.get("projectDesc").setValue(this.experiment.projectDescription);
+                    this.descriptionForm.get("projectDescription").setValue(this.experiment.projectDescription);
                 }
     
                 let showAdminNotesOnRequest = this.gnomexService.getCoreFacilityProperty(this.experiment.idCoreFacility, PropertyService.SHOW_ADMIN_NOTES_ON_REQUEST);
@@ -242,7 +243,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
                 }
                 
                 this.numEditors = this.getShowEditors();
-    
+
                 setTimeout( () => {
                     this.updateForm();
                 });
@@ -272,7 +273,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         this.getEditorHeight();
         
         if (this.editMode) {
-            this.descriptionForm.get("expName").enable();
+            this.descriptionForm.get("name").enable();
             this.descriptionForm.get("description").enable();
             this.descEditor.editorToolbar.showToolbar = true;
             this.descEditorConfig.editable = true;
@@ -280,14 +281,14 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
             this.descEditorConfig.maxHeight = this.editorHeight;
             
             if(this.showProjectDesc) {
-                this.descriptionForm.get("projectDesc").enable();
+                this.descriptionForm.get("projectDescription").enable();
                 this.projectDescEditor.editorToolbar.showToolbar = true;
                 this.projectDescEditorConfig.editable = true;
                 this.projectDescEditorConfig.height = this.editorMinorHeight;
                 this.projectDescEditorConfig.maxHeight = this.editorMinorHeight;
             }
-            if(this.showNotesForCoreFacility) {
-                this.descriptionForm.get("notesForCoreFacility").enable();
+            if(this.showCorePrepInstructions) {
+                this.descriptionForm.get("corePrepInstructions").enable();
                 this.notesEditor.editorToolbar.showToolbar = true;
                 this.notesEditorConfig.editable = true;
                 this.notesEditorConfig.height = this.editorMinorHeight;
@@ -303,10 +304,10 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
             }
             
         } else {
-            this.descriptionForm.get("expName").setValue( this.experiment.name);
+            this.descriptionForm.get("name").setValue( this.experiment.name);
             this.descriptionForm.get("description").setValue(this.experiment.description);
             
-            this.descriptionForm.get("expName").disable();
+            this.descriptionForm.get("name").disable();
             this.descriptionForm.get("description").disable();
             
             this.descEditor.editorToolbar.showToolbar = false;
@@ -315,17 +316,17 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
             this.descEditorConfig.maxHeight = this.editorHeight;
             
             if(this.showProjectDesc) {
-                this.descriptionForm.get("projectDesc").setValue(this.experiment.projectDescription);
-                this.descriptionForm.get("projectDesc").disable();
+                this.descriptionForm.get("projectDescription").setValue(this.experiment.projectDescription);
+                this.descriptionForm.get("projectDescription").disable();
                 this.projectDescEditor.editorToolbar.showToolbar = false;
                 this.projectDescEditorConfig.editable = false;
                 this.projectDescEditorConfig.height = this.editorMinorHeight;
                 this.projectDescEditorConfig.maxHeight = this.editorMinorHeight;
             }
             
-            if(this.showNotesForCoreFacility) {
-                this.descriptionForm.get("notesForCoreFacility").setValue( this.experiment.corePrepInstructions);
-                this.descriptionForm.get("notesForCoreFacility").disable();
+            if(this.showCorePrepInstructions) {
+                this.descriptionForm.get("corePrepInstructions").setValue( this.experiment.corePrepInstructions);
+                this.descriptionForm.get("corePrepInstructions").disable();
                 this.notesEditor.editorToolbar.showToolbar = false;
                 this.notesEditorConfig.editable = false;
                 this.notesEditorConfig.height = this.editorMinorHeight;
@@ -345,7 +346,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
     
     getShowEditors(): number {
         let editorNum: number = 1;
-        if (this.showNotesForCoreFacility) {
+        if (this.showCorePrepInstructions) {
             editorNum ++;
         }
         if (this.showProjectDesc) {

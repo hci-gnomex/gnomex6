@@ -29,7 +29,7 @@ import {HttpParams} from "@angular/common/http";
                     </mat-radio-button>
                 </mat-radio-group>
             </div>
-            <mat-form-field class="short-input" *ngIf="isPrivacyExpSupported" 
+            <mat-form-field class="short-input" *ngIf="isPrivacyExpSupported"
                             matTooltip="Public visibility date&#13;(visibility automatically changes to public on this date)">
                 <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" formControlName="privacyExp" [min]="this.today">
                 <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
@@ -53,10 +53,10 @@ import {HttpParams} from "@angular/common/http";
                             This field is required
                         </mat-error>
                     </mat-form-field>
-                    <button mat-button [disabled]="!enableAdd" type="button" (click)="addCollaborator()">
+                    <button mat-button [disabled]="!enableAdd || _disabled" type="button" (click)="addCollaborator()">
                         <img [src]="this.constService.ICON_ADD"> add
                     </button>
-                    <button mat-button [disabled]="selectedCollabRow.length < 1" type="button" (click)="removeCollaborator()">
+                    <button mat-button [disabled]="selectedCollabRow.length < 1 || _disabled" type="button" (click)="removeCollaborator()">
                         <img [src]="this.constService.ICON_DELETE"> remove
                     </button>
                 </div>
@@ -159,6 +159,20 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
         }
 
     ];
+
+    public _disabled: boolean = false;
+
+    @Input()
+    set disabled(value: boolean) {
+        this._disabled = value;
+        if (this.visibilityForm) {
+            if (this._disabled) {
+                this.visibilityForm.disable();
+            } else {
+                this.visibilityForm.enable();
+            }
+        }
+    }
 
     sortFn = (obj1,obj2 ) =>{
         if (obj1[this.prefService.userDisplayField] < obj2[this.prefService.userDisplayField])
@@ -263,6 +277,11 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             }
 
             this.visibilityForm.markAsPristine();
+            if (this._disabled) {
+                this.visibilityForm.disable();
+            } else {
+                this.visibilityForm.enable();
+            }
         });
     }
 
