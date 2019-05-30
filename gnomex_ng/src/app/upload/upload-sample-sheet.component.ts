@@ -9,6 +9,11 @@ import {SelectEditor} from "../util/grid-editors/select.editor";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.component";
+import {Experiment} from "../util/models/experiment.model";
+import {Sample} from "../util/models/sample.model";
+import {DictionaryService} from "../services/dictionary.service";
+import {GnomexService} from "../services/gnomex.service";
+import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer";
 
 
 @Component({
@@ -88,6 +93,8 @@ import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.c
 
     public reportText: string = '';
 
+    public experiment: Experiment;
+
     public file: any;
 
     private columnChoicesDictionary: any[];
@@ -157,6 +164,8 @@ import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.c
     constructor(private dialogRef: MatDialogRef<UploadSampleSheetComponent>,
                 private dialog: MatDialog,
                 private dialogService: DialogsService,
+                private dictionaryService: DictionaryService,
+                private gnomexService: GnomexService,
                 private sampleUploadService: SampleUploadService,
                 @Inject(MAT_DIALOG_DATA) private data) { }
 
@@ -173,27 +182,51 @@ import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.c
             if (this.data) {
                 if (this.data.sampleColumns) {
                     this.mostRecentRowData = this.data.sampleColumns.filter((a) => {
+                        if (a.field && a.field === 'ccNumber') {
+                            return this.data && !this.data.ccNumberColumnIsCurrentlyHidden;
+                        }
+
                         return a && a.headerName;
                     });
 
                     for (let row of this.mostRecentRowData) {
-                        if (row.selectOptions) {
+                        if (row.cellRendererFramework && row.cellRendererFramework === SelectRenderer) {
                             row.type = 'Dropdown (single sel.)';
                             row.typeCode = 'OPTION';
+                        } else if (row.cellRendererFramework && row.cellRendererFramework === MultiSelectRenderer) {
+                            row.type = 'Dropdown (multiple sel.)';
+                            row.typeCode = 'MOPTION';
                         } else {
                             row.type = 'Text';
                             row.typeCode = 'TEXT';
                         }
 
-
                         row.columnNumber = "0";
+
+                        // This is to help with the transition between GNomEx versions 5 and 6, where the display name changed a bit.
+                        if (row.headerName && row.headerName.toLowerCase() === 'multiplex group') {
+                            for (let entry of this.headersDictionary) {
+                                if (entry.label && entry.label.toLowerCase() === 'multiplex #') {
+                                    row.columnNumber = entry.data;
+                                    break;
+                                }
+                            }
+                        }
+
+                        for (let entry of this.headersDictionary) {
+                            if (entry.label && row.headerName && row.headerName.toLowerCase() === entry.label.toLowerCase()) {
+                                row.columnNumber = entry.data;
+                                break;
+                            }
+                        }
                     }
 
                     this.gridApi.setRowData(this.mostRecentRowData);
                 }
 
-                if (this.data.rowData) {
-                    this.existingRows = this.data.rowData;
+                if (this.data.experiment && this.data.experiment.samples) {
+                    this.experiment = this.data.experiment;
+                    this.existingRows = this.data.experiment.samples;
                 }
 
                 if (this.data.allowedToAddAdditionalSamples) {
@@ -230,9 +263,9 @@ import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.c
             let message: string = '';
 
             if (tempExisting > tempNew) {
-                message = 'The specified sample sheet has fewer rows than there are samples.  If you continue only the rows available will be imported.  Please verify you have chosen the correct sample sheet.  Do you wish to continue?';
+                message = 'The specified sample sheet has fewer rows than there are samples.\n\nIf you continue only the first samples available will be imported.\n\nPlease verify you have chosen the correct sample sheet.\n\nDo you wish to continue?';
             } else if (tempExisting < tempNew) {
-                message = 'The specified sample sheet has more rows than there are samples.  The excess rows in the sample sheet will be ignored.  Please verify you have chosen the correct sample sheet.  Do you wish to continue?';
+                message = 'The specified sample sheet has more rows than there are samples.\n\nThe excess rows in the sample sheet will be added.\n\nPlease verify you have chosen the correct sample sheet.\n\nDo you wish to continue?';
             }
 
             this.dialogService.yesNoDialog(message, this, 'populateFieldsWarningPassed', 'populateFieldsWarningCancelled','Row/Sample Mismatch');
@@ -352,7 +385,7 @@ import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.c
                             let thisEntryFound = false;
 
                             for (let option of column.selectOptions) {
-                                if (option[column.selectOptionsDisplayField].toLowerCase() === value.toLowerCase()) {
+                                if (option[column.selectOptionsValueField].toLowerCase() === value.toLowerCase()) {
                                     thisEntryFound = true;
                                     if (optionsFound > 0) {
                                         constructedValue = constructedValue + ',';
@@ -376,6 +409,8 @@ import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.c
 
                         if (optionsFound == 0) {
                             writeThisField = false;
+                        } else {
+                            uploadColumnValue = constructedValue;
                         }
                     }
                     if (column.typeCode === "CHECK" ) {
@@ -390,8 +425,18 @@ import {SampleSheetColumnFormatsComponent} from "./sample-sheet-column-formats.c
 
                     if (writeThisField) {
                         if (this.firstRowIsColumnHeadings) {
+                            if (i > this.existingRows.length) {
+                                this.experiment.numberOfSamples = "" + ((+this.experiment.numberOfSamples) + 1);
+                                Sample.createNewSamplesForExperiment(this.experiment, this.dictionaryService, this.gnomexService);
+                            }
+
                             this.existingRows[i - 1][column.field] = uploadColumnValue;
                         } else {
+                            if (i >= this.existingRows.length) {
+                                this.experiment.numberOfSamples = "" + ((+this.experiment.numberOfSamples) + 1);
+                                Sample.createNewSamplesForExperiment(this.experiment, this.dictionaryService, this.gnomexService);
+                            }
+
                             this.existingRows[i][column.field] = uploadColumnValue;
                         }
                     }

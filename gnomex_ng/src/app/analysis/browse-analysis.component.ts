@@ -1,21 +1,8 @@
-import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component,
-    OnDestroy,
-    OnInit,
-    ViewChild,
-} from "@angular/core";
-import {
-    ITreeOptions,
-    TREE_ACTIONS,
-    TreeComponent,
-    TreeModel,
-    TreeNode,
-} from "angular-tree-component";
+import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from "@angular/core";
+import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode,} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {AnalysisService} from "../services/analysis.service";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
@@ -29,6 +16,9 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
+import {filter} from "rxjs/operators";
 
 
 @Component({
@@ -99,6 +89,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private selectedIdAnalysisGroup: any;
     private parentProject: any;
     private navAnalysisGroupListSubscription: Subscription;
+    private navEndSubscription:Subscription;
     private labListSubscription: Subscription;
 
     ngOnInit() {
@@ -221,12 +212,15 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
                     let id: string = "" + this.gnomexService.orderInitObj.idAnalysis;
                     if(this.treeModel && id) {
-                        let node = this.findNodeById("a" + id);
+                        let node:ITreeNode = this.findNodeById("a" + id);
                         if(node) {
                             node.setIsActive(true);
                             node.scrollIntoView();
-                            this.gnomexService.orderInitObj = null;
+                        }else{
+                            let navArray = ["/analysis", {outlets: {"analysisPanel": [this.gnomexService.orderInitObj.idAnalysis]}}];
+                            this.router.navigate(navArray);
                         }
+                        this.gnomexService.orderInitObj = null;
                     }
                 } else if(this.analysisService.setActiveNodeId) {
                     let node: TreeNode;
@@ -260,6 +254,20 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             }
         });
 
+        this.navEndSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd))
+            .subscribe((event:NavigationEnd) =>{
+                if(this.route.snapshot.firstChild){
+                    let data = this.route.snapshot.firstChild.data;
+                    if(data.analysis && data.analysis.Analysis){
+                        let selectedAnalysis = data.analysis.Analysis;
+                        if (selectedAnalysis.canDelete === "Y") {
+                            this.disableDelete = false;
+                        } else {
+                            this.disableDelete = true;
+                        }
+                    }
+                }
+            });
     }
 
     ngAfterViewInit() {
@@ -269,6 +277,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
                 private route: ActivatedRoute,
+                private constService:ConstantsService,
                 private utilService: UtilService,
                 private gnomexService: GnomexService,
                 private labListService: LabListService,
@@ -297,7 +306,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
      */
     buildTree(response: any[]) {
         this.labs = [];
-        this.items = [].concat(null);
+        this.items = [];
 
         if(response) {
             if (!this.isArray(response)) {
@@ -434,7 +443,13 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 parentComponent: "Analysis",
             };
 
-            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
+
+            this.dialogsService.genericDialogContainer(CreateAnalysisComponent,"Create Analysis",null,configuration, {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name:"Save" , internalAction:"saveAnalysis",externalAction:()=>{ console.log("hello")}},
+                    {type: ActionType.SECONDARY,  name:"Cancel", internalAction:"cancel"}
+                ]});
+
+            //this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
         }
     }
 
@@ -461,7 +476,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 selectedLab: this.selectedIdLab,
             };
 
-            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration);
+            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration,);
         }
     }
 
@@ -488,7 +503,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         let navArray: Array<any> = [];
 
 
-            //Lab
+        //Lab
         if (this.selectedItem.level === 1) {
             this.analysisService.selectedNodeId = event.node.data.id;
             this.disableNewAnalysis = false;
@@ -516,17 +531,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
-            let params: HttpParams = new HttpParams()
-                .set("idAnalysis", idAnalysis);
-            this.analysisService.getAnalysis(params).subscribe((response) => {
-                if (response.Analysis.canDelete === "Y") {
-                    this.disableDelete = false;
-                } else {
-                    this.disableDelete = true;
-                }
-            }, (err: IGnomexErrorResponse) => {
-                console.log(err);
-            });
         }
 
         this.router.navigate(navArray);
@@ -537,6 +541,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.analysisGroupListSubscription.unsubscribe();
         this.navAnalysisGroupListSubscription.unsubscribe();
+        this.navEndSubscription.unsubscribe();
         this.gnomexService.navInitBrowseAnalysisSubject.next(null);
         this.labListSubscription.unsubscribe();
     }

@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, ViewChild} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 
 import {MatOption, MatAutocomplete} from "@angular/material";
 
@@ -10,17 +10,44 @@ import {DictionaryService} from "../../services/dictionary.service";
 
 import {Experiment} from "../../util/models/experiment.model";
 import {Organism} from "../../util/models/organism.model";
+import {PropertyService} from "../../services/property.service";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
+import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
+import {BehaviorSubject, Subscription} from "rxjs";
+import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
 
 @Component({
     selector: "tabSampleSetupView",
     templateUrl: "./tab-sample-setup-view.component.html",
     styles: [`
+
+        .no-height { height: 0;  }
+        .single-em { width: 1em; }
+
+
+        .horizontal-center { text-align: center; }
+        
+        .green { color: green; }
+        .blue  { color: blue;  }
+        
+        .minimum-height-grid {
+            min-height: 12em;
+            height: 16em;
+        }
         
         .heading {
             width: 30%;
             min-width: 20em;
             padding-right: 2em;
         }
+        .minor-heading {
+            width: 15%;
+            min-width: 10em;
+            padding-right: 2em;
+        }
+        
+        .horizontal-center { text-align: center; }
         
         
         ol.three-depth-numbering {
@@ -109,11 +136,61 @@ import {Organism} from "../../util/models/organism.model";
     `]
 })
 
-export class TabSampleSetupViewComponent implements OnInit {
+export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     @Input() requestCategory: any;
+
+    @Input() idCoreFacility: string;
 
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
+
+        if (this.onChange_codeRequestCategorySubscription) {
+            this.onChange_codeRequestCategorySubscription.unsubscribe();
+        }
+        if (this.onChange_numberOfSamples_Subscription) {
+            this.onChange_numberOfSamples_Subscription.unsubscribe();
+        }
+
+        this.onChange_codeRequestCategorySubscription = this._experiment.onChange_codeRequestCategory.subscribe((value) => {
+            if (this.useIsolationTypeMode) {
+
+                this.sampleSources = this.dictionaryService.getEntries(DictionaryService.SAMPLE_SOURCE);
+
+                if (this.form && this.form.get("showDnaRnaChoices")) {
+                    this.form.get("showDnaRnaChoices").setValue(false);
+                }
+                if (this.form && this.form.get("showExtractionTypeChoices")) {
+                    this.form.get("showExtractionTypeChoices").setValue(true);
+                }
+            } else {
+                if (this.form && this.form.get("showDnaRnaChoices")) {
+                    this.form.get("showDnaRnaChoices").setValue(true);
+                }
+                if (this.form && this.form.get("showExtractionTypeChoices")) {
+                    this.form.get("showExtractionTypeChoices").setValue(false);
+                }
+            }
+
+            if (this.form && this.form.get("hasIsolationTypes")) {
+                this.form.get("hasIsolationTypes").setValue(false);
+            }
+        });
+
+        this.onChange_numberOfSamples_Subscription = this._experiment.onChange_numberOfSamples.subscribe((value: string) => {
+            if (this.form && this.form.get("numSamples")) {
+                this.form.get("numSamples").setValue(value);
+            }
+        });
+    };
+
+    @Input("QCChipPriceListSubject") set QCChipPriceListSubject(value: BehaviorSubject<any[]>) {
+        if (this.QCChipPriceListSubscription) {
+            this.QCChipPriceListSubscription.unsubscribe();
+        }
+
+        this.QCChipPriceListSubscription = value.subscribe((QCChipPriceList: any[]) => {
+            this.bioanalyzerChipPrices = QCChipPriceList;
+        });
     };
 
     @Input("organism") set organism(value: Organism) {
@@ -121,6 +198,7 @@ export class TabSampleSetupViewComponent implements OnInit {
     };
 
     @ViewChild("autoOrg") orgAutocomplete: MatAutocomplete;
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
     public form: FormGroup;
 
@@ -128,8 +206,8 @@ export class TabSampleSetupViewComponent implements OnInit {
     private _organism: Organism;
 
     private sampleType: any;
-    private filteredSampleTypeListDna: any[] = [];
-    private filteredSampleTypeListRna: any[] = [];
+    public filteredSampleTypeListDna: any[] = [];
+    public filteredSampleTypeListRna: any[] = [];
     private previousOrganismMatOption: MatOption;
     private showSampleNotes: boolean = false;
     public showSamplePrepContainer: boolean = true;
@@ -138,17 +216,47 @@ export class TabSampleSetupViewComponent implements OnInit {
     public showSampleQualityExperimentType: boolean = false;
     private showOrganism: boolean = true;
     private showSamplePurification: boolean = true;
+    private showQcInstructions: boolean = true;
     private showRnaseBox: boolean = false;
     private showDnaseBox: boolean = false;
 
     private organisms: any[] = [];
-    private filteredApplications: any[] = [];
+    public filteredApplications: any[] = [];
 
-    get numberOfSamples(): number|string {
-        return this._experiment.numberOfSamples;
+    private bioanalyzerChips: any[] = [];
+    private bioanalyzerChipPrices: any[] = [];
+
+    public isolationTypes: any[] = [];
+    public sampleSources: any[] = [];
+
+    private emToPxConversionRate: number = 13;
+
+    private gridApi;
+
+    // public noBioanalyzerChipTypesMessage = '';
+
+    private QCChipPriceListSubscription: Subscription;
+
+    private onChange_numberOfSamples_Subscription: Subscription;
+    private onChange_codeRequestCategorySubscription: Subscription;
+
+
+    public get useIsolationTypeMode(): boolean {
+        if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type
+            && this._experiment.requestCategory.type === NewExperimentService.TYPE_ISOLATION) {
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    set numberOfSamples(value: number|string) {
+    public get numberOfSamples(): number|string {
+        return this._experiment.numberOfSamples;
+    }
+    public set numberOfSamples(value: number|string) {
         this._experiment.numberOfSamples = '' + value;
 
         if (!this._experiment.samples) {
@@ -156,47 +264,109 @@ export class TabSampleSetupViewComponent implements OnInit {
         }
     }
 
+    public get showBioAnalyzerChipTypeGrid(): boolean {
+        if (this.form
+            && this.form.get("selectedApp")
+            && this.form.get("selectedApp").value
+            && this.form.get("selectedApp").value.hasChipTypes
+            && this.form.get("selectedApp").value.hasChipTypes === 'Y') {
+
+            return true;
+        }
+
+        return false;
+    }
 
     public get showElution(): boolean {
         return this.newExperimentService.currentState !== 'QCState';
     }
 
+    private get bioanalyzerColumnDefs(): any[] {
+        let temp: any[] = [];
+
+        temp.push({
+            headerName: "",
+            editable: true,
+            field: "",
+            checkboxSelection: true,
+            width: 22,
+            maxWidth: 22,
+            minWidth: 22
+        });
+        temp.push({
+            headerName: "Chip Type",
+            editable: false,
+            field: "display",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            width: 10 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate,
+            outerForm: this.form,
+            formName: 'gridForm'
+        });
+        temp.push({
+            headerName: "Concentration Range",
+            editable: false,
+            field: "concentrationRange",
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            width: 10 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate
+        });
+        temp.push({
+            headerName: "Cost per Sample",
+            editable: false,
+            field: "price",
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            width: 10 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate
+        });
+
+        return temp;
+    }
+
+    public bioanalyzerGridOptions = {
+        onSelectionChanged: TabSampleSetupViewComponent.onChangeBioanalyzer,
+        suppressDragLeaveHidesColumns: true
+    };
+
+
     constructor(private dictionaryService: DictionaryService,
                 public newExperimentService: NewExperimentService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
+                private propertyService: PropertyService,
                 private fb: FormBuilder) {
 
         this.form = this.fb.group({
-                numSamples:       ['', [Validators.pattern(/^\d+$/)]],
-                selectedDna:      [''],
-                selectedRna:      [''],
-                sampleTypeNotes:  [''],
-                organism:         [''],
-                reagent:          ['', [Validators.maxLength(100)]],
-                elution:          ['', [Validators.maxLength(100)]],
-                extractionMethod: ['', [Validators.maxLength(100)]],
-                dnaseBox:         [''],
-                rnaseBox:         [''],
-                keepSample:       [''],
-                acid:             [''],
-                coreNotes:        ['', [Validators.maxLength(5000)]]
+                numSamples:                        ['', [Validators.pattern(/^\d+$/)]],
+                showSampleQuality:                 [''],
+                selectedApp:                       [''],
+                selectedDna:                       [''],
+                selectedRna:                       [''],
+                sampleSource:                      [''],
+                showDnaRnaChoices:                 [''],
+                showExtractionTypeChoices:         [''],
+                hasIsolationTypes:                 [''],
+                selectedIsolationExtractionMethod: [''],
+                selectedIsolationType:             [''],
+                sampleTypeNotes:                   [''],
+                addQubit:                          [''],
+                notifyBMP:                         [''],
+                organism:                          [''],
+                reagent:                           ['', [Validators.maxLength(100)]],
+                elution:                           ['', [Validators.maxLength(100)]],
+                extractionMethod:                  ['', [Validators.maxLength(100)]],
+                dnaseBox:                          [''],
+                rnaseBox:                          [''],
+                keepSample:                        [''],
+                acid:                              [''],
+                coreNotes:                         ['', [Validators.maxLength(5000)]]
             },
-            { validator: TabSampleSetupViewComponent.oneCategoryRequired }
+            { validator: TabSampleSetupViewComponent.validatorWrapper }
         );
     }
 
-    // private validator_elution_requiredIfVisible(formControl: FormControl): any {
-    //     if (this.showElution && (!formControl || !formControl.value)) {
-    //         return { 'requiredIfVisible': true };
-    //     } else {
-    //         return null;
-    //     }
-    // }
-
     ngOnInit() {
         this.organisms = this.gnomexService.activeOrganismList;
-        // this.filteredApplications = this.requestCategory;
 
         this.newExperimentService.currentState_onChangeObservable.subscribe((value) =>{
             if (value) {
@@ -209,12 +379,133 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.form.markAsPristine();
     }
 
+    ngOnDestroy(): void {
+        if (this.QCChipPriceListSubscription) {
+            this.QCChipPriceListSubscription.unsubscribe();
+        }
+        if (this.onChange_codeRequestCategorySubscription) {
+            this.onChange_codeRequestCategorySubscription.unsubscribe();
+        }
+        if (this.onChange_numberOfSamples_Subscription) {
+            this.onChange_numberOfSamples_Subscription.unsubscribe();
+        }
+    }
+
+
+    private static validatorWrapper(group: FormGroup): { [s:string]: boolean } {
+        let temp: { [s:string]: boolean } = TabSampleSetupViewComponent.oneCategoryRequired(group);
+
+        if (temp) {
+            return temp;
+        } else {
+            temp = TabSampleSetupViewComponent.qcAssayRequiredIfShown(group);
+        }
+
+        if (temp) {
+            return temp;
+        } else {
+            temp = TabSampleSetupViewComponent.sampleQualityRequiredIfShown(group);
+        }
+
+        if (temp) {
+            return temp;
+        } else {
+            temp = TabSampleSetupViewComponent.requireExtractionTypeIfShown(group);
+        }
+
+        if (temp) {
+            return temp;
+        } else {
+            temp = TabSampleSetupViewComponent.requireIsolationTypeIfShownAndAvailableOptions(group);
+        }
+
+        return temp;
+    }
+
     private static oneCategoryRequired(group: FormGroup): { [s:string]: boolean } {
-        if (group && (group.controls['selectedDna'].value || group.controls['selectedRna'].value)) {
+        if (group
+            && ((group.controls['selectedDna'].value
+                || group.controls['selectedRna'].value)
+                || group.controls['showDnaRnaChoices'].value === false)) {
+
             return null;
         }
 
-        return { 'error': true };
+        return {
+            'error': true,
+            'oneCategoryRequired': true
+        };
+    }
+
+    private static qcAssayRequiredIfShown(group: FormGroup): { [s:string]: boolean } {
+
+        if (group
+            && group.controls["selectedApp"]
+            && group.controls["selectedApp"].value
+            && group.controls["selectedApp"].value.hasChipTypes
+            && group.controls["selectedApp"].value.hasChipTypes === 'Y'
+            && group.controls["gridForm"]
+            && group.controls["gridForm"].value
+            && !(group.controls["gridForm"].value['bioanalyzer'])) {
+
+            return {
+                'error': true,
+                'qcAssayRequiredIfShown': true
+            };
+        }
+
+        return null;
+    }
+
+    private static sampleQualityRequiredIfShown(group: FormGroup): { [s:string]: boolean } {
+
+        if (group
+            && group.controls["showSampleQuality"]
+            && group.controls["showSampleQuality"].value === true
+            && group.controls["selectedApp"]
+            && !(group.controls["selectedApp"].value)) {
+
+            return {
+                'error': true,
+                'sampleQualityRequiredIfShown': true
+            };
+        }
+
+        return null;
+    }
+
+    private static requireExtractionTypeIfShown(group: FormGroup): { [s:string]: boolean } {
+        if (group
+            && group.controls["showExtractionTypeChoices"]
+            && group.controls["showExtractionTypeChoices"].value === true
+            && group.controls["selectedIsolationExtractionMethod"]
+            && !(group.controls["selectedIsolationExtractionMethod"].value)) {
+
+            return {
+                'error': true,
+                'requireExtractionTypeIfShown': true
+            };
+        }
+
+        return null;
+    }
+
+    private static requireIsolationTypeIfShownAndAvailableOptions(group: FormGroup): { [s:string]: boolean } {
+        if (group
+            && group.controls["showExtractionTypeChoices"]
+            && group.controls["showExtractionTypeChoices"].value === true
+            && group.controls["hasIsolationTypes"]
+            && group.controls["hasIsolationTypes"].value === true
+            && group.controls["selectedIsolationType"]
+            && !(group.controls["selectedIsolationType"].value)) {
+
+            return {
+                'error': true,
+                'requireIsolationTypeIfShownAndAvailableOptions': true
+            };
+        }
+
+        return null;
     }
 
     ngOnChanges() {
@@ -308,6 +599,8 @@ export class TabSampleSetupViewComponent implements OnInit {
                             }
                         }
                     }
+
+                    this.filteredApplications = this.filteredApplications.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay)
                 }
             }
         }
@@ -327,6 +620,75 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.numberOfSamples = this.form.get("numSamples").value;
     }
 
+    public onAppChange(event): void {
+        if (this.form
+            && this.form.get("selectedApp")
+            && this.form.get("selectedApp").value
+            && this.form.get("selectedApp").value.hasChipTypes
+            && this.form.get("selectedApp").value.hasChipTypes === 'Y') {
+
+            this.bioanalyzerChips = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BIOANALYZER_CHIP_TYPE);
+
+            if (this.bioanalyzerChips && Array.isArray(this.bioanalyzerChips)) {
+                this.bioanalyzerChips = this.bioanalyzerChips.filter((a) => {
+                    let temp = this.form.get("selectedApp").value;
+                    return a.codeApplication
+                        && this.form.get("selectedApp").value.codeApplication
+                        && a.codeApplication === this.form.get("selectedApp").value.codeApplication;
+                });
+
+                for (let bioanalyzerChip of this.bioanalyzerChips) {
+                    for (let price of this.bioanalyzerChipPrices) {
+                        if (bioanalyzerChip.codeBioanalyzerChipType
+                            && bioanalyzerChip.codeBioanalyzerChipType === price.codeBioanalyzerChipType) {
+                            bioanalyzerChip.price = '$' + price.price;
+                        }
+                    }
+                }
+
+                this.bioanalyzerChips = this.bioanalyzerChips.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
+            }
+
+            if (this._experiment) {
+                this._experiment.codeApplication = this.form.get("selectedApp").value.codeApplication;
+            }
+
+            if (this.gridApi) {
+                this.gridApi.setRowData(this.bioanalyzerChips);
+            }
+        }
+
+        // if (this.requestCategory) {
+        //     let property = this.propertyService.getProperty('qc_instructions', this.idCoreFacility, this.requestCategory.codeRequestCategory);
+        //
+        //     if (property) {
+        //         this.noBioanalyzerChipTypesMessage = property.propertyValue;
+        //     }
+        // }
+    }
+
+    private static onChangeBioanalyzer(event): void {
+        if (event && event.api && event.api.formGroup) {
+            let selectedRows: any[] = event.api.getSelectedRows();
+
+            if (selectedRows && Array.isArray(selectedRows) && selectedRows.length === 1) {
+                event.api.formGroup.addControl('bioanalyzer', new FormControl('',[]));
+                event.api.formGroup.get('bioanalyzer').setValue(selectedRows[0]);
+
+                if (event.api._experiment) {
+                    event.api._experiment.codeBioanalyzerChipType = selectedRows[0].codeBioanalyzerChipType;
+                }
+            } else if (selectedRows && Array.isArray(selectedRows) && selectedRows.length === 0) {
+                event.api.formGroup.addControl('bioanalyzer', new FormControl('',[]));
+                event.api.formGroup.get('bioanalyzer').setValue(null);
+
+                if (event.api._experiment) {
+                    event.api._experiment.codeBioanalyzerChipType = selectedRows[0].codeBioanalyzerChipType;
+                }
+            }
+        }
+    }
+
     public onDnaChange(event): void {
         if (this.form
             && this.form.get("selectedRna")
@@ -342,10 +704,53 @@ export class TabSampleSetupViewComponent implements OnInit {
         this.pickSampleType();
     }
 
+    public onSelectedIsolationExtractionMethod(event): void {
+        this.setState();
+
+        if (this.form.get("selectedIsolationExtractionMethod")
+            && this.form.get("selectedIsolationExtractionMethod").value) {
+
+            this.isolationTypes = [];
+            let temp = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ISOLATION_PREP_TYPE);
+
+            if (temp && Array.isArray(temp)) {
+                this.isolationTypes = temp.filter((value) => {
+                    return value && value.isActive && value.isActive !== 'N' && value.type === this.form.get("selectedIsolationExtractionMethod").value;
+                });
+            }
+
+            if (this.form && this.form.get("hasIsolationTypes")) {
+                this.form.get("hasIsolationTypes").setValue(this.isolationTypes && Array.isArray(this.isolationTypes) && this.isolationTypes.length > 0);
+            }
+        }
+    }
+
+    public onChangeIsolationType(event: any): void {
+
+        if (this.form.get("selectedIsolationExtractionMethod")
+            && this.form.get("selectedIsolationExtractionMethod").value
+            && this.form.get("selectedIsolationExtractionMethod").value === 'DNA') {
+
+            this._experiment.coreToExtractDNA = 'Y';
+        } else {
+            this._experiment.coreToExtractDNA = '';
+        }
+
+        if (this.form.get("selectedIsolationType")
+            && this.form.get("selectedIsolationType").value
+            && this.form.get("selectedIsolationType").value.codeIsolationPrepType) {
+
+            this._experiment.codeIsolationPrepType = this.form.get("selectedIsolationType").value.codeIsolationPrepType
+        } else {
+            this._experiment.codeIsolationPrepType = '';
+        }
+    }
+
     public onRnaChange(event): void {
         if (this.form.get("selectedDna").value) {
             this.form.get("selectedDna").setValue("");
         }
+
         this.setState();
         this.showSampleNotes = !!(this.form.get("selectedRna").value.notes);
         this.sampleType = this.form.get("selectedRna").value;
@@ -361,15 +766,25 @@ export class TabSampleSetupViewComponent implements OnInit {
             this.requireSamplePrepContainer = false;
             this.showOrganism = true;
             this.showSamplePurification = true;
+            this.showQcInstructions = false;
 
-            if (this.requestCategory.codeRequestCategory === "MDMISEQ") {
-                //TODO this.sampleSetupView.currentState = 'MDMiSeqState';
-            }
             if (this.gnomexService.submitInternalExperiment()) {
                 this.showSamplePrepContainer = false;
             }
 
-            if (this.requestCategory.codeRequestCategory === "QC") {
+            if (this.requestCategory.codeRequestCategory === "MDMISEQ") {
+                this.showSamplePrepContainer = true;
+                this.requireSamplePrepContainer = true;
+                this.showSamplePurification = false;
+                this.showKeepSample = false;
+            }
+
+            if (this.form && this.form.get('showSampleQuality')) {
+                this.form.get('showSampleQuality').setValue(this.requestCategory.type === "QC");
+            }
+
+            // if (this.requestCategory.codeRequestCategory === "QC" || this.requestCategory.codeRequestCategory === 'MDSQ') {}
+            if (this.requestCategory.type === "QC") {
                 this.showSamplePrepContainer = true;
                 this.showKeepSample = false;
                 this.showSampleQualityExperimentType = true;
@@ -378,8 +793,18 @@ export class TabSampleSetupViewComponent implements OnInit {
                 this.showSamplePurification = false;
             }
 
+            if (this._experiment) {
+                let qcInstText: any = this.propertyService.getProperty(PropertyService.PROPERTY_QC_INSTRUCTIONS, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
+
+                if (qcInstText && qcInstText.propertyValue && qcInstText.propertyValue !== '') {
+                    this.qcInstructions = qcInstText.propertyValue;
+                    this.showQcInstructions = this.newExperimentService.isQCState();
+                }
+            }
         }
     }
+
+    public qcInstructions: string = '';
 
     private pickSampleType(): void {
         if (this.sampleType){
@@ -414,6 +839,10 @@ export class TabSampleSetupViewComponent implements OnInit {
                 }
             }
         }
+    }
+
+    public display_generic(value: any): void {
+        return value ? (typeof(value) === 'string' ? value : value.display) : '';
     }
 
     public chooseFirstOrgOption(): void {
@@ -454,6 +883,27 @@ export class TabSampleSetupViewComponent implements OnInit {
         }
     }
 
+
+    public onGridReady(event: any): void {
+        if (!event) {
+            return;
+        }
+
+        this.gridApi = event.api;
+
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        this.gridApi.setColumnDefs(this.bioanalyzerColumnDefs);
+        this.gridApi.setRowData(this.bioanalyzerChips);
+        this.gridApi.sizeColumnsToFit();
+
+        this.gridApi._experiment = this._experiment;
+    }
+
+
+
     public selectOrganism(event): void {
         if (event !== undefined && event.source && event.source.value && event.source.value.idLab !== "0") {
             // needed for an input with autocomplete instead of a matselect.
@@ -487,11 +937,49 @@ export class TabSampleSetupViewComponent implements OnInit {
         }
     }
 
+    public onChangeAddQubit(event): void {
+        if (this.form && this.form.get('addQubit') && this._experiment) {
+            this._experiment.includeQubitConcentration = this.form.get('addQubit').value ? 'Y' : 'N';
+        }
+    }
+
+    public onChangeBMPPickup(event): void {
+        if (this.form && this.form.get('notifyBMP') && this._experiment) {
+            // this looks like an error and may be, but is a duplication of the logic from the flex version.  See TabSampleSetupView.mxml:1259
+            this._experiment.includeQubitConcentration = this.form.get('notifyBMP').value ? 'Y' : 'N';
+        }
+    }
+
     public onKeepChange(event): void {
         if (event.value === 1) {
             this._experiment.keepSamples = 'Y';
         } else {
             this._experiment.keepSamples = 'N';
+        }
+    }
+
+    public onSelectSampleSource(event: any): void {
+        if (event
+            && event.isUserInput
+            && event.isUserInput === true
+            && event.source
+            && event.source.value) {
+
+            this._experiment.idSampleSource = event.source.value.value;
+        }
+    }
+
+    public onInputCoreFacilityNotes(event: any): void {
+        if (!event) {
+            return;
+        }
+
+        if (this.form && this.form.get("coreNotes")) {
+            if (this.form.get("coreNotes").value) {
+                this._experiment.corePrepInstructions = this.form.get("coreNotes").value;
+            } else {
+                this._experiment.corePrepInstructions = '';
+            }
         }
     }
 }

@@ -245,7 +245,7 @@ export class TabSeqSetupViewComponent implements OnInit {
             }
         }
 
-        this.appPrices = tempAppPrices;
+        this.appPrices = tempAppPrices.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
     }
 
 
@@ -447,7 +447,7 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
 
-    private static sortBySortOrderThenDisplay(obj1, obj2): number{
+    public static sortBySortOrderThenDisplay(obj1, obj2): number{
         if ((obj1 === null || obj1 === undefined) && (obj2 === null || obj2 === undefined)) {
             return 0;
         } else if (obj1 === null || obj1 === undefined) {

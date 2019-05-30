@@ -15,7 +15,7 @@ import {GnomexService} from "../../services/gnomex.service";
         
         
         .label {
-            color: blue;
+            color: darkblue;
             font-style: italic;
             
             padding: 0.3em;
@@ -90,6 +90,10 @@ export class ExperimentBioinformaticsTabComponent {
             this.analysisNote  = this.getStringValuedProperty(PropertyService.PROPERTY_REQUEST_BIO_ANALYSIS_NOTE,    this._experiment.idCoreFacility);
             this.linkUrl       = this.getStringValuedProperty(PropertyService.PROPERTY_CONTACT_EMAIL_BIOINFORMATICS, this._experiment.idCoreFacility);
         }
+    }
+    
+    @Input("editMode") set editMode (isEditMode: boolean) {
+        this.masterDisabled = !isEditMode;
     }
 
     get experiment(): any {
@@ -185,7 +189,7 @@ export class ExperimentBioinformaticsTabComponent {
             });
 
             for (let lanes of lanesToChange) {
-                lanes.idGenomeBuildAlignTo = event.value ? event.value : '';
+                lanes.idGenomeBuildAlignTo = event ? event : '';
             }
         }
     }

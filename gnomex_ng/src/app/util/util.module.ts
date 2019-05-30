@@ -41,8 +41,9 @@ import {DownloadProgressComponent} from "./download-progress.component";
 import {DownloadFilesComponent} from "./download-files.component";
 import {AngularSplitModule} from "angular-split";
 import {TreeModule} from "angular-tree-component";
-import {LazyLoadedSelectComponent} from "./lazy-loaded-select.component";
 import {EditInstitutionsComponent} from "./edit-institutions.component";
+import {CustomComboBoxComponent} from "./custom-combo-box.component";
+import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 
 @NgModule({
     imports: [
@@ -91,8 +92,9 @@ import {EditInstitutionsComponent} from "./edit-institutions.component";
         DownloadPickerComponent,
         DownloadProgressComponent,
         DownloadFilesComponent,
-        LazyLoadedSelectComponent,
         EditInstitutionsComponent,
+        CustomComboBoxComponent,
+        GuestTermsDialogComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -110,6 +112,7 @@ import {EditInstitutionsComponent} from "./edit-institutions.component";
         DownloadProgressComponent,
         DownloadFilesComponent,
         EditInstitutionsComponent,
+        GuestTermsDialogComponent,
     ],
     exports: [
         BrowseFilterComponent,
@@ -140,8 +143,9 @@ import {EditInstitutionsComponent} from "./edit-institutions.component";
         DownloadPickerComponent,
         DownloadProgressComponent,
         DownloadFilesComponent,
-        LazyLoadedSelectComponent,
         EditInstitutionsComponent,
+        CustomComboBoxComponent,
+        GuestTermsDialogComponent,
     ]
 })
 export class UtilModule {

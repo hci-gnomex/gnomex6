@@ -49,6 +49,23 @@ export class Experiment {
     }
     public onChange_sampleType: Subject<string> = new Subject<string>();
 
+
+    private _idSampleSource: string = '';
+    public get idSampleSource(): string {
+        return this._idSampleSource;
+    }
+    public set idSampleSource(value: string) {
+
+        for (let sample of this.samples) {
+            sample.idSampleSource = value;
+        }
+
+        this._idSampleSource = value;
+        this.onChange_idSampleSource.next(value);
+    }
+    public onChange_idSampleSource: BehaviorSubject<string> = new BehaviorSubject<string>('');
+
+
     public bioinformaticsAssist:               string = "";
     public idOrganismSampleDefault:            string = ''; // "204"
     public isArrayINFORequest:                 string = "";
@@ -168,6 +185,23 @@ export class Experiment {
     public usedRnase:                          string = "";
     public keepSamples:                        string = ''; // "Y"
 
+    public get projectObject(): any {
+        return this.project;
+    }
+    public set projectObject(proj: any) {
+        if (proj) {
+            this.idProject          = proj.idProject ? proj.idProject : "";
+            this.project            = proj;
+            this.projectName        = proj.name ? proj.name : (proj.display ? proj.display : "");
+            this.projectDescription = proj.description ? proj.description : "";
+        } else {
+            this.idProject          = "";
+            this.project            = null;
+            this.projectName        = "";
+            this.projectDescription = "";
+        }
+    }
+
     public seqPrepByCore_forSamples:           string = "";
     public get seqPrepByCore(): string {
         // The sample should always return "", but save what the choice was in case we
@@ -245,7 +279,7 @@ export class Experiment {
         this._codeApplication = value;
         this.onChange_codeApplication.next(value);
     }
-    public onChange_codeApplication: Subject<string> = new Subject<string>();
+    public onChange_codeApplication: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
     private _application: any;
     public get application_object(): any {
@@ -267,7 +301,20 @@ export class Experiment {
     }
     public application_object_changed: Subject<any> = new Subject<any>();
 
-    public codeBioanalyzerChipType:            string = "";
+    private _codeBioanalyzerChipType: string = "";
+    public get codeBioanalyzerChipType(): string {
+        return '' + this._codeBioanalyzerChipType;
+    };
+    public set codeBioanalyzerChipType(codeBioanalyzerChipType: string) {
+        this._codeBioanalyzerChipType = codeBioanalyzerChipType;
+        this.onChange_codeBioanalyzerChipType.next(this._codeBioanalyzerChipType);
+
+        for (let sample of this.samples) {
+            sample.codeBioanalyzerChipType = this._codeBioanalyzerChipType;
+        }
+    };
+    public onChange_codeBioanalyzerChipType: BehaviorSubject<any> = new BehaviorSubject<any>('');
+
     public codeVisibility:                     string = ''; // "MEM",
     public canUpdateVisibility:                string = ''; // "N",
     public isVisibleToMembersAndCollaborators: string = ''; // "N",
@@ -650,10 +697,11 @@ export class Experiment {
         let properties: any[] = [];
 
         if (propsToFilter) {
+            if(!Array.isArray(propsToFilter)) {
+                propsToFilter = [propsToFilter];
+            }
+
             for (let property of propsToFilter) {
-                // if (property.name && property.name.startsWith("Human_5hmC")) {
-                //     console.log("jj");
-                // }
                 let entry: any = this.gnomexService.getSampleProperty(property.idProperty);
                 let keep: boolean = this.filterPropertyEntryWithFullProperty(entry, property);
                 if (keep) {
@@ -750,6 +798,8 @@ export class Experiment {
     public refreshSampleAnnotationList(): void {
 
         this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
+            response = this.filterPropertiesByCore(response);
+            response = this.filterPropertiesByRequestCategory(response);
             response = Experiment.filterOnlyPropertiesForSamples(response);
             response = this.filterPropertiesByUser(response);
 
@@ -901,6 +951,56 @@ export class Experiment {
                 return value.forSample && value.forSample === 'Y';
             });
         }
+        return properties;
+    }
+
+    private filterPropertiesByCore(properties: any[]): any[] {
+        if (properties && Array.isArray(properties)) {
+            properties = properties.filter((value:any) => {
+                return value.idCoreFacility && value.idCoreFacility === this.idCoreFacility;
+            });
+        }
+        return properties;
+    }
+
+
+    private filterPropertiesByRequestCategory(properties: any[]): any[] {
+        let propertyPlatformApplicationsFull: any[] = [];
+
+        let temp: any[] = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PROPERTY_PLATFORM_APPLICATION_DICTIONARY);
+
+        for (let entry of temp) {
+            propertyPlatformApplicationsFull.push(entry);
+        }
+
+        let propertyPlatformApplicationsFiltered: any[];
+
+        if (propertyPlatformApplicationsFull && Array.isArray(propertyPlatformApplicationsFull)) {
+            propertyPlatformApplicationsFiltered = propertyPlatformApplicationsFull.filter((a: any) => {
+                return a.codeRequestCategory && a.codeRequestCategory === this.codeRequestCategory && (!a.codeApplication || a.codeApplication === this.codeApplication);
+            });
+        }
+
+        if (properties && Array.isArray(properties)) {
+            properties = properties.filter((value:any) => {
+                for (let propertyPlatformApplication of propertyPlatformApplicationsFiltered) {
+                    if (value.idProperty && value.idProperty === propertyPlatformApplication.idProperty) {
+                        return true;
+                    }
+                }
+
+                for (let propertyPlatformApplication of propertyPlatformApplicationsFull) {
+                    // If the property isn't explicitly allowed, only filter it out if it is specified for something else.
+                    // That is, an empty filter should mean no filter here.
+                    if (value.idProperty && value.idProperty === propertyPlatformApplication.idProperty) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        }
+
         return properties;
     }
 

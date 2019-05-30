@@ -18,6 +18,7 @@ import {FormsModule} from "@angular/forms";
 import {LocalStorageModule, ILocalStorageServiceConfig} from "angular-2-local-storage";
 
 import "./gnomex-app.css";
+import "./gnomex-app-color.css";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {ServicesModule } from './services/services.module';

@@ -51,12 +51,20 @@ export class PropertyService {
     public static readonly PROPERTY_CONFIGURABLE_BILLING_ACCOUNTS: string = "configurable_billing_accounts";
     public static readonly PROPERTY_EXPERIMENT_DEFAULT_VIEW: string = "experiment_default_view";
     public static readonly PROPERTY_EXCLUDE_NEW_REQUESTS: string = "exclude_new_requests";
+    public static readonly PROPERTY_BULLETIN: string = "bulletin";
+    public static readonly PROPERTY_DISABLE_USER_SIGNUP: string = "disable_user_signup";
+    public static readonly PROPERTY_NO_GUEST_ACCESS: string = "no_guest_access";
+    public static readonly PROPERTY_GUEST_DOWNLOAD_TERMS: string = "guest_download_terms";
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
     public static readonly PROPERTY_REQUEST_BIO_ALIGNMENT_NOTE: string = "request_bio_alignment_note";
     public static readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string  = "request_bio_analysis_note";
     public static readonly PROPERTY_EXPERIMENT_FILE_SAMPLE_LINKING_ENABLED:string = "experiment_file_sample_linking_enabled";
+
+    public static readonly PROPERTY_QC_INSTRUCTIONS: string = "qc_instructions";
+    public static readonly PROPERTY_BST_LINKAGE_SUPPORTED: string = "bst_linkage_supported";
+    public static readonly PROPERTY_CAN_ACCESS_BSTX: string = "can_access_bstx";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,

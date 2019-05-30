@@ -7,6 +7,21 @@ import {Subject} from "rxjs";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {Experiment} from "../util/models/experiment.model";
+import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
+import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
+import {SelectRenderer} from "../util/grid-renderers/select.renderer";
+import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer";
+import {
+    HttpClient,
+    HttpEvent,
+    HttpEventType,
+    HttpHeaders,
+    HttpParams,
+    HttpRequest
+} from "@angular/common/http";
+import {saveAs} from "file-saver";
 
 
 @Injectable()
@@ -26,8 +41,10 @@ export class SampleUploadService {
     private bulkUploadImportedSubject: Subject<any>;
 
 
-    constructor(private http: Http, private cookieUtilService: CookieUtilService,
-                private dialogService: DialogsService) {
+    constructor(private http: Http,
+                private cookieUtilService: CookieUtilService,
+                private dialogService: DialogsService,
+                private httpClient: HttpClient) {
         this.hasSampleUploadURLSubject = new Subject();
     }
 
@@ -144,5 +161,85 @@ export class SampleUploadService {
         });
 
         return this.bulkUploadImportedSubject;
+    }
+
+    public downloadSampleSheet(labName: string, stateName: string, columnDefs: any[], experiment: Experiment): void {
+        if (!labName || !columnDefs || !experiment) {
+            return null;
+        }
+
+        let nameList: any[] = [];
+
+        for (let columnDef of columnDefs) {
+            if (columnDef.field && columnDef.headerName) {
+                let newNameListEntry: any = {
+                    dataField : "" + columnDef.field,
+                    fieldText : "" + columnDef.headerName,
+                    fieldType : "TEXT"
+                };
+
+                if (columnDef.cellRendererFramework) {
+                    if (columnDef.cellRendererFramework instanceof CheckboxRenderer) {
+                        newNameListEntry.fieldType = "CHECK";
+                    } else if (columnDef.cellRendererFramework instanceof TextAlignLeftMiddleRenderer
+                        || columnDef.cellRendererFramework instanceof TextAlignRightMiddleRenderer) {
+
+                        newNameListEntry.fieldType = "TEXT";
+                    } else if (columnDef.cellRendererFramework instanceof SelectRenderer) {
+                        newNameListEntry.fieldType = "OPTION";
+                    } else if (columnDef.cellRendererFramework instanceof MultiSelectRenderer) {
+                        newNameListEntry.fieldType = "MOPTION";
+                    }
+                }
+
+                nameList.push(newNameListEntry);
+            }
+        }
+
+        let params: HttpParams = new HttpParams()
+            .set("names", JSON.stringify(nameList))
+            .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()));
+
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+
+        this.cookieUtilService.formatXSRFCookie();
+
+        let today: Date = new Date();
+        let filename: string = "";
+
+        let dateString: string = today.getFullYear() + "-";
+        let temp: string = "" + (today.getMonth() + 1);
+
+        if (temp.length === 1) {
+            temp = "0" + temp;
+        }
+
+        dateString += temp + "-";
+
+        temp = "" + today.getDate();
+
+        if (temp.length === 1) {
+            temp = "0" + temp;
+        }
+
+        dateString += temp;
+
+        if (stateName) {
+            filename = labName + "_" + stateName + "_" + dateString + ".txt";
+        } else {
+            filename = labName + "_" + today.getFullYear() + dateString + ".txt";
+        }
+
+        const request: HttpRequest<any> = new HttpRequest<any>("POST", "/gnomex/DownloadSampleSheet.gx", params.toString(), {
+            headers: headers,
+            responseType: "blob"
+        });
+
+        this.httpClient.request(request).subscribe((event: HttpEvent<any>) => {
+            if (event.type === HttpEventType.Response) {
+                saveAs(event.body, filename);
+            }
+        });
     }
 }

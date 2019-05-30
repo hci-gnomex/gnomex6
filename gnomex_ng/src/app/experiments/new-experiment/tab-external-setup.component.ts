@@ -19,21 +19,21 @@ import {Experiment} from "../../util/models/experiment.model";
     selector: 'tab-external-setup',
     template: `
         <div class="full-height full-width flex-container-col padded">
-            <lazy-loaded-select placeholder="Lab group" [options]="this.labList" class="half-width"
-                                [displayField]="this.prefService.labDisplayField" [allowNone]="true"
-                                [control]="this.form.get('lab')">
-            </lazy-loaded-select>
-            <lazy-loaded-select *ngIf="this.showUserSelection" placeholder="Submitter" [options]="this.userList" class="half-width"
-                                [displayField]="this.prefService.userDisplayField" [allowNone]="true"
-                                [control]="this.form.get('appUser')">
-            </lazy-loaded-select>
+            <custom-combo-box placeholder="Lab group" [options]="this.labList" class="half-width"
+                                [displayField]="this.prefService.labDisplayField"
+                                [formControl]="this.form.get('lab')">
+            </custom-combo-box>
+            <custom-combo-box *ngIf="this.showUserSelection" placeholder="Submitter" [options]="this.userList" class="half-width"
+                                [displayField]="this.prefService.userDisplayField"
+                                [formControl]="this.form.get('appUser')">
+            </custom-combo-box>
             <div class="flex-container-row align-center">
-                <lazy-loaded-select placeholder="Project folder for organizing experiments" [options]="this.projectList" class="half-width"
-                                    valueField="idProject" [displayField]="'name'" [allowNone]="true"
-                                    [control]="this.form.get('idProject')">
-                </lazy-loaded-select>
+                <custom-combo-box placeholder="Project folder for organizing experiments" [options]="this.projectList" class="half-width"
+                                    [displayField]="'name'"
+                                    [formControl]="this.form.get('project')">
+                </custom-combo-box>
                 <div>
-                    <button mat-button [disabled]="!this.form.get('idProject').value" (click)="this.editProject()">Edit</button>
+                    <button mat-button [disabled]="!this.form.get('project').value" (click)="this.editProject()">Edit</button>
                 </div>
                 <div>
                     <button mat-button (click)="this.newProject()">New</button>
@@ -51,10 +51,10 @@ import {Experiment} from "../../util/models/experiment.model";
                     <button mat-button (click)="this.toggleShowLinkToTopic()"><img [src]="this.constantsService.ICON_TOPIC" class="icon">{{showLinkToTopic ? 'Hide' : 'Show'}} Link to Topic</button>
                 </div>
             </div>
-            <lazy-loaded-select placeholder="Organism" [options]="this.organismList" class="half-width"
-                                [displayField]="'display'" [allowNone]="true"
-                                [control]="this.form.get('organism')">
-            </lazy-loaded-select>
+            <custom-combo-box placeholder="Organism" [options]="this.organismList" class="half-width"
+                                [displayField]="'display'"
+                                [formControl]="this.form.get('organism')">
+            </custom-combo-box>
             <div class="flex-container-row full-width align-center">
                 <label class="margin-right">Experiment platform</label>
                 <mat-radio-group class="flex-container-col" [formControl]="this.form.get('requestCategory')">
@@ -66,10 +66,10 @@ import {Experiment} from "../../util/models/experiment.model";
                     </mat-radio-button>
                 </mat-radio-group>
             </div>
-            <lazy-loaded-select placeholder="Experiment type" [options]="this.requestApplicationList" class="half-width"
-                                [displayField]="'display'" [allowNone]="true"
-                                [control]="this.form.get('application')">
-            </lazy-loaded-select>
+            <custom-combo-box placeholder="Experiment type" [options]="this.requestApplicationList" class="half-width"
+                                [displayField]="'display'"
+                                [formControl]="this.form.get('application')">
+            </custom-combo-box>
         </div>
     `,
     styles: [`
@@ -114,7 +114,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
         this.form = this.formBuilder.group({
             lab: ["", [Validators.required]],
             appUser: ["", [Validators.required]],
-            idProject: ["", [Validators.required]],
+            project: ["", [Validators.required]],
             topic: ["", []],
             organism: ["", [Validators.required]],
             requestCategory: ["", [Validators.required]],
@@ -173,8 +173,8 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
             this.experiment.experimentOwner = this.form.get("appUser").value;
         }));
 
-        this.subscriptions.push(this.form.get("idProject").valueChanges.subscribe(() => {
-            this.experiment.idProject = this.form.get("idProject").value;
+        this.subscriptions.push(this.form.get("project").valueChanges.subscribe(() => {
+            this.experiment.projectObject = this.form.get("project").value;
         }));
 
         this.subscriptions.push(this.form.get("topic").valueChanges.subscribe(() => {
@@ -221,22 +221,22 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private preselectProject(attribute?: string, value?: string): void {
-        let newValue: string = "";
+        let newValue: any;
         if (attribute && value) {
             for (let proj of this.projectList) {
                 if (proj[attribute] === value) {
-                    newValue = proj.idProject;
+                    newValue = proj;
                     break;
                 }
             }
         }
-        this.form.get("idProject").setValue(newValue);
+        this.form.get("project").setValue(newValue);
     }
 
     public editProject(): void {
         let config: MatDialogConfig = new MatDialogConfig();
         config.data = {
-            idProject: this.form.get('idProject').value,
+            idProject: this.form.get('project').value.idProject,
         };
         let dialogRef: MatDialogRef<CreateProjectComponent> = this.dialog.open(CreateProjectComponent, config);
         dialogRef.afterClosed().subscribe((result: any) => {

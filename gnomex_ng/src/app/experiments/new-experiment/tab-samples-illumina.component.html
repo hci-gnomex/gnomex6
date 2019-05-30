@@ -14,7 +14,7 @@
                     <img class="icon" [src]="this.constService.ICON_INFORMATION" alt="">
                     Instructions
                 </button>
-                <button *ngIf="experiment?.isExternal === 'Y'" mat-button class="padded-right" (click)="onAddSample()">
+                <button *ngIf="experiment?.isExternal === 'Y'" [disabled]="!(_state === this.STATE_NEW || _state === this.STATE_EDIT)" mat-button class="padded-right" (click)="onAddSample()">
                     <img class="icon" [src]="this.constService.ICON_ADD" alt="">
                     Add sample
                 </button>
@@ -34,7 +34,7 @@
                     <img class="icon" [src]="constService.ICON_DOWNLOAD">
                     Download Sample Sheet
                 </button>
-                <mat-checkbox *ngIf="(_state === this.STATE_NEW || (_state === this.STATE_EDIT && this.showCcCheckbox)) && experiment?.isExternal !== 'Y'" #ccCheckbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
+                <mat-checkbox *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && this.showCcCheckbox && experiment?.isExternal !== 'Y'" #ccCheckbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
             </div>
             <div class="full-width flex-grow">
                 <div #oneEmWidth class="no-height single-em"></div>

@@ -8,6 +8,7 @@ import * as _ from "lodash";
 import {GetLabService} from "../../../services/get-lab.service";
 import {LabListService} from "../../../services/lab-list.service";
 import {UserPreferencesService} from "../../../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
 	selector: "billing-users-selector",
@@ -219,8 +220,8 @@ export class BillingUsersSelectorComponent {
 		this.userListLoading = true;
 		this.userList = [];
 
-		let params: URLSearchParams = new URLSearchParams();
-		params.set("idLab", this.selectedLab.idLab);
+		let params: HttpParams = new HttpParams()
+			.set("idLab", this.selectedLab.idLab);
 		this.getLabService.getLab(params).subscribe((response: any) => {
 			if (response && response.Lab && response.Lab.activeSubmitters) {
 				if (Array.isArray(response.Lab.activeSubmitters)) {

@@ -71,11 +71,20 @@ export class TabAnnotationViewComponent implements OnDestroy {
                 this.dialogsService.stopAllSpinnerDialogs();
             });
         }
+
+        if (this.onChange_codeRequestCategorySubscription) {
+            this.onChange_codeRequestCategorySubscription.unsubscribe();
+        }
+
+        this.onChange_codeRequestCategorySubscription = this._experiment.onChange_codeRequestCategory.subscribe((value) => {
+            this._experiment.refreshSampleAnnotationList();
+        });
     }
 
     private _experiment: Experiment;
 
     private experimentSubscription: Subscription;
+    private onChange_codeRequestCategorySubscription: Subscription;
 
     public addAnnotationGridApi: GridApi;
     public removeAnnotationGridApi: GridApi;
@@ -123,6 +132,13 @@ export class TabAnnotationViewComponent implements OnDestroy {
         if (this.experimentSubscription) {
             this.experimentSubscription.unsubscribe();
         }
+        if (this.onChange_codeRequestCategorySubscription) {
+            this.onChange_codeRequestCategorySubscription.unsubscribe();
+        }
+    }
+
+    public tabDisplayed() {
+        this._experiment.refreshSampleAnnotationList();
     }
 
     public onGridSizeChanged(event: any) {

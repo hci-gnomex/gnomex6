@@ -154,8 +154,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     private idGenomeBuildString: string;
     private genomeBuildList: any[] = [];
 
-    private showCCNumberInput: boolean = false;
-    private ccNumberString: string;
+    public showCCNumberInput: boolean = false;
+    public ccNumberString: string;
 
     private showExperimentsRadioGroup: boolean = false;
     private experimentsRadioString: string;
@@ -221,6 +221,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         let isBillingAdminState: boolean = this.createSecurityAdvisorService.isBillingAdmin;
         let isGuestState: boolean = this.createSecurityAdvisorService.isGuest;
         if (this.mode === this.EXPERIMENT_BROWSE) {
+            let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
+            let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
             if (isAdminState) {
                 this.showAllCheckbox = true;
                 this.showLabComboBox = true;
@@ -230,7 +232,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showExternalExperimentsCheckbox = true;
                 this.showCoreFacilityComboBox = true;
                 this.showRequestCategoryComboBox = true;
-                this.showCCNumberInput = true;
+                this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response;
@@ -247,7 +249,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showLabMembersComboBox = true;
                 this.showCoreFacilityComboBox = true;
                 this.showRequestCategoryComboBox = true;
-                this.showCCNumberInput = true;
+                this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response.filter(lab => lab.isMyLab === 'Y');

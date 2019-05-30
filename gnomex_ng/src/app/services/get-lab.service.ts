@@ -25,8 +25,8 @@ export class GetLabService {
 
 
 
-    public getLabCall(params: URLSearchParams): Observable<Response> {
-        return this.http.get("/gnomex/GetLab.gx", {search: params});
+    public getLabCall(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetLab.gx", {params: params});
     }
 
 
@@ -133,14 +133,8 @@ export class GetLabService {
             }
         });
     }
-    getLab(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetLab.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    getLab(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetLab.gx", {params: params});
     }
 
     public getLabNew(params: HttpParams): Observable<any> {
@@ -178,23 +172,22 @@ export class GetLabService {
     }
 
     getLabById(idLab: string): Observable<any> {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idLab", idLab);
+        let params: HttpParams = new HttpParams().set("idLab", idLab);
         return this.getLab(params);
     }
 
     public getLabByIdOnlyForHistoricalOwnersAndSubmitters(idLab: string): Observable<any> {
-        let params: URLSearchParams = this.makeParams(idLab, false, false, false, false, true, false, false, false);
+        let params: HttpParams = this.makeParams(idLab, false, false, false, false, true, false, false, false);
         return this.getLab(params);
     }
 
     public getLabBillingAccounts(idLab: string): Observable<any> {
-        let params: URLSearchParams = this.makeParams(idLab, true, false, false, false, false, false, false, false);
+        let params: HttpParams = this.makeParams(idLab, true, false, false, false, false, false, false, false);
         return this.getLab(params);
     }
 
     public getLabBasic(idLab: string): Observable<Response> {
-        let params: URLSearchParams = this.makeParams(idLab, false, false, false, false, false, false, false, false);
+        let params: HttpParams = this.makeParams(idLab, false, false, false, false, false, false, false, false);
         return this.getLabCall(params);
     }
 
@@ -215,18 +208,18 @@ export class GetLabService {
 
     private makeParams(idLab: string, includeBillingAccounts: boolean, includeProductCounts: boolean,
                        includeProjects: boolean, includeCoreFacilities: boolean, includeHistoricalOwnersAndSubmitters: boolean,
-                       includeInstitutions: boolean, includeSubmitters: boolean, includeMoreCollaboratorInfo: boolean): URLSearchParams {
+                       includeInstitutions: boolean, includeSubmitters: boolean, includeMoreCollaboratorInfo: boolean): HttpParams {
 
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idLab", idLab);
-        params.set("includeBillingAccounts", includeBillingAccounts ? "Y" : "N");
-        params.set("includeProductCounts", includeProductCounts ? "Y" : "N");
-        params.set("includeProjects", includeProjects ? "Y" : "N");
-        params.set("includeCoreFacilities", includeCoreFacilities ? "Y" : "N");
-        params.set("includeHistoricalOwnersAndSubmitters", includeHistoricalOwnersAndSubmitters ? "Y" : "N");
-        params.set("includeInstitutions", includeInstitutions ? "Y" : "N");
-        params.set("includeSubmitters", includeSubmitters ? "Y" : "N");
-        params.set("includeMoreCollaboratorInfo", includeMoreCollaboratorInfo ? "Y" : "N");
+        let params: HttpParams = new HttpParams()
+            .set("idLab", idLab)
+            .set("includeBillingAccounts", includeBillingAccounts ? "Y" : "N")
+            .set("includeProductCounts", includeProductCounts ? "Y" : "N")
+            .set("includeProjects", includeProjects ? "Y" : "N")
+            .set("includeCoreFacilities", includeCoreFacilities ? "Y" : "N")
+            .set("includeHistoricalOwnersAndSubmitters", includeHistoricalOwnersAndSubmitters ? "Y" : "N")
+            .set("includeInstitutions", includeInstitutions ? "Y" : "N")
+            .set("includeSubmitters", includeSubmitters ? "Y" : "N")
+            .set("includeMoreCollaboratorInfo", includeMoreCollaboratorInfo ? "Y" : "N");
         return params;
     }
 

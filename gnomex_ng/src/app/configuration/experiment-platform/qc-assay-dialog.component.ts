@@ -100,7 +100,7 @@ import {first} from "rxjs/operators";
             <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
                 <div class="padded-inner flex-container-row" style="align-items:center" >
                     <div class="flex-grow">
-                        <save-footer [actionType]="applyText"
+                        <save-footer [name]="applyText"
                                      [disableSave]="formGroup.invalid"
                                      (saveClicked)="applyChanges()"
                                      [dirty]="formGroup.dirty" >

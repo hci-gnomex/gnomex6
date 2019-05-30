@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from "@angular/core";
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {LabListService} from "../../services/lab-list.service";
@@ -12,6 +12,7 @@ import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentsService} from "../experiments.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {UtilService} from "../../services/util.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 
 @Component({
@@ -127,8 +128,10 @@ import {UtilService} from "../../services/util.service";
         }
 
     `]
-}) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy {
+}) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy, OnChanges {
     private labListSubscription: Subscription;
+
+    @Input() editMode: boolean;
 
     @Input('experiment') set experiment(experiment: any) {
         this.isReady_filteredApplicationDictionary = false;
@@ -306,7 +309,8 @@ import {UtilService} from "../../services/util.service";
             this.updateCollaboratorsDisplay();
         });
     };
-
+    
+    public overviewTabForm: FormGroup;
     public _experiment: any = {};
 
     public lab: any;
@@ -421,10 +425,7 @@ import {UtilService} from "../../services/util.service";
     public get isAdmin(): boolean {
         return this.secAdvisor.isAdmin;
     }
-    
-    public get isEditMode(): boolean {
-        return this.experimentsService.getEditMode();
-    }
+
 
     constructor(private constantsService: ConstantsService,
                 public secAdvisor: CreateSecurityAdvisorService,
@@ -435,7 +436,8 @@ import {UtilService} from "../../services/util.service";
                 private matDialog: MatDialog,
                 private experimentsService: ExperimentsService,
                 private propertyService: PropertyService,
-                public prefService: UserPreferencesService) { }
+                public prefService: UserPreferencesService,
+                private fb: FormBuilder) { }
 
     public get selectedExperimentCategory(): string {
         if (!this._experiment || !this._experiment.experimentCategoryName) {
@@ -455,6 +457,15 @@ import {UtilService} from "../../services/util.service";
         setTimeout(() => {
             this.dialogService.startDefaultSpinnerDialog();
         });
+        
+        this.overviewTabForm = this.fb.group({
+            idLab: [{value: "", disabled: true}, Validators.required],
+            idProject: [{value: "", disabled: true}],
+            codeApplication: [{value: "", disabled: true}],
+            idAppUser: [{value: "", disabled: true}, Validators.required],
+            idSubmitter: [{value: "", disabled: true}],
+        });
+        this.experimentsService.addExperimentOverviewFormMember(this.overviewTabForm, this.constructor.name);
 
         this.applicationDictionary     = this.dictionaryService.getEntries('hci.gnomex.model.Application');
         this.coreFacilitiesDictionary  = this.dictionaryService.getEntries('hci.gnomex.model.CoreFacility');
@@ -486,7 +497,7 @@ import {UtilService} from "../../services/util.service";
                 this.lab = result;
 
                 if (result.Lab) {
-                    this.projectsDictionary = result.Lab.projects;
+                    this.projectsDictionary = UtilService.getJsonArray(result.Lab.projects, result.Lab.projects.Project);
                     this.isReady_projectsDictionary = true;
 
                     this.compilePossibleOwners();
@@ -536,6 +547,16 @@ import {UtilService} from "../../services/util.service";
         } else {
             this.privacyExp = null;
         }
+
+        this.updateForm();
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (this.experimentsService.modeChangedExperiment && this._experiment && this.experimentsService.modeChangedExperiment.number === this._experiment.number) {
+            if (!changes["editMode"].isFirstChange()) {
+                this.updateForm();
+            }
+        }
     }
 
     ngOnDestroy(): void {
@@ -544,6 +565,35 @@ import {UtilService} from "../../services/util.service";
         }
         if(this.labListSubscription){
             this.labListSubscription.unsubscribe();
+        }
+    }
+
+    updateForm() {
+        this.overviewTabForm.get("idLab").setValue(this._experiment.idLab);
+        this.overviewTabForm.get("idProject").setValue(this._experiment.idProject);
+        this.overviewTabForm.get("idAppUser").setValue(this._experiment.idAppUser);
+        if(!this.editMode || !(this.isAdmin || this._experiment.canUpdate === "Y")) {
+            this.overviewTabForm.get("idLab").disable();
+            this.overviewTabForm.get("idProject").disable();
+            this.overviewTabForm.get("idAppUser").disable();
+        } else {
+            this.overviewTabForm.get("idLab").enable();
+            this.overviewTabForm.get("idProject").enable();
+            this.overviewTabForm.get("idAppUser").enable();
+        }
+
+        this.overviewTabForm.get("codeApplication").setValue(this._experiment.codeApplication);
+        if(!this.editMode || !(this.isAdmin || (this._experiment.canUpdate === "Y" && this._experiment.isExternal === "Y"))) {
+            this.overviewTabForm.get("codeApplication").disable();
+        } else {
+            this.overviewTabForm.get("codeApplication").enable();
+        }
+
+        this.overviewTabForm.get("idSubmitter").setValue(this._experiment.idSubmitter);
+        if(!this.editMode || !this.isAdmin) {
+            this.overviewTabForm.get("idSubmitter").disable();
+        } else {
+            this.overviewTabForm.get("idSubmitter").enable();
         }
     }
 
