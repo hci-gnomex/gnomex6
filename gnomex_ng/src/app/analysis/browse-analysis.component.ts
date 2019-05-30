@@ -212,12 +212,15 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
                     let id: string = "" + this.gnomexService.orderInitObj.idAnalysis;
                     if(this.treeModel && id) {
-                        let node = this.findNodeById("a" + id);
+                        let node:ITreeNode = this.findNodeById("a" + id);
                         if(node) {
                             node.setIsActive(true);
                             node.scrollIntoView();
-                            this.gnomexService.orderInitObj = null;
+                        }else{
+                            let navArray = ["/analysis", {outlets: {"analysisPanel": [this.gnomexService.orderInitObj.idAnalysis]}}];
+                            this.router.navigate(navArray);
                         }
+                        this.gnomexService.orderInitObj = null;
                     }
                 } else if(this.analysisService.setActiveNodeId) {
                     let node: TreeNode;
@@ -303,7 +306,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
      */
     buildTree(response: any[]) {
         this.labs = [];
-        this.items = [].concat(null);
+        this.items = [];
 
         if(response) {
             if (!this.isArray(response)) {
@@ -528,9 +531,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
-            let params: HttpParams = new HttpParams()
-                .set("idAnalysis", idAnalysis);
-
         }
 
         this.router.navigate(navArray);

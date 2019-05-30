@@ -335,12 +335,12 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dtOverviewForm.markAsPristine();
                 let treeNode = this.dataTrackService.datatrackListTreeNode;
                 if (treeNode) {
-                    this.gnomexService.orderInitObj = {};
-                    this.gnomexService.orderInitObj.idDataTrack = treeNode.idDataTrack;
-                    this.gnomexService.orderInitObj.idGenomeBuild = treeNode.idGenomeBuild;
-                    this.gnomexService.orderInitObj.idOrganism = treeNode.idOrganism;
-                    this.gnomexService.orderInitObj.idLab = idLab;
-                    this.gnomexService.navInitBrowseDatatrackSubject.next(this.gnomexService.orderInitObj);
+                    let params: HttpParams = new HttpParams()
+                        .set("idDataTrack", treeNode.idDataTrack)
+                        .set("idGenomeBuild",treeNode.idGenomeBuild )
+                        .set("idOrganism", treeNode.idOrganism )
+                        .set("idLab", treeNode.idLab);
+                    this.dataTrackService.getDatatracksList_fromBackend(params);
                 }
             }
         },(err:IGnomexErrorResponse) => {
