@@ -14,13 +14,14 @@ import {
 } from "../../util/billing-template-window.component";
 import {BillingService} from "../../services/billing.service";
 import {FormControl} from "@angular/forms";
+import {ExperimentsService} from "../experiments.service";
 
 @Component({
     selector: 'experiment-billing-tab',
     template: `
         <div class="padded flex-container-col full-height">
             <div class="flex-container-row align-center" *ngIf="this.isInternal">
-                <button mat-button (click)="this.editBillingTemplate()" [disabled]="!this.canUpdate">Edit Billing Template</button>
+                <button mat-button (click)="this.editBillingTemplate()" [disabled]="!this.canUpdate || !this.experimentsService.getEditMode()">Edit Billing Template</button>
                 <label class="small-font"><span class="italic">Current Account(s):</span> {{this.currentAccountsLabel}}</label>
             </div>
             <div class="flex-grow">
@@ -56,7 +57,8 @@ export class ExperimentBillingTabComponent implements OnInit {
                 private route: ActivatedRoute,
                 private dictionaryService: DictionaryService,
                 private dialogsService: DialogsService,
-                private dialog: MatDialog) {
+                private dialog: MatDialog,
+                public experimentsService: ExperimentsService) {
     }
 
     ngOnInit() {
@@ -96,6 +98,7 @@ export class ExperimentBillingTabComponent implements OnInit {
         };
 
         this.billingTemplateFormControl = new FormControl();
+        this.experimentsService.addExperimentOverviewFormMember(this.billingTemplateFormControl, "BillingTemplateWindowComponent");
         this.route.data.forEach((data: any) => {
             this.request = null;
             this.gridData = [];
