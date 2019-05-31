@@ -10,6 +10,7 @@ import {Experiment} from "../util/models/experiment.model";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {element} from "@angular/core/src/render3";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {AbstractControl, FormGroup} from "@angular/forms";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -53,13 +54,16 @@ export class ExperimentsService {
     public filteredLabs: any;
     public labList: any[] = [];
     private editMode: boolean = false;
+    private _experimentOverviewForm: FormGroup;
 
 
     constructor(private cookieUtilService: CookieUtilService,
                 private _http: Http,
                 private httpClient: HttpClient,
                 private dialogService: DialogsService,
-                @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
+                @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {
+        this._experimentOverviewForm = new FormGroup({});
+    }
 
     getExperimentsObservable(): Observable<any> {
         return this.experimentOrdersSubject.asObservable();
@@ -216,10 +220,11 @@ export class ExperimentsService {
             return;
         }
 
-        let propertiesXML: string = JSON.stringify(experiment.RequestProperties);
-
-        if (!propertiesXML) {
-            propertiesXML = '';
+        let propertiesXML: string;
+        if(Array.isArray(experiment.RequestProperties) && experiment.RequestProperties.length === 0) {
+            propertiesXML = "";
+        } else {
+            propertiesXML = JSON.stringify(experiment.RequestProperties);
         }
 
         let params: HttpParams = new HttpParams()
@@ -401,5 +406,21 @@ export class ExperimentsService {
     emailServlet(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/EmailServlet.gx", null, {params: params});
+    }
+
+    get experimentOverviewForm(): FormGroup {
+        return this._experimentOverviewForm;
+    }
+
+    public addExperimentOverviewFormMember(control: AbstractControl, name: string, afterControlAddedFn?: any): void {
+        setTimeout(() => {
+            this._experimentOverviewForm.addControl(name, control);
+            if(afterControlAddedFn) {
+                afterControlAddedFn();
+            }
+        });
+    }
+    public clearExperimentOverviewForm(): void {
+        this._experimentOverviewForm = new FormGroup({});
     }
 }

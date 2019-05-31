@@ -7,7 +7,8 @@ import {URLSearchParams} from "@angular/http";
 import {HttpParams} from "@angular/common/http";
 import {BehaviorSubject} from "rxjs";
 import {AuthenticationService} from "../../auth/authentication.service";
-import {flatMap, map} from "rxjs/operators";
+import {catchError, flatMap, map} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.
@@ -82,6 +83,9 @@ export class AuthRouteGuardService implements CanActivate {
                 this._router.navigate(["authenticate"]);
                 return false;
             }
+        }), catchError( (err:IGnomexErrorResponse) =>{
+            this._router.navigate(["authenticate"]);
+            return of(false);
         }));
 
     }

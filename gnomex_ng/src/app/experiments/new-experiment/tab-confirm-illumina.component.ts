@@ -238,6 +238,13 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     private buildColumnDefinitions(): void {
+        for(let sample of this._experiment.samples) {
+            if (sample.ccNumber) {
+                this._experiment.hasCCNumber = "Y";
+                break;
+            }
+        }
+
         if (this.useMultiplexLanes) {
             this.buildMultiplexLaneColumnDefinitions();
         } else {
@@ -345,6 +352,19 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
                 temp.push(newColumn);
             }
+        }
+
+        if (this._experiment.hasCCNumber === "Y") {
+            temp.push({
+                headerName: "CC Number",
+                field: "ccNumber",
+                width: 9 * this.emToPxConversionRate,
+                minWidth: 8 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+            });
         }
 
         if (this._experiment
@@ -525,6 +545,19 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
                 temp.push(newColumn);
             }
+        }
+
+        if(this._experiment.hasCCNumber === "Y") {
+            temp.push({
+                headerName: "CC Number",
+                field: "ccNumber",
+                width: 9 * this.emToPxConversionRate,
+                minWidth: 8 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+            });
         }
 
         if (this._experiment

@@ -156,8 +156,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     public showCCNumberInput: boolean = false;
     public ccNumberString: string;
-    private isBSTLinkageSupported: boolean = false;
-    private canAccessBSTX: boolean = false;
 
     private showExperimentsRadioGroup: boolean = false;
     private experimentsRadioString: string;
@@ -223,8 +221,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         let isBillingAdminState: boolean = this.createSecurityAdvisorService.isBillingAdmin;
         let isGuestState: boolean = this.createSecurityAdvisorService.isGuest;
         if (this.mode === this.EXPERIMENT_BROWSE) {
-            this.isBSTLinkageSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
-            this.canAccessBSTX = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
+            let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
+            let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
             if (isAdminState) {
                 this.showAllCheckbox = true;
                 this.showLabComboBox = true;
@@ -234,7 +232,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showExternalExperimentsCheckbox = true;
                 this.showCoreFacilityComboBox = true;
                 this.showRequestCategoryComboBox = true;
-                this.showCCNumberInput = this.isBSTLinkageSupported && this.canAccessBSTX;
+                this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response;
@@ -251,7 +249,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showLabMembersComboBox = true;
                 this.showCoreFacilityComboBox = true;
                 this.showRequestCategoryComboBox = true;
-                this.showCCNumberInput = this.isBSTLinkageSupported && this.canAccessBSTX;
+                this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response.filter(lab => lab.isMyLab === 'Y');
@@ -609,14 +607,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     onRequestCategorySelect(event: any): void {
-        let isIlluminaType: boolean = false;
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
             this.codeRequestCategoryString = event.args.item.value;
-            isIlluminaType = event.args.item.originalItem && event.args.item.originalItem.isIlluminaType && event.args.item.originalItem.isIlluminaType === "Y";
         } else {
             this.codeRequestCategoryString = "";
         }
-        this.showCCNumberInput = this.isBSTLinkageSupported && this.canAccessBSTX && !isIlluminaType;
     }
 
     onRequestCategoryUnselect(): void {

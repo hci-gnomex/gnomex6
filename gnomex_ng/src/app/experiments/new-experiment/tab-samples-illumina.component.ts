@@ -34,8 +34,6 @@ import {SampleUploadService} from "../../upload/sample-upload.service";
     selector: "tab-samples-illumina",
     templateUrl: "./tab-samples-illumina.component.html",
     styles: [`
-
-
         .no-height { height: 0;  }
         .single-em { width: 1em; }
         
@@ -62,8 +60,6 @@ import {SampleUploadService} from "../../upload/sample-upload.service";
             overflow: visible !important;
             white-space: normal !important;
         }
-        
-
     `]
 })
 
@@ -240,8 +236,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 if (this.showCcCheckbox) {
                     setTimeout(() => {
                         if (this.ccCheckbox) {
-                            this.ccCheckbox.checked = true;
-                            this.toggleCC({ checked: true });
+                            if(this._experiment.hasCCNumber === "Y") {
+                                this.ccCheckbox.checked = true;
+                                this.toggleCC({ checked: true });
+                            } else {
+                                this.ccCheckbox.checked = false;
+                                this.toggleCC({ checked: false });
+                            }
                         }
                     });
                 }
@@ -278,9 +279,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     public get usingMultiplexGroupGroups(): boolean {
         return this._experiment
-            && this._experiment.requestCategory
-            && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'Y'
             && this._experiment.isExternal !== 'Y';
     };
 
@@ -385,10 +383,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showLinkToCCNumber(): boolean {
-        return this._experiment
-            && this._experiment.requestCategory
-            && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'N';
+        return this._experiment && this._experiment.hasCCNumber === 'Y';
     }
 
     public get showDescription(): boolean {
@@ -1270,22 +1265,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         }
 
-        temp.push({
-            headerName: "CC Number",
-            field: "ccNumber",
-            width:    9 * this.emToPxConversionRate,
-            minWidth: 8 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
-            suppressSizeToFit: true,
-            editable: false,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup',
-            hide: this.hideCCNum,
-            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-            sortOrder: 140
-        });
 
         // This is used as the sortOrder basis for the sample annotations.
         this._tabIndexToInsertAnnotations = 150;
@@ -1892,7 +1871,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.samplesGridApi.redrawRows();
         }
         if (this.ccCheckbox) {
-            this.ccCheckbox.checked = false;
+            this.toggleCC(this.ccCheckbox);
         }
 
         return temp;
@@ -1964,6 +1943,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
             if (temp.length > 0) {
                 this.gridColumnApi.setColumnVisible(temp[0].colId, event.checked);
                 this.ccNumberIsCurrentlyHidden = !event.checked;
+                if(!event.checked) {
+                    this._experiment.hasCCNumber = "N";
+                    for (let sample of this._experiment.samples) {
+                        sample.ccNumber = "";
+                    }
+                }
             }
 
             if (this.form && this.form.get('invalidateWithoutSamples')) {

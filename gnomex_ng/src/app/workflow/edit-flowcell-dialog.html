@@ -41,9 +41,8 @@
             <button mat-button (click)="removeChannel($event)" [disabled]="!channel"><mat-icon>remove</mat-icon>Remove Channel</button>
         </div>
     </div>
-    <div class="row-one">
-        <ag-grid-angular id="channelsTable" style="width: 100%;font-size: .85rem" class="ag-theme-fresh"
-                         [gridOptions]="assmGridOptions"
+    <div class="flex-grow">
+        <ag-grid-angular class="ag-theme-balham full-width full-height"
                          [rowData]="flowCellChannels"
                          [columnDefs]="flowCellColDefs"
                          [rowSelection]="'single'"
@@ -56,7 +55,7 @@
                          [enableColResize]="true">
         </ag-grid-angular>
     </div>
-    <mat-dialog-actions>
+    <mat-dialog-actions class="justify-flex-end">
         <button mat-button *ngIf="!showSpinner" [disabled]="!allFG.dirty||!allFG.valid" (click)="saveFlowCell()"><mat-icon>save</mat-icon>Save</button>
         <button mat-button *ngIf="!showSpinner" mat-dialog-close><mat-icon>cancel</mat-icon>Cancel</button>
         <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>

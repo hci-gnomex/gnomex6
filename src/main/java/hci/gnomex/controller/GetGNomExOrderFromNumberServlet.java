@@ -116,11 +116,13 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
 
                 if(hasID.equals("N")){
-                    queryStr ="SELECT a from Analysis as a where a.number = :analysisNumber" ;
+                    queryStr ="SELECT a.number,ag.idAnalysisGroup,a.codeVisibility, a.idAnalysis, a.idLab " +
+                            "FROM Analysis as a JOIN a.analysisGroups as ag WHERE a.number = :analysisNumber" ;
                     query = sess.createQuery(queryStr).setParameter("analysisNumber", analysisNumber );
                 }else{
                     idAnalysis = new Integer(this.analysisNumber);
-                    queryStr ="SELECT a from Analysis as a where a.idAnalysis = :idAnalysis" ;
+                    queryStr ="SELECT a.number,ag.idAnalysisGroup,a.codeVisibility, a.idAnalysis, a.idLab " +
+                            "FROM Analysis as a JOIN a.analysisGroups ag WHERE a.idAnalysis = :idAnalysis" ;
                     query = sess.createQuery(queryStr).setParameter("idAnalysis", idAnalysis );
                 }
 
@@ -129,13 +131,14 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                     throw new Exception("Analysis number " + analysisNumber + " does not exists" );
                 }
 
-                Analysis a = (Analysis)analysisRow.get(0);
+                Object[] a =  (Object[])analysisRow.get(0);
                 value = Json.createObjectBuilder()
                         .add("result", "SUCCESS")
-                        .add("analysisNumber", a.getNumber())
-                        .add("codeVisbility", a.getCodeVisibility())
-                        .add("idAnalysis", a.getIdAnalysis())
-                        .add("idLab", a.getIdLab())
+                        .add("analysisNumber", "" + a[0])
+                        .add("idAnalysisGroup", "" + a[1])
+                        .add("codeVisbility", "" + a[2])
+                        .add("idAnalysis", "" + a[3])
+                        .add("idLab", "" + a[4])
                         .build();
 
 

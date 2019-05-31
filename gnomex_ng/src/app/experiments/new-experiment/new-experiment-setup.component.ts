@@ -596,10 +596,10 @@ export class NewExperimentSetupComponent implements OnDestroy {
                     this.getLabService.getSubmittersForLab(value.idLab, 'Y', 'N');
                 }
 
-                let params: URLSearchParams = new URLSearchParams();
-                params.set("idLab", value.idLab);
-                params.set("includeBillingAccounts", "Y");
-                params.set("includeProductCounts", "N");
+                let params: HttpParams = new HttpParams()
+                    .set("idLab", value.idLab)
+                    .set("includeBillingAccounts", "Y")
+                    .set("includeProductCounts", "N");
                 this.getLabService.getLab(params).subscribe((response: any) => {
                     if (response && response.Lab && response.Lab.activeSubmitters) {
                         this.authorizedBillingAccounts = response.Lab.authorizedBillingAccounts;

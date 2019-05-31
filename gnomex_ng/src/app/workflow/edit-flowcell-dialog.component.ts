@@ -10,6 +10,7 @@ import {HttpParams} from "@angular/common/http";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {GridApi} from 'ag-grid-community/dist/lib/gridApi';
 
 @Component({
     selector: 'edit-flowcell-dialog',
@@ -20,13 +21,6 @@ import {DialogsService} from "../util/popup/dialogs.service";
             flex-direction: column;
             background-color: white;
             height: 100%;
-            width: 100%;
-        }
-        .flex-column-container-outlet {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 94%;
             width: 100%;
         }
         .flex-row-container {
@@ -90,7 +84,7 @@ export class EditFlowcellDialogComponent implements OnInit{
     private codeSequencingPlatform: string;
 
     private flowCellColDefs;
-    private assmGridApi;
+    private assmGridApi:GridApi;
 
     constructor(public dialogRef: MatDialogRef<EditFlowcellDialogComponent>,
                 private workflowService: WorkflowService,
@@ -121,7 +115,8 @@ export class EditFlowcellDialogComponent implements OnInit{
 
     ngOnInit() {
         this.sequenceProtocolsList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.NumberSequencingCyclesAllowed").filter(proto =>
-            (proto.codeRequestCategory ===  "HISEQ" || proto.codeRequestCategory === "MISEQ" || proto.codeRequestCategory === "NOSEQ") && proto.isActive === 'Y'
+            (proto.codeRequestCategory ===  "HISEQ" || proto.codeRequestCategory === "MISEQ" ||
+                proto.codeRequestCategory === "NOSEQ" || proto.codeRequestCategory === "ILLSEQ") && proto.isActive === 'Y'
         );
         this.instrumentList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.Instrument").filter(instrument =>
             instrument.isActive === 'Y'
@@ -143,6 +138,7 @@ export class EditFlowcellDialogComponent implements OnInit{
 
     onAssmGridReady(params) {
         this.assmGridApi = params.api;
+        this.assmGridApi.sizeColumnsToFit();
     }
 
     initializeAssm() {

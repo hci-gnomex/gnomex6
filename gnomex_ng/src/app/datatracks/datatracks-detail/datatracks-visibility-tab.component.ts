@@ -4,13 +4,13 @@
         import {DataTrackService} from "../../services/data-track.service";
         import {ActivatedRoute} from "@angular/router";
         import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-        import {URLSearchParams} from "@angular/http";
         import {PropertyService} from "../../services/property.service";
         import {ConstantsService} from "../../services/constants.service";
         import {GnomexService} from "../../services/gnomex.service";
         import {GetLabService} from "../../services/get-lab.service";
         import {first} from "rxjs/operators";
         import {UserPreferencesService} from "../../services/user-preferences.service";
+        import {HttpParams} from "@angular/common/http";
 
 
 
@@ -92,13 +92,13 @@
 
                     this.visibilityForm.get("codeVisibility").setValue(this.currentDatatrack.codeVisibility);
 
-                    let labParams: URLSearchParams = new URLSearchParams();
+                    let labParams: HttpParams = new HttpParams();
 
                     let idLab = this.dtService.datatrackListTreeNode.idLab;
                     if(idLab !== null  && idLab !== undefined){ //empty string is valid
-                        labParams.set('idLab', idLab);
-                        labParams.set('includeBillingAccounts', 'N');
-                        labParams.set('includeProductCounts','N');
+                        labParams = labParams.set('idLab', idLab);
+                        labParams = labParams.set('includeBillingAccounts', 'N');
+                        labParams = labParams.set('includeProductCounts','N');
                         this.getLabService.getLab(labParams).pipe(first()).subscribe( data =>{
                             if(data.Lab){
                                 this.makeOwnerList(data.Lab);
@@ -167,20 +167,17 @@
                 }
                 if(this.currentIdLab != value.idLab){
                     this.currentIdLab = value.idLab;
-                    let params: URLSearchParams = new URLSearchParams();
-                    params.set("idLab", value.idLab );
-                    params.set("includeBillingAccounts", "N");
-                    params.set("includeProductCounts", "N");
-
+                    let params: HttpParams = new HttpParams()
+                        .set("idLab", value.idLab )
+                        .set("includeBillingAccounts", "N")
+                        .set("includeProductCounts", "N");
 
                     this.getLabService.getLab(params).pipe(first()).subscribe( data =>{
                         if(data.Lab){
-
                             this.visibilityForm.get("idAppUser").setValue(""); // setting empty string because new lab won't match owner
                             this.visibilityForm.get("lab").setValue(data.Lab);
                             this.makeOwnerList(data.Lab);
                             this.updateCollaborators();
-
 
                             this.visibilityForm.markAsPristine();
 

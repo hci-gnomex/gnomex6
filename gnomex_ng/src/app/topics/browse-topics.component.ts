@@ -293,11 +293,14 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
                     let id: string = "t" + this.gnomexService.orderInitObj.idTopic;
+                    let capID = id.toUpperCase();
                     if (this.treeModel && id) {
                         let tNode = this.treeModel.getNodeById(id);
                         if(tNode){
                             tNode.setIsActive(true);
                             tNode.scrollIntoView();
+                        }else{
+                            this.dialogService.alert("You do not have permission to view Topic " + capID ,"INVALID");
                         }
                         this.gnomexService.orderInitObj = null;
                     }
@@ -594,7 +597,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         let topicListNode = _.cloneDeep(this.selectedItem.data);
 
 
-
         if(this.selectedItem.isRoot){
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
         }else if(name === "Data Tracks" || name === "Experiments" || name === "Analysis" ){
@@ -623,10 +625,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
             }
             if(pathPair){
-
                 this.router.navigate(['/topics',{outlets:{topicsPanel:pathPair}}])
-
-
             }
         }
 
@@ -660,6 +659,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.utilService.removeChangeDetectorRef(this.changeDetector);
         this.topicListSubscription.unsubscribe();
         this.navInitSubsciption.unsubscribe();
+        this.gnomexService.navInitBrowseTopicSubject.next(null);
     }
 
     chooseFirstExpLabOption() {
