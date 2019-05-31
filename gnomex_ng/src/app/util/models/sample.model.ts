@@ -31,6 +31,7 @@ export class Sample {
     public qualStatus:                      string = '';
     public seqPrepStatus:                   string = '';
     public numberSequencingLanes:           string = ''; // "1";
+    public additionalNumberSequencingLanes: string = ''; // "1";
     public codeConcentrationUnit:           string = ''; // "ng/ul";
     public idSampleType:                    string = ''; // "1";
 

@@ -538,7 +538,7 @@ export class Experiment {
             return null;
         }
 
-        let experiment = new Experiment(dictionaryService, gnomexService, propertyService, securityAdvisor);
+        let experiment: Experiment = new Experiment(dictionaryService, gnomexService, propertyService, securityAdvisor);
 
         experiment.cloneProperty("name", value);
         experiment.cloneProperty("number", value);
@@ -590,7 +590,15 @@ export class Experiment {
         experiment.cloneProperty("createDate", value);
         experiment.cloneProperty("completedDate", value);
         experiment.cloneProperty("notes", value);
-        experiment.cloneProperty("application", value);
+
+        if (value.application) {
+            if (value.application.Application) {
+                experiment.application_object = value.application.Application;
+            } else {
+                experiment.cloneProperty("application", value);
+            }
+        }
+
         experiment.cloneProperty("projectName", value);
         experiment.cloneProperty("idProject", value);
         experiment.cloneProperty("project", value);

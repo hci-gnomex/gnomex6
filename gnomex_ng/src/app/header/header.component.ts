@@ -317,7 +317,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Add Additional Illumina Sequencing Lanes',
                         iconName: '../../assets/flask_edit.png',
-                        route: ''
+                        route: 'amend-experiment'
                     },
                     {
                         displayName: 'New Project',
@@ -455,7 +455,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Add Additional Illumina Sequencing Lanes',
                         iconName: '../../assets/flask_edit.png',
-                        route: ''
+                        route: 'amend-experiment'
                     },
                     {
                         displayName: 'New Project',
@@ -710,7 +710,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Add Additional Illumina Sequencing Lanes',
                         iconName: '../../assets/flask_edit.png',
-                        route: ''
+                        route: 'amend-experiment'
                     },
                     {
                         displayName: 'New Project',

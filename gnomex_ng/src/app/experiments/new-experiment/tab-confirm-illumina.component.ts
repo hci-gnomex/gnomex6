@@ -76,6 +76,17 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     @Input("experiment") public set experiment(value: Experiment) {
         this._experiment = value;
+        if (value.RequestProperties && !this._experimentAnnotations) {
+            this._experimentAnnotations = value.RequestProperties;
+        }
+    }
+
+    private _isAmendState: boolean = false;
+    @Input('isAmendState') public set isAmendState(value: boolean) {
+        this._isAmendState = value;
+    }
+    public get isAmendState(): boolean {
+        return this._isAmendState;
     }
 
     @Input("getExperimentAnnotationsSubject") public set getExperimentAnnotationsSubject(subject: BehaviorSubject<any>) {
@@ -589,6 +600,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     public tabDisplayed(): void {
+        if (this.isAmendState) {
+            this.prepareAmendSequenceLanes();
+        }
+
         if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
             this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
         }
@@ -667,6 +682,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
             if (this._experiment.billingAccount != null) {
                 accountName = this._experiment.billingAccount.accountNumberDisplay;
+            } else if (this.experiment.accountNumberDisplay) {
+                accountName = this.experiment.accountNumberDisplay;
             }
 
             this.agreeCheckboxLabel_subject.next("I authorize all charges to be billed to account(s): " + accountName);
@@ -816,4 +833,12 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this.gridApi.setRowData(this.sequenceLanes);
         this.gridApi.sizeColumnsToFit();
     }
+
+    private prepareAmendSequenceLanes(): void {
+        // TODO
+        if (this.experiment && this.experiment.sequenceLanes) {
+
+        }
+    }
+
 }

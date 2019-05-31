@@ -90,8 +90,6 @@ import {Experiment} from "../../util/models/experiment.model";
 
 export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
 
-    @Input() requestCategory: any;
-
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
 
@@ -126,7 +124,7 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
     private idLab_subscription: Subscription;
     private codeRequestCategory_subscription: Subscription;
 
-    private form: FormGroup;
+    public form: FormGroup;
     private filteredNumberSequencingCyclesAllowedList: any[] = [];
     private priceMap: Map<string, string> = new Map<string, string>();
 
@@ -215,7 +213,7 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
     private changePrices(): void {
         if (this._experiment && this._experiment.idLab) {
             let appPriceListParams: HttpParams = new HttpParams()
-                .set("codeRequestCategory" ,this.requestCategory.codeRequestCategory)
+                .set("codeRequestCategory" ,this.experiment.codeRequestCategory)
                 .set("idLab", this._experiment.idLab);
 
             this.billingService.getHiSeqRunTypePriceList(appPriceListParams).subscribe((response: any) => {
@@ -227,10 +225,10 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
                     }
                 }
 
-                if (this.requestCategory) {
+                if (this.experiment.requestCategory) {
                     this.filteredNumberSequencingCyclesAllowedList = TabSeqProtoViewComponent.filterNumberSequencingCyclesAllowed(
                         this.dictionaryService.getEntries('hci.gnomex.model.NumberSequencingCyclesAllowed'),
-                        this.requestCategory
+                        this.experiment.requestCategory
                     ).sort(TabSeqProtoViewComponent.sortNumberSequencingCyclesAllowed);
 
                     for (let proto of this.filteredNumberSequencingCyclesAllowedList) {

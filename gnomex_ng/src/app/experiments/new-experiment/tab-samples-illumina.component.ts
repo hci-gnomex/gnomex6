@@ -74,6 +74,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     private emToPxConversionRate: number = 13;
 
+    private _isAmendState: boolean = false;
+    @Input('isAmendState') public set isAmendState(value: boolean) {
+        this._isAmendState = value;
+    }
+    public get isAmendState(): boolean {
+        return this._isAmendState;
+    }
+
     @Input('experiment') public set experiment(value: Experiment) {
 
         let newExperiment: boolean = (this._experiment !== value);
@@ -285,15 +293,18 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showCcCheckbox(): boolean {
+        if (this._state === this.STATE_VIEW) {
+            return false;
+        }
+
+        if (this.experiment && this.experiment.isExternal === "Y") {
+            return false;
+        }
+
         let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
         let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
 
-        return this._experiment
-            && this._experiment.requestCategory
-            && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'N'
-            && isBSTLinkageSupported
-            && canAccessBSTX;
+        return isBSTLinkageSupported && canAccessBSTX;
     }
 
     public get showNucleicAcidExtractionMethod(): boolean {
@@ -645,7 +656,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 width: 6.5 * this.emToPxConversionRate,
                 minWidth: 5 * this.emToPxConversionRate,
                 maxWidth: 8 * this.emToPxConversionRate,
-                editable: true,
+                editable: !this.isAmendState,
                 cellRendererFramework: TextAlignRightMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 showFillButton: true,
@@ -654,6 +665,29 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 cellStyle: {color: 'black', 'background-color': 'LightGreen'},
                 sortOrder: 200
             });
+
+            if (this.isAmendState) {
+                // TODO fix validator
+                temp.push({
+                    headerName: "Addtl # Seq Lanes",
+                    field: "additionalNumberSequencingLanes",
+                    width: 6.5 * this.emToPxConversionRate,
+                    minWidth: 5 * this.emToPxConversionRate,
+                    maxWidth: 8 * this.emToPxConversionRate,
+                    editable: true,
+                    cellRendererFramework: TextAlignRightMiddleRenderer,
+                    cellEditorFramework: TextAlignLeftMiddleEditor,
+                    showFillButton: true,
+                    fillGroupAttribute: 'frontEndGridGroup',
+                    headerTooltip: "This is the number of times (0 or greater) that you want to sequence this sample again.",
+                    validators: [Validators.required, Validators.min(0)],
+                    errorNameErrorMessageMap: [
+                        {errorName: 'required', errorMessage: 'Addtl # Seq Lanes required'},
+                        {errorName: 'min', errorMessage: '0 or greater required'},
+                    ],
+                    sortOrder: 200
+                });
+            }
         }
 
         if (this._experiment
@@ -679,71 +713,74 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 ],
                 sortOrder: 300
             });
-            temp.push({
-                headerName: "Index Tag Sequence A",
-                field: "barcodeSequence",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 305
-            });
 
-            let permittedBarcodes: any[] = [];
-
-            if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
-                permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
-            }
-
-            if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
+            if (!this.isAmendState) {
                 temp.push({
-                    headerName: "Index Tag B",
-                    editable: true,
-                    width:    12 * this.emToPxConversionRate,
-                    minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
-                    field: "idOligoBarcodeB",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: BarcodeSelectEditor,
-                    selectOptions: this._barCodes,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "idOligoBarcodeB",
-                    indexTagLetter: 'B',
-                    validators: [Validators.required],
-                    errorNameErrorMessageMap: [
-                        {errorName: 'required', errorMessage: 'Index Tag B required'}
-                    ],
-                    sortOrder: 310
+                    headerName: "Index Tag Sequence A",
+                    field: "barcodeSequence",
+                    width:    7.5 * this.emToPxConversionRate,
+                    minWidth: 6.5 * this.emToPxConversionRate,
+                    maxWidth: 9 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    sortOrder: 305
                 });
-            } else {
+
+                let permittedBarcodes: any[] = [];
+
+                if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
+                    permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
+                }
+
+                if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
+                    temp.push({
+                        headerName: "Index Tag B",
+                        editable: true,
+                        width:    12 * this.emToPxConversionRate,
+                        minWidth: 12 * this.emToPxConversionRate,
+                        maxWidth: 20 * this.emToPxConversionRate,
+                        field: "idOligoBarcodeB",
+                        cellRendererFramework: SelectRenderer,
+                        cellEditorFramework: BarcodeSelectEditor,
+                        selectOptions: this._barCodes,
+                        selectOptionsDisplayField: "display",
+                        selectOptionsValueField: "idOligoBarcodeB",
+                        indexTagLetter: 'B',
+                        validators: [Validators.required],
+                        errorNameErrorMessageMap: [
+                            {errorName: 'required', errorMessage: 'Index Tag B required'}
+                        ],
+                        sortOrder: 310
+                    });
+                } else {
+                    temp.push({
+                        headerName: "Index Tag B",
+                        editable: true,
+                        width:    12 * this.emToPxConversionRate,
+                        minWidth: 12 * this.emToPxConversionRate,
+                        maxWidth: 20 * this.emToPxConversionRate,
+                        field: "idOligoBarcodeB",
+                        cellRendererFramework: SelectRenderer,
+                        cellEditorFramework: BarcodeSelectEditor,
+                        selectOptions: this._barCodes,
+                        selectOptionsDisplayField: "display",
+                        selectOptionsValueField: "idOligoBarcodeB",
+                        indexTagLetter: 'B',
+                        sortOrder: 310
+                    });
+                }
+
                 temp.push({
-                    headerName: "Index Tag B",
-                    editable: true,
-                    width:    12 * this.emToPxConversionRate,
-                    minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
-                    field: "idOligoBarcodeB",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: BarcodeSelectEditor,
-                    selectOptions: this._barCodes,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "idOligoBarcodeB",
-                    indexTagLetter: 'B',
-                    sortOrder: 310
+                    headerName: "Index Tag Sequence B",
+                    field: "barcodeSequenceB",
+                    width:    7 * this.emToPxConversionRate,
+                    minWidth: 6.5 * this.emToPxConversionRate,
+                    maxWidth: 9 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    sortOrder: 315
                 });
             }
-
-            temp.push({
-                headerName: "Index Tag Sequence B",
-                field: "barcodeSequenceB",
-                width:    7 * this.emToPxConversionRate,
-                minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 315
-            });
         }
 
         return temp;
@@ -1432,20 +1469,22 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         this.form = this.fb.group({});
 
-        this.form.addControl(
-            'invalidateWithoutSamples',
-            new FormControl('', (control: AbstractControl) => {
-                if (control
-                    && control.parent
-                    && control.parent.controls
-                    && control.parent.controls['gridFormGroup']
-                    && control.parent.controls['gridFormGroup'].controls) {
-                    return null;
-                } else {
-                    return { message: 'Grid is not populated yet' };
-                }
-            })
-        );
+        if (!this.isAmendState) {
+            this.form.addControl(
+                'invalidateWithoutSamples',
+                new FormControl('', (control: AbstractControl) => {
+                    if (control
+                        && control.parent
+                        && control.parent.controls
+                        && control.parent.controls['gridFormGroup']
+                        && control.parent.controls['gridFormGroup'].controls) {
+                        return null;
+                    } else {
+                        return { message: 'Grid is not populated yet' };
+                    }
+                })
+            );
+        }
 
         this.samplesGridColumnDefs = this.defaultSampleColumnDefinitions;
         this.nodeChildDetails = this.getItemNodeChildDetails;
@@ -1934,7 +1973,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public onClickCCNumberLink(event: any): void {
-        console.log("Hello World");
+        //console.log("Hello World");
 
         let search: any = this.propertyService.getProperty("gnomex_linkage_bst_url");
         let ccNum: string = '';

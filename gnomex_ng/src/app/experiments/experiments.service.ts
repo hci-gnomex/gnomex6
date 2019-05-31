@@ -314,6 +314,10 @@ export class ExperimentsService {
             }));
     }
 
+    public getProjectRequestListNew(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params: params});
+    }
+
     getRequestProgressListObservable():Observable<any>{
         return this.requestProgressList;
     }
