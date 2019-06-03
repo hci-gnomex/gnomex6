@@ -31,6 +31,7 @@ export class Sample {
     public qualStatus:                      string = '';
     public seqPrepStatus:                   string = '';
     public numberSequencingLanes:           string = ''; // "1";
+    public sequenceLaneCount:               string = ''; // "1";
     public codeConcentrationUnit:           string = ''; // "ng/ul";
     public idSampleType:                    string = ''; // "1";
 
@@ -137,6 +138,7 @@ export class Sample {
         sample.cloneProperty("qualStatus", source);
         sample.cloneProperty("seqPrepStatus", source);
         sample.cloneProperty("numberSequencingLanes", source);
+        sample.cloneProperty("sequenceLaneCount", source);
         sample.cloneProperty("codeConcentrationUnit", source);
         sample.cloneProperty("idSampleType", source);
         sample.cloneProperty("sampleType", source);
@@ -314,6 +316,7 @@ export class Sample {
             qualStatus:                      this.qualStatus,
             seqPrepStatus:                   this.seqPrepStatus,
             numberSequencingLanes:           this.numberSequencingLanes,
+            sequenceLaneCount:               this.sequenceLaneCount,
             codeConcentrationUnit:           this.codeConcentrationUnit,
             idSampleType:                    this.idSampleType,
             idSampleSource:                  this.idSampleSource,

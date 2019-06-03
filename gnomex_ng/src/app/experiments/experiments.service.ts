@@ -189,7 +189,8 @@ export class ExperimentsService {
     public getMultiplexLaneList(experiment: Experiment): Observable<any> {
 
         let params: HttpParams = new HttpParams()
-            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()));
+            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()))
+            .set("noJSONToXMLConversionNeeded", "Y");
 
         this.cookieUtilService.formatXSRFCookie();
 
@@ -317,6 +318,10 @@ export class ExperimentsService {
             .pipe(catchError((err:IGnomexErrorResponse) =>{
                 return throwError(err);
             }));
+    }
+
+    public getProjectRequestListNew(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params: params});
     }
 
     getRequestProgressListObservable():Observable<any>{

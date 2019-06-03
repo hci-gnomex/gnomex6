@@ -90,6 +90,8 @@ import {LinkButtonRenderer} from "../util/grid-renderers/link-button.renderer";
 import {NewExternalExperimentComponent} from "./new-experiment/new-external-experiment.component";
 import {TabExternalSetupComponent} from "./new-experiment/tab-external-setup.component";
 import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-description.component";
+import {AmendExperimentOverviewComponent} from "./amend-experiment-overview.component";
+import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.component";
 
 @NgModule({
     imports: [
@@ -185,6 +187,8 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         NewExternalExperimentComponent,
         TabExternalSetupComponent,
         TabExternalDescriptionComponent,
+        AmendExperimentOverviewComponent,
+        TabAmendExperimentSetupComponent,
     ],
     entryComponents: [
         CreateProjectComponent,
@@ -209,6 +213,7 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         ProtocolDialogComponent,
         TabExternalSetupComponent,
         TabExternalDescriptionComponent,
+        TabAmendExperimentSetupComponent,
     ],
     exports:[
         CreateProjectComponent,
@@ -230,6 +235,8 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         NewExternalExperimentComponent,
         TabExternalSetupComponent,
         TabExternalDescriptionComponent,
+        AmendExperimentOverviewComponent,
+        TabAmendExperimentSetupComponent,
     ]
 })
 export class ExperimentsModule { }

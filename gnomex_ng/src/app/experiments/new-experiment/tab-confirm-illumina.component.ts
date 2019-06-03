@@ -20,6 +20,7 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {GridApi} from "ag-grid-community";
+import {NewExternalExperimentService} from "../../services/new-external-experiment.service";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -76,6 +77,17 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     @Input("experiment") public set experiment(value: Experiment) {
         this._experiment = value;
+        if (value.RequestProperties && !this._experimentAnnotations) {
+            this._experimentAnnotations = value.RequestProperties;
+        }
+    }
+
+    private _isAmendState: boolean = false;
+    @Input('isAmendState') public set isAmendState(value: boolean) {
+        this._isAmendState = value;
+    }
+    public get isAmendState(): boolean {
+        return this._isAmendState;
     }
 
     @Input("getExperimentAnnotationsSubject") public set getExperimentAnnotationsSubject(subject: BehaviorSubject<any>) {
@@ -385,28 +397,30 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 suppressSizeToFit: true,
                 editable: false
             });
-            temp.push({
-                headerName: "Index Tag B",
-                editable: false,
-                width:    12 * this.emToPxConversionRate,
-                minWidth: 12 * this.emToPxConversionRate,
-                maxWidth: 20 * this.emToPxConversionRate,
-                field: "idOligoBarcodeB",
-                cellRendererFramework: SelectRenderer,
-                selectOptions: this._barCodes,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idOligoBarcodeB",
-                indexTagLetter: 'B'
-            });
-            temp.push({
-                headerName: "Index Tag Sequence B",
-                field: "barcodeSequenceB",
-                width:    7 * this.emToPxConversionRate,
-                minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-            });
+            if (!this.isAmendState) {
+                temp.push({
+                    headerName: "Index Tag B",
+                    editable: false,
+                    width:    12 * this.emToPxConversionRate,
+                    minWidth: 12 * this.emToPxConversionRate,
+                    maxWidth: 20 * this.emToPxConversionRate,
+                    field: "idOligoBarcodeB",
+                    cellRendererFramework: SelectRenderer,
+                    selectOptions: this._barCodes,
+                    selectOptionsDisplayField: "display",
+                    selectOptionsValueField: "idOligoBarcodeB",
+                    indexTagLetter: 'B'
+                });
+                temp.push({
+                    headerName: "Index Tag Sequence B",
+                    field: "barcodeSequenceB",
+                    width:    7 * this.emToPxConversionRate,
+                    minWidth: 6.5 * this.emToPxConversionRate,
+                    maxWidth: 9 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                });
+            }
         }
 
         this.tabIndexToInsertAnnotations = 150;
@@ -622,6 +636,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     public tabDisplayed(): void {
+        if (this.isAmendState) {
+            this.prepareAmendSequenceLanes();
+        }
+
         if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
             this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
         }
@@ -700,6 +718,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
             if (this._experiment.billingAccount != null) {
                 accountName = this._experiment.billingAccount.accountNumberDisplay;
+            } else if (this.experiment.accountNumberDisplay) {
+                accountName = this.experiment.accountNumberDisplay;
             }
 
             this.agreeCheckboxLabel_subject.next("I authorize all charges to be billed to account(s): " + accountName);
@@ -738,7 +758,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     private getSequenceLanes(): void {
-        if (this.experiment.isExternal === 'Y') {
+        if (this.experiment.isExternal === 'Y' || this.isAmendState) {
             let lanes = [];
             for (let index = 0; index < this.experiment.samples.length; index++) {
                 let lane: any = this.experiment.samples[index].getJSONObjectRepresentation();
@@ -849,4 +869,30 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this.gridApi.setRowData(this.sequenceLanes);
         this.gridApi.sizeColumnsToFit();
     }
+
+    private prepareAmendSequenceLanes(): void {
+        if (this.experiment && this.experiment.samples && this.experiment.sequenceLanes) {
+            // Remove existing "dummy" sequence lanes if the samples grid has changed
+            let seqLanesToRemove: any[] = [];
+            for (let seqLane of this.experiment.sequenceLanes) {
+                if (seqLane.idSequenceLane === "SequenceLane") {
+                    seqLanesToRemove.push(seqLane);
+                }
+            }
+            for (let seqLaneToRemove of seqLanesToRemove) {
+                this.experiment.sequenceLanes.splice(this.experiment.sequenceLanes.indexOf(seqLanesToRemove), 1);
+            }
+
+            // Add "dummy" sequence lane for each sample that will be re-sequenced
+            for (let sample of this.experiment.samples) {
+                if (sample.numberSequencingLanes) {
+                    let additionalSequencingNumber: number = parseInt(sample.numberSequencingLanes);
+                    for (let i = 0; i < additionalSequencingNumber; i++) {
+                        this.experiment.sequenceLanes.push(NewExternalExperimentService.createSequenceLane(sample));
+                    }
+                }
+            }
+        }
+    }
+
 }

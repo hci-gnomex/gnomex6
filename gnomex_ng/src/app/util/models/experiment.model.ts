@@ -178,6 +178,7 @@ export class Experiment {
     public project:                            any;
     public slideProduct:                       string = "";
     public isExternal:                         string = ''; // "N",
+    public amendState:                         string = ''; // "SolexaLaneAmendState";
     public requestStatus:                      string = "";
     public reagent:                            string = ''; // "asdf"
     public elutionBuffer:                      string = ''; // "fdsa",
@@ -206,7 +207,7 @@ export class Experiment {
     public get seqPrepByCore(): string {
         // The sample should always return "", but save what the choice was in case we
         // save more samples, because samples save this information individually (???)
-        return "";
+        return this.seqPrepByCore_forSamples;
     }
     public set seqPrepByCore(value: string) {
         this.seqPrepByCore_forSamples = value ? value : '';
@@ -538,7 +539,7 @@ export class Experiment {
             return null;
         }
 
-        let experiment = new Experiment(dictionaryService, gnomexService, propertyService, securityAdvisor);
+        let experiment: Experiment = new Experiment(dictionaryService, gnomexService, propertyService, securityAdvisor);
 
         experiment.cloneProperty("name", value);
         experiment.cloneProperty("number", value);
@@ -590,7 +591,15 @@ export class Experiment {
         experiment.cloneProperty("createDate", value);
         experiment.cloneProperty("completedDate", value);
         experiment.cloneProperty("notes", value);
-        experiment.cloneProperty("application", value);
+
+        if (value.application) {
+            if (value.application.Application) {
+                experiment.application_object = value.application.Application;
+            } else {
+                experiment.cloneProperty("application", value);
+            }
+        }
+
         experiment.cloneProperty("projectName", value);
         experiment.cloneProperty("idProject", value);
         experiment.cloneProperty("project", value);
@@ -924,6 +933,7 @@ export class Experiment {
             hasSampleDescription:               this.hasSampleDescription,
             hasPlates:                          this.hasPlates,
             isOpeningNewBillingTemplate:        this.isOpeningNewBillingTemplate,
+            amendState:                         this.amendState,
 
             analysisExperimentItems:  this.analysisExperimentItems,
             billingItems:             this.billingItems,
