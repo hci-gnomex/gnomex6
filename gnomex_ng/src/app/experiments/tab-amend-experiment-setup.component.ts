@@ -248,7 +248,9 @@ export class TabAmendExperimentSetupComponent implements OnInit, OnDestroy {
             this.experimentsService.getExperiment(event.node.data.idRequest).subscribe((response: any) => {
                 this.dialogsService.stopAllSpinnerDialogs();
                 if (response && response.Request) {
-                    this.form.get("experiment").setValue(Experiment.createExperimentObjectFromAny(this.dictionaryService, this.gnomexService, this.propertyService, this.securityAdvisor, response.Request));
+                    let request: Experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService, this.gnomexService, this.propertyService, this.securityAdvisor, response.Request);
+                    request.amendState = AmendExperimentService.AMEND_ADD_SEQ_LANES;
+                    this.form.get("experiment").setValue(request);
                 } else {
                     this.dialogsService.alert("An error occurred loading the experiment", "Warning");
                 }

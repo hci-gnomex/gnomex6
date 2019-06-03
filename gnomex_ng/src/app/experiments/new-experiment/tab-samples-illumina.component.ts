@@ -647,7 +647,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (this.usingMultiplexGroupGroups) {
             temp.push({
                 headerName: "# Seq Lanes",
-                field: "numberSequencingLanes",
+                field: this.isAmendState ? "sequenceLaneCount" : "numberSequencingLanes",
                 width: 6.5 * this.emToPxConversionRate,
                 minWidth: 5 * this.emToPxConversionRate,
                 maxWidth: 8 * this.emToPxConversionRate,
@@ -662,10 +662,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
             });
 
             if (this.isAmendState) {
-                // TODO fix validator
                 temp.push({
                     headerName: "Addtl # Seq Lanes",
-                    field: "additionalNumberSequencingLanes",
+                    field: "numberSequencingLanes",
                     width: 6.5 * this.emToPxConversionRate,
                     minWidth: 5 * this.emToPxConversionRate,
                     maxWidth: 8 * this.emToPxConversionRate,
@@ -675,10 +674,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     showFillButton: true,
                     fillGroupAttribute: 'frontEndGridGroup',
                     headerTooltip: "This is the number of times (0 or greater) that you want to sequence this sample again.",
-                    validators: [Validators.required, Validators.min(0)],
+                    validators: [Validators.required],
                     errorNameErrorMessageMap: [
                         {errorName: 'required', errorMessage: 'Addtl # Seq Lanes required'},
-                        {errorName: 'min', errorMessage: '0 or greater required'},
                     ],
                     sortOrder: 200
                 });
@@ -1750,6 +1748,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         let idSeqRunType: string = '';
         let protocol: any = '';
         let numberSequencingLanes: string = this._experiment.isRapidMode === 'Y' ? '2' : '1';
+        if (this.isAmendState) {
+            numberSequencingLanes = "";
+        }
 
         if (this.gnomexService.submitInternalExperiment() && this._experiment.sampleType) {
             idSampleType = this._experiment.sampleType.idSampleType;

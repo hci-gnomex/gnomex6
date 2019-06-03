@@ -224,11 +224,21 @@ export class AmendExperimentOverviewComponent implements OnInit, OnDestroy {
     }
 
     public save(): void {
+        this.dialogsService.startDefaultSpinnerDialog();
+        let idCoreFacility: string = this.amendExpService.experiment.idCoreFacility;
         this.experimentService.saveRequest(this.amendExpService.experiment).subscribe((result: any) => {
+            this.dialogsService.stopAllSpinnerDialogs();
             if (result && result.idRequest) {
-                this.dialogsService.alert("Experiment #" + result.requestNumber + " has been added to the GNomEx repository", "Experiment Saved");
+                let submissionMessage = 'Experiment request # ' + result.requestNumber + ' has been submitted, adding services to the existing experiment request.\n'
+                    + 'Please print off the request form and deliver it to the ' + this.gnomexService.getCoreFacilityName(idCoreFacility);
+                this.dialogsService.alert(submissionMessage, "Services added to Request");
+
+                window.open('ShowRequestForm.gx?idRequest=' + result.idRequest, '_blank');
+
                 this.gnomexService.navByNumber(result.requestNumber);
             }
+        }, () => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 

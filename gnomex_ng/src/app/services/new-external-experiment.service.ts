@@ -47,12 +47,14 @@ export class NewExternalExperimentService {
     public static createSequenceLane(sample: any): any {
         return {
             idSequenceLane: "SequenceLane",
-            notes: "",
-            idSeqRunType: "",
-            idNumberSequencingCycles: "",
-            idNumberSequencingCyclesAllowed: "",
-            idSample: sample.idSample,
-            idGenomeBuildAlignTo: ""
+            notes: sample.notes ? sample.notes : "",
+            idSeqRunType: sample.idSeqRunType ? sample.idSeqRunType : "",
+            idNumberSequencingCycles: sample.idNumberSequencingCycles ? sample.idNumberSequencingCycles : "",
+            idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed ? sample.idNumberSequencingCyclesAllowed : "",
+            idSample: sample.idSample ? sample.idSample : "",
+            idGenomeBuildAlignTo: sample.idGenomeBuildAlignTo ? sample.idGenomeBuildAlignTo : "",
+            idOrganism: sample.idOrganism ? sample.idOrganism : "",
+            organism: sample.organism ? sample.organism : "",
         };
     }
 

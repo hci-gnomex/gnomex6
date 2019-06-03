@@ -178,6 +178,7 @@ export class Experiment {
     public project:                            any;
     public slideProduct:                       string = "";
     public isExternal:                         string = ''; // "N",
+    public amendState:                         string = ''; // "SolexaLaneAmendState";
     public requestStatus:                      string = "";
     public reagent:                            string = ''; // "asdf"
     public elutionBuffer:                      string = ''; // "fdsa",
@@ -206,7 +207,7 @@ export class Experiment {
     public get seqPrepByCore(): string {
         // The sample should always return "", but save what the choice was in case we
         // save more samples, because samples save this information individually (???)
-        return "";
+        return this.seqPrepByCore_forSamples;
     }
     public set seqPrepByCore(value: string) {
         this.seqPrepByCore_forSamples = value ? value : '';
@@ -932,6 +933,7 @@ export class Experiment {
             hasSampleDescription:               this.hasSampleDescription,
             hasPlates:                          this.hasPlates,
             isOpeningNewBillingTemplate:        this.isOpeningNewBillingTemplate,
+            amendState:                         this.amendState,
 
             analysisExperimentItems:  this.analysisExperimentItems,
             billingItems:             this.billingItems,

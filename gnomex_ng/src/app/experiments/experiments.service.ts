@@ -189,7 +189,8 @@ export class ExperimentsService {
     public getMultiplexLaneList(experiment: Experiment): Observable<any> {
 
         let params: HttpParams = new HttpParams()
-            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()));
+            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()))
+            .set("noJSONToXMLConversionNeeded", "Y");
 
         this.cookieUtilService.formatXSRFCookie();
 

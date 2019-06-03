@@ -6,18 +6,25 @@ import {BehaviorSubject, Subject} from "rxjs";
 @Injectable()
 export class AmendExperimentService {
 
+    public static readonly AMEND_ADD_SEQ_LANES: string = "SolexaLaneAmendState";
+
     private _experiment: Experiment;
     public get experiment(): Experiment {
         return this._experiment;
     }
     public set experiment(experiment: Experiment) {
         this._experiment = experiment;
-        this.inputs = {
-            experiment: this._experiment,
-            stateChangeSubject: this.stateChangeSubject,
-            isAmendState: true,
-            agreeCheckboxLabelSubject: this.billingAgreementLabel,
-        };
+        if (experiment) {
+            this.inputs = {
+                experiment: this._experiment,
+                requestCategory: this._experiment.requestCategory,
+                stateChangeSubject: this.stateChangeSubject,
+                isAmendState: true,
+                agreeCheckboxLabelSubject: this.billingAgreementLabel,
+            };
+        } else {
+            this.inputs = {};
+        }
         this.onExperimentChanged.next(experiment);
     }
     public onExperimentChanged: Subject<Experiment> = new Subject<Experiment>();
