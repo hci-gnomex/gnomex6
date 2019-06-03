@@ -121,7 +121,7 @@ export class ExperimentBioinformaticsTabComponent {
     public genomeBuild: string = '';
 
     public sampleOrganisms: any[] = [];
-    public sampleGenomeBuilds: any[] = [];
+    // public sampleGenomeBuilds: any[] = [];
 
     private _experiment: any;
 
@@ -208,7 +208,7 @@ export class ExperimentBioinformaticsTabComponent {
     private prepareComponent(): void {
 
         this.genomeBuild = '';
-        this.sampleGenomeBuilds = [];
+        // this.sampleGenomeBuilds = [];
 
         let consolidatedGenomeBuildIds: Set<string> = new Set();
         let consolidatedOrganismIds: Set<string> = new Set();
@@ -280,22 +280,13 @@ export class ExperimentBioinformaticsTabComponent {
 
                 if (entry) {
                     this.genomeBuild = this.genomeBuild + entry.display;
-                    this.sampleGenomeBuilds.push(entry);
+                    // this.sampleGenomeBuilds.push(entry);
                 }
             }
         } else {
             this._experiment.sequenceLanes = [];
 
-            let samples: any[] = [];
-            if(this._experiment.samples) {
-                if (Array.isArray(this._experiment.samples)) {
-                    samples = this._experiment.samples;
-                } else {
-                    samples = [this._experiment.samples.Sample];
-                }
-            }
-
-            for (let sample of samples) {
+            for (let sample of this._experiment.samples) {
                 let idOrganism: string = '';
 
                 if (sample.idOrganism) {

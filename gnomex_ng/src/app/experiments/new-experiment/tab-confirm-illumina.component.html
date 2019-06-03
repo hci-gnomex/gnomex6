@@ -54,31 +54,43 @@
         <div class="top-margin font-bold" *ngIf="experiment?.isExternal !== 'Y'">
             Estimated Charges : {{ totalEstimatedCharges }}
         </div>
-        <div class="padded heavily-left-padded">
-            <div class="t">
-                <div *ngFor="let billingItem of billingItems" class="tr">
-                    <div class="td padded heavily-right-padded">
-                        {{ billingItem.category ? '' + billingItem.category : '' }}
-                    </div>
-                    <div class="td padded heavily-right-padded">
-                        {{ billingItem.description ? '' + billingItem.description : '' }}
-                    </div>
-                    <div class="td padded">
-                        {{ billingItem.qty ? '' + billingItem.qty : '' }}
-                    </div>
-                    <div class="td padded heavily-right-padded">
-                        &#215;
-                    </div>
-                    <div class="td right-align padded">
-                        {{ billingItem.unitPrice ? '' + billingItem.unitPrice : '' }}
-                    </div>
-                    <div class="td padded heavily-right-padded">
-                        =
-                    </div>
-                    <div class="td right-align padded">
-                        {{ billingItem.invoicePriceDisplay ? '' + billingItem.invoicePriceDisplay : '' }}
+        <div class="flex-container-row">
+            <div>
+                <div class="padded heavily-left-padded">
+                    <div class="t">
+                        <div *ngFor="let billingItem of billingItems" class="tr">
+                            <div class="td padded heavily-right-padded">
+                                {{ billingItem.category ? '' + billingItem.category : '' }}
+                            </div>
+                            <div class="td padded heavily-right-padded">
+                                {{ billingItem.description ? '' + billingItem.description : '' }}
+                            </div>
+                            <div class="td padded">
+                                {{ billingItem.qty ? '' + billingItem.qty : '' }}
+                            </div>
+                            <div class="td padded heavily-right-padded">
+                                &#215;
+                            </div>
+                            <div class="td right-align padded">
+                                {{ billingItem.unitPrice ? '' + billingItem.unitPrice : '' }}
+                            </div>
+                            <div class="td padded heavily-right-padded">
+                                =
+                            </div>
+                            <div class="td right-align padded">
+                                {{ billingItem.invoicePriceDisplay ? '' + billingItem.invoicePriceDisplay : '' }}
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div class="flex-grow padded heavily-left-padded">
+                <button mat-raised-button (click)="onClickPriceQuote($event)">
+                    <img class="padded" [alt]="" [src]="constantService.ICON_MONEY">
+                    <span>
+                        Generate Price Quote
+                    </span>
+                </button>
             </div>
         </div>
         <div *ngIf="showExperimentDescription" class="top-margin font-bold">
@@ -86,7 +98,7 @@
         </div>
         <div *ngIf="showExperimentDescription" class="padded heavily-left-padded">
             <div class="full-width flex-container-row padded">
-                {{ _experiment.description }}
+                {{ experiment?.description }}
             </div>
         </div>
         <div *ngIf="showNotesForCoreFacility" class="top-margin font-bold">
@@ -94,7 +106,7 @@
         </div>
         <div *ngIf="showNotesForCoreFacility" class="padded heavily-left-padded">
             <div class="full-width flex-container-row padded">
-                {{ _experiment.corePrepInstructions }}
+                {{ experiment?.corePrepInstructions }}
             </div>
         </div>
         <div class="top-margin font-bold">

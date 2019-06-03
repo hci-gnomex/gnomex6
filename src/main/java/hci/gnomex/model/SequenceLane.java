@@ -690,9 +690,11 @@ public class SequenceLane extends HibernateDetailObject {
     List laneGroups = new ArrayList();
 
     // First create a hash map key=barcode sequence, value=list of lanes holding this sequence
-    HashMap seqTagMap = new HashMap();
-    for(Iterator i = seqLanes.iterator(); i.hasNext();) {
-      SequenceLane theLane = (SequenceLane)i.next();
+    HashMap<String, List> seqTagMap = new HashMap<>();
+
+    for(Object i : seqLanes) {
+      SequenceLane theLane = (SequenceLane)i;
+
       String tag = null;
 
       // Initialize tag to the barcodeSequence of Index A (if it is not null)
@@ -713,13 +715,13 @@ public class SequenceLane extends HibernateDetailObject {
         tag = theLane.getSample().getIdSample().toString();
       } else if (tag == null && theLane.getSample().getMultiplexGroupNumber() == null) {
         tag = "";
-      } 
-      List theLanes = (List)seqTagMap.get(tag);
-      if (theLanes == null) {
-        theLanes = new ArrayList();
-        seqTagMap.put(tag, theLanes);
       }
-      theLanes.add(theLane);
+
+      if (!seqTagMap.containsKey(tag)) {
+        seqTagMap.put(tag, new ArrayList());
+      }
+
+      seqTagMap.get(tag).add(theLane);
     }
 
     int maxTagCount = 0;

@@ -21,6 +21,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {GridApi} from "ag-grid-community";
 import {NewExternalExperimentService} from "../../services/new-external-experiment.service";
+import {ConstantsService} from "../../services/constants.service";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -107,7 +108,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     @Input("requestCategory") set requestCategory(requestCategory: any) {
         setTimeout(() => {
-            this.useMultiplexLanes = requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
+            this.useMultiplexLanes = requestCategory
+                && requestCategory.isIlluminaType === 'Y'
+                && this.experiment
+                && this.experiment.isExternal !== 'Y';
         });
     }
 
@@ -173,7 +177,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     public get billingAccountName(): string {
-        return this._experiment.billingAccountName;
+        return this._experiment ? this._experiment.billingAccountName : "";
     }
     public set billingAccountName(value: string) {
         this._experiment.billingAccountName = value;
@@ -202,6 +206,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 private gnomexService: GnomexService,
                 private billingService: BillingService,
                 private fb: FormBuilder,
+                public constantService: ConstantsService,
                 public prefService: UserPreferencesService) {
 
         this.requestPropsColumnDefs = [
@@ -709,51 +714,53 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this.disable_agreeCheckbox = true;
         this.isCheckboxChecked = false;
 
-        if (this._experiment.isExternal === 'Y') {
-            // This is an external experiment submission.  Don't attempt to get estimated charges.
-            this.totalEstimatedCharges = '$-.--';
-            this.billingItems = [];
-        } else {
-            let accountName:String = "";
-
-            if (this._experiment.billingAccount != null) {
-                accountName = this._experiment.billingAccount.accountNumberDisplay;
-            } else if (this.experiment.accountNumberDisplay) {
-                accountName = this.experiment.accountNumberDisplay;
-            }
-
-            this.agreeCheckboxLabel_subject.next("I authorize all charges to be billed to account(s): " + accountName);
-            this.disable_agreeCheckbox = false;
-
-            // This is a new experiment request. Get the estimated charges for this request.
-
-            let propertiesXML = JSON.stringify(this._experimentAnnotations);
-
-            this.dialogsService.startDefaultSpinnerDialog();
-            this.totalEstimatedCharges = "Calculating...";
-
-            this.billingService.createBillingItems(propertiesXML, this._experiment).subscribe((response: any) => {
-
-                this.dialogsService.stopAllSpinnerDialogs();
-
-                if (!response || !response.Request) {
-                    return;
-                }
-
-                if (response.Request.invoicePrice && ('' + response.Request.invoicePrice).match(/^.[\d,]+\.\d{2}$/)) {
-                    this.totalEstimatedCharges = response.Request.invoicePrice;
-                }
-
+        if (this._experiment) {
+            if (this._experiment.isExternal === 'Y') {
+                // This is an external experiment submission.  Don't attempt to get estimated charges.
+                this.totalEstimatedCharges = '$-.--';
                 this.billingItems = [];
+            } else {
+                let accountName:String = "";
 
-                if (response.Request.BillingItem){
-                    if (Array.isArray(response.Request.BillingItem)) {
-                        this.billingItems = response.Request.BillingItem
-                    } else {
-                        this.billingItems = [response.Request.BillingItem];
-                    }
+                if (this._experiment.billingAccount != null) {
+                    accountName = this._experiment.billingAccount.accountNumberDisplay;
+                } else if (this.experiment.accountNumberDisplay) {
+                    accountName = this.experiment.accountNumberDisplay;
                 }
-            });
+
+                this.agreeCheckboxLabel_subject.next("I authorize all charges to be billed to account(s): " + accountName);
+                this.disable_agreeCheckbox = false;
+
+                // This is a new experiment request. Get the estimated charges for this request.
+
+                let propertiesXML = JSON.stringify(this._experimentAnnotations);
+
+                this.dialogsService.startDefaultSpinnerDialog();
+                this.totalEstimatedCharges = "Calculating...";
+
+                this.billingService.createBillingItems(propertiesXML, this._experiment).subscribe((response: any) => {
+
+                    this.dialogsService.stopAllSpinnerDialogs();
+
+                    if (!response || !response.Request) {
+                        return;
+                    }
+
+                    if (response.Request.invoicePrice && ('' + response.Request.invoicePrice).match(/^.[\d,]+\.\d{2}$/)) {
+                        this.totalEstimatedCharges = response.Request.invoicePrice;
+                    }
+
+                    this.billingItems = [];
+
+                    if (response.Request.BillingItem){
+                        if (Array.isArray(response.Request.BillingItem)) {
+                            this.billingItems = response.Request.BillingItem
+                        } else {
+                            this.billingItems = [response.Request.BillingItem];
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -855,6 +862,42 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     return temp;
             }
         }
+    }
+
+    public onClickPriceQuote(event?: any) {
+        console.log("Hello world");
+
+        this.experimentService.showPriceQuote(this._experiment);
+
+        // let mapForm = document.createElement("form");
+        // mapForm.target = "Map";
+        // mapForm.method = "GET"; // or "post" if appropriate
+        // mapForm.action = "/gnomex/ShowRequestForm.gx";
+        // mapForm.name = "_blank";
+        //
+        // // let mapInput = document.createElement("input");
+        // // mapInput.type = "text";
+        // // mapInput.name = "requestJSONString";
+        // // mapInput.value = "" + JSON.stringify(this._experiment.getJSONObjectRepresentation());
+        // // mapForm.appendChild(mapInput);
+        //
+        // let mapInput = document.createElement("input");
+        // mapInput.type = "text";
+        // mapInput.name = "idRequest";
+        // mapInput.value = "40600";
+        // mapForm.appendChild(mapInput);
+        //
+        // document.body.appendChild(mapForm);
+        //
+        // let map = window.open("", "Map");
+        //
+        // if (map) {
+        //     mapForm.submit();
+        // } else {
+        //     alert('You must allow popups for this map to work.');
+        // }
+
+        //window.open('ShowRequestForm.gx?idRequest=' + response.idRequest, '_blank');
     }
 
     public onGridReady(params: any): void {

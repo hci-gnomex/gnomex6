@@ -1,6 +1,7 @@
 import {DictionaryService} from "../../services/dictionary.service";
 import {Experiment} from "./experiment.model";
 import {GnomexService} from "../../services/gnomex.service";
+import {BehaviorSubject} from "rxjs";
 
 export class Sample {
     public idSample:                        string = ''; // "Sample0";
@@ -30,8 +31,19 @@ export class Sample {
     public qualFragmentSizeTo:              string = '';
     public qualStatus:                      string = '';
     public seqPrepStatus:                   string = '';
-    public numberSequencingLanes:           string = ''; // "1";
     public sequenceLaneCount:               string = ''; // "1";
+
+    public get numberSequencingLanes(): string {
+        return this._numberSequencingLanes;
+    }
+    public set numberSequencingLanes(value: string) {
+        this._numberSequencingLanes = value ? value : '';
+
+        this.onChange_numberSequencingLanes.next(this.numberSequencingLanes);
+    }
+    public _numberSequencingLanes:           string = ''; // "1";
+    public onChange_numberSequencingLanes:   BehaviorSubject<string> = new BehaviorSubject(this._numberSequencingLanes);
+
     public codeConcentrationUnit:           string = ''; // "ng/ul";
     public idSampleType:                    string = ''; // "1";
 

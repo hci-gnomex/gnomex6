@@ -1,8 +1,14 @@
 package hci.gnomex.controller;
 
 import java.io.Serializable;
+import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import javax.json.Json;
+import javax.json.JsonReader;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -44,6 +50,11 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
 
     private String				serverName;
 
+    // Used if the command is being called on an unsubmitted experiment.
+    private boolean isGeneratingQuote = false;
+
+    private String requestJSONString;
+
     @Override
     public void validate() {
     }
@@ -52,8 +63,12 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
         if (request.getParameter("idRequest") != null) {
             idRequest = new Integer(request.getParameter("idRequest"));
+        } else if (request.getParameter("requestJSONString") != null) {
+            isGeneratingQuote = true;
+            requestJSONString = request.getParameter("requestJSONString").toString();
         } else {
-            this.addInvalidField("idRequest", "idRequest is required");
+            this.addInvalidField("idRequest", "Either idRequest or requestJSONString is required but neither was found");
+            this.addInvalidField("requestJSONString", "Either idRequest or requestJSONString is required but neither was found");
         }
 
         amendState = "";
@@ -78,7 +93,115 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
 
             dictionaryHelper = DictionaryHelper.getInstance(sess);
 
-            request = (Request) sess.get(Request.class, idRequest);
+            if (isGeneratingQuote) {
+                try (JsonReader jsonReader = Json.createReader(new StringReader(this.requestJSONString))) {
+                    RequestParser requestParser = new RequestParser(jsonReader, secAdvisor);
+
+                    requestParser.parse(sess);
+
+                    request = requestParser.getRequest();
+
+                    if (request.getRequestCategory() == null && request.getCodeRequestCategory() != null) {
+                        request.setRequestCategory ((RequestCategory) sess.get(RequestCategory.class, request.getCodeRequestCategory()));
+                    }
+
+                    if (request.getNumber() == null || request.getNumber().equals("")) {
+                        request.setNumber("Predicted Prices for : ");
+                    }
+
+                    if (request.getIdLab() != null) {
+                        request.setLab((Lab) sess.get(Lab.class, request.getIdLab()));
+                    }
+
+                    HashSet<Sample> samples = new HashSet(requestParser.getSampleMap().values());
+
+                    for (Object keyObj : requestParser.getSampleMap().keySet()) {
+                        String key = "0";
+
+                        if (keyObj instanceof String) {
+                            key = keyObj.toString();
+                        }
+
+                        Object sampleObj = requestParser.getSampleMap().get(key);
+
+                        if (sampleObj instanceof Sample) {
+                            Sample sample = (Sample) sampleObj;
+                            sample.setIdSample((Integer.parseInt(key.substring(6)) + 1));
+                            sample.setDescription(key.substring(6));
+                        }
+                    }
+
+                    request.setSamples(samples);
+
+                    HashMap<Integer, ArrayList<RequestParser.SequenceLaneInfo>> multiplexGroupMap = new HashMap<>();
+
+                    for (Object sequenceLaneInfo : requestParser.getSequenceLaneInfos()) {
+                        if (sequenceLaneInfo instanceof RequestParser.SequenceLaneInfo) {
+                            RequestParser.SequenceLaneInfo temp = (RequestParser.SequenceLaneInfo) sequenceLaneInfo;
+
+                            if (temp.getSample() != null && temp.getSample().getMultiplexGroupNumber() != null) {
+                                if (!multiplexGroupMap.containsKey(temp.getSample().getMultiplexGroupNumber())) {
+                                    multiplexGroupMap.put(temp.getSample().getMultiplexGroupNumber(), new ArrayList<>());
+                                }
+
+                                multiplexGroupMap.get(temp.getSample().getMultiplexGroupNumber()).add(temp);
+                            }
+                        }
+                    }
+
+                    HashSet<SequenceLane> spoofedSequenceLanes = new HashSet<>();
+
+                    int fakeIdSequenceLanes = 1;
+                    int maxIdSequenceLanes = 1;
+                    int sequenceLaneNameCounter = 1;
+
+                    ArrayList<Integer> sortedMultiplexGroupNumbers = new ArrayList<>(multiplexGroupMap.keySet());
+                    sortedMultiplexGroupNumbers.sort(Integer::compareTo);
+
+                    fakeIdSequenceLanes = 1;
+
+                    HashMap<Integer, ArrayList<Sample>> flowCellLaneMap = new HashMap<>();
+
+                    for (Integer multiplexGroupNumber : sortedMultiplexGroupNumbers) {
+                        multiplexGroupMap.get(multiplexGroupNumber).sort(RequestParser.SequenceLaneInfo::compareTo);
+                        sequenceLaneNameCounter = 1;
+
+                        for (RequestParser.SequenceLaneInfo sequenceLaneInfo : multiplexGroupMap.get(multiplexGroupNumber)) {
+                            if (sequenceLaneInfo.getSample() != null
+                                && sequenceLaneInfo.getSample().getNumberSequencingLanes() != null) {
+
+                                for (int i = 0; i < sequenceLaneInfo.getSample().getNumberSequencingLanes(); i++) {
+                                    SequenceLane lane = new SequenceLane();
+
+                                    sequenceLaneInfo.setIdSampleString(sequenceLaneInfo.getSample().getIdSampleString());
+
+                                    lane.setSample(sequenceLaneInfo.getSample());
+                                    lane.setIdSample(sequenceLaneInfo.getSample().getIdSample());
+                                    lane.getSample().setNumber("#####X" + sequenceLaneInfo.getSample().getIdSample());
+                                    lane.setCreateDate(new java.util.Date(System.currentTimeMillis()));
+
+                                    lane.setIdSequenceLane(fakeIdSequenceLanes + i);
+                                    lane.setNumber("#####F" + sequenceLaneInfo.getSample().getIdSample() + "_" + (i + 1));
+
+                                    spoofedSequenceLanes.add(lane);
+
+                                    maxIdSequenceLanes = Math.max(maxIdSequenceLanes, fakeIdSequenceLanes + i);
+                                    sequenceLaneNameCounter++;
+                                }
+                            }
+                        }
+
+                        fakeIdSequenceLanes = maxIdSequenceLanes + 1;
+                    }
+
+                    request.setSequenceLanes(spoofedSequenceLanes);
+                } catch (Exception e) {
+                    this.addInvalidField( "requestJSONString", "Invalid request JSON");
+                }
+            } else {
+                request = (Request) sess.get(Request.class, idRequest);
+            }
+
             if (request == null) {
                 this.addInvalidField("no request", "Request not found");
             }
@@ -91,13 +214,26 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
                         appUser = (AppUser) sess.get(AppUser.class, request.getIdAppUser());
                     }
 
-                    if (request.getAcceptingBalanceAccountId(sess) != null) {
-                        billingAccount = (BillingAccount) sess.get(BillingAccount.class, request.getAcceptingBalanceAccountId(sess));
+                    if (isGeneratingQuote) {
+                        if (request.getIdBillingAccount() != null) {
+                            billingAccount = (BillingAccount) sess.get(BillingAccount.class, request.getIdBillingAccount());
+                        }
+                    } else {
+                        if (request.getAcceptingBalanceAccountId(sess) != null) {
+                            billingAccount = (BillingAccount) sess.get(BillingAccount.class, request.getAcceptingBalanceAccountId(sess));
+                        }
                     }
+
 
                     // Set up the ReportTray
                     String title = dictionaryHelper.getRequestCategory(request.getCodeRequestCategory()) + " Request " + request.getNumber();
-                    String fileName = "gnomex_request_report_" + request.getNumber().toLowerCase();
+                    String fileName = "";
+
+                    if (isGeneratingQuote) {
+                        fileName = "gnomex_price_quote_" + request.getLabName().toLowerCase();
+                    } else {
+                        fileName = "gnomex_request_report_" + request.getNumber().toLowerCase();
+                    }
 
                     tray = new ReportTray();
                     tray.setReportDate(new java.util.Date(System.currentTimeMillis()));
@@ -138,8 +274,8 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
             try {
                 secAdvisor.closeReadOnlyHibernateSession();
             } catch(Exception e){
-        LOG.error("Error", e);
-      }
+                LOG.error("Error", e);
+            }
         }
 
         return this;

@@ -2859,6 +2859,25 @@ public class RequestParser implements Serializable {
       this.number = number;
     }
 
+    public int compareTo(SequenceLaneInfo anotherSequenceLaneInfo) {
+      if (this.getSample() == null && anotherSequenceLaneInfo.getSample() == null) {
+        return 0;
+      } else if (this.getSample() == null) {
+        return 1;
+      } else if (anotherSequenceLaneInfo.getSample() == null) {
+        return -1;
+      } else {
+        if (this.getSample().getNumber() == null && anotherSequenceLaneInfo.getSample().getNumber() == null) {
+          return 0;
+        } else if (this.getSample().getNumber() == null) {
+          return 1;
+        } else if (anotherSequenceLaneInfo.getSample().getNumber() == null) {
+          return -1;
+        } else {
+          return this.getSample().getNumber().compareTo(anotherSequenceLaneInfo.getSample().getNumber());
+        }
+      }
+    }
   }
 
   public boolean isNewRequest() {
@@ -3007,5 +3026,4 @@ public class RequestParser implements Serializable {
   }
 
   public Boolean getIsOpeningNewBillingTemplate() { return isOpeningNewBillingTemplate; }
-
 }

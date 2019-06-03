@@ -542,7 +542,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.dialogService.startDefaultSpinnerDialog();
 
         this.experimentService.saveRequest(this.inputs.experiment).subscribe((response) => {
-            console.log("Save Experiment returned!");
             this.dialogService.stopAllSpinnerDialogs();
 
             if (!response) {
@@ -558,20 +557,11 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
                 let temp = this.dialogService.alert(submissionMessage, "Request Submitted").subscribe((value: boolean) => {
                     if (response.requestNumber) {
-                        // this.router.navigateByUrl('ShowRequestForm.gx?idRequest=' + response.requestNumber);
-
                         window.open('ShowRequestForm.gx?idRequest=' + response.idRequest, '_blank');
-
-                        // setTimeout(() => {
-                        //     this.router.navigateByUrl('/experiments/' + response.requestNumber);
-                        // });
-
-                        // this.router.navigate(['/experiments', { outlets: { 'browsePanel': ['id', response.requestNumber] } } ]);
 
                         this.gnomexService.navByNumber(response.requestNumber);
                     } else {
                         // Should not be reachable...
-                        // this.router.navigateByUrl("/home");
                     }
 
                     temp.unsubscribe();

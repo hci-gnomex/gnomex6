@@ -24,14 +24,13 @@ import {GnomexService} from "../services/gnomex.service";
                         <div class="full-width major-vertical-spacer flex-container-row align-center">
                             <div *ngIf="_errorMsg" class="horizontal-centered small-font {{ errorClasses }}">
                                 <div>
-                                    <div class="error">Authentication Failed ({{ numberOfAttempts > 1 ? numberOfAttempts : '' }})</div>
+                                    <div class="error">Authentication Failed{{ numberOfAttempts > 1 ? ' (' + numberOfAttempts + ')' : '' }}</div>
                                     <div class="alert-text">{{_errorMsg}}</div>
                                 </div>
                             </div>
                         </div>
                         <div class="full-width">
                             <form class="login-form" [formGroup]="_loginForm">
-                            <!--<form class="login-form">-->
                                 <div class="full-width">
                                     <div>
                                         <custom-input [form]="_loginForm"
