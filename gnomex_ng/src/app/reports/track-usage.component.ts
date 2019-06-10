@@ -1,37 +1,220 @@
-import {AfterViewInit, Component, ElementRef, ViewChild} from "@angular/core";
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UsageService} from "../services/usage.service";
-import {Observable} from "rxjs";
-import {URLSearchParams} from "@angular/http";
+import {Observable, Subscription} from "rxjs";
 import {of} from "rxjs";
+import {ConstantsService} from "../services/constants.service";
+import {HttpParams} from "@angular/common/http";
+import {first} from "rxjs/operators";
+import {UtilService} from "../services/util.service";
+import * as chartJS from "chart.js";
+import {MatDialogConfig} from "@angular/material";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {TrackUsageDetailComponent} from "./track-usage-detail.component";
 
 @Component({
     selector: 'track-usage',
-    templateUrl: "./track-usage.component.html",
+    template: `
+        <as-split>
+            <as-split-area [size]="25">
+                <div class="flex-container-col full-width full-height children-margin-bottom padded">
+                    <div>
+                        <h5><img [src]="this.constantsService.ICON_BAR_CHART" class="icon">Usage</h5>
+                    </div>
+                    <div>
+                        <mat-radio-group [(ngModel)]="this.usageType" class="flex-container-col" (change)="this.onUsageTypeChange()">
+                            <mat-radio-button [value]="this.MODE_EXPERIMENTS" class="margin-left">Experiments</mat-radio-button>
+                            <mat-radio-button [value]="this.MODE_ANALYSIS" class="margin-left">Analysis</mat-radio-button>
+                            <mat-radio-button [value]="this.MODE_FILES" class="margin-left">Files</mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                    <div class="flex-container-col full-width children-margin-bottom">
+                        <div class="full-width flex-container-col align-center">
+                            <custom-combo-box class="three-quarters-width" placeholder="Core facility" [(ngModel)]="this.idCoreFacility" 
+                                          valueField="idCoreFacility" [options]="this.coreFacilities" displayField="display" (optionSelected)="this.onCoreFacilityChange()">
+                            </custom-combo-box>
+                        </div>
+                        <label class="bold margin-left">Lab Activity</label>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_EXPERIMENTS">
+                            <button mat-button class="underlined" (click)="showExperiments()" [disabled]="!this.idCoreFacility">Experiments</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_ANALYSIS">
+                            <button mat-button class="underlined" (click)="showAnalysis()">Analysis</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_FILES">
+                            <button mat-button class="underlined" (click)="showFilesDaysSinceLastUpload()">Days Since Last Upload</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_FILES">
+                            <button mat-button class="underlined" (click)="showFilesUploads()">Uploads</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_FILES">
+                            <button mat-button class="underlined" (click)="showFilesDownloads()">Downloads</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_FILES">
+                            <button mat-button class="underlined" (click)="showFilesDiskSpace()">Disk Space</button>
+                        </div>
+                        <label class="bold margin-left">Overall Activity</label>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_EXPERIMENTS">
+                            <button mat-button class="underlined" (click)="showExperimentsByType()" [disabled]="!this.idCoreFacility">Experiments By Type</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_EXPERIMENTS">
+                            <button mat-button class="underlined" (click)="showExperimentsIllumina()" [disabled]="!this.idCoreFacility">Illumina Sequencing Experiment Type</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_EXPERIMENTS">
+                            <button mat-button class="underlined" (click)="showExperimentsActivityByWeek()" [disabled]="!this.idCoreFacility">Activity By Week</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_EXPERIMENTS">
+                            <button mat-button class="underlined" (click)="showDiskSpaceByYear()" [disabled]="!this.idCoreFacility">Disk Space By Year</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_ANALYSIS">
+                            <button mat-button class="underlined" (click)="showAnalysisByType()">Analysis By Type</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_ANALYSIS">
+                            <button mat-button class="underlined" (click)="showAnalysisByWeek()">Activity By Week</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_ANALYSIS">
+                            <button mat-button class="underlined" (click)="showDiskSpaceByYear()">Disk Space By Year</button>
+                        </div>
+                        <div class="margin-left-large" *ngIf="this.usageType === this.MODE_FILES">
+                            <button mat-button class="underlined" (click)="showFilesDiskSpaceByCategory()">Disk Space By Category</button>
+                        </div>
+                    </div>
+                </div>
+            </as-split-area>
+            <as-split-area [size]="75">
+                <div class="flex-container-col full-height full-width padded children-margin-bottom">
+                    <div *ngIf="show" class="full-width flex-container-row justify-space-between">
+                        <div>
+                            <label>{{label}}</label>
+                            <span class="margin-left details-note" *ngIf="this.showInteractiveChartNote">Click on chart to see details</span>
+                        </div>
+                        <label *ngIf="showTotal">Total: {{total}}{{totalUnits}}</label>
+                    </div>
+                    <div *ngIf="showLoading" class="flex-container-row justify-center align-center full-width flex-grow">
+                        <mat-spinner [strokeWidth]="10" [diameter]="80"></mat-spinner>
+                    </div>
+                    <div *ngIf="showBarChart" class="flex-grow full-width">
+                        <canvas #barChart baseChart width="100%" height="100%"
+                                [datasets]="barChartData"
+                                [labels]="barChartLabels"
+                                [options]="barChartOptions"
+                                [legend]="barChartLegend"
+                                [chartType]="barChartType">
+                        </canvas>
+                    </div>
+                    <div *ngIf="showPieChart" class="flex-grow full-width">
+                        <canvas #pieChart baseChart width="100%" height="100%"
+                                [data]="pieChartData"
+                                [labels]="pieChartLabels"
+                                [options]="pieChartOptions"
+                                [legend]="pieChartLegend"
+                                [chartType]="pieChartType">
+                        </canvas>
+                    </div>
+                    <div *ngIf="showLineChart" class="flex-grow full-width">
+                        <canvas #lineChart baseChart width="100%" height="100%"
+                                [datasets]="lineChartData"
+                                [labels]="lineChartLabels"
+                                [options]="lineChartOptions"
+                                [legend]="lineChartLegend"
+                                [chartType]="lineChartType">
+                        </canvas>
+                    </div>
+                    <div *ngIf="showLabel2">
+                        <label>{{label2}}</label>
+                        <span class="margin-left details-note" *ngIf="this.showInteractiveChartNote">Click on chart to see details</span>
+                    </div>
+                    <div *ngIf="showLineChart2" class="flex-grow full-width">
+                        <canvas #lineChart2 baseChart width="100%" height="100%"
+                                [datasets]="lineChart2Data"
+                                [labels]="lineChart2Labels"
+                                [options]="lineChart2Options"
+                                [legend]="lineChart2Legend"
+                                [chartType]="lineChart2Type">
+                        </canvas>
+                    </div>
+                    <div *ngIf="showPieChart2" class="flex-grow full-width">
+                        <label>{{pieChart2Label}}</label>
+                        <canvas #pieChart2 baseChart width="100%" height="100%"
+                                [data]="pieChart2Data"
+                                [labels]="pieChart2Labels"
+                                [options]="pieChart2Options"
+                                [legend]="pieChart2Legend"
+                                [chartType]="pieChart2Type">
+                        </canvas>
+                    </div>
+                    <div *ngIf="showPieChart3" class="flex-grow full-width">
+                        <label>{{pieChart3Label}}</label>
+                        <canvas #pieChart3 baseChart width="100%" height="100%"
+                                [data]="pieChart3Data"
+                                [labels]="pieChart3Labels"
+                                [options]="pieChart3Options"
+                                [legend]="pieChart3Legend"
+                                [chartType]="pieChart3Type">
+                        </canvas>
+                    </div>
+                    <div *ngIf="show" class="full-width flex-container-row justify-flex-end align-center">
+                        <div *ngIf="showIntervalFilter" class="flex-grow">
+                            <mat-radio-group [(ngModel)]="this.interval" class="flex-container-row children-margin-right" (change)="onFilterChange()">
+                                <mat-radio-button [value]="INTERVAL_10">Top 10</mat-radio-button>
+                                <mat-radio-button [value]="INTERVAL_20">Top 20</mat-radio-button>
+                                <mat-radio-button [value]="INTERVAL_50">Top 50</mat-radio-button>
+                                <mat-radio-button [value]="INTERVAL_ALL">All</mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        <div *ngIf="showAsOfFilter" class="flex-grow">
+                            <mat-radio-group [(ngModel)]="this.asOf" class="flex-container-row children-margin-right" (change)="onFilterChange()">
+                                <mat-radio-button [value]="AS_OF_6_MONTHS">Last 6 Months</mat-radio-button>
+                                <mat-radio-button [value]="AS_OF_YEAR">Last Year</mat-radio-button>
+                                <mat-radio-button [value]="AS_OF_2_YEARS">Last 2 Years</mat-radio-button>
+                                <mat-radio-button [value]="AS_OF_ALL">All</mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        <button mat-raised-button (click)="print()"><img class="icon" [src]="this.constantsService.ICON_PRINTER">Print</button>
+                    </div>
+                </div>
+            </as-split-area>
+        </as-split>
+    `,
+    styles: [`
+        .margin-left {
+            margin-left: 1em;
+        }
+        .margin-left-large {
+            margin-left: 2em;
+        }
+        .children-margin-bottom > *:not(:last-child) {
+            margin-bottom: 1em;
+        }
+        .children-margin-right > *:not(:last-child) {
+            margin-right: 1em;
+        }
+        .three-quarters-width {
+            width: 75%;
+        }
+        .details-note {
+            background: yellow;
+            border-radius: 0.3em;
+            padding: 0.3em;
+        }
+    `],
 })
 
-export class TrackUsageComponent implements AfterViewInit {
-    readonly OFFSET: number = 18;
-    readonly COUNTER_OFFSET: number = 100 - this.OFFSET;
-    readonly CLOSED_OFFSET: number = 0;
-    readonly COUNTER_CLOSED_OFFSET: number = 100 - this.CLOSED_OFFSET;
+export class TrackUsageComponent implements OnInit, OnDestroy {
+    public readonly MODE_EXPERIMENTS: string = "Experiments";
+    public readonly MODE_ANALYSIS: string = "Analysis";
+    public readonly MODE_FILES: string = "Files";
 
-    readonly MODE_EXPERIMENTS: string = "Experiments";
-    readonly MODE_ANALYSIS: string = "Analysis";
-    readonly MODE_FILES: string = "Files";
+    public readonly INTERVAL_10: string = "10";
+    public readonly INTERVAL_20: string = "20";
+    public readonly INTERVAL_50: string = "50";
+    public readonly INTERVAL_ALL: string = "9999";
 
-    readonly INTERVAL_10: string = "10";
-    readonly INTERVAL_20: string = "20";
-    readonly INTERVAL_50: string = "50";
-    readonly INTERVAL_ALL: string = "9999";
+    public readonly AS_OF_6_MONTHS: string = "6 Months";
+    public readonly AS_OF_YEAR: string = "1 Year";
+    public readonly AS_OF_2_YEARS: string = "2 Years";
+    public readonly AS_OF_ALL: string = "All";
 
-    readonly AS_OF_6_MONTHS: string = "6 Months";
-    readonly AS_OF_YEAR: string = "1 Year";
-    readonly AS_OF_2_YEARS: string = "2 Years";
-    readonly AS_OF_ALL: string = "All";
-
-    @ViewChild("sidenav") sidenav: ElementRef;
-    @ViewChild("mainnav") mainnav: ElementRef;
     @ViewChild("barChart") barChartCanvas: ElementRef;
     @ViewChild("pieChart") pieChartCanvas: ElementRef;
     @ViewChild("lineChart") lineChartCanvas: ElementRef;
@@ -44,6 +227,7 @@ export class TrackUsageComponent implements AfterViewInit {
 
     public show: boolean = false;
     public showLoading: boolean = false;
+    public showInteractiveChartNote: boolean = false;
     public usageType: string = this.MODE_EXPERIMENTS;
     public interval: string = this.INTERVAL_20;
     public showIntervalFilter: boolean = false;
@@ -100,19 +284,39 @@ export class TrackUsageComponent implements AfterViewInit {
     public lineChart2Legend: boolean = false;
     public lineChart2Data: any[] = [];
 
-    private lastParams: URLSearchParams = new URLSearchParams();
-    public data: any[] = [];
-    private lastCalledGraph: any;
-    private lastCalledGraphParams: string[];
+    private lastParams: HttpParams = new HttpParams();
+    public data: any = null;
+    private lastCalledGraphFn: (...args: any[]) => void;
+    private lastCalledGraphFnParams: any[];
+    private currentSubscription: Subscription;
 
-    constructor(private createSecurityAdvisorService: CreateSecurityAdvisorService,
+    constructor(public constantsService: ConstantsService,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private dialogsService: DialogsService,
                 private usageService: UsageService) {
-        this.coreFacilities = createSecurityAdvisorService.coreFacilitiesICanManage;
     }
 
-    ngAfterViewInit() {
-        this.openSidenav();
-        this.updateShow(false, false);
+    ngOnInit() {
+        this.coreFacilities = this.createSecurityAdvisorService.coreFacilitiesICanManage;
+
+        this.onUsageTypeChange();
+    }
+
+    public onUsageTypeChange(): void {
+        if (this.usageType === this.MODE_EXPERIMENTS) {
+            UtilService.safelyUnsubscribe(this.currentSubscription);
+            this.updateShow(false, false);
+        } else if (this.usageType === this.MODE_ANALYSIS) {
+            this.showAnalysis();
+        } else if (this.usageType === this.MODE_FILES) {
+            this.showFilesDaysSinceLastUpload();
+        }
+    }
+
+    public onCoreFacilityChange(): void {
+        if (this.idCoreFacility && this.usageType === this.MODE_EXPERIMENTS) {
+            this.showExperiments();
+        }
     }
 
     private updateShow(value: boolean, loading: boolean = false): void {
@@ -121,24 +325,21 @@ export class TrackUsageComponent implements AfterViewInit {
             this.hideAllCharts();
             this.showHideFilters(false, false);
             this.updateLabels("");
+            this.showInteractiveChartNote = false;
         }
         this.showLoading = loading;
     }
 
-    private getParams(): URLSearchParams {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", this.idCoreFacility);
-        params.set("endRank", this.interval);
-        params.set("currentView", this.usageType);
-        params.set("asOfLast6Months", this.asOf === this.AS_OF_6_MONTHS ? "Y" : "N");
-        params.set("asOfLastYear", this.asOf === this.AS_OF_YEAR ? "Y" : "N");
-        params.set("asOfLast2Years", this.asOf === this.AS_OF_2_YEARS ? "Y" : "N");
-        return params;
-    }
-
     private refreshData(forceRefresh: boolean = false): Observable<any> {
-        let params: URLSearchParams = this.getParams();
-        if (forceRefresh || !(params.toString() === this.lastParams.toString())) {
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", this.idCoreFacility ? this.idCoreFacility : "")
+            .set("endRank", this.interval)
+            .set("currentView", this.usageType)
+            .set("asOfLast6Months", this.asOf === this.AS_OF_6_MONTHS ? "Y" : "N")
+            .set("asOfLastYear", this.asOf === this.AS_OF_YEAR ? "Y" : "N")
+            .set("asOfLast2Years", this.asOf === this.AS_OF_2_YEARS ? "Y" : "N");
+
+        if (forceRefresh || !(params.toString() === this.lastParams.toString()) || !this.data) {
             this.lastParams = params;
             return this.usageService.getUsageData(params);
         } else {
@@ -153,22 +354,6 @@ export class TrackUsageComponent implements AfterViewInit {
         this.showLineChart2 = false;
         this.showPieChart2 = false;
         this.showPieChart3 = false;
-    }
-
-    private convertToCSSPercentage(num: number): string {
-        return num.toString() + "%";
-    }
-
-    public openSidenav(): void {
-        this.sidenav.nativeElement.style.width = this.convertToCSSPercentage(this.OFFSET);
-        this.mainnav.nativeElement.style.marginLeft = this.convertToCSSPercentage(this.OFFSET);
-        this.mainnav.nativeElement.style.width = this.convertToCSSPercentage(this.COUNTER_OFFSET);
-    }
-
-    public closeSidenav(): void {
-        this.sidenav.nativeElement.style.width = this.convertToCSSPercentage(this.CLOSED_OFFSET);
-        this.mainnav.nativeElement.style.marginLeft = this.convertToCSSPercentage(this.CLOSED_OFFSET);
-        this.mainnav.nativeElement.style.width = this.convertToCSSPercentage(this.COUNTER_CLOSED_OFFSET);
     }
 
     private updateTotal(newTotal: string, newTotalUnits: string, showTotal: boolean = true): void {
@@ -188,19 +373,20 @@ export class TrackUsageComponent implements AfterViewInit {
         this.showAsOfFilter = showAsOf;
     }
 
-    private updateLastCalledGraph(graph: any, params: any[] = []): void {
-        this.lastCalledGraph = graph;
-        this.lastCalledGraphParams = params;
+    private updateLastCalledGraphFn(graphFn: (...args: any[]) => void, params: any[] = []): void {
+        this.lastCalledGraphFn = graphFn;
+        this.lastCalledGraphFnParams = params;
     }
 
     public onFilterChange(): void {
-        this.lastCalledGraph(...this.lastCalledGraphParams);
+        this.lastCalledGraphFn(...this.lastCalledGraphFnParams);
     }
 
     private showCounts(rootField: string, countField: string, label: string, graphLabels: string): void {
-        this.updateLastCalledGraph(this.showCounts, [rootField, countField, label, graphLabels]);
+        this.updateLastCalledGraphFn(this.showCounts, [rootField, countField, label, graphLabels]);
         this.updateShow(false, true);
-        this.refreshData().subscribe((data: any) => {
+        UtilService.safelyUnsubscribe(this.currentSubscription);
+        this.currentSubscription = this.refreshData().pipe(first()).subscribe((data: any) => {
             this.data = data;
 
             let root: any = data[rootField];
@@ -251,9 +437,10 @@ export class TrackUsageComponent implements AfterViewInit {
     }
 
     private showCountsByType(rootField: string, countField: string, label: string): void {
-        this.updateLastCalledGraph(this.showCountsByType, [rootField, countField, label]);
+        this.updateLastCalledGraphFn(this.showCountsByType, [rootField, countField, label]);
         this.updateShow(false, true);
-        this.refreshData().subscribe((data: any) => {
+        UtilService.safelyUnsubscribe(this.currentSubscription);
+        this.currentSubscription = this.refreshData().pipe(first()).subscribe((data: any) => {
             this.data = data;
 
             let root: any = data[rootField];
@@ -286,10 +473,11 @@ export class TrackUsageComponent implements AfterViewInit {
         });
     }
 
-    private showActivityByWeek(countField: string, label:string, graphLabels: string): void {
-        this.updateLastCalledGraph(this.showActivityByWeek, [countField, label, graphLabels]);
+    private showActivityByWeek(countField: string, label: string, graphLabels: string): void {
+        this.updateLastCalledGraphFn(this.showActivityByWeek, [countField, label, graphLabels]);
         this.updateShow(false, true);
-        this.refreshData().subscribe((data: any) => {
+        UtilService.safelyUnsubscribe(this.currentSubscription);
+        this.currentSubscription = this.refreshData().pipe(first()).subscribe((data: any) => {
             this.data = data;
 
             let newLabels: string[] = [];
@@ -322,6 +510,7 @@ export class TrackUsageComponent implements AfterViewInit {
             this.updateShow(true, false);
             this.showHideFilters(false, true);
             this.updateLabels("Uploads And Downloads By Week", true, label);
+            this.showInteractiveChartNote = true;
 
             setTimeout(() => {
                 let options: any = {
@@ -343,7 +532,8 @@ export class TrackUsageComponent implements AfterViewInit {
                         line: {
                             tension: 0
                         }
-                    }
+                    },
+                    onClick: this.showUsageDetail,
                 };
 
                 this.lineChartLabels = newLabels;
@@ -363,10 +553,46 @@ export class TrackUsageComponent implements AfterViewInit {
         });
     }
 
+    private showUsageDetail: (event: MouseEvent, activeElements: any[]) => void = (event: MouseEvent, activeElements: any[]) => {
+        if (activeElements.length) {
+            let dataPoint: any = this.data.SummaryActivityByWeek[activeElements[0]._index];
+            let detailConfig: MatDialogConfig = new MatDialogConfig();
+            detailConfig.data = {
+                idCoreFacility: this.idCoreFacility,
+                fields: [],
+                startDate: dataPoint.startDate,
+            };
+
+            let chartConfig: chartJS.ChartConfiguration = activeElements[0]._chart.config;
+            let title: string = "";
+
+            // Uploads and downloads chart
+            if (chartConfig.data.datasets.length === 2) {
+                title = "Uploads and Downloads for ";
+                detailConfig.data.fields.push("uploadCount");
+                detailConfig.data.fields.push("downloadCount");
+            }
+            // Count chart
+            else if (chartConfig.data.datasets.length === 1) {
+                if (this.usageType === this.MODE_EXPERIMENTS) {
+                    title = "Experiments for ";
+                    detailConfig.data.fields.push("experimentCount");
+                } else if (this.usageType === this.MODE_ANALYSIS) {
+                    title = "Analyses for ";
+                    detailConfig.data.fields.push("analysisCount");
+                }
+            }
+
+            title += dataPoint.dataTip;
+            this.dialogsService.genericDialogContainer(TrackUsageDetailComponent, title, null, detailConfig);
+        }
+    };
+
     private showDiskSpace(rootField: string, showInterval: string, label: string): void {
-        this.updateLastCalledGraph(this.showDiskSpace, [rootField, showInterval, label]);
+        this.updateLastCalledGraphFn(this.showDiskSpace, [rootField, showInterval, label]);
         this.updateShow(false, true);
-        this.refreshData().subscribe((data: any) => {
+        UtilService.safelyUnsubscribe(this.currentSubscription);
+        this.currentSubscription = this.refreshData().pipe(first()).subscribe((data: any) => {
             this.data = data;
 
             let root: any = data[rootField];
@@ -425,9 +651,10 @@ export class TrackUsageComponent implements AfterViewInit {
     }
 
     public showExperimentsIllumina(): void {
-        this.updateLastCalledGraph(this.showExperimentsIllumina);
+        this.updateLastCalledGraphFn(this.showExperimentsIllumina);
         this.updateShow(false, true);
-        this.refreshData().subscribe((data: any) => {
+        UtilService.safelyUnsubscribe(this.currentSubscription);
+        this.currentSubscription = this.refreshData().pipe(first()).subscribe((data: any) => {
             this.data = data;
 
             let summarySeqExperimentsByApp: any = data.SummarySeqExperimentsByApp;
@@ -481,9 +708,10 @@ export class TrackUsageComponent implements AfterViewInit {
     }
 
     public showFilesDaysSinceLastUpload(): void {
-        this.updateLastCalledGraph(this.showFilesDaysSinceLastUpload);
+        this.updateLastCalledGraphFn(this.showFilesDaysSinceLastUpload);
         this.updateShow(false, true);
-        this.refreshData().subscribe((data: any) => {
+        UtilService.safelyUnsubscribe(this.currentSubscription);
+        this.currentSubscription = this.refreshData().pipe(first()).subscribe((data: any) => {
             this.data = data;
 
             let summaryDaysSinceLastUpload: any[] = data.SummaryDaysSinceLastUpload;
@@ -543,9 +771,10 @@ export class TrackUsageComponent implements AfterViewInit {
     }
 
     public showFilesDiskSpaceByCategory(): void {
-        this.updateLastCalledGraph(this.showFilesDiskSpaceByCategory);
+        this.updateLastCalledGraphFn(this.showFilesDiskSpaceByCategory);
         this.updateShow(false, true);
-        this.refreshData().subscribe((data: any) => {
+        UtilService.safelyUnsubscribe(this.currentSubscription);
+        this.currentSubscription = this.refreshData().pipe(first()).subscribe((data: any) => {
             this.data = data;
 
             let summaryDiskSpaceByAnalysis: any = data.SummaryDiskSpaceByAnalysis;
@@ -606,7 +835,7 @@ export class TrackUsageComponent implements AfterViewInit {
     }
 
     public print(): void {
-        let doc: string = "<html><head><title>Print</title></head><body>";
+        let doc: string = "<html><head><title>Usage</title></head><body>";
         doc += "<h4>" + this.label + "</h4>";
         if (this.showBarChart || this.showPieChart) {
             let url: string = "";
@@ -637,6 +866,10 @@ export class TrackUsageComponent implements AfterViewInit {
             printWindow.print();
             printWindow.close();
         });
+    }
+
+    ngOnDestroy(): void {
+        UtilService.safelyUnsubscribe(this.currentSubscription);
     }
 
 }
