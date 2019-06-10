@@ -96,6 +96,8 @@ export class ConstantsService {
     public readonly ICON_DOWNLOAD: string = "assets/download.png";
     public readonly ICON_DOWNLOAD_LARGE: string = "assets/download_large.png";
     public readonly ICON_BLUE_EXIT: string = "assets/blue-exit-button.png";
+    public readonly ICON_BAR_CHART: string = "assets/chart_bar.png";
+    public readonly ICON_PRINTER: string = "assets/printer.png";
 
     public readonly ICON_ANALYSIS: string = "assets/map.png";
     public readonly ICON_ANALYSIS_ADD: string = "assets/map_add.png";
