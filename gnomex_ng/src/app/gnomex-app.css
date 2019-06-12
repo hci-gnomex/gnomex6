@@ -251,6 +251,10 @@ div.mainnav {
     font-style: italic;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .overflow-auto {
     overflow: auto;
 }

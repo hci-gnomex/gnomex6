@@ -91,7 +91,7 @@ public class GetUsageDetail extends GNomExCommand implements Serializable {
         }
       }
       if (coreFacilityCount >  1) {
-        this.addInvalidField("idCoreFacility", "idCoreFacility is required");
+        this.addInvalidField("idCoreFacility", "Please select a core facility");
       }
     }
   }
