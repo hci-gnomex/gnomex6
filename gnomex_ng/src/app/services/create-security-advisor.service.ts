@@ -147,8 +147,13 @@ export class CreateSecurityAdvisorService {
     }
 
     public isCoreFacilityIManage(idCoreFacility: string): boolean {
-        let ids: string[] = this.extractCoreFacilityIds(this.coreFacilitiesICanManage);
-        return ids.indexOf(idCoreFacility) >= 0;
+        if (this.isSuperAdmin && this.coreFacilitiesICanManageIds.length === 0) {
+            for (let core of this.dictionaryService.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY)) {
+                this.coreFacilitiesICanManageIds.push(core.value);
+            }
+        }
+
+        return this.coreFacilitiesICanManageIds.includes(idCoreFacility);
     }
 
     public isMyCoreFacility(idCoreFacility: string): boolean {
@@ -247,6 +252,7 @@ export class CreateSecurityAdvisorService {
     private determineUsersCoreFacilities(): void {
         if (this.isSuperAdmin) {
             this.allowAllCoreFacilities = true;
+            this.coreFacilitiesICanManageIds = []; // Will be filled in after dictionaries load later
         } else if (!this.isGuest) {
             this.allowAllCoreFacilities = false;
             this.myCoreFacilitiesIds = this.concatUnique(
