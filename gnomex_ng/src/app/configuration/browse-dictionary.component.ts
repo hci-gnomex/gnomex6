@@ -12,6 +12,7 @@ import {HttpParams} from "@angular/common/http";
 import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 
 @Component({
     selector: "browse-dictionary",
@@ -159,6 +160,7 @@ export class BrowseDictionaryComponent implements OnInit, OnDestroy {
 
     constructor(private dictionaryService: DictionaryService,
                 private changeDetector: ChangeDetectorRef,
+                private securityAdvisor: CreateSecurityAdvisorService,
                 private utilService: UtilService,
                 private dialogsService: DialogsService) {
     }
@@ -187,7 +189,36 @@ export class BrowseDictionaryComponent implements OnInit, OnDestroy {
         dictionariesTemp.sort((a: Dictionary, b:Dictionary) => {
             return a.display.toUpperCase().localeCompare(b.display.toUpperCase());
         });
+        dictionariesTemp = this.restrictCoreFacilityVisibility(dictionariesTemp);
         this.dictionaries = dictionariesTemp;
+    }
+
+    private restrictCoreFacilityVisibility(dictionariesTemp: Dictionary[]): Dictionary[] {
+        // If user is an admin, restrict visibility of any dictionary / dictionary entry related
+        // to a core other than what they manage
+        if (this.securityAdvisor.isAdmin && !this.securityAdvisor.isSuperAdmin) {
+            let coreFacilities: DictionaryEntry[] = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY);
+            let dnaSeqCore: DictionaryEntry = coreFacilities.find((entry: DictionaryEntry) => (entry.display.includes("DNA Sequencing")));
+            let molecDiagCore: DictionaryEntry = coreFacilities.find((entry: DictionaryEntry) => (entry.display.includes("Molecular Diagnostics")));
+
+            return dictionariesTemp.filter((dict: Dictionary) => {
+                if ((dict.display.includes("DNA Seq Core") && dnaSeqCore && !this.securityAdvisor.isCoreFacilityIManage(dnaSeqCore.value)) ||
+                    (dict.display.includes("Molecular Diagnostics") && molecDiagCore && !this.securityAdvisor.isCoreFacilityIManage(molecDiagCore.value))) {
+                    return false;
+                }
+
+                dict.DictionaryEntry = (dict.DictionaryEntry as any[]).filter((entry: any) => {
+                    if (entry.idCoreFacility) {
+                        return this.securityAdvisor.isCoreFacilityIManage(entry.idCoreFacility);
+                    }
+                    return true;
+                });
+
+                return true;
+            });
+        } else {
+            return dictionariesTemp;
+        }
     }
 
     public selectTreeItem(event: any): void {
