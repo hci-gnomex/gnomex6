@@ -91,47 +91,54 @@ export class AuthRouteGuardService implements CanActivate {
     }
 
     private determineIfPublic(queryParam: any, isAuthed: boolean, url: string): Observable<boolean> {
-        let numberObj: any = {};
-        if (queryParam["requestNumber"]) {
-            numberObj["type"] = "requestNumber";
-            numberObj["value"] = queryParam["requestNumber"];
-            //numberObj["urlSegList"] =  ["experiments","idProject","browsePanel","idRequest"];
-            numberObj["urlSegList"] = ["experiments"];
-            let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
-            let sub = this.gnomexService.navInitBrowseExperimentSubject;
-            return this.redirectByURL(params, sub, isAuthed, numberObj);
+        return this.gnomexService.getLoginPropertiesObservable().pipe(flatMap((loginPropResp)=>{
+            loginPropResp
+
+            let numberObj: any = {};
+            if (queryParam["requestNumber"]) {
+                numberObj["type"] = "requestNumber";
+                numberObj["value"] = queryParam["requestNumber"];
+                //numberObj["urlSegList"] =  ["experiments","idProject","browsePanel","idRequest"];
+                numberObj["urlSegList"] = ["experiments"];
+                let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+                let sub = this.gnomexService.navInitBrowseExperimentSubject;
+                return this.redirectByURL(params, sub, isAuthed, numberObj);
 
 
-        } else if (queryParam["analysisNumber"]) {
-            numberObj["type"] = "analysisNumber";
-            numberObj["value"] = queryParam["analysisNumber"];
-            //numberObj["urlSegList"] =  ["analysis","idLab","analysisPanel","idAnalysis"];
-            numberObj["urlSegList"] = ["analysis"];
-            let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
-            let sub = this.gnomexService.navInitBrowseAnalysisSubject;
-            return this.redirectByURL(params, sub, isAuthed, numberObj);
+            } else if (queryParam["analysisNumber"]) {
+                numberObj["type"] = "analysisNumber";
+                numberObj["value"] = queryParam["analysisNumber"];
+                //numberObj["urlSegList"] =  ["analysis","idLab","analysisPanel","idAnalysis"];
+                numberObj["urlSegList"] = ["analysis"];
+                let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+                let sub = this.gnomexService.navInitBrowseAnalysisSubject;
+                return this.redirectByURL(params, sub, isAuthed, numberObj);
 
-        } else if (queryParam["dataTrackNumber"]) {
-            numberObj["type"] = "dataTrackNumber";
-            numberObj["value"] = queryParam["dataTrackNumber"];
-            //numberObj["urlSegList"] =  ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
-            numberObj["urlSegList"] = ["datatracks"];
-            let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
-            let sub = this.gnomexService.navInitBrowseDatatrackSubject;
-            return this.redirectByURL(params, sub, isAuthed, numberObj);
+            } else if (queryParam["dataTrackNumber"]) {
+                numberObj["type"] = "dataTrackNumber";
+                numberObj["value"] = queryParam["dataTrackNumber"];
+                //numberObj["urlSegList"] =  ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
+                numberObj["urlSegList"] = ["datatracks"];
+                let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+                let sub = this.gnomexService.navInitBrowseDatatrackSubject;
+                return this.redirectByURL(params, sub, isAuthed, numberObj);
 
-        } else if (queryParam["topicNumber"]) {
-            numberObj["type"] = "topicNumber";
-            numberObj["value"] = queryParam["topicNumber"];
-            numberObj["urlSegList"] = ["topics"];
-            let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
-            let sub = this.gnomexService.navInitBrowseTopicSubject;
-            return this.redirectByURL(params, sub, isAuthed, numberObj);
+            } else if (queryParam["topicNumber"]) {
+                numberObj["type"] = "topicNumber";
+                numberObj["value"] = queryParam["topicNumber"];
+                numberObj["urlSegList"] = ["topics"];
+                let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+                let sub = this.gnomexService.navInitBrowseTopicSubject;
+                return this.redirectByURL(params, sub, isAuthed, numberObj);
 
 
-        } else {
-            return of(false);
-        }
+            } else {
+                return of(false);
+            }
+
+        }));
+
+
 
 
     }
