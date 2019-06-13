@@ -80,7 +80,7 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
                 private utilService: UtilService,
                 private changeDetector: ChangeDetectorRef,
                 private dialogRef: MatDialogRef<GenericContainerDialogComponent>,
-                @Inject(MAT_DIALOG_DATA) private data) {
+                @Inject(MAT_DIALOG_DATA) public data) {
         if (data) {
             this.dialogContentBluePrint = data.dialogContent;
             this.icon = data.icon;

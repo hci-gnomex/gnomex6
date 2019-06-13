@@ -38,6 +38,7 @@ import {BillingTemplate} from "../../util/billing-template-window.component";
 import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-tab.component";
 import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 export const TOOLTIPS = Object.freeze({
     PRINT_EXPERIMENT_ORDER: "Create PDF form for this experiment order",
@@ -111,7 +112,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
 
     private overviewListSubscription: Subscription;
     private requestCategory: any;
-    private createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
     private contactCoreEmailDialogRef: MatDialogRef<BasicEmailDialogComponent>;
 
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
@@ -438,7 +438,11 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             number: this.experiment ? this.experiment.number : "",
             type: "requestNumber"
         };
-        this.dialog.open(ShareLinkDialogComponent, configuration);
+        this.dialogsService.genericDialogContainer(ShareLinkDialogComponent,
+            "Web Link for Experiment " + (this.experiment ? this.experiment.number : ""), null, configuration,
+            {actions: [
+                {type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                ]});
     }
 
     showPrintableRequestForm() {
@@ -459,8 +463,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             }
 
             let config: MatDialogConfig = new MatDialogConfig();
-            config.width = "35em";
-            // config.height = "30em";
+            config.width = "40em";
             config.panelClass = "no-padding-dialog";
             config.autoFocus = false;
             config.disableClose = true;
@@ -473,7 +476,11 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
 
             };
 
-            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, config);
+            this.dialogsService.genericDialogContainer(CreateAnalysisComponent, "Create Analysis", null, config, {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save" , internalAction: "createAnalysisYesButtonClicked", externalAction: () => { console.log("hello"); }},
+                    {type: ActionType.SECONDARY,  name: "Cancel", internalAction: "cancel"}
+                ]});
+
         }
     }
 

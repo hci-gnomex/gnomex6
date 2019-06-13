@@ -1,43 +1,35 @@
-<form class="example-form">
-    <h6 mat-dialog-title><img class="icon" [src]="this.constantsService.ICON_FOLDER_ADD">New Analysis Group</h6>
-    <mat-dialog-content>
-        <form [formGroup]="createAnalysisGroupForm">
-        <div>
-            <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20"
-                         formControlName="selectedLab" [placeHolder]="'Select a lab...'"
-                         [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                         (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect($event)">
-            </jqxComboBox>
-        </div>
-        <mat-form-field class="full-width" >
-            <label>Analysis Group Name:</label>
-            <div>
-                <input matInput formControlName="analysisGroupName">
-                <mat-error *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('required')">
-                    Analysis Group Name is required
-                </mat-error>
-                <mat-error *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('maxLength')">
-                    Analysis Group Name exceeded the 500 character limit
-                </mat-error>
-            </div>
+<form [formGroup]="createAnalysisGroupForm" class="full-height full-width padded flex-container-col">
+    <div class="flex-container-row align-center padded">
+        <label class="label label-width">Group:</label>
+        <jqxComboBox #labComboBox class="inlineComboBox" [width]="450"
+                     formControlName="selectedLab" [placeHolder]="'Select a lab...'"
+                     [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
+                     (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect($event)">
+        </jqxComboBox>
+    </div>
+    <div class="flex-container-row align-center padded">
+        <mat-form-field class="full-width">
+            <input matInput formControlName="analysisGroupName" placeholder="Analysis Group Name">
+            <mat-error
+                    *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('required')">
+                Analysis Group Name is required
+            </mat-error>
+            <mat-error
+                    *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('maxlength')">
+                Analysis Group Name exceeded the 500 character limit
+            </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width" >
-            <label>Description:</label>
-            <div>
-                <textarea matInput rows="6" columns="60" [(ngModel)]="analysisGroupDescription"
-                          formControlName="description"> </textarea>
-                <mat-error *ngIf="createAnalysisGroupForm.get('description').hasError('maxLength')">
-                    Description exceeded the 500 character limit
-                </mat-error>
-            </div>
-        </mat-form-field>
-        </form>
-    </mat-dialog-content>
-
-    <mat-dialog-actions>
-        <button *ngIf="!showSpinner" mat-raised-button color="primary" [disabled]="createAnalysisGroupForm.invalid" (click)="createAnalysisGroupSaveButtonClicked()" tabindex="2">Save</button>
-        <button *ngIf="!showSpinner" mat-raised-button color="accent" mat-dialog-close tabindex="-1">Cancel</button>
-        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-    </mat-dialog-actions>
-
+    </div>
+    <div class="flex-container-col full-width padded">
+        <label class="label label-width" for="descEditor">Description:</label>
+        <angular-editor #descEditorRef id="descEditor"
+                        formControlName="description"
+                        [config]="editorConfig">
+        </angular-editor>
+        <mat-error *ngIf="createAnalysisGroupForm.get('description').hasError('maxlength')">
+            Description exceeded the 500 character limit including HTML code formatting and styles.
+            Character count: {{createAnalysisGroupForm.get('description').value.toString().length}}
+        </mat-error>
+    </div>
 </form>
+

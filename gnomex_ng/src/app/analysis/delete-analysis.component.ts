@@ -1,23 +1,24 @@
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {Component, Inject} from "@angular/core";
-import { URLSearchParams } from "@angular/http";
 import {AnalysisService} from "../services/analysis.service";
 import * as _ from "lodash";
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: "delete-analysis-dialog",
     templateUrl: "delete-analysis-dialog.html"
 })
 
-export class DeleteAnalysisComponent {
+export class DeleteAnalysisComponent extends BaseGenericContainerDialog {
 
     public _nodesString: string = "";
     public hasAnalysisGroup: boolean = false;
-    public showSpinner: boolean = false;
+    public primaryDisable: (action?: GDAction) => boolean;
 
     private _selectedItem: any;
     private _label: string;
@@ -32,6 +33,7 @@ export class DeleteAnalysisComponent {
                 private analysisService: AnalysisService,
                 private dialogService: DialogsService) {
 
+        super();
         this._idAnalysisGroup = data.idAnalysisGroup;
         this._label = data.label;
         this._selectedItem = data.selectedItem;
@@ -57,43 +59,42 @@ export class DeleteAnalysisComponent {
         this._sortedNodes = data.nodes.sort((n1, n2) => n1.level < n2.level);
         this._nodesString = this._nodesString.substring(0, this._nodesString.lastIndexOf(","));
 
-    }
-    /**
-     * The yes button was selected in the delete dialog.
-     */
-    deleteAnalysisYesButtonClicked() {
-        this.showSpinner = true;
-        this.deleteAnalysis();
+        this.primaryDisable = (action) => {
+            return false;
+        };
+
     }
 
     /**
      * Delete the analysis.
      */
     deleteAnalysis () {
+        this.dialogService.startDefaultSpinnerDialog();
         if (this.i < this._sortedNodes.length) {
             let params: HttpParams = new HttpParams();
 
-            if(!this._sortedNodes[this.i].data){ // delete analysis from grid case
+            if(!this._sortedNodes[this.i].data) { // delete analysis from grid case
                 params = params.set("idAnalysis", this._nodes[this.i].idAnalysis);
                 this.analysisService.deleteAnalysis(params).pipe(first()).subscribe(response => {
                     this.deleteAnalysis();
-                },(err:IGnomexErrorResponse) => {
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogService.stopAllSpinnerDialogs();
                 });
                 this.analysisService.isDeleteFromGrid = true; // Flag used to refresh AnalysisOverviewList
-            }
-            else if (this._sortedNodes[this.i].level === 3) {
+            } else if (this._sortedNodes[this.i].level === 3) {
                 params = params.set("idAnalysis", this._sortedNodes[this.i].data.idAnalysis);
                 this.analysisService.deleteAnalysis(params).pipe(first()).subscribe(response => {
                     this.deleteAnalysis();
-                },(err:IGnomexErrorResponse) => {
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogService.stopAllSpinnerDialogs();
                 });
 
-            }
-            else if (this._sortedNodes[this.i].level === 2 || !this._nodes[this.i].data) {
+            } else if (this._sortedNodes[this.i].level === 2 || !this._nodes[this.i].data) {
                 params = params.set("idAnalysisGroup", this._sortedNodes[this.i].data.idAnalysisGroup);
                 this.analysisService.deleteAnalysisGroup(params).pipe(first()).subscribe(response => {
                     this.deleteAnalysis();
-                },(err:IGnomexErrorResponse) => {
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogService.stopAllSpinnerDialogs();
                 });
 
             }
@@ -105,8 +106,14 @@ export class DeleteAnalysisComponent {
                 }
 
                 this.analysisService.refreshAnalysisGroupList_fromBackend();
+                this.dialogRef.close(true);
+                this.dialogService.stopAllSpinnerDialogs();
             });
 
         }
+    }
+
+    cancel() {
+        this.dialogRef.close();
     }
 }
