@@ -1,5 +1,5 @@
 <div class="full-height full-width padding-sides flex-container-col">
-    <h5 class="flex-one">Configure Organisms</h5>
+    <h5 *ngIf="!this.isDialog" class="flex-one">Configure Organisms</h5>
     <div class="full-width flex-container-row flex-one">
         <button mat-button (click)="this.addOrganism()"><img class="icon" src="../../assets/page_add.png">Add</button>
         <button mat-button [disabled]="!this.selectedOrganism || !this.canDeleteSelectedOrganism" (click)="this.removeOrganism()"><img class="icon" src="../../assets/page_remove.png">Remove</button>
@@ -79,7 +79,7 @@
                     </custom-combo-box>
                 </div>
             </div>
-            <div class="full-width flex-container-row flex-one align-center justify-end">
+            <div *ngIf="!this.isDialog" class="full-width flex-container-row flex-one align-center justify-end">
                 <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirty-note">Changes Have Not Been Saved</span>
                 <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.canUpdateSelectedOrganism || !this.formGroup.valid"
                         (click)="this.prepareToSaveOrganism()"><img class="icon" src="../../assets/action_save.gif">Save</button>

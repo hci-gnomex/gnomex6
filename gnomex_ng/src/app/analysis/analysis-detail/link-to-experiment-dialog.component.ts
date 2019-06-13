@@ -1,10 +1,6 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import { URLSearchParams } from "@angular/http";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {Component, Inject, OnInit} from "@angular/core";
+import {FormControl} from "@angular/forms";
 import {GnomexService} from "../../services/gnomex.service";
 import {HttpParams} from "@angular/common/http";
 import {AnalysisService} from "../../services/analysis.service";
@@ -14,6 +10,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {Router} from "@angular/router";
 import {debounceTime, distinctUntilChanged, first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {GDAction} from "../../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -33,23 +31,17 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 
 })
 
-export class LinkToExperimentDialogComponent implements OnInit{
-    private fileInfoList:Array<any> = [];
+export class LinkToExperimentDialogComponent extends BaseGenericContainerDialog implements OnInit{
     public gridApi:GridApi;
     private idAnalysis:string;
     private idLab:string;
     private labList:Array<any> = [];
     public selectedAnalysisToLink:any[] =[];
     public showSpinner:boolean = false;
+    public primaryDisable: (action?: GDAction) => boolean;
 
     public labControl: FormControl;
     public numberControl:FormControl;
-
-
-
-
-
-
 
     public columnDefs = [
         {
@@ -96,7 +88,7 @@ export class LinkToExperimentDialogComponent implements OnInit{
                 private dialogService:DialogsService,
                 private gnomexService:GnomexService,
                 private analysisService: AnalysisService) {
-
+        super();
         this.idAnalysis = this.data.idAnalysis;
         this.idLab = this.data.idLab;
 
@@ -139,6 +131,10 @@ export class LinkToExperimentDialogComponent implements OnInit{
         });
 
         this.labControl.setValue(this.idLab);
+
+        this.primaryDisable = (action) => {
+            return this.selectedAnalysisToLink.length < 1;
+        };
 
     }
 
@@ -203,9 +199,14 @@ export class LinkToExperimentDialogComponent implements OnInit{
                         this.router.navigate(['/analysis',{outlets:{'analysisPanel':[this.idAnalysis]}}]);
 
                     }
-                },(err:IGnomexErrorResponse) =>{
-                })
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogService.stopAllSpinnerDialogs();
+                });
         }
+    }
+
+    cancel(): void {
+        this.dialogRef.close();
     }
 
 }

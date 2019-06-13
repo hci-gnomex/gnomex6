@@ -11,55 +11,50 @@ import {DownloadProgressComponent} from "./download-progress.component";
 import {UtilService} from "../services/util.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div mat-dialog-title class="no-margin-force no-padding">
-                <div class="dialog-header-colors padded">
-                    Select Files to Download
+            <div class="full-height full-width flex-container-col padded">
+                <div class="flex-container-row">
+                    <label>Drag files or folders that you want to download</label>
+                </div>
+                <div class="flex-container-row justify-space-between">
+                    <label>Available Files</label>
+                    <label>Files to Download</label>
+                </div>
+                <div class="trees-container">
+                    <as-split>
+                        <as-split-area size="50">
+                            <tree-root #availableFilesTreeComponent
+                                       [nodes]="this.availableFilesNodes"
+                                       [options]="this.filesOptions">
+                                <ng-template #treeNodeTemplate let-node>
+                                    <img src="{{node.data.icon}}" class="icon">
+                                    <span>{{node.data.displayName}}</span>
+                                </ng-template>
+                            </tree-root>
+                        </as-split-area>
+                        <as-split-area size="50">
+                            <tree-root #filesToDownloadTreeComponent
+                                       [nodes]="this.filesToDownloadNodes"
+                                       [options]="this.filesOptions">
+                                <ng-template #treeNodeTemplate let-node>
+                                    <img src="{{node.data.icon}}" class="icon">
+                                    <span>{{node.data.displayName}}</span>
+                                </ng-template>
+                            </tree-root>
+                        </as-split-area>
+                    </as-split>
+                </div>
+                <div class="flex-container-row justify-space-between">
+                    <label>{{this.availableFilesCount}} file(s)</label>
+                    <label>{{this.filesToDownloadCount}} file(s) ({{this.filesToDownloadSizeLabel}}
+                        )</label>
                 </div>
             </div>
-            <div mat-dialog-content class="full-height no-padding-force no-margin-force">
-                <div class="full-height full-width flex-container-col padded">
-                    <div class="flex-container-row justify-center">
-                        <label>Drag files or folders that you want to download</label>
-                    </div>
-                    <div class="flex-container-row justify-space-between">
-                        <label>Available Files</label>
-                        <label>Files to Download</label>
-                    </div>
-                    <div class="trees-container">
-                        <as-split>
-                            <as-split-area size="50">
-                                <tree-root #availableFilesTreeComponent
-                                           [nodes]="this.availableFilesNodes"
-                                           [options]="this.filesOptions">
-                                    <ng-template #treeNodeTemplate let-node>
-                                        <img src="{{node.data.icon}}" class="icon">
-                                        <span>{{node.data.displayName}}</span>
-                                    </ng-template>
-                                </tree-root>
-                            </as-split-area>
-                            <as-split-area size="50">
-                                <tree-root #filesToDownloadTreeComponent
-                                           [nodes]="this.filesToDownloadNodes"
-                                           [options]="this.filesOptions">
-                                    <ng-template #treeNodeTemplate let-node>
-                                        <img src="{{node.data.icon}}" class="icon">
-                                        <span>{{node.data.displayName}}</span>
-                                    </ng-template>
-                                </tree-root>
-                            </as-split-area>
-                        </as-split>
-                    </div>
-                    <div class="flex-container-row justify-space-between">
-                        <label>{{this.availableFilesCount}} file(s)</label>
-                        <label>{{this.filesToDownloadCount}} file(s) ({{this.filesToDownloadSizeLabel}})</label>
-                    </div>
-                </div>
-            </div>
-            <mat-dialog-actions class="justify-flex-end no-margin-force">
+            <mat-dialog-actions class="justify-flex-end no-margin-force generic-dialog-footer-colors">
                 <button mat-button [disabled]="this.filesToDownloadCount < 1" (click)="this.download()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download</button>
                 <button mat-button [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDTCommandLine()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Command Line</button>
                 <button mat-button [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDT()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Download</button>
@@ -68,7 +63,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
             </mat-dialog-actions>
         </div>
     `,
-    styles:[`
+    styles: [`
         div.trees-container {
             width: 60em;
             height: 25em;
@@ -83,7 +78,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
         }
     `]
 })
-export class DownloadFilesComponent implements OnInit, OnDestroy {
+export class DownloadFilesComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
     @ViewChild("availableFilesTreeComponent") private availableFilesTreeComponent: TreeComponent;
     public availableFilesNodes: any[] = [];
@@ -116,6 +111,7 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
                 private dialogsService: DialogsService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private dialog: MatDialog) {
+        super();
     }
 
     ngOnInit() {

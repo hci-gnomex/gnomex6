@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, Inject, OnInit} from "@angular/core";
 import {GridApi, GridReadyEvent, RowSelectedEvent, RowNode} from "ag-grid-community";
 import {OrganismService} from "../services/organism.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
@@ -9,19 +9,21 @@ import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateParserComponent} from "../util/parsers/date-parser.component";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'configure-organisms',
     templateUrl: "./configure-organisms.component.html",
 })
 
-export class ConfigureOrganismsComponent implements OnInit {
+export class ConfigureOrganismsComponent extends BaseGenericContainerDialog implements OnInit {
 
     public formGroup: FormGroup;
     public nameFC: FormControl;
@@ -50,12 +52,22 @@ export class ConfigureOrganismsComponent implements OnInit {
     private canWriteDictionaries: boolean;
     public canUpdateSelectedOrganism: boolean;
     public canDeleteSelectedOrganism: boolean;
+    public primaryDisable: (action?: GDAction) => boolean;
+    public isDialog: boolean = false;
+    private preSelectedOrganism: string;
 
-    constructor(private organismService: OrganismService,
+    constructor(private dialogRef: MatDialogRef<ConfigureOrganismsComponent>,
+                @Inject(MAT_DIALOG_DATA) private data: any,
+                private organismService: OrganismService,
                 private dictionaryService: DictionaryService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
                 private snackBar: MatSnackBar) {
+        super();
+        if(this.data && Object.keys(this.data).length > 0) {
+            this.isDialog = data.isDialog;
+            this.preSelectedOrganism = this.data.preSelectedOrganism;
+        }
     }
 
     ngOnInit() {
@@ -107,7 +119,11 @@ export class ConfigureOrganismsComponent implements OnInit {
             owner: this.ownerFC,
         });
 
-        this.loadOrganismList();
+        this.preSelectedOrganism ? this.loadOrganismList(this.preSelectedOrganism) : this.loadOrganismList();
+        this.formGroup.markAsPristine();
+        this.primaryDisable = (action) => {
+            return this.formGroup.invalid;
+        };
     }
 
     private loadOrganismList(preselectOrganism?: string): void {
@@ -119,7 +135,7 @@ export class ConfigureOrganismsComponent implements OnInit {
                 if (preselectOrganism) {
                     setTimeout(() => {
                         this.organismGridApi.forEachNode((node: RowNode) => {
-                            if (node.data.organism === preselectOrganism) {
+                            if (node.data.idOrganism === preselectOrganism) {
                                 node.setSelected(true);
                             }
                         });
@@ -266,10 +282,14 @@ export class ConfigureOrganismsComponent implements OnInit {
         this.organismService.saveOrganismNew(params).subscribe((result: any) => {
             this.showSpinner = false;
             if (result && result.result && result.result === "SUCCESS") {
-                let config: MatSnackBarConfig = new MatSnackBarConfig();
-                config.duration = 2000;
-                this.snackBar.open("Organism Saved", "Configure Organisms", config);
-                this.loadOrganismList(name);
+                if(this.isDialog) {
+                    this.dialogRef.close(result.idOrganism);
+                } else {
+                    let config: MatSnackBarConfig = new MatSnackBarConfig();
+                    config.duration = 2000;
+                    this.snackBar.open("Organism Saved", "Configure Organisms", config);
+                    this.loadOrganismList(result.idOrganism);
+                }
             }
         }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
@@ -378,6 +398,10 @@ export class ConfigureOrganismsComponent implements OnInit {
         if (api) {
             api.sizeColumnsToFit();
         }
+    }
+
+    public cancel(): void {
+        this.dialogRef.close();
     }
 
 }

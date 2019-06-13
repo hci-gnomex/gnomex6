@@ -27,6 +27,7 @@ import {ConfigurationBrowsePanelComponent} from "./configuration-browse-panel.co
 import {OverviewProtocolComponent} from "./overview-protocol.component";
 import {ExperimentPlatformModule} from "./experiment-platform/experiment-platform.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         ReactiveFormsModule,
         AngularSplitModule,
         ExperimentPlatformModule,
-        AngularEditorModule
+        AngularEditorModule,
+        MatDialogModule
     ],
     declarations: [
         BrowseDictionaryComponent,
@@ -63,6 +65,10 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
     ],
     entryComponents: [
         CreateProtocolDialogComponent
+    ],
+    providers: [
+        {provide: MatDialogRef, useValue: {}},
+        {provide: MAT_DIALOG_DATA, useValue: {}}
     ],
     exports: [
     ]

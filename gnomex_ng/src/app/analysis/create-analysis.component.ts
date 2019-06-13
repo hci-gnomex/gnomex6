@@ -1,26 +1,22 @@
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
-import {URLSearchParams} from "@angular/http";
-import {
-    AfterViewInit, ChangeDetectorRef, Component, Inject, Input, OnInit, ViewChild,
-} from "@angular/core";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {AfterViewInit, ChangeDetectorRef, Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {AnalysisService} from "../services/analysis.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {GetLabService} from "../services/get-lab.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {NewOrganismComponent} from "../util/new-organism.component";
-import {NewGenomeBuildComponent} from "../util/new-genome-build.component";
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {ConstantsService} from "../services/constants.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
-import jqxComboBox = jqwidgets.jqxComboBox;
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.model";
+import {ConfigureOrganismsComponent} from "../configuration/configure-organisms.component";
+import jqxComboBox = jqwidgets.jqxComboBox;
 
 @Component({
     selector: "create-analysis-dialog",
@@ -44,7 +40,7 @@ import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.mod
         }
 
         .example-full-width {
-            width: 350px;
+            width: 450px;
         }
 
     `]
@@ -67,7 +63,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     public ownerList: any[] = [];
     public newAnalysisGroup: boolean = false;
     public createAnalysisForm: FormGroup;
-    public primaryDisable:(action?:GDAction)=>boolean;
+    public primaryDisable: (action?: GDAction) => boolean;
     public newAnalysisName: string;
     public newAnalysisId: string;
     public selectedAnalysisGroup: string;
@@ -141,9 +137,9 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     ngOnInit() {
         this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
         this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILITY);
-        this.primaryDisable = (action) =>{
+        this.primaryDisable = (action) => {
             return this.createAnalysisForm.invalid;
-        }
+        };
 
         this.activeOrganismList = this.organismList.filter(org =>
             org.isActive === "Y");
@@ -349,6 +345,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
                     this.gnomexService.navByNumber("A" + resp.idAnalysis);
                 } else if(this.parentComponent === "Analysis") {
                     this.analysisService.createdAnalysis = resp.idAnalysis;
+                    this.dialogRef.close();
                     setTimeout(() => {
                         this.analysisService.refreshAnalysisGroupList_fromBackend();
                     });
@@ -405,19 +402,45 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     }
 
     newOrganism() {
-        let dialogRef: MatDialogRef<NewOrganismComponent> = this.dialog.open(NewOrganismComponent, {
-            height: "430px",
-            width: "300px",
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "1000px";
+        config.height = "790px";
+        config.panelClass = "no-padding-dialog";
+        config.autoFocus = false;
+        config.disableClose = true;
+        config.data = {
+            isDialog: true,
+            preSelectedOrganism: this.organismCombo.getSelectedItem() ? this.organismCombo.getSelectedItem().value : "",
+        };
+
+        this.dialogsService.genericDialogContainer(ConfigureOrganismsComponent, "Configure Organisms", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "prepareToSaveOrganism"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+            if(result) {
+                this.refreshOrganisms(result);
+                this.refreshGenomeBuilds();
+            }
         });
     }
 
-    newGenomeBuild() {
-        let dialogRef: MatDialogRef<NewGenomeBuildComponent> = this.dialog.open(NewGenomeBuildComponent, {
-            height: "430px",
-            width: "300px",
+    private refreshOrganisms(idOrganism: any): void {
+        this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
+        this.activeOrganismList = this.organismList.filter(org => org.isActive === "Y");
+        let createdOrganism = this.activeOrganismList.filter(activeOrg => activeOrg.idOrganism === idOrganism);
+        if(createdOrganism) {
+            this.organismCombo.selectItem(idOrganism);
+        }
+    }
+
+    private refreshGenomeBuilds(): void {
+        this.genomeBuildList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD).filter((build: any) => {
+            return build.isActive === "Y" && build.idOrganism === this.organismCombo.getSelectedItem().value;
         });
     }
-    cancel(){
+
+    public cancel() {
         this.dialogRef.close();
     }
 

@@ -7,7 +7,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialog, MatDialogRef, MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {DatatracksSummaryTabComponent} from "./datatracks-summary-tab.component";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
@@ -19,6 +19,7 @@ import {first} from "rxjs/operators";
 import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 import {UtilService} from "../../services/util.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     templateUrl: "./datatrack-detail-overview.component.html",
@@ -62,7 +63,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     private datatrack: any;
     private datatrackFiles: Array<any>;
     private datatrackDirectory: any;
-    private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
 
 
     constructor(public dataTrackService: DataTrackService, private route: ActivatedRoute,
@@ -269,17 +269,20 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     }
 
     shareableLink(): void {
-        this.shareWebLinkDialogRef = this.dialog.open(ShareLinkDialogComponent, {
-            width: "35em",
-            panelClass: "no-padding-dialog",
-            autoFocus: false,
-            data: {
-                name: "Data Track",
-                number: this.datatrack ? this.datatrack.number : "",
-                type: "dataTrackNumber"
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "35em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = true;
+        configuration.disableClose = true;
+        configuration.data = {
+            number: this.datatrack ? this.datatrack.number : "",
+            type: "dataTrackNumber"
+        };
 
-            }
-        });
+        this.dialogsService.genericDialogContainer(ShareLinkDialogComponent,
+            "Web Link for Data Track " + (this.datatrack ? this.datatrack.number : ""), null, configuration,
+            {actions: [{type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                ]});
     }
 
     showFolders(showFolders: any) {
