@@ -385,7 +385,16 @@ export class Experiment {
     public billingItems:            any[] = [];
     public SeqLibTreatmentEntries:  any[] = [];
     public protocols:               any[] = [];
-    public sequenceLanes:           any[] = [];
+
+    public get sequenceLanes(): any[] {
+        return this._sequenceLanes;
+    }
+    public set sequenceLanes(value: any[]) {
+        this._sequenceLanes = value ? value : [];
+        this.onChange_sequenceLanes.next(this._sequenceLanes);
+    }
+    public _sequenceLanes: any[] = [];
+    public onChange_sequenceLanes: BehaviorSubject<any[]> = new BehaviorSubject(this._sequenceLanes);
 
     // PropertyEntries should probably be named something more like "SampleAnnotationTemplates".
     public _PropertyEntries:         any[] = [];

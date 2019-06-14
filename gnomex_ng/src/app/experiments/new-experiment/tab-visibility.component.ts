@@ -77,7 +77,7 @@ export class TabVisibilityComponent implements OnInit, OnDestroy{
             this.idLabSubscription = this._experiment.onChange_idLab.subscribe((value: string) => {
                 let idLab = this.currentOrder.idLab;
 
-                if(idLab !== null  && idLab !== undefined) { //empty string is valid
+                if(idLab) {
                     let labParams: HttpParams = new HttpParams()
                         .set('idLab', idLab)
                         .set('includeBillingAccounts', 'N')
