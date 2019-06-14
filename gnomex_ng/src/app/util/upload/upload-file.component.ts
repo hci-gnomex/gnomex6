@@ -1,14 +1,13 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import { MatDialogRef } from '@angular/material';
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowSelectedEvent} from "ag-grid-community";
+import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {UploadFileService} from "../../services/upload-file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 import {ConstantsService} from "../../services/constants.service";
-import {concat, of, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import {FileService} from "../../services/file.service";
 import {DialogsService} from "../popup/dialogs.service";
-import {flatMap, last, take} from "rxjs/operators";
-import {TabChangeEvent} from "../tabs";
+import {take} from "rxjs/operators";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {saveAs} from 'file-saver';
 import {PropertyService} from "../../services/property.service";
@@ -52,8 +51,6 @@ export class UploadFileComponent implements OnInit {
 
 
 
-
-
     public columnDefs = [
         {
             headerName: "File",
@@ -80,7 +77,7 @@ export class UploadFileComponent implements OnInit {
     constructor(public dialogRef: MatDialogRef<UploadFileComponent>,
                 public uploadService: UploadFileService,
                 private dialogService: DialogsService,
-                public constService:ConstantsService,
+                public constService: ConstantsService,
                 public secAdvisor: CreateSecurityAdvisorService,
                 private propertyService: PropertyService,
                 private fileService: FileService) {}

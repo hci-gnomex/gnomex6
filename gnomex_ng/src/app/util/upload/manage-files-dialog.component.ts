@@ -1,13 +1,10 @@
-
-
 import {Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA, MatTabChangeEvent} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef, MatTabChangeEvent} from "@angular/material";
 import * as _ from "lodash";
 import {ConstantsService} from "../../services/constants.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {PropertyService} from "../../services/property.service";
 import {IFileParams} from "../interfaces/file-params.model";
-import {ExperimentSequenceLanesTab} from "../../experiments/experiment-detail/experiment-sequence-lanes-tab";
 import {LinkedSampleFileComponent} from "./linked-sample-file.component";
 import {FileService} from "../../services/file.service";
 import {Subscription} from "rxjs";
@@ -16,44 +13,30 @@ import {OrganizeFilesComponent} from "./organize-files.component";
 import {DialogsService} from "../popup/dialogs.service";
 import {UploadFileComponent} from "./upload-file.component";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
-
-
+import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog";
 
 
 @Component({
-    template:`
+    template: `
         <div class="full-height full-width flex-container-col">
-            <div mat-dialog-title class="padded-outer dialog-header-colors flex-container-row justify-space-between force-flex" >
-                <div class=" padded-inner">
-                    Upload Files
-                </div>
-                <div (click)="onCloseDialog()" class="padded-inner">
-                    <img [src]="this.constService.ICON_CLOSE_BLACK">
-                </div>
-            </div>
-            <div mat-dialog-content class="full-height" style="margin: 0; padding: 0;">
-                <div style="padding:0.5em;" class="full-height full-width flex-container-col">
-                    <mat-tab-group [(selectedIndex)]="this.selectedTabIndex"
-                                   (selectedTabChange)="tabChanged($event)"
-                                   class="mat-tab-group-border full-height full-width">
-                        <mat-tab class="full-height" label="Upload">
-                            <upload-file (navToTab)="tabNavigateTo($event)" [manageData]="this.manageData"> </upload-file>
-                        </mat-tab>
-                        <mat-tab class="full-height" label="Organize Files">
-                            <organize-file  (closeDialog)="onCloseDialog()" [manageData]="this.manageData">
-                            </organize-file>
-                        </mat-tab>
-                        <mat-tab *ngIf="this.showLinkedSampleTab" class="full-height" label="Link Samples">
-                            <linked-sample-file (closeDialog)="onCloseDialog()" [manageData]="this.manageData">
-                            </linked-sample-file>
-                        </mat-tab>
-                    </mat-tab-group>
-                </div>
-            </div>
+            <mat-tab-group [(selectedIndex)]="this.selectedTabIndex"
+                           (selectedTabChange)="tabChanged($event)"
+                           class="mat-tab-group-border full-height full-width">
+                <mat-tab class="full-height" label="Upload">
+                    <upload-file (navToTab)="tabNavigateTo($event)"
+                                 [manageData]="this.manageData"></upload-file>
+                </mat-tab>
+                <mat-tab class="full-height" label="Organize Files">
+                    <organize-file (closeDialog)="onCloseDialog()" [manageData]="this.manageData">
+                    </organize-file>
+                </mat-tab>
+                <mat-tab *ngIf="this.showLinkedSampleTab" class="full-height" label="Link Samples">
+                    <linked-sample-file (closeDialog)="onCloseDialog()"
+                                        [manageData]="this.manageData">
+                    </linked-sample-file>
+                </mat-tab>
+            </mat-tab-group>
         </div>
-
-
-
     `,
     styles: [`
 
@@ -81,7 +64,7 @@ import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 
     `]
 })
-export class ManageFilesDialogComponent implements OnInit{
+export class ManageFilesDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
     order:any;
     manageData:IFileParams;
@@ -101,6 +84,7 @@ export class ManageFilesDialogComponent implements OnInit{
                 private dialogService: DialogsService,
                 public constService:ConstantsService,private fb:FormBuilder,
                 @Inject(MAT_DIALOG_DATA) private data,private propertyService: PropertyService) {
+        super();
     }
 
     ngOnInit(){

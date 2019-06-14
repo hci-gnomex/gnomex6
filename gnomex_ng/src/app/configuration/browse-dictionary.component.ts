@@ -1,7 +1,7 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
 
-import {TreeComponent, ITreeOptions, TreeNode} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeNode} from "angular-tree-component";
 import {Dictionary} from "./dictionary.interface";
 import {DictionaryEntry} from "./dictionary-entry.type";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
@@ -13,11 +13,14 @@ import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: "browse-dictionary",
     template: `
-        <div class="flex-container-row padded full-height full-width">
+        <div class="flex-container-row double-padded-left-right full-height full-width">
             <div class="full-height panel">
                 <div class="flex-container-row justify-space-between align-center tree-row">
                     <label>Dictionaries</label>
@@ -71,7 +74,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
                             </mat-form-field>
                             <mat-form-field *ngSwitchCase="'textArea'" class="full-width">
                                 <textarea matInput [placeholder]="field.caption" [formControlName]="field.dataField"
-                                          matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+                                          matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="5"></textarea>
                             </mat-form-field>
                             <custom-combo-box *ngSwitchCase="'comboBox'" class="full-width" [placeholder]="field.caption"
                                               [options]="field.options" valueField="value" displayField="display"
@@ -92,8 +95,8 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
                         </div>
                     </ng-container>
                 </form>
-                <div class="full-width" [hidden]="!this.selectedEntry">
-                    <save-footer [disableSave]="this.entryForm.invalid || !this.selectedEntry" 
+                <div class="full-width" *ngIf="!this.isDialog" [hidden]="!this.selectedEntry">
+                    <save-footer [disableSave]="this.entryForm.invalid || !this.selectedEntry || !this.entryForm.dirty"
                                  [showSpinner]="this.showSpinner" (saveClicked)="this.save()" [dirty]="this.entryForm.dirty">
                     </save-footer>
                 </div>
@@ -106,6 +109,9 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
         }
         .flex-one {
             flex: 1;
+        }
+        .double-padded-left-right {
+            padding: 0.3em 0.6em 0.3em 0.6em;
         }
         img.button-image {
             height: 16px;
@@ -129,7 +135,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
     `],
 })
 
-export class BrowseDictionaryComponent implements OnInit, OnDestroy {
+export class BrowseDictionaryComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
     @ViewChild("treeComponent") private treeComponent: TreeComponent;
     public treeOptions: ITreeOptions = {
@@ -150,17 +156,29 @@ export class BrowseDictionaryComponent implements OnInit, OnDestroy {
     public entryFields: any[] = [];
     public visibleEntryFields: any[] = [];
     public showSpinner: boolean = false;
+    public primaryDisable: (action?: GDAction) => boolean;
+    private isDialog: boolean = false;
+    private preSelectedDictionary: string;
+    private preSelectedEntry: string;
 
     private cachedMetaDataClassName: string = "";
     private cachedMetaDataFields: any[] = [];
 
     private gridApi: GridApi;
 
-    constructor(private dictionaryService: DictionaryService,
+    constructor(private dialogRef: MatDialogRef<BrowseDictionaryComponent>,
+                @Inject(MAT_DIALOG_DATA) private data: any,
+                private dictionaryService: DictionaryService,
                 private changeDetector: ChangeDetectorRef,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private utilService: UtilService,
                 private dialogsService: DialogsService) {
+        super();
+        if(this.data && Object.keys(this.data).length > 0) {
+            this.isDialog = this.data.isDialog;
+            this.preSelectedDictionary = this.data.preSelectedDictionary;
+            this.preSelectedEntry = this.data.preSelectedEntry;
+        }
     }
 
 
@@ -168,6 +186,22 @@ export class BrowseDictionaryComponent implements OnInit, OnDestroy {
         this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.entryForm = new FormGroup({});
         this.buildTree();
+        this.entryForm.markAsPristine();
+        this.primaryDisable = (action) => {
+            return this.entryForm.invalid || !this.selectedEntry || !this.entryForm.dirty;
+        };
+
+        if(this.isDialog) {
+            setTimeout(() => {
+                let node: ITreeNode;
+                node = this.findNodeByIdAndClassName(this.preSelectedDictionary, this.preSelectedEntry);
+                if (node) {
+                    node.setIsActive(true);
+                    node.scrollIntoView();
+                }
+            });
+        }
+
     }
 
     ngOnDestroy(): void {
@@ -384,26 +418,31 @@ export class BrowseDictionaryComponent implements OnInit, OnDestroy {
 
             let className: string = this.selectedTreeNode.data.className ? this.selectedTreeNode.data.className : this.selectedTreeNode.parent.data.className;
             this.dictionaryService.save(isInsertMode, object, className, () => {
-                this.buildTree();
-                this.showSpinner = false;
-                setTimeout(() => {
-                    for (let dict of this.treeComponent.treeModel.roots) {
-                        if (dict.data.className === className) {
-                            dict.expand();
-                            if (isInsertMode) {
-                                dict.toggleActivated(null);
-                            } else {
-                                for (let entry of dict.children) {
-                                    if (entry.data[dataKeyField] === dataKeyValue) {
-                                        entry.toggleActivated(null);
-                                        break;
+                if(this.isDialog) {
+                    this.showSpinner = false;
+                    this.dialogRef.close();
+                } else {
+                    this.buildTree();
+                    this.showSpinner = false;
+                    setTimeout(() => {
+                        for (let dict of this.treeComponent.treeModel.roots) {
+                            if (dict.data.className === className) {
+                                dict.expand();
+                                if (isInsertMode) {
+                                    dict.toggleActivated(null);
+                                } else {
+                                    for (let entry of dict.children) {
+                                        if (entry.data[dataKeyField] === dataKeyValue) {
+                                            entry.toggleActivated(null);
+                                            break;
+                                        }
                                     }
                                 }
+                                break;
                             }
-                            break;
                         }
-                    }
-                });
+                    });
+                }
             }, () => {
                 this.showSpinner = false;
                 this.dialogsService.confirm("An error occurred while saving dictionary", null);
@@ -484,6 +523,30 @@ export class BrowseDictionaryComponent implements OnInit, OnDestroy {
 
     private static getFieldAsString(obj: any, field: string): string {
         return (obj && obj[field]) ? obj[field] : "";
+    }
+
+    public cancel(): void {
+        this.dialogRef.close();
+    }
+
+    private findNodeByIdAndClassName(className: string, id?: string): ITreeNode {
+        if (this.treeComponent.treeModel && this.treeComponent.treeModel.roots) {
+            for (let dict of this.treeComponent.treeModel.roots) {
+                if(dict.data.className === className) {
+                    dict.expand();
+                    if(dict.hasChildren && id) {
+                        for(let entry of dict.children) {
+                            if (entry.data.value === id) {
+                                return entry;
+                            }
+                        }
+                    } else {
+                        return dict;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }
