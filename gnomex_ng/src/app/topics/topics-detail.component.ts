@@ -22,6 +22,7 @@ import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 import {first} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     templateUrl: "./topics-detail.component.html",
@@ -207,11 +208,18 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         configuration.panelClass = "no-padding-dialog";
         configuration.autoFocus = false;
         configuration.data = {
-            name:   this.topicNode.name,
             number: this.topicNode.idTopic,
             type:   "topicNumber"
         };
-        this.dialog.open(ShareLinkDialogComponent, configuration);
+
+        let topicName: string = "Topic T" + this.topicNode.idTopic + " - " + this.topicNode.name;
+        topicName = topicName.length > 35 ? topicName.substr(0, 35) + "..." : topicName;
+
+        this.dialogService.genericDialogContainer(ShareLinkDialogComponent,
+            "Web Link for " + topicName, null, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                ]});
     }
 
     onEmailClick(): void {

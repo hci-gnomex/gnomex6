@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {Component, Inject, OnInit} from '@angular/core';
-import {MatDialogRef, MAT_DIALOG_DATA, MatDialog} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {WorkflowService} from "../services/workflow.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
@@ -11,6 +11,11 @@ import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {GridApi} from 'ag-grid-community/dist/lib/gridApi';
+import {RowDoubleClickedEvent} from "ag-grid-community";
+import {ActionType, GDAction, GDActionConfig} from "../util/interfaces/generic-dialog-action.model";
+import {AddSamplesDialogComponent} from "./add-samples-dialog.component";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'edit-flowcell-dialog',
@@ -38,7 +43,7 @@ import {GridApi} from 'ag-grid-community/dist/lib/gridApi';
             flex-direction: row;
             margin-bottom: .5em;
             font-style: italic;
-            color: #1601db;        
+            color: #1601db;
         }
         .normal-text {
             font-style: normal;
@@ -193,7 +198,7 @@ export class EditFlowcellDialogComponent implements OnInit{
     }
 
     setEditForm() {
-        // this.codeSequencingPlatform = event.data.codeSequencingPlatform;
+        this.codeSequencingPlatform = this.flowCell.codeSequencingPlatform;
         this.flowCellColDefs = [];
         this.flowCellNumber = this.flowCell.number;
         this.idFlowCell = this.flowCell.idFlowCell;
@@ -221,6 +226,13 @@ export class EditFlowcellDialogComponent implements OnInit{
                 this.flowCellChannels = this.flowCell.flowCellChannels;
             }
         }
+        for(let fcChannel of this.flowCellChannels){
+            if(fcChannel.sequenceLanes){
+                fcChannel.sequenceLanes = UtilService.getJsonArray(fcChannel.sequenceLanes, fcChannel.sequenceLanes.SequenceLane);
+            }
+        }
+
+
         this.initializeAssm();
     }
 
@@ -268,7 +280,7 @@ export class EditFlowcellDialogComponent implements OnInit{
         if (this.allFG.dirty) {
             //SaveFlowCell will recalulate the folder name.
             this.dialogsService.confirm("You have changed the Bar Code, Run #, Cluster Gen Date, Instrument or Side which will cause the Folder Name to change.",
-                    "Do you wish to continue with this save?").subscribe((answer: boolean) => {
+                "Do you wish to continue with this save?").subscribe((answer: boolean) => {
                 if (answer) {
                     let checkReply = this.checkForDuplicateBarcode();
                     if (checkReply) {
@@ -291,33 +303,24 @@ export class EditFlowcellDialogComponent implements OnInit{
             .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
             .set("notes", this.flowCell.notes)
             .set("number", this.flowCell.number)
-            .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesActual)
-            .set("runNumber", this.runFC.value);
+            .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesActual ? this.protocolFC.value.numberSequencingCyclesActual : "")
+            .set("runNumber", this.runFC.value)
+            .set("noJSONToXMLConversionNeeded", "Y");
 
-        params = params.set("channelsXMLString", JSON.stringify(this.flowCellChannels));
+        params = params.set("channelsJSONString", JSON.stringify(this.flowCellChannels));
 
         this.showSpinner = true;
         this.workflowService.saveFlowCell(params).subscribe((response: any) => {
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.allFG.markAsPristine();
-                    if (!responseJSON.flowCellNumber) {
-                        responseJSON.flowCellNumber = "";
-                    }
-                    this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " created", null);
-                    this.dialogRef.close();
-                } else {
-                    let message: string = "";
-                    if (responseJSON && responseJSON.message) {
-                        message = ": " + responseJSON.message;
-                    }
-                    this.dialogsService.confirm("An error occurred while saving" + message, null);
-                }
-            } else {
-                this.dialogsService.confirm("An error occurred while saving " + response.message, null);
-
+            this.allFG.markAsPristine();
+            if (!response.flowCellNumber) {
+                response.flowCellNumber = "";
             }
+            this.dialogsService.confirm("Flowcell " + response.flowCellNumber + " created", null);
+            this.rebuildFlowCells = true;
+            this.dialogRef.close();
+            this.showSpinner = false;
+
+        },(err:IGnomexErrorResponse) =>{
             this.showSpinner = false;
         });
     }
@@ -326,14 +329,27 @@ export class EditFlowcellDialogComponent implements OnInit{
         this.channel = event.data;
     }
 
-    launchAddSample(event) {
-        console.log("launch");
+    launchAddSample(event:RowDoubleClickedEvent) {
+        if(event.data){
+            let actionConfig : GDActionConfig = {actions: [
+                    {name:"Update", internalAction:"update", type: ActionType.PRIMARY},
+                    {name: "Cancel", internalAction:"cancel", type: ActionType.SECONDARY}
+                ]};
+            let config:MatDialogConfig = new MatDialogConfig();
+
+            config.data = event.data;
+            config.width = "65em";
+            config.height = "40em";
+
+            this.dialogsService.genericDialogContainer(AddSamplesDialogComponent,"Add Samples to Flow Cell ",null,config,actionConfig)
+
+        }
     }
 
     removeChannel(event) {
         this.flowCellChannels = this.flowCellChannels.filter(channel =>
             channel.idFlowCellChannel != this.channel.idFlowCellChannel
-        )
+        );
         this.allFG.markAsDirty();
         this.setEditForm();
     }

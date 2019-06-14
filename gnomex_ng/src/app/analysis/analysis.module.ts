@@ -1,9 +1,6 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {FormsModule,ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 import { TreeModule } from "angular-tree-component";
 
@@ -21,7 +18,7 @@ import { ToggleButtonModule } from "../../modules/togglebutton.module";
 import { WindowModule }       from "../../modules/window.module";
 import {UtilModule} from "../util/util.module";
 import {ServicesModule} from "../services/services.module";
-import { AngularSplitModule } from 'angular-split';
+import { AngularSplitModule } from "angular-split";
 
 import {BrowseAnalysisComponent} from "./browse-analysis.component";
 import {ANALYSIS_ROUTING} from "./analysis.routes";
@@ -35,6 +32,7 @@ import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {DialogsModule} from "../util/popup/dialogs.module";
 import {AnalysisOverviewModule} from "./analysis-overview/analysis-overview.module";
 import {AnalysisDetailModule} from "./analysis-detail/analysis-detail.module";
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 /**
  * @author jdewell
@@ -69,7 +67,8 @@ import {AnalysisDetailModule} from "./analysis-detail/analysis-detail.module";
         ReactiveFormsModule,
         AngularSplitModule,
         AnalysisOverviewModule,
-        AnalysisDetailModule
+        AnalysisDetailModule,
+        AngularEditorModule
     ],
     declarations: [
         BrowseAnalysisComponent,

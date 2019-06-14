@@ -1,4 +1,16 @@
-import {AfterViewInit, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, Output, SimpleChanges} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Injector,
+    Input,
+    OnChanges,
+    OnDestroy,
+    Output,
+    SimpleChanges,
+    ViewChild
+} from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {UtilService} from "../services/util.service";
@@ -8,7 +20,7 @@ import {debounceTime} from "rxjs/operators";
     selector: "custom-combo-box",
     template: `
         <mat-form-field class="full-width full-height">
-            <input matInput class="full-width full-height" [placeholder]="this.placeholder"
+            <input #input matInput class="full-width full-height" [placeholder]="this.placeholder"
                    [matAutocomplete]="auto" [formControl]="this.innerControl">
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="this.selectOption($event.option.value)"
                               (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
@@ -27,6 +39,8 @@ import {debounceTime} from "rxjs/operators";
 })
 
 export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDestroy, ControlValueAccessor {
+    @ViewChild("input") inputElement: ElementRef;
+
     @Input() public placeholder: string = "";
     @Input() public allowNone: boolean = true;
     public forceShowNone: boolean = false;
@@ -154,6 +168,9 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
         if (this.noNgControl) {
             this.outerControl.setValue(newVal);
         }
+
+        this.inputElement.nativeElement.blur();
+
         this.onChangeFn(newVal);
         this.optionSelected.emit(newVal);
     }

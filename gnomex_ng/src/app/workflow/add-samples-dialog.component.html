@@ -1,0 +1,64 @@
+<div class="flex-container-row full-height full-width">
+    <div class="full-width flex-container-row flex-grow overflow-auto">
+        <as-split (dragEnd)="onSplitDragEnd($event)">
+            <as-split-area size="30" >
+                <div class="full-width full-height max-height flex-container-col border-subtle padded-left">
+                    <div style="width:20em;">
+                        <label style="font-style: italic; font-size:small;"> Drag and drop samples to the flow cell </label>
+                        <custom-combo-box [(ngModel)]="idLab"
+                                          [options]="labList"
+                                          [allowNone]="false"
+                                          (optionSelected)="onLabSelected()"
+                                          [placeholder]="'Lab'"
+                                          [displayField]="this.preferenceService.labDisplayField"
+                                          [valueField]="'idLab'">
+                        </custom-combo-box>
+                    </div>
+                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <div class="full-height full-width border-subtle">
+                            <tree-root (activate)="onTreeSelected($event)"
+                                       [nodes]="itemList" [options]="options">
+                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                    <div class="truncate">
+                                        <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" height="16" width="16">
+                                        <span [matTooltip]="node.data.label" >{{ node.data.label }}</span>
+                                    </div>
+
+                                </ng-template>
+                            </tree-root>
+                        </div>
+                    </div>
+                </div>
+            </as-split-area>
+            <as-split-area size="70">
+                <div class="full-width full-height max-height flex-container-col border-subtle">
+                    <div class="flex-container-row justify-flex-end">
+                        <button mat-button [disabled]="this.selectedSampleFlowCell.length == 0" (click)="remove($event)">
+                            <img [src]="this.constService.ICON_DELETE" >
+                            Remove
+                        </button>
+                        <button mat-button (click)="clearAll($event)">
+                            <img [src]="this.constService.ICON_FOLDER_DELETE" >
+                            Clear All
+                        </button>
+                    </div>
+                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                         (gridReady)="onGridReady($event)"
+                                         [columnDefs]="columnDefs"
+                                         [rowSelection]="'single'"
+                                         [rowDeselection]="true"
+                                         [enableColResize]="true"
+                                         (treeDrop)="onDrop($event)"
+                                         (rowSelected)="onGridRowSelected($event)"
+                                         [treeAllowDrop]="allowDrop.bind(this)">
+                        </ag-grid-angular>
+                    </div>
+                </div>
+            </as-split-area>
+
+        </as-split>
+    </div>
+
+</div>
+

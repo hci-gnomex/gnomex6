@@ -97,6 +97,9 @@ export class ConstantsService {
     public readonly ICON_DOWNLOAD: string = "assets/download.png";
     public readonly ICON_DOWNLOAD_LARGE: string = "assets/download_large.png";
     public readonly ICON_BLUE_EXIT: string = "assets/blue-exit-button.png";
+    public readonly ICON_BAR_CHART: string = "assets/chart_bar.png";
+    public readonly ICON_PRINTER: string = "assets/printer.png";
+    public readonly ICON_EXCLAMATION: string = "assets/exclamation.png";
 
     public readonly ICON_ANALYSIS: string = "assets/map.png";
     public readonly ICON_ANALYSIS_ADD: string = "assets/map_add.png";
@@ -128,8 +131,10 @@ export class ConstantsService {
     public readonly ICON_FLASK: string = "assets/flask.png";
     public readonly ICON_ORGANISM: string = "assets/organism.jpg";
     public readonly ICON_ORGANISM_NEW: string = "assets/organism_new.png";
+    public readonly ICON_GENOME_BUILD: string = "assets/genome_build.png";
     public readonly ICON_GENOME_BUILD_NEW: string = "assets/genome_build_new.png";
     public readonly ICON_ADD: string = "assets/add.png";
+    public readonly ICON_ADD_DISABLE: string = "assets/add_disable.png";
     public readonly ICON_DELETE: string = "assets/delete.png";
     public readonly ICON_CROSS: string = "assets/cross.png";
     public readonly ICON_CROSSOUT: string = "assets/crossout.png";

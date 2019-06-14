@@ -251,6 +251,10 @@ div.mainnav {
     font-style: italic;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .overflow-auto {
     overflow: auto;
 }
@@ -269,6 +273,10 @@ img.icon {
 
 .no-padding .mat-dialog-container {
     padding: 0 !important;
+}
+
+.no-padding-dialog {
+    padding: 0;
 }
 
 .no-margin {

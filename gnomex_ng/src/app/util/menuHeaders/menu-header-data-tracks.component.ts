@@ -7,7 +7,6 @@ import {NewOrganismComponent} from "../new-organism.component";
 import {NewDataTrackFolderComponent} from "../../datatracks/new-datatrackfolder.component";
 import {DialogsService} from "../popup/dialogs.service";
 import {DataTrackService} from "../../services/data-track.service";
-import {Response, URLSearchParams} from "@angular/http";
 import {NewDataTrackComponent} from "../../datatracks/new-datatrack.component";
 import {DeleteDataTrackComponent} from "../../datatracks/delete-datatrack.component";
 import {ConstantsService} from "../../services/constants.service";
@@ -19,6 +18,7 @@ import {HttpParams} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {DictionaryService} from "../../services/dictionary.service";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
+import {ActionType} from "../interfaces/generic-dialog-action.model";
 
 const DATATRACK = "DATATRACK";
 const GENOMEBUILD = "GENOMEBUILD";
@@ -35,6 +35,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     @Input() allActiveNodes: ITreeNode[];
     @Output() onDataTrackFolderCreated: EventEmitter<string> = new EventEmitter<string>();
     @Output() onDataTrackCreated: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onGenomeBuildCreated: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onOrganismCreated: EventEmitter<string> = new EventEmitter<string>();
 
     public newDTisDisabled: boolean = true;
     public newGenomeBuildisDisabled: boolean = true;
@@ -347,25 +349,44 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     private makeNewGenomeBuild(): void {
-        let dialogRef: MatDialogRef<NewGenomeBuildComponent> = this.dialog.open(NewGenomeBuildComponent, {
-            height: "24em",
-            width: "30em",
-            data: {
-                selectedItem: this.selectedNode
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "35em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = false;
+        configuration.disableClose = true;
+        configuration.data = {
+            selectedItem: this.selectedNode
+        };
+
+        this.dialogsService.genericDialogContainer(NewGenomeBuildComponent, "New Genome Build", this.constantsService.ICON_GENOME_BUILD, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+            if(result) {
+                this.onGenomeBuildCreated.emit(result);
             }
         });
     }
 
     private makeNewOrganism(): void {
-        let dialogRef: MatDialogRef<NewOrganismComponent> = this.dialog.open(NewOrganismComponent, {
-            height: "24em",
-            width: "30em",
-        });
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "35em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = false;
+        configuration.disableClose = true;
+
+        this.dialogsService.genericDialogContainer(NewOrganismComponent, "New Species", this.constantsService.ICON_ORGANISM, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+            if(result) {
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.ORGANISM);
+                this.onGenomeBuildCreated.emit(result);
+                this.dialogsService.stopAllSpinnerDialogs();
             }
         });
     }

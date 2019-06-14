@@ -11,10 +11,11 @@ import {AnalysisService} from "../../services/analysis.service";
 import {GnomexStringUtilService} from "../../services/gnomex-string-util.service";
 import {LabListService} from "../../services/lab-list.service";
 import {CreateAnalysisComponent} from "../create-analysis.component";
-import {MatDialogRef, MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import {DeleteAnalysisComponent} from "../delete-analysis.component";
 import {ConstantsService} from "../../services/constants.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -146,8 +147,6 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
     private createAnalysisData: any;
     private enableRemoveAnalysis: boolean = false;
     private enableCreateAnalysis: boolean = true;
-    private createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
-    private deleteAnalysisDialogRef: MatDialogRef<DeleteAnalysisComponent>;
     private labs: any[] = [];
     private analysisTabNode: any;
 
@@ -160,7 +159,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
                 private StrUtil: GnomexStringUtilService,
                 private labListService: LabListService,
                 private dialog: MatDialog,
-                private dialogService: DialogsService,
+                private dialogsService: DialogsService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private constService: ConstantsService) {
         super(fb);
@@ -209,20 +208,6 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
                 }
             }
 
-
-            if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
-                this.dialogService.stopAllSpinnerDialogs();
-                this.createAnalysisDialogRef.close();
-                this.createAnalysisDialogRef = null;
-            }
-            if (this.deleteAnalysisDialogRef && this.deleteAnalysisDialogRef.componentInstance) {
-                if (this.deleteAnalysisDialogRef.componentInstance.showSpinner) {
-                    this.deleteAnalysisDialogRef.componentInstance.showSpinner = false;
-                }
-                this.dialogService.stopAllSpinnerDialogs();
-                this.deleteAnalysisDialogRef.close();
-                this.deleteAnalysisDialogRef = null;
-            }
         });
 
     }
@@ -256,12 +241,19 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
         let selectedAnalysisList: Array<any> = this.gridOpt.api.getSelectedRows();
         if (selectedAnalysisList && selectedAnalysisList.length > 0) {
             let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.width = "35em";
+            configuration.panelClass = "no-padding-dialog";
+            configuration.autoFocus = false;
+            configuration.disableClose = true;
             configuration.data = {
                 idAnalysisGroup: selectedAnalysisList[0].idAnalysisGroup,
                 nodes: selectedAnalysisList
             };
 
-            this.deleteAnalysisDialogRef = this.dialog.open(DeleteAnalysisComponent, configuration);
+            this.dialogsService.genericDialogContainer(DeleteAnalysisComponent, "Warning: Delete Analysis", this.constService.ICON_EXCLAMATION, configuration, {actions: [
+                    {type: ActionType.PRIMARY, icon: null, name: "Yes", internalAction: "deleteAnalysis"},
+                    {type: ActionType.SECONDARY, icon: null, name: "No", internalAction: "cancel"}
+                ]});
         }
     }
 
@@ -285,7 +277,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
                 selectedIdAnalysisGroup = this.analysisService.analysisList[0].idAnalysisGroup;
             } else {
                 selectedIdLab = this.analysisTabNode.idLab;
-                selectedIdAnalysisGroup = "";
+                selectedIdAnalysisGroup = this.analysisTabNode.idAnalysisGroup ? this.analysisTabNode.idAnalysisGroup : "";
             }
 
         }
@@ -304,7 +296,7 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
         }
 
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = "35em";
+        configuration.width = "40em";
         configuration.panelClass = "no-padding-dialog";
         configuration.autoFocus = false;
         configuration.disableClose = true;
@@ -316,7 +308,10 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
             parentComponent: "Analysis",
         };
 
-        this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
+        this.dialogsService.genericDialogContainer(CreateAnalysisComponent, "Create Analysis", null, configuration, {actions: [
+                {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save" , internalAction: "createAnalysisYesButtonClicked"},
+                {type: ActionType.SECONDARY,  name: "Cancel", internalAction: "cancel"}
+            ]});
     }
 
     selectedRow(event: any) {

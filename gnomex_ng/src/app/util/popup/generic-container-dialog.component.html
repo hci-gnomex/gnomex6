@@ -1,25 +1,28 @@
-<div class="full-width generic-dialog-header-colors no-margin no-padding">
-    <div #topmostLeftmost mat-dialog-title (mousedown)="onMouseDownHeader($event)"
-         class="force-flex-container-row align-center full-width padding {{ movingDialog ? 'grabbed' : 'grabbable' }}">
-        <div class="flex-container-row align-center padded">
-            <img class="icon" *ngIf="icon" [src]="icon">
-            <h3 style="margin:0;">{{title}}</h3>
-        </div>
-        <div class="flex-grow"> </div>
-        <div class="padded" (click)="onClose($event)">
-            <img class="exit" [src]="this.constService.ICON_BLUE_EXIT">
+<div class="full-height full-width flex-container-col">
+    <div class="full-width generic-dialog-header-colors no-margin no-padding">
+        <div #topmostLeftmost mat-dialog-title (mousedown)="onMouseDownHeader($event)"
+             class="force-flex-container-row align-center full-width padding {{ movingDialog ? 'grabbed' : 'grabbable' }}">
+            <div class="flex-container-row align-center padded">
+                <img class="icon" *ngIf="icon" [src]="icon">
+                <h3 style="margin:0;">{{title}}</h3>
+            </div>
+            <div class="flex-grow"></div>
+            <div class="padded" (click)="onClose($event)">
+                <img class="exit" [src]="this.constService.ICON_BLUE_EXIT">
+            </div>
         </div>
     </div>
-</div>
-<mat-dialog-content  class="flex-grow full-width no-margin no-padding">
-    <div class="flex-container-col full-height full-width padded">
-        <ndc-dynamic [ndcDynamicComponent]="this.dialogContentBluePrint" [ndcDynamicInputs]="this.data"
-                     (ndcDynamicCreated)="createdComponent($event)">
-        </ndc-dynamic>
-    </div>
-</mat-dialog-content>
-<mat-dialog-actions class="flex-container-row justify-flex-end no-margin no-padding generic-dialog-footer-colors">
-        <div *ngFor="let action of actions" >
+    <mat-dialog-content class="flex-grow no-margin no-padding">
+        <div class="flex-grow full-height full-width">
+            <ndc-dynamic [ndcDynamicComponent]="this.dialogContentBluePrint"
+                         [ndcDynamicInputs]="this.data"
+                         (ndcDynamicCreated)="createdComponent($event)">
+            </ndc-dynamic>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions *ngIf="actions && actions.length > 0"
+            class="flex-container-row justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+        <div *ngFor="let action of actions">
             <save-footer *ngIf="action.type === type.PRIMARY;else secondary"
                          [actionType]="action.type"
                          [icon]="action.icon"
@@ -31,17 +34,14 @@
             </save-footer>
             <!-- to avoid issue with multiple spinner or dirty notes-->
             <ng-template #secondary>
-               <save-footer [actionType]="action.type"
-                            (saveClicked)="executeAction(action)"
-                            [icon]="action.icon"
-                            [disableSave]="this.dialogContent.secondaryDisable(action)"
-                            [name]="action.name">
+                <save-footer [actionType]="action.type"
+                             (saveClicked)="executeAction(action)"
+                             [icon]="action.icon"
+                             [disableSave]="this.dialogContent.secondaryDisable(action)"
+                             [name]="action.name">
 
-               </save-footer>
+                </save-footer>
             </ng-template>
-
-
         </div>
-
-</mat-dialog-actions>
-
+    </mat-dialog-actions>
+</div>

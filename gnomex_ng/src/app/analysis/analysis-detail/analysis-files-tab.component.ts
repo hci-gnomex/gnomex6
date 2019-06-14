@@ -41,11 +41,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
             </div>
         </div>
     `,
-    styles: [`
-        .no-padding-dialog {
-            padding: 0;
-        }
-    `]
+    styles: [``]
 })
 export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 
@@ -136,7 +132,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             setTimeout(() => {
                 this.determineFileCount();
             });
-        })
+        });
     }
 
     public onGridReady(event: GridReadyEvent): void {
@@ -185,7 +181,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         },(err:IGnomexErrorResponse) => {
             this.handleBackendLinkError(err.gError);
         });
-    };
+    }
 
     private makeUCSCLink: (data: any) => void = (data:any) => {
         let params: HttpParams = new HttpParams()
@@ -198,7 +194,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         },(err:IGnomexErrorResponse) => {
             this.handleBackendLinkError(err.gError);
         });
-    };
+    }
 
     private makeIGVLink: (data: any) => void = (data: any) => {
         this.dataTrackService.makeIGVLink().subscribe((result: any) => {
@@ -208,7 +204,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         }, (err: IGnomexErrorResponse) => {
             this.handleBackendLinkError(err.gError);
         });
-    };
+    }
 
     private makeIOBIOLink: (data: any) => void = (data: any) => {
         let params: HttpParams = new HttpParams()
@@ -221,7 +217,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         },(err:IGnomexErrorResponse) =>{
             this.handleBackendLinkError(err.gError);
         });
-    };
+    }
 
     private makeGENELink: (data: any) => void = (data: any) => {
         let params: HttpParams = new HttpParams()
@@ -237,7 +233,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         },(err:IGnomexErrorResponse) => {
             this.handleBackendLinkError(err.gError);
         });
-    };
+    }
 
     private handleBackendLinkError(result: any): void {
         let message: string = "";
@@ -255,10 +251,10 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             startTabIndex: 0,
             isFDT: false
         };
-        config.height = "40em";
+        config.height = "40.3em";
         config.width = "70em";
         config.disableClose = true;
-        this.dialog.open(ManageFilesDialogComponent,config);
+        this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
     public handleFDTUploadCommandLine(): void {
@@ -273,10 +269,10 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             startTabIndex: 0,
             isFDT: true
         };
-        config.height = "40em";
-        config.width = "55em";
+        config.height = "40.3em";
+        config.width = "70em";
         config.disableClose = true;
-        this.dialog.open(ManageFilesDialogComponent,config);
+        this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
     public handleManageFiles(): void {
@@ -287,10 +283,11 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             startTabIndex: 1,
             isFDT: false
         };
-        config.height = "40em";
-        config.width = "55em";
+        config.height = "40.3em";
+        config.width = "70em";
         config.disableClose = true;
-        this.dialog.open(ManageFilesDialogComponent,config);
+        config.autoFocus = false;
+        this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
 
     }
 
@@ -306,7 +303,8 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             suggestedFilename: "gnomex-analysis",
         };
         config.disableClose = true;
-        this.dialog.open(DownloadFilesComponent, config);
+        config.autoFocus = false;
+        this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Select Files to Download", null, config);
     }
 
     ngOnDestroy() {

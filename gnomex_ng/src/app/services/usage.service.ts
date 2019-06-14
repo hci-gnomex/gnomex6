@@ -1,26 +1,25 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {HttpClient, HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class UsageService {
 
-    constructor(private http: Http) {
+    constructor(private httpClient: HttpClient) {
     }
 
-    public getUsageDataCall(params: URLSearchParams): Observable<Response> {
-        return this.http.get("/gnomex/GetUsageData.gx", {search: params});
+    public getUsageData(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetUsageData.gx", {params: params});
     }
 
-    public getUsageData(params: URLSearchParams): Observable<any[]> {
-        return this.getUsageDataCall(params).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                return [];
-            }
-        }));
+    public getUsageDetail(fieldName: string, startDate: string, idCoreFacility: string): Observable<any> {
+        let params = new HttpParams()
+            .set("chartName", "SummaryActivityByWeek")
+            .set("fieldName", fieldName)
+            .set("startDate", startDate)
+            .set("idCoreFacility", idCoreFacility ? idCoreFacility : "");
+
+        return this.httpClient.get("/gnomex/GetUsageDetail.gx", {params: params});
     }
 
 }

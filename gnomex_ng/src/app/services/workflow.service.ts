@@ -206,6 +206,10 @@ export class WorkflowService {
         return this.httpClient.get("/gnomex/GetFlowCell.gx", {params: params});
     }
 
+    public getFlowCellChannel(params: HttpParams){
+        return this.httpClient.get("/gnomex/GetFlowCellChannel.gx", {params:params});
+    }
+
 
 
     getWorkItemList(params: HttpParams):  Observable<any> {
