@@ -146,6 +146,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
 
     public onOpened(): void {
         this.onTouchedFn();
+        this.inputElement.nativeElement.select(); // Highlights text
         this.isLoading = true;
         setTimeout(() => {
             this.filterOptions(true);

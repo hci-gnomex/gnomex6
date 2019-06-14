@@ -1,6 +1,6 @@
 <h6 mat-dialog-title>{{title}}</h6>
 <mat-dialog-content>
-    <div>
+    <div class="flex-container-row align-center">
         <billing-period-selector (onChange)="this.onStartChange($event)" class="margin-right"></billing-period-selector>
         <label class="margin-right">through</label>
         <billing-period-selector (onChange)="this.onEndChange($event)"></billing-period-selector>

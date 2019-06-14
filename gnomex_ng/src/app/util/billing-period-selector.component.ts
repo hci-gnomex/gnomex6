@@ -7,7 +7,9 @@ import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 @Component({
     selector: 'billing-period-selector',
     template: `
-        <label>Billing Period: <button mat-button type="button" (click)="this.showPopup()">{{this.label}}</button></label>
+        <div class="full-height full-width flex-container-row align-center justify-center">
+            <label>Billing Period: <button mat-button type="button" (click)="this.showPopup()">{{this.label}}</button></label>
+        </div>
     `,
     styles: [`
     `]

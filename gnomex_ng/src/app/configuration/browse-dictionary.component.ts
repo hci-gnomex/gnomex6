@@ -73,12 +73,10 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
                                 <textarea matInput [placeholder]="field.caption" [formControlName]="field.dataField"
                                           matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
                             </mat-form-field>
-                            <mat-form-field *ngSwitchCase="'comboBox'" class="full-width">
-                                <mat-select [placeholder]="field.caption" [formControlName]="field.dataField">
-                                    <mat-option>None</mat-option>
-                                    <mat-option *ngFor="let opt of field.options" [value]="opt.value">{{opt.display}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box *ngSwitchCase="'comboBox'" class="full-width" [placeholder]="field.caption"
+                                              [options]="field.options" valueField="value" displayField="display"
+                                              [formControlName]="field.dataField">
+                            </custom-combo-box>
                             <mat-form-field *ngSwitchCase="'isActive'" class="full-width">
                                 <mat-select [placeholder]="field.caption" [formControlName]="field.dataField">
                                     <mat-option value="Y">Yes</mat-option>
