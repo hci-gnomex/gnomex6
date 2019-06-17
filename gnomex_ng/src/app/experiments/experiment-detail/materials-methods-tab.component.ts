@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, isDevMode, OnDestroy, OnInit} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 
@@ -9,6 +9,8 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {ProtocolService} from "../../services/protocol.service";
 import {ProtocolDialogComponent} from "./protocol-dialog.component";
 import {first} from "rxjs/operators";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -45,7 +47,6 @@ export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDe
     public designAndInsertLabel: string = "";
     public designAndInsertText: string = "";
     public codeIsolationPrepType: string = "";
-    public selectedProtocol: any;
     public protocols: any[] = [];
 
 
@@ -121,28 +122,22 @@ export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDe
     }
 
     showProtocol(protocol: any): void {
-        this.selectedProtocol = undefined;
 
         if (protocol.idProtocol && protocol.protocolClassName ) {
             this.protocolService.getProtocolByIdAndClass(protocol.idProtocol, protocol.protocolClassName);
-            this.protocolService.getProtocolObservable().pipe(first()).subscribe((result) => {
+            this.protocolService.getProtocolObservable().pipe(first()).subscribe((result: any) => {
                 if (result) {
-                    this.selectedProtocol = result;
+                    this.openProtocolDialog(result, protocol.name);
                 }
-            }, error => {
+            }, (error: IGnomexErrorResponse) => {
                 this.dialogService.alert("An exception occurred in GetProtocol:" + error.message, null);
-            }, () => {
-                if (this.selectedProtocol) {
-                    this.openProtocolDialog();
-                }
             });
         }
 
     }
 
-    openProtocolDialog(): void {
-        // Set and open MatDialog
-        if (this.selectedProtocol) {
+    private openProtocolDialog(protocol: any, protocolName: string): void {
+        if (protocol) {
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = "64em";
             configuration.height = "41em";
@@ -151,13 +146,13 @@ export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDe
             configuration.disableClose = true;
 
             configuration.data = {
-                protocol: this.selectedProtocol
+                protocol: protocol
             };
 
-            let protocolDialogRef = this.matDialog.open(ProtocolDialogComponent, configuration);
-            protocolDialogRef.afterClosed().subscribe(() => {
-                this.selectedProtocol = undefined;
-            });
+            this.dialogService.genericDialogContainer(ProtocolDialogComponent, protocolName, null, configuration,
+                {actions: [
+                        {type: ActionType.SECONDARY, name: "Close", internalAction: "close"}
+                    ]});
         }
     }
 

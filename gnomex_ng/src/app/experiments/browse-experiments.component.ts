@@ -35,11 +35,12 @@ import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {DictionaryService} from "../services/dictionary.service";
 import {PropertyService} from "../services/property.service";
 import {GnomexService} from "../services/gnomex.service";
-import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {filter} from "rxjs/operators";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -127,10 +128,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private labList: any[] = [];
     private selectedExperiment: any;
     private projectRequestListSubscription: Subscription;
-    private deleteProjectDialogRef: MatDialogRef<DeleteProjectComponent>;
-    private createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
     private reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
-    private deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
     private navInitSubscription: Subscription;
     private labListSubscription: Subscription;
     private navEndSubscription: Subscription;
@@ -209,7 +207,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private labListService: LabListService,
                 private propertyService: PropertyService,
                 private route: ActivatedRoute,
-                private router: Router) {
+                private router: Router,
+                private constantsService: ConstantsService) {
 
         this.items = [];
         this.dragEndItems = [];
@@ -225,38 +224,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             } else {
                 this.experimentCount = "0";
                 this.experimentCountMessage = "";
-            }
-            if (this.createProjectDialogRef && this.createProjectDialogRef.componentInstance) {
-                if(this.createProjectDialogRef.componentInstance.showSpinner === true) {
-                    this.createProjectDialogRef.componentInstance.showSpinner = false;
-                }
-                if(this.createProjectDialogRef.componentInstance.newProjectId) {
-                    this.setActiveNodeId = "p" + this.createProjectDialogRef.componentInstance.newProjectId;
-                }
-                this.createProjectDialogRef.close();
-                this.createProjectDialogRef = null;
-            }
-
-            if (this.deleteProjectDialogRef && this.deleteProjectDialogRef.componentInstance) {
-                if(this.deleteProjectDialogRef.componentInstance.showSpinner === true) {
-                    this.deleteProjectDialogRef.componentInstance.showSpinner = false;
-                }
-                if(this.parentProject) {
-                    this.setActiveNodeId = this.parentProject.data.id;
-                }
-                this.deleteProjectDialogRef.close();
-                this.deleteProjectDialogRef = null;
-            }
-
-            if (this.deleteExperimentDialogRef && this.deleteExperimentDialogRef.componentInstance) {
-                if(this.deleteExperimentDialogRef.componentInstance.showSpinner === true) {
-                    this.deleteExperimentDialogRef.componentInstance.showSpinner = false;
-                }
-                if(this.parentProject) {
-                    this.setActiveNodeId = this.parentProject.data.id;
-                }
-                this.deleteExperimentDialogRef.close();
-                this.deleteExperimentDialogRef = null;
             }
 
             if (this.reassignExperimentDialogRef) {
@@ -585,14 +552,25 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
 
             let configuration: MatDialogConfig = new MatDialogConfig();
-
+            configuration.width = "45em";
+            configuration.panelClass = "no-padding-dialog";
+            configuration.autoFocus = false;
+            configuration.disableClose = true;
             configuration.data = {
                 labList:            useThisLabList,
                 items:              this.items,
                 selectedLabItem:    selectedLab
             };
 
-            this.createProjectDialogRef = this.dialog.open(CreateProjectComponent, configuration);
+            this.dialogsService.genericDialogContainer(CreateProjectComponent, "New Project", this.constantsService.ICON_FOLDER_ADD, configuration,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.setActiveNodeId = "p" + result;
+                        }
+            });
         }
     }
 
@@ -606,16 +584,39 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             return;
         }
         let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "30em";
+        configuration.height = "15em";
+        configuration.disableClose = true;
         configuration.data = { selectedItem: this.selectedItem };
 
-        this.deleteProjectDialogRef = this.dialog.open(DeleteProjectComponent, configuration);
+        this.dialogsService.genericDialogContainer(DeleteProjectComponent, "Warning: Delete Project",
+            this.constantsService.ICON_EXCLAMATION, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "deleteProject"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+                    if(result && this.parentProject) {
+                        this.setActiveNodeId = this.parentProject.data.id;
+                    }
+        });
     }
 
     deleteExperimentClicked() {
         let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "30em";
+        configuration.height = "15em";
+        configuration.disableClose = true;
         configuration.data = { selectedExperiment: this.selectedExperiment };
 
-        this.deleteExperimentDialogRef = this.dialog.open(DeleteExperimentComponent, configuration);
+        this.dialogsService.genericDialogContainer(DeleteExperimentComponent, "Warning: Delete Experiment", this.constantsService.ICON_EXCLAMATION, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "deleteExperiment"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+                    if(result && this.parentProject) {
+                        this.setActiveNodeId = this.parentProject.data.id;
+                    }
+        });
     }
     /**
      * A node is selected in the tree.

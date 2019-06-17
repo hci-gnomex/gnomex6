@@ -93,12 +93,9 @@
             </as-split-area>
         </as-split>
     </div>
-    <div class="flex-container-row align-center generic-dialog-footer-colors">
-        <div class="flex-grow">
-            <save-footer (saveClicked)="requestSave()" [dirty]="formGroup.dirty"></save-footer>
-        </div>
-        <button mat-button color="primary" (click)="requestToCloseDialog()">Close</button>
-
+    <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+        <save-footer (saveClicked)="requestSave()" [dirty]="formGroup.dirty"></save-footer>
+        <save-footer [actionType]="actionType" (saveClicked)="requestToCloseDialog()" [name]="'Close'"></save-footer>
     </div>
 </div>
 

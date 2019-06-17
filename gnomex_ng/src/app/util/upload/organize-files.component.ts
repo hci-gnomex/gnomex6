@@ -1,13 +1,12 @@
-
 import {
-    Component,
-    OnInit,
-    ViewChild,
     AfterViewInit,
+    ChangeDetectorRef,
+    Component,
     EventEmitter,
-    Output,
     Input,
-    ChangeDetectorRef
+    OnInit,
+    Output,
+    ViewChild,
 } from "@angular/core";
 import {Subscription} from "rxjs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -15,18 +14,18 @@ import {DialogsService} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
 import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent} from "angular-tree-component";
-import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
-import { ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
 import {IFileParams} from "../interfaces/file-params.model";
+import {ActionType} from "../interfaces/generic-dialog-action.model";
 
-const actionMapping:IActionMapping = {
+const actionMapping: IActionMapping = {
     mouse: {
         click: (tree, node, $event) => {
             $event.ctrlKey
@@ -38,9 +37,8 @@ const actionMapping:IActionMapping = {
 
 @Component({
     selector: "organize-file",
-    templateUrl:"./organize-files.component.html",
+    templateUrl: "./organize-files.component.html",
     styles: [`
-
         .no-padding-dialog {
             padding: 0;
         }
@@ -51,7 +49,12 @@ const actionMapping:IActionMapping = {
         }
         .no-overflow  { overflow: hidden; }
 
-
+        .secondary-action {
+            background-color: white;
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
+        }
     `]
 })
 export class OrganizeFilesComponent implements OnInit, AfterViewInit{
@@ -72,7 +75,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     public showFileTrees: boolean =  false;
     public disableRemove:boolean = true;
     public disableRename:boolean = true;
-
+    public actionType: any = ActionType.SECONDARY ;
 
     @ViewChild('organizeTree')
     private organizeTree: TreeComponent;
@@ -93,8 +96,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 private fileService: FileService,
                 public constService:ConstantsService,
                 private changeDetector: ChangeDetectorRef,
-                private dialogService: DialogsService,
-                private dialog:MatDialog) {
+                private dialogService: DialogsService) {
     }
 
     ngOnInit(){
@@ -451,20 +453,19 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
     }
 
-    openRenameDialog(title:string,placeHolder:string,onClose,imgIcon?:string){
+    openRenameDialog(title: string, placeHolder: string, onClose, imgIcon?: string) {
         let config: MatDialogConfig = new MatDialogConfig();
         config.panelClass = 'no-padding-dialog';
         config.data = {
-            imgIcon: imgIcon ? imgIcon : '',
-            title: title,
             placeHolder: placeHolder
         };
-        config.minWidth='35em';
+        config.minWidth = "35em";
 
-        let dialogRef: MatDialogRef<NameFileDialogComponent>  = this.dialog.open(NameFileDialogComponent,config);
-        if(onClose){
-            dialogRef.afterClosed().subscribe(onClose);
-        }
+        this.dialogService.genericDialogContainer(NameFileDialogComponent, title, imgIcon ? imgIcon : null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "OK", internalAction: "applyChanges"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe(onClose);
 
     }
 
@@ -478,7 +479,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             }
 
             let title ="Rename " + this.organizeSelectedNode.data.displayName;
-            this.openRenameDialog(title,'To',this.renameCallBack);
+            this.openRenameDialog(title,'To', this.renameCallBack);
         }
 
     }
@@ -541,7 +542,6 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
 
     save(){
-
         let params:any = null;
         if(this.data.type === 'a'){
             params = this.makeParams( "idAnalysis",  this.data.id.idAnalysis);
@@ -550,18 +550,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         }
         this.formGroup.get("organizeFileParams").setValue(params);
         this.removedChildren.clear();
-
-
-
     }
-
-
-
-
 
     ngOnDestroy():void{
         this.manageFileSubscript.unsubscribe();
     }
-
-
 }

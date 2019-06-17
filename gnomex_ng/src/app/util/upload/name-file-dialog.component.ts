@@ -1,36 +1,18 @@
-
-
 import {Component, Inject, OnInit} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
+import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog";
 
 
 @Component({
-    template:`
+    template: `
         <div class="full-height full-width flex-container-col">
-            <div mat-dialog-title class="padded-outer">
-                <div class="dialog-header-colors padded-inner">
-                    <img [src]="imgIcon"> {{this.title}}
-                </div>
+            <div style="padding:0.5em;" class="full-height full-width flex-container-col">
+                <mat-form-field>
+                    <input matInput [placeholder]="placeHolder" [(ngModel)]="name">
+                </mat-form-field>
             </div>
-            <div mat-dialog-content class="full-height" style="margin: 0; padding: 0;">
-                <div style="padding:0.5em;" class="full-height full-width flex-container-col">
-                    <mat-form-field >
-                        <input matInput [placeholder]="placeHolder" [(ngModel)]="name">
-                    </mat-form-field>
-                </div>
-            </div>
-            <div class="padded-outer" mat-dialog-actions align="end">
-                <div class="padded-inner">
-                    <button mat-button color="primary" (click)="applyChanges()">
-                        <img class="icon" [src]="constService.ICON_SAVE" > OK
-                    </button>
-                    <button mat-button mat-dialog-close color="accent" > Cancel </button>
-                </div>
-            </div>
-            
         </div>
-
     `,
     styles: [`
 
@@ -55,19 +37,16 @@ import {ConstantsService} from "../../services/constants.service";
 
     `]
 })
-export class NameFileDialogComponent implements OnInit{
+export class NameFileDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
-    imgIcon: string ="";
-    title: string = "";
     placeHolder: string = "Folder Name";
     name: string;
 
     constructor(private dialogRef: MatDialogRef<NameFileDialogComponent>,
-                public constService:ConstantsService,
+                public constService: ConstantsService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (this.data) {
-            this.imgIcon = this.data.imgIcon;
-            this.title = this.data.title;
             this.placeHolder = this.data.placeHolder;
         }
     }
@@ -78,9 +57,7 @@ export class NameFileDialogComponent implements OnInit{
     applyChanges(){
         this.dialogRef.close(this.name);
     }
-    onCloseDialog(){
+    cancel(): void {
         this.dialogRef.close();
     }
-
-
 }
