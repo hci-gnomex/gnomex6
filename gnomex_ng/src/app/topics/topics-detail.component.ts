@@ -5,13 +5,7 @@ import {Subscription} from "rxjs";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {
-    MatAutocomplete,
-    MatDialog,
-    MatDialogConfig,
-    MatDialogRef,
-    MatSnackBar,
-} from "@angular/material";
+import {MatAutocomplete, MatDialog, MatDialogConfig, MatSnackBar} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
 import {URLSearchParams} from "@angular/http";
 import {PropertyService} from "../services/property.service";
@@ -23,6 +17,7 @@ import {first} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     templateUrl: "./topics-detail.component.html",
@@ -66,7 +61,6 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private topicListNodeSubscription: Subscription;
     private topicLab: any;
     public labList: any[] = [];
-    private emailImportDialogRef: MatDialogRef<BasicEmailDialogComponent>;
 
     public editorConfig: AngularEditorConfig;
     private labChangesSubscription: Subscription;
@@ -231,7 +225,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             return;
         }
 
-        let saveFn = (data: any) => {
+        let saveFn = (data: any): boolean => {
             data.format =  "text";
             data.idAppUser = idAppUser;
 
@@ -243,21 +237,12 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 .set("subject", data.subject);
 
             this.topicService.emailTopicOwner(params).pipe(first()).subscribe(resp => {
-                let email = <BasicEmailDialogComponent>this.emailImportDialogRef.componentInstance;
-                email.showSpinner = false;
-
-                if(resp && resp.result === "SUCCESS") {
-                    this.emailImportDialogRef.close();
-
-                    this.snackBar.open("Email was sent", "Email Topic Owner", {
-                        duration: 2000
-                    });
-                } else if(resp && resp.message) {
-                    this.dialogService.alert("Error sending email" + ": " + resp.message);
-                }
-            }, error => {
-                this.dialogService.alert(error);
+                this.dialogService.stopAllSpinnerDialogs();
+                return true;
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs();
             });
+            return false;
         };
 
         let configuration: MatDialogConfig = new MatDialogConfig();
@@ -268,12 +253,17 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         configuration.disableClose = true;
         configuration.data = {
             saveFn: saveFn,
-            title: "Email Topic Owner",
+            action: "Email Topic Owner",
             parentComponent: "Topics",
             subjectText: "",
         };
 
-        this.emailImportDialogRef = this.dialog.open(BasicEmailDialogComponent, configuration);
+        this.dialogService.genericDialogContainer(BasicEmailDialogComponent,
+            "Email Topic Owner", this.constService.EMAIL_GO_LINK, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.EMAIL_GO_LINK, name: "Send", internalAction: "send"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]});
     }
 
     ngOnDestroy() {
