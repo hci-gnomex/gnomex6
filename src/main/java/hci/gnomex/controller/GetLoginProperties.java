@@ -35,10 +35,17 @@ public class GetLoginProperties extends HttpServlet {
                 noGuestAccess = false;
             }
 
+            boolean noPublicAccess = true;
+            PropertyDictionary noPublicAccessProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.NO_PUBLIC_VISIBILITY + "'").uniqueResult();
+            if(noPublicAccessProp == null || !noPublicAccessProp.getPropertyValue().equals("Y")){
+                noPublicAccess = false;
+            }
+
             String jsonResult = Json.createObjectBuilder()
                     .add("result", "SUCCESS")
                     .add(PropertyDictionary.DISABLE_USER_SIGNUP, disableUserSignup)
                     .add(PropertyDictionary.NO_GUEST_ACCESS, noGuestAccess)
+                    .add(PropertyDictionary.NO_PUBLIC_VISIBILITY,noPublicAccess)
                     .build()
                     .toString();
 
