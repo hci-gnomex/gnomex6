@@ -41,9 +41,8 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                 </ag-grid-angular>
             </div>
         </div>
-        <div class="full-width justify-flex-end flex-grow no-margin no-padding generic-dialog-footer-colors">
-        <mat-dialog-actions>
-            <div class="major-left-right-margin">
+        <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+            <div class="double-padded-right">
                 <button mat-raised-button color="primary" class="primary-action" [disabled]="this.currentPedFileIndex <= 0" (click)="this.changePed(-1)"><img [src]="this.constantsService.ICON_ARROW_LEFT" class="icon">Previous</button>
                 <button mat-raised-button color="primary" class="primary-action" [disabled]="this.currentPedFileIndex >= (this.pedInfo.length - 1)" (click)="this.changePed(1)"><img [src]="this.constantsService.ICON_ARROW_RIGHT" class="icon">Next</button>
                 <button mat-raised-button color="primary" class="primary-action" [disabled]="this.selectedEntryNode === null" (click)="this.launch()"><img [src]="this.constantsService.ICON_IOBIO" class="icon">Launch</button>
@@ -51,7 +50,6 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                 <button mat-raised-button color="accent" class="secondary-action" mat-dialog-close>Cancel</button>
             </div>
         </mat-dialog-actions>
-        </div>
     `,
     styles:[`
         label.error-action {
@@ -77,11 +75,6 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
             font-weight: bolder;
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
-        }
-
-        .major-left-right-margin {
-            margin-left:  0.5em;
-            margin-right: 0.5em;
         }
     `]
 })

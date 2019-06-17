@@ -7,12 +7,13 @@ import {Subscription, throwError} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {PropertyService} from "../../services/property.service";
 import {ConstantsService} from "../../services/constants.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentsService} from "../experiments.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {UtilService} from "../../services/util.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -433,7 +434,6 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
                 private dictionaryService: DictionaryService,
                 private getLabService: GetLabService,
                 private labListService: LabListService,
-                private matDialog: MatDialog,
                 private experimentsService: ExperimentsService,
                 private propertyService: PropertyService,
                 public prefService: UserPreferencesService,
@@ -614,6 +614,8 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
         configuration.height = '33em';
         configuration.width  = '44em';
         configuration.panelClass = 'no-padding-dialog';
+        configuration.disableClose = true;
+        configuration.autoFocus = false;
 
         configuration.data = {
             currentCollaborators:  this._experiment.collaborators,
@@ -622,13 +624,16 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
             idFieldValue: this._experiment.idRequest
         };
 
-        let collaboratorsDialogReference = this.matDialog.open(CollaboratorsDialogComponent, configuration);
-
-        collaboratorsDialogReference.afterClosed().subscribe(result => {
-            if (result) {
+        this.dialogService.genericDialogContainer(CollaboratorsDialogComponent,
+            "Collaborators for Experiment " + this._experiment.number,
+            this.constantsService.ICON_GROUP, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Update", internalAction: "onClickUpdate"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+            if(result) {
                 this._experiment.collaborators = result;
             }
-
             this.updateCollaboratorsDisplay();
         });
     }

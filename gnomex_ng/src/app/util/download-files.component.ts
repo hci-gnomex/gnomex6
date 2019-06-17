@@ -54,12 +54,14 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
                         )</label>
                 </div>
             </div>
-            <mat-dialog-actions class="justify-flex-end no-margin-force generic-dialog-footer-colors">
-                <button mat-button [disabled]="this.filesToDownloadCount < 1" (click)="this.download()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download</button>
-                <button mat-button [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDTCommandLine()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Command Line</button>
-                <button mat-button [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDT()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Download</button>
-                <button mat-button *ngIf="this.showCreateSoftLinks" [disabled]="this.filesToDownloadCount < 1" (click)="this.createSoftLinks()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Create Soft Links</button>
-                <button mat-button mat-dialog-close>Cancel</button>
+            <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+                <div class="double-padded-right">
+                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1" (click)="this.download()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download</button>
+                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDTCommandLine()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Command Line</button>
+                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDT()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Download</button>
+                    <button mat-raised-button color="primary" class="primary-action" *ngIf="this.showCreateSoftLinks" [disabled]="this.filesToDownloadCount < 1" (click)="this.createSoftLinks()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Create Soft Links</button>
+                    <button mat-raised-button color="accent" class="secondary-action" mat-dialog-close>Cancel</button>
+                </div>
             </mat-dialog-actions>
         </div>
     `,
@@ -70,11 +72,22 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
             border: solid lightgrey 1px;
             padding: 0.3em;
         }
-        .no-padding-force {
-            padding: 0 !important;
+        .no-margin {
+            margin: 0;
         }
-        .no-margin-force {
-            margin: 0 !important;
+        .no-padding {
+            padding: 0;
+        }
+        .primary-action {
+            background-color: var(--bluewarmvivid-medlight);
+            font-weight: bolder;
+            color: white;
+        }
+        .secondary-action {
+            background-color: white;
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
         }
     `]
 })

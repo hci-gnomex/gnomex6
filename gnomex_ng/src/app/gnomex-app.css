@@ -287,6 +287,10 @@ img.icon {
     margin: 0;
 }
 
+.no-padding {
+    padding: 0;
+}
+
 .small-font {
     font-size: small;
 }
@@ -341,8 +345,16 @@ img.icon {
     padding: 0.6em;
 }
 
+.double-padded-left-right {
+    padding: 0.3em 0.6em 0.3em 0.6em;
+}
+
 .double-left-padded {
     padding-left: 0.6em;
+}
+
+.double-padded-right {
+    padding-right: 0.6em;
 }
 
 .warningLabelMinor {
