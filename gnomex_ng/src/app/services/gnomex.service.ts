@@ -1021,5 +1021,9 @@ export class GnomexService {
             }
         });
     }
+    public getLoginPropertiesObservable(): Observable<any> {
+        return this.http.get("/gnomex/GetLoginProperties.gx");
+    }
+
 
 }
