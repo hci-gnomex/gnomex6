@@ -770,6 +770,19 @@ export class Experiment {
         return keep;
     }
 
+
+    public replaceAllSequenceLanes(): void {
+        let result: any[] = [];
+
+        for (let sample of this.samples) {
+            for (let sequenceLane of sample.createAllSequenceLanes()) {
+                result.push(sequenceLane);
+            }
+        }
+
+        this.sequenceLanes = result;
+    }
+
     // private getSelectedPropertyEntries
     public getSelectedSampleAnnotations(): any[] {
         return this.PropertyEntries.filter((value: any) => {

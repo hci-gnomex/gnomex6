@@ -84,7 +84,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex-grow padded heavily-left-padded">
+            <div *ngIf="showGenerateQuote" class="flex-grow padded heavily-left-padded">
                 <button mat-raised-button (click)="onClickPriceQuote($event)">
                     <img class="padded" [alt]="" [src]="constantService.ICON_MONEY">
                     <span>

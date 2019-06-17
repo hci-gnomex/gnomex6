@@ -586,7 +586,6 @@ public class SequenceLane extends HibernateDetailObject {
       }
     }
     return laneCount;
-
   }
   public static SortedMap getMultiplexLaneMap(Collection sequenceLanes, Date requestCreateDate) {
     TreeMap laneMap = new TreeMap();
@@ -642,13 +641,12 @@ public class SequenceLane extends HibernateDetailObject {
           if (laneList == null) {
             laneList = lanesInGroup;
             multiplexLaneMap.put(key, laneList);
-          } 
+          }
+
           for (Iterator i2 = lanesInGroup.iterator(); i2.hasNext();) {
             SequenceLane l = (SequenceLane)i2.next();
             laneList.add(l);
           }
-
-
         } else {
           String multiplexLaneID = "";
           // Call the grouping by the flow cell channel
@@ -658,13 +656,13 @@ public class SequenceLane extends HibernateDetailObject {
             // Or if not in a flow cell channel, just give it an ordinal designation
             multiplexLaneID = Integer.valueOf(idx++).toString();
           }
-          multiplexLaneMap.put(multiplexLaneID, lanesInGroup);
 
+          multiplexLaneMap.put(multiplexLaneID, lanesInGroup);
         }
       }
     }
-    return multiplexLaneMap;
 
+    return multiplexLaneMap;
   }
 
   /*
@@ -722,6 +720,10 @@ public class SequenceLane extends HibernateDetailObject {
       }
 
       seqTagMap.get(tag).add(theLane);
+    }
+
+    for (List lanes : seqTagMap.values()) {
+      lanes.sort(new SequenceLaneNumberComparator());
     }
 
     int maxTagCount = 0;

@@ -153,45 +153,47 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
 
                     int fakeIdSequenceLanes = 1;
                     int maxIdSequenceLanes = 1;
-                    int sequenceLaneNameCounter = 1;
 
                     ArrayList<Integer> sortedMultiplexGroupNumbers = new ArrayList<>(multiplexGroupMap.keySet());
                     sortedMultiplexGroupNumbers.sort(Integer::compareTo);
 
-                    fakeIdSequenceLanes = 1;
-
-                    HashMap<Integer, ArrayList<Sample>> flowCellLaneMap = new HashMap<>();
+                    int previousIdSample = -1;
+                    int number = 0;
 
                     for (Integer multiplexGroupNumber : sortedMultiplexGroupNumbers) {
                         multiplexGroupMap.get(multiplexGroupNumber).sort(RequestParser.SequenceLaneInfo::compareTo);
-                        sequenceLaneNameCounter = 1;
 
                         for (RequestParser.SequenceLaneInfo sequenceLaneInfo : multiplexGroupMap.get(multiplexGroupNumber)) {
-                            if (sequenceLaneInfo.getSample() != null
-                                && sequenceLaneInfo.getSample().getNumberSequencingLanes() != null) {
+                            if (sequenceLaneInfo.getSample() != null && sequenceLaneInfo.getSample().getIdSample() != null) {
 
-                                for (int i = 0; i < sequenceLaneInfo.getSample().getNumberSequencingLanes(); i++) {
-                                    SequenceLane lane = new SequenceLane();
-
-                                    sequenceLaneInfo.setIdSampleString(sequenceLaneInfo.getSample().getIdSampleString());
-
-                                    lane.setSample(sequenceLaneInfo.getSample());
-                                    lane.setIdSample(sequenceLaneInfo.getSample().getIdSample());
-                                    lane.getSample().setNumber("#####X" + sequenceLaneInfo.getSample().getIdSample());
-                                    lane.setCreateDate(new java.util.Date(System.currentTimeMillis()));
-
-                                    lane.setIdSequenceLane(fakeIdSequenceLanes + i);
-                                    lane.setNumber("#####F" + sequenceLaneInfo.getSample().getIdSample() + "_" + (i + 1));
-
-                                    spoofedSequenceLanes.add(lane);
-
-                                    maxIdSequenceLanes = Math.max(maxIdSequenceLanes, fakeIdSequenceLanes + i);
-                                    sequenceLaneNameCounter++;
+                                if (sequenceLaneInfo.getSample().getIdSample() != previousIdSample) {
+                                    number = 1;
+                                    previousIdSample = sequenceLaneInfo.getSample().getIdSample();
                                 }
+
+                                SequenceLane lane = new SequenceLane();
+
+                                sequenceLaneInfo.setIdSampleString(sequenceLaneInfo.getSample().getIdSampleString());
+
+                                lane.setSample(sequenceLaneInfo.getSample());
+                                lane.setIdSample(sequenceLaneInfo.getSample().getIdSample());
+                                lane.getSample().setNumber("#####X" + sequenceLaneInfo.getSample().getIdSample());
+                                lane.setCreateDate(new java.util.Date(System.currentTimeMillis()));
+
+                                lane.setIdSequenceLane(fakeIdSequenceLanes + number - 1);
+                                lane.setNumber("#####F" + sequenceLaneInfo.getSample().getIdSample() + "_" + number);
+
+                                lane.setIdSeqRunType(sequenceLaneInfo.getIdSeqRunType());
+                                lane.setIdNumberSequencingCycles(sequenceLaneInfo.getIdNumberSequencingCycles());
+
+                                spoofedSequenceLanes.add(lane);
+
+                                maxIdSequenceLanes = Math.max(maxIdSequenceLanes, fakeIdSequenceLanes + number);
+                                number++;
                             }
                         }
 
-                        fakeIdSequenceLanes = maxIdSequenceLanes + 1;
+                        fakeIdSequenceLanes = maxIdSequenceLanes;
                     }
 
                     request.setSequenceLanes(spoofedSequenceLanes);

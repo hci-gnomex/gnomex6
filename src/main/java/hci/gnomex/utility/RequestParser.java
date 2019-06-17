@@ -2867,15 +2867,9 @@ public class RequestParser implements Serializable {
       } else if (anotherSequenceLaneInfo.getSample() == null) {
         return -1;
       } else {
-        if (this.getSample().getNumber() == null && anotherSequenceLaneInfo.getSample().getNumber() == null) {
-          return 0;
-        } else if (this.getSample().getNumber() == null) {
-          return 1;
-        } else if (anotherSequenceLaneInfo.getSample().getNumber() == null) {
-          return -1;
-        } else {
-          return this.getSample().getNumber().compareTo(anotherSequenceLaneInfo.getSample().getNumber());
-        }
+        SampleComparator sc = new SampleComparator();
+
+        return sc.compare(this.getSample(), anotherSequenceLaneInfo.getSample());
       }
     }
   }

@@ -22,6 +22,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 import {GridApi} from "ag-grid-community";
 import {NewExternalExperimentService} from "../../services/new-external-experiment.service";
 import {ConstantsService} from "../../services/constants.service";
+import {PropertyService} from "../../services/property.service";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -81,6 +82,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         if (value.RequestProperties && !this._experimentAnnotations) {
             this._experimentAnnotations = value.RequestProperties;
         }
+
+        this.recalculateShowGenerateQuote();
     }
 
     private _isAmendState: boolean = false;
@@ -112,6 +115,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 && requestCategory.isIlluminaType === 'Y'
                 && this.experiment
                 && this.experiment.isExternal !== 'Y';
+
+            this.recalculateShowGenerateQuote();
         });
     }
 
@@ -121,6 +126,12 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     public get experiment(): Experiment {
         return this._experiment;
     }
+
+    public get showGenerateQuote(): boolean {
+        return this._showGenerateQuote;
+    }
+
+    private _showGenerateQuote: boolean = false;
 
     private _experiment: Experiment;
     public  _experimentAnnotations: any[];
@@ -206,6 +217,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 private gnomexService: GnomexService,
                 private billingService: BillingService,
                 private fb: FormBuilder,
+                private propertyService: PropertyService,
                 public constantService: ConstantsService,
                 public prefService: UserPreferencesService) {
 
@@ -643,6 +655,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     public tabDisplayed(): void {
         if (this.isAmendState) {
             this.prepareAmendSequenceLanes();
+        } else if (!this._experiment.sequenceLanes || this._experiment.sequenceLanes.length === 0) {
+            this._experiment.replaceAllSequenceLanes();
         }
 
         if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
@@ -789,26 +803,27 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 }
 
                 let sequenceLanes = [];
+                let sampleNumber: number = 0;
 
                 for (let sample of this._experiment.samples) {
+                    sample.sampleId = "X" + ++sampleNumber;
                     sequenceLanes.push(sample.getJSONObjectRepresentation());
                 }
 
-                let sampleNumber: number = 0;
-
-                for (let multiplexLane of multiplexLanes) {
-                    let multiplexNumber = multiplexLane.number;
-
-                    if (multiplexLane.SequenceLane) {
-                        if (Array.isArray(multiplexLane.SequenceLane)) {
-                            for (let lane of multiplexLane.SequenceLane) {
-                                sequenceLanes[sampleNumber].sampleId = 'X' + ++sampleNumber;
-                            }
-                        } else {
-                            sequenceLanes[sampleNumber].sampleId        = 'X' + ++sampleNumber;
-                        }
-                    }
-                }
+                // for (let multiplexLane of multiplexLanes) {
+                //     let sampleNumber: number = 0;
+                //     let multiplexNumber = multiplexLane.number;
+                //
+                //     if (multiplexLane.SequenceLane) {
+                //         if (Array.isArray(multiplexLane.SequenceLane)) {
+                //             for (let lane of multiplexLane.SequenceLane) {
+                //                 sequenceLanes[sampleNumber].sampleId = 'X' + ++sampleNumber;
+                //             }
+                //         } else {
+                //             sequenceLanes[sampleNumber].sampleId        = 'X' + ++sampleNumber;
+                //         }
+                //     }
+                // }
 
                 this.sequenceLanes = sequenceLanes;
                 this.gridApi.setRowData(this.sequenceLanes);
@@ -865,39 +880,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     public onClickPriceQuote(event?: any) {
-        console.log("Hello world");
-
         this.experimentService.showPriceQuote(this._experiment);
-
-        // let mapForm = document.createElement("form");
-        // mapForm.target = "Map";
-        // mapForm.method = "GET"; // or "post" if appropriate
-        // mapForm.action = "/gnomex/ShowRequestForm.gx";
-        // mapForm.name = "_blank";
-        //
-        // // let mapInput = document.createElement("input");
-        // // mapInput.type = "text";
-        // // mapInput.name = "requestJSONString";
-        // // mapInput.value = "" + JSON.stringify(this._experiment.getJSONObjectRepresentation());
-        // // mapForm.appendChild(mapInput);
-        //
-        // let mapInput = document.createElement("input");
-        // mapInput.type = "text";
-        // mapInput.name = "idRequest";
-        // mapInput.value = "40600";
-        // mapForm.appendChild(mapInput);
-        //
-        // document.body.appendChild(mapForm);
-        //
-        // let map = window.open("", "Map");
-        //
-        // if (map) {
-        //     mapForm.submit();
-        // } else {
-        //     alert('You must allow popups for this map to work.');
-        // }
-
-        //window.open('ShowRequestForm.gx?idRequest=' + response.idRequest, '_blank');
     }
 
     public onGridReady(params: any): void {
@@ -931,11 +914,19 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 if (sample.numberSequencingLanes) {
                     let additionalSequencingNumber: number = parseInt(sample.numberSequencingLanes);
                     for (let i = 0; i < additionalSequencingNumber; i++) {
-                        this.experiment.sequenceLanes.push(NewExternalExperimentService.createSequenceLane(sample));
+                        this.experiment.sequenceLanes.push(sample.createSequenceLane());
                     }
                 }
             }
         }
     }
 
+    private recalculateShowGenerateQuote(): void {
+        if (this._experiment && this._experiment.idCoreFacility && this._experiment.codeRequestCategory) {
+            let temp = this.propertyService.getProperty(PropertyService.PROPERTY_ALLOW_PRICE_QUOTE, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
+            this._showGenerateQuote = temp && temp.propertyValue && temp.propertyValue === 'Y';
+        } else {
+            this._showGenerateQuote = false;
+        }
+    }
 }

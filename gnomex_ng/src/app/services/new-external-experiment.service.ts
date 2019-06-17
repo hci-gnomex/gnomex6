@@ -44,18 +44,18 @@ export class NewExternalExperimentService {
         this.form.setControl(tabLabel, form);
     }
 
-    public static createSequenceLane(sample: any): any {
-        return {
-            idSequenceLane: "SequenceLane",
-            notes: sample.notes ? sample.notes : "",
-            idSeqRunType: sample.idSeqRunType ? sample.idSeqRunType : "",
-            idNumberSequencingCycles: sample.idNumberSequencingCycles ? sample.idNumberSequencingCycles : "",
-            idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed ? sample.idNumberSequencingCyclesAllowed : "",
-            idSample: sample.idSample ? sample.idSample : "",
-            idGenomeBuildAlignTo: sample.idGenomeBuildAlignTo ? sample.idGenomeBuildAlignTo : "",
-            idOrganism: sample.idOrganism ? sample.idOrganism : "",
-            organism: sample.organism ? sample.organism : "",
-        };
-    }
+    // public static createSequenceLane(sample: any): any {
+    //     return {
+    //         idSequenceLane:                  "SequenceLane",
+    //         notes:                           sample.notes                           ? sample.notes                           : "",
+    //         idSeqRunType:                    sample.idSeqRunType                    ? sample.idSeqRunType                    : "",
+    //         idNumberSequencingCycles:        sample.idNumberSequencingCycles        ? sample.idNumberSequencingCycles        : "",
+    //         idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed ? sample.idNumberSequencingCyclesAllowed : "",
+    //         idSample:                        sample.idSample                        ? sample.idSample                        : "",
+    //         idGenomeBuildAlignTo:            sample.idGenomeBuildAlignTo            ? sample.idGenomeBuildAlignTo            : "",
+    //         idOrganism:                      sample.idOrganism                      ? sample.idOrganism                      : "",
+    //         organism:                        sample.organism                        ? sample.organism                        : "",
+    //     };
+    // }
 
 }
