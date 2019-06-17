@@ -386,7 +386,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
                 if (temp.length === 1) {
                 	this.selectedLab = temp[0];
 
-                	this.onLabListSelection({ value: temp[0] });
+                	this.onLabListSelection( temp[0] );
 				}
 
 				this.dialogService.stopAllSpinnerDialogs();
@@ -1171,8 +1171,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	private onLabListSelection(event: any): void {
 		let coreFacilityApplicable: any[] = [];
 
-		if (event && event.value && event.value.coreFacilities) {
-			let coreFacilities = event.value.coreFacilities;
+		if (event && event.coreFacilities) {
+			let coreFacilities = event.coreFacilities;
 
 			if (coreFacilities != undefined && coreFacilities != null) {
 				if (coreFacilities[0] != undefined && coreFacilities[0] != null) {

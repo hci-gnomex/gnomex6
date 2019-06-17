@@ -7,7 +7,7 @@ import {
     Input,
     OnChanges,
     OnDestroy,
-    Output,
+    Output, SimpleChange,
     SimpleChanges,
     ViewChild
 } from "@angular/core";
@@ -19,7 +19,7 @@ import {debounceTime} from "rxjs/operators";
 @Component({
     selector: "custom-combo-box",
     template: `
-        <mat-form-field class="full-width full-height">
+        <mat-form-field class="full-width full-height" [matTooltip]="this.tooltip">
             <input #input matInput class="full-width full-height" [placeholder]="this.placeholder"
                    [matAutocomplete]="auto" [formControl]="this.innerControl">
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="this.selectOption($event.option.value)"
@@ -42,6 +42,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     @ViewChild("input") inputElement: ElementRef;
 
     @Input() public placeholder: string = "";
+    @Input() public tooltip: string = "";
     @Input() public allowNone: boolean = true;
     public forceShowNone: boolean = false;
 
@@ -87,6 +88,13 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        if (changes.options) {
+            let optionsChange: SimpleChange = changes.options;
+            if (!optionsChange.currentValue) {
+                this.options = [];
+            }
+        }
+
         this.loadOnlyCurrentValue();
     }
 

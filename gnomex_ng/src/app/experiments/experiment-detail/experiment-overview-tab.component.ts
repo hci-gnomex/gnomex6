@@ -635,9 +635,9 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 
     public onChange_lab(event: any): void {
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.filteredLabDictionary.filter((a) => {
-                return a.idLab === event.value;
+                return a.idLab === event;
             });
 
             this._experiment.labName          = temp && temp.length === 1 ? temp[0].display : '';
@@ -650,9 +650,9 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
     }
 
     public onChange_application(event: any): void {
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.filteredApplicationDictionary.filter((a) => {
-                return a.codeApplication === event.value;
+                return a.codeApplication === event;
             });
 
             this._experiment.application.Application = temp && temp.length === 1 ? temp[0] : null;
@@ -660,9 +660,9 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
     }
 
     public onChange_project(event: any): void {
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.projectsDictionary.filter((a) => {
-                return a.idProject === event.value;
+                return a.idProject === event;
             });
 
             this._experiment.project.Project = temp && temp.length === 1 ? temp[0] : null;
@@ -674,12 +674,12 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
             return;
         }
 
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.possibleOwnersForLabDictionary.filter((a) => {
-                return a.idAppUser === event.value;
+                return a.idAppUser === event;
             });
 
-            this._experiment.ownerName = temp && temp.length === 1 ? temp[0].firstLastDisplayName : '';
+            this._experiment.ownerName = temp && temp.length === 1 ? temp[0][this.prefService.userDisplayField] : '';
         }
     }
 
@@ -688,9 +688,9 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
             return;
         }
 
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.possibleSubmittersForLabDictionary.filter((a) => {
-                return a.idAppUser === event.value;
+                return a.idAppUser === event;
             });
 
             this._experiment.submitterName = temp && temp.length === 1 ? temp[0].firstLastDisplayName : '';

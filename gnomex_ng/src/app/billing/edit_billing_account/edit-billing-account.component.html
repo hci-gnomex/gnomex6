@@ -11,14 +11,10 @@
 						Lab
 					</div>
 					<div class="td">
-						<mat-form-field class="full-width font-small">
-							<mat-select placeholder="Select a lab..." [(value)]="selectedLab" disabled>
-								<mat-option>--</mat-option>
-								<mat-option *ngFor="let lab of labList" [value]="lab">
-									{{ lab[this.prefService.labDisplayField] }}
-								</mat-option>
-							</mat-select>
-						</mat-form-field>
+						<custom-combo-box class="full-width font-small" placeholder="Select a lab..."
+										  [displayField]="this.prefService.labDisplayField" [options]="labList"
+										  [(ngModel)]="selectedLab" disabled>
+						</custom-combo-box>
 					</div>
 				</div>
 				<div class="tr full-width">
@@ -415,14 +411,10 @@
 						Funding Agency
 					</div>
 					<div class="td">
-						<mat-form-field class="long-input font-small">
-							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_chartfield" required="{{ requireFundingAgency }}">
-								<mat-option>--</mat-option>
-								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
-									{{ fundingAgency.display }}
-								</mat-option>
-							</mat-select>
-						</mat-form-field>
+						<custom-combo-box class="long-input font-small" placeholder="Funding Agency" displayField="display"
+										  [options]="fundingAgencies" valueField="value"
+										  [(ngModel)]="selectedFundingAgency_chartfield" required="{{ requireFundingAgency }}">
+						</custom-combo-box>
 					</div>
 				</div>
 				<div class="tr full-width row-spacer">
@@ -506,14 +498,10 @@
 						Funding Agency
 					</div>
 					<div class="td">
-						<mat-form-field class="long-input font-small">
-							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_po" required="{{ requireFundingAgency }}">
-								<mat-option>--</mat-option>
-								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
-									{{ fundingAgency.display }}
-								</mat-option>
-							</mat-select>
-						</mat-form-field>
+						<custom-combo-box class="long-input font-small" placeholder="Funding Agency" displayField="display"
+										  [options]="fundingAgencies" valueField="value"
+										  [(ngModel)]="selectedFundingAgency_po" required="{{ requireFundingAgency }}">
+						</custom-combo-box>
 					</div>
 				</div>
 				<div class="tr full-width">
@@ -567,14 +555,10 @@
 						Funding Agency
 					</div>
 					<div class="td">
-						<mat-form-field class="long-input font-small">
-							<mat-select placeholder="Funding Agency" [(value)]="selectedFundingAgency_creditCard" required="{{ requireFundingAgency }}">
-								<mat-option>--</mat-option>
-								<mat-option *ngFor="let fundingAgency of fundingAgencies" [value]="fundingAgency.value">
-									{{ fundingAgency.display }}
-								</mat-option>
-							</mat-select>
-						</mat-form-field>
+						<custom-combo-box class="long-input font-small" placeholder="Funding Agency" displayField="display"
+										  [options]="fundingAgencies" valueField="value"
+										  [(ngModel)]="selectedFundingAgency_creditCard" required="{{ requireFundingAgency }}">
+						</custom-combo-box>
 					</div>
 				</div>
 				<div class="tr full-width">
@@ -627,14 +611,10 @@
 						Credit Card Company
 					</div>
 					<div class="td">
-						<mat-form-field class="medium-input">
-							<mat-select placeholder="Credit Card Company" [(value)]="selectedCreditCardCompany" required>
-								<mat-option>--</mat-option>
-								<mat-option *ngFor="let company of creditCardCompanies" [value]="company.value">
-									{{ company.display }}
-								</mat-option>
-							</mat-select>
-						</mat-form-field>
+						<custom-combo-box class="medium-input" placeholder="Credit Card Company" displayField="display"
+										  [options]="creditCardCompanies" valueField="value"
+										  [(ngModel)]="selectedCreditCardCompany" required>
+						</custom-combo-box>
 					</div>
 				</div>
 			</div>

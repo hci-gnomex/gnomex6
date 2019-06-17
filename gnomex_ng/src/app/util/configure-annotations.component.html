@@ -21,24 +21,18 @@
         </div>
         <div class="embeddedRow" >
             <label class="leadingLabel">Applies To Specific</label>
-            <mat-form-field class="embeddedField">
-                <mat-select placeholder="Organism" [(ngModel)]="idOrganism" (selectionChange)="this.onCriteriaChange()">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let organism of listOrganism" [value]="organism.display">{{organism.display}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field class="embeddedField">
-                <mat-select placeholder="Experiment Platform" [(ngModel)]="codeRequestCategory" (selectionChange)="this.onCriteriaChange()">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let plat of listExperimentPlatform" [value]="plat.display">{{plat.display}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field class="embeddedField">
-                <mat-select placeholder="Analysis Type" [(ngModel)]="idAnalysisType" (selectionChange)="this.onCriteriaChange()">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let analysisType of listAnalysisType" [value]="analysisType.display">{{analysisType.display}}</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <custom-combo-box class="embeddedField" placeholder="Organism" displayField="display"
+                              [options]="listOrganism" valueField="display"
+                              [(ngModel)]="idOrganism" (optionSelected)="this.onCriteriaChange()">
+            </custom-combo-box>
+            <custom-combo-box class="embeddedField" placeholder="Experiment Platform" displayField="display"
+                              [options]="listExperimentPlatform" valueField="display"
+                              [(ngModel)]="codeRequestCategory" (optionSelected)="this.onCriteriaChange()">
+            </custom-combo-box>
+            <custom-combo-box class="embeddedField" placeholder="Analysis Type" displayField="display"
+                              [options]="listAnalysisType" valueField="display"
+                              [(ngModel)]="idAnalysisType" (optionSelected)="this.onCriteriaChange()">
+            </custom-combo-box>
         </div>
     </div>
     <div class="gridAndDetailRow">
@@ -63,12 +57,10 @@
                         <mat-checkbox [formControl]="this.activeFC">Active</mat-checkbox>
                     </div>
                     <div class="tabRow" *ngIf="!experimentPlatformMode">
-                        <mat-form-field class="propFormField">
-                            <mat-select [compareWith]="compareCorefn" placeholder="Core Facility" [formControl]="this.coreFacilityFC">
-                                <mat-option *ngFor="let core of myCoreFacilities" [value]="core.idCoreFacility">{{core.display}}</mat-option>
-                            </mat-select>
-                            <mat-error *ngIf="this.coreFacilityFC.hasError('required')">Required</mat-error>
-                        </mat-form-field>
+                        <custom-combo-box class="propFormField" placeholder="Core Facility" displayField="display"
+                                          [options]="myCoreFacilities" valueField="idCoreFacility"
+                                          [formControl]="this.coreFacilityFC">
+                        </custom-combo-box>
                     </div>
                     <div class="tabRow" *ngIf="!experimentPlatformMode">
                         <label style="margin-right: 4%;">Annotates</label>
@@ -133,18 +125,16 @@
                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode || this.listFilteredApplication.length > 0">
                         <label>Only show for these platforms/experiment types</label>
                         <div style="display: flex; flex-direction: row;">
-                            <mat-form-field class="appliesToField" *ngIf="!experimentPlatformMode">
-                                <mat-select  placeholder="Platform" [formControl]="this.appliesToPlatform">
-                                    <mat-option>None</mat-option>
-                                    <mat-option *ngFor="let plat of this.listFilteredExperimentPlatform" [value]="plat">{{plat.display}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field class="appliesToField">
-                                <mat-select placeholder="Experiment Type (optional)" [(ngModel)]="this.appliesToApp">
-                                    <mat-option>None</mat-option>
-                                    <mat-option *ngFor="let app of this.listFilteredApplication" [value]="app">{{app.application}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box class="appliesToField" *ngIf="!experimentPlatformMode"
+                                              placeholder="Platform" displayField="display"
+                                              [options]="this.listFilteredExperimentPlatform"
+                                              [formControl]="this.appliesToPlatform">
+                            </custom-combo-box>
+                            <custom-combo-box class="appliesToField"
+                                              placeholder="Experiment Type (optional)" displayField="application"
+                                              [options]="this.listFilteredApplication"
+                                              [(ngModel)]="this.appliesToApp">
+                            </custom-combo-box>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || !this.appliesToPlatform.value" (click)="this.addPlatform()"><img class="icon" src="../../assets/add.png"></button>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedPlatformIndex == null" (click)="this.deletePlatform()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
@@ -162,12 +152,11 @@
                     <div class="appliesToGroup">
                         <label>Only show for these organisms</label>
                         <div style="display: flex; flex-direction: row;">
-                            <mat-form-field class="appliesToField">
-                                <mat-select placeholder="Organism" [(ngModel)]="this.appliesToOrganism">
-                                    <mat-option>None</mat-option>
-                                    <mat-option *ngFor="let org of this.listOrganism" [value]="org">{{org.display}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box class="appliesToField"
+                                              placeholder="Organism" displayField="display"
+                                              [options]="this.listOrganism"
+                                              [(ngModel)]="this.appliesToOrganism">
+                            </custom-combo-box>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToOrganism == null" (click)="this.addOrganism()"><img class="icon" src="../../assets/add.png"></button>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOrganismIndex == null" (click)="this.deleteOrganism()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
@@ -185,12 +174,11 @@
                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode">
                         <label>Only show for these analysis types</label>
                         <div style="display: flex; flex-direction: row;">
-                            <mat-form-field class="appliesToField">
-                                <mat-select placeholder="Analysis Type" [(ngModel)]="this.appliesToAnalysisType">
-                                    <mat-option>None</mat-option>
-                                    <mat-option *ngFor="let an of this.listAnalysisType" [value]="an">{{an.display}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box class="appliesToField"
+                                              placeholder="Analysis Type" displayField="display"
+                                              [options]="this.listAnalysisType"
+                                              [(ngModel)]="this.appliesToAnalysisType">
+                            </custom-combo-box>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToAnalysisType == null" (click)="this.addAnalysisType()"><img class="icon" src="../../assets/add.png"></button>
                             <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedAnalysisTypeIndex == null" (click)="this.deleteAnalysisType()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
