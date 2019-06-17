@@ -9,11 +9,11 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {DataTrackService} from "../../services/data-track.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 @Component({
     template: `
-        <h6 mat-dialog-title>Manage Ped File -- {{this.pedFilename}}</h6>
-        <mat-dialog-content>
+        <div class="full-width flex-container-col double-padded-left-right">
             <div *ngIf="this.showErrorAction">
                 <label class="error-action">{{this.errorMessage}}</label>
             </div>
@@ -40,13 +40,15 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
                                  [enableColResize]="true">
                 </ag-grid-angular>
             </div>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button [disabled]="this.currentPedFileIndex <= 0" (click)="this.changePed(-1)"><img [src]="this.constantsService.ICON_ARROW_LEFT" class="icon">Previous</button>
-            <button mat-button [disabled]="this.currentPedFileIndex >= (this.pedInfo.length - 1)" (click)="this.changePed(1)"><img [src]="this.constantsService.ICON_ARROW_RIGHT" class="icon">Next</button>
-            <button mat-button [disabled]="this.selectedEntryNode === null" (click)="this.launch()"><img [src]="this.constantsService.ICON_IOBIO" class="icon">Launch</button>
-            <button mat-button [disabled]="!this.showSaveAction" (click)="this.save()"><img [src]="this.constantsService.ICON_IOBIO" class="icon">Save</button>
-            <button mat-button mat-dialog-close>Cancel</button>
+        </div>
+        <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+            <div class="double-padded-right">
+                <button mat-raised-button color="primary" class="primary-action" [disabled]="this.currentPedFileIndex <= 0" (click)="this.changePed(-1)"><img [src]="this.constantsService.ICON_ARROW_LEFT" class="icon">Previous</button>
+                <button mat-raised-button color="primary" class="primary-action" [disabled]="this.currentPedFileIndex >= (this.pedInfo.length - 1)" (click)="this.changePed(1)"><img [src]="this.constantsService.ICON_ARROW_RIGHT" class="icon">Next</button>
+                <button mat-raised-button color="primary" class="primary-action" [disabled]="this.selectedEntryNode === null" (click)="this.launch()"><img [src]="this.constantsService.ICON_IOBIO" class="icon">Launch</button>
+                <button mat-raised-button color="primary" class="primary-action" [disabled]="!this.showSaveAction" (click)="this.save()"><img [src]="this.constantsService.ICON_IOBIO" class="icon">Save</button>
+                <button mat-raised-button color="accent" class="secondary-action" mat-dialog-close>Cancel</button>
+            </div>
         </mat-dialog-actions>
     `,
     styles:[`
@@ -57,19 +59,33 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
             color: blue;
         }
         div.grid-container {
-            width: 60em;
-            height: 20em;
+            width: 100%;
+            height: 21em;
+        }
+        .double-padded-left-right {
+            padding: 0.3em 0.6em 0.3em 0.6em;
+        }
+        .primary-action {
+            background-color: var(--bluewarmvivid-medlight);
+            font-weight: bolder;
+            color: white;
+        }
+        .secondary-action {
+            background-color: white;
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
         }
     `]
 })
-export class ManagePedFileWindowComponent implements OnInit {
+export class ManagePedFileWindowComponent extends BaseGenericContainerDialog implements OnInit {
 
     public pedFilename: string = "";
-    private pedInfo: any[] = [];
+    public pedInfo: any[] = [];
     private vcfInfo: any[] = [];
     private bamInfo: any[] = [];
     private pedFile: any[] = [];
-    private currentPedFileIndex: number = 0;
+    public currentPedFileIndex: number = 0;
 
     public errorMessage: string = "";
     public showErrorAction: boolean = false;
@@ -81,7 +97,8 @@ export class ManagePedFileWindowComponent implements OnInit {
     private allPedEntries: any[] = [];
     public filteredPedEntries: any[] = [];
     private gridApi: GridApi;
-    private selectedEntryNode: RowNode = null;
+    public selectedEntryNode: RowNode = null;
+    public gridColDefs: any[] = []; // TODO: this wasn't defined and need to fix
 
     private sexList: any[] = [
         {sex: 'Unknown'},
@@ -96,10 +113,11 @@ export class ManagePedFileWindowComponent implements OnInit {
 
     constructor(private dialogRef: MatDialogRef<ManagePedFileWindowComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
-                private constantsService: ConstantsService,
+                public constantsService: ConstantsService,
                 private analysisService: AnalysisService,
                 private dialogsService: DialogsService,
                 private dataTrackService: DataTrackService) {
+        super();
     }
 
     ngOnInit() {
@@ -141,14 +159,15 @@ export class ManagePedFileWindowComponent implements OnInit {
     }
 
     private initializeFromPedFile(analysis?: any): void {
-        this.pedFilename = "";
-        if (this.pedInfo.length > 0) {
-            let fullPedFilename: string = this.pedInfo[this.currentPedFileIndex].path;
-            let lastSlashIndex: number = fullPedFilename.lastIndexOf("/");
-            this.pedFilename = lastSlashIndex > 0 ? fullPedFilename.substring(lastSlashIndex + 1) : "";
-        } else if (analysis && analysis.number) {
-            this.pedFilename = analysis.number + ".ped";
-        }
+        // TODO: comment these temporarily. Need to fix the pedFileName and undefined gridColDefs as well
+        // this.pedFilename = "";
+        // if (this.pedInfo.length > 0) {
+        //     let fullPedFilename: string = this.pedInfo[this.currentPedFileIndex].path;
+        //     let lastSlashIndex: number = fullPedFilename.lastIndexOf("/");
+        //     this.pedFilename = lastSlashIndex > 0 ? fullPedFilename.substring(lastSlashIndex + 1) : "";
+        // } else if (analysis && analysis.number) {
+        //     this.pedFilename = analysis.number + ".ped";
+        // }
 
         let params: HttpParams = new HttpParams()
             .set("noJSONToXMLConversionNeeded", "Y")

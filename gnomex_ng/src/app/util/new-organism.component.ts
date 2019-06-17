@@ -1,78 +1,111 @@
-import {Component} from '@angular/core';
-import {MatDialogRef} from "@angular/material";
+import {Component, Inject, OnInit} from "@angular/core";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {OrganismService} from "../services/organism.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "./popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
+import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {GDAction} from "./interfaces/generic-dialog-action.model";
 
 @Component({
-    selector: 'new-organism',
+    selector: "new-organism",
     template: `
-        <h1 mat-dialog-title><img [src]="this.constantsService.ICON_ORGANISM" class="icon">New Species</h1>
-        <div mat-dialog-content class="content">
-            <div class="flex-container-col">
-                <mat-form-field>
-                    <input matInput [(ngModel)]="commonName" placeholder="Common Name">
+        <form [formGroup]="organismForm" class="full-height full-width padded-inner flex-container-col">
+            <div class="flex-container-row full-width align-center padded">
+                <mat-form-field class="full-width padded">
+                    <input matInput placeholder="Common Name" formControlName="commonName">
                     <mat-hint align="end">Example: Human</mat-hint>
+                    <mat-error *ngIf="organismForm.get('commonName').hasError('required')">
+                        Common Name is required
+                    </mat-error>
+                    <mat-error *ngIf="organismForm.get('commonName').hasError('maxlength')">
+                        Common Name exceeded the 50 character limit
+                    </mat-error>
                 </mat-form-field>
-                <mat-form-field>
-                    <input matInput [(ngModel)]="binomialName" placeholder="Binomial Name">
-                    <mat-hint align="end">Example: Homo sapiens</mat-hint>
-                </mat-form-field>
-                <mat-form-field>
-                    <input matInput [(ngModel)]="das2Name" placeholder="DAS2 Name">
-                    <mat-hint align="end">Example: H_sapiens</mat-hint>
-                </mat-form-field>
-                <mat-checkbox [(ngModel)]="activeFlag">Active</mat-checkbox>
             </div>
-        </div>
-        <div mat-dialog-actions>
-            <button mat-button *ngIf="!showSpinner && !(commonName === '') && !(binomialName === '') && !(das2Name === '')" (click)="save()">Save</button>
-            <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
-            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-        </div>
+            <div class="flex-container-row full-width align-center padded">
+                <mat-form-field class="full-width padded">
+                    <input matInput placeholder="Binomial Name" formControlName="binomialName">
+                    <mat-hint align="end">Example: Homo sapiens</mat-hint>
+                    <mat-error *ngIf="organismForm.get('binomialName').hasError('required')">
+                        Binomial Name is required
+                    </mat-error>
+                    <mat-error *ngIf="organismForm.get('binomialName').hasError('maxlength')">
+                        Binomial Name exceeded the 200 character limit
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="flex-container-row full-width align-center padded">
+                <mat-form-field class="full-width padded">
+                    <input matInput placeholder="DAS2 Name" formControlName="das2Name">
+                    <mat-hint align="end">Example: H_sapiens</mat-hint>
+                    <mat-error *ngIf="organismForm.get('das2Name').hasError('required')">
+                        DAS2 Name is required
+                    </mat-error>
+                    <mat-error *ngIf="organismForm.get('das2Name').hasError('maxlength')">
+                        DAS2 Name exceeded the 200 character limit
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div class="flex-container-row align-center padded">
+                <mat-checkbox formControlName="activeFlag">Active</mat-checkbox>
+            </div>
+        </form>
     `,
-    styles: [`
-        .content {
-            height: 16em;
-        }
-    `]
+    styles: [``]
 })
 
-export class NewOrganismComponent {
+export class NewOrganismComponent extends BaseGenericContainerDialog implements OnInit {
 
-    public commonName: string = "";
-    public binomialName: string = "";
-    public das2Name: string = "";
-    public activeFlag: boolean = true;
+    public organismForm: FormGroup;
+    public primaryDisable: (action?: GDAction) => boolean;
 
-    public showSpinner: boolean = false;
 
     constructor(private dialogRef: MatDialogRef<NewOrganismComponent>,
+                @Inject(MAT_DIALOG_DATA) private data: any,
                 private organismService: OrganismService,
                 private dialogsService: DialogsService,
-                public constantsService: ConstantsService) {
+                public constantsService: ConstantsService,
+                private fb: FormBuilder) {
+        super();
     }
 
-    public save(): void {
-        this.showSpinner = true;
-        let params: HttpParams = new HttpParams()
-            .set("organism", this.commonName)
-            .set("binomialName", this.binomialName)
-            .set("das2Name", this.das2Name)
-            .set("isActive", this.activeFlag ? "Y" : "N");
-        this.organismService.saveOrganismNew(params).subscribe((response: any) => {
-            this.showSpinner = false;
-            if (response && response.result && response.result === 'SUCCESS') {
-                this.dialogRef.close(true);
-            } else {
-                let message: string = "";
-                if (response && response.message) {
-                    message = ": " + response.message;
-                }
-                this.dialogsService.confirm("An error occurred while saving organism" + message, null);
-            }
+    ngOnInit(): void {
+        this.organismForm = this.fb.group({
+            commonName: ["", [Validators.required, Validators.maxLength(50)]],
+            binomialName: ["", [Validators.required, Validators.maxLength(this.constantsService.MAX_LENGTH_200)]],
+            das2Name: ["", [Validators.required, Validators.maxLength(this.constantsService.MAX_LENGTH_200)]],
+            activeFlag: [true]
         });
+
+        this.organismForm.markAsPristine();
+        this.primaryDisable = (action) => {
+            return this.organismForm.invalid;
+        };
+    }
+
+
+    public save(): void {
+        this.dialogsService.startDefaultSpinnerDialog();
+        let params: HttpParams = new HttpParams()
+            .set("organism", this.organismForm.get("commonName").value)
+            .set("binomialName", this.organismForm.get("binomialName").value)
+            .set("das2Name", this.organismForm.get("das2Name").value)
+            .set("isActive", this.organismForm.get("das2Name").value ? "Y" : "N");
+        this.organismService.saveOrganismNew(params).subscribe((response: any) => {
+            this.dialogsService.stopAllSpinnerDialogs();
+            if (response && response.result && response.result === "SUCCESS" && response.idOrganism) {
+                this.dialogRef.close(response.idOrganism);
+            }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
+        });
+    }
+
+    public cancel(): void {
+        this.dialogRef.close();
     }
 
 }

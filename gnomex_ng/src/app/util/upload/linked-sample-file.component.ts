@@ -1,43 +1,45 @@
-
 import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input} from "@angular/core";
 import {Subscription} from "rxjs";
-import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {AnalysisService} from "../../services/analysis.service";
-import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
-import {HttpParams} from "@angular/common/http";
+import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
 import { ITreeNode} from "angular-tree-component/dist/defs/api";
-import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
 import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 import {ExperimentsService} from "../../experiments/experiments.service";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, ValueParserParams, RowClickedEvent, RowDragEvent} from "ag-grid-community";
-import * as _ from "lodash";
-
-
+import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, RowClickedEvent, RowDragEvent} from "ag-grid-community";
+import {ActionType} from "../interfaces/generic-dialog-action.model";
 
 
 @Component({
     selector: "linked-sample-file",
-    templateUrl:"./linked-sample-file.component.html",
+    templateUrl: "./linked-sample-file.component.html",
     styles: [`
 
         .no-padding-dialog {
             padding: 0;
         }
+
         .truncate{
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .no-overflow  { overflow: hidden; }
 
+        .secondary-action {
+            background-color: white;
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
+        }
 
     `]
 })
@@ -65,7 +67,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
     public readonly SAMPLE:string = "Sample";
     public readonly SEQ_FOLDER:string = "SeqRunNumber";
     public readonly FILE = "FileDescriptor";
-
+    public actionType: any = ActionType.SECONDARY ;
 
 
     private readonly sampleHierarchyRules = {

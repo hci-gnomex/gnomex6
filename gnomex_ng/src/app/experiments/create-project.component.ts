@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from "@angular/core";
+import {Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentsService} from "./experiments.service";
@@ -8,48 +8,83 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
 import {ConstantsService} from "../services/constants.service";
 import {LabListService} from "../services/lab-list.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 
 @Component({
     selector: "create-project-component",
     template: `
-        <h6 mat-dialog-title><img [src]="this.constantsService.ICON_FOLDER_ADD" class="icon">{{this.isEditMode ? 'Edit' : 'New'}} Project</h6>
-        <div mat-dialog-content class="content-div">
-            <custom-combo-box class="half-width" placeholder="Lab" [options]="this.labList"
+        <div class="full-width full-height flex-container-col double-padded-left-right">
+            <custom-combo-box class="full-width" placeholder="Lab" [options]="this.labList"
                                 valueField="idLab" [displayField]="this.prefService.labDisplayField"
                                 [formControl]="this.form.get('idLab')">
             </custom-combo-box>
             <mat-form-field class="full-width">
                 <input matInput placeholder="Project name" [formControl]="this.form.get('name')">
                 <mat-error *ngIf="this.form.get('name').hasError('required')">Project name is <strong>required</strong></mat-error>
+                <mat-error *ngIf="this.form.get('name').hasError('maxlength')">
+                    Project name can be at most {{this.constantsService.MAX_LENGTH_200}} characters
+                </mat-error>
             </mat-form-field>
-            <mat-form-field class="full-width">
-                <textarea matInput placeholder="Project description" [formControl]="this.form.get('description')"
-                          matTextareaAutosize [matAutosizeMinRows]="8" [matAutosizeMaxRows]="8"></textarea>
-            </mat-form-field>
+            <label for="descEditor">Project description</label>
+            <angular-editor class="full-width" #descEditorRef id="descEditor"
+                            [formControl]="this.form.get('description')"
+                            [config]="descEditorConfig">
+            </angular-editor>
+            <mat-error *ngIf="this.form.get('description').hasError('maxlength')">
+                Project description can be at most {{this.constantsService.MAX_LENGTH_4000}}
+                characters
+                including HTML code formatting and styles. Character count: {{this.form.get(
+                    'description').value.toString().length}}
+            </mat-error>
         </div>
-        <mat-dialog-actions class="justify-flex-end">
-            <mat-spinner *ngIf="showSpinner" [strokeWidth]="3" [diameter]="30"></mat-spinner>
-            <button mat-button [disabled]="this.form.invalid || showSpinner" (click)="this.save()">
-                <img [src]="this.constantsService.ICON_SAVE" class="icon">Save
-            </button>
-            <button mat-button [disabled]="this.showSpinner" mat-dialog-close>Cancel</button>
-        </mat-dialog-actions>
     `,
     styles: [`
-        div.content-div {
-            display: flex !important;
-            flex-direction: column;
-            width: 40em;
+
+        :host /deep/ angular-editor#descEditor #editor {
+            resize: none;
+        }
+
+        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Insert Image"],
+        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Unlink"],
+        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Horizontal Line"],
+        :host /deep/ angular-editor#descEditor #strikeThrough-descEditor,
+        :host /deep/ angular-editor#descEditor #subscript-descEditor,
+        :host /deep/ angular-editor#descEditor #superscript-descEditor,
+        :host /deep/ angular-editor#descEditor #link-descEditor,
+        :host /deep/ angular-editor#descEditor #underline-descEditor,
+        :host /deep/ angular-editor#descEditor #justifyLeft-descEditor,
+        :host /deep/ angular-editor#descEditor #justifyCenter-descEditor,
+        :host /deep/ angular-editor#descEditor #justifyRight-descEditor,
+        :host /deep/ angular-editor#descEditor #justifyFull-descEditor,
+        :host /deep/ angular-editor#descEditor #foregroundColorPicker-descEditor,
+        :host /deep/ angular-editor#descEditor #backgroundColorPicker-descEditor,
+        :host /deep/ angular-editor#descEditor #toggleEditorMode-descEditor,
+        :host /deep/ angular-editor#descEditor #customClassSelector-descEditor {
+            display: none;
         }
     `]
 })
 
-export class CreateProjectComponent implements OnInit {
+export class CreateProjectComponent extends BaseGenericContainerDialog implements OnInit {
     public isEditMode: boolean = false;
     public form: FormGroup;
-    public showSpinner: boolean = false;
+    public primaryDisable: (action?: GDAction) => boolean;
     public labList: any[] = [];
     public newProjectId: string = "";
+    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    descEditorConfig: AngularEditorConfig = {
+        height: "20em",
+        minHeight: "5em",
+        maxHeight: "20em",
+        width: "100%",
+        minWidth: "5em",
+        editable: true,
+        defaultFontName: "Arial",
+        defaultFontSize: "2",
+    };
 
     private idProject: string = "";
     private project: any = null;
@@ -63,13 +98,14 @@ export class CreateProjectComponent implements OnInit {
                 private formBuilder: FormBuilder,
                 private dialogsService: DialogsService,
                 private labListService: LabListService) {
+        super();
     }
 
     ngOnInit(): void {
         this.form = this.formBuilder.group({
             idLab: ["", [Validators.required]],
-            name: ["", [Validators.required]],
-            description: ["", []],
+            name: ["", [Validators.required, Validators.maxLength(this.constantsService.MAX_LENGTH_200)]],
+            description: ["", [Validators.maxLength(this.constantsService.MAX_LENGTH_4000)]],
         });
 
         if (this.data) {
@@ -104,9 +140,17 @@ export class CreateProjectComponent implements OnInit {
                 this.form.get("idLab").setValue(this.project.idLab);
                 this.form.get("name").setValue(this.project.name);
                 this.form.get("description").setValue(this.project.description);
-            }, () => {
+            }, (err: IGnomexErrorResponse) => {
             });
         }
+
+        this.primaryDisable = (action) => {
+            return this.form.invalid;
+        };
+    }
+
+    public cancel(): void {
+        this.dialogRef.close();
     }
 
     public save(): void {
@@ -119,13 +163,13 @@ export class CreateProjectComponent implements OnInit {
             this.experimentsService.getProject(params).pipe(first()).subscribe((response: any) => {
                 this.project = response.Project;
                 this.saveProject();
-            }, () => {
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }
 
     private saveProject() {
-        this.showSpinner = true;
+        this.dialogsService.startDefaultSpinnerDialog();
 
         this.project.name = this.form.get("name").value;
         this.project.description = this.form.get("description").value;
@@ -133,14 +177,14 @@ export class CreateProjectComponent implements OnInit {
             .set("projectXMLString", JSON.stringify(this.project))
             .set("parseEntries", "Y");
         this.experimentsService.saveProject(params).pipe(first()).subscribe((response: any) => {
-            this.showSpinner = false;
+            this.dialogsService.stopAllSpinnerDialogs();
             this.newProjectId = response.idProject;
             if (this.items.length > 0) {
                 this.experimentsService.refreshProjectRequestList_fromBackend();
             }
             this.dialogRef.close(this.newProjectId);
-        }, () => {
-            this.showSpinner = false;
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 

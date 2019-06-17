@@ -6,7 +6,7 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {Subscription} from "rxjs";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
-import {MatDialog, MatDialogConfig, MatDialogRef, MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {ConstantsService} from "../../services/constants.service";
 import {LinkToExperimentDialogComponent} from "./index";
@@ -21,6 +21,7 @@ import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {GnomexService} from "../../services/gnomex.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -62,7 +63,6 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
     public analysisTreeNode: any;
     private analysisTreeNodeSubscription: Subscription;
-    private linkExpDialogRef: MatDialogRef<LinkToExperimentDialogComponent>;
 
 
 
@@ -170,13 +170,20 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
     makeLinkToExperiment() {
         let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "56em";
         config.panelClass = "no-padding-dialog";
+        config.autoFocus = false;
+        config.disableClose = true;
         config.data = {
             idAnalysis : this.analysis ? this.analysis.idAnalysis : "",
             idLab: this.analysis ? this.analysis.idLab : ""
         };
 
-        this.linkExpDialogRef = this.dialog.open(LinkToExperimentDialogComponent, config );
+        this.dialogsService.genericDialogContainer(LinkToExperimentDialogComponent, "Link to Experiment", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_LINK, name: "Link", internalAction: "linkAnalysis"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]});
 
     }
 
@@ -186,11 +193,13 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
         configuration.panelClass = "no-padding-dialog";
         configuration.autoFocus = false;
         configuration.data = {
-            name:   "Analysis",
             number: this.analysis ? this.analysis.number : "",
             type:   "analysisNumber"
         };
-        this.dialog.open(ShareLinkDialogComponent, configuration);
+        this.dialogsService.genericDialogContainer(ShareLinkDialogComponent,
+            "Web Link for Analysis " + (this.analysis ? this.analysis.number : ""), null, configuration,
+            {actions: [{type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                ]});
     }
 
     public autoDistributeDataTracks(): void {
@@ -217,10 +226,17 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
     public showManagePEDFileWindow(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "52.5em";
+        configuration.maxWidth = "52.5em";
+        configuration.height = "30.5em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = true;
+        configuration.disableClose = true;
         configuration.data = {
             idAnalysis: this.analysis && this.analysis.idAnalysis ? this.analysis.idAnalysis : ""
         };
-        this.dialog.open(ManagePedFileWindowComponent, configuration);
+        let pedFileName: string = this.analysis && this.analysis.number ? " -- A" + this.analysis.number + ".ped" : "";
+        this.dialogsService.genericDialogContainer(ManagePedFileWindowComponent, "Manage Ped File" + pedFileName, null, configuration);
     }
 
     save() {

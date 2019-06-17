@@ -14,8 +14,8 @@
     </div>
 
 
-    <div class="flex-grow full-width" *ngIf="!manageData.isFDT; else fdtInstructions">
-        <ag-grid-angular class="ag-theme-balham full-width full-height"
+    <div class="flex-grow full-width full-height padded" *ngIf="!manageData.isFDT; else fdtInstructions">
+        <ag-grid-angular style="width: 100%; height: 36em;" class="ag-theme-balham"
                          [columnDefs]="columnDefs"
                          [rowSelection]="'single'"
                          [enableSorting]="true"
@@ -26,17 +26,19 @@
         </ag-grid-angular>
     </div>
     <ng-template #fdtInstructions>
-        <div class="flex-grow full-width  padded" [innerHTML]="this.constService.UPLOAD_FILE_FDT_INFO"> </div>
+        <div class="flex-grow full-width full-height padded" [innerHTML]="this.constService.UPLOAD_FILE_FDT_INFO"> </div>
     </ng-template>
 
-    <div class="flex-container-row spaced-children-margin align-center" style="padding: 0.5em; justify-content: flex-end;">
-        <div class="flex-grow" *ngIf="!this.manageData.isFDT">
+    <mat-dialog-actions class="flex-container-row justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+        <div class="flex-grow double-padded" *ngIf="!this.manageData.isFDT">
             <mat-progress-bar  mode="determinate" [value]="progressVal"> </mat-progress-bar>
         </div>
-        <button mat-raised-button
-                color="primary" [disabled]="this.manageData.isFDT ? !allowFDTButton : rowData.length === 0" (click)="upload()">
-            <img [src]="constService.ICON_UPLOAD" >
-            {{primaryButtonText}}
-        </button>
-    </div>
+        <div class="double-padded">
+            <button mat-raised-button [disabled]="this.manageData.isFDT ? !allowFDTButton : rowData.length === 0"
+                    color="primary" class="primary-action" (click)="upload()">
+                <img [src]="constService.ICON_UPLOAD"> {{primaryButtonText}}
+            </button>
+            <button mat-raised-button color="accent" class="secondary-action" mat-dialog-close>Cancel</button>
+        </div>
+    </mat-dialog-actions>
 </div>
