@@ -112,7 +112,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
 
     private overviewListSubscription: Subscription;
     private requestCategory: any;
-    private contactCoreEmailDialogRef: MatDialogRef<BasicEmailDialogComponent>;
 
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
@@ -421,9 +420,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     suggestedFilename: "gnomex-data",
                 };
                 config.disableClose = true;
-                this.dialog.open(DownloadFilesComponent, config);
-
-            },(err:IGnomexErrorResponse) => {
+                this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Download Files", null, config);
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }
@@ -488,7 +486,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         if (this.experiment) {
             let subjectText = "Inquiry about Experiment " + this.experiment.number;
 
-            let saveFn = (data: any) => {
+            let saveFn = (data: any): boolean  => {
 
                 data.format =  "text";
                 data.idAppUser = this.secAdvisor.idAppUser.toString();
@@ -507,19 +505,12 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     .set("subject", data.subject);
 
                 this.experimentService.emailServlet(params).pipe(first()).subscribe(resp => {
-                    let email = <BasicEmailDialogComponent>this.contactCoreEmailDialogRef.componentInstance;
-                    email.showSpinner = false;
-
-                    this.contactCoreEmailDialogRef.close();
-
-                    this.snackBar.open("Email successfully sent", "Contact Core", {
-                        duration: 2000
-                    });
-
-
-
-                }, (err:IGnomexErrorResponse) => {
+                    this.dialogsService.stopAllSpinnerDialogs();
+                    return true;
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogsService.stopAllSpinnerDialogs();
                 });
+                return false;
             };
 
             let configuration: MatDialogConfig = new MatDialogConfig();
@@ -530,12 +521,17 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             configuration.disableClose = true;
             configuration.data = {
                 saveFn: saveFn,
-                title: "Email Core Regarding this Experiment",
+                action: "Contact Core",
                 parentComponent: "Experiment",
                 subjectText: subjectText,
             };
 
-            this.contactCoreEmailDialogRef = this.dialog.open(BasicEmailDialogComponent, configuration);
+            this.dialogsService.genericDialogContainer(BasicEmailDialogComponent,
+                "Email Core Regarding this Experiment", this.constService.EMAIL_GO_LINK, configuration,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constService.EMAIL_GO_LINK, name: "Send Email", internalAction: "send"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    ]});
 
         }
     }

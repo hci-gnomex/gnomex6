@@ -1,45 +1,21 @@
 <div class="full-height full-width flex-container-col">
-    <div mat-dialog-title class="dialog-header-colors no-padding no-margin">
-        <div class="flex-container-row">
-            <div class="full-height padded title-size" style="width: 95%;">
-                <img class="icon" [src]="this.constService.EMAIL_GO_LINK">{{emailTitle}}
-            </div>
-            <div class="right-align">
-                <button mat-button mat-dialog-close>
-                <img class="icon" [src]="this.constService.ICON_CLOSE_BLACK">
-                </button>
-            </div>
-        </div>
-    </div>
-    <div mat-dialog-content class="flex-grow no-padding no-margin">
         <div class="full-width full-height flex-container-col double-padded">
-            <form [formGroup]="emailGroup">
+            <form [formGroup]="this.emailGroup">
                 <mat-form-field class="formField">
                     <input matInput placeholder="Subject" formControlName="subject">
-                    <mat-error *ngIf="emailGroup.get('subject').hasError('required')">Subject is required</mat-error>
+                    <mat-error *ngIf="this.emailGroup.get('subject').hasError('required')">Subject is required</mat-error>
                 </mat-form-field>
                 <mat-form-field class="formField">
                     <input matInput placeholder="From" formControlName="fromAddress">
-                    <mat-error *ngIf="emailGroup.get('fromAddress').hasError('required')">From is required</mat-error>
-                    <mat-error *ngIf="emailGroup.get('fromAddress').hasError('email') && !emailGroup.hasError('required')">Please enter a valid email address</mat-error>
+                    <mat-error *ngIf="this.emailGroup.get('fromAddress').hasError('required')">From is required</mat-error>
+                    <mat-error *ngIf="this.emailGroup.get('fromAddress').hasError('email') && !this.emailGroup.hasError('required')">Please enter a valid email address</mat-error>
                 </mat-form-field>
-                <mat-form-field  class="formField">
-                    <textarea style="resize: none; height: 14rem;" matInput placeholder="Body" formControlName="body"></textarea>
-                    <mat-error *ngIf="emailGroup.get('body').hasError('required')">Body is required</mat-error>
-                </mat-form-field>
+                <label class="label" for="emailEditor">Body</label>
+                <angular-editor class="full-width" #emailEditorRef id="emailEditor"
+                                formControlName="body"
+                                [config]="emailEditorConfig">
+                </angular-editor>
+                <mat-error *ngIf="this.emailGroup.get('body').hasError('required')">Email body is required</mat-error>
             </form>
         </div>
-    </div>
-    <div mat-dialog-actions class="no-padding no-margin">
-        <div class="full-width right-align flex-container-row padded">
-            <div class="full-height flex-grow">
-                <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-            </div>
-            <div *ngIf="!showSpinner">
-                <button mat-button [disabled]="!emailGroup.valid" (click)="send(emailGroup)">
-                    <img class="icon" [src]="this.constService.EMAIL_GO_LINK">Send Email</button>
-                <button mat-button mat-dialog-close>Cancel</button>
-            </div>
-        </div>
-    </div>
 </div>

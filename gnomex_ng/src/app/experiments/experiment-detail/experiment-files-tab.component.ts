@@ -62,8 +62,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
                 private route: ActivatedRoute,
                 private fileService: FileService,
                 private dialogsService: DialogsService,
-                private experimentsService: ExperimentsService,
-                private dialog:MatDialog) {
+                private experimentsService: ExperimentsService) {
     }
 
     ngOnInit() {
@@ -164,10 +163,10 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             startTabIndex: 0,
             isFDT: false
         };
-        config.height = "40em";
-        config.width = "80em";
+        config.height = "40.3em";
+        config.width = "70em";
         config.disableClose = true;
-        this.dialog.open(ManageFilesDialogComponent,config);
+        this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
     public handleFDTUploadCommandLine(): void {
@@ -182,10 +181,10 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             startTabIndex: 0,
             isFDT: true
         };
-        config.height = "40em";
-        config.width = "55em";
+        config.height = "40.3em";
+        config.width = "70em";
         config.disableClose = true;
-        this.dialog.open(ManageFilesDialogComponent,config);
+        this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
     public handleSFTPUploadFiles(): void {
@@ -200,10 +199,10 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             startTabIndex: 1,
             isFDT: false
         };
-        config.height = "40em";
-        config.width = "55em";
+        config.height = "40.3em";
+        config.width = "70em";
         config.disableClose = true;
-        this.dialog.open(ManageFilesDialogComponent,config);
+        this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
     public handleDownloadFiles(): void {
@@ -219,7 +218,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             suggestedFilename: "gnomex-data",
         };
         config.disableClose = true;
-        this.dialog.open(DownloadFilesComponent, config);
+        this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Download Files", null, config);
     }
 
     ngOnDestroy() {

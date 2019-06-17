@@ -304,7 +304,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         };
         config.disableClose = true;
         config.autoFocus = false;
-        this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Select Files to Download", null, config);
+        this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Download Files", null, config);
     }
 
     ngOnDestroy() {

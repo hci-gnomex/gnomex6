@@ -21,11 +21,29 @@ import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
             float: right;
         }
 
+        .primary-action {
+            background-color: var(--bluewarmvivid-medlight);
+            font-weight: bolder;
+            color: white;
+        }
+        .secondary-action {
+            background-color: white;
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
+        }
+
         :host {
             height: 100%;
             display: flex;
             flex: 1;
             flex-direction: column;
+        }
+        .no-padding {
+            padding: 0;
+        }
+        .no-margin {
+            margin: 0;
         }
 
     `]

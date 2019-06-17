@@ -9,11 +9,13 @@ import {TopicService} from "../../services/topic.service";
 import {OrganismService} from "../../services/organism.service";
 import {UtilService} from "../../services/util.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import {CreateProjectComponent} from "../create-project.component";
 import {AppUserListService} from "../../services/app-user-list.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Experiment} from "../../util/models/experiment.model";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'tab-external-setup',
@@ -109,7 +111,8 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
                 private dictionaryService: DictionaryService,
                 private dialog: MatDialog,
                 private appUserService: AppUserListService,
-                private formBuilder: FormBuilder) {
+                private formBuilder: FormBuilder,
+                private dialogsService: DialogsService,) {
 
         this.form = this.formBuilder.group({
             lab: ["", [Validators.required]],
@@ -235,21 +238,39 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
 
     public editProject(): void {
         let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "45em";
+        config.panelClass = "no-padding-dialog";
+        config.autoFocus = false;
+        config.disableClose = true;
         config.data = {
-            idProject: this.form.get('project').value.idProject,
+            idProject: this.form.get("project").value.idProject,
         };
-        let dialogRef: MatDialogRef<CreateProjectComponent> = this.dialog.open(CreateProjectComponent, config);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.getLabProjects(result);
-            }
+
+        this.dialogsService.genericDialogContainer(CreateProjectComponent, "Edit Project", this.constantsService.ICON_FOLDER_ADD, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.getLabProjects(result);
+                    }
         });
     }
 
     public newProject(): void {
-        let dialogRef: MatDialogRef<CreateProjectComponent> = this.dialog.open(CreateProjectComponent);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "45em";
+        config.panelClass = "no-padding-dialog";
+        config.autoFocus = false;
+        config.disableClose = true;
+        config.data = {};
+
+        this.dialogsService.genericDialogContainer(CreateProjectComponent, "New Project", this.constantsService.ICON_FOLDER_ADD, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+            if(result) {
                 this.getLabProjects(result);
             }
         });
