@@ -60,7 +60,7 @@ import {UtilService} from "../services/util.service";
             display: flex;
             flex-direction: row;
         }
-        mat-form-field.formField {
+        .formField {
             width: 50%;
             margin: 0 0.5%;
         }

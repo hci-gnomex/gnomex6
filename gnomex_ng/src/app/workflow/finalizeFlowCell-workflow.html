@@ -54,20 +54,16 @@
                     </mat-form-field>
                 </div>
                 <div class="flex-container-row spaced-children-margin">
-                    <mat-form-field>
-                        <mat-select placeholder="Instrument" (selectionChange)="createFlowCellFileName()" [formControl]="this.instrumentFC">
-                            <mat-option *ngFor="let instrument of instrumentList" [value]="instrument">{{instrument.instrument}}</mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="this.instrumentFC.hasError('required')">field is required </mat-error>
-                    </mat-form-field>
-                    <mat-form-field style="width:25em;">
-                        <mat-select placeholder="Protocol" (selectionChange)="createFlowCellFileName()" [formControl]="this.protocolFC">
-                            <mat-option>Choose a protocol...</mat-option>
-                            <mat-option *ngFor="let protocol of filteredProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="this.protocolFC.hasError('required')">field is required </mat-error>
-
-                    </mat-form-field>
+                    <div>
+                        <custom-combo-box placeholder="Instrument" [options]="this.instrumentList" (optionSelected)="createFlowCellFileName()"
+                                          displayField="instrument" [formControl]="this.instrumentFC">
+                        </custom-combo-box>
+                    </div>
+                    <div style="width:25em;">
+                        <custom-combo-box placeholder="Protocol" [options]="this.filteredProtocolsList" (optionSelected)="createFlowCellFileName()"
+                                          displayField="name" [formControl]="this.protocolFC">
+                        </custom-combo-box>
+                    </div>
                 </div>
                 <div class="flex-row-container-margin">
                     Filename

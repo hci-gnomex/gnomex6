@@ -18,7 +18,7 @@ import {PropertyService} from "../../services/property.service";
     selector: 'experiment-platform-tab',
     templateUrl: './experiment-platform-tab.component.html',
     styles:[`
-        mat-form-field.medium-form-input{
+        .medium-form-input{
             width: 30em;
         }
         .padded-checkbox{
@@ -201,9 +201,6 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
 
 
-    compareByID(reqCatOne, reqCatTwo) { // reqCatTwo is the str don't have object
-        return reqCatOne && reqCatTwo &&  reqCatOne.value === reqCatTwo;
-    }
 
     private  setSecurityLabel():void {
         let prepSecurityLabel = "";
@@ -261,7 +258,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
     }
 
 
-    onTypeChanged(event:any):void{
+    onTypeChanged():void{
         let selectedType:any = this.formGroup.get('type').value;
         if(selectedType){
             this.formGroup.get('icon').setValue(selectedType.defaultIcon);
@@ -319,7 +316,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
 
 
-    onCoreChanged(event:any):void{
+    onCoreChanged():void{
         this.showExpPlatformFields();
         this.filterProjectTypeList();
         this.updateProductType();

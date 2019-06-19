@@ -8,6 +8,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {SelectCoreComponent} from "./select-core.component";
 import {REGISTER_USER_ROUTES} from "./register-user.routes";
 import {RegisterUserComponent} from "./register-user.component";
+import {UtilModule} from "../../util/util.module";
 
 
 @NgModule({
@@ -17,8 +18,8 @@ import {RegisterUserComponent} from "./register-user.component";
         ServicesModule,
         AngularMaterialModule,
         FormsModule,
-        ReactiveFormsModule
-
+        ReactiveFormsModule,
+        UtilModule,
     ],
     declarations: [SelectCoreComponent, RegisterUserComponent],
     providers: []

@@ -4,14 +4,13 @@
             <input matInput [formControl]="numberControl" type="text"
                    placeholder="Filter by experiment number"/>
         </mat-form-field>
-        <mat-form-field style="flex:1; margin-left: 1em ">
-            <mat-select placeholder="Filter by Lab" [formControl]="labControl">
-                <mat-option></mat-option>
-                <mat-option *ngFor="let lab of labList" [value]="lab.idLab">
-                    {{ lab.name }}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+        <div style="flex:1; margin-left: 1em ">
+            <custom-combo-box placeholder="Filter by Lab"
+                              [options]="this.labList"
+                              displayField="name" valueField="idLab"
+                              [formControl]="labControl">
+            </custom-combo-box>
+        </div>
     </div>
 
     <div style="height:25em; width: 100%; margin-top:0.5em;">

@@ -10,33 +10,17 @@ import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'configure-product-types',
     templateUrl: "./configure-product-types.component.html",
     styles: [`
-        div.flex-container-row {
-            display: flex;
-            flex-direction: row;
-        }
-        div.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        .full-width {
-            width: 100%;
-        }
-        .half-width {
-            width: 50%;
-        }
         .margin-right {
             margin-right: 2rem;
         }
         .margin-bottom {
             margin-bottom: 2rem;
-        }
-        .align-center {
-            align-items: center;
         }
         .justify-end {
             justify-content: flex-end;
@@ -127,8 +111,8 @@ export class ConfigureProductTypesComponent implements OnInit {
     private loadPriceCategories(): void {
         this.priceCategories = [];
         this.productsService.getPriceCategories(true, this.propertyService.getProperty(PropertyService.PROPERTY_PRODUCT_SHEET_NAME).propertyValue).subscribe((result: any) => {
-            if (result && Array.isArray(result)) {
-                this.priceCategories = result;
+            if (result && (Array.isArray(result) || result.PriceCategory)) {
+                this.priceCategories = UtilService.getJsonArray(result, result.PriceCategory);
             } else {
                 let message: string = "";
                 if (result && result.message) {

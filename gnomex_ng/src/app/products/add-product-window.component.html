@@ -1,18 +1,16 @@
 <h6 mat-dialog-title>Add Product</h6>
 <mat-dialog-content>
     <form [formGroup]="this.form" class="flex-container-col">
-        <mat-form-field class="full-width">
-            <mat-select placeholder="Lab" [formControlName]="'lab'">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let lab of this.labList" [value]="lab">{{lab[this.prefService.labDisplayField]}}</mat-option>
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field class="full-width">
-            <mat-select placeholder="Product" [formControlName]="'product'">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let product of this.productList" [value]="product">{{product.display}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+        <custom-combo-box class="full-width" placeholder="Lab"
+                          [options]="this.labList"
+                          displayField="displayName"
+                          [formControlName]="'lab'">
+        </custom-combo-box>
+        <custom-combo-box class="full-width" placeholder="Product"
+                          [options]="this.productList"
+                          displayField="display"
+                          [formControlName]="'product'">
+        </custom-combo-box>
     </form>
 </mat-dialog-content>
 <mat-dialog-actions>

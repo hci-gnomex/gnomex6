@@ -12,7 +12,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
     selector: 'billing-template-window',
     templateUrl: "./billing-template-window.component.html",
     styles: [`
-        .margin-right {
+        .children-margin-right > *:not(:last-child) {
             margin-right: 1em;
         }
         div.accounts-grid-div {

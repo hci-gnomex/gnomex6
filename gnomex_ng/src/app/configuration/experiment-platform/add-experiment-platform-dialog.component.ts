@@ -36,24 +36,14 @@ import {first} from "rxjs/operators";
                     <input matInput placeholder="Code" formControlName="code">
                 </mat-form-field>
 
-                <mat-form-field class="medium-form-input">
-                    <mat-select placeholder="Type" formControlName="type" >
-                        <mat-option *ngFor="let type of typeList " [value]="type" >{{type.display}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="this.formGroup?.get('type')?.hasError('required')">
-                        This field is required
-                    </mat-error>
-                </mat-form-field>
-                <mat-form-field class="medium-form-input">
-                    <mat-select placeholder="Core Facility" formControlName="idCoreFacility" >
-                        <mat-option *ngFor="let cf of coreFacilityList" [value]="cf.value" >{{cf?.display}}
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="this.formGroup?.get('idCoreFacility')?.hasError('required')">
-                        This field is required
-                    </mat-error>
-                </mat-form-field>
+                <custom-combo-box class="medium-form-input" placeholder="Type"
+                                  displayField="display" [options]="typeList"
+                                  [formControlName]="'type'">
+                </custom-combo-box>
+                <custom-combo-box class="medium-form-input" placeholder="Core Facility"
+                                  displayField="display" [options]="coreFacilityList"
+                                  [formControlName]="'idCoreFacility'" valueField="value">
+                </custom-combo-box>
 
             </form>
 
