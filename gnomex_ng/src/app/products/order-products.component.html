@@ -2,31 +2,31 @@
     <div class="padding-bottom">
         <h5>Order Products for {{this.currentCoreFacility?.display}}</h5>
     </div>
-    <div class="full-width">
-        <mat-form-field class="half-width">
-            <mat-select placeholder="Verify your lab group" [(value)]="this.idLab" (selectionChange)="this.onLabChange()">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let lab of this.labList" [value]="lab.idLab">{{lab[this.prefService.labDisplayField]}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+    <div class="full-width flex-container-row align-center">
+        <div class="half-width">
+            <custom-combo-box placeholder="Verify your lab group" (optionSelected)="this.onLabChange()"
+                              [options]="this.labList" valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                              [(ngModel)]="this.idLab">
+            </custom-combo-box>
+        </div>
         <context-help name="experimentLab" [isEditMode]="this.isAdminState" popupTitle="Lab Help" tooltipPosition="right"></context-help>
     </div>
-    <div *ngIf="this.isAdminState" [hidden]="!this.idLab" class="full-width">
-        <mat-form-field class="half-width">
-            <mat-select placeholder="Verify your name" [(value)]="this.idAppUser">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let user of this.userList" [value]="user.idAppUser">{{user[this.prefService.userDisplayField]}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+    <div *ngIf="this.isAdminState" [hidden]="!this.idLab" class="full-width flex-container-row align-center">
+        <div class="half-width">
+            <custom-combo-box placeholder="Verify your name"
+                              [options]="this.userList" valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
+                              [(ngModel)]="this.idAppUser">
+            </custom-combo-box>
+        </div>
         <context-help name="experimentOwnerName" [isEditMode]="this.isAdminState" popupTitle="Name" tooltipPosition="right"></context-help>
     </div>
-    <div [hidden]="!this.idLab" class="full-width padding-bottom">
-        <mat-form-field class="half-width">
-            <mat-select placeholder="Select a billing account" [(value)]="this.idBillingAccount">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let ba of this.billingAccountList" [value]="ba.idBillingAccount">{{ba.accountNameAndNumber}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+    <div [hidden]="!this.idLab" class="full-width padding-bottom flex-container-row align-center">
+        <div class="half-width">
+            <custom-combo-box placeholder="Select a billing account"
+                              [options]="this.billingAccountList" valueField="idBillingAccount" displayField="accountNameAndNumber"
+                              [(ngModel)]="this.idBillingAccount">
+            </custom-combo-box>
+        </div>
         <context-help name="experimentBillingAccount" [isEditMode]="this.isAdminState" popupTitle="Billing Account Help"></context-help>
         <button mat-button matTooltip="New accounts must be approved before they can be used." (click)="this.showSubmitWorkAuthorization()">Submit Work Authorization</button>
         <button mat-button *ngIf="this.showSplitBillingButton" (click)="this.showSplitBilling()">Split Billing</button>

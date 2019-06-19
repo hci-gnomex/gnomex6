@@ -756,10 +756,6 @@ export class ConfigureAnnotationsComponent {
         this.updateDisplayedProperties();
     }
 
-    private compareCorefn(core1,core2){
-        return core1 && core2 && core1 === core2;
-    }
-
     externallyResizeGrid(){
         if(this.annotGridApi){
             this.annotGridApi.sizeColumnsToFit();

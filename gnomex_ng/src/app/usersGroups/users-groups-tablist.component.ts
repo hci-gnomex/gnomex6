@@ -362,9 +362,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     public buildGroups(params: URLSearchParams) {
-        this.labListService.getLabListWithParams(params).subscribe((response: any[]) => {
-            this.groupsData = response;
-            this.groupLabel = response.length + " groups";
+        this.labListService.getLabListWithParams(params).subscribe((response: any) => {
+            this.groupsData = response ? UtilService.getJsonArray(response, response.Lab) : [];
+            this.groupLabel = this.groupsData.length + " groups";
             this.setPricing();
         });
 
@@ -1359,7 +1359,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
     searchCoreFacility(event) {
         let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", event.value);
+        params.set("idCoreFacility", event ? event : "");
         params.set("idInstitution", "");
         params.set("isExternal", "");
         params.set("listKind", "UnboundedLabList");
@@ -1437,7 +1437,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     searchInstitution(event) {
         let params: URLSearchParams = new URLSearchParams();
         params.set("idCoreFacility", "");
-        params.set("idInstitution", event.value);
+        params.set("idInstitution", event ? event : "");
         params.set("isExternal", "");
         params.set("listKind", "UnboundedLabList");
 

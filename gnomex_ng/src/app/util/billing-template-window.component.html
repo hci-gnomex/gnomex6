@@ -1,21 +1,15 @@
 <h6 mat-dialog-title>Billing Template</h6>
 <mat-dialog-content>
-    <div>
-        <context-help class="margin-right" name="billingTemplateHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
-        <mat-form-field class="margin-right">
-            <mat-select placeholder="Lab" [(value)]="this.selectedLab" (selectionChange)="this.loadAccountsForLab()">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let lab of this.labList" [value]="lab">{{lab.name}}</mat-option>
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-select placeholder="Account" [(value)]="this.selectedAccount">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let account of this.accountList" [value]="account">{{account.accountNumberDisplay}}</mat-option>
-            </mat-select>
-        </mat-form-field>
-        <mat-checkbox [(ngModel)]="this.showInactiveAccounts" (change)="this.loadLabs()" class="margin-right">Show inactive accounts</mat-checkbox>
-        <button mat-button class="margin-right" (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img src="../../assets/add.png" class="icon">Add</button>
+    <div class="flex-container-row align-center children-margin-right">
+        <context-help name="billingTemplateHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
+        <custom-combo-box placeholder="Lab" [options]="this.labList" displayField="name"
+                          [(ngModel)]="this.selectedLab" (optionSelected)="this.loadAccountsForLab()">
+        </custom-combo-box>
+        <custom-combo-box placeholder="Account" [options]="this.accountList"
+                          displayField="accountNumberDisplay" [(ngModel)]="this.selectedAccount">
+        </custom-combo-box>
+        <mat-checkbox [(ngModel)]="this.showInactiveAccounts" (change)="this.loadLabs()">Show inactive accounts</mat-checkbox>
+        <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img src="../../assets/add.png" class="icon">Add</button>
         <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null"><img src="../../assets/delete.png" class="icon">Remove</button>
     </div>
     <div class="accounts-grid-div full-width">

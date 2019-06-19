@@ -93,12 +93,9 @@ import {ConstantsService} from "../../services/constants.service";
             <div class="form-row-children">
                 <div class="flex-container-col">
                     <div class="flex-container-row form-entry-children">
-                        <mat-form-field>
-                            <mat-select placeholder="Genome Builds" [formControlName]="'genomeBuildToAdd'">
-                                <mat-option>None</mat-option>
-                                <mat-option *ngFor="let build of this.genomeBuildList" [value]="build">{{build.display}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                        <custom-combo-box placeholder="Genome Builds" [formControlName]="'genomeBuildToAdd'"
+                                          displayField="display" [options]="genomeBuildList">
+                        </custom-combo-box>
                         <button mat-button (click)="this.addGenomeBuild()" [disabled]="!isEditMode || !canUpdate || !this.form.controls['genomeBuildToAdd'].value">
                             <img src="../../../assets/add.png" class="icon">Add
                         </button>
@@ -119,12 +116,9 @@ import {ConstantsService} from "../../services/constants.service";
                 </div>
                 <span></span>
                 <div class="flex-container-col">
-                    <mat-form-field>
-                        <mat-select placeholder="Institution" [formControlName]="'idInstitution'">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let inst of this.institutionList" [value]="inst.idInstitution">{{inst.display}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <custom-combo-box placeholder="Institution" [formControlName]="'idInstitution'"
+                                      displayField="display" valueField="idInstitution" [options]="institutionList">
+                    </custom-combo-box>
                     <div>
                         <ul>Analysis Group(s)
                             <li *ngFor="let analysisGroup of this.form.controls['analysisGroupsJSONString'].value">{{analysisGroup.name}}</li>

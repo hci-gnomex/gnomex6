@@ -16,14 +16,9 @@
 
 
     <div class="flex-container-row">
-        <mat-form-field class="medium-form-input">
-            <mat-select [compareWith]="compareByID" placeholder="Type" formControlName="type" (selectionChange)="onTypeChanged($event)">
-                <mat-option
-                        *ngFor="let opt of typeList"
-                        [value]="opt" >{{opt.display}}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+        <custom-combo-box class="medium-form-input" placeholder="Type" (optionSelected)="onTypeChanged()"
+                          [options]="this.typeList" displayField="display" [formControlName]="'type'">
+        </custom-combo-box>
         <div class="padded-checkbox" >
             <label style="margin-right: 1em;" > Associated With Analysis  </label>
             <mat-checkbox  formControlName="associatedWithAnalysis" > </mat-checkbox>
@@ -56,23 +51,19 @@
 
     </div>
 
-    <mat-form-field class="medium-form-input">
-        <mat-select placeholder="Core Facility" formControlName="idCoreFacility" (selectionChange)="onCoreChanged($event)">
-            <mat-option *ngFor="let core of coreFacilityList" [value]="core.idCoreFacility" > {{core.display}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
+    <custom-combo-box class="medium-form-input" placeholder="Core Facility"
+                      (optionSelected)="onCoreChanged()" [options]="this.coreFacilityList"
+                      displayField="display" valueField="idCoreFacility" [formControlName]="'idCoreFacility'">
+    </custom-combo-box>
 
     <mat-form-field *ngIf="showNote">
         <textarea matInput placeholder="Notes" formControlName="notes" matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="2"></textarea>
     </mat-form-field>
 
-    <mat-form-field class="medium-form-input" *ngIf="showVendor">
-        <mat-select placeholder="Vendor" formControlName="idVendor" >
-            <mat-option *ngFor="let vendor of vendorList" [value]="vendor.idVendor" > {{vendor.display}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
+    <custom-combo-box *ngIf="showVendor" class="medium-form-input" placeholder="Vendor"
+                      [options]="this.vendorList" displayField="display"
+                      valueField="idVendor" [formControlName]="'idVendor'">
+    </custom-combo-box>
 
     <div class="flex-container-row">
         <label class="gx-label" style="margin-right: 2em;" > Available for </label>
@@ -116,12 +107,10 @@
         </mat-form-field>
 
     </div>
-    <mat-form-field class="medium-form-input"  *ngIf="showOrganism">
-        <mat-select placeholder="Default Organism" formControlName="idOrganism" >
-            <mat-option *ngFor="let organism of organismList" [value]="organism.value" > {{organism.display}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
+    <custom-combo-box *ngIf="showOrganism" class="medium-form-input" placeholder="Default Organism"
+                      [options]="this.organismList" displayField="display"
+                      valueField="value" [formControlName]="'idOrganism'">
+    </custom-combo-box>
 
 
 
@@ -132,24 +121,21 @@
                 <mat-checkbox (change)="onUseProducts()" formControlName="useProduct" > </mat-checkbox>
                 <label class="gx-label" style="margin-left:0.5em;"  > Use Products  </label>
             </div>
-            <mat-form-field class="margin-right-field" style="flex:4"  *ngIf="this.formGroup.get('useProduct')?.value;">
-                <mat-select placeholder="Product Type" formControlName="idProductType" >
-                    <mat-option *ngFor="let productType of productTypeList" [value]="productType.idProductType" > {{productType.display}}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+            <custom-combo-box *ngIf="this.formGroup.get('useProduct')?.value" class="margin-right-field"
+                              style="flex:4" placeholder="Product Type"
+                              [options]="this.productTypeList" displayField="display"
+                              valueField="idProductType" [formControlName]="'idProductType'">
+            </custom-combo-box>
             <mat-form-field style="flex:6" *ngIf="this.formGroup.get('useProduct')?.value;">
                 <input matInput placeholder="No Products Message" formControlName="noProductsMessage">
             </mat-form-field>
         </div>
 
         <div class="flex-container-row"  *ngIf="this.formGroup.get('useProduct')?.value;">
-            <mat-form-field >
-                <mat-select placeholder="Select a Status" formControlName="productStatus" >
-                    <mat-option *ngFor="let productStatus of productStatusList" [value]="productStatus.codeRequestStatus" > {{productStatus.codeRequestStatus}}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+            <custom-combo-box placeholder="Select a Status"
+                              [options]="this.productStatusList" displayField="codeRequestStatus"
+                              valueField="codeRequestStatus" [formControlName]="'productStatus'">
+            </custom-combo-box>
 
 
         </div>

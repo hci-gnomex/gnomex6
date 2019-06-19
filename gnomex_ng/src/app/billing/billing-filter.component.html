@@ -17,26 +17,17 @@
                 </mat-form-field>
             </div>
         </div>
-        <form [formGroup]="this.form">
-            <mat-form-field class="small-margin-right">
-                <mat-select placeholder="Core Facility" [formControlName]="'idCoreFacility'">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let cf of this.coreFacilityList" [value]="cf.idCoreFacility">{{cf.display}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <billing-period-selector (onChange)="this.onBillingPeriodChange($event)" class="small-margin-right"></billing-period-selector>
-            <mat-form-field class="small-margin-right">
-                <mat-select placeholder="Lab Group" [formControlName]="'idLab'">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let l of this.filteredLabList" [value]="l.idLab">{{l[this.prefService.labDisplayField]}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-select placeholder="Account" [formControlName]="'idBillingAccount'">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let a of this.billingAccountList" [value]="a.idBillingAccount">{{a.accountNameDisplay}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-        </form>
+        <div class="flex-container-row align-center children-flex-grow children-margin-right">
+            <custom-combo-box placeholder="Core Facility" [options]="this.coreFacilityList" displayField="display"
+                              valueField="idCoreFacility" [formControl]="this.form.get('idCoreFacility')">
+            </custom-combo-box>
+            <billing-period-selector (onChange)="this.onBillingPeriodChange($event)"></billing-period-selector>
+            <custom-combo-box placeholder="Lab Group" [options]="this.filteredLabList" valueField="idLab"
+                              [formControl]="this.form.get('idLab')" [displayField]="this.prefService.labDisplayField">
+            </custom-combo-box>
+            <custom-combo-box placeholder="Account" [options]="this.billingAccountList" displayField="accountNameDisplay"
+                              valueField="idBillingAccount" [formControl]="this.form.get('idBillingAccount')">
+            </custom-combo-box>
+        </div>
     </div>
 </div>
