@@ -313,6 +313,8 @@ export class Experiment {
         for (let sample of this.samples) {
             sample.codeBioanalyzerChipType = this._codeBioanalyzerChipType;
         }
+
+        this.refreshSampleAnnotationList();
     };
     public onChange_codeBioanalyzerChipType: BehaviorSubject<any> = new BehaviorSubject<any>('');
 
@@ -836,7 +838,9 @@ export class Experiment {
 
             if (this._PropertyEntries_original && Array.isArray(this._PropertyEntries_original)) {
                 let originalPropertiesThatAreSelected: any[] = this._PropertyEntries_original.filter((value) => {
-                    return value.isSelected && value.isSelected === 'true';
+                    return value.isSelected
+                        && value.isSelected === 'true'
+                        && (!value.idCoreFacility || value.idCoreFacility === this.idCoreFacility);
                 });
 
                 for (let propertyEntry of response) {

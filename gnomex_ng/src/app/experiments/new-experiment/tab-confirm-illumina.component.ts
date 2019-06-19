@@ -112,9 +112,14 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     @Input("requestCategory") set requestCategory(requestCategory: any) {
         setTimeout(() => {
             this.useMultiplexLanes = requestCategory
+                && requestCategory.isIlluminaType
                 && requestCategory.isIlluminaType === 'Y'
                 && this.experiment
                 && this.experiment.isExternal !== 'Y';
+
+            this.showRowNumberColumn = requestCategory
+                && requestCategory.isQCType
+                && requestCategory.isQCType !== 'Y';
 
             this.recalculateShowGenerateQuote();
         });
@@ -154,6 +159,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private isCheckboxChecked: boolean;
     private disable_agreeCheckbox: boolean;
     private useMultiplexLanes: boolean;
+    private showRowNumberColumn: boolean = true;
 
     private requestPropBox: boolean;
     public billingItems: any[] = [];
@@ -483,17 +489,19 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         let temp: any[] = [];
 
-        temp.push({
-            headerName: "",
-            field: "index",
-            width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
-            minWidth: 4 * this.emToPxConversionRate,
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            suppressSizeToFit: true,
-            pinned: "left",
-            sortOrder: 5
-        });
+        if (this.showRowNumberColumn) {
+            temp.push({
+                headerName: "",
+                field: "index",
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                suppressSizeToFit: true,
+                pinned: "left",
+                sortOrder: 5
+            });
+        }
         temp.push({
             headerName: "Sample Name",
             field: "name",
@@ -806,30 +814,26 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 let sampleNumber: number = 0;
 
                 for (let sample of this._experiment.samples) {
-                    sample.sampleId = "X" + ++sampleNumber;
-                    sequenceLanes.push(sample.getJSONObjectRepresentation());
+                    let lane = sample.getJSONObjectRepresentation();
+                    lane.sampleId = "X" + ++sampleNumber;
+                    sequenceLanes.push(lane);
                 }
-
-                // for (let multiplexLane of multiplexLanes) {
-                //     let sampleNumber: number = 0;
-                //     let multiplexNumber = multiplexLane.number;
-                //
-                //     if (multiplexLane.SequenceLane) {
-                //         if (Array.isArray(multiplexLane.SequenceLane)) {
-                //             for (let lane of multiplexLane.SequenceLane) {
-                //                 sequenceLanes[sampleNumber].sampleId = 'X' + ++sampleNumber;
-                //             }
-                //         } else {
-                //             sequenceLanes[sampleNumber].sampleId        = 'X' + ++sampleNumber;
-                //         }
-                //     }
-                // }
 
                 this.sequenceLanes = sequenceLanes;
                 this.gridApi.setRowData(this.sequenceLanes);
             });
         } else {
-            this.sequenceLanes = this._experiment.samples;
+            let sampleNumber: number = 0;
+            let sequenceLanes = [];
+
+            for (let sample of this._experiment.samples) {
+                let lane = sample.getJSONObjectRepresentation();
+                lane.sampleId = "X" + ++sampleNumber;
+                sequenceLanes.push(lane);
+            }
+
+            this.sequenceLanes = sequenceLanes;
+            this.gridApi.setRowData(this.sequenceLanes);
         }
     }
 
