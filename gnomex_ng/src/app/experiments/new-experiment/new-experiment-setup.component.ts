@@ -269,7 +269,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
             // These spoofedEvents are needed in places where the field is assigned a
             // default value, because (selectionChanged) does not pick up changes to the
             // form value.
-            let spoofedEvent = { source: { value: this.authorizedBillingAccounts[0] } };
+            let spoofedEvent = this.authorizedBillingAccounts[0];
             this.onBillingSelection(spoofedEvent);
         }
 
@@ -446,7 +446,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
                         // These spoofedEvents are needed in places where the field is assigned a
                         // default value, because (selectionChanged) does not pick up changes to the
                         // form value.
-                        let spoofedEvent: any = { source: { value: project } };
+                        let spoofedEvent: any = project;
                         this.onProjectSelection(spoofedEvent);
                     });
 
@@ -630,7 +630,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
     public onBillingSelection(event: any): void {
-        if (!event || !event.source) {
+        if (!event) {
             return;
         }
 
@@ -638,7 +638,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
     public onProjectSelection(event: any): void {
-        if (!event || !event.source) {
+        if (!event) {
             return;
         }
 

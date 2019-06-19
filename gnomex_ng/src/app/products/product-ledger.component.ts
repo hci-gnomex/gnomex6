@@ -13,25 +13,12 @@ import {AddLedgerEntryComponent} from "./add-ledger-entry.component";
 import {HttpParams} from "@angular/common/http";
 import {AddProductWindowComponent} from "./add-product-window.component";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UserPreferencesService} from "../services/user-preferences.service";
 
 @Component({
     selector: 'product-ledger',
     templateUrl: "./product-ledger.component.html",
     styles: [`
-        div.flex-container-row {
-            display: flex;
-            flex-direction: row;
-        }
-        div.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        .full-height {
-            height: 100%;
-        }
-        .full-width {
-            width: 100%;
-        }
         .ninety-five-percent-height {
             height: 95%;
         }
@@ -44,23 +31,14 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
         .five-percent-height {
             height: 5%;
         }
-        .half-width {
-            width: 50%;
-        }
         .margin-right {
             margin-right: 2rem;
         }
         .margin-bottom {
             margin-bottom: 2rem;
         }
-        .align-center {
-            align-items: center;
-        }
         .justify-end {
             justify-content: flex-end;
-        }
-        .justify-space-between {
-            justify-content: space-between;
         }
         .flex-one {
             flex: 1;
@@ -81,9 +59,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             background: yellow;
             padding: 0.5rem;
             margin-left: 1rem;
-        }
-        img.icon {
-            margin-right: 0.5rem;
         }
         .border-right {
             border-right: 2px solid lightgray;
@@ -112,6 +87,7 @@ export class ProductLedgerComponent implements OnInit {
     public gridRowData: any[];
 
     constructor(@Inject(FormBuilder) private fb: FormBuilder,
+                public prefService: UserPreferencesService,
                 private labListService: LabListService,
                 private productsService: ProductsService,
                 private dialogsService: DialogsService,

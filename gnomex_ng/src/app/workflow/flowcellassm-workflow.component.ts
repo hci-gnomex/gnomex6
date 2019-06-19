@@ -358,11 +358,11 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
 
 
     onSeqListSelection(event: any): void {
-        if(!event.value){
+        if(!event){
             this.workingWorkItemList = this.workItemList.slice();
         }else{
             this.workingWorkItemList = this.workItemList.filter(workItem =>
-                 workItem.idNumberSequencingCyclesAllowed === event.value.idNumberSequencingCyclesAllowed
+                 workItem.idNumberSequencingCyclesAllowed === event.idNumberSequencingCyclesAllowed
             );
         }
 

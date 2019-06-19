@@ -17,17 +17,10 @@
                     </div>
                     <div class="flex-grow">
                         <div [matTooltip]="_experiment?.labName">
-                            <mat-form-field class="full-width">
-                                <mat-select [(value)]="_experiment.idLab" formControlName="idLab"
-                                            (selectionChange)="onChange_lab($event)">
-                                    <mat-option [value]="">
-                                        {{ '' }}
-                                    </mat-option>
-                                    <mat-option *ngFor="let lab of filteredLabDictionary" [value]="lab.idLab">
-                                        {{ lab.display }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box class="full-width" (optionSelected)="onChange_lab($event)" valueField="idLab"
+                                              [options]="filteredLabDictionary" [displayField]="this.prefService.labDisplayField"
+                                              [(ngModel)]="_experiment.idLab" [formControlName]="'idLab'">
+                            </custom-combo-box>
                         </div>
                     </div>
                 </div>
@@ -37,14 +30,10 @@
                     </div>
                     <div class="flex-grow">
                         <div [matTooltip]="_experiment?.project?.Project?.name">
-                            <mat-form-field class="full-width">
-                                <mat-select [(value)]="_experiment.idProject" formControlName="idProject"
-                                            (selectionChange)="onChange_project($event)">
-                                    <mat-option *ngFor="let project of projectsDictionary" [value]="project.idProject">
-                                        {{ project.name }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box class="full-width" (optionSelected)="onChange_project($event)"
+                                              [options]="projectsDictionary" displayField="name" valueField="idProject"
+                                              [(ngModel)]="_experiment.idProject" [formControlName]="'idProject'">
+                            </custom-combo-box>
                         </div>
                     </div>
                 </div>
@@ -73,18 +62,10 @@
                     <div class="flex-grow">
                         <div class="full-width">
                             <div [matTooltip]="_experiment?.application?.Application?.display">
-                                <mat-form-field class="full-width">
-                                    <mat-select
-                                            [(value)]="_experiment.codeApplication" formControlName="codeApplication"
-                                            (selectionChange)="onChange_application($event)" >
-                                        <mat-option [value]="">
-                                            {{ '' }}
-                                        </mat-option>
-                                        <mat-option *ngFor="let application of filteredApplicationDictionary" [value]="application.value">
-                                            {{ application.display }}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
+                                <custom-combo-box class="full-width" (optionSelected)="onChange_application($event)" displayField="display"
+                                                  [options]="filteredApplicationDictionary" valueField="value"
+                                                  [(ngModel)]="_experiment.codeApplication" [formControlName]="'codeApplication'">
+                                </custom-combo-box>
                             </div>
                         </div>
                     </div>
@@ -131,18 +112,10 @@
                     </div>
                     <div class="flex-grow">
                         <div [matTooltip]="_experiment?.ownerName">
-                            <mat-form-field class="full-width">
-                                <mat-select
-                                        [(value)]="_experiment.idAppUser" formControlName="idAppUser"
-                                        (selectionChange)="onChange_owner($event)">
-                                    <mat-option [value]="">
-                                        {{ '' }}
-                                    </mat-option>
-                                    <mat-option *ngFor="let appUser of possibleOwnersForLabDictionary" [value]="appUser.idAppUser">
-                                        {{ appUser[this.prefService.userDisplayField] }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box class="full-width" (optionSelected)="onChange_owner($event)" valueField="idAppUser"
+                                              [options]="possibleOwnersForLabDictionary" [displayField]="this.prefService.userDisplayField"
+                                              [(ngModel)]="_experiment.idAppUser" [formControlName]="'idAppUser'">
+                            </custom-combo-box>
                         </div>
                     </div>
                 </div>
@@ -152,18 +125,10 @@
                     </div>
                     <div class="flex-grow">
                         <div [matTooltip]="_experiment?.submitterName">
-                            <mat-form-field class="full-width">
-                                <mat-select
-                                        [(value)]="_experiment.idSubmitter" formControlName="idSubmitter"
-                                        (selectionChange)="onChange_submitter($event)">
-                                    <mat-option [value]="">
-                                        {{ '' }}
-                                    </mat-option>
-                                    <mat-option *ngFor="let appUser of possibleSubmittersForLabDictionary" [value]="appUser.idAppUser">
-                                        {{ appUser[this.prefService.userDisplayField] }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box class="full-width" (optionSelected)="onChange_submitter($event)" valueField="idAppUser"
+                                              [options]="possibleSubmittersForLabDictionary" [displayField]="this.prefService.userDisplayField"
+                                              [(ngModel)]="_experiment.idSubmitter" [formControlName]="'idSubmitter'">
+                            </custom-combo-box>
                         </div>
                     </div>
                 </div>
