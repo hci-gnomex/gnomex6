@@ -8,23 +8,22 @@
         <tree-root #tree class="flex-one margin-right border-right" [nodes]="this.nodes" [options]="this.options" (activate)="this.onActivate($event)"></tree-root>
         <div [hidden]="this.selectedProductType" class="flex-three">{{''}}</div>
         <form [formGroup]="this.form" class="flex-three flex-container-col" [hidden]="!this.selectedProductType">
-            <mat-form-field class="full-width">
-                <mat-select placeholder="General - Core Facility" [formControlName]="'coreFacility'">
-                    <mat-option *ngFor="let cf of this.coreFacilities" [value]="cf.idCoreFacility">{{cf.display}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field class="full-width">
-                <mat-select placeholder="General - Vendor" [formControlName]="'vendor'">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let v of this.vendors" [value]="v.idVendor">{{v.display}}</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <custom-combo-box class="full-width" placeholder="General - Core Facility"
+                              [options]="this.coreFacilities"
+                              valueField="idCoreFacility" displayField="display"
+                              [formControlName]="'coreFacility'">
+            </custom-combo-box>
+            <custom-combo-box class="full-width" placeholder="General - Vendor"
+                              [options]="this.vendors"
+                              valueField="idVendor" displayField="display"
+                              [formControlName]="'vendor'">
+            </custom-combo-box>
             <div class="flex-container-row full-width">
-                <mat-form-field class="flex-one margin-right">
-                    <mat-select placeholder="Price Category" [formControlName]="'priceCategory'">
-                        <mat-option *ngFor="let pc of this.priceCategories" [value]="pc.idPriceCategory">{{pc.display}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <custom-combo-box class="flex-one margin-right" placeholder="Price Category"
+                                  [options]="this.priceCategories"
+                                  valueField="idPriceCategory" displayField="display"
+                                  [formControlName]="'priceCategory'">
+                </custom-combo-box>
                 <button class="flex-one margin-right" mat-button color="accent" (click)="this.toggleNewPriceCategory()">{{this.showNewPriceCategoryInput ? 'Close' : 'New'}}</button>
                 <mat-form-field [hidden]="!this.showNewPriceCategoryInput" class="flex-one margin-right">
                     <input matInput placeholder="Name" [formControlName]="'newPriceCategoryName'">

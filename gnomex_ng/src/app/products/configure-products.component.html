@@ -13,12 +13,12 @@
             <mat-checkbox [formControlName]="'active'" class="flex-one">Active</mat-checkbox>
         </div>
         <div class="flex-container-row full-width align-center">
-            <mat-form-field class="flex-four margin-right">
-                <mat-select placeholder="Product Type" [formControlName]="'productType'">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let type of this.productTypes" [value]="type.idProductType">{{type.display}}</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <div class="flex-four margin-right">
+                <custom-combo-box placeholder="Product Type" [options]="this.productTypes"
+                                  valueField="idProductType" displayField="display"
+                                  [formControlName]="'productType'">
+                </custom-combo-box>
+            </div>
             <button class="flex-one" mat-raised-button color="accent" (click)="this.openEditProductTypes()">Edit</button>
         </div>
         <mat-form-field class="full-width">

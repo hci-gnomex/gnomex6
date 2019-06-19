@@ -11,12 +11,14 @@
                     <mat-label class="justify-label-left">{{workingWorkItemList.length}} experiments</mat-label>
                 </div>
                 <div class="flex-container-row">
-                    <mat-form-field style="width:25em;">
-                        <mat-select placeholder="Protocol" [(ngModel)]="protocol" (selectionChange)="onSeqListSelection($event)">
-                            <mat-option>Choose a protocol...</mat-option>
-                            <mat-option *ngFor="let protocol of sequenceProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <div style="width:25em;">
+                        <custom-combo-box placeholder="Protocol"
+                                          (optionSelected)="onSeqListSelection($event)"
+                                          [options]="this.sequenceProtocolsList"
+                                          displayField="name"
+                                          [(ngModel)]="protocol">
+                        </custom-combo-box>
+                    </div>
                 </div>
 
                 <div class="flex-container-row spaced-children-margin">
@@ -70,19 +72,16 @@
                     </mat-form-field>
                 </div>
                 <div class="flex-container-row spaced-children-margin">
-                    <mat-form-field >
-                        <mat-select placeholder="Instrument" [formControl]="this.instrumentFC">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let instrument of instrumentList" [value]="instrument">{{instrument.instrument}}</mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="this.instrumentFC.hasError('required')"> This field is required </mat-error>
-                    </mat-form-field>
-                    <mat-form-field style="width:25em;">
-                        <mat-select placeholder="Protocol" [formControl]="this.protocolFC">
-                            <mat-option>Choose a protocol...</mat-option>
-                            <mat-option *ngFor="let protocol of filteredProtocolsList" [value]="protocol">{{protocol.name}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <div>
+                        <custom-combo-box placeholder="Instrument" [options]="this.instrumentList"
+                                          displayField="instrument" [formControl]="this.instrumentFC">
+                        </custom-combo-box>
+                    </div>
+                    <div style="width:25em;">
+                        <custom-combo-box placeholder="Protocol" [options]="this.filteredProtocolsList"
+                                          displayField="name" [formControl]="this.protocolFC">
+                        </custom-combo-box>
+                    </div>
                 </div>
                 <div class="flex-grow">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"

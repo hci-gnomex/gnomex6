@@ -16,30 +16,25 @@
             </mat-form-field>
         </div>
         <div>
-            <mat-form-field class="full-width">
-                <mat-select placeholder="Charge Kind" [formControlName]="'chargeKind'">
-                    <mat-option *ngFor="let kind of this.allChargeKinds" [value]="kind.codeBillingChargeKind">{{kind.display}}</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <custom-combo-box class="full-width" placeholder="Charge Kind"
+                              [options]="this.allChargeKinds" valueField="codeBillingChargeKind" displayField="display"
+                              [formControlName]="'chargeKind'">
+            </custom-combo-box>
         </div>
         <div>
             <label>Determine experiment's price using</label>
         </div>
         <div>
-            <mat-form-field class="full-width">
-                <mat-select [formControlName]="'filter1'">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let filterType of this.allFilterTypes" [value]="filterType.className">{{filterType.displayName}}</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <custom-combo-box class="full-width"
+                              [options]="this.allFilterTypes" valueField="className" displayField="displayName"
+                              [formControlName]="'filter1'">
+            </custom-combo-box>
         </div>
         <div>
-            <mat-form-field class="full-width">
-                <mat-select [formControlName]="'filter2'">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let filterType of this.allFilterTypes" [value]="filterType.className">{{filterType.displayName}}</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <custom-combo-box class="full-width"
+                              [options]="this.allFilterTypes" valueField="className" displayField="displayName"
+                              [formControlName]="'filter2'">
+            </custom-combo-box>
         </div>
         <div>
             <mat-form-field class="full-width">

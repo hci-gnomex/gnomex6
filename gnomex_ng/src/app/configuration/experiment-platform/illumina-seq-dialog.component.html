@@ -15,16 +15,10 @@
                 <mat-checkbox  formControlName="isActive" > Active </mat-checkbox>
             </div>
         </div>
-        <mat-form-field *ngIf="runOptions.length > 0" class="medium-form-input">
-            <mat-select placeholder="Run Mode" formControlName="isCustom" >
-                <mat-option>--</mat-option>
-                <mat-option *ngFor="let opt of runOptions " [value]="opt.value" >{{opt.display}}
-                </mat-option>
-            </mat-select>
-            <mat-error *ngIf="this.formGroup?.get('isCustom')?.hasError('required')">
-                This field is required
-            </mat-error>
-        </mat-form-field>
+        <custom-combo-box *ngIf="runOptions.length > 0" class="medium-form-input" placeholder="Run Mode"
+                          [options]="this.runOptions" valueField="value" displayField="display"
+                          [formControlName]="'isCustom'">
+        </custom-combo-box>
         <div style="align-items: center" class="flex-container-row">
             <mat-form-field class="medium-form-input">
                 <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
@@ -52,26 +46,14 @@
             </mat-error>
         </mat-form-field>
 
-        <mat-form-field class="medium-form-input">
-            <mat-select placeholder="Cycles" formControlName="idNumberSequencingCycles" >
-                <mat-option>--</mat-option>
-                <mat-option *ngFor="let cycle of cycleList " [value]="cycle.value" >{{cycle.display}}
-                </mat-option>
-            </mat-select>
-            <mat-error *ngIf="this.formGroup?.get('idNumberSequencingCycles')?.hasError('required')">
-                This field is required
-            </mat-error>
-        </mat-form-field>
-        <mat-form-field class="medium-form-input">
-            <mat-select placeholder="Type" formControlName="idSeqRunType" >
-                <mat-option>--</mat-option>
-                <mat-option *ngFor="let seqType of seqTypeRunList " [value]="seqType.value" >{{seqType.display}}
-                </mat-option>
-            </mat-select>
-            <mat-error *ngIf="this.formGroup?.get('idSeqRunType')?.hasError('required')">
-                This field is required
-            </mat-error>
-        </mat-form-field>
+        <custom-combo-box class="medium-form-input" placeholder="Cycles"
+                          [options]="this.cycleList" valueField="value" displayField="display"
+                          [formControlName]="'idNumberSequencingCycles'">
+        </custom-combo-box>
+        <custom-combo-box class="medium-form-input" placeholder="Type"
+                          [options]="this.seqTypeRunList" valueField="value" displayField="display"
+                          [formControlName]="'idSeqRunType'">
+        </custom-combo-box>
         <mat-form-field class="propFormField">
             <textarea matInput placeholder="Protocol Description" formControlName="protocolDescription"
                       matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="10">

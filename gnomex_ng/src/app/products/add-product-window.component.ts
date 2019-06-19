@@ -9,16 +9,6 @@ import {UserPreferencesService} from "../services/user-preferences.service";
     selector: 'add-product-window',
     templateUrl: "./add-product-window.component.html",
     styles: [`
-        form.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        mat-form-field.full-width {
-            width: 100%;
-        }
-        img.icon {
-            margin-right: 0.5rem;
-        }
     `]
 })
 export class AddProductWindowComponent implements OnInit {
