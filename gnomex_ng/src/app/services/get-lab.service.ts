@@ -196,9 +196,9 @@ export class GetLabService {
     }
 
     public getLabMembers(idLab: string): Observable<any[]> {
-        return this.getLabBasic(idLab).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                let lab = response.json();
+        return this.getLabBasic(idLab).pipe(map((response: any) => {
+            if (response && response.Lab) {
+                let lab = response
                 return UtilService.getJsonArray(lab.Lab.members, lab.Lab.members.AppUser);
             } else {
                 return [];

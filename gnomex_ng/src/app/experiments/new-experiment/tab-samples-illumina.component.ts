@@ -29,7 +29,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GridApi} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
-import {UtilService} from "../../services/util.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -2064,9 +2064,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         config.panelClass = 'no-padding-dialog';
         config.data = data;
 
-        let dialogRef = this.dialog.open(UploadSampleSheetComponent, config);
-
-        dialogRef.afterClosed().subscribe((result) => {
+        this.dialogService.genericDialogContainer(UploadSampleSheetComponent, "Upload Sample Sheet", null, config,
+            {actions: [{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}]}).subscribe((result: any) => {
             if (result && Array.isArray(result)) {
                 this._experiment.numberOfSamples = '' + result.length;
             }

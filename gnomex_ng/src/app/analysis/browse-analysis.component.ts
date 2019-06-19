@@ -53,13 +53,21 @@ import {filter} from "rxjs/operators";
         .small-font {
             font-size: 12px;
         }
+        .allow-line-breaks {
+            white-space: pre-line;
+        }
+        .background-lightyellow {
+            background-color: lightyellow;
+        }
     `]
 })
 
 export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
-
     @ViewChild("analysisTree") treeComponent: TreeComponent;
+
+    public readonly DRAG_AND_DROP_HINT: string = "Drag-and-drop to move analyses to another lab and/or group. Hold Ctrl while dragging-and-dropping to assign to multiple groups";
+    public showDragDropHint: boolean = false;
     public options: ITreeOptions;
 
     public items: any;
@@ -467,8 +475,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         }
     }
 
-    dragDropHintClicked(event: any) {
-        this.dialogsService.alert("Drag-and-drop to move analyses to another lab and/or group. Hold Ctrl while dragging-and-dropping to assign to multiple groups");
+    dragDropHintClicked(): void {
+        this.showDragDropHint = !this.showDragDropHint;
     }
 
     treeOnSelect(event: any) {

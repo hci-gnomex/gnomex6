@@ -104,9 +104,12 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
             action.externalAction();
         }
         if(action.internalAction){
-            this.dialogContent[action.internalAction]();
+            if(action.internalAction === "cancel" || action.internalAction === "onClose") {
+                this.onClose();
+            } else {
+                this.dialogContent[action.internalAction]();
+            }
         }
-        console.log(action);
     }
 
     onMouseDownHeader(event: any): void {
@@ -150,7 +153,7 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
         this.changeDetector.reattach();
     }
 
-    onClose($event){
+    onClose(){
         this.dialogRef.close();
     }
 

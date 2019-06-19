@@ -2,7 +2,7 @@ import {Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChanges} f
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewGenomeBuildComponent} from "../new-genome-build.component";
-import {MatDialogRef, MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {NewOrganismComponent} from "../new-organism.component";
 import {NewDataTrackFolderComponent} from "../../datatracks/new-datatrackfolder.component";
 import {DialogsService} from "../popup/dialogs.service";
@@ -116,32 +116,41 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public makeNewDataTrack(): void {
-        let dialogRef: MatDialogRef<NewDataTrackComponent> = this.dialog.open(NewDataTrackComponent, {
-            height: "23em",
-            width: "40em",
-            data: {
-                selectedItem: this.selectedNode
-            }
-        });
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.onDataTrackCreated.emit(result);
-            }
+        let title: string = "Add new data track to " + this.selectedNode.data.label;
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "40em";
+        config.height = "23em";
+        config.data = {
+            selectedItem: this.selectedNode
+        };
+        this.dialogsService.genericDialogContainer(NewDataTrackComponent, title, this.constantsService.ICON_DATATRACK, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.onDataTrackCreated.emit(result);
+                    }
         });
     }
 
     public makeNewFolder(): void {
-        let dialogRef: MatDialogRef<NewDataTrackFolderComponent> = this.dialog.open(NewDataTrackFolderComponent, {
-            height: "18em",
-            width: "40em",
-            data: {
-                selectedItem: this.selectedNode
-            }
-        });
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.onDataTrackFolderCreated.emit(result);
-            }
+        let title = "Add new data track folder to " + this.selectedNode.data.label;
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "40em";
+        config.height = "18em";
+        config.data = {
+            selectedItem: this.selectedNode
+        };
+
+        this.dialogsService.genericDialogContainer(NewDataTrackFolderComponent, title, this.constantsService.ICON_FOLDER_GROUP, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.onDataTrackFolderCreated.emit(result);
+                    }
         });
     }
 
@@ -199,13 +208,17 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         let params: HttpParams = new HttpParams();
 
         if (this.selectedNode.data.idDataTrack) {
-            let dialogRef: MatDialogRef<DeleteDataTrackComponent> = this.dialog.open(DeleteDataTrackComponent, {
-                height: "210px",
-                width: "300px",
-                data: {
-                    selectedItem: this.selectedNode
-                }
-            });
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.height = "15em";
+            config.width = "35em";
+            config.data = {
+                selectedItem: this.selectedNode
+            };
+            this.dialogsService.genericDialogContainer(DeleteDataTrackComponent, "Confirm: Delete Data Track", this.selectedNode.data.icon, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
         } else {
             if (this.selectedNode.data.binomialName) {
                 if (this.selectedNode.data.GenomeBuild) {
@@ -339,11 +352,13 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     private getChildDataTracks(item: any, children: any[]): void {
-        for (let child of item.items) {
-            if (child.idDataTrack) {
-                children.push(child);
-            } else {
-                this.getChildDataTracks(child, children);
+        if(item.items) {
+            for (let child of item.items) {
+                if (child.idDataTrack) {
+                    children.push(child);
+                } else {
+                    this.getChildDataTracks(child, children);
+                }
             }
         }
     }
@@ -351,9 +366,6 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     private makeNewGenomeBuild(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = "35em";
-        configuration.panelClass = "no-padding-dialog";
-        configuration.autoFocus = false;
-        configuration.disableClose = true;
         configuration.data = {
             selectedItem: this.selectedNode
         };
@@ -361,7 +373,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         this.dialogsService.genericDialogContainer(NewGenomeBuildComponent, "New Genome Build", this.constantsService.ICON_GENOME_BUILD, configuration,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
-                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
             if(result) {
                 this.onGenomeBuildCreated.emit(result);
@@ -372,14 +384,11 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     private makeNewOrganism(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = "35em";
-        configuration.panelClass = "no-padding-dialog";
-        configuration.autoFocus = false;
-        configuration.disableClose = true;
 
         this.dialogsService.genericDialogContainer(NewOrganismComponent, "New Species", this.constantsService.ICON_ORGANISM, configuration,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
-                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
             if(result) {
                 this.dictionaryService.reloadAndRefresh(() => {

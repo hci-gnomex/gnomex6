@@ -3,7 +3,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {GridReadyEvent, GridSizeChangedEvent} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
 import {UtilService} from "../../services/util.service";
@@ -15,6 +15,7 @@ import {
 import {BillingService} from "../../services/billing.service";
 import {FormControl} from "@angular/forms";
 import {ExperimentsService} from "../experiments.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'experiment-billing-tab',
@@ -57,7 +58,6 @@ export class ExperimentBillingTabComponent implements OnInit {
                 private route: ActivatedRoute,
                 private dictionaryService: DictionaryService,
                 private dialogsService: DialogsService,
-                private dialog: MatDialog,
                 public experimentsService: ExperimentsService) {
     }
 
@@ -159,18 +159,22 @@ export class ExperimentBillingTabComponent implements OnInit {
         params.billingTemplate = this.currentBillingTemplate;
 
         let config: MatDialogConfig = new MatDialogConfig();
+        config.autoFocus = false;
         config.data = {
             params: params
         };
 
-        let dialogRef: MatDialogRef<BillingTemplateWindowComponent> = this.dialog.open(BillingTemplateWindowComponent, config);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.currentBillingTemplate = result as BillingTemplate;
-                this.refreshBillingAccountsLabel();
-                this.billingTemplateFormControl.setValue(this.currentBillingTemplate);
-                this.billingTemplateFormControl.markAsDirty();
-            }
+        this.dialogsService.genericDialogContainer(BillingTemplateWindowComponent, "Billing Template", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "promptToSave"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"},
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.currentBillingTemplate = result as BillingTemplate;
+                        this.refreshBillingAccountsLabel();
+                        this.billingTemplateFormControl.setValue(this.currentBillingTemplate);
+                        this.billingTemplateFormControl.markAsDirty();
+                    }
         });
     }
 

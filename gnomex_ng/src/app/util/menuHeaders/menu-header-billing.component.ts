@@ -8,6 +8,8 @@ import {InvoiceEmailWindowComponent} from "../../billing/invoice-email-window.co
 import {BillingGlInterfaceViewComponent} from "../../billing/billing-gl-interface-view.component";
 import {NotesToCoreComponent} from "../../billing/notes-to-core.component";
 import {BillingService} from "../../services/billing.service";
+import {ConstantsService} from "../../services/constants.service";
+import {ActionType} from "../interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'menu-header-billing',
@@ -27,7 +29,8 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     constructor(private dialog: MatDialog,
                 private dialogsService: DialogsService,
-                private billingService: BillingService) {
+                private billingService: BillingService,
+                private constantsService: ConstantsService) {
     }
 
     ngOnInit() {
@@ -51,14 +54,21 @@ export class MenuHeaderBillingComponent implements OnInit {
             return;
         }
 
+        let title: string = this.billingPeriodString + " GL Interface " + this.totalPrice.toLocaleString("en-US", {style: "currency", currency: "USD"});
+
         let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "35em";
         config.data = {
             totalPrice: this.totalPrice,
             idBillingPeriod: this.idBillingPeriod,
             idCoreFacility: this.idCoreFacility,
             billingPeriodString: this.billingPeriodString
         };
-        this.dialog.open(BillingGlInterfaceViewComponent, config);
+        this.dialogsService.genericDialogContainer(BillingGlInterfaceViewComponent, title, null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "OK", internalAction: "send"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
     }
 
     public showBillingInvoice(sendEmail: boolean): void {
@@ -127,7 +137,11 @@ export class MenuHeaderBillingComponent implements OnInit {
             labNode: labNode,
             idCoreFacility: this.idCoreFacility
         };
-        this.dialog.open(InvoiceEmailWindowComponent, config);
+        this.dialogsService.genericDialogContainer(InvoiceEmailWindowComponent, "Email Invoice", this.constantsService.EMAIL_GO_LINK, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.EMAIL_GO_LINK, name: "Send", internalAction: "send"},
+                    {type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}
+                ]});
     }
 
     public showMonthendBillingReport(uMergeFormat: boolean = false): void {
@@ -158,20 +172,34 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     public showBillingByLabReport(): void {
         let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "35em";
+        config.height = "12em";
+        config.autoFocus = false;
         config.data = {
             mode: "Total Billing by Lab",
             idCoreFacility: this.idCoreFacility
         };
-        this.dialog.open(BillingUsageReportComponent, config);
+        this.dialogsService.genericDialogContainer(BillingUsageReportComponent, "Total Billing by Lab Report for Bioinformatics", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "OK", internalAction: "submit"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
     }
 
     public showUsageReport(): void {
         let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "35em";
+        config.height = "12em";
+        config.autoFocus = false;
         config.data = {
             mode: "Lab Usage",
             idCoreFacility: this.idCoreFacility
         };
-        this.dialog.open(BillingUsageReportComponent, config);
+        this.dialogsService.genericDialogContainer(BillingUsageReportComponent, "Lab Usage Report for Bioinformatics", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "OK", internalAction: "submit"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
     }
 
     public showNotesToCore(): void {
@@ -182,10 +210,14 @@ export class MenuHeaderBillingComponent implements OnInit {
 
         let config: MatDialogConfig = new MatDialogConfig();
         config.disableClose = true;
-        config.hasBackdrop = false;
+        config.autoFocus = false;
         config.data = {
         };
-        this.dialog.open(NotesToCoreComponent, config);
+        // this.dialog.open(NotesToCoreComponent, config);
+        this.dialogsService.genericDialogContainer(NotesToCoreComponent, "Billing Item Notes to Core", null, config,
+            {actions: [
+                    {type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}
+                ]});
     }
 
     public refresh(): void {

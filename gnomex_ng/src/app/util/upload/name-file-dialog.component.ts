@@ -2,6 +2,7 @@ import {Component, Inject, OnInit} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
 import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog";
+import {GDAction} from "../interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -39,6 +40,7 @@ import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog
 })
 export class NameFileDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
+    public primaryDisable: (action: GDAction) => boolean;
     placeHolder: string = "Folder Name";
     name: string;
 
@@ -52,12 +54,11 @@ export class NameFileDialogComponent extends BaseGenericContainerDialog implemen
     }
 
     ngOnInit(){
-
+        this.primaryDisable = (action) => {
+            return !this.name;
+        };
     }
     applyChanges(){
         this.dialogRef.close(this.name);
-    }
-    cancel(): void {
-        this.dialogRef.close();
     }
 }
