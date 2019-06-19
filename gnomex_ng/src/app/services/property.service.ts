@@ -56,6 +56,8 @@ export class PropertyService {
     public static readonly PROPERTY_NO_GUEST_ACCESS: string = "no_guest_access";
     public static readonly PROPERTY_GUEST_DOWNLOAD_TERMS: string = "guest_download_terms";
     public static readonly PROPERTY_ALLOW_PRICE_QUOTE: string = "allow_price_quote";
+    public static readonly PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN: string = "hide_multiplex_lane_column";
+    public static readonly PROPERTY_DEFAULT_VALUE_MULTIPLEX_LANE_COLUMN: string = "default_value_multiplex_lane_column";
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
