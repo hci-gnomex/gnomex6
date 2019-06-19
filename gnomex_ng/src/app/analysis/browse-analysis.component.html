@@ -11,13 +11,18 @@
             <as-split>
                 <as-split-area size="20">
                     <div class="full-width full-height foreground border flex-container-col"> <!-- start tree container -->
+                        <div *ngIf="showDragDropHint" class="full-width padded">
+                            <div class="background-lightyellow allow-line-breaks padded">{{ this.DRAG_AND_DROP_HINT }}
+                            </div>
+                        </div>
                         <div class="full-width flex-container-row align-center padded">
                             <div class="full-height flex-grow major-left-right-padded no-word-wrap flex-container-col align-center justify-center">
                                 <label>{{analysisCount}} analyses</label>
                                 <label class="small-font">{{analysisCountMessage}}</label>
                             </div>
                             <div>
-                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked($event)" [disabled]="this.createSecurityAdvisorService.isGuest">
+                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"
+                                        [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_AND_DROP_HINT">
                                     <img src="../../assets/information.png">
                                     Drag-and-drop hint
                                 </button>

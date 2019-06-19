@@ -7,6 +7,7 @@ import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowSelectedEvent} from "a
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 
 @Component({
     selector: 'billing-template-window',
@@ -21,7 +22,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
     `]
 })
 
-export class BillingTemplateWindowComponent implements OnInit {
+export class BillingTemplateWindowComponent extends BaseGenericContainerDialog implements OnInit {
 
     public idCoreFacility: string = "";
     public codeRequestCategory: string = "";
@@ -46,6 +47,8 @@ export class BillingTemplateWindowComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService) {
+        super();
+
         if (data && data.params) {
             let params: BillingTemplateWindowParams = data.params as BillingTemplateWindowParams;
             if (params.idCoreFacility) {

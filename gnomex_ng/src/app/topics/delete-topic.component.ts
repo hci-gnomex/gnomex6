@@ -4,27 +4,19 @@ import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {TopicService} from "../services/topic.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: "delete-topic",
     template: `
-        <h6 mat-dialog-title><img src="../../assets/folder_group.png">Confirm</h6>
-        <mat-dialog-content>
+        <div class="double-padded">
             {{deletePrompt}}
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button *ngIf="!showSpinner" (click)="delete()">Yes</button>
-            <button mat-button *ngIf="!showSpinner" mat-dialog-close>No</button>
-            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-        </mat-dialog-actions>
+        </div>
     `,
 })
 
-export class DeleteTopicComponent {
+export class DeleteTopicComponent extends BaseGenericContainerDialog {
     private selectedItem: ITreeNode;
-    public title: string = "";
-    public folderName: string = "";
-    public idLab: string = "";
     public deletePrompt: string = "";
     public showSpinner: boolean = false;
     private topic: any;
@@ -36,7 +28,7 @@ export class DeleteTopicComponent {
                 private dialogsService: DialogsService,
                 private topicService: TopicService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
-
+        super();
         this.selectedItem = data.selectedItem;
         this.topic = data.topic;
         if (!this.selectedItem.data.idDataTrack && !this.selectedItem.data.idAnalysis && !this.selectedItem.data.idRequest) {

@@ -29,6 +29,7 @@ import {PriceSheetViewComponent} from "./price-sheet-view.component";
 import {PriceCategoryViewComponent} from "./price-category-view.component";
 import {PriceViewComponent} from "./price-view.component";
 import {UtilService} from "../services/util.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'nav-billing',
@@ -932,27 +933,31 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     params.billingTemplate = template;
 
                     let config: MatDialogConfig = new MatDialogConfig();
+                    config.autoFocus = false;
                     config.data = {
                         params: params
                     };
 
-                    let dialogRef: MatDialogRef<BillingTemplateWindowComponent> = this.dialog.open(BillingTemplateWindowComponent, config);
-                    dialogRef.afterClosed().subscribe((result: any) => {
-                        if (result) {
-                            this.billingService.saveBillingTemplate(result).subscribe((result: any) => {
-                                if (result && result.result === "SUCCESS") {
-                                    if (this.lastFilterEvent) {
-                                        this.onFilterChange(this.lastFilterEvent);
-                                    }
-                                } else {
-                                    let message: string = "";
-                                    if (result && result.message) {
-                                        message = ": " + result.message;
-                                    }
-                                    this.dialogsService.confirm("An error occurred while saving the billing template" + message, null);
+                    this.dialogsService.genericDialogContainer(BillingTemplateWindowComponent, "Billing Template", null, config,
+                        {actions: [
+                                {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "promptToSave"},
+                                {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"},
+                            ]}).subscribe((result: any) => {
+                                if (result) {
+                                    this.billingService.saveBillingTemplate(result).subscribe((result: any) => {
+                                        if (result && result.result === "SUCCESS") {
+                                            if (this.lastFilterEvent) {
+                                                this.onFilterChange(this.lastFilterEvent);
+                                            }
+                                        } else {
+                                            let message: string = "";
+                                            if (result && result.message) {
+                                                message = ": " + result.message;
+                                            }
+                                            this.dialogsService.confirm("An error occurred while saving the billing template" + message, null);
+                                        }
+                                    });
                                 }
-                            });
-                        }
                     });
                 } else {
                     this.dialogsService.confirm("There was an error retrieving the billing template", null);

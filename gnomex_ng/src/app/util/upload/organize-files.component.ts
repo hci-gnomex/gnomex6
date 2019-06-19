@@ -464,7 +464,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         this.dialogService.genericDialogContainer(NameFileDialogComponent, title, imgIcon ? imgIcon : null, config,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "OK", internalAction: "applyChanges"},
-                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe(onClose);
 
     }

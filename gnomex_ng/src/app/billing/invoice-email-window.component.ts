@@ -5,36 +5,31 @@ import {FormControl, Validators} from "@angular/forms";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {ConstantsService} from "../services/constants.service";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'invoice-email-window',
     template: `
-        <h6 mat-dialog-title>Email Invoice</h6>
-        <mat-dialog-content>
-            <div class="email-address-box">
-                <mat-form-field class="full-width">
-                    <textarea matInput placeholder="Email Address(es)" [formControl]="this.addressFC"
+        <div class="email-address-box double-padded">
+            <mat-form-field class="full-width">
+                <textarea matInput placeholder="Email Address(es)" [formControl]="this.addressFC"
                           matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
-                </mat-form-field>
-                <label>*Please separate multiple email addresses with a comma</label>
+            </mat-form-field>
+            <label>*Please separate multiple email addresses with a comma</label>
+        </div>
+        <div *ngIf="this.emailSent" class="email-sent-box double-padded">
+            <div>
+                <label class="underline" *ngIf="this.controllerResponse?.note">Email Sent</label>
             </div>
-            <div *ngIf="this.emailSent" class="email-sent-box">
-                <div>
-                    <label class="underline" *ngIf="this.controllerResponse?.note">Email Sent</label>
-                </div>
-                <div>
-                    <label>{{this.controllerResponse?.title}}</label>
-                </div>
-                <div>
-                    <label *ngIf="this.controllerResponse?.note">({{this.controllerResponse?.note}})</label>
-                </div>
+            <div>
+                <label>{{this.controllerResponse?.title}}</label>
             </div>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button color="primary" [disabled]="this.addressFC.invalid || this.showError || this.emailSent" (click)="this.send()"><img src="../../assets/email_go.png" class="icon">Send</button>
-            <button mat-button mat-dialog-close>Close</button>
-            <label class="error-warning" *ngIf="this.showError">***Email address(es) are malformed***</label>
-        </mat-dialog-actions>
+            <div>
+                <label *ngIf="this.controllerResponse?.note">({{this.controllerResponse?.note}})</label>
+            </div>
+        </div>
+        <label class="error-warning double-padded" *ngIf="this.showError">***Email address(es) are malformed***</label>
     `,
     styles: [`
         div.email-address-box {
@@ -53,8 +48,9 @@ import {HttpParams} from "@angular/common/http";
     `]
 })
 
-export class InvoiceEmailWindowComponent implements OnInit {
+export class InvoiceEmailWindowComponent extends BaseGenericContainerDialog implements OnInit {
 
+    public primaryDisable: (action?: GDAction) => boolean;
     public addressFC: FormControl;
     private idBillingPeriod: string;
     private labNode: ITreeNode;
@@ -66,6 +62,7 @@ export class InvoiceEmailWindowComponent implements OnInit {
 
     constructor(@Inject(MAT_DIALOG_DATA) private data: any,
                 private billingService: BillingService) {
+        super();
     }
 
     ngOnInit() {
@@ -77,6 +74,9 @@ export class InvoiceEmailWindowComponent implements OnInit {
         this.addressFC.valueChanges.subscribe(() => {
             this.showError = false;
         });
+        this.primaryDisable = (action) => {
+            return this.addressFC.invalid || this.showError || this.emailSent;
+        };
     }
 
     public send(): void {

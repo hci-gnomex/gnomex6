@@ -1,21 +1,22 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {Component, Inject} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {DataTrackService} from "../services/data-track.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: "delete-data-track",
-    templateUrl: "./delete-datatrack-dialog.html",
+    template: `
+        <div class="double-padded">
+            {{deletePrompt}}
+        </div>
+    `,
 })
 
-export class DeleteDataTrackComponent {
+export class DeleteDataTrackComponent extends BaseGenericContainerDialog {
     private selectedItem: ITreeNode;
     public title: string = "";
     private idGenomeBuild: string = "";
@@ -30,6 +31,7 @@ export class DeleteDataTrackComponent {
                 private dialogsService: DialogsService,
                 private dataTrackService: DataTrackService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
+        super();
 
         this.selectedItem = data.selectedItem;
         if (this.selectedItem.data.folderCount > 1) {
@@ -37,7 +39,7 @@ export class DeleteDataTrackComponent {
                  "' under '" + this.selectedItem.parent.data.label + "'?";
             this.hasLink = true;
         } else {
-            this.deletePrompt = "Delete dataTrack" + this.selectedItem.data.label;
+            this.deletePrompt = "Delete dataTrack " + this.selectedItem.data.label + "'?";
             this.hasLink = false;
         }
     }
@@ -60,7 +62,7 @@ export class DeleteDataTrackComponent {
                     .set("idDataTrackFolder", this.selectedItem.data.idDataTrackFolder)
                     .set("idGenomeBuild", this.selectedItem.data.idGenomeBuild);
 
-                this.dataTrackService.unlinkDataTrack(params).subscribe((response: Response) => {
+                this.dataTrackService.unlinkDataTrack(params).subscribe((response: any) => {
 
                     var level = "DataTrack '" + this.selectedItem.data.label + "' is referenced under folders '" + dString + "'.";
                     var confirmString = "Do you want to remove all references to this dataTrack?";
@@ -77,7 +79,7 @@ export class DeleteDataTrackComponent {
                             }
                         );
                 });
-            },(err:IGnomexErrorResponse) =>{
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
         } else {
@@ -89,11 +91,11 @@ export class DeleteDataTrackComponent {
     deleteDataTrack() {
         let params: HttpParams = new HttpParams()
             .set("idDataTrack", this.selectedItem.data.idDataTrack);
-        this.dataTrackService.deleteDataTrack(params).subscribe((response: Response) => {
+        this.dataTrackService.deleteDataTrack(params).subscribe((response: any) => {
             this.showSpinner = false;
             this.dialogRef.close();
             this.dataTrackService.refreshDatatracksList_fromBackend();
-        },(err: IGnomexErrorResponse) =>{
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
 
