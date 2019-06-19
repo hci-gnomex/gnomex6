@@ -188,7 +188,7 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
     public save(): void {
         let sequenceLanes: any[] = [];
         for (let sample of this.newEEService.experiment.samples) {
-            sequenceLanes.push(NewExternalExperimentService.createSequenceLane(sample));
+            sequenceLanes.push(sample.createSequenceLane());
         }
         this.newEEService.experiment.sequenceLanes = sequenceLanes;
 

@@ -1,10 +1,13 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, OnDestroy} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {AbstractControl, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Experiment} from "../../util/models/experiment.model";
 import {GnomexService} from "../../services/gnomex.service";
+import {UtilService} from "../../services/util.service";
+import {Subscription} from "rxjs";
+import {Sample} from "../../util/models/sample.model";
 
 @Component({
     selector: 'experiment-bioinformatics-tab',
@@ -58,7 +61,7 @@ import {GnomexService} from "../../services/gnomex.service";
         
     `]
 })
-export class ExperimentBioinformaticsTabComponent {
+export class ExperimentBioinformaticsTabComponent implements OnDestroy {
 
     @Input('experiment') set experiment(experiment: any) {
 
@@ -73,11 +76,6 @@ export class ExperimentBioinformaticsTabComponent {
         }
 
         if (this._experiment && this._experiment.sequenceLanes) {
-
-            if (!Array.isArray(this._experiment.sequenceLanes)) {
-                this._experiment.sequenceLanes = [this._experiment.sequenceLanes.SequenceLane];
-            }
-
             if (this._experiment.sequenceLanes.length === 0) {
                 this.flag_isANewExperiment = true;
             }
@@ -90,6 +88,23 @@ export class ExperimentBioinformaticsTabComponent {
             this.analysisNote  = this.getStringValuedProperty(PropertyService.PROPERTY_REQUEST_BIO_ANALYSIS_NOTE,    this._experiment.idCoreFacility);
             this.linkUrl       = this.getStringValuedProperty(PropertyService.PROPERTY_CONTACT_EMAIL_BIOINFORMATICS, this._experiment.idCoreFacility);
         }
+
+        UtilService.safelyUnsubscribe(this.numberOfSamples_subscription);
+        for (let subscription of this.sampleOrganism_subscriptionSet) {
+            UtilService.safelyUnsubscribe(subscription);
+        }
+
+        this.numberOfSamples_subscription = this._experiment.onChange_numberOfSamples.subscribe((value: string) => {
+            for (let sample of this._experiment.samples) {
+                sample.onChange_organism.subscribe((organism: any) => {
+                    this.requireReconfirmation();
+                });
+            }
+
+            this.requireReconfirmation();
+        });
+
+        this.requireReconfirmation();
     }
     
     @Input("editMode") set editMode (isEditMode: boolean) {
@@ -113,6 +128,11 @@ export class ExperimentBioinformaticsTabComponent {
         return this._experiment && this._experiment.bioinformaticsAssist && this._experiment.bioinformaticsAssist === 'Y';
     }
 
+
+    private numberOfSamples_subscription: Subscription;
+    private sampleOrganism_subscriptionSet: Set<Subscription> = new Set<Subscription>();
+
+
     public masterDisabled: boolean = false;
     public form: FormGroup;
 
@@ -121,9 +141,8 @@ export class ExperimentBioinformaticsTabComponent {
     public genomeBuild: string = '';
 
     public sampleOrganisms: any[] = [];
-    public sampleGenomeBuilds: any[] = [];
 
-    private _experiment: any;
+    private _experiment: Experiment;
 
     private flag_isANewExperiment: boolean = false;
 
@@ -155,35 +174,28 @@ export class ExperimentBioinformaticsTabComponent {
         this.form = this.formBuilder.group({});
     }
 
+    ngOnDestroy(): void {
+        UtilService.safelyUnsubscribe(this.numberOfSamples_subscription);
+
+        for (let subscription of this.sampleOrganism_subscriptionSet) {
+            UtilService.safelyUnsubscribe(subscription);
+        }
+    }
 
     public onCheckboxChanged(item: any, event: any) {
         if (this._experiment && this._experiment.sequenceLanes) {
-            if (!Array.isArray(this._experiment.sequenceLanes)) {
-                this._experiment.sequenceLanes = [this._experiment.sequenceLanes.SequenceLane];
-            }
-
             let lanesToChange = this._experiment.sequenceLanes.filter((a) => {
                 return a.idOrganism === item.idOrganism;
             });
 
-            if (event.value) {
-                for (let lanes of lanesToChange) {
-                    lanes.idGenomeBuildAlignTo = event.value ? event.value : '';
-                }
-            } else {
-                for (let lanes of lanesToChange) {
-                    lanes.idGenomeBuildAlignTo = event.value ? event.value : '';
-                }
+            for (let lanes of lanesToChange) {
+                lanes.idGenomeBuildAlignTo = event.value ? event.value : '';
             }
         }
     }
 
     public onSelectChanged(item: any, event: any) {
         if (this._experiment && this._experiment.sequenceLanes) {
-            if (!Array.isArray(this._experiment.sequenceLanes)) {
-                this._experiment.sequenceLanes = [this._experiment.sequenceLanes.SequenceLane];
-            }
-
             let lanesToChange = this._experiment.sequenceLanes.filter((a) => {
                 return a.idOrganism === item.idOrganism;
             });
@@ -208,7 +220,6 @@ export class ExperimentBioinformaticsTabComponent {
     private prepareComponent(): void {
 
         this.genomeBuild = '';
-        this.sampleGenomeBuilds = [];
 
         let consolidatedGenomeBuildIds: Set<string> = new Set();
         let consolidatedOrganismIds: Set<string> = new Set();
@@ -280,22 +291,12 @@ export class ExperimentBioinformaticsTabComponent {
 
                 if (entry) {
                     this.genomeBuild = this.genomeBuild + entry.display;
-                    this.sampleGenomeBuilds.push(entry);
                 }
             }
         } else {
             this._experiment.sequenceLanes = [];
 
-            let samples: any[] = [];
-            if(this._experiment.samples) {
-                if (Array.isArray(this._experiment.samples)) {
-                    samples = this._experiment.samples;
-                } else {
-                    samples = [this._experiment.samples.Sample];
-                }
-            }
-
-            for (let sample of samples) {
+            for (let sample of this._experiment.samples) {
                 let idOrganism: string = '';
 
                 if (sample.idOrganism) {
@@ -306,17 +307,35 @@ export class ExperimentBioinformaticsTabComponent {
                 let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
                 let laneStr: string = lanePlus.toString().substr(1);
 
-                let laneObj = {
-                    idSequenceLane: 'SequenceLane' + laneStr,
-                    notes: '',
-                    idSeqRunType: sample.idSeqRunType,
-                    idNumberSequencingCycles: sample.idNumberSequencingCycles,
-                    idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
-                    idSample: sample.idSample,
-                    idOrganism: sample.idOrganism,
-                    idGenomeBuildAlignTo: ''
-                };
-                this._experiment.sequenceLanes.push(laneObj);
+                if (sample.numberSequencingLanes) {
+                    for (let i: number = 0; i < sample.numberSequencingLanes; i++) {
+                        let laneObj = {
+                            idSequenceLane: 'SequenceLane' + laneStr,
+                            notes: '',
+                            idSeqRunType: sample.idSeqRunType,
+                            idNumberSequencingCycles: sample.idNumberSequencingCycles,
+                            idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
+                            idSample: sample.idSample,
+                            idOrganism: sample.idOrganism,
+                            idGenomeBuildAlignTo: ''
+                        };
+
+                        this._experiment.sequenceLanes.push(laneObj);
+                    }
+                } else {
+                    let laneObj = {
+                        idSequenceLane: 'SequenceLane' + laneStr,
+                        notes: '',
+                        idSeqRunType: sample.idSeqRunType,
+                        idNumberSequencingCycles: sample.idNumberSequencingCycles,
+                        idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
+                        idSample: sample.idSample,
+                        idOrganism: sample.idOrganism,
+                        idGenomeBuildAlignTo: ''
+                    };
+
+                    this._experiment.sequenceLanes.push(laneObj);
+                }
 
 
                 let temp: any = {
@@ -393,7 +412,25 @@ export class ExperimentBioinformaticsTabComponent {
         }
     }
 
+    public requireReconfirmation(): void {
+        if (this.form && !this.form.contains('invalidateWithoutConfirmation')) {
+            this.form.addControl(
+                'invalidateWithoutConfirmation',
+                new FormControl('', (control: AbstractControl) => {
+                    return { message: 'Samples have changed. They require review.' };
+                })
+            );
+        }
+    }
+
+    public confirm(): void {
+        if (this.form && this.form.contains('invalidateWithoutConfirmation')) {
+            this.form.removeControl('invalidateWithoutConfirmation');
+        }
+    }
+
     public tabDisplayed(): void {
         this.prepareComponent();
+        this.confirm();
     }
 }

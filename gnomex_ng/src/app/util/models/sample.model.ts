@@ -1,6 +1,7 @@
 import {DictionaryService} from "../../services/dictionary.service";
 import {Experiment} from "./experiment.model";
 import {GnomexService} from "../../services/gnomex.service";
+import {BehaviorSubject} from "rxjs";
 
 export class Sample {
     public idSample:                        string = ''; // "Sample0";
@@ -30,8 +31,45 @@ export class Sample {
     public qualFragmentSizeTo:              string = '';
     public qualStatus:                      string = '';
     public seqPrepStatus:                   string = '';
-    public numberSequencingLanes:           string = ''; // "1";
     public sequenceLaneCount:               string = ''; // "1";
+
+    public get numberSequencingLanes(): string {
+        return this._numberSequencingLanes;
+    }
+    public set numberSequencingLanes(value: string) {
+        this._numberSequencingLanes = value ? value : '';
+
+        this.onChange_numberSequencingLanes.next(this.numberSequencingLanes);
+    }
+    public _numberSequencingLanes:           string = ''; // "1";
+    public onChange_numberSequencingLanes:   BehaviorSubject<string> = new BehaviorSubject(this._numberSequencingLanes);
+
+
+    public createSequenceLane(): any {
+        return {
+            idSequenceLane:                  "SequenceLane",
+            notes:                           this.notes                           ? this.notes                           : "",
+            idSeqRunType:                    this.idSeqRunType                    ? this.idSeqRunType                    : "",
+            idNumberSequencingCycles:        this.idNumberSequencingCycles        ? this.idNumberSequencingCycles        : "",
+            idNumberSequencingCyclesAllowed: this.idNumberSequencingCyclesAllowed ? this.idNumberSequencingCyclesAllowed : "",
+            idSample:                        this.idSample                        ? this.idSample                        : "",
+            idGenomeBuildAlignTo:            this.idGenomeBuildAlignTo            ? this.idGenomeBuildAlignTo            : "",
+            idOrganism:                      this.idOrganism                      ? this.idOrganism                      : "",
+            organism:                        this.organism                        ? this.organism                        : "",
+        };
+    }
+
+    public createAllSequenceLanes(): any[] {
+        let result: any[] = [];
+
+        for (let i: number = 0; i < (this._numberSequencingLanes ? +this._numberSequencingLanes: 0); i++) {
+            result.push(this.createSequenceLane());
+        }
+
+        return result;
+    }
+
+
     public codeConcentrationUnit:           string = ''; // "ng/ul";
     public idSampleType:                    string = ''; // "1";
 
@@ -69,7 +107,10 @@ export class Sample {
             this._organism = value;
             this.idOrganism = value.idOrganism;
         }
+
+        this.onChange_organism.next(this.organism);
     }
+    public onChange_organism: BehaviorSubject<any> = new BehaviorSubject<any>(this.organism);
 
     private _sequencingOption: any;
     public get sequencingOption(): any {

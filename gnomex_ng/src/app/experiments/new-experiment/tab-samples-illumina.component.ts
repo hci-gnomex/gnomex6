@@ -279,7 +279,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     public get usingMultiplexGroupGroups(): boolean {
         return this._experiment
-            && this._experiment.isExternal !== 'Y';
+            && this._experiment.isExternal !== 'Y'
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
     };
 
     public get showConcentrationUnitColumn(): boolean {
