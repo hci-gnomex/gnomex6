@@ -29,8 +29,10 @@
             <label for="myLabRadio" class="following-label leading-label">My lab</label>
             <input [(ngModel)]="experimentsRadioString" id="myCollaborationsRadio" value="myCollaborations" type="radio" name="radioFilter" (change)="onExperimentsRadioGroupChange()">
             <label for="myCollaborationsRadio" class="following-label leading-label">My collaborations</label>
-            <input [(ngModel)]="experimentsRadioString" id="publicDataRadio" value="publicData" type="radio" name="radioFilter" (change)="onExperimentsRadioGroupChange()">
-            <label for="publicDataRadio" class="following-label leading-label">Public data</label>
+            <div class="inlineDiv" *ngIf="this.propertyService.isPublicVisbility()" >
+                <input [(ngModel)]="experimentsRadioString" id="publicDataRadio" value="publicData" type="radio" name="radioFilter" (change)="onExperimentsRadioGroupChange()">
+                <label for="publicDataRadio" class="following-label leading-label">Public data</label>
+            </div>
             <input [(ngModel)]="experimentsRadioString" id="allRadio" value="all" type="radio" name="radioFilter" (change)="onExperimentsRadioGroupChange()">
             <label for="allRadio" class="following-label">All</label>
         </div>
@@ -88,8 +90,11 @@
             <label for="visibilityInstitutionCheckbox" class="following-label leading-label">Institution</label>
             <input [(ngModel)]="visibilityAllLabMembersFlag" id="visibilityAllLabMembersCheckbox" type="checkbox">
             <label for="visibilityAllLabMembersCheckbox" class="following-label leading-label">All Lab Members</label>
-            <input [(ngModel)]="visibilityPublicFlag" id="visibilityPublicCheckbox" type="checkbox">
-            <label for="visibilityPublicCheckbox" class="following-label">Public</label>
+            <div *ngIf="this.propertyService.isPublicVisbility()" class="inlineDiv">
+                <input [(ngModel)]="visibilityPublicFlag" id="visibilityPublicCheckbox" type="checkbox">
+                <label for="visibilityPublicCheckbox" class="following-label">Public</label>
+            </div>
+
         </div>
         <div class="inlineDiv" *ngIf="showExperimentNumberInput">
             <label for="experimentNumberInput" class="leading-label">Experiment #</label>
@@ -111,7 +116,7 @@
             <input [(ngModel)]="externalExperimentsFlag" id="externalExperimentsCheckbox" type="checkbox">
             <label for="externalExperimentsCheckbox" class="following-label">External Experiments</label>
         </div>
-        <div class="inlineDiv" *ngIf="showPublicCheckbox">
+        <div class="inlineDiv" *ngIf="showPublicCheckbox && this.propertyService.isPublicVisbility()">
             <input [(ngModel)]="publicFlag" id="publicCheckbox" type="checkbox">
             <label for="publicCheckbox" class="following-label">Public</label>
         </div>
