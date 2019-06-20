@@ -14,7 +14,7 @@ import {ConstantsService} from "../services/constants.service";
 @Component({
     selector: 'new-genome-build',
     template: `
-        <form [formGroup]="genomeBuildForm" class="full-height full-width padded-inner flex-container-col">
+        <form [formGroup]="genomeBuildForm" class="full-height full-width flex-container-col double-padded-left-right">
             <div class="flex-container-row align-center padded">
                 <label class="label label-width">Organism</label>
                 <jqxComboBox class="dialogComboBox" [width]="450"
@@ -44,9 +44,6 @@ import {ConstantsService} from "../services/constants.service";
         </form>
     `,
     styles: [`
-        /*.content {*/
-            /*height: 16em;*/
-        /*}*/
         .label-width {
             width: 7em;
         }
@@ -137,8 +134,5 @@ export class NewGenomeBuildComponent extends BaseGenericContainerDialog {
         });
     }
 
-    public cancel(): void {
-        this.dialogRef.close();
-    }
-
 }
+

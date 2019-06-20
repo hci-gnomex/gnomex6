@@ -31,7 +31,6 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {DeleteProjectComponent} from "./delete-project.component";
 import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
-import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {DictionaryService} from "../services/dictionary.service";
 import {PropertyService} from "../services/property.service";
 import {GnomexService} from "../services/gnomex.service";
@@ -89,6 +88,13 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
         .no-overflow  { overflow:    hidden; }
         .no-word-wrap { white-space: nowrap; }
+
+        .allow-line-breaks {
+            white-space: pre-line;
+        }
+        .background-lightyellow {
+            background-color: lightyellow;
+        }
     `]
 })
 
@@ -115,6 +121,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public disableDeleteProject: boolean = true;
     public disableDeleteExperiment: boolean = true;
     public disableAll: boolean = false;
+
+    public readonly DRAG_DROP_HINT: string = "Drag-and-drop to move object to another group";
+    public showDragDropHint: boolean = false;
 
     private treeModel: TreeModel;
     private currentItem: any;
@@ -208,7 +217,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private propertyService: PropertyService,
                 private route: ActivatedRoute,
                 private router: Router,
-                private constantsService: ConstantsService) {
+                public constantsService: ConstantsService) {
 
         this.items = [];
         this.dragEndItems = [];
@@ -683,10 +692,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         });
     }
 
-    dragDropHintClicked(event: any) {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-
-        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, configuration);
+    onClickShowDragDropHint(): void {
+        this.showDragDropHint = !this.showDragDropHint;
     }
 
     /**

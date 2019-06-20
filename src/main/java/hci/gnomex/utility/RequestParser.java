@@ -2859,6 +2859,19 @@ public class RequestParser implements Serializable {
       this.number = number;
     }
 
+    public int compareTo(SequenceLaneInfo anotherSequenceLaneInfo) {
+      if (this.getSample() == null && anotherSequenceLaneInfo.getSample() == null) {
+        return 0;
+      } else if (this.getSample() == null) {
+        return 1;
+      } else if (anotherSequenceLaneInfo.getSample() == null) {
+        return -1;
+      } else {
+        SampleComparator sc = new SampleComparator();
+
+        return sc.compare(this.getSample(), anotherSequenceLaneInfo.getSample());
+      }
+    }
   }
 
   public boolean isNewRequest() {
@@ -3007,5 +3020,4 @@ public class RequestParser implements Serializable {
   }
 
   public Boolean getIsOpeningNewBillingTemplate() { return isOpeningNewBillingTemplate; }
-
 }

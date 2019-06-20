@@ -1,29 +1,23 @@
-<h6 mat-dialog-title>Billing Template</h6>
-<mat-dialog-content>
-    <div class="flex-container-row align-center children-margin-right">
-        <context-help name="billingTemplateHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
-        <custom-combo-box placeholder="Lab" [options]="this.labList" displayField="name"
-                          [(ngModel)]="this.selectedLab" (optionSelected)="this.loadAccountsForLab()">
-        </custom-combo-box>
-        <custom-combo-box placeholder="Account" [options]="this.accountList"
-                          displayField="accountNumberDisplay" [(ngModel)]="this.selectedAccount">
-        </custom-combo-box>
-        <mat-checkbox [(ngModel)]="this.showInactiveAccounts" (change)="this.loadLabs()">Show inactive accounts</mat-checkbox>
-        <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img src="../../assets/add.png" class="icon">Add</button>
-        <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null"><img src="../../assets/delete.png" class="icon">Remove</button>
-    </div>
-    <div class="accounts-grid-div full-width">
-        <ag-grid-angular class="ag-theme-fresh full-height full-width"
-                         (gridReady)="this.onGridReady($event)"
-                         (gridSizeChanged)="this.onGridSizeChanged($event)"
-                         [rowSelection]="'single'"
-                         [singleClickEdit]="true"
-                         (rowSelected)="this.onGridRowSelected($event)"
-                         [rowData]="this.currentAccountsList">
-        </ag-grid-angular>
-    </div>
-</mat-dialog-content>
-<mat-dialog-actions>
-    <button mat-button (click)="promptToSave()"><img src="../../assets/save.png" class="icon">Save</button>
-    <button mat-button mat-dialog-close>Cancel</button>
-</mat-dialog-actions>
+<div class="flex-container-row align-center children-margin-right padded">
+    <context-help name="billingTemplateHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
+    <custom-combo-box placeholder="Lab" [options]="this.labList" displayField="name"
+                      [(ngModel)]="this.selectedLab" (optionSelected)="this.loadAccountsForLab()">
+    </custom-combo-box>
+    <custom-combo-box placeholder="Account" [options]="this.accountList"
+                      displayField="accountNumberDisplay" [(ngModel)]="this.selectedAccount">
+    </custom-combo-box>
+    <mat-checkbox [(ngModel)]="this.showInactiveAccounts" (change)="this.loadLabs()">Show inactive accounts</mat-checkbox>
+    <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img src="../../assets/add.png" class="icon">Add</button>
+    <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null"><img src="../../assets/delete.png" class="icon">Remove</button>
+</div>
+<div class="accounts-grid-div full-width padded">
+    <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                     (gridReady)="this.onGridReady($event)"
+                     (gridSizeChanged)="this.onGridSizeChanged($event)"
+                     [rowSelection]="'single'"
+                     [singleClickEdit]="true"
+                     (rowSelected)="this.onGridRowSelected($event)"
+                     [rowData]="this.currentAccountsList">
+    </ag-grid-angular>
+</div>
+

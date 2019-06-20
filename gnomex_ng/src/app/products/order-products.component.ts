@@ -17,6 +17,7 @@ import {BillingService} from "../services/billing.service";
 import {WorkAuthorizationTypeSelectorDialogComponent} from "./work-authorization-type-selector-dialog.component";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'order-products',
@@ -90,7 +91,8 @@ export class OrderProductsComponent implements OnInit {
                 private router: Router,
                 private dialog: MatDialog,
                 private billingService: BillingService,
-                public prefService: UserPreferencesService) {
+                public prefService: UserPreferencesService,
+                private constantsService: ConstantsService) {
     }
 
     ngOnInit() {
@@ -295,16 +297,20 @@ export class OrderProductsComponent implements OnInit {
             params.billingTemplate = this.billingTemplate;
         }
         let config: MatDialogConfig = new MatDialogConfig();
+        config.autoFocus = false;
         config.data = {
             params: params
         };
 
-        let dialogRef: MatDialogRef<BillingTemplateWindowComponent> = this.dialog.open(BillingTemplateWindowComponent, config);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.billingTemplate = result as BillingTemplate;
-                this.idBillingAccount = "";
-            }
+        this.dialogsService.genericDialogContainer(BillingTemplateWindowComponent, "Billing Template", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "promptToSave"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"},
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.billingTemplate = result as BillingTemplate;
+                        this.idBillingAccount = "";
+                    }
         });
     }
 

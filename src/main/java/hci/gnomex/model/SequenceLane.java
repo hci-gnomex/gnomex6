@@ -586,7 +586,6 @@ public class SequenceLane extends HibernateDetailObject {
       }
     }
     return laneCount;
-
   }
   public static SortedMap getMultiplexLaneMap(Collection sequenceLanes, Date requestCreateDate) {
     TreeMap laneMap = new TreeMap();
@@ -642,13 +641,12 @@ public class SequenceLane extends HibernateDetailObject {
           if (laneList == null) {
             laneList = lanesInGroup;
             multiplexLaneMap.put(key, laneList);
-          } 
+          }
+
           for (Iterator i2 = lanesInGroup.iterator(); i2.hasNext();) {
             SequenceLane l = (SequenceLane)i2.next();
             laneList.add(l);
           }
-
-
         } else {
           String multiplexLaneID = "";
           // Call the grouping by the flow cell channel
@@ -658,13 +656,13 @@ public class SequenceLane extends HibernateDetailObject {
             // Or if not in a flow cell channel, just give it an ordinal designation
             multiplexLaneID = Integer.valueOf(idx++).toString();
           }
-          multiplexLaneMap.put(multiplexLaneID, lanesInGroup);
 
+          multiplexLaneMap.put(multiplexLaneID, lanesInGroup);
         }
       }
     }
-    return multiplexLaneMap;
 
+    return multiplexLaneMap;
   }
 
   /*
@@ -690,9 +688,11 @@ public class SequenceLane extends HibernateDetailObject {
     List laneGroups = new ArrayList();
 
     // First create a hash map key=barcode sequence, value=list of lanes holding this sequence
-    HashMap seqTagMap = new HashMap();
-    for(Iterator i = seqLanes.iterator(); i.hasNext();) {
-      SequenceLane theLane = (SequenceLane)i.next();
+    HashMap<String, List> seqTagMap = new HashMap<>();
+
+    for(Object i : seqLanes) {
+      SequenceLane theLane = (SequenceLane)i;
+
       String tag = null;
 
       // Initialize tag to the barcodeSequence of Index A (if it is not null)
@@ -713,13 +713,17 @@ public class SequenceLane extends HibernateDetailObject {
         tag = theLane.getSample().getIdSample().toString();
       } else if (tag == null && theLane.getSample().getMultiplexGroupNumber() == null) {
         tag = "";
-      } 
-      List theLanes = (List)seqTagMap.get(tag);
-      if (theLanes == null) {
-        theLanes = new ArrayList();
-        seqTagMap.put(tag, theLanes);
       }
-      theLanes.add(theLane);
+
+      if (!seqTagMap.containsKey(tag)) {
+        seqTagMap.put(tag, new ArrayList());
+      }
+
+      seqTagMap.get(tag).add(theLane);
+    }
+
+    for (List lanes : seqTagMap.values()) {
+      lanes.sort(new SequenceLaneNumberComparator());
     }
 
     int maxTagCount = 0;

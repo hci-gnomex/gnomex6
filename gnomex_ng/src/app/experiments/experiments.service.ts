@@ -3,7 +3,14 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject, throwError} from "rxjs";
 import {Observable} from "rxjs";
 import {BehaviorSubject} from "rxjs";
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {
+    HttpClient,
+    HttpEvent,
+    HttpEventType,
+    HttpHeaders,
+    HttpParams,
+    HttpRequest
+} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {first,catchError, map} from "rxjs/operators";
 import {Experiment} from "../util/models/experiment.model";
@@ -11,6 +18,7 @@ import {CookieUtilService} from "../services/cookie-util.service";
 import {element} from "@angular/core/src/render3";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {AbstractControl, FormGroup} from "@angular/forms";
+import {saveAs} from "file-saver";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -423,5 +431,29 @@ export class ExperimentsService {
     }
     public clearExperimentOverviewForm(): void {
         this._experimentOverviewForm = new FormGroup({});
+    }
+
+    public showPriceQuote(experiment: Experiment): void {
+        if (!experiment) {
+            return;
+        }
+
+        let params: HttpParams = new HttpParams()
+            .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
+            .set("noJSONToXMLConversionNeeded", 'Y');
+
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+
+        const request: HttpRequest<any> = new HttpRequest<any>("POST", "/gnomex/ShowRequestForm.gx", params.toString(), {
+            headers: headers,
+            responseType: "blob"
+        });
+
+        this.httpClient.request(request).subscribe((event: HttpEvent<any>) => {
+            if (event.type === HttpEventType.Response) {
+                saveAs(event.body, "testing_ShowRequestForm.pdf");
+            }
+        });
     }
 }

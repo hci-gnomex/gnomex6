@@ -24,6 +24,7 @@ export class ConstantsService {
         "     4. After all of the files have been uploaded (% Completed column indicates 100 for all files), click the<br>        \"Organize files\" link on Experiment Detail to move the uploaded files to the appropriate folders.<br>         button.";
 
     public readonly ICON_CHECKED = "assets/tick.png";
+    public readonly ICON_MONEY = "assets/money.png";
     public readonly SEGMENT_NEW = "assets/segment_new.png";
     public readonly SEGMENT_REMOVE = "assets/segment_remove.png";
     public readonly SEGMENT_NEW_DISABLE = "assets/segment_new_disable.png";

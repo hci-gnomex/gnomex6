@@ -313,6 +313,8 @@ export class Experiment {
         for (let sample of this.samples) {
             sample.codeBioanalyzerChipType = this._codeBioanalyzerChipType;
         }
+
+        this.refreshSampleAnnotationList();
     };
     public onChange_codeBioanalyzerChipType: BehaviorSubject<any> = new BehaviorSubject<any>('');
 
@@ -385,7 +387,16 @@ export class Experiment {
     public billingItems:            any[] = [];
     public SeqLibTreatmentEntries:  any[] = [];
     public protocols:               any[] = [];
-    public sequenceLanes:           any[] = [];
+
+    public get sequenceLanes(): any[] {
+        return this._sequenceLanes;
+    }
+    public set sequenceLanes(value: any[]) {
+        this._sequenceLanes = value ? value : [];
+        this.onChange_sequenceLanes.next(this._sequenceLanes);
+    }
+    public _sequenceLanes: any[] = [];
+    public onChange_sequenceLanes: BehaviorSubject<any[]> = new BehaviorSubject(this._sequenceLanes);
 
     // PropertyEntries should probably be named something more like "SampleAnnotationTemplates".
     public _PropertyEntries:         any[] = [];
@@ -761,6 +772,19 @@ export class Experiment {
         return keep;
     }
 
+
+    public replaceAllSequenceLanes(): void {
+        let result: any[] = [];
+
+        for (let sample of this.samples) {
+            for (let sequenceLane of sample.createAllSequenceLanes()) {
+                result.push(sequenceLane);
+            }
+        }
+
+        this.sequenceLanes = result;
+    }
+
     // private getSelectedPropertyEntries
     public getSelectedSampleAnnotations(): any[] {
         return this.PropertyEntries.filter((value: any) => {
@@ -814,7 +838,9 @@ export class Experiment {
 
             if (this._PropertyEntries_original && Array.isArray(this._PropertyEntries_original)) {
                 let originalPropertiesThatAreSelected: any[] = this._PropertyEntries_original.filter((value) => {
-                    return value.isSelected && value.isSelected === 'true';
+                    return value.isSelected
+                        && value.isSelected === 'true'
+                        && (!value.idCoreFacility || value.idCoreFacility === this.idCoreFacility);
                 });
 
                 for (let propertyEntry of response) {

@@ -26,7 +26,6 @@ import {DeleteAnalysisComponent} from "./delete-analysis.component";
 import { AngularMaterialModule} from "../../modules/angular-material.module";
 import {MatAutocompleteModule} from "@angular/material";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {DragDropHintComponent} from "./drag-drop-hint.component";
 import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {DialogsModule} from "../util/popup/dialogs.module";
@@ -73,12 +72,11 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
     declarations: [
         BrowseAnalysisComponent,
         DeleteAnalysisComponent,
-        DragDropHintComponent,
         CreateAnalysisComponent,
         CreateAnalysisGroupComponent
     ],
-    entryComponents: [DeleteAnalysisComponent, DragDropHintComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent],
-    exports: [DeleteAnalysisComponent, DragDropHintComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent]
+    entryComponents: [DeleteAnalysisComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent],
+    exports: [DeleteAnalysisComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent]
 })
 export class AnalysisModule {
 }

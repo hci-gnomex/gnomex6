@@ -1,10 +1,13 @@
 import {Component, EventEmitter, Input, OnInit, Output, SimpleChanges} from '@angular/core';
-import {MatDialogRef, MatDialog} from '@angular/material';
+import {MatDialogConfig} from '@angular/material';
 import {NewTopicComponent} from "../new-topic.component";
 import {DeleteTopicComponent} from "../../topics/delete-topic.component";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {Router} from "@angular/router";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {DialogsService} from "../popup/dialogs.service";
+import {ConstantsService} from "../../services/constants.service";
+import {ActionType} from "../interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'menu-header-topics',
@@ -30,9 +33,10 @@ export class MenuHeaderTopicsComponent implements OnInit {
 
     @Output() messageEvent = new EventEmitter<string>();
 
-    constructor(private dialog: MatDialog,
+    constructor(private dialogsService: DialogsService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
-                private router: Router) {
+                private router: Router,
+                private constantsService: ConstantsService) {
     }
 
     ngOnInit() {
@@ -44,14 +48,29 @@ export class MenuHeaderTopicsComponent implements OnInit {
     public makeNewTopic(): void {
         // TODO depending on where the user has clicked in the topics tree, this dialog
         // needs to be provided with an idParentTopic and parentTopicLabel parameter
-        this.dialog.open(NewTopicComponent, {
-            height: '430px',
-            width: '300px',
-            data: {
-                selectedItem: this.selectedNode,
-                idParentTopic: this.idParentTopic,
-                parentTopicLabel: this.parentTopicLabel
-            }
+        let title: string;
+        if (!this.selectedNode || !this.selectedNode.data.idTopic) {
+            title = " Add New Top Level Topic";
+        } else {
+            title = " Add Subtopic of " + this.selectedNode.parent.data.label;
+        }
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "35em";
+        config.data = {
+            selectedItem: this.selectedNode,
+            idParentTopic: this.idParentTopic,
+            parentTopicLabel: this.parentTopicLabel
+        };
+
+        this.dialogsService.genericDialogContainer(NewTopicComponent, title, this.constantsService.ICON_TOPIC, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        // TODO: Navigate to the new created topic
+                    }
         });
     }
 
@@ -62,21 +81,25 @@ export class MenuHeaderTopicsComponent implements OnInit {
     }
 
     public doDelete(): void {
-        let dialogRef: MatDialogRef<DeleteTopicComponent> = this.dialog.open(DeleteTopicComponent, {
-            height: '250px',
-            width: '400px',
-            data: {
-                selectedItem: this.selectedNode,
-                idTopic: this.selectedNode.data.idTopic,
-                topic: this.selectedNode.parent.parent.data
-            }
-        });
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
-                this.selectedNode = null;
-                this.ngOnChanges(null);
-            }
+        let title: string = "Confirm: " + this.showRemoveLink ? "Remove Link" : "Delete Topic";
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "35em";
+        config.height = "15em";
+        config.data = {
+            selectedItem: this.selectedNode,
+            idTopic: this.selectedNode.data.idTopic,
+            topic: this.selectedNode.parent.parent.data
+        };
+        this.dialogsService.genericDialogContainer(DeleteTopicComponent, title, this.constantsService.ICON_EXCLAMATION, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.router.navigate(["/topics", {outlets: {topicsPanel: null}}]);
+                        this.selectedNode = null;
+                        this.ngOnChanges(null);
+                    }
         });
     }
 

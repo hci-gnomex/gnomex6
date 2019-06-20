@@ -1229,11 +1229,14 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 		PDFFormatterUtil.addToTableHeader(table, "Lib Size", tableHeaderFont);
 		PDFFormatterUtil.addToTableHeader(table, "# Lanes", tableHeaderFont);
 		PDFFormatterUtil.addToTableHeader(table, "Seq. Date", tableHeaderFont);
-		
+
+		ArrayList<Sample> sortedSamples = new ArrayList<>(samples);
+		sortedSamples.sort(new SampleNumberComparator());
+
 		// Populate table
-		for (Iterator i = samples.iterator(); i.hasNext();) {
+		for (Iterator i = sortedSamples.iterator(); i.hasNext();) {
 			Sample s = (Sample) i.next();
-			
+
 			// Get data
 			String sampleID = "";
 			if (s.getNumber() != null) {
@@ -1371,7 +1374,12 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 		for (Iterator dateIter = laneDateMap.keySet().iterator(); dateIter.hasNext();) {
 			Date createDate = (Date) dateIter.next();
 			List<SequenceLane> theLanes = laneDateMap.get(createDate);
-			String caption = "Sequence Lanes added on " + request.formatDate(createDate);
+			String caption = "";
+
+			if (request.getNumber() != null && !request.getNumber().equals("Predicted Prices for : ")) {
+				caption = "Sequence Lanes added on " + request.formatDate(createDate);
+			}
+
 			if (amendState != null && amendState.equals(Constants.AMEND_ADD_SEQ_LANES)) {
 				tables.add(makeTableSequenceLanes(theLanes, caption));
 				break; // If we are adding lanes, only add the most recent entries, otherwise print all
@@ -1395,8 +1403,8 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 		// Headers
 		table.setHeaderRows(2);
 		PDFFormatterUtil.addToTable(table, caption, tableHeaderFont, Element.ALIGN_LEFT, Element.ALIGN_MIDDLE, false, false, false, false, BaseColor.BLACK, table.getNumberOfColumns(), 1);
-		PDFFormatterUtil.addToTableHeader(table, "Lane", tableHeaderFont);
-		PDFFormatterUtil.addToTableHeader(table, "#", tableHeaderFont);
+		PDFFormatterUtil.addToTableHeader(table, "FlowCell Lane #", tableHeaderFont);
+		PDFFormatterUtil.addToTableHeader(table, "Sequence Lane #", tableHeaderFont);
 		PDFFormatterUtil.addToTableHeader(table, HEADER_SAMPLE_NAME, tableHeaderFont);
 		PDFFormatterUtil.addToTableHeader(table, "Status", tableHeaderFont);
 		
@@ -1453,8 +1461,10 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 	}
 	
 	private Element makeTableLabeledSamples() {
-		TreeSet labeledSamples = new TreeSet(new LabeledSampleNumberComparator());
+		ArrayList<LabeledSample> labeledSamples = new ArrayList<>();
 		labeledSamples.addAll(request.getLabeledSamples());
+		labeledSamples.sort(new LabeledSampleNumberComparator());
+
 		boolean hasCy5Samples = false;
 		for (Iterator iter = labeledSamples.iterator(); iter.hasNext();) {
 			LabeledSample labeledSample = (LabeledSample) iter.next();
@@ -1491,7 +1501,7 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 		return table;
 	}
 	
-	private PdfPTable makeTableLabeledSample(Set labeledSamples, String label) {
+	private PdfPTable makeTableLabeledSample(List labeledSamples, String label) {
 		PdfPTable table = new PdfPTable(3);
 		Font tableHeaderFont = FONT_TABLE_HEADERS_NORMAL;
 		Font tableValueFont = FONT_TABLE_VALUES_NORMAL;
