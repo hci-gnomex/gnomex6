@@ -223,11 +223,13 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         opt.value.selected = selected ? 'Y' : 'N';
     }
 
-    selectChanged(opt: MatSelectChange, annot:IAnnotation) { // on mat select
+    selectChanged(opt: any, annot:IAnnotation) { // on mat select
         for(let opt of annot.PropertyOption){
             opt.selected = 'N';
         }
-        opt.value.selected = 'Y';
+        if (opt) {
+            opt.selected = 'Y';
+        }
     }
 
 

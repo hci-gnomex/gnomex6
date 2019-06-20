@@ -10,7 +10,6 @@ import {PropertyService} from "../services/property.service";
 import {ActivatedRoute} from "@angular/router";
 import {GridApi} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
-import {MatSelectChange} from "@angular/material";
 import {first} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
@@ -38,21 +37,12 @@ import {HttpParams} from "@angular/common/http";
             <div style="margin-top: 1em; display: flex; flex-direction: column;" *ngIf="showCollaboratorBlock" >
                 <label class="gx-label"> Individual collaborators allowed access to this data track  </label>
                 <div >
-                    <mat-form-field style="width:30%" >
-                        <mat-select (selectionChange)="collaborDropdownChange($event)"
-                                    [compareWith]="compareByID"
-                                    placeholder="Collaborators"
-                                    formControlName="collaborator" >
-                            <mat-option ></mat-option>
-                            <mat-option *ngFor="let collab of this.collabDropdown"
-                                        [value]="collab" >
-                                {{collab[this.prefService.userDisplayField]}}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="this.visibilityForm?.get('collaborator')?.hasError('selectRequired')">
-                            This field is required
-                        </mat-error>
-                    </mat-form-field>
+                    <div style="width:30%">
+                        <custom-combo-box placeholder="Collaborators" (optionSelected)="collaborDropdownChange($event)"
+                                          [options]="collabDropdown" [displayField]="this.prefService.userDisplayField"
+                                          [formControlName]="'collaborator'">
+                        </custom-combo-box>
+                    </div>
                     <button mat-button [disabled]="!enableAdd || _disabled" type="button" (click)="addCollaborator()">
                         <img [src]="this.constService.ICON_ADD"> add
                     </button>
@@ -367,8 +357,8 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
     }
 
-    collaborDropdownChange(event:MatSelectChange) {
-        if (event.value ) {
+    collaborDropdownChange(event:any) {
+        if (event) {
             this.enableAdd = true;
         } else {
             this.enableAdd = false;

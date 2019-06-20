@@ -23,7 +23,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             display: flex;
             flex-direction: row;
         }
-        mat-form-field.formField {
+        .formField {
             width: 20%;
             margin: 0 0.5%;
         }
@@ -371,9 +371,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.gridApi.redrawRows();
     }
 
-    selectCoreOption(event) {
-        this.core = event.source.value;
-        if (event.source.selected) {
+    selectCoreOption() {
+        if (this.core) {
             if (this.codeStepNext == this.workflowService.ALL) {
                 this.workingWorkItemList = this.filterWorkItems();
             } else if (this.codeStepNext === this.workflowService.ILLUMINA_SEQQC){

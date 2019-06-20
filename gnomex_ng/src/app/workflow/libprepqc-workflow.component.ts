@@ -22,7 +22,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             display: flex;
             flex-direction: row;
         }
-        mat-form-field.formField {
+        .formField {
             width: 20%;
             margin: 0 0.5%;
         }
@@ -222,7 +222,7 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    selectCodeOption(event) {
+    selectCodeOption() {
         this.initialize();
     }
 

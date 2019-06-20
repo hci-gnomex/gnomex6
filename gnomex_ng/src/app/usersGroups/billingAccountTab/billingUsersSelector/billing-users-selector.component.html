@@ -27,21 +27,19 @@
 					<div class="tr">
 						<div class="td vertical-center center">
 
-							<mat-form-field style="width: 80%;">
-								<mat-select placeholder="Select a Lab..." [(value)]="selectedLab" (selectionChange)="onLabListSelection($event)">
-									<mat-option *ngFor="let lab of labList" [value]="lab">
-										{{ lab[this.prefService.labDisplayField] }}
-									</mat-option>
-								</mat-select>
-							</mat-form-field>
+							<div style="width: 80%;">
+								<custom-combo-box placeholder="Select a Lab..." (optionSelected)="onLabListSelection()"
+												  [options]="labList" displayField="name"
+												  [(ngModel)]="selectedLab">
+								</custom-combo-box>
+							</div>
 
-							<mat-form-field style="width: 80%;">
-								<mat-select placeholder="Select a User..." [(value)]="selectedUser">
-									<mat-option *ngFor="let user of userList" [value]="user">
-										{{ user.display }}
-									</mat-option>
-								</mat-select>
-							</mat-form-field>
+							<div style="width: 80%;">
+								<custom-combo-box placeholder="Select a User..."
+												  [options]="userList" displayField="display"
+												  [(ngModel)]="selectedUser">
+								</custom-combo-box>
+							</div>
 
 							<p *ngIf="!!selectedLab && !userListLoading && (!userList || userList.length < 1)" class="error-message">No users found</p>
 
