@@ -42,6 +42,7 @@
             private possibleCollaborators:Array<any> = [];
             public selectMode:string = "Select All";
             public isSelectable: boolean = true;
+            private lab: any;
 
 
 
@@ -103,7 +104,8 @@
                             if(data.Lab){
                                 this.makeOwnerList(data.Lab);
                                 this.visibilityForm.get("idAppUser").setValue(this.currentDatatrack.idAppUser);
-                                this.visibilityForm.get("lab").setValue(data.Lab);
+                                this.visibilityForm.get("lab").setValue(data.Lab.idLab);
+                                this.lab = data.Lab;
                                 this.visibilityForm.get("collaborators").setValue(currentCollaborators);
                                 this.updateCollaborators();
 
@@ -135,47 +137,24 @@
 
             }
 
-
-            filterLabList(selectedLab:any){
-
-                let fLabs: any[];
-                if (selectedLab) {
-                    if(selectedLab.idLab){
-                        fLabs = this.labList.filter(lab =>
-                            lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                        return fLabs;
-
-                    }else{
-                        fLabs = this.labList.filter(lab =>
-                            lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                        return fLabs;
-                    }
-
-
-                } else {
-                    return this.labList;
-                }
-
-            }
-
             selectOption($event){
-                let value = $event.source.value;
-                this.visibilityForm.get("lab").setValue($event.source.value);
+                let value = $event;
 
-                if(!value.idLab){
+                if(!value){
                     return;
                 }
-                if(this.currentIdLab != value.idLab){
-                    this.currentIdLab = value.idLab;
+                if(this.currentIdLab != value){
+                    this.currentIdLab = value;
                     let params: HttpParams = new HttpParams()
-                        .set("idLab", value.idLab )
+                        .set("idLab", value)
                         .set("includeBillingAccounts", "N")
                         .set("includeProductCounts", "N");
 
                     this.getLabService.getLab(params).pipe(first()).subscribe( data =>{
                         if(data.Lab){
                             this.visibilityForm.get("idAppUser").setValue(""); // setting empty string because new lab won't match owner
-                            this.visibilityForm.get("lab").setValue(data.Lab);
+                            this.visibilityForm.get("lab").setValue(data.Lab.idLab);
+                            this.lab = data.Lab;
                             this.makeOwnerList(data.Lab);
                             this.updateCollaborators();
 
@@ -193,7 +172,7 @@
             updateCollaborators(){
                 let visCode =  this.visibilityForm.get('codeVisibility').value;
                 let toSelectCollaborators:Array<any> = this.visibilityForm.get('collaborators').value;
-                let lab = this.visibilityForm.get('lab').value;
+                let lab = this.lab;
                 let prepCollabsList:Array<any> = [];
 
                 if(visCode === 'MEM'){

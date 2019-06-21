@@ -22,11 +22,14 @@ import {debounceTime} from "rxjs/operators";
         <mat-form-field class="full-width full-height" [matTooltip]="this.tooltip">
             <input #input matInput class="full-width full-height" [placeholder]="this.placeholder"
                    [matAutocomplete]="auto" [formControl]="this.innerControl">
-            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="this.selectOption($event.option.value)"
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
+                              (optionSelected)="this.selectOption($event.option.value)"
                               (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
                 <mat-option *ngIf="this.allowNone && (this.forceShowNone || !this.innerControl.value)">None</mat-option>
-                <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">{{this.displayField ? opt[this.displayField] : opt}}</mat-option>
-                <mat-option *ngIf="this.isLoading">Loading...</mat-option>
+                <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">
+                    {{this.displayField ? opt[this.displayField] : opt}}
+                </mat-option>
+                <mat-option *ngIf="this.includeLoadingOption">Loading...</mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="this.innerControl.hasError('required')">{{this.placeholder}} is required</mat-error>
         </mat-form-field>
@@ -47,7 +50,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     public forceShowNone: boolean = false;
 
     @Input() private options: any[] = [];
-    public isLoading: boolean = false;
+    public includeLoadingOption: boolean = true;
     public loadedOptions: any[] = [];
 
     @Input() private valueField: string;
@@ -155,10 +158,10 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     public onOpened(): void {
         this.onTouchedFn();
         this.inputElement.nativeElement.select(); // Highlights text
-        this.isLoading = true;
+
         setTimeout(() => {
             this.filterOptions(true);
-            this.isLoading = false;
+            this.includeLoadingOption = false;
         });
     }
 
@@ -169,6 +172,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
 
         setTimeout(() => {
             this.loadOnlyCurrentValue();
+            this.includeLoadingOption = true;
         });
     }
 

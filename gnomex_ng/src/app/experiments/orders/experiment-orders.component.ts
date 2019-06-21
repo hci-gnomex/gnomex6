@@ -143,7 +143,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
     private emToPxConversionRate: number = 1;
 
 	private dropdownChoices: any[] = [
-		{value: "", label: ""},
 		{value: "COMPLETE", label: "COMPLETE"},
 		{value: "FAILED", label: "FAILED"},
 		{value: "NEW", label: "NEW"},
@@ -400,7 +399,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 	goButtonClicked(): void {
 		// The "go" button should be disabled in this case, but if we get a click without a valid status,
 		// stop.
-		if (!this.enableChanges || this.changeStatus === "") {
+		if (!this.enableChanges || !this.changeStatus) {
 			return;
 		}
 

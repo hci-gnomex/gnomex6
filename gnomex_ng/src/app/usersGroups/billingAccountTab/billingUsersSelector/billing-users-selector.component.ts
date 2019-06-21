@@ -216,7 +216,7 @@ export class BillingUsersSelectorComponent {
 		this.selectRowData();
 	}
 
-	onLabListSelection(event: any): void {
+	onLabListSelection(): void {
 		this.userListLoading = true;
 		this.userList = [];
 

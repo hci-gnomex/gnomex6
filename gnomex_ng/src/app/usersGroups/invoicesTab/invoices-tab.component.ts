@@ -1,5 +1,4 @@
 import {Component, forwardRef, Inject, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
-import {MatAutocomplete} from "@angular/material";
 import {FormControl, NG_VALUE_ACCESSOR, Validators} from '@angular/forms';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
@@ -55,7 +54,6 @@ export class InvoicesTabComponent implements OnInit {
 
     @Input() label = '';
 
-    @ViewChild(MatAutocomplete) matAutocomplete: MatAutocomplete;
     private cores: any[];
     private monthInputCtrl: FormControl = new FormControl(new Date(2020,0,1));
     private billingPeriods: any[] = [];

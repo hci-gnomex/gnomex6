@@ -1,6 +1,5 @@
 import {Component, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {MatAutocomplete, MatOption} from "@angular/material";
 import {Observable} from "rxjs";
 import {DataSource} from '@angular/cdk/collections';
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -54,7 +53,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
             margin: 0 0.5%;
 
         }
-    mat-form-field.formField {
+    .formField {
         width: 50%;
         margin: 0 0.5%;
     }
@@ -95,11 +94,6 @@ export class MembershipTabComponent implements OnInit {
     @Input()
     users: any[];
 
-    // @ViewChild(MatAutocomplete) matAutocomplete: MatAutocomplete;
-    @ViewChild("autoMem") memAutoComplete: MatAutocomplete;
-    @ViewChild("autoColl") collAutoComplete: MatAutocomplete;
-    @ViewChild("autoMan") manAutoComplete: MatAutocomplete;
-
     public membershipForm: FormGroup;
     private showSpinner: boolean = false;
     private displayedColumns = ['name'];
@@ -116,9 +110,6 @@ export class MembershipTabComponent implements OnInit {
     private collaboratorsFC: FormControl;
     private managersFC: FormControl;
     private showInactive: boolean = false;
-    private previousMemMatOption: MatOption;
-    private previousColMatOption: MatOption;
-    private previousManMatOption: MatOption;
     constructor(private securityAdvisor: CreateSecurityAdvisorService,
                 public prefService: UserPreferencesService) {
 
@@ -204,17 +195,6 @@ export class MembershipTabComponent implements OnInit {
         this.selectedManRowIndex = row.idAppUser;
     }
 
-    filterUsers(name: any): any[] {
-        let fUsers: any[];
-        if (name) {
-            fUsers = this.users.filter(user =>
-                user[this.prefService.userDisplayField].toLowerCase().indexOf(name.toLowerCase()) >= 0);
-            return fUsers;
-        } else {
-            return this.users;
-        }
-    }
-
     addUser(userType: string) {
         switch(userType) {
             case "member": {
@@ -287,68 +267,6 @@ export class MembershipTabComponent implements OnInit {
         }
     }
 
-    highlightMemFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.memAutoComplete.options.first) {
-            if (this.previousMemMatOption) {
-                this.previousMemMatOption.setInactiveStyles();
-            }
-            this.memAutoComplete.options.first.setActiveStyles();
-            this.previousMemMatOption = this.memAutoComplete.options.first;
-        }
-    }
-
-    highlightCollFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.collAutoComplete.options.first) {
-            if (this.previousColMatOption) {
-                this.previousColMatOption.setInactiveStyles();
-            }
-            this.collAutoComplete.options.first.setActiveStyles();
-            this.previousColMatOption = this.collAutoComplete.options.first;
-        }
-    }
-
-    highlightManFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.manAutoComplete.options.first) {
-            if (this.previousManMatOption) {
-                this.previousManMatOption.setInactiveStyles();
-            }
-            this.manAutoComplete.options.first.setActiveStyles();
-            this.previousManMatOption = this.manAutoComplete.options.first;
-        }
-    }
-
-    selectOption(event) {
-        this.memberUser = event.source.value;
-    }
-
-    selectCollOption(event) {
-        this.collUser = event.source.value;
-    }
-
-    selectManOption(event) {
-        this.collUser = event.source.value;
-    }
-
-    chooseFirstMemOption(): void {
-        this.memAutoComplete.options.first.select();
-    }
-
-    chooseFirstCollOption(): void {
-        this.collAutoComplete.options.first.select();
-    }
-
-    chooseFirstManOption(): void {
-        this.manAutoComplete.options.first.select();
-    }
 }
 
 export class MyDataSource extends DataSource<any> {

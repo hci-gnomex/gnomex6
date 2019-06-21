@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {URLSearchParams} from "@angular/http";
-import {MatAutocomplete, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 
 import {BehaviorSubject, Subscription} from "rxjs/index";
 import {first} from "rxjs/internal/operators";
@@ -127,8 +127,6 @@ import {PropertyService} from "../../services/property.service";
     `]
 })
 export class NewExperimentSetupComponent implements OnDestroy {
-
-    @ViewChild("autoLab") autoLab: MatAutocomplete;
 
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
@@ -483,28 +481,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
 
-    public filterLabList(selectedLab: any) {
-        let fLabs: any[];
-
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                fLabs = this.labList.filter((lab) => {
-                    return (lab
-                        && lab.name
-                        && ('' + lab.name).toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                });
-                return fLabs;
-            } else {
-                fLabs = this.labList.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.labList;
-        }
-    }
-
-
     onCategoryChange() {
         if (this.form && this.form.get("selectedCategory")) {
 
@@ -525,13 +501,14 @@ export class NewExperimentSetupComponent implements OnDestroy {
         this.onChangeRequestCategory.emit(this._experiment.requestCategory);
 
         if (this.labList && Array.isArray(this.labList) && this.labList.length === 1) {
-            this.chooseFirstLabOption();
+            this.form.get("selectLab").setValue(this.labList[0]);
+            this.selectLabOption(this.labList[0]);
         }
     }
 
     public selectLabOption(event: any) {
-        if (event && event.source && event.source.selected === true) {
-            let value = event.source.value;
+        if (event) {
+            let value = event;
             this.filteredProjectList = this.gnomexService.projectList;
 
             if (!value.idLab) {
@@ -612,7 +589,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 });
             }
 
-            this._experiment.lab = event.source.value;
+            this._experiment.lab = event;
         }
 
         if (this.adminState !== "AdminState") {
@@ -662,10 +639,6 @@ export class NewExperimentSetupComponent implements OnDestroy {
         }
 
         this.description = this.form.get("description").value;
-    }
-
-    public chooseFirstLabOption(): void {
-        this.autoLab.options.first.select();
     }
 
     public onClickNewAccount(): void {

@@ -35,24 +35,10 @@
                     <div class="heading">
                         Verify your lab group :
                     </div>
-                    <mat-form-field class="moderate-width">
-                        <input matInput
-                               placeholder="Select a Lab"
-                               aria-label="Lab"
-                               formControlName="selectLab"
-                               [matAutocomplete]="autoLab"
-                               (keyup.enter)="chooseFirstLabOption()">
-                        <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
-                            <mat-option *ngFor="let lab of filterLabList(form.get('selectLab').value)"
-                                        [value]="lab"
-                                        (onSelectionChange)="selectLabOption($event)">
-                                {{ lab[this.prefService.labDisplayField] }}
-                            </mat-option>
-                        </mat-autocomplete>
-                        <mat-error *ngIf="form?.get('selectLab')?.hasError('required')">
-                            Lab is required
-                        </mat-error>
-                    </mat-form-field>
+                    <custom-combo-box class="moderate-width" placeholder="Select a Lab" (optionSelected)="selectLabOption($event)"
+                                      [displayField]="this.prefService.labDisplayField" [options]="this.labList"
+                                      [formControlName]="'selectLab'">
+                    </custom-combo-box>
                 </div>
             </li>
             <li *ngIf="showName" class="full-width align-baseline">

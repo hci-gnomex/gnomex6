@@ -37,13 +37,10 @@
 											{{gridApi?.getSelectedRows().length}} selected
 										</div>
 										<div class="td vertical-align">
-											<mat-form-field class="full-height full-width small-font">
-												<mat-select placeholder="- Change Status -" [(value)]="changeStatus">
-													<mat-option *ngFor="let choice of dropdownChoices" [value]="choice.value">
-														{{ choice.label }}
-													</mat-option>
-												</mat-select>
-											</mat-form-field>
+											<custom-combo-box class="full-height full-width small-font" placeholder="- Change Status -"
+															  [options]="dropdownChoices" displayField="label" valueField="value"
+															  [(ngModel)]="changeStatus">
+											</custom-combo-box>
 										</div>
 										<div class="td vertical-align">
 											<button mat-button

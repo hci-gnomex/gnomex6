@@ -5,7 +5,7 @@ import {Subscription} from "rxjs";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {MatAutocomplete, MatDialog, MatDialogConfig, MatSnackBar} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatSnackBar} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
 import {URLSearchParams} from "@angular/http";
 import {PropertyService} from "../services/property.service";
@@ -50,8 +50,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 })
 
 export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
-
-    @ViewChild("autoLab") matAutoLab: MatAutocomplete;
 
     public showSpinner: boolean = false;
     public topicNode: any;
