@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService, qcModes} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
-import {MatAutocomplete, MatAutocompleteTrigger, MatInput, MatOption, MatSidenav} from "@angular/material";
+import {MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
 import {GridOptions, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
@@ -31,11 +31,8 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 })
 
 export class QcWorkflowComponent implements OnInit, AfterViewInit {
-    @ViewChild("autoRequest") autoRequestComplete: MatAutocomplete;
     @ViewChild("requestInput") requestInput: ElementRef;
     @ViewChild("coreFacility") coreFacilityInput: ElementRef;
-    @ViewChild("autoCore") autoCoreComplete: MatAutocomplete;
-    @ViewChild("autoRequest") trigger: MatAutocompleteTrigger;
     @ViewChild('sidenav') sidenav: MatSidenav;
     @Input() mode: string;
 
@@ -53,7 +50,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     public showSpinner: boolean = false;
     public workItem: any;
     public core: any;
-    private previousRequestMatOption: MatOption;
     private hide260230: boolean = true;
     private gridApi:GridApi;
     private gridColumnApi;
@@ -317,54 +313,16 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.requestIds.unshift(this.emptyRequest);
     }
 
-    chooseFirstRequestOption() {
-        if (this.autoRequestComplete.options.first) {
-            this.autoRequestComplete.options.first.select();
-        }
-    }
-
-    chooseFirstCoreOption() {
-        this.autoCoreComplete.options.first.select();
-    }
-
-    filterRequests(name: any): any[] {
-        let fRequests: any[];
-        if (name) {
-            fRequests = this.requestIds.filter(request =>
-                request.requestNumber.indexOf(name) >= 0);
-            return fRequests;
-        } else {
-            return this.requestIds;
-        }
-    }
-
     filterCores(): any[] {
         return this.cores;
     }
-
-    highlightFirstRequestOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.autoRequestComplete.options.first) {
-            if (this.previousRequestMatOption) {
-                this.previousRequestMatOption.setInactiveStyles();
-            }
-            this.autoRequestComplete.options.first.setActiveStyles();
-            this.previousRequestMatOption = this.autoRequestComplete.options.first;
-        }
-    }
-
 
     compareByID(core1,core2) {
         return core1 && core2 && core1.idCoreFacility == core2.idCoreFacility;
     }
 
-    selectRequestOption(event) {
-        if (event.source.selected) {
-            this.workItem = event.source.value;
-            this.workingWorkItemList = this.filterWorkItems();
-        }
+    selectRequestOption() {
+        this.workingWorkItemList = this.filterWorkItems();
     }
 
     selectedRow(event) {

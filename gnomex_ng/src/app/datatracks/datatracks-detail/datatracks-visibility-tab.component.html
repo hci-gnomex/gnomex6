@@ -39,29 +39,19 @@
 
 
 
-    <mat-form-field style="width:30%;">
-        <input matInput placeholder="Lab" aria-label="State" [matAutocomplete]="autoLab"
-               formControlName="lab" (keyup.enter)="firstLabOpt()"  >
-        <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
-            <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let lab of  filterLabList(visibilityForm?.get('lab').value)" [value]="lab">
-                {{lab[this.prefService.labDisplayField] }}
-            </mat-option>
-        </mat-autocomplete>
-        <mat-error *ngIf="visibilityForm?.get('lab')?.hasError('lab')">
-            Lab is required
-        </mat-error>
-    </mat-form-field>
+    <div style="width:30%;">
+        <custom-combo-box placeholder="Lab" (optionSelected)="selectOption($event)"
+                          [displayField]="this.prefService.labDisplayField" valueField="idLab"
+                          [options]="this.labList" [formControlName]="'lab'">
+        </custom-combo-box>
+    </div>
 
 
-    <mat-form-field style="width:30%;">
-        <mat-select placeholder="Owner" formControlName="idAppUser">
-            <mat-option>-- None --</mat-option>
-            <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem.idAppUser">
-                {{ mem[this.prefService.userDisplayField] }}
-            </mat-option>
-        </mat-select>
-        <mat-error *ngIf="visibilityForm?.get('idAppUser')?.hasError('required')"> Owner is required </mat-error>
-    </mat-form-field>
+    <div style="width:30%;">
+        <custom-combo-box placeholder="Owner" valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
+                          [options]="getLabService.labMembersSubject | async" [formControlName]="'idAppUser'">
+        </custom-combo-box>
+    </div>
 
 
 

@@ -29,13 +29,12 @@
             <mat-form-field class="formField">
                 <input matInput placeholder="City" [formControl]="this.cityFC">
             </mat-form-field>
-            <mat-form-field class="formField">
-                <input matInput placeholder="Pick a state" aria-label="State" [matAutocomplete]="auto"
-                       [formControl]="stateFC" (keyup.enter)="chooseFirstOption()" (keyup)="highlightStateFirstOption($event)">
-                <mat-autocomplete #auto="matAutocomplete">
-                    <mat-option (onSelectionChange)="selectOption($event)" *ngFor="let state of filterStates(this.stateFC.value)" [value]="state.value">{{state.value}}</mat-option>
-                </mat-autocomplete>
-            </mat-form-field>
+            <div class="formField">
+                <custom-combo-box placeholder="Pick a state"
+                                  displayField="value" valueField="value" [options]="this.states"
+                                  [formControl]="stateFC">
+                </custom-combo-box>
+            </div>
             <button mat-button class="edit-button" (click)="editDictionary()">
                 Edit...
             </button>

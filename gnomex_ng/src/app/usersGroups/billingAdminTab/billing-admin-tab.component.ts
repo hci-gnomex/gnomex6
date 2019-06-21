@@ -1,7 +1,6 @@
 
 import {Component, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {MatAutocomplete} from "@angular/material";
 import {Observable} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Router} from "@angular/router";
@@ -36,7 +35,7 @@ import {Router} from "@angular/router";
             margin: 0 0.5%;
 
         }
-    mat-form-field.formField {
+    .formField {
         width: 30%;
         margin: 0 0.5%;
     }
@@ -65,7 +64,6 @@ export class BillingAdminTabComponent implements OnInit {
     group: any;
 
     states: any[];
-    @ViewChild(MatAutocomplete) matAutocomplete: MatAutocomplete;
 
     public billingForm: FormGroup;
 
@@ -90,7 +88,7 @@ export class BillingAdminTabComponent implements OnInit {
     ngOnInit() {
         this.createBillingForm();
         this.setBillingFields();
-        this.states = this.dictionaryService.getEntries('hci.gnomex.model.State');
+        this.states = this.dictionaryService.getEntriesExcludeBlank('hci.gnomex.model.State');
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -156,31 +154,6 @@ export class BillingAdminTabComponent implements OnInit {
                 }
             }
         }
-    }
-
-    chooseFirstOption(): void {
-        this.matAutocomplete.options.first.select();
-    }
-
-    highlightStateFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.matAutocomplete.options.first) {
-            this.matAutocomplete.options.first.setActiveStyles();
-        }
-    }
-
-    filterStates(name: any): any[] {
-        if (name) {
-            return this.states.filter(state =>
-                state.value.toLowerCase().indexOf(name.toLowerCase()) === 0);
-        } else {
-            return this.states;
-        }
-    }
-    selectOption(event) {
-        this.stateFC.setValue(event.source.value);
     }
 
     editDictionary() {

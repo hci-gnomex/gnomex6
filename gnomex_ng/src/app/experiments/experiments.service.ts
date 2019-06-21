@@ -322,7 +322,7 @@ export class ExperimentsService {
     }
 
     getProjectRequestList(params: HttpParams) {
-        return this._http.get("/gnomex/GetProjectRequestList.gx", {params:params})
+        return this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params:params})
             .pipe(catchError((err:IGnomexErrorResponse) =>{
                 return throwError(err);
             }));

@@ -20,19 +20,17 @@
                         <mat-error *ngIf="topicForm.get('name').hasError('required')">Name is required</mat-error>
                     </mat-form-field>
                     <div *ngIf="this.topicForm.enabled" class="flex-container-row">
-                        <custom-combo-box class="formField" placeholder="Lab" [options]="this.labList"
-                                            valueField="idLab" [displayField]="this.prefService.labDisplayField"
-                                            [formControl]="this.topicForm.get('idLab')">
-                        </custom-combo-box>
-                        <mat-form-field class="formField">
-                            <mat-select placeholder="Owner" formControlName="idAppUser">
-                                <mat-option>None</mat-option>
-                                <mat-option *ngFor="let mem of getLabService.labMembersSubject | async" [value]="mem.idAppUser">
-                                    {{ mem[this.prefService.userDisplayField] }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-error *ngIf="topicForm?.get('idAppUser')?.hasError('required')">Owner is required</mat-error>
-                        </mat-form-field>
+                        <div class="formField">
+                            <custom-combo-box placeholder="Lab" [options]="this.labList"
+                                              valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                              [formControl]="this.topicForm.get('idLab')">
+                            </custom-combo-box>
+                        </div>
+                        <div class="formField">
+                            <custom-combo-box placeholder="Owner" valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
+                                              [options]="getLabService.labMembersSubject | async" [formControlName]="'idAppUser'">
+                            </custom-combo-box>
+                        </div>
                     </div>
                     <div *ngIf="this.topicForm.disabled" class="flex-container-row">
                         <label class="formField">Lab: {{this.topicNode?.lab}}</label>
