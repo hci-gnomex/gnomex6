@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {URLSearchParams} from "@angular/http";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 
 import {BehaviorSubject, Subscription} from "rxjs/index";
 import {first} from "rxjs/internal/operators";
@@ -20,6 +19,7 @@ import {Experiment} from "../../util/models/experiment.model";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {ExperimentsService} from "../experiments.service";
 import {PropertyService} from "../../services/property.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: "new-experiment-setup",
@@ -645,14 +645,13 @@ export class NewExperimentSetupComponent implements OnDestroy {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width  = "40em";
         configuration.height = "30em";
-        configuration.panelClass = 'no-padding-dialog';
+        configuration.autoFocus = false;
         configuration.data = { idLab: "" + this.currentIdLab };
 
-        let dialogRef: MatDialogRef<WorkAuthorizationTypeSelectorDialogComponent> = this.dialog.open(WorkAuthorizationTypeSelectorDialogComponent, configuration);
-
-        dialogRef.afterClosed().pipe(first()).subscribe(() => {
-            this.dialogService.confirm('Confirmation', 'New accounts will require approval from billing administrator before use.');
-        });
+        this.dialogService.genericDialogContainer(WorkAuthorizationTypeSelectorDialogComponent, "New Billing Account (Choose Type)", null, configuration,
+            {actions: [
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
     }
 
     public onClickShowMoreAccounts(): void {

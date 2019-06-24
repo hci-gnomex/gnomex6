@@ -18,8 +18,6 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 
 export class DeleteDataTrackComponent extends BaseGenericContainerDialog {
     private selectedItem: ITreeNode;
-    public title: string = "";
-    private idGenomeBuild: string = "";
 
     public folderName: string = "";
     public idLab: string = "";

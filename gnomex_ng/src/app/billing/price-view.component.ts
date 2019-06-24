@@ -8,14 +8,15 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, SelectionChangedEvent} from "ag-grid-community";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'price-view',
     templateUrl: "./price-view.component.html",
     styles: [`
         div.grid-div {
-            height: 300px;
-            width: 400px;
+            height: 200px;
+            width: 100%;
         }
         .flex-one {
             flex: 1;
@@ -23,12 +24,12 @@ import {HttpParams} from "@angular/common/http";
     `]
 })
 
-export class PriceViewComponent implements OnInit {
+export class PriceViewComponent extends BaseGenericContainerDialog implements OnInit {
 
     private allCriteria1: any[];
     private allCriteria2: any[];
 
-    public title: string = "Price";
+    public innerTitle: string = "Price";
     public form: FormGroup;
     private idPrice: string = "0";
     private idPriceCategory: string;
@@ -45,6 +46,7 @@ export class PriceViewComponent implements OnInit {
                 private billingService: BillingService,
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService) {
+        super();
         this.form = fb.group({
             name: '',
             active: false,
@@ -53,6 +55,7 @@ export class PriceViewComponent implements OnInit {
             academicPrice: '0',
             commercialPrice: '0'
         });
+
     }
 
     ngOnInit() {
@@ -88,7 +91,7 @@ export class PriceViewComponent implements OnInit {
         this.billingService.getPriceCategory(this.idPriceCategory).subscribe((result: any) => {
             if (result && result.PriceCategory) {
                 let priceCategory: any = result.PriceCategory;
-                this.title += " (" + priceCategory.name + ")";
+                this.innerTitle += " (" + priceCategory.name + ")";
 
                 if (priceCategory.dictionaryClassNameFilter1) {
                     if (priceCategory.dictionaryClassNameFilter1 === 'text') {

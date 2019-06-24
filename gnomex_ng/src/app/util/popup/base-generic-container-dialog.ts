@@ -1,23 +1,21 @@
 import {Input} from "@angular/core";
-import {ActionType, GDAction} from "../interfaces/generic-dialog-action.model";
-import {FormGroup} from "@angular/forms";
+import {GDAction} from "../interfaces/generic-dialog-action.model";
 
 
 export abstract class BaseGenericContainerDialog {
-    public  primaryDisable: (action?:GDAction)=>boolean = (action) =>{
-        return false;
-    };
-    public  secondaryDisable: (action?:GDAction)=>boolean = (action) =>{
-        return false;
-    };
-
-    public dirty: ()=>boolean = () =>{ return false};
+    @Input() inputData: any;
     public showSpinner: boolean = false;
-    @Input() inputData:any;
+    public innerTitle: string = "";
 
-
-    protected constructor(){
+    public  primaryDisable: (action?: GDAction) => boolean = (action) => {
+        return false;
+    }
+    public  secondaryDisable: (action?: GDAction) => boolean = (action) => {
+        return false;
     }
 
+    public dirty: () => boolean = () => { return false; };
 
+    protected constructor() {
+    }
 }

@@ -1,10 +1,5 @@
-<div mat-dialog-title class="full-width inline-block header">
-	<img src="../../../assets/work_auth_form.png" alt="Image not found" class="header-image"/>
-	<h5 class="inline-block">Edit Billing Account</h5>
-</div>
-<div mat-dialog-content class="mat-dialog-content">
-	<div class="full-width background-sideless">
-		<div class="padded">
+<div class="flex-container-col full-width full-height">
+	<div class="full-width padded">
 			<div class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
@@ -56,10 +51,8 @@
 					</div>
 				</div>
 			</div>
-		</div>
 	</div>
-	<div class="full-width background">
-		<div class="padded">
+	<div class="full-width background padded">
 			<div *ngIf="showField === CHARTFIELD" class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
@@ -458,8 +451,6 @@
 					</div>
 				</div>
 			</div>
-
-
 			<div *ngIf="showField === PO" class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
@@ -531,8 +522,6 @@
 					</div>
 				</div>
 			</div>
-
-
 			<div *ngIf="showField === CREDIT_CARD" class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
@@ -618,12 +607,8 @@
 					</div>
 				</div>
 			</div>
-
-
-		</div>
 	</div>
-	<div class="full-width background-sideless">
-		<div class="padded">
+	<div class="full-width padded">
 			<div class="t full-width">
 				<div class="tr full-width">
 					<div class="td cell-label">
@@ -688,18 +673,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
 	</div>
 </div>
-<div mat-dialog-actions>
-	<div class="full-width button-container">
-		<div class="inline-block">
-			<button mat-raised-button (click)="onUpdateButtonClicked()" autofocus>
-				<img src="../../../assets/save.png" alt=""/> Update
-			</button>
-		</div>
-		<div class="inline-block">
-			<button mat-raised-button (click)="onCancelButtonClicked()">Cancel</button>
-		</div>
-	</div>
-</div>
+

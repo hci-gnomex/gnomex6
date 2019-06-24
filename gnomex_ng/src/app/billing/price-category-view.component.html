@@ -1,67 +1,61 @@
-<h6 mat-dialog-title>{{this.title}}</h6>
-<mat-dialog-content>
-    <form [formGroup]="this.form">
-        <div>
-            <mat-form-field class="full-width">
-                <input matInput placeholder="Name" [formControlName]="'name'">
-            </mat-form-field>
-        </div>
-        <div>
-            <mat-checkbox [formControlName]="'active'">Active</mat-checkbox>
-        </div>
-        <div>
-            <mat-form-field class="full-width">
-                <textarea matInput placeholder="Notes" [formControlName]="'notes'"
-                          matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
-            </mat-form-field>
-        </div>
-        <div>
-            <custom-combo-box class="full-width" placeholder="Charge Kind"
-                              [options]="this.allChargeKinds" valueField="codeBillingChargeKind" displayField="display"
-                              [formControlName]="'chargeKind'">
-            </custom-combo-box>
-        </div>
-        <div>
-            <label>Determine experiment's price using</label>
-        </div>
-        <div>
-            <custom-combo-box class="full-width"
-                              [options]="this.allFilterTypes" valueField="className" displayField="displayName"
-                              [formControlName]="'filter1'">
-            </custom-combo-box>
-        </div>
-        <div>
-            <custom-combo-box class="full-width"
-                              [options]="this.allFilterTypes" valueField="className" displayField="displayName"
-                              [formControlName]="'filter2'">
-            </custom-combo-box>
-        </div>
-        <div>
-            <mat-form-field class="full-width">
-                <input matInput placeholder="Plugin Class" [formControlName]="'plugin'">
-            </mat-form-field>
-        </div>
-        <div>
-            <label>Workflow Steps</label>
-        </div>
-        <div>
-            <button mat-button (click)="this.addStep()"><img src="../../assets/add.png" class="icon">Add</button>
-            <button mat-button [disabled]="!this.selectedStep" (click)="this.removeStep()"><img src="../../assets/delete.png" class="icon">Remove</button>
-        </div>
-        <div class="grid-div">
-            <ag-grid-angular class="ag-theme-balham full-height full-width"
-                             (gridReady)="this.onGridReady($event)"
-                             (gridSizeChanged)="this.onGridSizeChanged($event)"
-                             (selectionChanged)="this.onGridSelectionChanged($event)"
-                             [singleClickEdit]="true"
-                             [stopEditingWhenGridLosesFocus]="true"
-                             [rowSelection]="'single'"
-                             [rowData]="this.steps">
-            </ag-grid-angular>
-        </div>
-    </form>
-</mat-dialog-content>
-<mat-dialog-actions>
-    <button mat-button color="primary" (click)="this.save()">Save</button>
-    <button mat-button mat-dialog-close>Cancel</button>
-</mat-dialog-actions>
+<form [formGroup]="this.form" class="flex-container-col full-width full-height double-padded">
+    <div>
+        <mat-form-field class="full-width">
+            <input matInput placeholder="Name" [formControlName]="'name'">
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-checkbox [formControlName]="'active'">Active</mat-checkbox>
+    </div>
+    <div>
+        <mat-form-field class="full-width">
+            <textarea matInput placeholder="Notes" [formControlName]="'notes'"
+                      matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+        </mat-form-field>
+    </div>
+    <div>
+        <custom-combo-box class="full-width" placeholder="Charge Kind"
+                          [options]="this.allChargeKinds" valueField="codeBillingChargeKind" displayField="display"
+                          [formControlName]="'chargeKind'">
+        </custom-combo-box>
+    </div>
+    <div>
+        <label>Determine experiment's price using</label>
+    </div>
+    <div>
+        <custom-combo-box class="full-width"
+                          [options]="this.allFilterTypes" valueField="className" displayField="displayName"
+                          [formControlName]="'filter1'">
+        </custom-combo-box>
+    <!--</div>-->
+    <!--<div>-->
+        <custom-combo-box class="full-width"
+                          [options]="this.allFilterTypes" valueField="className" displayField="displayName"
+                          [formControlName]="'filter2'">
+        </custom-combo-box>
+    </div>
+    <div>
+        <mat-form-field class="full-width">
+            <input matInput placeholder="Plugin Class" [formControlName]="'plugin'">
+        </mat-form-field>
+    </div>
+    <div>
+        <label>Workflow Steps</label>
+    </div>
+    <div>
+        <button mat-button (click)="this.addStep()"><img src="../../assets/add.png" class="icon">Add</button>
+        <button mat-button [disabled]="!this.selectedStep" (click)="this.removeStep()"><img src="../../assets/delete.png" class="icon">Remove</button>
+    </div>
+    <div class="grid-div">
+        <ag-grid-angular class="ag-theme-balham full-height full-width"
+                         (gridReady)="this.onGridReady($event)"
+                         (gridSizeChanged)="this.onGridSizeChanged($event)"
+                         (selectionChanged)="this.onGridSelectionChanged($event)"
+                         [singleClickEdit]="true"
+                         [stopEditingWhenGridLosesFocus]="true"
+                         [rowSelection]="'single'"
+                         [rowData]="this.steps">
+        </ag-grid-angular>
+    </div>
+</form>
+

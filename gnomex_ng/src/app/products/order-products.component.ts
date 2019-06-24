@@ -280,13 +280,14 @@ export class OrderProductsComponent implements OnInit {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width  = "40em";
         configuration.height = "30em";
-        configuration.panelClass = 'no-padding-dialog';
+        configuration.autoFocus = false;
         configuration.data = { idLab: "" + this.idLab };
 
-        let dialogRef: MatDialogRef<WorkAuthorizationTypeSelectorDialogComponent> = this.dialog.open(WorkAuthorizationTypeSelectorDialogComponent, configuration);
-
-        dialogRef.afterClosed().subscribe(() => {
-            this.onLabChange();
+        this.dialogsService.genericDialogContainer(WorkAuthorizationTypeSelectorDialogComponent, "New Billing Account (Choose Type)", null, configuration,
+            {actions: [
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe(() => {
+                    this.onLabChange();
         });
     }
 
