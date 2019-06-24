@@ -213,7 +213,6 @@ export class MenuHeaderBillingComponent implements OnInit {
         config.autoFocus = false;
         config.data = {
         };
-        // this.dialog.open(NotesToCoreComponent, config);
         this.dialogsService.genericDialogContainer(NotesToCoreComponent, "Billing Item Notes to Core", null, config,
             {actions: [
                     {type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}

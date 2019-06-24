@@ -30,6 +30,8 @@ import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-us
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {CopyAccountsDialogComponent} from "./dialogs/copy-accounts-dialog.component";
 import {UniqueIdGeneratorService} from "../../services/unique-id-generator.service";
+import {ConstantsService} from "../../services/constants.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -42,28 +44,28 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 	templateUrl: "./billing-account-tab.component.html",
 	styles: [`
         
-        .border {  
-            width: 50%;  
-            margin-bottom: 0.8em;  
-            padding: 0.5em;  
-            border: 1px solid lightgrey;  
-            border-radius: 3px;  
+        .border {
+            width: 50%;
+            margin-bottom: 0.8em;
+            padding: 0.5em;
+            border: 1px solid lightgrey;
+            border-radius: 3px;
         }
         
-        .t  { display: table;      }  
-        .tr { display: table-row;  }  
+        .t  { display: table;      }
+        .tr { display: table-row;  }
         .td { display: table-cell; }
         
-        .block        { display: block;        }  
+        .block        { display: block;        }
         .inline-block { display: inline-block; }
         
         
         .padded { padding: 0.3em; }
         
-        .padded-not-bottom { 
+        .padded-not-bottom {
             padding-top:   0.3em;
             padding-left:  0.3em;
-            padding-right: 0.3em; 
+            padding-right: 0.3em;
         }
 
         .medium-width    { width:  20em;  }
@@ -162,6 +164,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 private propertyService: PropertyService,
                 private accountFieldsConfigurationService: AccountFieldsConfigurationService,
                 private dialog: MatDialog,
+                private constService: ConstantsService,
                 private idGenerator: UniqueIdGeneratorService) {
 		this.context = { componentParent: this };
 	}
@@ -1240,79 +1243,72 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
     openChartfieldEditor(rowNode: any) {
         this.chartfieldRowNode_LastSelected = rowNode.id;
 
-        let data = { labActiveSubmitters: this.labActiveSubmitters };
-
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = data;
+        configuration.autoFocus = false;
+        configuration.data = {
+            labActiveSubmitters: this.labActiveSubmitters,
+            rowData: rowNode.data
+        };
 
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
-        dialogRef.componentInstance.rowData = rowNode.data;
-
-        dialogRef.afterClosed().subscribe((result) => {
-            // We only expect a result back if the popup's "OK" button was clicked.
-            if (!result) {
-                return;
-            }
-
-            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-
-            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
-
-            this.translateChangesOntoAccountRecords(rowNode);
+        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+                        this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                        this.translateChangesOntoAccountRecords(rowNode);
+                    }
         });
     }
 
     openPoEditor(rowNode: any) {
         this.poRowNode_LastSelected = rowNode.id;
 
-        let data = { labActiveSubmitters: this.labActiveSubmitters };
-
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = data;
+        configuration.autoFocus = false;
+        configuration.data = {
+            labActiveSubmitters: this.labActiveSubmitters,
+            rowData: rowNode.data
+        };
 
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
-        dialogRef.componentInstance.rowData = rowNode.data;
-
-        dialogRef.afterClosed().subscribe((result) => {
-            // We only expect a result back if the popup's "OK" button was clicked.
-            if (!result) {
-                return;
+        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
+                this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                this.translateChangesOntoAccountRecords(rowNode);
             }
-            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-
-            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
-
-            this.translateChangesOntoAccountRecords(rowNode);
         });
     }
 
     openCreditCardEditor(rowNode: any) {
         this.creditCardRowNode_LastSelected = rowNode.id;
 
-        let data = { labActiveSubmitters: this.labActiveSubmitters };
-
 	    let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = data;
+        configuration.autoFocus = false;
+        configuration.data = {
+            labActiveSubmitters: this.labActiveSubmitters,
+            rowData: rowNode.data
+        };
 
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
-        dialogRef.componentInstance.rowData = rowNode.data;
-
-        dialogRef.afterClosed().subscribe((result) => {
-            // We only expect a result back if the popup's "OK" button was clicked.
-            if (!result) {
-                return;
+        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
+                this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                this.translateChangesOntoAccountRecords(rowNode);
             }
-            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-
-            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
-
-            this.translateChangesOntoAccountRecords(rowNode);
         });
     }
 

@@ -9,9 +9,14 @@ import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
 import {MatCheckboxChange, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {
-    CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent, RowClickedEvent, RowDoubleClickedEvent,
+    CellValueChangedEvent,
+    GridApi,
+    GridReadyEvent,
+    GridSizeChangedEvent,
+    RowClickedEvent,
+    RowDoubleClickedEvent,
     RowDragEvent,
-    RowNode
+    RowNode,
 } from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
@@ -21,8 +26,9 @@ import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateParserComponent} from "../util/parsers/date-parser.component";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 import {
-    BillingTemplate, BillingTemplateWindowComponent,
-    BillingTemplateWindowParams
+    BillingTemplate,
+    BillingTemplateWindowComponent,
+    BillingTemplateWindowParams,
 } from "../util/billing-template-window.component";
 import {Observable, Subscription} from "rxjs";
 import {PriceSheetViewComponent} from "./price-sheet-view.component";
@@ -1054,33 +1060,49 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
         event.node.setExpanded(true);
         let dialogConfig: MatDialogConfig = new MatDialogConfig();
-        let dialogRef: MatDialogRef<any>;
+        dialogConfig.width = "45em";
 
         if (event.data.idPriceSheet) {
             dialogConfig.data = {
                 idPriceSheet: event.data.idPriceSheet
             };
-            dialogRef = this.dialog.open(PriceSheetViewComponent, dialogConfig);
+            this.dialogsService.genericDialogContainer(PriceSheetViewComponent, "", null, dialogConfig,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.refreshPricingGrid();
+                        }
+            });
         } else if (event.data.idPriceCategory && !event.data.idPrice) {
             dialogConfig.data = {
                 idPriceCategory: event.data.idPriceCategory,
                 idPriceSheet: event.node.parent.data.idPriceSheet
             };
-            dialogRef = this.dialog.open(PriceCategoryViewComponent, dialogConfig);
+            this.dialogsService.genericDialogContainer(PriceCategoryViewComponent, "", null, dialogConfig,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.refreshPricingGrid();
+                        }
+            });
         } else if (event.data.idPrice) {
             dialogConfig.data = {
                 idPrice: event.data.idPrice,
                 idPriceCategory: event.node.parent.data.idPriceCategory,
                 idCoreFacility: this.lastFilterEvent.idCoreFacility
             };
-            dialogRef = this.dialog.open(PriceViewComponent, dialogConfig);
-        }
-
-        if (dialogRef) {
-            dialogRef.afterClosed().subscribe((result: any) => {
-                if (result) {
-                    this.refreshPricingGrid();
-                }
+            this.dialogsService.genericDialogContainer(PriceViewComponent, "", null, dialogConfig,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.refreshPricingGrid();
+                        }
             });
         }
     }
@@ -1144,11 +1166,16 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     public openNewSheetWindow(): void {
-        let dialogRef: MatDialogRef<PriceSheetViewComponent> = this.dialog.open(PriceSheetViewComponent);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.refreshPricingGrid();
-            }
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "45em";
+        this.dialogsService.genericDialogContainer(PriceSheetViewComponent, "", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.refreshPricingGrid();
+                    }
         });
     }
 
@@ -1170,14 +1197,18 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
 
         let dialogConfig: MatDialogConfig = new MatDialogConfig();
+        dialogConfig.width = "45em";
         dialogConfig.data = {
             idPriceSheet: idPriceSheet
         };
-        let dialogRef: MatDialogRef<PriceCategoryViewComponent> = this.dialog.open(PriceCategoryViewComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.refreshPricingGrid();
-            }
+        this.dialogsService.genericDialogContainer(PriceCategoryViewComponent, "", null, dialogConfig,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.refreshPricingGrid();
+                    }
         });
     }
 
@@ -1197,13 +1228,18 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
 
         let dialogConfig: MatDialogConfig = new MatDialogConfig();
+        dialogConfig.width = "45em";
         dialogConfig.data = {
             idPriceCategory: idPriceCategory,
             idCoreFacility: this.lastFilterEvent.idCoreFacility
         };
-        let dialogRef: MatDialogRef<PriceViewComponent> = this.dialog.open(PriceViewComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
+
+        this.dialogsService.genericDialogContainer(PriceViewComponent, "", null, dialogConfig,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
                 this.refreshPricingGrid();
             }
         });

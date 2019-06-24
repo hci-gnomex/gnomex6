@@ -1,25 +1,28 @@
 import {Component, Inject } from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {MAT_DIALOG_DATA} from "@angular/material";
+import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-container-dialog";
 
 @Component({
 	selector: "new-billing-account-error-dialog",
-	templateUrl: "./new-billing-account-error-dialog.component.html",
-	styles: [`			
-			.center {
-					text-align: center;
-			}
-	`]
+	template: `
+		<div class="flex-container-col full-width full-height double-padded">
+            <h3>
+                Please fix the following errors with this form before proceeding:
+            </h3>
+			<div class="padded-left-right">
+                <pre>{{errorMessage}}</pre>
+			</div>
+		</div>
+	`,
+	styles: [``]
 })
-export class NewBillingAccountErrorDialogComponent {
+export class NewBillingAccountErrorDialogComponent extends BaseGenericContainerDialog {
 
-	errorMessage: string = '';
+	public errorMessage: string = "";
 
-	constructor(private dialogRef: MatDialogRef<NewBillingAccountErrorDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-		this.errorMessage = !!data ? data.errorMessage : '';
-	}
-
-	private errorOkButtonClicked(): void {
-		this.dialogRef.close();
+	constructor(@Inject(MAT_DIALOG_DATA) private data: any) {
+		super();
+		this.errorMessage = this.data ? this.data.errorMessage : "";
 	}
 
 }

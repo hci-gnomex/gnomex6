@@ -5,6 +5,9 @@ import {Router} from "@angular/router";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {NewBillingAccountComponent} from "../billing/new_billing_account/new-billing-account.component";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'work-authorization-type-selector-dialog',
@@ -13,7 +16,7 @@ import {NewBillingAccountComponent} from "../billing/new_billing_account/new-bil
 
         .title-size { font-size: large; }
         
-        .no-padding { padding: 0; } 
+        .no-padding { padding: 0; }
         .no-margin  { margin:  0; }
 
         .bordered { border: 1px solid silver; }
@@ -21,14 +24,14 @@ import {NewBillingAccountComponent} from "../billing/new_billing_account/new-bil
         .foreground { background-color: white; }
         .background { background-color: #eeeeeb; }
 
-        .link-button { 
+        .link-button {
             color: blue;
             text-decoration: underline;
         }
         
     `]
 })
-export class WorkAuthorizationTypeSelectorDialogComponent {
+export class WorkAuthorizationTypeSelectorDialogComponent extends BaseGenericContainerDialog {
 
     public get showInternalButton(): boolean {
         return this.gnomexService && this.gnomexService.isCoreGenomics === true;
@@ -50,7 +53,9 @@ export class WorkAuthorizationTypeSelectorDialogComponent {
                 private dialogRef: MatDialogRef<WorkAuthorizationTypeSelectorDialogComponent>,
                 private propertyService: PropertyService,
                 private router:Router,
+                private constService: ConstantsService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
 
         if (this.data && this.data.idLab) {
             this.idLab = this.data.idLab;
@@ -102,10 +107,14 @@ export class WorkAuthorizationTypeSelectorDialogComponent {
 
             let config: MatDialogConfig = new MatDialogConfig();
             config.width = '60em';
-            config.panelClass = 'no-padding-dialog';
+            config.autoFocus = false;
             config.data = { idLab: "" + this.idLab };
 
-            let dialogRef = this.dialog.open(NewBillingAccountComponent, config);
+            this.dialogService.genericDialogContainer(NewBillingAccountComponent, "Submit Campus Billing Account", this.constService.ICON_WORK_AUTH_FORM, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "onSaveButtonClicked"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
         } else {
             let url: string = this.propertyService.getProperty(PropertyService.PROPERTY_WORK_AUTHORIZATION_MAIN_GNOMEX_URL);
             if (url) {
