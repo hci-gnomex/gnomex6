@@ -1,25 +1,29 @@
 import {Component, Inject } from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {MAT_DIALOG_DATA} from "@angular/material";
+import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-container-dialog";
 
 @Component({
 	selector: "new-billing-account-success-dialog",
-	templateUrl: "./new-billing-account-success-dialog.component.html",
-	styles: [`			
-			.center {
-					text-align: center;
-			}
-	`]
+	template: `
+		<div class="flex-container-col full-width full-height double-padded">
+            <h3>
+                Billing Account Added
+            </h3>
+            <p>{{successMessage}}</p>
+            <p>
+                After the account information is reviewed and approved, you will be notified by email when
+                experiment requests may be submitted using this account.
+            </p>
+		</div>
+	`,
+	styles: [``]
 })
-export class NewBillingAccountSuccessDialogComponent {
+export class NewBillingAccountSuccessDialogComponent extends BaseGenericContainerDialog {
 
-	successMessage: string = '';
+	public successMessage: string = "";
 
-	constructor(private dialogRef: MatDialogRef<NewBillingAccountSuccessDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-		this.successMessage = !!data ? data.successMessage : '';
+	constructor(@Inject(MAT_DIALOG_DATA) private data: any) {
+		super();
+		this.successMessage = this.data ? this.data.successMessage : "";
 	}
-
-	private successOkButtonClicked(): void {
-		this.dialogRef.close();
-	}
-
 }

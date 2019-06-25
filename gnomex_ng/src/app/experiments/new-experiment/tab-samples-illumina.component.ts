@@ -29,6 +29,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GridApi} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -122,6 +123,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
         if (newExperiment && this.onChange_idSampleSourceSubscription) {
             this.onChange_idSampleSourceSubscription.unsubscribe();
+        }
+        if (newExperiment && this.onChange_codeRequestCategorySubscription) {
+            this.onChange_codeRequestCategorySubscription.unsubscribe();
+        }
+
+        if (!this.onChange_codeRequestCategorySubscription) {
+            this.onChange_codeRequestCategorySubscription = this._experiment.onChange_codeRequestCategory.subscribe((value) => {
+                let hide_property = this.propertyService.getProperty(PropertyService.PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
+                this._hideMultiplexGroupColumn = hide_property && hide_property.propertyValue && hide_property.propertyValue === 'Y';
+            });
         }
 
         if (!this.onChange_numberOfSamplesSubscription) {
@@ -279,8 +290,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     public get usingMultiplexGroupGroups(): boolean {
         return this._experiment
-            && this._experiment.isExternal !== 'Y';
+            && this._experiment.isExternal !== 'Y'
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
     };
+
+    public get hideMultiplexGroupColumn(): boolean {
+        return this._hideMultiplexGroupColumn;
+    }
 
     public get showConcentrationUnitColumn(): boolean {
         return !this.usingMultiplexGroupGroups;
@@ -393,11 +410,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this._experiment.requestCategory.isIlluminaType === 'N';
     }
 
+
     public context: any = this;
 
     private _experiment: Experiment;
 
     private _barCodes: any[] = [];
+
+    private _hideMultiplexGroupColumn: boolean = false;
+    private _defaultMultiplexGroupValue: string;
 
     public _state: string = TabSamplesIlluminaComponent.STATE_NEW;
 
@@ -410,6 +431,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private onChange_selectedProtocolSubscription: Subscription;
     private onChange_codeBioanalyzerChipTypeSubscription: Subscription;
     private onChange_idSampleSourceSubscription: Subscription;
+    private onChange_codeRequestCategorySubscription: Subscription;
 
     public static readonly ANNOTATION_ATTRIBUTE_NAME_PREFIX :string = "ANNOT";
 
@@ -503,7 +525,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             sortOrder: 5
         });
 
-        if (this.usingMultiplexGroupGroups) {
+        if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn) {
             temp.push({
                 headerName: "Multiplex Group",
                 editable: true,
@@ -795,7 +817,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             pinned: "left"
         });
 
-        if (this.usingMultiplexGroupGroups) {
+        if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn) {
             temp.push({
                 headerName: "Multiplex Group",
                 editable: true,
@@ -1799,7 +1821,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         if (this._experiment && this._experiment.numberOfSamples) {
 
-            Sample.createNewSamplesForExperiment(this._experiment, this.dictionaryService, this.gnomexService);
+            Sample.createNewSamplesForExperiment(this._experiment, this.dictionaryService, this.propertyService, this.gnomexService);
 
             this.createColumnsBasedOnState(this._state);
             this.assignRowDataBasedOnState(this._state); // REMEMBER
@@ -2042,9 +2064,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         config.panelClass = 'no-padding-dialog';
         config.data = data;
 
-        let dialogRef = this.dialog.open(UploadSampleSheetComponent, config);
-
-        dialogRef.afterClosed().subscribe((result) => {
+        this.dialogService.genericDialogContainer(UploadSampleSheetComponent, "Upload Sample Sheet", null, config,
+            {actions: [{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}]}).subscribe((result: any) => {
             if (result && Array.isArray(result)) {
                 this._experiment.numberOfSamples = '' + result.length;
             }

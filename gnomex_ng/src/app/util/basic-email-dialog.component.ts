@@ -112,7 +112,4 @@ export class BasicEmailDialogComponent extends BaseGenericContainerDialog implem
 
     }
 
-    public cancel(): void {
-        this.dialogRef.close();
-    }
 }

@@ -1,5 +1,5 @@
-import {Component, Inject} from '@angular/core';
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {Component, Inject} from "@angular/core";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
 import {TopicService} from "../services/topic.service";
 import {LabListService} from "../services/lab-list.service";
@@ -8,19 +8,20 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "./popup/dialogs.service";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {GDAction} from "./interfaces/generic-dialog-action.model";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
 
 @Component({
-    selector: 'new-topic',
+    selector: "new-topic",
     templateUrl: "./new-topic.component.html",
 })
 
-export class NewTopicComponent {
+export class NewTopicComponent extends BaseGenericContainerDialog {
 
-    public title: string = "";
-
-    public name: string = "";
-    public idLab: string = "";
-    public idOwner: string = "";
+    public form: FormGroup;
+    public primaryDisable: (action?: GDAction) => boolean;
 
     public labList: any[] = [];
     public ownerList: any[] = [];
@@ -35,81 +36,58 @@ export class NewTopicComponent {
                 private labListService: LabListService,
                 public prefService: UserPreferencesService,
                 private dialogService: DialogsService,
-                @Inject(MAT_DIALOG_DATA) private data: any) {
+                @Inject(MAT_DIALOG_DATA) private data: any,
+                private fb: FormBuilder) {
+        super();
+        this.form = this.fb.group({
+            name: ["", [Validators.required, Validators.maxLength(2000)]],
+            idLab: ["", [Validators.required]],
+            idAppUser: ["", [Validators.required]],
+        });
+
         if (this.data != null) {
             this.selectedItem = data.selectedItem;
-        }
-        if (!this.selectedItem || !this.selectedItem.data.idTopic) {
-            this.title = " Add New Top Level Topic";
-        } else {
-            this.title = " Add Subtopic of " + this.selectedItem.parent.data.label;
         }
 
         this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
             this.labList = response;
         });
+
+        this.form.markAsPristine();
+        this.primaryDisable = (action) => {
+            return this.form.invalid;
+        };
     }
 
-    public onLabSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idLab = event.args.item.value;
-                this.getLabService.getLabMembers(this.idLab).subscribe((response: any[]) => {
-                    if (this.createSecurityAdvisorService.isAdmin || this.createSecurityAdvisorService.isSuperAdmin) {
-                        this.ownerList = response;
-                    } else {
-                        this.ownerList = response.filter((user: any) => {
-                            return user.idAppUser == this.createSecurityAdvisorService.idAppUser;
-                        });
-                    }
-                });
-            }
-        } else {
-            this.resetLabSelection();
-        }
-    }
-
-    public onLabUnselect(): void {
-        this.resetLabSelection();
-    }
-
-    private resetLabSelection(): void {
-        this.idLab = "";
+    public onLabSelect(): void {
         this.ownerList = [];
-        this.resetOwnerSelection();
-    }
-
-    public onOwnerSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idOwner = event.args.item.value;
-            }
-        } else {
-            this.resetOwnerSelection();
+        let idLab: string = this.form.get("idLab").value;
+        if (idLab) {
+            this.getLabService.getLabMembers(idLab).subscribe((response: any[]) => {
+                if (this.createSecurityAdvisorService.isAdmin || this.createSecurityAdvisorService.isSuperAdmin) {
+                    this.ownerList = response;
+                } else {
+                    this.ownerList = response.filter((user: any) => {
+                        return user.idAppUser === this.createSecurityAdvisorService.idAppUser;
+                    });
+                }
+            });
         }
-    }
-
-    public onOwnerUnselect(): void {
-        this.resetOwnerSelection();
-    }
-
-    private resetOwnerSelection(): void {
-        this.idOwner = "";
     }
 
     public save(): void {
         this.showSpinner = true;
         let params: HttpParams = new HttpParams()
             .set("idParentTopic", this.selectedItem.data.idTopic ? this.selectedItem.data.idTopic : "")
-            .set("name", this.name)
+            .set("name", this.form.get("name").value)
             .set("description", "")
-            .set("idLab", this.idLab)
-            .set("idAppUser", this.idOwner)
+            .set("idLab", this.form.get("idLab").value)
+            .set("idAppUser", this.form.get("idAppUser").value)
             .set("codeVisibility", "MEM");
         this.topicService.saveTopic(params).subscribe((result: any) => {
             this.showSpinner = false;
-            if (result && result.result === 'SUCCESS') {
-                this.dialogRef.close();
+            if (result && result.result === "SUCCESS") {
+                this.dialogRef.close(result.idTopic);
                 this.topicService.refreshTopicsList_fromBackend();
             } else {
                 let message: string = "";
@@ -118,6 +96,8 @@ export class NewTopicComponent {
                 }
                 this.dialogService.alert("An error occurred while saving the topic" + message);
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

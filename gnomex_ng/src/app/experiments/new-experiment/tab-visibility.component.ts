@@ -70,14 +70,11 @@ export class TabVisibilityComponent implements OnInit, OnDestroy{
             this.visibilityForm.get("codeVisibility").setValue('MEM');
         }
 
-
-
-
         if (!this.idLabSubscription) {
             this.idLabSubscription = this._experiment.onChange_idLab.subscribe((value: string) => {
                 let idLab = this.currentOrder.idLab;
 
-                if(idLab !== null  && idLab !== undefined) { //empty string is valid
+                if(idLab) {
                     let labParams: HttpParams = new HttpParams()
                         .set('idLab', idLab)
                         .set('includeBillingAccounts', 'N')
@@ -94,12 +91,12 @@ export class TabVisibilityComponent implements OnInit, OnDestroy{
                         this.possibleCollaborators = this.removeInvalidDropdownCollabs(this.possibleCollaborators,currentCollaborators);
 
                         //remove from grid inactive collabs and the owner if in grid
-                        for(let dropdownCollab of this.allCollabs){
+                        for (let dropdownCollab of this.allCollabs){
                             let i:number = currentCollaborators.findIndex(c => c.idAppUser === dropdownCollab.idAppUser);
-                            if(i > -1 && dropdownCollab.isActive === 'N'){
+                            if (i > -1 && dropdownCollab.isActive === 'N'){
                                 currentCollaborators.splice(i,1);
                             }
-                            else if(i > -1 && this.currentOrder.idAppUser === dropdownCollab.idAppUser ){
+                            else if (i > -1 && this.currentOrder.idAppUser === dropdownCollab.idAppUser ){
                                 currentCollaborators.splice(i,1);
                             }
                         }

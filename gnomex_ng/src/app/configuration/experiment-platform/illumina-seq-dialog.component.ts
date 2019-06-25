@@ -18,7 +18,7 @@ import {numberRange} from "../../util/validators/number-range-validator";
             padding:0.3em;
 
         }
-        mat-form-field.medium-form-input{
+        .medium-form-input{
             width: 20em;
             margin-right: 1em;
         }

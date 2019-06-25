@@ -7,7 +7,7 @@
         </div>
         <div class="flex-container-row flex-grow">
             <as-split>
-                <as-split-area size="20">
+                <as-split-area [size]="20">
                     <div class="full-width full-height small-font border">
                         <div class="full-height full-width flex-container-col foreground">
                             <div class="full-width flex-grow left-right-padded top-padded small-font no-overflow">
@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 </as-split-area>
-                <as-split-area size="80">
+                <as-split-area [size]="80">
                     <div class="full-width full-height border padded small-font">
                         <div [hidden]="!linkDataView" class="full-width full-height foreground">
                             <div class="full-width full-height flex-container-col">
@@ -61,13 +61,14 @@
                                 <div class="full-width flex-grow flex-container-col padded border">
                                     <!-- Only one group of search criteria should be shown -->
                                     <div *ngIf="isExperimentsTab" class="full-width flex-container-row align-center">
-                                        <mat-form-field class="formField">
-                                            <input #experimentInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoExpLab"
-                                                   [(ngModel)]="experimentLab" (keyup.enter)="chooseFirstExpLabOption()" (keyup)="highlightExpLabFirstOption($event)">
-                                            <mat-autocomplete #autoExpLab="matAutocomplete" [displayWith]="this.prefService.createLabDisplayWithFunction()">
-                                                <mat-option (onSelectionChange)="selectExperimentLabOption($event)" *ngFor="let lab of filterExperimentLabs(this.experimentLab)" [value]="lab">{{lab[this.prefService.labDisplayField]}}</mat-option>
-                                            </mat-autocomplete>
-                                        </mat-form-field>
+                                        <div class="formField">
+                                            <custom-combo-box placeholder="Filter by Lab"
+                                                              [options]="this.pickerLabs"
+                                                              [displayField]="this.prefService.labDisplayField"
+                                                              (optionSelected)="selectExperimentLabOption($event)"
+                                                              [(ngModel)]="experimentLab">
+                                            </custom-combo-box>
+                                        </div>
                                         <mat-form-field class="formField">
                                             <input matInput [(ngModel)]="experimentSearchText" placeholder="Search" (keyup)="searchExperiementsOnEnter($event)">
                                         </mat-form-field>
@@ -86,13 +87,14 @@
                                     </div>
 
                                     <div *ngIf="isAnalysisTab" class="full-width flex-container-row align-center">
-                                        <mat-form-field class="formField">
-                                            <input #analysisInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoAnalLab"
-                                                   [(ngModel)]="analysisLab" (keyup.enter)="chooseFirstAnalLabOption()" (keyup)="highlightAnalLabFirstOption($event)">
-                                            <mat-autocomplete #autoAnalLab="matAutocomplete" [displayWith]="this.prefService.createLabDisplayWithFunction()">
-                                                <mat-option (onSelectionChange)="selectAnalysisLabOption($event)" *ngFor="let lab of filterAnalysisLabs(this.analysisLab)" [value]="lab">{{lab[this.prefService.labDisplayField]}}</mat-option>
-                                            </mat-autocomplete>
-                                        </mat-form-field>
+                                        <div class="formField">
+                                            <custom-combo-box placeholder="Filter by Lab"
+                                                              [options]="this.pickerLabs"
+                                                              [displayField]="this.prefService.labDisplayField"
+                                                              (optionSelected)="selectAnalysisLabOption($event)"
+                                                              [(ngModel)]="analysisLab">
+                                            </custom-combo-box>
+                                        </div>
                                         <mat-form-field class="formField">
                                             <input matInput [(ngModel)]="analysisSearchText" placeholder="Search" (keyup)="searchAnalysisOnEnter($event)">
                                         </mat-form-field>
@@ -105,31 +107,30 @@
                                     </div>
 
                                     <div *ngIf="isDatatracksTab" class="full-width flex-container-row align-center">
-                                        <mat-form-field class="formField">
-                                            <input #datatrackInput matInput placeholder="Filter by lab" aria-label="Lab" [matAutocomplete]="autoLab"
-                                                   [(ngModel)]="datatrackLab" (keyup.enter)="chooseFirstLabOption()" (keyup)="highlightDtLabFirstOption($event)">
-                                            <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
-                                                <mat-option (onSelectionChange)="selectDatatrackLabOption($event)" *ngFor="let lab of filterDatatrackLabs(this.datatrackLab)" [value]="lab">{{lab[this.prefService.labDisplayField]}}</mat-option>
-                                            </mat-autocomplete>
-                                        </mat-form-field>
-                                        <mat-form-field class="formField">
-                                            <input matInput placeholder="Organism" aria-label="Organism" [matAutocomplete]="autoOrg"
-                                                   [(ngModel)]="organism" (keyup.enter)="chooseFirstOrgOption()" (keyup)="highlightDtOrgFirstOption($event)">
-                                            <mat-autocomplete [displayWith]="displayOrg" #autoOrg="matAutocomplete">
-                                                <mat-option (onSelectionChange)="selectDatatrackOrgOption($event)" *ngFor="let org of filterOrganism(this.organism)" [value]="org">{{org.binomialName}}</mat-option>
-                                            </mat-autocomplete>
-                                        </mat-form-field>
-                                        <mat-form-field class="formField" *ngIf="datatrackLab && organism">
-                                            <input matInput
-                                                   placeholder="Genome Build"
-                                                   aria-label="Genome Build"
-                                                   [matAutocomplete]="autoGen"
-                                                   [(ngModel)]="genomeBuild"
-                                                   (keyup.enter)="chooseFirstGenomeOption()">
-                                            <mat-autocomplete [displayWith]="displayGen" #autoGen="matAutocomplete">
-                                                <mat-option (onSelectionChange)="selectDatatrackGenOption($event)" *ngFor="let gen of filterGenomeBuild(this.genomeBuild)" [value]="gen">{{gen.genomeBuildName}}</mat-option>
-                                            </mat-autocomplete>
-                                        </mat-form-field>
+                                        <div class="formField">
+                                            <custom-combo-box placeholder="Filter by Lab"
+                                                              [options]="this.pickerLabs"
+                                                              [displayField]="this.prefService.labDisplayField"
+                                                              (optionSelected)="selectDatatrackLabOption($event)"
+                                                              [(ngModel)]="datatrackLab">
+                                            </custom-combo-box>
+                                        </div>
+                                        <div class="formField">
+                                            <custom-combo-box placeholder="Organism"
+                                                              [options]="this.organisms"
+                                                              displayField="binomialName"
+                                                              (optionSelected)="selectDatatrackOrgOption($event)"
+                                                              [(ngModel)]="organism">
+                                            </custom-combo-box>
+                                        </div>
+                                        <div class="formField" *ngIf="datatrackLab && organism">
+                                            <custom-combo-box placeholder="Genome Build"
+                                                              [options]="this.genomeBuildList"
+                                                              displayField="genomeBuildName"
+                                                              (optionSelected)="selectDatatrackGenOption()"
+                                                              [(ngModel)]="genomeBuild">
+                                            </custom-combo-box>
+                                        </div>
                                         <mat-form-field class="formField">
                                             <input matInput [(ngModel)]="datatrackSearchText" placeholder="Search" (keyup)="searchDatatrackOnEnter($event)">
                                         </mat-form-field>

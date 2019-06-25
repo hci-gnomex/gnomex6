@@ -10,30 +10,14 @@ import {HttpParams} from "@angular/common/http";
 import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
 import {ConfigureProductTypesComponent} from "./configure-product-types.component";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'configure-products',
     templateUrl: "./configure-products.component.html",
-    styles: [`
-        div.flex-container-row {
-            display: flex;
-            flex-direction: row;
-        }
-        div.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        .full-width {
-            width: 100%;
-        }
-        .half-width {
-            width: 50%;
-        }
+    styles: [`        
         .margin-right {
             margin-right: 2rem;
-        }
-        .align-center {
-            align-items: center;
         }
         .justify-end {
             justify-content: flex-end;
@@ -118,8 +102,8 @@ export class ConfigureProductsComponent implements OnInit {
         this.products = [];
         this.nodes = [];
         this.productsService.getProductList().subscribe((response: any) => {
-            if (response && Array.isArray(response)) {
-                this.products = response;
+            if (response && (Array.isArray(response) || response.Product)) {
+                this.products = UtilService.getJsonArray(response, response.Product);
                 this.productTypes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PRODUCT_TYPE).filter((type: any) => {
                     return type.value && type.idCoreFacility && this.createSecurityAdvisorService.isCoreFacilityIManage(type.idCoreFacility);
                 });

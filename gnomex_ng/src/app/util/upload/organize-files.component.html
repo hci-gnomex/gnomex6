@@ -1,6 +1,6 @@
 <div class="full-width full-height flex-container-col max-height">
     <div class="full-width padded">
-        <button mat-button color="primary"  (click)="addNewFolder()" >
+        <button [disabled]="!this.organizeSelectedNode" mat-button color="primary"  (click)="addNewFolder()" >
             <img [src]="constService.ICON_FOLDER_ADD" > New Folder
         </button>
         <button mat-button

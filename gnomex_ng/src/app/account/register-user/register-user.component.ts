@@ -104,16 +104,12 @@ import {HttpParams} from "@angular/common/http";
                         </div>
                         <ng-template #selectLab >
 
-                            <mat-form-field class="input-field">
-                                <mat-select placeholder="Choose Lab" formControlName="labDropdown">
-                                    <mat-option>  </mat-option>
-                                    <mat-option *ngFor="let lab of this.labs" [value]="lab.idLab" > {{lab.name}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error *ngIf="this.formGroup?.get('newLabGroup.contactEmail')?.hasError('pattern')">
-                                    This field is required
-                                </mat-error>
-                            </mat-form-field>
+                            <div class="input-field">
+                                <custom-combo-box placeholder="Choose Lab"
+                                                  displayField="name" [options]="labs" valueField="idLab"
+                                                  [formControlName]="'labDropdown'">
+                                </custom-combo-box>
+                            </div>
                         </ng-template>
                     </div>
                     <div>
@@ -214,7 +210,7 @@ import {HttpParams} from "@angular/common/http";
             padding-top: 10px;
             text-align: center;
         }
-        mat-form-field.input-field {
+        .input-field {
             width: 20em;
         }
     `]

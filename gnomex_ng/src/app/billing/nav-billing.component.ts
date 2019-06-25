@@ -9,9 +9,14 @@ import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
 import {MatCheckboxChange, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {
-    CellValueChangedEvent, GridApi, GridReadyEvent, GridSizeChangedEvent, RowClickedEvent, RowDoubleClickedEvent,
+    CellValueChangedEvent,
+    GridApi,
+    GridReadyEvent,
+    GridSizeChangedEvent,
+    RowClickedEvent,
+    RowDoubleClickedEvent,
     RowDragEvent,
-    RowNode
+    RowNode,
 } from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
@@ -21,14 +26,16 @@ import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateParserComponent} from "../util/parsers/date-parser.component";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 import {
-    BillingTemplate, BillingTemplateWindowComponent,
-    BillingTemplateWindowParams
+    BillingTemplate,
+    BillingTemplateWindowComponent,
+    BillingTemplateWindowParams,
 } from "../util/billing-template-window.component";
 import {Observable, Subscription} from "rxjs";
 import {PriceSheetViewComponent} from "./price-sheet-view.component";
 import {PriceCategoryViewComponent} from "./price-category-view.component";
 import {PriceViewComponent} from "./price-view.component";
 import {UtilService} from "../services/util.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'nav-billing',
@@ -932,27 +939,31 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     params.billingTemplate = template;
 
                     let config: MatDialogConfig = new MatDialogConfig();
+                    config.autoFocus = false;
                     config.data = {
                         params: params
                     };
 
-                    let dialogRef: MatDialogRef<BillingTemplateWindowComponent> = this.dialog.open(BillingTemplateWindowComponent, config);
-                    dialogRef.afterClosed().subscribe((result: any) => {
-                        if (result) {
-                            this.billingService.saveBillingTemplate(result).subscribe((result: any) => {
-                                if (result && result.result === "SUCCESS") {
-                                    if (this.lastFilterEvent) {
-                                        this.onFilterChange(this.lastFilterEvent);
-                                    }
-                                } else {
-                                    let message: string = "";
-                                    if (result && result.message) {
-                                        message = ": " + result.message;
-                                    }
-                                    this.dialogsService.confirm("An error occurred while saving the billing template" + message, null);
+                    this.dialogsService.genericDialogContainer(BillingTemplateWindowComponent, "Billing Template", null, config,
+                        {actions: [
+                                {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "promptToSave"},
+                                {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"},
+                            ]}).subscribe((result: any) => {
+                                if (result) {
+                                    this.billingService.saveBillingTemplate(result).subscribe((result: any) => {
+                                        if (result && result.result === "SUCCESS") {
+                                            if (this.lastFilterEvent) {
+                                                this.onFilterChange(this.lastFilterEvent);
+                                            }
+                                        } else {
+                                            let message: string = "";
+                                            if (result && result.message) {
+                                                message = ": " + result.message;
+                                            }
+                                            this.dialogsService.confirm("An error occurred while saving the billing template" + message, null);
+                                        }
+                                    });
                                 }
-                            });
-                        }
                     });
                 } else {
                     this.dialogsService.confirm("There was an error retrieving the billing template", null);
@@ -1049,33 +1060,49 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
         event.node.setExpanded(true);
         let dialogConfig: MatDialogConfig = new MatDialogConfig();
-        let dialogRef: MatDialogRef<any>;
+        dialogConfig.width = "45em";
 
         if (event.data.idPriceSheet) {
             dialogConfig.data = {
                 idPriceSheet: event.data.idPriceSheet
             };
-            dialogRef = this.dialog.open(PriceSheetViewComponent, dialogConfig);
+            this.dialogsService.genericDialogContainer(PriceSheetViewComponent, "", null, dialogConfig,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.refreshPricingGrid();
+                        }
+            });
         } else if (event.data.idPriceCategory && !event.data.idPrice) {
             dialogConfig.data = {
                 idPriceCategory: event.data.idPriceCategory,
                 idPriceSheet: event.node.parent.data.idPriceSheet
             };
-            dialogRef = this.dialog.open(PriceCategoryViewComponent, dialogConfig);
+            this.dialogsService.genericDialogContainer(PriceCategoryViewComponent, "", null, dialogConfig,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.refreshPricingGrid();
+                        }
+            });
         } else if (event.data.idPrice) {
             dialogConfig.data = {
                 idPrice: event.data.idPrice,
                 idPriceCategory: event.node.parent.data.idPriceCategory,
                 idCoreFacility: this.lastFilterEvent.idCoreFacility
             };
-            dialogRef = this.dialog.open(PriceViewComponent, dialogConfig);
-        }
-
-        if (dialogRef) {
-            dialogRef.afterClosed().subscribe((result: any) => {
-                if (result) {
-                    this.refreshPricingGrid();
-                }
+            this.dialogsService.genericDialogContainer(PriceViewComponent, "", null, dialogConfig,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.refreshPricingGrid();
+                        }
             });
         }
     }
@@ -1139,11 +1166,16 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     public openNewSheetWindow(): void {
-        let dialogRef: MatDialogRef<PriceSheetViewComponent> = this.dialog.open(PriceSheetViewComponent);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.refreshPricingGrid();
-            }
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "45em";
+        this.dialogsService.genericDialogContainer(PriceSheetViewComponent, "", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.refreshPricingGrid();
+                    }
         });
     }
 
@@ -1165,14 +1197,18 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
 
         let dialogConfig: MatDialogConfig = new MatDialogConfig();
+        dialogConfig.width = "45em";
         dialogConfig.data = {
             idPriceSheet: idPriceSheet
         };
-        let dialogRef: MatDialogRef<PriceCategoryViewComponent> = this.dialog.open(PriceCategoryViewComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.refreshPricingGrid();
-            }
+        this.dialogsService.genericDialogContainer(PriceCategoryViewComponent, "", null, dialogConfig,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.refreshPricingGrid();
+                    }
         });
     }
 
@@ -1192,13 +1228,18 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
 
         let dialogConfig: MatDialogConfig = new MatDialogConfig();
+        dialogConfig.width = "45em";
         dialogConfig.data = {
             idPriceCategory: idPriceCategory,
             idCoreFacility: this.lastFilterEvent.idCoreFacility
         };
-        let dialogRef: MatDialogRef<PriceViewComponent> = this.dialog.open(PriceViewComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
+
+        this.dialogsService.genericDialogContainer(PriceViewComponent, "", null, dialogConfig,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
                 this.refreshPricingGrid();
             }
         });

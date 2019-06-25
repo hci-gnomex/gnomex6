@@ -20,7 +20,7 @@ import {
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {NavigationEnd, Router} from "@angular/router";
-import {MatDialogRef, MatDialog, MatAutocomplete,MatOption} from '@angular/material';
+import {MatDialogRef, MatDialog} from '@angular/material';
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TopicService} from "../services/topic.service";
@@ -53,7 +53,7 @@ const actionMapping:IActionMapping = {
     templateUrl: "./browse-topics.component.html",
     styles: [`
 
-        mat-form-field.formField {
+        .formField {
             margin: 0 2.0%;
             width: 20%
         }
@@ -102,14 +102,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild("experimentsTree") experimentTreeComponent: TreeComponent;
     @ViewChild("analysisTree") analysisTreeComponent: TreeComponent;
     @ViewChild("datatrackTree") datatrackTreeComponent: TreeComponent;
-    @ViewChild("autoLab") dtLabAutocomplete: MatAutocomplete;
     @ViewChild("datatrackInput") datatrackInput: ElementRef;
-    @ViewChild("autoOrg") dtOrgAutocomplete: MatAutocomplete;
-    @ViewChild("autoAnalLab") analLabAutoComplete: MatAutocomplete;
     @ViewChild("analysisInput") analysisInput: ElementRef;
-    @ViewChild("autoExpLab") expLabAutoComplete: MatAutocomplete;
     @ViewChild("experimentInput") experimentInput: ElementRef;
-    @ViewChild("autoGen") dtGenAutocomplete: MatAutocomplete;
     @Input() childMessage: string;
     public moveTopicDialogRef: MatDialogRef<MoveTopicComponent>;
 
@@ -147,8 +142,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     // private showSpinner: boolean = false;
     private idAnalysis: string = "";
     private idExperiment: string = "";
-    private emptyLab = {idLab: "0",
-        name: ""};
     private previousURLParams: HttpParams;
     private resetExperiment: boolean = false;
     private resetAnalysis: boolean = false;
@@ -158,10 +151,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     private experimentLabel: string;
     private analysisLabel: string;
     private datatrackLabel: string;
-    private previousExperimentMatOption: MatOption;
-    private previousAnalysisMatOption: MatOption;
-    private previousDatatrackMatOption: MatOption;
-    private previousOrganismMatOption: MatOption;
     private navInitSubsciption:Subscription;
 
 
@@ -317,7 +306,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
 
-        this.pickerLabs.push(this.emptyLab);
         this.pickerLabs = this.pickerLabs.concat(this.gnomexService.labList);
         this.organisms = this.gnomexService.das2OrganismList;
         this.isExperimentsTab = true;
@@ -662,29 +650,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.gnomexService.navInitBrowseTopicSubject.next(null);
     }
 
-    chooseFirstExpLabOption() {
-        this.expLabAutoComplete.options.first.select();
-    }
-
-    chooseFirstAnalLabOption() {
-        this.analLabAutoComplete.options.first.select();
-    }
-
-    chooseFirstLabOption(): void {
-        this.dtLabAutocomplete.options.first.select();
-    }
-
-    chooseFirstOrgOption(): void {
-        this.dtOrgAutocomplete.options.first.select();
-    }
-
-    chooseFirstGenomeOption(): void {
-        this.dtGenAutocomplete.options.first.select();
-    }
-
     selectExperimentLabOption(event) {
-        if (event.source.value) {
-            this.experimentLab = event.source.value;
+        if (event) {
             this.dialogService.startDefaultSpinnerDialog();
             // this.showSpinner = true;
             this.getExperiments(this.experimentLab.idLab, this.selectedExpTimeFrame);
@@ -692,8 +659,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     selectAnalysisLabOption(event) {
-        if (event.source.value && event.source.selected && event.source.value.idLab !== "0") {
-            this.analysisLab = event.source.value;
+        if (event && event.idLab !== "0") {
             this.dialogService.startDefaultSpinnerDialog();
             // this.showSpinner = true;
             this.getAnalysis(this.analysisLab.idLab, this.selectedAnalTimeFrame);
@@ -701,20 +667,16 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     selectDatatrackLabOption(event) {
-        if (event.source.value && event.source.selected && event.source.value.idLab !== "0") {
+        if (event && event.idLab !== "0") {
             this.oldOrganisms = [];
-            this.datatrackLab = event.source.value;
-            let orgs = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
             this.dialogService.startDefaultSpinnerDialog();
             // this.showSpinner = true;
             this.getDatatracks(this.datatrackLab.idLab, "", "");
-            console.log("datatrack lab");
         }
     }
 
     selectDatatrackOrgOption(event) {
-        if (event != undefined && event.source.value && event.source.value.idLab !== "0") {
-            this.organism = event.source.value;
+        if (event) {
             let genomeBuilds = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD);
             this.genomeBuildList = genomeBuilds.filter(gen => {
                 if (gen.isActive === "Y" && !(gen.value === "")) {
@@ -739,155 +701,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.getDatatracks(this.datatrackLab.idLab, "", "");
     }
 
-    selectDatatrackGenOption(event) {
-        this.genomeBuild = event.source.value;
+    selectDatatrackGenOption() {
         this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, this.genomeBuild.idGenomeBuild);
-    }
-
-    filterAnalysisLabs(selectedLab: any): any[] {
-        let fLabs: any[];
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                if (selectedLab.idLab === "0") {
-                    this.dialogService.startDefaultSpinnerDialog();
-                    // this.showSpinner = true;
-                    this.resetAnalysis = true;
-                    this.analysisLab = null;
-                    this.analysisInput.nativeElement.blur();
-                } else {
-                    fLabs = this.pickerLabs.filter(lab =>
-                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                    return fLabs;
-                }
-            } else {
-                fLabs = this.pickerLabs.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.pickerLabs;
-        }
-    }
-
-    filterDatatrackLabs(selectedLab: any): any[] {
-        let fLabs: any[];
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                if (selectedLab.idLab === "0") {
-                    this.dialogService.startDefaultSpinnerDialog();
-                    // this.showSpinner = true;
-                    this.resetDatatrack = true;
-                    this.datatrackLab = null;
-                    this.datatrackInput.nativeElement.blur();
-                } else {
-                    fLabs = this.pickerLabs.filter(lab =>
-                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                    return fLabs;
-                }
-            } else {
-                fLabs = this.pickerLabs.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.pickerLabs;
-        }
-
-    }
-
-    filterExperimentLabs(selectedLab: any): any[] {
-        let fLabs: any[];
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                if (selectedLab.idLab === "0") {
-                    this.dialogService.startDefaultSpinnerDialog();
-                    // this.showSpinner = true;
-                    this.resetExperiment = true;
-                    this.experimentLab = null;
-                    this.experimentInput.nativeElement.blur();
-                } else {
-                    fLabs = this.pickerLabs.filter(lab =>
-                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                    return fLabs;
-                }
-            } else {
-                fLabs = this.pickerLabs.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.pickerLabs;
-        }
-
-    }
-
-    filterOrganism(selectedOrganism: any): any[] {
-        let fOrgs: any[] = [];
-        if (selectedOrganism) {
-            if (selectedOrganism.idOrganism) {
-                fOrgs = this.organisms.filter(org =>
-                    org.binomialName.toLowerCase().indexOf(selectedOrganism.binomialName.toLowerCase()) >= 0);
-                return fOrgs;
-            } else {
-                fOrgs = this.organisms.filter(org =>
-                    org.binomialName.toLowerCase().indexOf(selectedOrganism.toLowerCase()) >= 0);
-                return fOrgs;
-            }
-        } else {
-            return this.organisms;
-        }
-    }
-
-    highlightExpLabFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.expLabAutoComplete.options.first) {
-            if (this.previousExperimentMatOption) {
-                this.previousExperimentMatOption.setInactiveStyles();
-            }
-            this.expLabAutoComplete.options.first.setActiveStyles();
-            this.previousExperimentMatOption = this.expLabAutoComplete.options.first;
-        }
-    }
-
-    highlightAnalLabFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.analLabAutoComplete.options.first) {
-            if (this.previousAnalysisMatOption) {
-                this.previousAnalysisMatOption.setInactiveStyles();
-            }
-            this.analLabAutoComplete.options.first.setActiveStyles();
-            this.previousAnalysisMatOption = this.analLabAutoComplete.options.first;
-        }
-    }
-
-    highlightDtLabFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.dtLabAutocomplete.options.first) {
-            if (this.previousDatatrackMatOption) {
-                this.previousDatatrackMatOption.setInactiveStyles();
-            }
-            this.dtLabAutocomplete.options.first.setActiveStyles();
-            this.previousDatatrackMatOption = this.dtLabAutocomplete.options.first;
-        }
-    }
-
-    highlightDtOrgFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.dtOrgAutocomplete.options.first) {
-            if (this.previousOrganismMatOption) {
-                this.previousOrganismMatOption.setInactiveStyles();
-            }
-            this.dtOrgAutocomplete.options.first.setActiveStyles();
-            this.previousOrganismMatOption = this.dtOrgAutocomplete.options.first;
-        }
     }
 
     searchExperiementsOnEnter(event): void {
@@ -907,33 +722,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.searchDatatrack();
         }
     }
-
-
-    displayOrg(org: any) {
-        return org ? org.binomialName : org;
-    }
-
-    displayGen(gen: any) {
-        return gen ? gen.genomeBuildName : gen;
-    }
-
-    filterGenomeBuild(genomeBuild: any): any[] {
-        let gBuilds: any[];
-        if (genomeBuild) {
-            if (genomeBuild.idGenomeBuild) {
-                gBuilds = this.genomeBuildList.filter(gen =>
-                    gen.genomeBuildName.toLowerCase().indexOf(genomeBuild.genomeBuildName.toLowerCase()) >= 0);
-                return gBuilds;
-            } else {
-                gBuilds = this.genomeBuildList.filter(gen =>
-                    gen.genomeBuildName.toLowerCase().indexOf(genomeBuild.toLowerCase()) >= 0);
-                return gBuilds;
-            }
-        } else {
-            return this.genomeBuildList;
-        }
-    }
-
 
     onTabChange(event) {
         if (event.tab.textLabel === "Experiments") {

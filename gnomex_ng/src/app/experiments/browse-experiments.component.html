@@ -13,13 +13,18 @@
                     <div class="full-height flex-grow border"> <!-- start tree container -->
                         <div class="full-height flex-container-col foreground">
                             <div class="full-width padding">
+                                <div *ngIf="showDragDropHint" class="full-width padded">
+                                    <div class="background-lightyellow allow-line-breaks padded">{{this.DRAG_DROP_HINT}}
+                                    </div>
+                                </div>
                                 <div class="flex-container-row align-center">
                                     <div class="full-height flex-grow major-left-right-padding no-word-wrap flex-container-col align-center justify-center">
                                         <label>{{experimentCount}} experiments</label>
                                         <label style="font-size: 12px;">{{experimentCountMessage}}</label>
                                     </div>
                                     <div class="full-height">
-                                        <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()" [disabled]="this.createSecurityAdvisorService.isGuest">
+                                        <button mat-button aria-label="Drag-and-drop hint" (click)="onClickShowDragDropHint()"
+                                                [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_DROP_HINT">
                                             <img src="../../assets/information.png" alt="" class="padding">
                                             Drag-and-drop hint
                                         </button>

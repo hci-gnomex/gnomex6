@@ -1,16 +1,16 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
-import { URLSearchParams } from "@angular/http";
-import { Router } from "@angular/router";
+import {URLSearchParams} from "@angular/http";
+import {Router} from "@angular/router";
 
-import { NewBillingAccountErrorDialogComponent } from "./dialogs/new-billing-account-error-dialog.component";
-import { NewBillingAccountSuccessDialogComponent } from "./dialogs/new-billing-account-success-dialog.component";
+import {NewBillingAccountErrorDialogComponent} from "./dialogs/new-billing-account-error-dialog.component";
+import {NewBillingAccountSuccessDialogComponent} from "./dialogs/new-billing-account-success-dialog.component";
 
-import { AccountFieldsConfigurationService } from "../../services/account-fields-configuration.service";
-import { CreateSecurityAdvisorService } from "../../services/create-security-advisor.service";
-import { DictionaryService } from "../../services/dictionary.service";
-import { LabListService } from "../../services/lab-list.service";
-import { NewBillingAccountService } from "../../services/new-billing-account.service";
-import { PropertyService } from "../../services/property.service";
+import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {DictionaryService} from "../../services/dictionary.service";
+import {LabListService} from "../../services/lab-list.service";
+import {NewBillingAccountService} from "../../services/new-billing-account.service";
+import {PropertyService} from "../../services/property.service";
 
 import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
@@ -22,6 +22,9 @@ import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {ConstantsService} from "../../services/constants.service";
 
 @Component({
 	selector: "new-billing-account-launcher",
@@ -30,18 +33,24 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 })
 export class NewBillingAccountLauncher {
 
-	constructor(private dialog: MatDialog, private router: Router,
-				public createSecurityAdvisorService: CreateSecurityAdvisorService) {
+	constructor(private dialogsService: DialogsService, private router: Router,
+				public createSecurityAdvisorService: CreateSecurityAdvisorService,
+				private constService: ConstantsService) {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.width = '60em';
-        config.panelClass = 'no-padding-dialog';
+        config.width = "60em";
+        config.autoFocus = false;
 
-		let dialogRef = this.dialog.open(NewBillingAccountComponent, config);
-
-		dialogRef.afterClosed().subscribe((result) => {
-			// After closing the dialog, route away from this component so that the dialog could
-			// potentially be reopened.
-			this.router.navigate([{ outlets: {modal: null}}]);
+		this.dialogsService.genericDialogContainer(NewBillingAccountComponent, "Submit Campus Billing Account", this.constService.ICON_WORK_AUTH_FORM, config,
+			{actions: [
+					{type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "onSaveButtonClicked"},
+					{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+				]}).subscribe((result: any) => {
+					//FixMe: Does this need to be navigated to the created billing account page? If not, then close the dialog and the follow code is not necessary
+					if(result) {
+                        // After closing the dialog, route away from this component so that the dialog could
+                        // potentially be reopened.
+                        this.router.navigate([{ outlets: {modal: null}}]);
+					}
 		});
 	}
 }
@@ -99,7 +108,7 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
           height: 2.6em;
 					vertical-align: middle;
 					font-style: italic;
-					font-size: x-small;
+					font-size: small;
 					color: #1601db;
 			}
 
@@ -154,7 +163,7 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 			}
 	`]
 })
-export class NewBillingAccountComponent implements OnInit, OnDestroy {
+export class NewBillingAccountComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
 	readonly CHARTFIELD:  string = 'chartfield';
 	readonly PO:          string = 'po';
@@ -363,7 +372,9 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 				private newBillingAccountService: NewBillingAccountService,
 				private propertyService: PropertyService,
 				public prefService: UserPreferencesService,
-				@Inject(MAT_DIALOG_DATA) private data) { }
+				@Inject(MAT_DIALOG_DATA) private data) {
+		super();
+	}
 
 	ngOnInit(): void {
         if (this.data && this.data.idLab) {
@@ -386,7 +397,7 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
                 if (temp.length === 1) {
                 	this.selectedLab = temp[0];
 
-                	this.onLabListSelection({ value: temp[0] });
+                	this.onLabListSelection( temp[0] );
 				}
 
 				this.dialogService.stopAllSpinnerDialogs();
@@ -1171,8 +1182,8 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 	private onLabListSelection(event: any): void {
 		let coreFacilityApplicable: any[] = [];
 
-		if (event && event.value && event.value.coreFacilities) {
-			let coreFacilities = event.value.coreFacilities;
+		if (event && event.coreFacilities) {
+			let coreFacilities = event.coreFacilities;
 
 			if (coreFacilities != undefined && coreFacilities != null) {
 				if (coreFacilities[0] != undefined && coreFacilities[0] != null) {
@@ -1238,32 +1249,35 @@ export class NewBillingAccountComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private onCancelButtonClicked(): void {
-		this.dialogRef.close();
-	}
 
 	private openSuccessDialog(): void {
-		let data: any = { successMessage: this.successMessage };
-
         let config: MatDialogConfig = new MatDialogConfig();
-		config.width = '40em';
-		config.panelClass = 'no-padding-dialog';
+		config.width = "40em";
+		config.autoFocus = false;
+		config.data = {
+            successMessage: this.successMessage
+		};
 
-		let successDialogReference = this.dialog.open(NewBillingAccountSuccessDialogComponent, config);
-
-		successDialogReference.afterClosed().subscribe(() => {
-			this.dialogRef.close();
+		this.dialogService.genericDialogContainer(NewBillingAccountSuccessDialogComponent, "Succeed", null, config,
+            {actions: [
+                    {type: ActionType.SECONDARY, name: "OK", internalAction: "onClose"}
+                ]}).subscribe(() => {
+                	this.dialogRef.close();
 		});
 	}
 
 	private openErrorDialog(): void {
-		let data: any = { errorMessage: this.errorMessage };
-
 		let config: MatDialogConfig = new MatDialogConfig();
-        config.width = '40em';
-        config.panelClass = 'no-padding-dialog';
+        config.width = "40em";
+        config.autoFocus = false;
+        config.data = {
+            errorMessage: this.errorMessage
+        };
 
-		let errorDialogReference = this.dialog.open(NewBillingAccountErrorDialogComponent, config);
+        this.dialogService.genericDialogContainer(NewBillingAccountErrorDialogComponent, "Validation Error", null, config,
+			{actions: [
+					{type: ActionType.SECONDARY, name: "OK", internalAction: "onClose"}
+				]});
 	}
 
 	private clearAccountNumberActivity(): void {

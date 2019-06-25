@@ -9,40 +9,35 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'new-datatrack-folder',
     template: `
-        <h6 mat-dialog-title><img class="icon" [src]="this.constantsService.ICON_FOLDER_GROUP">Add new data track folder to {{label}}</h6>
-        <mat-dialog-content>
-            <form [formGroup]="this.form">
-                <div class="dialogDiv">
-                    <mat-form-field class="full-width">
-                        <input matInput formControlName="name" placeholder="Folder Name">
-                    </mat-form-field>
-                </div>
-                <div class="dialogDiv">
-                    <custom-combo-box class="full-width" placeholder="Lab" [options]="this.labList"
-                                        valueField="idLab" [displayField]="this.prefService.labDisplayField"
-                                        [formControl]="this.form.get('idLab')">
-                    </custom-combo-box>
-                </div>
-            </form>
-        </mat-dialog-content>
-        <mat-dialog-actions class="justify-flex-end">
-            <button mat-button *ngIf="!showSpinner" [disabled]="this.form.invalid" (click)="save()">Save</button>
-            <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
-            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-        </mat-dialog-actions>
+        <form [formGroup]="this.form" class="full-height full-width flex-container-col double-padded-left-right">
+            <div class="dialogDiv">
+                <mat-form-field class="full-width">
+                    <input matInput formControlName="name" placeholder="Folder Name">
+                </mat-form-field>
+            </div>
+            <div class="dialogDiv">
+                <custom-combo-box class="full-width" placeholder="Lab" [options]="this.labList"
+                                  valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                  [formControl]="this.form.get('idLab')">
+                </custom-combo-box>
+            </div>
+        </form>
     `,
 })
 
-export class NewDataTrackFolderComponent implements OnInit {
+export class NewDataTrackFolderComponent extends BaseGenericContainerDialog implements OnInit {
 
     public label: string = "";
     public form: FormGroup;
     public labList: any[] = [];
     public showSpinner: boolean = false;
+    public primaryDisable: (action?: GDAction) => boolean;
 
     private selectedItem: ITreeNode;
 
@@ -54,6 +49,7 @@ export class NewDataTrackFolderComponent implements OnInit {
                 public constantsService: ConstantsService,
                 private formBuilder: FormBuilder,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
+        super();
     }
 
     ngOnInit(): void {
@@ -66,6 +62,10 @@ export class NewDataTrackFolderComponent implements OnInit {
         this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
             this.labList = response.sort(this.prefService.createLabDisplaySortFunction());
         });
+
+        this.primaryDisable = () => {
+            return this.form.invalid;
+        };
     }
 
     public save(): void {

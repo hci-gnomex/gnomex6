@@ -24,6 +24,7 @@ export class ConstantsService {
         "     4. After all of the files have been uploaded (% Completed column indicates 100 for all files), click the<br>        \"Organize files\" link on Experiment Detail to move the uploaded files to the appropriate folders.<br>         button.";
 
     public readonly ICON_CHECKED = "assets/tick.png";
+    public readonly ICON_MONEY = "assets/money.png";
     public readonly SEGMENT_NEW = "assets/segment_new.png";
     public readonly SEGMENT_REMOVE = "assets/segment_remove.png";
     public readonly SEGMENT_NEW_DISABLE = "assets/segment_new_disable.png";
@@ -99,6 +100,7 @@ export class ConstantsService {
     public readonly ICON_BAR_CHART: string = "assets/chart_bar.png";
     public readonly ICON_PRINTER: string = "assets/printer.png";
     public readonly ICON_EXCLAMATION: string = "assets/exclamation.png";
+    public readonly ICON_WORK_AUTH_FORM: string = "assets/work_auth_form.png";
 
     public readonly ICON_ANALYSIS: string = "assets/map.png";
     public readonly ICON_ANALYSIS_ADD: string = "assets/map_add.png";

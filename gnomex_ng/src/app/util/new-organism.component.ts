@@ -13,7 +13,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 @Component({
     selector: "new-organism",
     template: `
-        <form [formGroup]="organismForm" class="full-height full-width padded-inner flex-container-col">
+        <form [formGroup]="organismForm" class="full-height full-width flex-container-col double-padded-left-right">
             <div class="flex-container-row full-width align-center padded">
                 <mat-form-field class="full-width padded">
                     <input matInput placeholder="Common Name" formControlName="commonName">
@@ -105,10 +105,6 @@ export class NewOrganismComponent extends BaseGenericContainerDialog implements 
         }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
-    }
-
-    public cancel(): void {
-        this.dialogRef.close();
     }
 
 }

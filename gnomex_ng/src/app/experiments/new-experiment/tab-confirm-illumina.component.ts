@@ -21,6 +21,8 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {GridApi} from "ag-grid-community";
 import {NewExternalExperimentService} from "../../services/new-external-experiment.service";
+import {ConstantsService} from "../../services/constants.service";
+import {PropertyService} from "../../services/property.service";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -80,6 +82,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         if (value.RequestProperties && !this._experimentAnnotations) {
             this._experimentAnnotations = value.RequestProperties;
         }
+
+        this.recalculateShowGenerateQuote();
     }
 
     private _isAmendState: boolean = false;
@@ -107,7 +111,17 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     @Input("requestCategory") set requestCategory(requestCategory: any) {
         setTimeout(() => {
-            this.useMultiplexLanes = requestCategory.isIlluminaType === 'Y' && this.experiment.isExternal !== 'Y';
+            this.useMultiplexLanes = requestCategory
+                && requestCategory.isIlluminaType
+                && requestCategory.isIlluminaType === 'Y'
+                && this.experiment
+                && this.experiment.isExternal !== 'Y';
+
+            this.showRowNumberColumn = requestCategory
+                && requestCategory.isQCType
+                && requestCategory.isQCType !== 'Y';
+
+            this.recalculateShowGenerateQuote();
         });
     }
 
@@ -117,6 +131,12 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     public get experiment(): Experiment {
         return this._experiment;
     }
+
+    public get showGenerateQuote(): boolean {
+        return this._showGenerateQuote;
+    }
+
+    private _showGenerateQuote: boolean = false;
 
     private _experiment: Experiment;
     public  _experimentAnnotations: any[];
@@ -139,6 +159,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private isCheckboxChecked: boolean;
     private disable_agreeCheckbox: boolean;
     private useMultiplexLanes: boolean;
+    private showRowNumberColumn: boolean = true;
 
     private requestPropBox: boolean;
     public billingItems: any[] = [];
@@ -173,7 +194,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     public get billingAccountName(): string {
-        return this._experiment.billingAccountName;
+        return this._experiment ? this._experiment.billingAccountName : "";
     }
     public set billingAccountName(value: string) {
         this._experiment.billingAccountName = value;
@@ -202,6 +223,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 private gnomexService: GnomexService,
                 private billingService: BillingService,
                 private fb: FormBuilder,
+                private propertyService: PropertyService,
+                public constantService: ConstantsService,
                 public prefService: UserPreferencesService) {
 
         this.requestPropsColumnDefs = [
@@ -466,17 +489,19 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         let temp: any[] = [];
 
-        temp.push({
-            headerName: "",
-            field: "index",
-            width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
-            minWidth: 4 * this.emToPxConversionRate,
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            suppressSizeToFit: true,
-            pinned: "left",
-            sortOrder: 5
-        });
+        if (this.showRowNumberColumn) {
+            temp.push({
+                headerName: "",
+                field: "index",
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                suppressSizeToFit: true,
+                pinned: "left",
+                sortOrder: 5
+            });
+        }
         temp.push({
             headerName: "Sample Name",
             field: "name",
@@ -638,6 +663,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     public tabDisplayed(): void {
         if (this.isAmendState) {
             this.prepareAmendSequenceLanes();
+        } else if (!this._experiment.sequenceLanes || this._experiment.sequenceLanes.length === 0) {
+            this._experiment.replaceAllSequenceLanes();
         }
 
         if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
@@ -709,51 +736,53 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this.disable_agreeCheckbox = true;
         this.isCheckboxChecked = false;
 
-        if (this._experiment.isExternal === 'Y') {
-            // This is an external experiment submission.  Don't attempt to get estimated charges.
-            this.totalEstimatedCharges = '$-.--';
-            this.billingItems = [];
-        } else {
-            let accountName:String = "";
-
-            if (this._experiment.billingAccount != null) {
-                accountName = this._experiment.billingAccount.accountNumberDisplay;
-            } else if (this.experiment.accountNumberDisplay) {
-                accountName = this.experiment.accountNumberDisplay;
-            }
-
-            this.agreeCheckboxLabel_subject.next("I authorize all charges to be billed to account(s): " + accountName);
-            this.disable_agreeCheckbox = false;
-
-            // This is a new experiment request. Get the estimated charges for this request.
-
-            let propertiesXML = JSON.stringify(this._experimentAnnotations);
-
-            this.dialogsService.startDefaultSpinnerDialog();
-            this.totalEstimatedCharges = "Calculating...";
-
-            this.billingService.createBillingItems(propertiesXML, this._experiment).subscribe((response: any) => {
-
-                this.dialogsService.stopAllSpinnerDialogs();
-
-                if (!response || !response.Request) {
-                    return;
-                }
-
-                if (response.Request.invoicePrice && ('' + response.Request.invoicePrice).match(/^.[\d,]+\.\d{2}$/)) {
-                    this.totalEstimatedCharges = response.Request.invoicePrice;
-                }
-
+        if (this._experiment) {
+            if (this._experiment.isExternal === 'Y') {
+                // This is an external experiment submission.  Don't attempt to get estimated charges.
+                this.totalEstimatedCharges = '$-.--';
                 this.billingItems = [];
+            } else {
+                let accountName:String = "";
 
-                if (response.Request.BillingItem){
-                    if (Array.isArray(response.Request.BillingItem)) {
-                        this.billingItems = response.Request.BillingItem
-                    } else {
-                        this.billingItems = [response.Request.BillingItem];
-                    }
+                if (this._experiment.billingAccount != null) {
+                    accountName = this._experiment.billingAccount.accountNumberDisplay;
+                } else if (this.experiment.accountNumberDisplay) {
+                    accountName = this.experiment.accountNumberDisplay;
                 }
-            });
+
+                this.agreeCheckboxLabel_subject.next("I authorize all charges to be billed to account(s): " + accountName);
+                this.disable_agreeCheckbox = false;
+
+                // This is a new experiment request. Get the estimated charges for this request.
+
+                let propertiesXML = JSON.stringify(this._experimentAnnotations);
+
+                this.dialogsService.startDefaultSpinnerDialog();
+                this.totalEstimatedCharges = "Calculating...";
+
+                this.billingService.createBillingItems(propertiesXML, this._experiment).subscribe((response: any) => {
+
+                    this.dialogsService.stopAllSpinnerDialogs();
+
+                    if (!response || !response.Request) {
+                        return;
+                    }
+
+                    if (response.Request.invoicePrice && ('' + response.Request.invoicePrice).match(/^.[\d,]+\.\d{2}$/)) {
+                        this.totalEstimatedCharges = response.Request.invoicePrice;
+                    }
+
+                    this.billingItems = [];
+
+                    if (response.Request.BillingItem){
+                        if (Array.isArray(response.Request.BillingItem)) {
+                            this.billingItems = response.Request.BillingItem
+                        } else {
+                            this.billingItems = [response.Request.BillingItem];
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -782,32 +811,29 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 }
 
                 let sequenceLanes = [];
-
-                for (let sample of this._experiment.samples) {
-                    sequenceLanes.push(sample.getJSONObjectRepresentation());
-                }
-
                 let sampleNumber: number = 0;
 
-                for (let multiplexLane of multiplexLanes) {
-                    let multiplexNumber = multiplexLane.number;
-
-                    if (multiplexLane.SequenceLane) {
-                        if (Array.isArray(multiplexLane.SequenceLane)) {
-                            for (let lane of multiplexLane.SequenceLane) {
-                                sequenceLanes[sampleNumber].sampleId = 'X' + ++sampleNumber;
-                            }
-                        } else {
-                            sequenceLanes[sampleNumber].sampleId        = 'X' + ++sampleNumber;
-                        }
-                    }
+                for (let sample of this._experiment.samples) {
+                    let lane = sample.getJSONObjectRepresentation();
+                    lane.sampleId = "X" + ++sampleNumber;
+                    sequenceLanes.push(lane);
                 }
 
                 this.sequenceLanes = sequenceLanes;
                 this.gridApi.setRowData(this.sequenceLanes);
             });
         } else {
-            this.sequenceLanes = this._experiment.samples;
+            let sampleNumber: number = 0;
+            let sequenceLanes = [];
+
+            for (let sample of this._experiment.samples) {
+                let lane = sample.getJSONObjectRepresentation();
+                lane.sampleId = "X" + ++sampleNumber;
+                sequenceLanes.push(lane);
+            }
+
+            this.sequenceLanes = sequenceLanes;
+            this.gridApi.setRowData(this.sequenceLanes);
         }
     }
 
@@ -857,6 +883,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         }
     }
 
+    public onClickPriceQuote(event?: any) {
+        this.experimentService.showPriceQuote(this._experiment);
+    }
+
     public onGridReady(params: any): void {
         this.gridApi = params.api;
         this.columnApi = params.columnApi;
@@ -888,11 +918,19 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 if (sample.numberSequencingLanes) {
                     let additionalSequencingNumber: number = parseInt(sample.numberSequencingLanes);
                     for (let i = 0; i < additionalSequencingNumber; i++) {
-                        this.experiment.sequenceLanes.push(NewExternalExperimentService.createSequenceLane(sample));
+                        this.experiment.sequenceLanes.push(sample.createSequenceLane());
                     }
                 }
             }
         }
     }
 
+    private recalculateShowGenerateQuote(): void {
+        if (this._experiment && this._experiment.idCoreFacility && this._experiment.codeRequestCategory) {
+            let temp = this.propertyService.getProperty(PropertyService.PROPERTY_ALLOW_PRICE_QUOTE, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
+            this._showGenerateQuote = temp && temp.propertyValue && temp.propertyValue === 'Y';
+        } else {
+            this._showGenerateQuote = false;
+        }
+    }
 }

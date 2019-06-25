@@ -438,10 +438,12 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				RequestParser.SequenceLaneInfo laneInfo = (RequestParser.SequenceLaneInfo) i.next();
 
 				List lanes = (List) sampleToLaneMap.get(laneInfo.getIdSampleString());
+
 				if (lanes == null) {
 					lanes = new ArrayList();
 					sampleToLaneMap.put(laneInfo.getIdSampleString(), lanes);
 				}
+
 				lanes.add(laneInfo);
 			}
 
@@ -462,17 +464,18 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				// Figure out next number to assign for a
 				for (Iterator i1 = lanes.iterator(); i1.hasNext();) {
 					RequestParser.SequenceLaneInfo laneInfo = (RequestParser.SequenceLaneInfo) i1.next();
-					boolean isNewLane = requestParser.isNewRequest() || laneInfo.getIdSequenceLane() == null
-							|| laneInfo.getIdSequenceLane().startsWith("SequenceLane");
-					if (!isNewLane) {
 
+					boolean isNewLane = requestParser.isNewRequest()
+							|| laneInfo.getIdSequenceLane() == null
+							|| laneInfo.getIdSequenceLane().startsWith("SequenceLane");
+
+					if (!isNewLane) {
 						SequenceLane sl = sess.load(SequenceLane.class, new Integer(laneInfo.getIdSequenceLane()));
 						boolean seqLaneReassignment = isSeqReassignment(sess, laneInfo, idSampleMap);
 
 						if (!seqLaneReassignment) {
 							lastSampleSeqCount++;
 						}
-
 					}
 				}
 
@@ -510,24 +513,29 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					// create a work item for the Cluster Gen (Assemble) worklist.
 					// Also ignore this if this is a QC Amend as seqPrep work items were
 					// created above.
-					if ((!requestParser.isExternalExperiment() && !requestParser.isNewRequest() && !requestParser.isQCAmendRequest() && isNewLane && s != null
+					if ((!requestParser.isExternalExperiment()
+							&& !requestParser.isNewRequest()
+							&& !requestParser.isQCAmendRequest()
+							&& isNewLane && s != null
 							&& s.getWorkItems() != null && s.getWorkItems().size() == 0)) {
+
 						WorkItem workItem = new WorkItem();
 						workItem.setIdRequest(requestParser.getRequest().getIdRequest());
 						workItem.setIdCoreFacility(requestParser.getRequest().getIdCoreFacility());
 						workItem.setSequenceLane(lane);
+
 						String codeStepNext = "";
+
 						if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
 							codeStepNext = Step.HISEQ_CLUSTER_GEN;
 						}  else if (requestCategory.getType().equals(RequestCategoryType.TYPE_ILLSEQ)) {
-                            codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
-                        }  else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
+							codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
+						}  else if (requestCategory.getType().equals(RequestCategoryType.TYPE_MISEQ)) {
 							codeStepNext = Step.MISEQ_CLUSTER_GEN;
 						} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_NOSEQ)) {
 							codeStepNext = Step.NOSEQ_CLUSTER_GEN;
-						} else if (requestCategory.getType().equals(RequestCategoryType.TYPE_ILLSEQ)) {
-							codeStepNext = Step.ILLSEQ_CLUSTER_GEN;
-						}	
+						}
+
 						workItem.setCodeStepNext(codeStepNext);
 						workItem.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
 						sess.save(workItem);
@@ -538,10 +546,9 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					}
 				}
 			}
-
 		}
-		return existingLanesSaved;
 
+		return existingLanesSaved;
 	}
 
 	/*

@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
-import {MatAutocomplete, MatDialog, MatDialogRef, MatOption} from "@angular/material";
+import {MatDialog, MatDialogRef} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
 import {GridOptions, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
@@ -52,8 +52,6 @@ import {Subscription} from "rxjs";
 })
 
 export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
-    @ViewChild("autoProtocol") autoProtocolComplete: MatAutocomplete;
-    @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
     @ViewChild("labInput") labInput: ElementRef;
 
     private static readonly COLOR = '#f1eed6';
@@ -68,7 +66,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     public assmColumnDefs;
     private showSpinner: boolean = false;
     public selectedLab:FormControl;
-    private previousLabMatOption: MatOption;
     private gridApi:GridApi;
     private gridColumnApi;
     private assmGridApi:GridApi;
@@ -344,25 +341,12 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         this.assmGridApi.sizeColumnsToFit();
     }
 
-    chooseFirstProtocolOption() {
-        if (this.autoProtocolComplete.options.first) {
-            this.autoProtocolComplete.options.first.select();
-        }
-    }
-
-    chooseFirstLabOption() {
-        if (this.autoLabComplete.options.first) {
-            this.autoLabComplete.options.first.select();
-        }
-    }
-
-
     onSeqListSelection(event: any): void {
-        if(!event.value){
+        if(!event){
             this.workingWorkItemList = this.workItemList.slice();
         }else{
             this.workingWorkItemList = this.workItemList.filter(workItem =>
-                 workItem.idNumberSequencingCyclesAllowed === event.value.idNumberSequencingCyclesAllowed
+                 workItem.idNumberSequencingCyclesAllowed === event.idNumberSequencingCyclesAllowed
             );
         }
 
@@ -396,20 +380,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
             workItem.idLab === this.selectedLab.value
         )
     }
-
-    highlightFirstLabOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.autoLabComplete.options.first) {
-            if (this.previousLabMatOption) {
-                this.previousLabMatOption.setInactiveStyles();
-            }
-            this.autoLabComplete.options.first.setActiveStyles();
-            this.previousLabMatOption = this.autoLabComplete.options.first;
-        }
-    }
-
 
     onNotifyGridRowDataChanged(event) {
         if (this.gridApi) {

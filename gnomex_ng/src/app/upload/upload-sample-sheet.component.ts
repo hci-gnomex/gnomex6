@@ -14,6 +14,8 @@ import {Sample} from "../util/models/sample.model";
 import {DictionaryService} from "../services/dictionary.service";
 import {GnomexService} from "../services/gnomex.service";
 import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {PropertyService} from "../services/property.service";
 
 
 @Component({
@@ -69,7 +71,7 @@ import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer"
         label.mat-checkbox-layout { margin: 0; margin-bottom: 0; }
         
     `]
-}) export class UploadSampleSheetComponent implements OnDestroy {
+}) export class UploadSampleSheetComponent extends BaseGenericContainerDialog implements OnDestroy {
 
     private readonly SUCCESS_STATUS: string = 'SUCCESS';
 
@@ -166,8 +168,11 @@ import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer"
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
+                private propertyService: PropertyService,
                 private sampleUploadService: SampleUploadService,
-                @Inject(MAT_DIALOG_DATA) private data) { }
+                @Inject(MAT_DIALOG_DATA) private data) {
+        super();
+    }
 
     ngOnDestroy(): void {
         if (this.uploadSubscription) {
@@ -427,14 +432,14 @@ import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer"
                         if (this.firstRowIsColumnHeadings) {
                             if (i > this.existingRows.length) {
                                 this.experiment.numberOfSamples = "" + ((+this.experiment.numberOfSamples) + 1);
-                                Sample.createNewSamplesForExperiment(this.experiment, this.dictionaryService, this.gnomexService);
+                                Sample.createNewSamplesForExperiment(this.experiment, this.dictionaryService, this.propertyService, this.gnomexService);
                             }
 
                             this.existingRows[i - 1][column.field] = uploadColumnValue;
                         } else {
                             if (i >= this.existingRows.length) {
                                 this.experiment.numberOfSamples = "" + ((+this.experiment.numberOfSamples) + 1);
-                                Sample.createNewSamplesForExperiment(this.experiment, this.dictionaryService, this.gnomexService);
+                                Sample.createNewSamplesForExperiment(this.experiment, this.dictionaryService, this.propertyService, this.gnomexService);
                             }
 
                             this.existingRows[i][column.field] = uploadColumnValue;
