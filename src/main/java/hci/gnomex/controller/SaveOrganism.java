@@ -97,7 +97,6 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
         } else {
 
           o = sess.load(Organism.class, organismScreen.getIdOrganism());
-
           // Hibernate.initialize(o.getGenomeBuilds());
 
           initializeOrganism(o);

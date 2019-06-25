@@ -1761,8 +1761,12 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
         }
         else if(object instanceof Organism){
             Organism org = (Organism) object;
-            if(org.getIdAppUser() != null ){
+
+            if(this.hasPermission(CAN_ADMINISTER_ALL_CORE_FACILITIES)){
+                canDelete = true;
+            } else if(org.getIdAppUser() != null){
                 canDelete = isOwner(org.getIdAppUser());
+
             }
 
         }

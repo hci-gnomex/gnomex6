@@ -44,6 +44,7 @@ import {AdvancedSearchService} from "./advanced_search/advanced-search.service";
 import {TreeModule} from "angular-tree-component";
 import {ServicesModule} from "../services/services.module";
 import {UploadModule} from "../upload/upload.module";
+import {LogoutLoaderComponent} from "./logout-loader-component";
 
 @NgModule({
     imports: [
@@ -86,6 +87,7 @@ import {UploadModule} from "../upload/upload.module";
         ManageLinksLauncherComponent,
         MenuItemComponent,
         ReportProblemComponent,
+        LogoutLoaderComponent
     ],
     entryComponents:[
         AdvancedSearchComponent,

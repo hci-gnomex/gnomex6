@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core'
-import {Resolve, ActivatedRouteSnapshot, ActivatedRoute} from '@angular/router'
+import {Resolve, ActivatedRouteSnapshot, ActivatedRoute, UrlTree, Router} from '@angular/router'
 import {URLSearchParams} from "@angular/http";
 import {AnalysisService} from "../analysis.service";
 import {GnomexService} from "../gnomex.service";
@@ -11,18 +11,20 @@ import {HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class DatatrackResolverService implements Resolve<any> {
-    constructor(private datatrackService: DataTrackService) {
+    constructor(private datatrackService: DataTrackService,
+                private router:Router) {
     }
 
     resolve(route: ActivatedRouteSnapshot) { // resolve is good with asyncrous data, it waits to load component till data is ready
         // then it calls subscribe
-        let ids: HttpParams = new HttpParams();
-
-        let idDataTrack= route.params["id"];
-        ids = ids.set("idDataTrack", idDataTrack);
-
-        if(idDataTrack){
-            return this.datatrackService.getDataTrack(ids);
+        let segGroup  = (<UrlTree>this.router.parseUrl(this.router.url)).root.children['modal'];
+        if(!segGroup){
+            let ids: HttpParams = new HttpParams();
+            let idDataTrack= route.params["id"];
+            ids = ids.set("idDataTrack", idDataTrack);
+            if(idDataTrack){
+                return this.datatrackService.getDataTrack(ids);
+            }
         }
 
     }

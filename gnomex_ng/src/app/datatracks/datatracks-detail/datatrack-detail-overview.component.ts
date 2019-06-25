@@ -126,7 +126,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     }
 
     initLinkVisibility() {
-        if (this.datatrack.Files) {
+        if (this.datatrack && this.datatrack.Files) {
             let ucscLinkFile: string = "";
 
             this.datatrackDirectory = this.datatrack.Files.Dir;

@@ -34,10 +34,16 @@ export class LogoutComponent implements OnInit {
                     this.gnomexService.redirectURL = null;
                     this.progressService.hideLoaderStatus(false);
                     this.progressService.loaderStatus = new BehaviorSubject<number> (0);
-                    this.router.navigate([{ outlets: { modal: null }}])
+                    this.router.navigate([{ outlets: { modal: null }}],{skipLocationChange:true})
                         .then( () => {
-                            this.router.navigate(['authenticate']);
+                            this.router.navigate(['/logout-loader']);
                         });
+
+
+
+
+
+
                 } else {
                     this.router.navigate([{ outlets: { modal: null }}]);
                 }
