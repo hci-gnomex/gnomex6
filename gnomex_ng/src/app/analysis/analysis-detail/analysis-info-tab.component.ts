@@ -275,7 +275,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
         });
 
         this.route.data.forEach((data: any) => {
-            if (!data.analysis.Analysis) {
+            if (!data.analysis || !data.analysis.Analysis) {
                 return;
             }
 

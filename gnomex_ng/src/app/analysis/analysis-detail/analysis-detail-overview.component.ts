@@ -88,8 +88,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
         this.route.data.forEach((data: any) => {
             this.analysisService.analysisOverviewForm.reset();
-            this.analysis = data.analysis.Analysis;
-            this.lab = data.analysis.Lab;
+            this.analysis = data.analysis ? data.analysis.Analysis : null;
             if(this.analysis) {
                 let annots = this.analysis.AnalysisProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);

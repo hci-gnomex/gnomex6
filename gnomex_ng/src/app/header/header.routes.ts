@@ -5,6 +5,7 @@ import {Routes, RouterModule} from "@angular/router";
 import {LogoutComponent} from "./logout.component";
 import {CreateReportProblemLauncherComponent} from "./reportProblem/report-problem-launcher.component";
 import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
+import {LogoutLoaderComponent} from "./logout-loader-component";
 
 /**
  * A file defining and exporting the router configuration for the home module.
@@ -15,6 +16,7 @@ import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.
 
 const ROUTES: Routes = [
     { path: "logout", component: LogoutComponent, outlet: 'modal'},
+    {path: "logout-loader", component: LogoutLoaderComponent },
     { path: "manageLinks", component: ManageLinksLauncherComponent, outlet: 'modal' },
     { path: "reportProblem", component: CreateReportProblemLauncherComponent, outlet: 'modal' }
 

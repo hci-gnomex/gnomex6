@@ -8,6 +8,7 @@ import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 import {GDAction} from "./interfaces/generic-dialog-action.model";
+import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 
 @Component({
     selector: "new-organism",
@@ -67,6 +68,7 @@ export class NewOrganismComponent extends BaseGenericContainerDialog implements 
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 private organismService: OrganismService,
                 private dialogsService: DialogsService,
+                private secAdvisor: CreateSecurityAdvisorService,
                 public constantsService: ConstantsService,
                 private fb: FormBuilder) {
         super();
@@ -93,7 +95,8 @@ export class NewOrganismComponent extends BaseGenericContainerDialog implements 
             .set("organism", this.organismForm.get("commonName").value)
             .set("binomialName", this.organismForm.get("binomialName").value)
             .set("das2Name", this.organismForm.get("das2Name").value)
-            .set("isActive", this.organismForm.get("das2Name").value ? "Y" : "N");
+            .set("isActive", this.organismForm.get("das2Name").value ? "Y" : "N")
+            .set("idAppUser", ""+this.secAdvisor.idAppUser);
         this.organismService.saveOrganismNew(params).subscribe((response: any) => {
             this.dialogsService.stopAllSpinnerDialogs();
             if (response && response.result && response.result === "SUCCESS" && response.idOrganism) {

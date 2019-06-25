@@ -50,6 +50,8 @@ import {AngularSplitModule} from "angular-split";
 import {RegisterUserModule} from "./account/register-user/register-user.module";
 import {HTTP_INTERCEPTORS} from "@angular/common/http";
 import {ErrorHandlerInterceptor} from "./services/interceptors/error-handler.interceptor";
+import {LogoutComponent} from "./header/logout.component";
+import {LogoutLoaderComponent} from "./header/logout-loader-component";
 
 
 
