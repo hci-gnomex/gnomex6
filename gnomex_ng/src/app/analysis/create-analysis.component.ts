@@ -47,9 +47,6 @@ import jqxComboBox = jqwidgets.jqxComboBox;
 })
 
 export class CreateAnalysisComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit  {
-    @ViewChild("labCombo") labCombo: jqxComboBox;
-    @ViewChild("analysisGroupCombo") analysisGroupCombo: jqxComboBox;
-    @ViewChild("organismCombo") organismCombo: jqxComboBox;
 
     formControl: FormControl = new FormControl();
 
@@ -76,7 +73,6 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     private organismList: any[] = [];
     private analysisLabList: any[] = [];
     private idOrganism: string;
-    private selectedAnalysisLabItem: any;
     private organism: any;
     private genomBuilds: any[] = [];
     private analysisGroup: any[] = [];
@@ -156,11 +152,13 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     ngAfterViewInit() {
         setTimeout(() => {
             if(this.selectedLab) {
-                this.labCombo.selectItem(this.selectedLab);
+                this.createAnalysisForm.get("selectedLab").setValue(this.selectedLab);
+                this.onLabSelect(this.selectedLab);
             }
 
             if(this.selectedOrganism) {
-                this.organismCombo.selectItem(this.selectedOrganism);
+                this.createAnalysisForm.get("organism").setValue(this.selectedOrganism);
+                this.onOrganismSelect(this.selectedOrganism);
             }
         });
 
@@ -168,7 +166,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
             if(this.selectedAnalysisGroup && this.analysisGroupList.length > 0) {
                 for(let ag of this.analysisGroupList) {
                     if(ag.idAnalysisGroup === this.selectedAnalysisGroup) {
-                        this.analysisGroupCombo.selectItem(this.selectedAnalysisGroup);
+                        this.createAnalysisForm.get("analysisGroup").setValue(ag.idAnalysisGroup);
+                        this.onAnalysisGroupSelect(ag.idAnalysisGroup);
                         break;
                     }
                 }
@@ -182,13 +181,12 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
      * @param event
      */
     onLabSelect(event: any) {
-        if (event.args && event.args.item && event.args.item.value) {
-            this.selectedAnalysisLabItem = event.args.item.originalItem;
+        if (event) {
             this.analysisGroupList = [];
 
             this.dialogsService.startDefaultSpinnerDialog();
 
-            this.idLabString = event.args.item.value;
+            this.idLabString = event;
             if (this.showOwnerComboBox) {
                 this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
                     this.ownerList = response.Lab.historicalOwnersAndSubmitters;
@@ -232,8 +230,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
      * @param event
      */
     onAnalysisGroupSelect(event: any) {
-        if (event.args && event.args.item && event.args.item.value) {
-            this.idAnalysisGroup = event.args.item.value;
+        if (event) {
+            this.idAnalysisGroup = event;
             this.analysisGroup = this.analysisGroupList.filter(group => group.idAnalysisGroup === this.idAnalysisGroup);
 
         }
@@ -249,8 +247,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
      * @param event
      */
     onUserSelect(event: any) {
-        if (event.args && event.args.item && event.args.item.value) {
-            this.idAppUser = event.args.item.value;
+        if (event) {
+            this.idAppUser = event;
         }
     }
 
@@ -259,7 +257,11 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
      * @param event
      */
     onVisibilitySelect(event: any) {
-        this.codeVisibility = event.args.item.value;
+        if (event) {
+            this.codeVisibility = event;
+        } else {
+            this.codeVisibility = "";
+        }
     }
 
     /**
@@ -267,9 +269,9 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
      * @param event
      */
     onOrganismSelect(event: any) {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
+        if (event) {
 
-            this.idOrganism = event.args.item.value;
+            this.idOrganism = event;
             let genomeBuilds = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD);
             this.genomeBuildList = genomeBuilds.filter(gen => {
                 if (gen.isActive === "Y" && !(gen.value === "")) {
@@ -410,7 +412,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
         config.disableClose = true;
         config.data = {
             isDialog: true,
-            preSelectedOrganism: this.organismCombo.getSelectedItem() ? this.organismCombo.getSelectedItem().value : "",
+            preSelectedOrganism: this.createAnalysisForm.get("organism").value ? this.createAnalysisForm.get("organism").value : "",
         };
 
         this.dialogsService.genericDialogContainer(ConfigureOrganismsComponent, "Configure Organisms", null, config,
@@ -430,13 +432,14 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
         this.activeOrganismList = this.organismList.filter(org => org.isActive === "Y");
         let createdOrganism = this.activeOrganismList.filter(activeOrg => activeOrg.idOrganism === idOrganism);
         if(createdOrganism) {
-            this.organismCombo.selectItem(idOrganism);
+            this.createAnalysisForm.get("organism").setValue(idOrganism);
+            this.onOrganismSelect(idOrganism);
         }
     }
 
     private refreshGenomeBuilds(): void {
         this.genomeBuildList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD).filter((build: any) => {
-            return build.isActive === "Y" && build.idOrganism === this.organismCombo.getSelectedItem().value;
+            return build.isActive === "Y" && build.idOrganism === this.createAnalysisForm.get("organism").value;
         });
     }
 

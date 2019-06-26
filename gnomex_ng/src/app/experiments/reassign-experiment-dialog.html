@@ -1,20 +1,22 @@
-<form (ngSubmit)="save(reassignExperimentForm.value)" [formGroup]="reassignExperimentForm" >
+<form [formGroup]="reassignExperimentForm" >
     <h6 mat-dialog-title><img src="../../assets/folder_add.png">Reassign experiment {{currentItem.label}} to project {{targetItem.label}}</h6>
     <div mat-dialog-content>
         <div>
-            <label style="width: 10em">Owner</label>
-            <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an owner...'"
-                         [source]="labMembers" [displayMember]="'name'" [valueMember]="'idAppUser'"
-                         (onSelect)="onOwnerSelect($event)" formControlName="selectedOwner">
-            </jqxComboBox>
+            <custom-combo-box [options]="this.labMembers"
+                              placeholder="Owner"
+                              [displayField]="'displayName'"
+                              valueField="idAppUser"
+                              [formControlName]="'selectedOwner'">
+            </custom-combo-box>
         </div>
 
         <div *ngIf="showBillingCombo">
-            <label style="width: 10em">Account</label>
-            <jqxComboBox #labComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an account...'"
-                         [source]="billingAccounts" [displayMember]="'name'" [valueMember]="'idBillingAccount'"
-                         (onSelect)="onAccountSelect($event)" formControlName="selectedAccount">
-            </jqxComboBox>
+            <custom-combo-box [options]="this.billingAccounts"
+                              placeholder="Account"
+                              [displayField]="'accountNameAndNumber'"
+                              valueField="idBillingAccount"
+                              [formControlName]="'selectedAccount'">
+            </custom-combo-box>
         </div>
 
     </div>

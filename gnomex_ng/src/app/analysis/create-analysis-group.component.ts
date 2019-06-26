@@ -57,7 +57,6 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
 })
 
 export class CreateAnalysisGroupComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
-    @ViewChild("labComboBox") labComboBox;
     @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
 
     public createAnalysisGroupForm: FormGroup;
@@ -112,7 +111,8 @@ export class CreateAnalysisGroupComponent extends BaseGenericContainerDialog imp
 
     ngAfterViewInit() {
         if(this.selectedLab) {
-            this.labComboBox.selectItem(this.selectedLab);
+            this.createAnalysisGroupForm.get("selectedLab").setValue(this.selectedLab);
+            this.onLabSelect(this.selectedLab);
         }
 
         this.changeDetectorRef.detectChanges();
@@ -120,12 +120,9 @@ export class CreateAnalysisGroupComponent extends BaseGenericContainerDialog imp
     }
 
     onLabSelect(event: any) {
-        if (event.args.item) {
-            this.idLabString = event.args.item.value;
+        if (event) {
+            this.idLabString = event;
         }
-    }
-
-    onLabUnselect(event: any) {
     }
 
     /**

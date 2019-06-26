@@ -22,17 +22,11 @@ export class AnnotationProgressReportComponent {
     }
 
     public onLabSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idLab = event.args.item.value;
-            }
+        if (event) {
+            this.idLab = event;
         } else {
-            this.onLabUnselect();
+            this.idLab = "";
         }
-    }
-
-    public onLabUnselect(): void {
-        this.idLab = "";
     }
 
     public run(): void {

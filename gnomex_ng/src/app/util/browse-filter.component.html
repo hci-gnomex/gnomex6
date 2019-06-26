@@ -41,24 +41,35 @@
             <label for="allCheckbox" class="following-label">All</label>
         </div>
         <div class="inlineDiv children-spaced" *ngIf="showLabComboBox && (mode === 'billingBrowse' ? !(idCoreFacilityString === '') : true)">
-            <label class="leading-label">Group</label>
-            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select a lab...'"
-                         [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                         (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
-            </jqxComboBox>
-            <div class="inlineDiv" *ngIf="showOwnerComboBox && !(idLabString === '')">
-                <label class="leading-label">Owner/Submitter</label>
-                <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an Owner...'"
-                             [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
-                             (onSelect)="onAppUserSelect($event)" (onUnselect)="onAppUserUnselect()">
-                </jqxComboBox>
+            <label>Group</label>
+            <div>
+                <custom-combo-box [options]="this.labList"
+                                  placeholder="Select a lab..."
+                                  [temporaryPlaceholder]="true"
+                                  valueField="idLab"
+                                  [displayField]="this.prefService.labDisplayField"
+                                  (optionSelected)="onLabSelect($event)">
+                </custom-combo-box>
             </div>
-            <div class="inlineDiv" *ngIf="showBillingAccountComboBox && !(idLabString === '')">
-                <label class="leading-label">Account</label>
-                <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Select an Account...'"
-                             [source]="billingAccountList" [displayMember]="'accountNameDisplay'" [valueMember]="'idBillingAccount'"
-                             (onSelect)="onBillingAccountSelect($event)" (onUnselect)="onBillingAccountUnselect()">
-                </jqxComboBox>
+            <div *ngIf="showOwnerComboBox && idLabString" class="flex-container-row align-center children-spaced">
+                <label>Owner/Submitter</label>
+                <custom-combo-box [options]="this.ownerList"
+                                  placeholder="Select an Owner..."
+                                  [temporaryPlaceholder]="true"
+                                  valueField="idAppUser"
+                                  [displayField]="this.prefService.userDisplayField"
+                                  (optionSelected)="onAppUserSelect($event)">
+                </custom-combo-box>
+            </div>
+            <div *ngIf="showBillingAccountComboBox && idLabString" class="flex-container-row align-center children-spaced">
+                <label>Account</label>
+                <custom-combo-box [options]="this.billingAccountList"
+                                  placeholder="Select an Account..."
+                                  [temporaryPlaceholder]="true"
+                                  valueField="idBillingAccount"
+                                  displayField="accountNameDisplay"
+                                  (optionSelected)="onBillingAccountSelect($event)">
+                </custom-combo-box>
             </div>
         </div>
         <date-range-filter *ngIf="this.showDateRangePicker" (onChange)="this.onDateRangePickerChange($event)"></date-range-filter>
@@ -68,15 +79,21 @@
             <input class="filterTextInput" [(ngModel)]="orderNumberString" id="orderNumberInput">
         </div>
         <div class="inlineDiv children-spaced" *ngIf="showOrganismComboBox">
-            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Organism...'"
-                         [source]="organismList" [displayMember]="'display'" [valueMember]="'idOrganism'"
-                         (onSelect)="onOrganismSelect($event)" (onUnselect)="onOrganismUnselect()">
-            </jqxComboBox>
-            <div class="inlineDiv" *ngIf="showGenomeBuildComboBox && !(idOrganismString === '')">
-                <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Genome Build...'"
-                             [source]="genomeBuildList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
-                             (onSelect)="onGenomeBuildSelect($event)" (onUnselect)="onGenomeBuildUnselect()">
-                </jqxComboBox>
+            <custom-combo-box [options]="this.organismList"
+                              placeholder="Organism..."
+                              [temporaryPlaceholder]="true"
+                              valueField="idOrganism"
+                              displayField="display"
+                              (optionSelected)="onOrganismSelect($event)">
+            </custom-combo-box>
+            <div class="flex-container-row align-center" *ngIf="showGenomeBuildComboBox && idOrganismString">
+                <custom-combo-box [options]="this.genomeBuildList"
+                                  placeholder="Genome Build..."
+                                  [temporaryPlaceholder]="true"
+                                  valueField="idGenomeBuild"
+                                  displayField="display"
+                                  (optionSelected)="onGenomeBuildSelect($event)">
+                </custom-combo-box>
             </div>
         </div>
         <div class="inlineDiv" *ngIf="showSearchTextInput">
@@ -137,21 +154,30 @@
                          (onSelect)="onMultiLabSelect($event)" (onUnselect)="onMultiLabUnselect($event)">
             </jqxComboBox>
         </div>
-        <jqxComboBox *ngIf="showExperimentsRadioGroup && showLabMembersComboBox && experimentsRadioString == 'myLab'"
-                     class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Filter by lab member...'"
-                     [source]="labMembersList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
-                     (onSelect)="onAppUserSelect($event)" (onUnselect)="onAppUserUnselect()">
-        </jqxComboBox>
+        <custom-combo-box *ngIf="showExperimentsRadioGroup && showLabMembersComboBox && experimentsRadioString == 'myLab'"
+                          [options]="this.labMembersList"
+                          placeholder="Filter by lab member..."
+                          [temporaryPlaceholder]="true"
+                          valueField="idAppUser"
+                          [displayField]="this.prefService.userDisplayField"
+                          (optionSelected)="onAppUserSelect($event)">
+        </custom-combo-box>
         <div class="inlineDiv children-spaced" *ngIf="showCoreFacilityComboBox">
-            <jqxComboBox class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Core facility...'"
-                         [source]="coreFacilityList" [displayMember]="'display'" [valueMember]="'idCoreFacility'"
-                         (onSelect)="onCoreFacilitySelect($event)" (onUnselect)="onCoreFacilityUnselect()">
-            </jqxComboBox>
-            <jqxComboBox *ngIf="showRequestCategoryComboBox && !(idCoreFacilityString === '')"
-                         class="inlineComboBox" [width]="170" [height]="20" [placeHolder]="'Experiment type...'"
-                         [source]="requestCategoryList" [displayMember]="'display'" [valueMember]="'codeRequestCategory'"
-                         (onSelect)="onRequestCategorySelect($event)" (onUnselect)="onRequestCategoryUnselect()">
-            </jqxComboBox>
+            <custom-combo-box [options]="this.coreFacilityList"
+                              placeholder="Core facility..."
+                              [temporaryPlaceholder]="true"
+                              valueField="idCoreFacility"
+                              displayField="display"
+                              (optionSelected)="onCoreFacilitySelect($event)">
+            </custom-combo-box>
+            <custom-combo-box *ngIf="showRequestCategoryComboBox && idCoreFacilityString"
+                              [options]="this.requestCategoryList"
+                              placeholder="Experiment type..."
+                              [temporaryPlaceholder]="true"
+                              valueField="codeRequestCategory"
+                              displayField="display"
+                              (optionSelected)="onRequestCategorySelect($event)">
+            </custom-combo-box>
         </div>
         <div class="inlineDiv" *ngIf="showCCNumberInput">
             <label for="ccNumberInput" class="leading-label">CC Number</label>

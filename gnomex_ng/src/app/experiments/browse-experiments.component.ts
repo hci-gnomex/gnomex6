@@ -491,7 +491,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
         }
 
-        for (let billingAccount of response.authorizedBillingAccounts) {
+        for (let billingAccount of response.billingAccounts) {
             if (billingAccount.isApproved === "Y" && billingAccount.isActive === "Y" && billingAccount.idCoreFacility === requestCategoryCoreFacility) {
                 billingAccount.label = billingAccount.accountName;
                 this.billingAccounts.push(billingAccount);

@@ -1,11 +1,16 @@
 <form [formGroup]="createAnalysisGroupForm" class="full-height full-width padded flex-container-col">
     <div class="flex-container-row align-center padded">
         <label class="label label-width">Group:</label>
-        <jqxComboBox #labComboBox class="inlineComboBox" [width]="450"
-                     formControlName="selectedLab" [placeHolder]="'Select a lab...'"
-                     [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                     (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect($event)">
-        </jqxComboBox>
+        <div class="flex-grow">
+            <custom-combo-box [options]="this.labList"
+                              placeholder="Select a lab..."
+                              [temporaryPlaceholder]="true"
+                              [displayField]="this.prefService.labDisplayField"
+                              valueField="idLab"
+                              [formControlName]="'selectedLab'"
+                              (optionSelected)="onLabSelect($event)">
+            </custom-combo-box>
+        </div>
     </div>
     <div class="flex-container-row align-center padded">
         <mat-form-field class="full-width">

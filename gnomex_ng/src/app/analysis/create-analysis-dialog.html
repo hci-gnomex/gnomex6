@@ -2,24 +2,42 @@
     <form class="full-height full-width padded-inner flex-container-col" [formGroup]="createAnalysisForm" >
         <div class="flex-container-row align-center padded">
             <label class="label label-width">Group</label>
-            <jqxComboBox #labCombo class="inlineComboBox" [width]="450" [placeHolder]="'Select a lab...'"
-                         [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                         (onSelect)="onLabSelect($event)" formControlName="selectedLab">
-            </jqxComboBox>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.labList"
+                                  placeholder="Select a lab..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="this.prefService.labDisplayField"
+                                  valueField="idLab"
+                                  [formControlName]="'selectedLab'"
+                                  (optionSelected)="onLabSelect($event)">
+                </custom-combo-box>
+            </div>
         </div>
         <div class="flex-container-row align-center padded" *ngIf="showOwnerComboBox">
             <label class="label label-width">Analysis Owner</label>
-            <jqxComboBox class="inlineComboBox" [width]="450" [placeHolder]="'Select an Owner...'"
-                         [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
-                         (onSelect)="onUserSelect($event)" formControlName="analysisOwner">
-            </jqxComboBox>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.ownerList"
+                                  placeholder="Select an Owner..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="this.prefService.userDisplayField"
+                                  valueField="idAppUser"
+                                  [formControlName]="'analysisOwner'"
+                                  (optionSelected)="onUserSelect($event)">
+                </custom-combo-box>
+            </div>
         </div>
         <div class="flex-container-row align-center padded" *ngIf="!newAnalysisGroup">
             <label class="label label-width">Analysis Group</label>
-            <jqxComboBox #analysisGroupCombo class="inlineComboBox" [width]="450" [placeHolder]="'...'"
-                         [source]="analysisGroupList" [displayMember]="'name'" [valueMember]="'idAnalysisGroup'"
-                         (onSelect)="onAnalysisGroupSelect($event)" formControlName="analysisGroup">
-            </jqxComboBox>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.analysisGroupList"
+                                  placeholder="..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="'name'"
+                                  valueField="idAnalysisGroup"
+                                  [formControlName]="'analysisGroup'"
+                                  (optionSelected)="onAnalysisGroupSelect($event)">
+                </custom-combo-box>
+            </div>
         </div>
         <div class="flex-container-row align-center padded">
             <button mat-button
@@ -51,10 +69,16 @@
         </div>
         <div class="flex-container-row align-center padded">
             <label class="label label-width">Organism</label>
-            <jqxComboBox #organismCombo class="inlineComboBox" [width]="450" [placeHolder]="'Organism...'"
-                         [source]="activeOrganismList" [displayMember]="'display'" [valueMember]="'idOrganism'"
-                         (onSelect)="onOrganismSelect($event)" formControlName="organism">
-            </jqxComboBox>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.activeOrganismList"
+                                  placeholder="Organism..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="'display'"
+                                  valueField="idOrganism"
+                                  [formControlName]="'organism'"
+                                  (optionSelected)="onOrganismSelect($event)">
+                </custom-combo-box>
+            </div>
         </div>
         <div class="flex-container-row align-center padded">
             <button mat-button
@@ -81,10 +105,16 @@
 
         <div class="flex-container-row align-center padded">
             <label class="label label-width">Visibility</label>
-            <jqxComboBox class="inlineComboBox" [width]="450"
-                         [source]="visibilityList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
-                         (onSelect)="onVisibilitySelect($event)" formControlName="visibility">
-            </jqxComboBox>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.visibilityList"
+                                  placeholder="..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="'display'"
+                                  valueField="value"
+                                  [formControlName]="'visibility'"
+                                  (optionSelected)="onVisibilitySelect($event)">
+                </custom-combo-box>
+            </div>
         </div>
     </form>
 </div>

@@ -1,15 +1,9 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {Component, Inject} from "@angular/core";
-import { URLSearchParams } from "@angular/http";
-import {ProjectService} from "../services/project.service";
 import {ExperimentsService} from "./experiments.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
-import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
 
 @Component({
@@ -26,8 +20,6 @@ export class ReassignExperimentComponent {
     private showBillingCombo: boolean = false;
     private billingAccounts: any;
     private labMembers: any;
-    private selectedOwnerItem: any;
-    private selectedBillingItem: any;
     private currentItem: any;
     private targetItem: any;
     public noButton: boolean = true;
@@ -61,68 +53,35 @@ export class ReassignExperimentComponent {
         }
     }
 
-
-    /**
-     * The yes button was selected in the delete dialog.
-     */
     reassignYesButtonClicked() {
         this.noButton = false;
         let params: HttpParams = new HttpParams()
             .set("idRequest", this.currentItem.idRequest)
             .set("idProject", this.targetItem.idProject)
             .set("isExtermal", this.currentItem.isExternal)
-            .set("idAppUser", this.selectedOwnerItem.idAppUser);
-        let idBillingAccount =  null;
-        if (this.showBillingCombo === true) {
-            idBillingAccount = this.selectedBillingItem.idBillingAccount;
+            .set("idAppUser", this.reassignExperimentForm.get("selectedOwner").value);
+        let idBillingAccount: string = "";
+        if (this.showBillingCombo) {
+            idBillingAccount = this.reassignExperimentForm.get("selectedAccount").value;
         }
         params = params.set("idBillingAccount", idBillingAccount);
         this.saveRequestProject(params);
-
     }
 
     reassignNoButtonClicked() {
         this.noButton = true;
     }
-    /**
-     * Save the project request created in the reassign dialog
-     * @param {URLSearchParams} params
-     */
+
     saveRequestProject(params: HttpParams) {
         this.showSpinner = true;
         this.experimentsService.saveRequestProject(params).pipe(first())
             .subscribe(response => {
                 this.experimentsService.refreshProjectRequestList_fromBackend();
                 console.log("saveprojectrequest " + response);
-            }, (err:IGnomexErrorResponse) => {
+            }, () => {
                 this.showSpinner = false;
             });
 
-    }
-
-    /**
-     * Set the selected project lab.
-     * @param event
-     */
-    onOwnerSelect(event: any) {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.selectedOwnerItem = event.args.item.originalItem;
-        }
-    }
-
-    /**
-     * Set the selected project lab.
-     * @param event
-     */
-    onAccountSelect(event: any) {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.selectedBillingItem = event.args.item.originalItem;
-        }
-    }
-
-
-    save(formData:any){
-//    console.log(formData);
     }
 
 }
