@@ -1,12 +1,11 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {PrimaryTab} from "../../util/tabs/primary-tab.component";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {URLSearchParams} from "@angular/http";
 import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
-import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
@@ -19,7 +18,6 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 export class DatatracksFolderComponent extends PrimaryTab implements OnInit, AfterViewInit {
     //Override
     @ViewChild("editorReference") myEditor: jqxEditorComponent;
-    @ViewChild("comboBox")  myCombo: jqxComboBoxComponent;
 
     public canWrite: boolean = false;
     public showSpinner: boolean = false;
@@ -27,13 +25,13 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
     private toolBarSettings: string;
     private folderFormGroup: FormGroup;
     private labList: Array<string> = [];
-    private idLabString: string;
     private description: string;
 
 
-    constructor(protected fb: FormBuilder, public dtService: DataTrackService,
-                private route: ActivatedRoute, public secAdvisor: CreateSecurityAdvisorService,
-                private dialogService: DialogsService,
+    constructor(protected fb: FormBuilder,
+                public dtService: DataTrackService,
+                private route: ActivatedRoute,
+                public secAdvisor: CreateSecurityAdvisorService,
                 public prefService: UserPreferencesService) {
         super(fb);
     }
@@ -41,7 +39,7 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
 
     ngOnInit(): void { // Note this hook runs once if route changes to another folder you don't recreate component
         this.labList = this.dtService.labList;
-        this.description = "TESTME PLEASE";
+        this.description = "";
 
         if(this.secAdvisor.isGuest) {
             this.toolBarSettings = "";
@@ -51,6 +49,7 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
 
         this.folderFormGroup =  this.fb.group({
             folderName: [{value: ""  , disabled: this.secAdvisor.isGuest}, [ Validators.required, Validators.maxLength(100)]],
+            lab: [{value: "", disabled: this.secAdvisor.isGuest}, []],
         });
 
         this.route.paramMap.forEach(params => {
@@ -68,7 +67,7 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
             let description = this.dtService.datatrackListTreeNode.description;
             this.myEditor.val(description);
             setTimeout(() => {
-                this.myCombo.selectItem(this.dtService.datatrackListTreeNode.idLab);
+                this.folderFormGroup.get("lab").setValue(this.dtService.datatrackListTreeNode.idLab);
                 this.folderFormGroup.markAsPristine();
             });
 
@@ -85,7 +84,7 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
             .set('idDataTrackFolder', idDataTrackFolder)
             .set('description', this.description)
             .set('name', name)
-            .set('idLab',this.idLabString);
+            .set('idLab', this.folderFormGroup.get("lab").value ? this.folderFormGroup.get("lab").value : "");
 
         this.dtService.saveFolder(params).subscribe(resp =>{
             this.folderFormGroup.markAsPristine();
@@ -96,23 +95,7 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
         });
     }
 
-    onSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idLabString = event.args.item.value;
-                this.folderFormGroup.markAsDirty();
-            }
-        } else {
-            this.idLabString = "";
-        }
-    }
-
-    onUnselect(event: any): void {
-        this.idLabString = "";
-    }
-
     changed(event: any) {
-        console.log(event.args);
         this.folderFormGroup.markAsDirty();
     }
 

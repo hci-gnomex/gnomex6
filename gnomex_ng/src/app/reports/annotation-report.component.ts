@@ -6,10 +6,16 @@ import {jqxComboBoxComponent} from "../../assets/jqwidgets-ts/angular_jqxcombobo
 import {DictionaryService} from "../services/dictionary.service";
 import {AnnotationService} from "../services/annotation.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {DateRange} from "../util/date-range-filter.component";
 
 @Component({
     selector: 'annotation-report',
     templateUrl: "./annotation-report.component.html",
+    styles: [`
+        .children-margin-right > *:not(:last-child) {
+            margin-right: 0.5em;
+        }
+    `]
 })
 
 export class AnnotationReportComponent {
@@ -30,7 +36,7 @@ export class AnnotationReportComponent {
     public dateFromString: string = "";
     public dateToString: string = "";
 
-    private allProperties: any[];
+    private allProperties: any[] = [];
     public annotationColumnDefs: any[];
     public annotationRowData: any[];
     private annotationGridApi: any;
@@ -125,21 +131,15 @@ export class AnnotationReportComponent {
     }
 
     public onCoreSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idCoreFacility = event.args.item.value;
-                this.updateRequestCategoriesOnCoreChange();
-                this.refreshAnnotationList();
-            }
+        if (event) {
+            this.idCoreFacility = event;
+            this.updateRequestCategoriesOnCoreChange();
+            this.refreshAnnotationList();
         } else {
-            this.onCoreUnselect();
+            this.idCoreFacility = "";
+            this.updateRequestCategoriesOnCoreChange();
+            this.refreshAnnotationList();
         }
-    }
-
-    public onCoreUnselect(): void {
-        this.idCoreFacility = "";
-        this.updateRequestCategoriesOnCoreChange();
-        this.refreshAnnotationList();
     }
 
     private updateRequestCategoriesOnCoreChange(): void {
@@ -151,17 +151,11 @@ export class AnnotationReportComponent {
     }
 
     public onLabSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idLab = event.args.item.value;
-            }
+        if (event) {
+            this.idLab = event;
         } else {
-            this.onLabUnselect();
+            this.idLab = "";
         }
-    }
-
-    public onLabUnselect(): void {
-        this.idLab = "";
     }
 
     public onAnnotationsForRadioChange(): void {
@@ -187,6 +181,16 @@ export class AnnotationReportComponent {
             if (event.args.item && event.args.item.value) {
                 this.codeRequestCategories.delete(event.args.item.value);
             }
+        }
+    }
+
+    public onDateRangeChange(event: DateRange): void {
+        if (event && event.from && event.to) {
+            this.dateFromString = event.from.toLocaleDateString();
+            this.dateToString = event.to.toLocaleDateString();
+        } else {
+            this.dateFromString = "";
+            this.dateToString = "";
         }
     }
 

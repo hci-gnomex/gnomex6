@@ -220,12 +220,11 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
 
 
     setVisibility(reqObj: any): void{
-
-        let visObj = this.visList.find(vis => vis.value === reqObj.codeVisibility);
-        let visStr:string = visObj.display + ',' + reqObj.codeVisibility;
-        reqObj["visStr"] = visStr;
-
-
+        if (reqObj) {
+            let visObj = this.visList.find(vis => vis.value === reqObj.codeVisibility);
+            let visStr:string = visObj.display + ',' + reqObj.codeVisibility;
+            reqObj["visStr"] = visStr;
+        }
     }
     setInstitution(reqObj: any):void{
         let instObj = this.instList.find(inst => inst.value === reqObj.idInstitution);

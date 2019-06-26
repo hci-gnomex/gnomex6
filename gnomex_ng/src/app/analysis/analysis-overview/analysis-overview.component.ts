@@ -19,13 +19,9 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                     </div>
                     <div class="flex-container-row align-center right-padding">
                         <div class="padded">Analysis #</div>
-                        <jqxComboBox class="no-top-margin"
-                                     [width]="170"
-                                     [height]="20"
-                                     [source]="orderedAnalysisIds"
-                                     (onSelect)="onIDSelect($event)"
-                                     (onUnselect)="onUnselectID($event)">
-                        </jqxComboBox>
+                        <custom-combo-box [options]="this.orderedAnalysisIds"
+                                          (optionSelected)="onIDSelect($event)">
+                        </custom-combo-box>
                     </div>
                 </div>
                 <div class="full-width vertical-spacer"></div>
@@ -237,11 +233,11 @@ export class AnalysisOverviewComponent implements OnInit, OnDestroy {
 
     onIDSelect($event: any): void {
         let filteredIdList: Array<any> = [];
-        if($event.args && $event.args.item.value) {
+        if($event) {
             let aList: Array<any> = this.analysisService.analysisList;
             if(aList) {
                 aList.forEach(aObject => {
-                    if($event.args.item.value === aObject.number) {
+                    if($event === aObject.number) {
                         filteredIdList.push(aObject);
                     }
                 });
@@ -249,13 +245,11 @@ export class AnalysisOverviewComponent implements OnInit, OnDestroy {
         }
         if(filteredIdList.length > 0) {
             this.analysisService.emitFilteredOverviewList(filteredIdList);
-        }
-    }
-
-    onUnselectID($event: any): void {
-        let eList: Array<any> = this.analysisService.analysisList;
-        if(eList) {
-            this.analysisService.emitFilteredOverviewList(eList);
+        } else {
+            let eList: Array<any> = this.analysisService.analysisList;
+            if(eList) {
+                this.analysisService.emitFilteredOverviewList(eList);
+            }
         }
     }
 

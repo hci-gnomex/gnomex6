@@ -34,31 +34,19 @@ export class ProjectExperimentReportComponent {
     }
 
     public onCoreSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idCoreFacility = event.args.item.value;
-            }
+        if (event) {
+            this.idCoreFacility = event;
         } else {
-            this.onCoreUnselect();
+            this.idCoreFacility = "";
         }
-    }
-
-    public onCoreUnselect(): void {
-        this.idCoreFacility = "";
     }
 
     public onLabSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idLab = event.args.item.value;
-            }
+        if (event) {
+            this.idLab = event;
         } else {
-            this.onLabUnselect();
+            this.idLab = "";
         }
-    }
-
-    public onLabUnselect(): void {
-        this.idLab = "";
     }
 
     public run(): void {
