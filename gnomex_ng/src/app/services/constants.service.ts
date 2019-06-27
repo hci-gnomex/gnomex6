@@ -162,6 +162,10 @@ export class ConstantsService {
     public readonly ICON_TABLE_MULTIPLE: string = "assets/table_multiple.png";
     public readonly ICON_TAG_BLUE_EDIT: string = "assets/tag_blue_edit.png";
 
+    public readonly ICON_MATERIAL_ARROW_EXPAND: string = "assets/icons8-expand-arrow-24.png";
+    public readonly ICON_MATERIAL_ARROW_COLLAPSE: string = "assets/icons8-collapse-arrow-24.png";
+    public readonly ICON_MATERIAL_FILTER_EDIT: string = "assets/icons8-filter-edit-24.png";
+
     public readonly STATUS_IN_PROGRESS: string = "In Progress";
     public readonly STATUS_COMPLETED: string = "Completed";
     public readonly STATUS_TERMINATED: string = "Terminated";
