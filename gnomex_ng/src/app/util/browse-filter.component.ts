@@ -18,6 +18,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {PropertyService} from "../services/property.service";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'browse-filter',
@@ -27,11 +28,9 @@ import {PropertyService} from "../services/property.service";
             background: gainsboro;
         }
 
-        div.filter {
+        .filter {
             font-size: 12px;
-            float: left;
             width: 100%;
-            vertical-align: center;
             border: 1px solid grey;
             background-color: white;
         }
@@ -97,6 +96,17 @@ import {PropertyService} from "../services/property.service";
 
         label.following-label {
             margin-left: 0.3em;
+        }
+        .padding-right {
+            padding-right: 1em;
+        }
+        .collapse-expand-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .collapse-expand-icon {
+            height: 1.5em;
         }
     `]
 })
@@ -205,11 +215,13 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     private labListSubscription: Subscription;
 
+    public isCollapsed: boolean = false;
+
     constructor(private labListService: LabListService, private getLabService: GetLabService,
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
                 private dictionaryService: DictionaryService, private billingService: BillingService,
-                private dialogService: DialogsService,
+                private dialogService: DialogsService, public constantsService: ConstantsService,
                 private propertyService: PropertyService,
                 public prefService: UserPreferencesService) {
         this.showMore = false;
@@ -886,6 +898,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             });
         }
     }
+
+    public toggleCollapseExpand(): void {
+        this.isCollapsed = !this.isCollapsed;
+    }
+
     ngOnDestroy(){
         if(this.labListSubscription){
             this.labListSubscription.unsubscribe();
