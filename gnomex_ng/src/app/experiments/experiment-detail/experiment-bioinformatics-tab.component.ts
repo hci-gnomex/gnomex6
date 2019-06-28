@@ -8,6 +8,7 @@ import {GnomexService} from "../../services/gnomex.service";
 import {UtilService} from "../../services/util.service";
 import {Subscription} from "rxjs";
 import {Sample} from "../../util/models/sample.model";
+import {NewExperimentService} from "../../services/new-experiment.service";
 
 @Component({
     selector: 'experiment-bioinformatics-tab',
@@ -126,6 +127,15 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
     }
     get bioinformaticsAssist(): boolean {
         return this._experiment && this._experiment.bioinformaticsAssist && this._experiment.bioinformaticsAssist === 'Y';
+    }
+
+    public get showConsolidatedGenome(): boolean {
+        // Directly from the Flex version, we grant this choice to everything with the explicit exclusion of nanostring experiments.
+
+        return !(this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type
+            && this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOSTRING);
     }
 
 

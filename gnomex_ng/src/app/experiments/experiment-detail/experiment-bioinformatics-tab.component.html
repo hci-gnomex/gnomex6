@@ -61,48 +61,44 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="consolidatedGenomeInformation?.length > 0" class="full-width flex-container-row">
-            <div class="padded">
-                (1)
-            </div>
-            <div class="flex-grow padded">
-                <context-help name="bioSequenceAligned" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
-                              [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Sequence Alignment Help"
-                              label="Do you want the sequence data to be aligned? {{ alignmentNote }}"></context-help>
-                <div *ngFor="let item of consolidatedGenomeInformation" class="flex-container-row align-center">
-                    <div class="label-width">
-                        {{ item.organismName }}
-                    </div>
-                    <div class="margin-top">
-                        <mat-checkbox [(ngModel)]="item.alignToGenomeBuild" (change)="onCheckboxChanged(item, $event)">Yes, align to genome build</mat-checkbox>
-                    </div>
-                    <div class="margin">
-                        <custom-combo-box class="medium-width" [(ngModel)]="item.idGenomeBuildAlignTo" [options]="item.dictionary"
-                                          [disabled]="!item.alignToGenomeBuild" (optionSelected)="onSelectChanged(item, $event)"
-                                          valueField="value" displayField="display">
-                        </custom-combo-box>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="full-width flex-container-row">
-            <div class="padded">
-                {{ (consolidatedGenomeInformation?.length > 0) ? '(2)': '(1)' }}
-            </div>
-            <div class="flex-grow padded">
-                <context-help name="bioAnalysisAssistance" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
-                              [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Assistance Help"
-                              label="Would you like the {{ groupName }} to assist you with analysis?"></context-help>
-                <div class="flex-container-row align-center">
-                    <div class="label-width margin-top">
-                        <mat-checkbox [(ngModel)]="bioinformaticsAssist">Yes</mat-checkbox>
-                    </div>
-                    <div>
-                        {{ analysisNote }}
+        <ol>
+            <li *ngIf="showConsolidatedGenome && consolidatedGenomeInformation?.length > 0" class="full-width flex-container-row">
+                <div class="flex-grow padded">
+                    <context-help name="bioSequenceAligned" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                                  [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Sequence Alignment Help"
+                                  label="Do you want the sequence data to be aligned? {{ alignmentNote }}"></context-help>
+                    <div *ngFor="let item of consolidatedGenomeInformation" class="flex-container-row align-center">
+                        <div class="label-width">
+                            {{ item.organismName }}
+                        </div>
+                        <div class="margin-top">
+                            <mat-checkbox [(ngModel)]="item.alignToGenomeBuild" (change)="onCheckboxChanged(item, $event)">Yes, align to genome build</mat-checkbox>
+                        </div>
+                        <div class="margin">
+                            <custom-combo-box class="medium-width" [(ngModel)]="item.idGenomeBuildAlignTo" [options]="item.dictionary"
+                                              [disabled]="!item.alignToGenomeBuild" (optionSelected)="onSelectChanged(item, $event)"
+                                              valueField="value" displayField="display">
+                            </custom-combo-box>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </li>
+            <li class="full-width flex-container-row">
+                <div class="flex-grow padded">
+                    <context-help name="bioAnalysisAssistance" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                                  [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Assistance Help"
+                                  label="Would you like the {{ groupName }} to assist you with analysis?"></context-help>
+                    <div class="flex-container-row align-center">
+                        <div class="label-width margin-top">
+                            <mat-checkbox [(ngModel)]="bioinformaticsAssist">Yes</mat-checkbox>
+                        </div>
+                        <div>
+                            {{ analysisNote }}
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ol>
         <div class="full-width flex-container-col padded">
             <context-help *ngIf="bioinformaticsAssist" name="bioNote" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
                           [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Note Help"

@@ -3,8 +3,9 @@
         <div [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations" class="full-width full-height small-font padded">
             <div class="display-white-space">{{ annot && annot.description ? annot.description : '' }}</div>
             <div *ngSwitchCase="'CHECK'" class="annot-control">
-                <label>{{ annot && annot.name ? annot.name : "" }}</label>
+                <!--<label>{{ annot && annot.name ? annot.name : "" }}</label>-->
                 <mat-checkbox  [formControl]="this.form.controls[annot.name]" >
+                    {{ annot && annot.name ? annot.name : "" }}
                 </mat-checkbox>
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required

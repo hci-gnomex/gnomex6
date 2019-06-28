@@ -789,6 +789,13 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.showSamplePurification = false;
             }
 
+            if (this.requestCategory.type === NewExperimentService.TYPE_NANOSTRING) {
+                this.showSamplePrepContainer = true;
+                this.requireSamplePrepContainer = true;
+                this.showSamplePurification = false;
+                this.showKeepSample = false;
+            }
+
             if (this._experiment) {
                 let qcInstText: any = this.propertyService.getProperty(PropertyService.PROPERTY_QC_INSTRUCTIONS, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
 
