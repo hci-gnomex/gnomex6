@@ -16,7 +16,7 @@ import {ConstantsService} from "../services/constants.service";
     template: `
         <form [formGroup]="genomeBuildForm" class="full-height full-width flex-container-col double-padded-left-right">
             <div class="flex-container-row align-center padded full-width">
-                <custom-combo-box [options]="this.das2OrganismList"
+                <custom-combo-box class="full-width padded" [options]="this.das2OrganismList"
                                   placeholder="Organism"
                                   valueField="idOrganism"
                                   [displayField]="'binomialName'"

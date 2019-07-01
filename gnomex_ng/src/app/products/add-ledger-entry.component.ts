@@ -4,35 +4,39 @@ import {ProductsService} from "../services/products.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'add-ledger-entry',
-    templateUrl: "./add-ledger-entry.component.html",
-    styles: [`
-        form.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        span.dirty-note {
-            background: yellow;
-            padding: 0.5rem;
-            margin-left: 1rem;
-        }
-        .full-width {
-            width: 100%;
-        }
-    `]
+    template: `
+        <div class="flex-container-col full-width full-height double-padded">
+            <div class="full-width padded-bottom">{{this.selectedProduct.display}}</div>
+            <form [formGroup]="this.form" class="padded-top">
+                <mat-form-field class="full-width">
+                    <input matInput placeholder="Quantity" [formControlName]="'quantity'">
+                </mat-form-field>
+                <mat-form-field class="full-width">
+                    <textarea matInput placeholder="Comment" [formControlName]="'comment'"
+                              matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+                </mat-form-field>
+                <mat-form-field class="full-width">
+                    <textarea matInput placeholder="Notes" [formControlName]="'notes'"
+                              matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+                </mat-form-field>
+            </form>
+        </div>
+    `,
 })
-export class AddLedgerEntryComponent implements OnInit {
+export class AddLedgerEntryComponent extends BaseGenericContainerDialog implements OnInit {
     public form: FormGroup;
     public selectedProduct: any;
-    public showSpinner: boolean;
 
     constructor(private productsService: ProductsService,
                 @Inject(FormBuilder) private fb: FormBuilder,
                 @Inject(MAT_DIALOG_DATA) public data: any,
                 private dialogRef: MatDialogRef<AddLedgerEntryComponent>,
-                private dialogsService: DialogsService,) {
+                private dialogsService: DialogsService) {
+        super();
         this.selectedProduct = data.product;
         let currentCount: number = Number.parseInt(this.selectedProduct.qty);
         this.form = fb.group({
@@ -43,10 +47,11 @@ export class AddLedgerEntryComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.showSpinner = false;
         Object.keys(this.form.controls).forEach((key: string) => {
             this.form.controls[key].markAsTouched();
         });
+
+        this.primaryDisable = (action) => this.form.invalid;
     }
 
     public save(): void {

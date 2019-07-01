@@ -1,20 +1,47 @@
-import {Component, OnInit} from '@angular/core';
-import {Response, URLSearchParams} from "@angular/http";
+import {Component, OnInit} from "@angular/core";
 import {MatDialogRef} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
-import {
-    FormBuilder, FormControl, FormGroup, Validators
-} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
-    selector: 'new-group-dialog',
-    templateUrl: "./new-group-dialog.html",
+    selector: "new-group-dialog",
+    template: `
+        <div class="flex-container-col full-height full-width padded">
+            <div [formGroup]="addGroupFG" class="double-padded-left-right">
+                <mat-form-field class="dialogFormField">
+                    <input matInput formControlName="firstName" placeholder="Investigator First name">
+                    <mat-error *ngIf="addGroupFG.controls['firstName'].hasError('incorrect')">
+                        First name or Last name <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="dialogFormField">
+                    <input matInput formControlName="lastName" placeholder="Investigator Last name">
+                    <mat-error *ngIf="addGroupFG.controls['lastName'].hasError('incorrect')">
+                        Last name or First name <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="dialogFormField">
+                    <input matInput formControlName="phone" placeholder="Phone">
+                </mat-form-field>
+                <mat-form-field class="dialogFormField">
+                    <input matInput [formControl]="this.emailFC" (change)="onEmailChange($event)" placeholder="PI email(s)">
+                    <mat-hint align="end">Place , between emails</mat-hint>
+                    <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
+                    <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
+                </mat-form-field>
+                <mat-radio-group class="permission-radio-group" [formControl]="pricingFC">
+                    <mat-radio-button value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
+                    <mat-radio-button value="EXACADEMIC"><img src="../../assets/graduation_cap.png"> External Academic</mat-radio-button>
+                    <mat-radio-button value="EXCOMM"><img src="../../assets/building.png"> External Commercial</mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </div>
+    `,
 })
 
-export class NewGroupDialogComponent implements OnInit{
-    public rebuildGroups: boolean = false;
-    public showSpinner: boolean = false;
+export class NewGroupDialogComponent extends BaseGenericContainerDialog implements OnInit{
     public emailFC: FormControl;
     public pricingFC: FormControl;
     public phoneFC: FormControl;
@@ -23,8 +50,8 @@ export class NewGroupDialogComponent implements OnInit{
 
     constructor(public dialogRef: MatDialogRef<NewGroupDialogComponent>,
                 private labListService: LabListService,
-                private formBuilder: FormBuilder
-    ) {
+                private formBuilder: FormBuilder) {
+        super();
    }
 
     ngOnInit() {
@@ -40,6 +67,8 @@ export class NewGroupDialogComponent implements OnInit{
         }, { validator: this.atLeastOneNameRequired}
             );
         this.pricingFC.setValue("INTERNAL");
+
+        this.primaryDisable = (action) => this.addGroupFG.invalid;
     }
 
     atLeastOneNameRequired(group: FormGroup) {
@@ -86,9 +115,9 @@ export class NewGroupDialogComponent implements OnInit{
         params = params.set("membersJSONString", "");
 
         this.labListService.saveLab(params).subscribe((responseJSON: any) => {
+            this.showSpinner = false;
             if (responseJSON.result && responseJSON.result === "SUCCESS") {
-                this.rebuildGroups = true;
-                this.showSpinner = false;
+                this.dialogRef.close(true);
             }
             this.dialogRef.close();
         });

@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ConstantsService} from "../../services/constants.service";
 import {GridApi} from "ag-grid-community";
@@ -6,11 +6,13 @@ import {ExperimentPlatformService} from "../../services/experiment-platform.serv
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {GnomexService} from "../../services/gnomex.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
-import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {Subscription} from "rxjs";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+
 //assets/page_add.png
 
 @Component({
@@ -75,7 +77,6 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     private sampleTypeList:any[];
     private _nucleotideTypeDataProvider:any[];
     public context;
-    private sampleTypeDialogRef: MatDialogRef<SampleTypeDetailDialogComponent>;
     private expPlatformNode: any;
 
 
@@ -179,12 +180,13 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
 
     ];
 
-    constructor(private fb:FormBuilder,private constService:ConstantsService,
+    constructor(private fb: FormBuilder,
+                private constService: ConstantsService,
                 private expPlatfromService: ExperimentPlatformService,
-                private gnomexService:GnomexService,
-                private dictionaryService:DictionaryService,
-                private dialog: MatDialog){
-        this.context = {componentParent:this};
+                private gnomexService: GnomexService,
+                private dictionaryService: DictionaryService,
+                private dialogsService: DialogsService) {
+        this.context = {componentParent: this};
 
     }
 
@@ -261,18 +263,19 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     }
 
 
-    openSampleTypeEditor(){
+    openSampleTypeEditor() {
         let config: MatDialogConfig = new MatDialogConfig();
         config.data = {
             rowData: this.selectedSampleTypeRows.length > 0 ? this.selectedSampleTypeRows[0] : null,
             applyFn: this.applySampleTypeNotesFn
         };
-        config.width = '60em';
-        config.panelClass = "no-padding-dialog";
-        this.sampleTypeDialogRef = this.dialog.open(SampleTypeDetailDialogComponent,config);
+        config.width = "60em";
 
-        console.log("Launching a the Sample type Editor");
-
+        this.dialogsService.genericDialogContainer(SampleTypeDetailDialogComponent, null, null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Apply", internalAction: "applyChanges"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
 
     }
 

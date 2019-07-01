@@ -1,6 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import {PropertyService} from "../services/property.service";
 import {GnomexService} from "../services/gnomex.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 
 @Component({
@@ -16,12 +17,13 @@ import {GnomexService} from "../services/gnomex.service";
         }
     `]
 })
-export class ContactUsComponent implements OnInit {
+export class ContactUsComponent extends BaseGenericContainerDialog implements OnInit {
     public bugContact: any;
     public bioinformaticsContact: any;
 
     constructor(private propertyService: PropertyService,
                 public gnomexService: GnomexService) {
+        super();
     }
 
     ngOnInit() {

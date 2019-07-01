@@ -1,5 +1,4 @@
 import {Injectable, OnDestroy} from "@angular/core";
-import {Http,Headers, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {BehaviorSubject} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
@@ -156,10 +155,12 @@ export class ExperimentPlatformService implements OnDestroy{
     getExperimentPlatformList_fromBackend(){
         return this.httpClient.get("/gnomex/GetExperimentPlatformList.gx")
             .subscribe(resp =>{
-                this.emitExperimentPlatformList(resp);
+                if(resp) {
+                    this.emitExperimentPlatformList(resp);
+                }
             },(error:IGnomexErrorResponse) =>{
                 this.dialogService.alert(error.error.message);
-            })
+            });
     }
 
     getExperimentPlatformListObservable(): Observable<any>{

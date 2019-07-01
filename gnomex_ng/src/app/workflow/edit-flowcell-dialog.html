@@ -1,6 +1,5 @@
-<div class="flex-column-container-workflow">
-    <h6 mat-dialog-title>Edit Flow Cell {{flowCell.number}}</h6>
-    <div class="flex-row-container">
+<div class="flex-container-col full-height full-width padded">
+    <div class="flex-container-row">
         <mat-form-field class="formField">
             <input matInput placeholder="Barcode" [formControl]="this.barcodeFC">
             <mat-error *ngIf="this.barcodeFC.hasError('required')">Required</mat-error>
@@ -20,7 +19,7 @@
             <mat-datepicker #seqRunDatePicker disabled="false"></mat-datepicker>
         </mat-form-field>
     </div>
-    <div class="flex-row-container">
+    <div class="flex-container-row">
         <div class="formField">
             <custom-combo-box placeholder="Instrument" [options]="this.instrumentList"
                               displayField="instrument" [formControl]="this.instrumentFC">
@@ -32,7 +31,7 @@
             </custom-combo-box>
         </div>
     </div>
-    <div class="flex-row-container">
+    <div class="flex-container-row">
         <div>
             Flow Cell Channels
         </div>
@@ -57,9 +56,4 @@
                          [enableColResize]="true">
         </ag-grid-angular>
     </div>
-    <mat-dialog-actions class="justify-flex-end">
-        <button mat-button *ngIf="!showSpinner" [disabled]="!allFG.dirty||!allFG.valid" (click)="saveFlowCell()"><mat-icon>save</mat-icon>Save</button>
-        <button mat-button *ngIf="!showSpinner" mat-dialog-close><mat-icon>cancel</mat-icon>Cancel</button>
-        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-    </mat-dialog-actions>
 </div>

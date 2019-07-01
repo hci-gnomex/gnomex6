@@ -1,30 +1,24 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
+import {Component, Inject, OnInit} from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {numberRange} from "../../util/validators/number-range-validator";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 
 
 @Component({
     template: `
+        <div class="full-height full-width flex-container-col">
 
-        <div mat-dialog-title class="padded-outer">
-            <div class="dialog-header-colors padded-inner">
-                Add Experiment Plaform
-            </div>
-        </div>
-        <div mat-dialog-content style="margin: 0; padding: 0;">
+            <form [formGroup]="this.formGroup" style="padding:1em;">
 
-            <form [formGroup]="this.formGroup" style="padding:1em;" class="full-height full-width flex-container-col">
-
-                <mat-form-field>
+                <mat-form-field class="full-width">
                     <input class="flex-grow" matInput placeholder="Name" formControlName="name">
                     <mat-error *ngIf="this.formGroup?.get('name')?.hasError('required')">
                         This field is required
@@ -32,15 +26,15 @@ import {first} from "rxjs/operators";
                 </mat-form-field>
 
 
-                <mat-form-field class="short-input">
+                <mat-form-field style="width: 50%;">
                     <input matInput placeholder="Code" formControlName="code">
                 </mat-form-field>
 
-                <custom-combo-box class="medium-form-input" placeholder="Type"
+                <custom-combo-box placeholder="Type"
                                   displayField="display" [options]="typeList"
                                   [formControlName]="'type'">
                 </custom-combo-box>
-                <custom-combo-box class="medium-form-input" placeholder="Core Facility"
+                <custom-combo-box placeholder="Core Facility"
                                   displayField="display" [options]="coreFacilityList"
                                   [formControlName]="'idCoreFacility'" valueField="value">
                 </custom-combo-box>
@@ -48,38 +42,10 @@ import {first} from "rxjs/operators";
             </form>
 
         </div>
-        <div class="padded-outer" mat-dialog-actions align="end">
-            <div class="padded-inner">
-                <button mat-button [disabled]="formGroup.invalid" (click)="saveChanges()">
-                    <img class="icon" [src]="constService.ICON_SAVE" > Save
-                </button>
-                <button mat-button mat-dialog-close color="accent" > Cancel </button>
-            </div>
-        </div>
-
-
     `,
-    styles: [`
-
-        .padded-outer{
-            margin:0;
-            padding:0;
-        }
-        .padded-inner{
-            padding:0.3em;
-
-        }
-        mat-form-field.medium-form-input{
-            width: 20em;
-            margin-right: 1em;
-        }
-
-
-
-
-    `]
+    styles: [``]
 })
-export class AddExperimentPlatformDialogComponent implements OnInit{
+export class AddExperimentPlatformDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
     addFn:any;
     formGroup:FormGroup;
@@ -94,6 +60,7 @@ export class AddExperimentPlatformDialogComponent implements OnInit{
                 private expPlatformService: ExperimentPlatformService,
                 private dialogService:DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         this.addFn = this.data.addFn;
     }
 
@@ -110,7 +77,9 @@ export class AddExperimentPlatformDialogComponent implements OnInit{
 
         });
 
-
+        this.primaryDisable = (action) => {
+            return this.formGroup.invalid;
+        };
     }
 
     private makeRequest():void {
