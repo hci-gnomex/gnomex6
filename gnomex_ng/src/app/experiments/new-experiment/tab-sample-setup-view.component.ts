@@ -865,7 +865,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
 
     public selectOrganism(event): void {
-        if (event && event.idLab !== "0") {
+        if (event && (!event.idLab || event.idLab !== "0")) {
             this._experiment.organism = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite', this.form.get("organism").value.idOrganism);
         }
     }

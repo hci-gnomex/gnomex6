@@ -168,7 +168,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (!this.onChange_organismSubscription) {
             this.onChange_organismSubscription = this._experiment.onChange_organism.subscribe((value) => {
                 if (value && this.samplesGridApi) {
-                    this.changeOrganism();
+                    this.changeOrganism(value);
                     this.requireReconfirmation();
                 }
             });
@@ -1738,11 +1738,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
-    private changeOrganism() {
+    private changeOrganism(value: any) {
+        for (let sample of this._experiment.samples) {
+            sample.idOrganism = value && value.idOrganism ? value.idOrganism : '';
+        }
+
         if (this.samplesGridApi) {
-            // this.samplesGridApi.forEachNode((node: any) => {
-            //     node.data.idOrganism = this._experiment.organism.idOrganism;
-            // });
             this.samplesGridApi.redrawRows();
         }
     }
