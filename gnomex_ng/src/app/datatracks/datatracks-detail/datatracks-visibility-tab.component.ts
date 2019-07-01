@@ -1,4 +1,3 @@
-
         import {Component, OnDestroy, OnInit} from "@angular/core";
         import {FormGroup,FormBuilder,Validators } from "@angular/forms"
         import {DataTrackService} from "../../services/data-track.service";
@@ -11,10 +10,6 @@
         import {first} from "rxjs/operators";
         import {UserPreferencesService} from "../../services/user-preferences.service";
         import {HttpParams} from "@angular/common/http";
-
-
-
-
 
         @Component({
             selector:'dt-visibility-tab',
@@ -45,17 +40,12 @@
             private lab: any;
 
 
-
-
-
             constructor(protected fb: FormBuilder,private dtService: DataTrackService,
                         private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService,
                         private propertyService: PropertyService, private constService: ConstantsService,
                         private gnomexService:GnomexService, private getLabService : GetLabService,
                         public prefService: UserPreferencesService){
             }
-
-
 
             ngOnInit():void{ // Note this hook runs once if route changes to another folder you don't recreate component
                 this.visRadio = [
@@ -92,31 +82,26 @@
                     }
 
                     this.visibilityForm.get("codeVisibility").setValue(this.currentDatatrack.codeVisibility);
+                    this.visibilityForm.get("idAppUser").setValue(this.currentDatatrack.idAppUser);
+                    this.visibilityForm.get("lab").setValue(this.currentDatatrack.idLab);
+                    this.visibilityForm.get("collaborators").setValue(currentCollaborators);
 
                     let labParams: HttpParams = new HttpParams();
 
-                    let idLab = this.dtService.datatrackListTreeNode.idLab;
-                    if(idLab !== null  && idLab !== undefined){ //empty string is valid
-                        labParams = labParams.set('idLab', idLab);
+                    if(this.currentDatatrack.idLab) {
+                        labParams = labParams.set('idLab', this.currentDatatrack.idLab);
                         labParams = labParams.set('includeBillingAccounts', 'N');
                         labParams = labParams.set('includeProductCounts','N');
                         this.getLabService.getLab(labParams).pipe(first()).subscribe( data =>{
                             if(data.Lab){
                                 this.makeOwnerList(data.Lab);
-                                this.visibilityForm.get("idAppUser").setValue(this.currentDatatrack.idAppUser);
-                                this.visibilityForm.get("lab").setValue(data.Lab.idLab);
                                 this.lab = data.Lab;
-                                this.visibilityForm.get("collaborators").setValue(currentCollaborators);
-                                this.updateCollaborators();
-
                             }
                         });
                     }
 
-
-
+                    this.updateCollaborators();
                 });
-
 
             }
 
@@ -161,10 +146,7 @@
                             this.visibilityForm.markAsPristine();
 
                         }
-
                     });
-
-
                 }
 
             }
@@ -200,7 +182,6 @@
 
                 this.setCollaboratorPermission(toSelectCollaborators);
 
-
             }
 
             /*handler gets called twice one for select one for deselect */
@@ -222,7 +203,6 @@
                             canUpdate = selected.canUpdate != null ? selected.canUpdate == "Y" : false;
                             break;
                         }
-
                     }
                     collab.isSelected = isSelected ? "Y" : "N";
                     collab.canUploadData = canUpload ? "Y" : "N";
@@ -230,8 +210,6 @@
 
                 }
             }
-
-
 
             compareByID(itemOne, itemTwo) {
                 return itemOne && itemTwo && itemOne.idAppUser == itemTwo.idAppUser;
@@ -249,18 +227,10 @@
 
             }
 
-
-
-
-
-
             ngOnDestroy(){
                 this.getLabService.labMembersSubject.next(null);
 
             }
-
-
-
 
         }
 

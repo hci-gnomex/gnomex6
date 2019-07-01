@@ -1,20 +1,15 @@
-<div mat-dialog-title class="full-width header no-margin no-padding">
-    <div #topmostLeftmost (mousedown)="onMouseDownHeader($event)" class="full-width padding {{ movingDialog ? 'grabbed' : 'grabbable' }}">
-        <h5 class="no-margin inline-block">Advanced Search</h5>
-    </div>
-</div>
-<div mat-dialog-content class="body background no-margin no-padding">
-    <div class="body-size light-background">
+<div class="flex-container-col full-width full-height">
+    <div class="full-height body-size light-background padded-bottom">
         <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="full-height">
 
             <mat-tab label="New Search" class="full-height" #newSearchTab >
-                <div class="full-width fixed-height padding">
+                <div class="full-width fixed-height padding-top">
 
                     <div class="t full-width full-height">
-                        <div class="tr full-width">
+                        <div class="tr full-width small-font">
                             <div class="td mat-input-label">General Keywords</div>
                             <div class="td">
-                                <mat-form-field class="medium-input">
+                                <mat-form-field class="full-width">
                                     <input  matInput
                                             placeholder="Search"
                                             [(ngModel)]="searchText">
@@ -37,7 +32,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tr full-width">
+                        <div class="tr full-width small-font">
                             <div class="td label">
                                 Search Category
                             </div>
@@ -58,7 +53,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tr full-width full-height">
+                        <div class="tr full-width full-height small-font">
                             <div class="td label">Field Search</div>
                             <div class="td">
                                 <div class="grid-container full-height">
@@ -83,7 +78,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tr full-width full-height">
+                        <div class="tr full-width full-height small-font">
                             <div class="td label"></div>
                             <div class="td">
                                 <mat-radio-group [(ngModel)]="matchType">
@@ -98,7 +93,7 @@
             </mat-tab>
 
             <mat-tab label="Search Results" class="full-height" #searchResultsTab >
-                <div class="full-width fixed-height padding">
+                <div class="full-width fixed-height padding-top">
                     <div class="flex-container full-width full-height">
                         <div class="full-width button-bar">
                             <button mat-button class="inline-block" (click)="onGridAllObjectsButtonClicked()">
@@ -190,23 +185,20 @@
             </mat-tab>
         </mat-tab-group>
     </div>
-</div>
-<div mat-dialog-actions class="background no-margin no-padding">
-    <div class="full-width button-container">
-        <div class="t full-width">
-            <div class="tr">
-                <div *ngIf="selectedTabIndex === 0" class="td">
-                    <button mat-button (click)="onClickSearchButton()"><img src="../../../assets/magnifier.png" alt="" /> Search</button>
-                    <button mat-button (click)="onClickClearButton()">Clear</button>
-                </div>
-                <div *ngIf="selectedTabIndex === 2" class="td">
-                    <button mat-button (click)="onClickExpandButton()">Expand Tree</button>
-                    <button mat-button (click)="onClickCollapseButton()">Collapse Tree</button>
-                </div>
-                <div class="td right-aligned">
-                    <button mat-button (click)="onClickCancelButton()">Cancel</button>
-                </div>
-            </div>
+    <div class="flex-container-row justify-space-between generic-dialog-footer-colors">
+        <div class="flex-container-row" *ngIf="selectedTabIndex === 0">
+            <save-footer [icon]="this.constService.ICON_MAGNIFIER" (saveClicked)="onClickSearchButton()" name="Search"></save-footer>
+            <save-footer (saveClicked)="onClickClearButton()" name="Clear"></save-footer>
+        </div>
+        <div class="flex-container-row" *ngIf="selectedTabIndex === 1">
+            <div class="flex-grow"></div>
+        </div>
+        <div class="flex-container-row" *ngIf="selectedTabIndex === 2">
+            <save-footer (saveClicked)="onClickExpandButton()" name="Expand Tree"></save-footer>
+            <save-footer (saveClicked)="onClickCollapseButton()" name="Collapse Tree"></save-footer>
+        </div>
+        <div class="justify-flex-end">
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="onClickCancelButton()" name="Cancel"></save-footer>
         </div>
     </div>
 </div>

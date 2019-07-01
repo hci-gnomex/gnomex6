@@ -6,7 +6,6 @@ import {ErrorStateMatcher, MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialo
 import {Subscription} from "rxjs";
 
 import {EditBillingAccountErrorDialogComponent} from "./dialogs/edit-billing-account-error-dialog.component";
-import {EditBillingAccountSuccessDialogComponent} from "./dialogs/edit-billing-account-success-dialog.component";
 
 import {BillingUsersSelectorComponent} from "../../usersGroups/billingAccountTab/billingUsersSelector/billing-users-selector.component";
 
@@ -1120,19 +1119,6 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 		}
 	}
 
-	private openSuccessDialog(): void {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = { successMessage: this.successMessage };
-
-		let successDialogReference = this.dialog.open(EditBillingAccountSuccessDialogComponent, configuration);
-
-		successDialogReference.afterClosed().subscribe(() => {
-			this.dialogRef.close();
-		});
-	}
-
 	private openErrorDialog(): void {
 		//TODO: This will be gone when we accomplish the alert pop-up wrapper
         let configuration: MatDialogConfig = new MatDialogConfig();
@@ -1365,25 +1351,23 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
     }
 
     private onClickApprovedUsers(): void {
-		let data = {
-			options: this.labActiveSubmitters,
-			optionName: "Users",
-			value: this.approvedUsersValue,
-			valueField: "value",
-			displayField: "display"
-		};
 
 		let configuration: MatDialogConfig = new MatDialogConfig();
 		configuration.width = '60em';
-		configuration.height = '45em';
-		configuration.panelClass = 'no-padding-dialog';
-		configuration.data = data;
+		configuration.height = '40em';
+		configuration.autoFocus = false;
+		configuration.data = {
+            options: this.labActiveSubmitters,
+            optionName: "Users",
+            value: this.approvedUsersValue,
+            valueField: "value",
+            displayField: "display"
+		};
 
-		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
-
-		dialogRef.afterClosed().subscribe((result) => {
-			if (dialogRef && dialogRef.componentInstance) {
-				this.approvedUsersValue = !!dialogRef.componentInstance.value ? dialogRef.componentInstance.value : '';
+		this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
+			.subscribe((result: any) => {
+			if (result) {
+				this.approvedUsersValue = result;
 			}
 		});
 	}

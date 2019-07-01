@@ -11,6 +11,7 @@ import {HttpParams} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'configure-product-types',
@@ -56,7 +57,7 @@ import {UtilService} from "../services/util.service";
         }
     `]
 })
-export class ConfigureProductTypesComponent implements OnInit {
+export class ConfigureProductTypesComponent extends BaseGenericContainerDialog implements OnInit {
     public form: FormGroup;
     public selectedProductType;
     public showSpinner: boolean;
@@ -76,6 +77,7 @@ export class ConfigureProductTypesComponent implements OnInit {
                 private propertyService: PropertyService,
                 private snackBar: MatSnackBar,
                 @Inject(FormBuilder) private fb: FormBuilder) {
+        super();
         this.showSpinner = false;
         this.form = fb.group({
             coreFacility: ['', Validators.required],
@@ -99,6 +101,8 @@ export class ConfigureProductTypesComponent implements OnInit {
             return v.isActive && v.isActive === 'Y';
         });
         this.loadPriceCategories();
+
+        this.primaryDisable = (action) => this.form.invalid || !this.selectedProductType;
     }
 
     private loadProductTypes(productTypes: any[]): void {

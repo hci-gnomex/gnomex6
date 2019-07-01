@@ -1,78 +1,49 @@
-<div class="full-width full-height flex-vertical-container">
-	<div mat-dialog-title style="margin: 0; padding: 0.5em;">
-		<h3 class="no-margin">
-			{{optionName}}
-		</h3>
-	</div>
-	<div mat-dialog-content class="full-width full-height stretch" style="margin: 0; padding: 0;">
-		<div class="full-width full-height">
-			<div *ngIf="!addingUser" class="full-height full-width" style="padding: .5em 2em;">
-
-				<ag-grid-angular
-						style="width:100%; height:100%;"
-						class="ag-theme-fresh"
-						[singleClickEdit]="true"
-						[rowSelection]="'multiple'"
-						[suppressRowClickSelection]="true"
-						[columnDefs]="columnDefinitions"
-						[enableSorting]="true"
-						[enableColResize]="true"
-						(gridSizeChanged)="onGridSizeChanged()"
-						(gridReady)="onGridReady($event)">
-				</ag-grid-angular>
-
-			</div>
-			<div *ngIf="addingUser" class="full-height full-width" style="padding: .5em 2em;">
-				<div class="t full-width full-height">
-					<div class="tr">
-						<div class="td vertical-center center">
-
-							<div style="width: 80%;">
-								<custom-combo-box placeholder="Select a Lab..." (optionSelected)="onLabListSelection()"
-												  [options]="labList" displayField="name"
-												  [(ngModel)]="selectedLab">
-								</custom-combo-box>
-							</div>
-
-							<div style="width: 80%;">
-								<custom-combo-box placeholder="Select a User..."
-												  [options]="userList" displayField="display"
-												  [(ngModel)]="selectedUser">
-								</custom-combo-box>
-							</div>
-
-							<p *ngIf="!!selectedLab && !userListLoading && (!userList || userList.length < 1)" class="error-message">No users found</p>
-
-						</div>
-					</div>
-				</div>
-			</div>
+<div class="flex-container-col full-width full-height padded">
+	<div class="full-width full-height padded-left-right">
+		<div *ngIf="!addingUser" class="full-width padded" style="height: 33em;">
+			<ag-grid-angular
+					style="width:100%; height:100%;"
+					class="ag-theme-fresh"
+					[singleClickEdit]="true"
+					[rowSelection]="'multiple'"
+					[suppressRowClickSelection]="true"
+					[columnDefs]="columnDefinitions"
+					[enableSorting]="true"
+					[enableColResize]="true"
+					(gridSizeChanged)="onGridSizeChanged()"
+					(gridReady)="onGridReady($event)">
+			</ag-grid-angular>
+		</div>
+		<div *ngIf="addingUser" class="full-width padded">
+			<custom-combo-box class="full-width" placeholder="Select a Lab..." (optionSelected)="onLabListSelection()"
+							  [options]="labList" displayField="name"
+							  [(ngModel)]="selectedLab">
+			</custom-combo-box>
+			<custom-combo-box class="full-width" placeholder="Select a User..."
+							  [options]="userList" displayField="display"
+							  [(ngModel)]="selectedUser">
+			</custom-combo-box>
+			<p *ngIf="!!selectedLab && !userListLoading && (!userList || userList.length < 1)" class="error-message">No users found</p>
 		</div>
 	</div>
-	<div mat-dialog-actions style="margin: 0; display: block;">
-
-		<div *ngIf="!addingUser" class="t full-width">
-			<div class="tr">
-				<div class="td left-align horizontal-padding">
-					<button mat-button (click)="addUserFromOtherLabButtonClicked()">Add User from Another Lab</button>
-				</div>
-				<div class="td right-align horizontal-padding">
-					<button mat-button cdkFocusInitial (click)="updateButtonClicked()">Update</button>
-					<button mat-button (click)="cancelButtonClicked()">Cancel</button>
-				</div>
+	<div class="flex-grow generic-dialog-footer-colors">
+		<div *ngIf="!addingUser" class="flex-container-row justify-space-between">
+			<div class="flex-container-row">
+				<save-footer (saveClicked)="addUserFromOtherLabButtonClicked()" name="Add User from Another Lab"></save-footer>
+			</div>
+			<div class="flex-container-row justify-flex-end">
+				<save-footer [icon]="this.constService.ICON_SAVE" (saveClicked)="updateButtonClicked()" name="Update"></save-footer>
+				<save-footer [actionType]="actionType.SECONDARY" (saveClicked)="cancelButtonClicked()" name="Cancel"></save-footer>
 			</div>
 		</div>
+		<div *ngIf="addingUser" class="flex-container-row justify-space-between">
+			<div class="flex-container-row">
+				<save-footer [actionType]="actionType.SECONDARY" (saveClicked)="backButtonClicked()" name="Back"></save-footer>
+			</div>
+			<div class="flex-container-row justify-flex-end">
+				<save-footer [disableSave]="!this.selectedLab || !this.selectedUser" (saveClicked)="addUserButtonClicked()" name="Add User"></save-footer>
 
-		<div *ngIf="addingUser" class="t full-width">
-			<div class="tr">
-				<div class="td left-align horizontal-padding">
-					<button mat-button (click)="backButtonClicked()">Back</button>
-				</div>
-				<div class="td right-align horizontal-padding">
-					<button mat-button (click)="addUserButtonClicked()">Add User</button>
-				</div>
 			</div>
 		</div>
-
 	</div>
 </div>

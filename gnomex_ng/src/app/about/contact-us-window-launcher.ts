@@ -1,7 +1,8 @@
 import {Component, OnInit} from "@angular/core";
-import {MatDialog, MatDialogRef} from "@angular/material";
 import {Router} from "@angular/router";
 import {ContactUsComponent} from "./contact-us.component";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'contact-us-window-launcher',
@@ -9,22 +10,18 @@ import {ContactUsComponent} from "./contact-us.component";
 })
 
 export class ContactUsWindowLauncher implements OnInit {
-    aboutDialogRef: MatDialogRef<ContactUsComponent>;
 
-    constructor(private dialog: MatDialog, private router: Router) {
+    constructor(private dialogsService: DialogsService, private router: Router) {
     }
 
     ngOnInit() {
-        setTimeout(() => {
-            this.aboutDialogRef = this.dialog.open(ContactUsComponent);
-        });
 
-        setTimeout(() =>
-            this.aboutDialogRef.afterClosed()
-                .subscribe(() => {
+        this.dialogsService.genericDialogContainer(ContactUsComponent, "Contact Us", null, null,
+            {actions: [
+                    {type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}
+                ]}).subscribe(() => {
                     this.router.navigate([{ outlets: { modal: null }}]);
-                })
-        );
+        });
     }
 
 }

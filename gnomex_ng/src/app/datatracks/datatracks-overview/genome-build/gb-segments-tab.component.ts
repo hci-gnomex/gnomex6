@@ -1,8 +1,8 @@
-import {Component, OnInit, ViewChild, AfterViewInit, OnDestroy} from "@angular/core";
-import {FormGroup, FormBuilder, Validators, FormControl} from "@angular/forms"
+import {Component, OnDestroy, OnInit} from "@angular/core";
+import {FormBuilder} from "@angular/forms"
 import {PrimaryTab} from "../../../util/tabs/primary-tab.component"
 import {ActivatedRoute} from "@angular/router";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {ImportSegmentsDialog} from "./import-segments-dialog";
 import {CreateSecurityAdvisorService} from "../../../services/create-security-advisor.service";
 import {ConstantsService} from "../../../services/constants.service";
@@ -10,6 +10,8 @@ import {GridOptions} from "ag-grid-community";
 import {GenomeBuildValidateService} from "../../../services/genome-build-validate.service";
 import {Subscription} from "rxjs";
 import {DataTrackService} from "../../../services/data-track.service";
+import {DialogsService} from "../../../util/popup/dialogs.service";
+import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -68,7 +70,6 @@ import {DataTrackService} from "../../../services/data-track.service";
 export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDestroy {
     //Override
     name = "Segments";
-    private createImportDialogRef: MatDialogRef<ImportSegmentsDialog>;
     private value: number = 0;
     private rowData: Array<any> = [];
     private gridOpt: GridOptions = {};
@@ -83,11 +84,11 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
 
 
     private editable = (): boolean => {
-        return !this.secAdvisor.isGuest
-    };
+        return !this.secAdvisor.isGuest;
+    }
     private importFn = (importValue: Array<any>) => {
-        this.rowData = importValue
-    };
+        this.rowData = importValue;
+    }
 
     private columnDefs = [
         {
@@ -114,9 +115,13 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
     ];
 
 
-    constructor(protected fb: FormBuilder, private route: ActivatedRoute,
-                private dialog: MatDialog, private secAdvisor: CreateSecurityAdvisorService, private datatracksService: DataTrackService,
-                private constService: ConstantsService, private gbValidateService: GenomeBuildValidateService) {
+    constructor(protected fb: FormBuilder,
+                private route: ActivatedRoute,
+                private dialogsService: DialogsService,
+                private secAdvisor: CreateSecurityAdvisorService,
+                private datatracksService: DataTrackService,
+                private constService: ConstantsService,
+                private gbValidateService: GenomeBuildValidateService) {
         super(fb);
     }
 
@@ -154,13 +159,17 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
     }
 
     openImportDialog(): void {
-        this.createImportDialogRef = this.dialog.open(ImportSegmentsDialog, {
-            data: {
-                importFn: this.importFn,
-                idGenomeBuild: this.idGenomeBuild
-            }
-        });
-
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.autoFocus = false;
+        config.data = {
+            importFn: this.importFn,
+            idGenomeBuild: this.idGenomeBuild
+        }
+        this.dialogsService.genericDialogContainer(ImportSegmentsDialog, "Copy/paste segment information", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
     }
 
     newSegments() {

@@ -1,14 +1,4 @@
-<div mat-dialog-title class="no-margin no-padding header-colors">
-    <div class="full-width flex-container-row align-center padded">
-        <div>
-            <img src="../../../../assets/work_auth_form.png" alt="">
-        </div>
-        <div class="flex-grow padded-left">
-            {{!!selectedCoreFacility ? 'Copy Billing Account to ' + selectedCoreFacility.display : 'Copy Billing Account'}}
-        </div>
-    </div>
-</div>
-<div mat-dialog-content class="no-margin no-padding fixed-height background">
+<div class="flex-container-col full-width fixed-height">
     <div class="full-width full-height padded">
         <div class="flex-container-col full-width full-height">
             <div class="full-width flex-grow small-font">
@@ -57,11 +47,4 @@
         </div>
     </div>
 </div>
-<div mat-dialog-actions class="no-margin no-padding background">
-    <div class="full-width right-align right-bottom-left-padded">
-        <button mat-button (click)="onClickSaveButton()">
-            <img src="../../../../assets/pricesheet_add.png" alt="">
-            Add to working document
-        </button>
-    </div>
-</div>
+

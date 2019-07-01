@@ -1,23 +1,31 @@
-import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {ErrorStateMatcher, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    Input,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from "@angular/core";
+import {ErrorStateMatcher, MatDialogConfig} from "@angular/material";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
 
 import {EditBillingAccountComponent} from "../../billing/edit_billing_account/edit-billing-account.component";
 
-import { ApproveButtonRenderer } from "../../util/grid-renderers/approve-button.renderer";
-import { CheckboxRenderer } from "../../util/grid-renderers/checkbox.renderer";
-import { DateEditor } from "../../util/grid-editors/date.editor";
-import { DateRenderer } from "../../util/grid-renderers/date.renderer";
-import { IconLinkButtonRenderer } from "../../util/grid-renderers/icon-link-button.renderer";
-import { SplitStringToMultipleLinesRenderer } from "../../util/grid-renderers/split-string-to-multiple-lines.renderer";
-import { RemoveLinkButtonRenderer } from "../../util/grid-renderers/remove-link-button.renderer";
-import { SelectEditor } from "../../util/grid-editors/select.editor";
-import { SelectRenderer } from "../../util/grid-renderers/select.renderer";
-import { TextAlignLeftMiddleRenderer } from "../../util/grid-renderers/text-align-left-middle.renderer";
-import { TextAlignRightMiddleRenderer } from "../../util/grid-renderers/text-align-right-middle.renderer";
-import { UploadViewRemoveRenderer } from "../../util/grid-renderers/upload-view-remove.renderer";
+import {ApproveButtonRenderer} from "../../util/grid-renderers/approve-button.renderer";
+import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
+import {DateEditor} from "../../util/grid-editors/date.editor";
+import {DateRenderer} from "../../util/grid-renderers/date.renderer";
+import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
+import {SplitStringToMultipleLinesRenderer} from "../../util/grid-renderers/split-string-to-multiple-lines.renderer";
+import {RemoveLinkButtonRenderer} from "../../util/grid-renderers/remove-link-button.renderer";
+import {SelectEditor} from "../../util/grid-editors/select.editor";
+import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
+import {UploadViewRemoveRenderer} from "../../util/grid-renderers/upload-view-remove.renderer";
 
 
 import * as _ from "lodash";
@@ -26,7 +34,7 @@ import {AccountFieldsConfigurationService} from "../../services/account-fields-c
 import {Subscription} from "rxjs";
 import {FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
-import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-users-selector.component";
+import {BillingUsersSelectorComponent} from "./billingUsersSelector/billing-users-selector.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {CopyAccountsDialogComponent} from "./dialogs/copy-accounts-dialog.component";
 import {UniqueIdGeneratorService} from "../../services/unique-id-generator.service";
@@ -163,7 +171,6 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 private dialogsService: DialogsService,
                 private propertyService: PropertyService,
                 private accountFieldsConfigurationService: AccountFieldsConfigurationService,
-                private dialog: MatDialog,
                 private constService: ConstantsService,
                 private idGenerator: UniqueIdGeneratorService) {
 		this.context = { componentParent: this };
@@ -1375,21 +1382,19 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = '60em';
-            configuration.height = '45em';
-            configuration.panelClass = 'no-padding-dialog';
+            configuration.height = '40em';
+            configuration.autoFocus = false;
             configuration.data = data;
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
-
-			dialogRef.afterClosed().subscribe((result) => {
-				if (dialogRef
-                    && dialogRef.componentInstance
-                    && this.chartfieldGridApi
-                    && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
-                    && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
-					this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
-					this.chartfieldGridApi.refreshCells();
-				}
+			this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, "", null, configuration)
+                .subscribe((result: any) => {
+                    if (result
+                        && this.chartfieldGridApi
+                        && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
+                        && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+                        this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
+                        this.chartfieldGridApi.refreshCells();
+                    }
 			});
 		}
 	}
@@ -1406,21 +1411,19 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = '60em';
-            configuration.height = '45em';
-            configuration.panelClass = 'no-padding-dialog';
+            configuration.height = '40em';
+            configuration.autoFocus = false;
             configuration.data = data;
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
-
-			dialogRef.afterClosed().subscribe((result) => {
-				if (dialogRef
-                    && dialogRef.componentInstance
-                    && this.poGridApi
-                    && this.poGridApi.getDisplayedRowAtIndex(rowIndex)
-                    && this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
-					this.poGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
-					this.poGridApi.refreshCells();
-				}
+            this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
+                .subscribe((result: any) => {
+                    if (result
+                        && this.poGridApi
+                        && this.poGridApi.getDisplayedRowAtIndex(rowIndex)
+                        && this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+                        this.poGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
+                        this.poGridApi.refreshCells();
+                    }
 			});
 		}
 	}
@@ -1437,21 +1440,19 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = '60em';
-            configuration.height = '45em';
-            configuration.panelClass = 'no-padding-dialog';
+            configuration.height = '40em';
+            configuration.autoFocus = false;
             configuration.data = data;
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
-
-			dialogRef.afterClosed().subscribe((result) => {
-				if (dialogRef
-                    && dialogRef.componentInstance
-                    && this.creditCardGridApi
-                    && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex)
-                    && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
-					this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
-					this.creditCardGridApi.refreshCells();
-				}
+            this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
+                .subscribe((result: any) => {
+                    if (result
+                        && this.creditCardGridApi
+                        && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex)
+                        && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+                        this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
+                        this.creditCardGridApi.refreshCells();
+                    }
 			});
 		}
 	}
@@ -1563,7 +1564,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
     onCopyAccountsClicked(): void {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width  = '60em';
-        config.panelClass = 'no-padding-dialog';
+        config.autoFocus = false;
         config.data = {
             labInfo: this._labInfo,
             creditCardCompanies: this.creditCardCompanies,
@@ -1571,28 +1572,29 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             coreFacilities: this.coreFacilities
         };
 
-        let dialogRef = this.dialog.open(CopyAccountsDialogComponent, config);
-        dialogRef.afterClosed().subscribe((data) => {
-            if (!data || !data.saveButtonClicked) {
-                return;
-            }
+        this.dialogsService.genericDialogContainer(CopyAccountsDialogComponent, "", this.constService.ICON_WORK_AUTH_FORM, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Add to working document", internalAction: "onClickSaveButton"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((data) => {
+                    if(data) {
+                        for (let account of data.chartfieldAccountRowsToCopy) {
+                            this._labInfo.internalBillingAccounts.push(account);
+                            this._labInfo.billingAccounts.push(account);
+                        }
+                        for (let account of data.poAccountRowsToCopy) {
+                            this._labInfo.pOBillingAccounts.push(account);
+                            this._labInfo.billingAccounts.push(account);
+                        }
+                        for (let account of data.creditCardAccountRowsToCopy) {
+                            this._labInfo.creditCardBillingAccounts.push(account);
+                            this._labInfo.billingAccounts.push(account);
+                        }
 
-            for (let account of data.chartfieldAccountRowsToCopy) {
-                this._labInfo.internalBillingAccounts.push(account);
-                this._labInfo.billingAccounts.push(account);
-            }
-            for (let account of data.poAccountRowsToCopy) {
-                this._labInfo.pOBillingAccounts.push(account);
-                this._labInfo.billingAccounts.push(account);
-            }
-            for (let account of data.creditCardAccountRowsToCopy) {
-                this._labInfo.creditCardBillingAccounts.push(account);
-                this._labInfo.billingAccounts.push(account);
-            }
-
-            this.assignChartfieldGridContents(this.selectedCoreFacility);
-            this.assignPoGridContents(this.selectedCoreFacility);
-            this.assignCreditCardGridContents(this.selectedCoreFacility);
+                        this.assignChartfieldGridContents(this.selectedCoreFacility);
+                        this.assignPoGridContents(this.selectedCoreFacility);
+                        this.assignCreditCardGridContents(this.selectedCoreFacility);
+                    }
         });
     }
 

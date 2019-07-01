@@ -5,16 +5,18 @@ import {FormControl} from "@angular/forms";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {DialogsService} from "./popup/dialogs.service";
+import {ConstantsService} from "../services/constants.service";
+import {ActionType} from "./interfaces/generic-dialog-action.model";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 
 @Component({
     selector: 'context-help-popup',
     template: `
-        <h6 mat-dialog-title>{{this.popupTitle}}</h6>
-        <mat-dialog-content>
+        <div class="flex-container-col full-width full-height double-padded">
             <div class="editor-grid">
                 <jqxEditor #editorReference
                            width="100%"
-                           [height]="230"
+                           height="15em"
                            [editable]="this.isEditMode"
                            [tools]="this.toolbarSettings"
                            [toolbarPosition]="'top'">
@@ -26,32 +28,32 @@ import {DialogsService} from "./popup/dialogs.service";
                               matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
                 </mat-form-field>
             </div>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button *ngIf="this.isEditMode" color="primary" mat-button (click)="this.save()">Save</button>
-            <button mat-button mat-dialog-close>Close</button>
-        </mat-dialog-actions>
+        </div>
+        <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+            <save-footer *ngIf="this.isEditMode" [icon]="this.constService.ICON_SAVE" (saveClicked)="this.save()" name="Save"></save-footer>
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Cancel"></save-footer>
+        </div>
     `,
     styles: [`
         div.editor-grid {
-            width: 450px;
-            height: 250px;
+            width: 35em;
+            height: 25em;
         }
     `]
 })
 
-export class ContextHelpPopupComponent implements OnInit, AfterViewInit {
+export class ContextHelpPopupComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
+    public actionType: any = ActionType ;
 
     private readonly NO_HELP_TEXT: string = "No help available";
     private readonly DEFAULT_TOOLBAR_SETTINGS: string = "bold italic underline | format font size | color background | left center right | outdent indent | ul ol | link | clean";
 
-    public popupTitle: string = "";
     private dictionary: any;
     public isEditMode: boolean = false;
 
     public toolbarSettings: string = "";
     private descriptionControl: FormControl;
-    private tooltipControl: FormControl;
+    public tooltipControl: FormControl;
 
     @ViewChild('editorReference') private editorRef: jqxEditorComponent;
 
@@ -59,13 +61,17 @@ export class ContextHelpPopupComponent implements OnInit, AfterViewInit {
                 private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService,
                 private dialogsService: DialogsService,
+                public constService: ConstantsService,
                 private dialogRef: MatDialogRef<ContextHelpPopupComponent>) {
+        super();
+        if(this.data) {
+            this.innerTitle = this.data.popupTitle;
+            this.dictionary = this.data.dictionary;
+            this.isEditMode = this.data.isEditMode;
+        }
     }
 
     ngOnInit() {
-        this.popupTitle = this.data.popupTitle;
-        this.dictionary = this.data.dictionary;
-        this.isEditMode = this.data.isEditMode;
 
         this.descriptionControl = new FormControl(this.dictionary && this.dictionary.helpText ? this.dictionary.helpText : this.NO_HELP_TEXT);
         this.tooltipControl = new FormControl(this.dictionary && this.dictionary.toolTipText ? this.dictionary.toolTipText : '');
@@ -108,6 +114,10 @@ export class ContextHelpPopupComponent implements OnInit, AfterViewInit {
                 }
             });
         }
+    }
+
+    onClose(): void {
+        this.dialogRef.close();
     }
 
 }

@@ -1,9 +1,8 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import { URLSearchParams } from "@angular/http";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions, GridApi} from "ag-grid-community";
+import {GridApi, GridOptions} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -18,6 +17,8 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {Subscription} from "rxjs";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'flowcellassm-workflow',
@@ -76,7 +77,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     private gridOptions:GridOptions = {};
     private lanes: any[] = [];
     private selectedSeqlanes: any[] = [];
-    private deleteSeqlaneDialogRef: MatDialogRef<DeleteSeqlaneDialogComponent>;
     private emptyLab = {idLab: "0",
         name: ""};
     private labList: any[] = [];
@@ -95,7 +95,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
                 private securityAdvisor: CreateSecurityAdvisorService,
-                private dialog: MatDialog,
+                private constService: ConstantsService,
                 private dictionaryService: DictionaryService,
                 public prefService: UserPreferencesService) {
         this.barcodeFC = new FormControl("");
@@ -580,22 +580,24 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         } else {
             laneString = "lanes";
         }
-        this.deleteSeqlaneDialogRef = this.dialog.open(DeleteSeqlaneDialogComponent, {
-            height: '12em',
-            width: '22em',
-            data: {
-                seqLanes: seqLanes,
-                laneLength: this.selectedSeqlanes.length,
-                laneString: laneString
-            }
-
-        });
-        this.deleteSeqlaneDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.deleteSeqlaneDialogRef.componentInstance.rebuildSeqlanes) {
-                    this.initialize();
-                }
-            })
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "25em";
+        config.height = "12em";
+        config.autoFocus = false;
+        config.data = {
+            seqLanes: seqLanes,
+            laneLength: this.selectedSeqlanes.length,
+            laneString: laneString
+        };
+        this.dialogsService.genericDialogContainer(DeleteSeqlaneDialogComponent, "Delete Sequence Lane", this.constService.ICON_DELETE, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.initialize();
+                    }
+            });
 
     }
 

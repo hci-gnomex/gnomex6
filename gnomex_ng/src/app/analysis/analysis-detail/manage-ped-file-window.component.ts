@@ -80,7 +80,6 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 })
 export class ManagePedFileWindowComponent extends BaseGenericContainerDialog implements OnInit {
 
-    public pedFilename: string = "";
     public pedInfo: any[] = [];
     private vcfInfo: any[] = [];
     private bamInfo: any[] = [];
@@ -159,15 +158,15 @@ export class ManagePedFileWindowComponent extends BaseGenericContainerDialog imp
     }
 
     private initializeFromPedFile(analysis?: any): void {
-        // TODO: comment these temporarily. Need to fix the pedFileName and undefined gridColDefs as well
-        // this.pedFilename = "";
-        // if (this.pedInfo.length > 0) {
-        //     let fullPedFilename: string = this.pedInfo[this.currentPedFileIndex].path;
-        //     let lastSlashIndex: number = fullPedFilename.lastIndexOf("/");
-        //     this.pedFilename = lastSlashIndex > 0 ? fullPedFilename.substring(lastSlashIndex + 1) : "";
-        // } else if (analysis && analysis.number) {
-        //     this.pedFilename = analysis.number + ".ped";
-        // }
+        let pedFilename: string = "";
+        if (this.pedInfo.length > 0) {
+            let fullPedFilename: string = this.pedInfo[this.currentPedFileIndex].path;
+            let lastSlashIndex: number = fullPedFilename.lastIndexOf("/");
+            pedFilename = lastSlashIndex > 0 ? fullPedFilename.substring(lastSlashIndex + 1) : "";
+        } else if (analysis && analysis.number) {
+            pedFilename = analysis.number + ".ped";
+        }
+        this.innerTitle = "Manage Ped File -- " + pedFilename;
 
         let params: HttpParams = new HttpParams()
             .set("noJSONToXMLConversionNeeded", "Y")

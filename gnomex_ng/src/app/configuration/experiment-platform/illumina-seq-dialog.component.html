@@ -1,14 +1,8 @@
+<div class="full-height full-width flex-container-col">
 
-<div mat-dialog-title class="padded-outer">
-    <div class="dialog-header-colors padded-inner">
-        Edit Sequencing Option
-    </div>
-</div>
-<div mat-dialog-content style="margin: 0; padding: 0;">
-
-    <form [formGroup]="this.formGroup" style="padding:1em;" class="full-height full-width flex-container-col">
+    <form [formGroup]="this.formGroup" style="padding:1em;" >
         <div class="flex-container-row">
-            <mat-form-field class="flex-grow">
+            <mat-form-field class="full-width">
                 <input matInput placeholder="Name" formControlName="name">
             </mat-form-field>
             <div style="align-items: center;margin-left:1em;" class="flex-container-row flex-grow">
@@ -54,7 +48,7 @@
                           [options]="this.seqTypeRunList" valueField="value" displayField="display"
                           [formControlName]="'idSeqRunType'">
         </custom-combo-box>
-        <mat-form-field class="propFormField">
+        <mat-form-field class="propFormField full-width">
             <textarea matInput placeholder="Protocol Description" formControlName="protocolDescription"
                       matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="10">
             </textarea>
@@ -64,11 +58,4 @@
     </form>
 
 </div>
-<div class="padded-outer" mat-dialog-actions align="end">
-    <div class="padded-inner">
-        <button mat-button [disabled]="formGroup.invalid" (click)="applyChanges()">
-            <img class="icon" [src]="constService.ICON_SAVE" > Apply
-        </button>
-        <button mat-button mat-dialog-close color="accent" > Cancel </button>
-    </div>
-</div>
+

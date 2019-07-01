@@ -1,10 +1,8 @@
-
-import {Component, OnInit, ViewChild,AfterViewInit} from "@angular/core";
-import {FormGroup, FormBuilder, Validators, FormControl} from "@angular/forms"
+import {Component, OnInit} from "@angular/core";
+import {FormBuilder} from "@angular/forms"
 import {PrimaryTab} from "../../../util/tabs/primary-tab.component"
 import {ActivatedRoute} from "@angular/router";
-import {MatDialog, MatDialogRef} from "@angular/material";
-import {ImportSegmentsDialog} from "./import-segments-dialog";
+import {MatDialogConfig} from "@angular/material";
 import {CreateSecurityAdvisorService} from "../../../services/create-security-advisor.service";
 import {GridOptions} from "ag-grid-community";
 import {ConstantsService} from "../../../services/constants.service";
@@ -12,7 +10,8 @@ import {SequenceFilesDialog} from "./sequence-files-dialog.component";
 import {GenomeBuildValidateService} from "../../../services/genome-build-validate.service";
 import {Subscription} from "rxjs";
 import {DataTrackService} from "../../../services/data-track.service";
-
+import {DialogsService} from "../../../util/popup/dialogs.service";
+import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -43,13 +42,7 @@ import {DataTrackService} from "../../../services/data-track.service";
                 </ag-grid-angular>
 
             </div>
-            
-            
-            
         </div>
-        
-        
-        
     `,
     styles: [`
         .form-field{
@@ -67,14 +60,13 @@ import {DataTrackService} from "../../../services/data-track.service";
 })
 export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
     //Override
-    name= "Sequence Files";
-    private rowData:Array<any> = [];
-    private gridOpt:GridOptions = {};
-    private newPage:string;
-    private removePage:string;
+    name = "Sequence Files";
+    public rowData:Array<any> = [];
+    public gridOpt:GridOptions = {};
+    public newPage:string;
+    public removePage:string;
     private enableUpload:boolean = true;
     private enableRemove:boolean = false;
-    private createSeqFilesDialogRef: MatDialogRef<SequenceFilesDialog>;
     private validSubscription:Subscription;
     private idGenomeBuild:string;
 
@@ -87,7 +79,7 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
 
 
 
-    private columnDefs = [
+    public columnDefs = [
         {
             headerName: "Name",
             field: "name",
@@ -110,11 +102,12 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
 
 
     constructor(protected fb: FormBuilder,private route:ActivatedRoute,
-                private dialog: MatDialog,private secAdvisor:CreateSecurityAdvisorService,
+                private dialogsService: DialogsService, private secAdvisor:CreateSecurityAdvisorService,
                 private datatracksService:DataTrackService, private constService:ConstantsService,
                 private gbValidateService:GenomeBuildValidateService){
         super(fb);
     }
+
     ngOnInit():void{
         this.newPage = this.constService.PAGE_NEW;
         this.removePage = this.constService.PAGE_REMOVE_DISABLE;
@@ -139,17 +132,25 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
         });
 
     }
+
     openSeqFilesDialog():void{
-        this.createSeqFilesDialogRef = this.dialog.open(SequenceFilesDialog,{
-            data:{
-                //importFn:this.importFn,
-                idGenomeBuild: this.idGenomeBuild,
-                setRowDataFn: this.setRowData,
-                datatrackName: this.datatracksService.datatrackListTreeNode.genomeBuildName
-            }
-        });
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "35em";
+        config.autoFocus = false;
+        config.data = {
+            idGenomeBuild: this.idGenomeBuild,
+            setRowDataFn: this.setRowData,
+            datatrackName: this.datatracksService.datatrackListTreeNode.genomeBuildName
+        };
+
+        this.dialogsService.genericDialogContainer(SequenceFilesDialog, "", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Upload", internalAction: "setUpSave"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
 
     }
+
     adjustColumnSize(event:any){
         if(this.gridOpt.api){
             this.gridOpt.api.sizeColumnsToFit();
@@ -180,18 +181,9 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
             }
         });
 
-
         this.gbValidateService.dirtyNote = true;
         this.rowData = tmpRowData;
-
-
     }
-
-
-
-
-
-
 
 }
 
