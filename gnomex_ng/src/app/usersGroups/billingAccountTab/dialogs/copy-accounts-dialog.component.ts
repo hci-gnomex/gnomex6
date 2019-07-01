@@ -4,49 +4,31 @@ import {DateRenderer} from "../../../util/grid-renderers/date.renderer";
 import {DateParserComponent} from "../../../util/parsers/date-parser.component";
 import {TextAlignLeftMiddleRenderer} from "../../../util/grid-renderers/text-align-left-middle.renderer";
 import {CheckboxRenderer} from "../../../util/grid-renderers/checkbox.renderer";
-import {TextAlignRightMiddleRenderer} from "../../../util/grid-renderers/text-align-right-middle.renderer";
 import {SelectRenderer} from "../../../util/grid-renderers/select.renderer";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 
 import * as _ from "lodash";
 import {UploadViewRemoveRenderer} from "../../../util/grid-renderers/upload-view-remove.renderer";
+import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'copy-accounts-dialog',
     templateUrl: './copy-accounts-dialog.component.html',
     styles: [`
-        
-        .vertical-spacer { height: 0.3em; }
-        
-        .fixed-height { height: 30em; }
-        
-        .no-margin  { margin:  0; }
-        .no-padding { padding: 0; }
-
-        .padded { padding: 0.3em; }
-        
-        .padded-left { padding-left: 0.3em; }
-        
-        .right-bottom-left-padded {
-            padding-right:  0.3em;
-            padding-bottom: 0.3em;
-            padding-left:   0.3em;
+        .vertical-spacer {
+            height: 0.3em;
         }
-        
-        .right-align { text-align: right; }
 
-        .header-colors {
-            background-color: #84b278; 
-            color: white;
+        .fixed-height {
+            height: 30em;
         }
-        
-        .background { background-color: #eeeeeb; }
 
-        .small-font { font-size: x-small; }
-        
+        .small-font {
+            font-size: x-small;
+        }
     `]
 })
-export class CopyAccountsDialogComponent implements OnInit {
+export class CopyAccountsDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
     context: any;
 
@@ -66,31 +48,27 @@ export class CopyAccountsDialogComponent implements OnInit {
 
     private internalAccountFieldsConfiguration: any[] = [];
 
-    private includeInCustomField_shortAccount: boolean = false;
+    private readonly creditCardCompanies: any[] = [];
+    private readonly coreFacilities: any[] = [];
 
-    private creditCardCompanies: any[] = [];
-    private coreFacilities: any[] = [];
+    private readonly selectedCoreFacility: any;
 
-    private selectedCoreFacility: any;
-
-    private labInfo: any;
-
-    private saveButtonClicked: boolean = false;
-
+    private readonly labInfo: any;
 
     constructor(private dialogRef: MatDialogRef<CopyAccountsDialogComponent>,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (data) {
             this.labInfo = data.labInfo;
             this.creditCardCompanies = data.creditCardCompanies;
             this.selectedCoreFacility = data.selectedCoreFacility;
             this.coreFacilities = data.coreFacilities;
         }
-        this.saveButtonClicked = false;
     }
 
     ngOnInit(): void {
         this.context = this;
+        this.innerTitle = this.selectedCoreFacility ? "Copy Billing Account to " + this.selectedCoreFacility.display : "Copy Billing Account";
     }
 
     // Cell size calculations
@@ -447,7 +425,6 @@ export class CopyAccountsDialogComponent implements OnInit {
     }
 
     onClickSaveButton(): void {
-        this.saveButtonClicked = true;
 
         let chartfieldAccountRowsToCopy: any[] = [];
         let poAccountRowsToCopy: any[] = [];
@@ -476,8 +453,6 @@ export class CopyAccountsDialogComponent implements OnInit {
         }
 
         this.dialogRef.close({
-            saveButtonClicked: true,
-
             chartfieldAccountRowsToCopy: chartfieldAccountRowsToCopy,
             poAccountRowsToCopy:         poAccountRowsToCopy,
             creditCardAccountRowsToCopy: creditCardAccountRowsToCopy

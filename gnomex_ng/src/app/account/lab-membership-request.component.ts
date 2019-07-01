@@ -3,22 +3,36 @@ import {Response} from "@angular/http";
 import {MatDialogRef, MatSnackBar} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
 import {LabMembershipRequestService} from "../services/lab-membership-request.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'lab-membership-request',
-    templateUrl: "./lab-membership-request.component.html",
+    template: `
+        <div class="double-padded full-width">
+            <ag-grid-angular style="width: 460px; height: 400px;"
+                             class="ag-theme-fresh"
+                             [enableFilter]="true"
+                             (gridReady)="this.onLabGridReady($event)"
+                             [rowSelection]="'multiple'"
+                             [rowData]="this.labGridRowData"
+                             [columnDefs]="this.labGridColumnDefs">
+            </ag-grid-angular>
+        </div>
+    `,
 })
 
-export class LabMembershipRequestComponent {
+export class LabMembershipRequestComponent extends BaseGenericContainerDialog {
+    public primaryDisable: (action?: GDAction) => boolean;
     public labGridColumnDefs: any[];
     public labGridRowData: any[];
     private labGridApi: any;
-    public showSpinner: boolean = false;
 
     constructor(private dialogRef: MatDialogRef<LabMembershipRequestComponent>,
                 private labListService: LabListService,
                 private labMembershipRequestService: LabMembershipRequestService,
-                private snackBar: MatSnackBar,) {
+                private snackBar: MatSnackBar) {
+        super();
         this.labGridColumnDefs = [
             {headerName: "Group", field: "name", checkboxSelection: true, headerCheckboxSelection: false, width: 100},
         ];
@@ -34,6 +48,9 @@ export class LabMembershipRequestComponent {
     public onLabGridReady(params: any): void {
         this.labGridApi = params.api;
         this.labGridApi.sizeColumnsToFit();
+        this.primaryDisable = (action) => {
+            return this.labGridApi.getSelectedRows().length < 1;
+        };
     }
 
     public request(): void {
@@ -46,6 +63,7 @@ export class LabMembershipRequestComponent {
             }
             idLabs = idLabs.substring(0, idLabs.lastIndexOf(","));
             this.labMembershipRequestService.requestLabMembership(idLabs).subscribe((response: Response) => {
+                this.showSpinner = false;
                 if (response.status === 200) {
                     let responseJSON: any = response.json();
                     if (responseJSON.result && responseJSON.result === "SUCCESS") {
@@ -56,8 +74,6 @@ export class LabMembershipRequestComponent {
                     }
                 }
             });
-        } else {
-            this.dialogRef.close();
         }
     }
 

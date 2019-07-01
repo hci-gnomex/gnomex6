@@ -1,7 +1,5 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {Component, OnInit} from "@angular/core";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 
 @Component({
@@ -20,9 +18,10 @@ import {Component, OnInit} from "@angular/core";
         }
     `]
 })
-export class AboutComponent implements OnInit {
+export class AboutComponent extends BaseGenericContainerDialog implements OnInit {
 
     constructor() {
+        super();
     }
 
     ngOnInit() {

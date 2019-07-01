@@ -1,24 +1,42 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {Component, Inject, OnInit} from "@angular/core";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {DataTrackService} from "../../../services/data-track.service";
-import {ProgressService} from "../../../home/progress.service";
 import {first} from "rxjs/operators";
-import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-container-dialog";
 
 @Component({
-    templateUrl:'./sequence-files-dialog.component.html',
-    styles:[`        
-        .dirtyWithSave{
-            display: flex;
-            justify-content: space-between;
-            margin-left:auto;
-        }
+    template: `
+        <div class="flex-container-col full-width full-height padded">
+            <div style="background-color: #eeeeeb; border:thin;">
+                <label class="fileContainer">
+                    Select
+                    <input  type="file" (change)="fileChange($event)" style="width: 70%;" accept=".bnib,.fasta" multiple>
+                </label>
+                <div style="height:25em; width:100%; margin-top:0.5em;">
+                    <ag-grid-angular style="width: 100%; height: 100%;" class="ag-theme-fresh"
+                                     [rowData]="rowData"
+                                     [columnDefs]="columnDefs"
+                                     [rowSelection]="'single'"
+                                     [enableSorting]="true"
+                                     [enableColResize]="true"
+                                     [rowDeselection]="true"
+                                     (gridReady)="onGridReady($event)">
+                    </ag-grid-angular>
+                </div>
+            </div>
+            <div style="margin-top: 1em">
+                <mat-progress-bar
+                        color="'primary'"
+                        mode="'determinate'"
+                        [value]="progressVal">
+                </mat-progress-bar>
+            </div>
+        </div>
+    `,
+    styles: [`
         .fileContainer {
             overflow: hidden;
             position: relative;
@@ -50,40 +68,28 @@ import {HttpParams} from "@angular/common/http";
         .fileContainer:hover{
             background: #F3FFFF;
         }
+
         .fileContainer [type=file] {
             cursor: pointer;
-
         }
-        
-        
-        
-        
-        
-        
-        
     `]
 
 })
 
-export class SequenceFilesDialog implements OnInit{
+export class SequenceFilesDialog extends BaseGenericContainerDialog implements OnInit{
     private setSeqGridFunc:any;
     private idGenomeBuild:string;
     private fileInfoList:Array<any> = [];
     private importSeqFilesForm:FormGroup;
-    private progressVal = 0;
+    public progressVal = 0;
     public dtName:string = "";
     private gridApi:any;
-
-
-
-
-
 
     public columnDefs = [
         {
             headerName: "File",
             field: "name",
-            width: 155
+            width: 310
 
         },
         {
@@ -106,14 +112,18 @@ export class SequenceFilesDialog implements OnInit{
     constructor(private dialogRef: MatDialogRef<SequenceFilesDialog>,
                 @Inject(MAT_DIALOG_DATA) private data: any, private fb: FormBuilder,
                 private dialogService: DialogsService,
-                private datatrackService: DataTrackService, private progressService: ProgressService) {
-        this.setSeqGridFunc = data.setRowDataFn;
-        this.idGenomeBuild = data.idGenomeBuild;
-        this.dtName = data.datatrackName;
+                private datatrackService: DataTrackService) {
+        super();
+        if(this.data) {
+            this.setSeqGridFunc = data.setRowDataFn;
+            this.idGenomeBuild = data.idGenomeBuild;
+            this.dtName = data.datatrackName;
+        }
 
     }
 
     ngOnInit(){
+        this.innerTitle = "Upload sequence files for: " + this.dtName;
 
     }
     onGridReady(params){
@@ -145,13 +155,10 @@ export class SequenceFilesDialog implements OnInit{
     }
 
 
-
     setUpSave(){
-
-        this.save(this.fileInfoList,0);
-
-
+        this.save(this.fileInfoList, 0);
     }
+
     save(fileListInfo:Array<any>,idx:number){
 
         if(fileListInfo.length > 0 && idx < this.fileInfoList.length ){
@@ -171,8 +178,7 @@ export class SequenceFilesDialog implements OnInit{
 
                 });
 
-        }
-        else if( idx == this.fileInfoList.length){
+        } else if( idx == this.fileInfoList.length){
             let params:HttpParams = new HttpParams()
                 .set("idGenomeBuild", this.idGenomeBuild);
             this.datatrackService.getGenomeBuild(params).pipe(first()).subscribe( resp =>{
@@ -184,8 +190,6 @@ export class SequenceFilesDialog implements OnInit{
             });
 
         }
-
-
     }
 
 }

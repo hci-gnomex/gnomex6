@@ -2,39 +2,37 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {DictionaryService} from "../services/dictionary.service";
 import {ProtocolService} from "../services/protocol.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'create-protocol-dialog',
-    templateUrl: 'create-protocol-dialog.component.html',
-    styles: [`
-
-        .no-margin  { margin:  0; }
-        .no-padding { padding: 0; }
-        
-        .padded { padding: 0.6em; }
-
-        .right-align {
-            text-align: right;
-        }
-        
-        .header {
-            background-color: #84b278;
-            color: white;
-            display: inline-block;
-        }
-        
-        .background {
-            background-color: #eeeeeb;
-        }
-        
-        .title {
-            font-size: large;
-        }
-    `]
+    template: `
+        <div class="flex-container-col full-width full-height double-padded">
+            <div class="full-width">
+                <mat-form-field class="full-width">
+                    <input  matInput
+                            placeholder="Protocol Name"
+                            [(ngModel)]="protocolName"
+                            required>
+                </mat-form-field>
+            </div>
+            <div *ngIf="protocolClassName && protocolClassName !== 'hci.gnomex.model.AnalysisProtocol'" class="full-width">
+                <custom-combo-box class="full-width" placeholder="Experiment Platform" displayField="display"
+                                  [options]="experimentPlatformList" valueField="codeRequestCategory"
+                                  [(ngModel)]="selectedExperimentPlatformCodeRequestCategory">
+                </custom-combo-box>
+            </div>
+            <div *ngIf="protocolClassName && protocolClassName === 'hci.gnomex.model.AnalysisProtocol'" class="full-width">
+                <custom-combo-box class="full-width" placeholder="Analysis Type" displayField="display"
+                                  [options]="analysisTypeList" valueField="idAnalysisType"
+                                  [(ngModel)]="selectedIdAnalysisType">
+                </custom-combo-box>
+            </div>
+        </div>
+    `,
 })
-export class CreateProtocolDialogComponent implements OnInit {
+export class CreateProtocolDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
-    protected protocolType: string = '';
     protected protocolName: string = '';
 
     protected protocolClassName: string = '';
@@ -50,19 +48,22 @@ export class CreateProtocolDialogComponent implements OnInit {
                 private dictionaryService: DictionaryService,
                 private protocolService: ProtocolService,
                 @Inject(MAT_DIALOG_DATA) private data) {
-        if (data
-            && data.protocolType && data.protocolType !== ''
-            && data.protocolClassName && data.protocolClassName !== '') {
-            this.protocolType = data.protocolType;
+        super();
+        if (data && data.protocolType && data.protocolClassName) {
+            this.innerTitle = "Create New " + data.protocolType;
             this.protocolClassName = data.protocolClassName;
         } else {
-            dialogRef.close();
+            this.dialogRef.close();
         }
 
         this.analysisTypeList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
     }
 
     ngOnInit(): void {
+        this.primaryDisable = (action) => {
+            return !this.protocolName;
+        };
+
         let tempExperimentPlatformList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
         this.experimentPlatformList = tempExperimentPlatformList.filter((experimentPlatform) => {
             if (experimentPlatform && experimentPlatform.isActive && experimentPlatform.isActive === 'Y') {
@@ -88,8 +89,7 @@ export class CreateProtocolDialogComponent implements OnInit {
     }
 
     protected onClickCreateProtocolButton(): void {
-        if (this.protocolName && this.protocolName !== ''
-            && this.protocolClassName && this.protocolClassName !== '') {
+        if (this.protocolName && this.protocolClassName) {
             this.protocolService.saveNewProtocol(this.protocolName, '' + this.selectedExperimentPlatformCodeRequestCategory, this.protocolClassName, '' + this.selectedIdAnalysisType);
         }
     }

@@ -45,6 +45,7 @@ import {TreeModule} from "angular-tree-component";
 import {ServicesModule} from "../services/services.module";
 import {UploadModule} from "../upload/upload.module";
 import {LogoutLoaderComponent} from "./logout-loader-component";
+import {UtilModule} from "../util/util.module";
 
 @NgModule({
     imports: [
@@ -70,7 +71,8 @@ import {LogoutLoaderComponent} from "./logout-loader-component";
         ]),
         TreeModule.forRoot(),
         ServicesModule,
-        UploadModule
+        UploadModule,
+        UtilModule
     ],
     providers: [
        AdvancedSearchService,

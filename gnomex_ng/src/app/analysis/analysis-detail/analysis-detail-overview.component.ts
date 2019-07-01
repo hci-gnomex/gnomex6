@@ -234,8 +234,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
         configuration.data = {
             idAnalysis: this.analysis && this.analysis.idAnalysis ? this.analysis.idAnalysis : ""
         };
-        let pedFileName: string = this.analysis && this.analysis.number ? " -- A" + this.analysis.number + ".ped" : "";
-        this.dialogsService.genericDialogContainer(ManagePedFileWindowComponent, "Manage Ped File" + pedFileName, null, configuration);
+        this.dialogsService.genericDialogContainer(ManagePedFileWindowComponent, null, null, configuration);
     }
 
     save() {

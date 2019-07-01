@@ -1,10 +1,11 @@
-import {Component} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {BroadcastEmailService} from "../services/broadcast-email.service";
 import {Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef} from "@angular/material";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'email-all-users',
@@ -16,10 +17,31 @@ import {AngularEditorConfig} from "@kolkov/angular-editor";
         :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
             display: none;
         }
+
+        .formField {
+            width: 100%;
+            margin: 0.25rem 0;
+        }
+        mat-radio-group.radio {
+            width: 100%;
+            margin: 0.25rem 0;
+        }
+        mat-radio-button.radioOption {
+            margin: 0 0.25rem;
+        }
+        div.formField {
+            width: 100%;
+            margin: 0.25rem 0;
+            display: flex;
+            flex-direction: row;
+        }
+        img.icon {
+            margin-right: 0.5rem;
+        }
     `]
 })
 
-export class EmailAllUsersComponent {
+export class EmailAllUsersComponent extends BaseGenericContainerDialog implements OnInit {
     public readonly SHOW_BODY: string = "b";
     public readonly SHOW_FILE_UPLOAD: string = "f";
 
@@ -41,6 +63,7 @@ export class EmailAllUsersComponent {
     constructor(private dialogRef: MatDialogRef<EmailAllUsersComponent>,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private broadcastEmailService: BroadcastEmailService) {
+        super();
         this.coresFormControl = new FormControl("", Validators.required);
         this.subjectFormControl = new FormControl("", Validators.required);
         this.fromFormControl = new FormControl(this.createSecurityAdvisorService.userEmail, [Validators.required, Validators.email]);
@@ -67,6 +90,10 @@ export class EmailAllUsersComponent {
                 this.uploadURL = result.url;
             }
         });
+    }
+
+    ngOnInit(): void {
+        this.primaryDisable = (action) => this.formGroup.invalid;
     }
 
     public fileChange(event: any): void {

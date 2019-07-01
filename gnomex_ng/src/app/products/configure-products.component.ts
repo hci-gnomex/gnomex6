@@ -7,15 +7,17 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
+import {MatDialogConfig, MatSnackBar} from "@angular/material";
 import {ConfigureProductTypesComponent} from "./configure-product-types.component";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'configure-products',
     templateUrl: "./configure-products.component.html",
-    styles: [`        
+    styles: [`
         .margin-right {
             margin-right: 2rem;
         }
@@ -69,7 +71,7 @@ export class ConfigureProductsComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private snackBar: MatSnackBar,
-                private dialog: MatDialog,
+                private constService: ConstantsService,
                 @Inject(FormBuilder) private fb: FormBuilder) {
         this.productForm = fb.group({
             name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -228,13 +230,15 @@ export class ConfigureProductsComponent implements OnInit {
     }
 
     public openEditProductTypes(): void {
-        let productTypeEditorDialogRef: MatDialogRef<ConfigureProductTypesComponent> =
-            this.dialog.open(ConfigureProductTypesComponent, {
-                width: '1000px',
-            });
-
-        productTypeEditorDialogRef.afterClosed().subscribe(() => {
-            this.loadProducts();
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "60em";
+        config.autoFocus = false;
+        this.dialogsService.genericDialogContainer(ConfigureProductTypesComponent, "Configure Product Types", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe(() => {
+                    this.loadProducts();
         });
     }
 

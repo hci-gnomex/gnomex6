@@ -1,10 +1,5 @@
 <form [formGroup]="formGroup">
-    <div mat-dialog-title class="padded-outer">
-        <div class="dialog-header-colors padded-inner">
-            Edit Library Prep
-        </div>
-    </div>
-    <div mat-dialog-content style="margin: 0; padding: 0;">
+    <div class="flex-container-col full-height full-width">
         <div style="margin: 0.5em;">
             <div class="flex-container-row spaced-children-margin">
                 <mat-form-field  class="medium-form-input">
@@ -90,23 +85,6 @@
                 </div>
 
             </div>
-
-
-
-
-        </div>
-    </div>
-    <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
-        <div class="padded-inner flex-container-row" style="align-items:center" >
-            <div class="flex-grow">
-                <save-footer
-                        [actionType]="applyText"
-                        [disableSave]="formGroup.invalid"
-                        (saveClicked)="applyLibPrepChanges()"
-                        [dirty]="formGroup.dirty" >
-                </save-footer>
-            </div>
-            <button mat-button  mat-dialog-close> Cancel  </button>
         </div>
     </div>
 </form>

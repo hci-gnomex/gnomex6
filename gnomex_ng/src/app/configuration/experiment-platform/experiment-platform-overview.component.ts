@@ -1,4 +1,4 @@
-import { Component, ComponentRef, OnDestroy, OnInit } from "@angular/core";
+import {Component, ComponentRef, OnDestroy, OnInit} from "@angular/core";
 import {GridOptions} from "ag-grid-community/main";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {ConstantsService} from "../../services/constants.service";
@@ -8,7 +8,7 @@ import {EpSampleTypeTabComponent} from "./ep-sample-type-tab.component";
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
-import {MatDialog, MatDialogConfig,MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {IconTextRendererComponent} from "../../util/grid-renderers";
 import {EpPipelineProtocolTabComponent} from "./ep-pipeline-protocol-tab.component";
@@ -24,6 +24,7 @@ import {FormGroup} from "@angular/forms";
 import {DictionaryService} from "../../services/dictionary.service";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -191,8 +192,12 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         config.data = {
             addFn: this.addedFn
         };
-        config.panelClass = "no-padding-dialog";
-        this.dialog.open(AddExperimentPlatformDialogComponent,config);
+        config.autoFocus = false;
+        this.dialogService.genericDialogContainer(AddExperimentPlatformDialogComponent, "Add Experiment Platform", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "saveChanges"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
 
     }
     removePlatform(){

@@ -1,29 +1,26 @@
-import {AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig, MatDialog} from "@angular/material";
+import {Component, Inject, OnInit} from "@angular/core";
+import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {GridApi, CellValueChangedEvent} from "ag-grid-community";
-import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
+import {CellValueChangedEvent, GridApi} from "ag-grid-community";
 import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {QcAssayChipTypeDialogComponent} from "./qc-assay-chip-type-dialog.component";
 import * as _ from "lodash";
 import {numberRange} from "../../util/validators/number-range-validator";
 import {first} from "rxjs/operators";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 
 @Component({
     template: `
-        <div class="full-height full-width flex-container-col" style="font-size: small">
-            <div mat-dialog-title class="padded-outer">
-                <div class="dialog-header-colors padded-inner">
-                    Edit QC Assay
-                </div>
-            </div>
-            <div class="padded-outer flex-grow" mat-dialog-content>
+        <div class="full-height full-width flex-container-col small-font double-padded">
+
+            <div class="padded-outer flex-grow">
                 <form class="full-height full-width padded-inner flex-container-col"  [formGroup]="formGroup">
                     <div  class="flex-container-row align-center spaced-children-margin" >
                         <mat-form-field class="medium-form-input">
@@ -97,23 +94,10 @@ import {first} from "rxjs/operators";
                     </div>
                 </form>
             </div>
-            <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
-                <div class="padded-inner flex-container-row" style="align-items:center" >
-                    <div class="flex-grow">
-                        <save-footer [name]="applyText"
-                                     [disableSave]="formGroup.invalid"
-                                     (saveClicked)="applyChanges()"
-                                     [dirty]="formGroup.dirty" >
-                        </save-footer>
-                    </div>
-                    <button mat-button  mat-dialog-close> Cancel  </button>
-                </div>
-            </div>
-        </div>
 
+        </div>
     `,
     styles: [`
-
         .padded-outer{
             margin:0;
             padding:0;
@@ -125,19 +109,11 @@ import {first} from "rxjs/operators";
         .medium-form-input{
             width: 30em
         }
-        .fixed-content-height{
-            height: 400px;
-        }
-
-
-
-
     `]
 })
-export class QcAssayDialogComponent implements OnInit{
+export class QcAssayDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
     applyFn:any;
-    applyText:string = "Apply";
     formGroup:FormGroup;
     rowData:any;
     private expPlatform:any;
@@ -232,13 +208,14 @@ export class QcAssayDialogComponent implements OnInit{
 
 
     constructor(private dialogRef: MatDialogRef<QcAssayDialogComponent>,
-                public constService:ConstantsService, private fb: FormBuilder,
+                public constService: ConstantsService,
+                private fb: FormBuilder,
                 private expPlatformService: ExperimentPlatformService,
                 private gnomexService: GnomexService,
-                private dialog: MatDialog,
                 private dictionaryService: DictionaryService,
-                private dialogService:DialogsService,
+                private dialogService: DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (this.data) {
             this.rowData = this.data.rowData;
             this.expPlatform = this.data.expPlatform;
@@ -287,6 +264,10 @@ export class QcAssayDialogComponent implements OnInit{
         if(hideWellPerChip && hideWellPerChip === 'Y'){
             this.columnDefs.splice(2,1);
         }
+
+        this.formGroup.markAsPristine();
+        this.primaryDisable = (action) => {return this.formGroup.invalid; };
+        this.dirty = () => {return this.formGroup.dirty; };
 
     }
 
@@ -355,15 +336,19 @@ export class QcAssayDialogComponent implements OnInit{
 
     };
     openAssayEditor(){
-        let config: MatDialogConfig = new MatDialogConfig();
         if(this.selectedAssay.length > 0){
+            let config: MatDialogConfig = new MatDialogConfig();
             config.data = {
                 rowData: this.selectedAssay[0],
                 applyFn: this.applyAssayFn,
                 expPlatform: this.expPlatform
             };
-            config.panelClass = "no-padding-dialog";
-            this.dialog.open(QcAssayChipTypeDialogComponent,config);
+
+            this.dialogService.genericDialogContainer(QcAssayChipTypeDialogComponent, "Edit QC Assay", null, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Apply", internalAction: "applyChanges"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
         }
 
     }

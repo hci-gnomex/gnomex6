@@ -1,18 +1,12 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
+import {Component, Inject, OnInit} from "@angular/core";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {WorkflowService} from "../services/workflow.service";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {HttpParams} from "@angular/common/http";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {GridApi} from 'ag-grid-community/dist/lib/gridApi';
-import {ColDef, GridReadyEvent, RowDoubleClickedEvent, RowSelectedEvent} from "ag-grid-community";
-import {ActionType, GDAction, GDActionConfig} from "../util/interfaces/generic-dialog-action.model";
+import {GridApi} from "ag-grid-community/dist/lib/gridApi";
+import {GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {LabListService} from "../services/lab-list.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
@@ -65,7 +59,6 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
                 public constService: ConstantsService,
                 public analysisService: AnalysisService,
                 public preferenceService: UserPreferencesService,
-                private dialog: MatDialog,
                 private dictionaryService: DictionaryService,
                 @Inject(MAT_DIALOG_DATA) private data: any
     ) {

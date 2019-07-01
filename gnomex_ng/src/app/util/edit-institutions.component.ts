@@ -5,12 +5,12 @@ import {DictionaryService} from "../services/dictionary.service";
 import {GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {DialogsService} from "./popup/dialogs.service";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 
 @Component({
     selector: "edit-institutions",
     template: `
-        <h6 mat-dialog-title>Edit Institutions</h6>
-        <div mat-dialog-content class="content-div">
+        <div class="content-div">
             <div class="flex-container-row align-center">
                 <button mat-button (click)="this.addInstitution()">
                     <img [src]="this.constantsService.PAGE_ADD" class="icon">Add Institution
@@ -31,11 +31,6 @@ import {DialogsService} from "./popup/dialogs.service";
                 </ag-grid-angular>
             </div>
         </div>
-        <mat-dialog-actions class="justify-flex-end">
-            <mat-spinner *ngIf="showSpinner" [strokeWidth]="3" [diameter]="30"></mat-spinner>
-            <save-footer (saveClicked)="this.save()" [dirty]="this.isDirty"></save-footer>
-            <button mat-button [disabled]="this.showSpinner" mat-dialog-close>Close</button>
-        </mat-dialog-actions>
     `,
     styles: [`
         div.content-div {
@@ -47,9 +42,8 @@ import {DialogsService} from "./popup/dialogs.service";
     `]
 })
 
-export class EditInstitutionsComponent implements OnInit {
+export class EditInstitutionsComponent extends BaseGenericContainerDialog implements OnInit {
 
-    public showSpinner: boolean = false;
     public isDirty: boolean = false;
     public columnDefs: any[];
     public institutions: any[] = [];
@@ -61,6 +55,7 @@ export class EditInstitutionsComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private dialogRef: MatDialogRef<EditInstitutionsComponent>) {
+        super();
     }
 
     ngOnInit(): void {
@@ -87,6 +82,8 @@ export class EditInstitutionsComponent implements OnInit {
                 width: 100,
             },
         ];
+
+        this.primaryDisable = (action) => !this.isDirty;
     }
 
     public onGridReady(event: GridReadyEvent): void {
@@ -127,9 +124,6 @@ export class EditInstitutionsComponent implements OnInit {
     }
 
     public save(): void {
-        if (this.showSpinner) {
-            return;
-        }
         this.showSpinner = true;
         this.dictionaryService.saveInstitutions(this.institutions).subscribe((result: any) => {
             if (result.unremovableInstitutions) {

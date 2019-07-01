@@ -1,9 +1,12 @@
 import {AfterViewInit, Component, OnInit} from "@angular/core";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {Router} from "@angular/router";
 import {ReportProblemComponent} from "./report-problem.component";
 import {GnomexService} from "../../services/gnomex.service";
 import * as html2canvas from 'html2canvas';
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../../services/constants.service";
 
 @Component({
     selector: 'report-problem-launcher',
@@ -11,25 +14,21 @@ import * as html2canvas from 'html2canvas';
 })
 
 export class CreateReportProblemLauncherComponent implements OnInit, AfterViewInit {
-    reportProblemDialogRef: MatDialogRef<ReportProblemComponent>;
     private smallImgData: any;
     private bigImgData: any;
 
-    constructor(private dialog: MatDialog, private router: Router,
+    constructor(private dialogsService: DialogsService,
+                private router: Router,
                 private gnomexService: GnomexService,
-    ) {
-        var elems = document.body.querySelectorAll("tree-viewport");
+                private constService: ConstantsService) {
+        let elems = document.body.querySelectorAll("tree-viewport");
         let myElement = <HTMLElement[]><any>document.querySelectorAll('tree-viewport');
 
-        var i;
-        for (i = 0; i < myElement.length; ++i) {
+        for (let i = 0; i < myElement.length; ++i) {
             myElement[i].style.overflow = "hidden";
         }
     }
 
-    /**
-     *
-     */
     ngOnInit() {
         html2canvas(document.body).then( canvas => {
             let littleCanvas = document.createElement("canvas");
@@ -50,23 +49,22 @@ export class CreateReportProblemLauncherComponent implements OnInit, AfterViewIn
             this.bigImgData = bigCanvas.toDataURL("image/png");
 
             setTimeout(() => {
-                this.reportProblemDialogRef = this.dialog.open(ReportProblemComponent, {
-
-                    data: {
-                        labList: this.gnomexService.submitRequestLabList,
-                        items: [],
-                        selectedLabItem: '',
-                        smallImgData: this.smallImgData,
-                        bigImgData: this.bigImgData,
-                    }
-                })
-                this.reportProblemDialogRef.afterClosed()
-                    .subscribe(result => {
-                        console.log("after close");
-                        this.router.navigate([{outlets: {modal: null}}]);
-                    })
-
-
+                let config: MatDialogConfig = new MatDialogConfig();
+                config.width = "45em";
+                config.data = {
+                    labList: this.gnomexService.submitRequestLabList,
+                    items: [],
+                    selectedLabItem: "",
+                    smallImgData: this.smallImgData,
+                    bigImgData: this.bigImgData,
+                };
+                this.dialogsService.genericDialogContainer(ReportProblemComponent, "Send Email to GNomEx Team", this.constService.EMAIL_GO_LINK, config,
+                    {actions: [
+                            {type: ActionType.PRIMARY, icon: this.constService.EMAIL_GO_LINK, name: "Send Email", internalAction: "send"},
+                            {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                        ]}).subscribe((result: any) => {
+                            this.router.navigate([{outlets: {modal: null}}]);
+                    });
             });
         });
     }
@@ -76,11 +74,10 @@ export class CreateReportProblemLauncherComponent implements OnInit, AfterViewIn
     }
 
     ngOnDestroy(): void {
-        var elems = document.body.querySelectorAll("tree-viewport");
+        let elems = document.body.querySelectorAll("tree-viewport");
         let myElement = <HTMLElement[]><any>document.querySelectorAll('tree-viewport');
 
-        var i;
-        for (i = 0; i < myElement.length; ++i) {
+        for (let i = 0; i < myElement.length; ++i) {
             myElement[i].style.overflow = "auto";
         }
     }

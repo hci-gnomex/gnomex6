@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit} from "@angular/core";
 import {MatDialogRef, MAT_DIALOG_DATA, MatDialog} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
-import {FormBuilder,FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
@@ -9,17 +9,13 @@ import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {numberRange} from "../../util/validators/number-range-validator";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 
 @Component({
     template: `
-        <div class="full-height full-width flex-container-col" style="font-size: small">
-            <div mat-dialog-title class="padded-outer">
-                <div class="dialog-header-colors padded-inner">
-                    Edit QC Assay
-                </div>
-            </div>
-            <div class="padded-outer flex-grow" mat-dialog-content>
+        <div class="full-height full-width flex-container-col small-font double-padded-left-right">
+            <div class="flex-grow">
                 <form class="full-height full-width padded-inner flex-container-col"  [formGroup]="formGroup">
                     <div class="flex-container-row spaced-children-margin">
                         <mat-form-field class="medium-form-input">
@@ -38,7 +34,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                             </mat-error>
                         </mat-form-field>
                     </div>
-                    
+
                     <div class="flex-container-row spaced-children-margin">
                         <mat-form-field *ngIf="!hideBufferStrength" class="medium-form-input">
                             <input matInput placeholder="Max Sample Buffer Strength" formControlName="maxSampleBufferStrength">
@@ -50,7 +46,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                             </mat-error>
                         </mat-form-field>
                     </div>
-                    
+
                     <!-- billing  -->
                     <div *ngIf="!this.canEnterPrice || this.createSecurityAdvisorService.isSuperAdmin">
                         <context-help name="ExperimentPlatformQCPricingHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Why can't I edit prices?" popupTitle="Pricing Help" tooltipPosition="right"></context-help>
@@ -83,52 +79,23 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                         <textarea matInput placeholder="Protocol Description" formControlName="protocolDescription" matTextareaAutosize matAutosizeMinRows="15" matAutosizeMaxRows="15">
                         </textarea>
                     </mat-form-field>
-                    
-                    
 
                 </form>
             </div>
-            <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
-                <div class="padded-inner flex-container-row" style="align-items:center" >
-                    <div class="flex-grow">
-                        <save-footer [name]="applyText"
-                                     (saveClicked)="applyChanges()"
-                                     [disableSave]="formGroup.invalid"
-                                     [dirty]="formGroup.dirty" >
-                        </save-footer>
-                    </div>
-                    <button mat-button  mat-dialog-close> Cancel  </button>
-                </div>
-            </div>
         </div>
-
     `,
     styles: [`
-
-        .padded-outer{
-            margin:0;
-            padding:0;
-        }
         .padded-inner{
             padding:0.3em;
-
         }
         .medium-form-input{
             width: 30em
         }
-        .fixed-content-height{
-            height: 400px;
-        }
-
-
-
-
     `]
 })
-export class QcAssayChipTypeDialogComponent implements OnInit{
+export class QcAssayChipTypeDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
     applyFn:any;
-    applyText:string = "Apply";
     formGroup:FormGroup;
     rowData:any;
     expPlatform:any;
@@ -148,6 +115,7 @@ export class QcAssayChipTypeDialogComponent implements OnInit{
                 private dialogService:DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService) {
+        super();
         if (this.data) {
             this.rowData = this.data.rowData;
             this.applyFn = this.data.applyFn;
@@ -181,19 +149,16 @@ export class QcAssayChipTypeDialogComponent implements OnInit{
                 Validators.pattern(this.currencyRegex)
             ],
             protocolDescription: this.rowData.protocolDescription ? this.rowData.protocolDescription : '',
-
-
         });
 
-
+        this.formGroup.markAsPristine();
+        this.primaryDisable = (action) => {return this.formGroup.invalid; };
+        this.dirty = () => {return this.formGroup.dirty; };
     }
-
-
 
     applyChanges(){
         this.applyFn(this.formGroup);
         this.dialogRef.close();
     }
-
 
 }

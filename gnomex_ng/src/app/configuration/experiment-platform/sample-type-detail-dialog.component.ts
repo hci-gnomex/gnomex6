@@ -1,30 +1,26 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
-import { URLSearchParams } from "@angular/http";
-import {ConstantsService} from "../../services/constants.service";
+import {MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
 import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
-
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 
 @Component({
-    templateUrl: "sample-type-detail-dialog.component.html",
-    styles: [`        
-
-            .padded-outer{
-                margin:0;
-                padding:0;
-            }
-            .padded-inner{
-                padding:0.3em;
-
-            }
-           
-
-
-
-    `]
+    template: `
+        <div class="flex-container-col full-width full-height padded">
+            <label class="gx-label" style="margin-bottom:0.5em;" for="experimentDescriptionId" > Notes </label>
+            <jqxEditor
+                    #editorReference
+                    id="experimentDescriptionId"
+                    width="100%"
+                    [height]="300"
+                    [editable]="true"
+                    [tools]="tbarSettings"
+                    [toolbarPosition]="'bottom'">
+            </jqxEditor>
+        </div>
+    `,
 })
-export class SampleTypeDetailDialogComponent implements OnInit, AfterViewInit {
+export class SampleTypeDetailDialogComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
 
     rowData:any;
     applyFn:any;
@@ -37,20 +33,17 @@ export class SampleTypeDetailDialogComponent implements OnInit, AfterViewInit {
 
 
     constructor(private dialogRef: MatDialogRef<SampleTypeDetailDialogComponent>,
-                public constService:ConstantsService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (this.data && this.data.rowData) {
             this.rowData = this.data.rowData;
             this.applyFn = this.data.applyFn;
             this.notes = this.rowData.notes;
-
-
-
         }
     }
 
     ngOnInit(){
-
+       this.innerTitle = this.rowData.display;
     }
 
     ngAfterViewInit(){
@@ -68,13 +61,5 @@ export class SampleTypeDetailDialogComponent implements OnInit, AfterViewInit {
 
         this.dialogRef.close();
     }
-    onCancelClose(){
-        this.dialogRef.close();
-    }
-
-
-
-
-
 
 }
