@@ -247,8 +247,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response;
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showMoreSwitch = true;
@@ -264,8 +264,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response.filter(lab => lab.isMyLab === 'Y');
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .filter(lab => lab.isMyLab === 'Y')
+                        .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
                     }
@@ -304,8 +305,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showMore = true;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response;
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showDateRangePicker = true;
@@ -321,8 +322,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showMoreSwitch = true;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response.filter(lab => lab.isMyLab === 'Y');
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .filter(lab => lab.isMyLab === 'Y')
+                        .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
                     }
@@ -340,8 +342,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showVisibilityCheckboxes = true;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response;
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showOrganismComboBox = true;
@@ -352,8 +354,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showVisibilityCheckboxes = true;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response.filter(lab => lab.isMyLab === 'Y');
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .filter(lab => lab.isMyLab === 'Y')
+                        .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
                     }
@@ -487,15 +490,10 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         }
     }
 
-    onMultiLabSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.multiSelectIdLabs.add(event.args.item.value);
-        }
-    }
-
-    onMultiLabUnselect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.multiSelectIdLabs.delete(event.args.item.value);
+    onMultiLabChange(labs: any[]): void {
+        this.multiSelectIdLabs.clear();
+        for (let lab of labs) {
+            this.multiSelectIdLabs.add(lab);
         }
     }
 
@@ -529,20 +527,21 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             }
             if (this.mode === this.BILLING_BROWSE) {
                 this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
-                    this.labList = response.filter(lab => {
-                        if (lab.coreFacilities.length === undefined && !(lab.coreFacilities.CoreFacility === undefined)) {
-                            return lab.coreFacilities.CoreFacility.idCoreFacility === this.idCoreFacilityString;
-                        } else if (!(lab.coreFacilities.length === undefined)) {
-                            let index: number;
-                            for (index = 0; index < lab.coreFacilities.length; index++) {
-                                if (lab.coreFacilities[index].idCoreFacility === this.idCoreFacilityString) {
-                                    return true;
+                    this.labList = response
+                        .filter(lab => {
+                            if (lab.coreFacilities.length === undefined && !(lab.coreFacilities.CoreFacility === undefined)) {
+                                return lab.coreFacilities.CoreFacility.idCoreFacility === this.idCoreFacilityString;
+                            } else if (!(lab.coreFacilities.length === undefined)) {
+                                let index: number;
+                                for (index = 0; index < lab.coreFacilities.length; index++) {
+                                    if (lab.coreFacilities[index].idCoreFacility === this.idCoreFacilityString) {
+                                        return true;
+                                    }
                                 }
                             }
-                        }
-                        return false;
-                    });
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                            return false;
+                        })
+                        .sort(this.prefService.createLabDisplaySortFunction());
                 });
             }
         } else {

@@ -552,10 +552,8 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (this.experimentsService.modeChangedExperiment && this._experiment && this.experimentsService.modeChangedExperiment.number === this._experiment.number) {
-            if (!changes["editMode"].isFirstChange()) {
-                this.updateForm();
-            }
+        if (this.overviewTabForm) {
+            this.updateForm();
         }
     }
 

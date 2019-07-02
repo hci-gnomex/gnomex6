@@ -82,20 +82,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     @Input('experiment') public set experiment(value: Experiment) {
 
         let newExperiment: boolean = (this._experiment !== value);
-
-        this.dictionaryService.reloadAndRefresh(() => {
-            this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
-
-            if (this.columnProperties) {
-                this.columnProperties = this.columnProperties.filter((a) => {
-                    return a.codeRequestCategory === this._experiment.codeRequestCategory;
-                });
-            } else {
-                this.columnProperties = [];
-            }
-        }, () => {
-            this.dialogService.alert("Error refreshing data from server.", "ERROR:")
-        }, DictionaryService.COLUMN_PROPERTIES);
+        this.getColumnProperties();
 
         this._experiment = value;
 
@@ -130,6 +117,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         if (!this.onChange_codeRequestCategorySubscription) {
             this.onChange_codeRequestCategorySubscription = this._experiment.onChange_codeRequestCategory.subscribe((value) => {
+                this.getColumnProperties();
                 let hide_property = this.propertyService.getProperty(PropertyService.PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
                 this._hideMultiplexGroupColumn = hide_property && hide_property.propertyValue && hide_property.propertyValue === 'Y';
             });
@@ -1652,17 +1640,18 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.confirm();
     }
 
-    private rebuildColumnDefinitions(): void {
-        this.columnProperties = [];
-        this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
-
-        if (this.columnProperties) {
-            this.columnProperties = this.columnProperties.filter((a) => {
-                return this._experiment && a.codeRequestCategory === this._experiment.codeRequestCategory;
+    private getColumnProperties(): void {
+        if (this._experiment && this._experiment.codeRequestCategory) {
+            this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES).filter((cp) => {
+                return this._experiment && cp.codeRequestCategory === this._experiment.codeRequestCategory;
             });
         } else {
             this.columnProperties = [];
         }
+    }
+
+    private rebuildColumnDefinitions(): void {
+        this.getColumnProperties();
 
         let temp: any[]  = this.defaultSampleColumnDefinitions;
 
