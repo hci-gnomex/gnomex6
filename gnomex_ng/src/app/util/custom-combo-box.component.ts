@@ -20,7 +20,9 @@ import {debounceTime} from "rxjs/operators";
     selector: "custom-combo-box",
     template: `
         <mat-form-field class="full-width full-height" [matTooltip]="this.tooltip">
-            <input #input matInput class="full-width full-height" 
+            <input #input matInput class="full-width full-height"
+                   name="customComboBoxFilter"
+                   autocomplete="off"
                    [placeholder]="this.temporaryPlaceholder ? (this.innerControl.value ? '' : this.placeholder) : this.placeholder"
                    [matAutocomplete]="auto" [formControl]="this.innerControl">
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
@@ -60,6 +62,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
 
     private outerControl: AbstractControl = new FormControl();
     public innerControl: FormControl = new FormControl(null);
+    private ignoreInnerControlChanges: boolean = false;
     private innerControlSubscription: Subscription;
     private noNgControl: boolean = false;
 
@@ -88,7 +91,11 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
         }
 
         this.innerControlSubscription = this.innerControl.valueChanges.pipe(debounceTime(300)).subscribe(() => {
-            this.filterOptions();
+            if (!this.ignoreInnerControlChanges) {
+                this.filterOptions();
+            } else {
+                this.ignoreInnerControlChanges = false;
+            }
         });
     }
 
@@ -134,6 +141,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
             }
         }
         if (this.innerControl.value !== newValue) {
+            this.ignoreInnerControlChanges = true;
             this.innerControl.setValue(newValue);
         }
     }
