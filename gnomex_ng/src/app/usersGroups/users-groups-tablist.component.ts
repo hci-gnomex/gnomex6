@@ -1,10 +1,17 @@
-import {AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+    AfterViewChecked,
+    ChangeDetectorRef,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {URLSearchParams} from "@angular/http";
-import {MatDialog, MatDialogConfig, MatDialogRef, MatSnackBar, MatSnackBarConfig} from "@angular/material";
+import {MatDialogConfig, MatSnackBar, MatSnackBarConfig} from "@angular/material";
 
 import {GridOptions} from "ag-grid-community/main";
-import {GridApi, GridReadyEvent, ColDef, RowSelectedEvent} from "ag-grid-community";
+import {ColDef, GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
 
 import {Subscription} from "rxjs";
 
@@ -29,8 +36,8 @@ import {HttpParams} from "@angular/common/http";
 import {PropertyService} from "../services/property.service";
 import {UtilService} from "../services/util.service";
 import {ConstantsService} from "../services/constants.service";
-import {ConfigAnnotationDialogComponent} from "../util/config-annotation-dialog.component";
 import {EditInstitutionsComponent} from "../util/edit-institutions.component";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 /**
  * @title Basic tabs
@@ -79,12 +86,12 @@ import {EditInstitutionsComponent} from "../util/edit-institutions.component";
         
         .reserve-height {
             height:     fit-content;
-            min-height: fit-content; 
+            min-height: fit-content;
         }
         
         .small-width { width: 12em; }
 
-        .horizontal-spacer { 
+        .horizontal-spacer {
             height: 100%;
             width: 0.3em;
         }
@@ -209,11 +216,6 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public showSpinner: boolean = false;
     private isActiveChanged: boolean = false;
     private beingIsActive: boolean = false;
-    private createUserDialogRef: MatDialogRef<NewUserDialogComponent>;
-    private deleteUserDialogRef: MatDialogRef<DeleteUserDialogComponent>;
-    private createGroupDialogRef: MatDialogRef<NewGroupDialogComponent>;
-    private deleteGroupDialogRef: MatDialogRef<DeleteGroupDialogComponent>;
-    private verifyUsersDialogRef: MatDialogRef<VerifyUsersDialogComponent>;
     panelOpenState: boolean = false;
     public externalGroup: boolean = false;
     public groupFormDirty: boolean = false;
@@ -231,12 +233,10 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 private getLabService: GetLabService,
                 private labListService: LabListService,
                 private dictionaryService: DictionaryService,
-                private changeRef:ChangeDetectorRef,
+                private changeRef: ChangeDetectorRef,
                 public prefService: UserPreferencesService,
                 private propertyService: PropertyService,
-                private utilService: UtilService,
-                private dialog: MatDialog
-                ) {
+                private utilService: UtilService) {
         this.columnDefs = [
             {
                 headerName: "",
@@ -873,15 +873,17 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     newUser() {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '20em';
-        configuration.width  = '24em';
+        configuration.width  = '40em';
 
-        this.createUserDialogRef = this.dialog.open(NewUserDialogComponent, configuration);
-        this.createUserDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.createUserDialogRef.componentInstance.rebuildUsers) {
-                    this.buildUsers();
-                }
-            })
+        this.dialogsService.genericDialogContainer(NewUserDialogComponent, "Add User", this.constantsService.ICON_USER, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.buildUsers();
+                    }
+        });
 
     }
 
@@ -895,13 +897,15 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             userName: this.selectedUser[this.prefService.userDisplayField]
         };
 
-        this.deleteUserDialogRef = this.dialog.open(DeleteUserDialogComponent, configuration);
-        this.deleteUserDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.deleteUserDialogRef.componentInstance.rebuildUsers) {
-                    this.buildUsers();
-                }
-            })
+        this.dialogsService.genericDialogContainer(DeleteUserDialogComponent, "Delete User", this.constantsService.ICON_USER, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.buildUsers();
+                    }
+        });
 
     }
 
@@ -1420,11 +1424,16 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     public onEditInstitutions(): void {
-        let dialogRef: MatDialogRef<EditInstitutionsComponent> = this.dialog.open(EditInstitutionsComponent);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.buildInstitutions();
-            }
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.autoFocus = false;
+        this.dialogsService.genericDialogContainer(EditInstitutionsComponent, "Edit Institutions", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.buildInstitutions();
+                    }
         });
     }
 
@@ -1448,15 +1457,17 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     newGroup() {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '35em';
-        configuration.width  = '20em';
+        configuration.width  = '40em';
 
-        this.createGroupDialogRef = this.dialog.open(NewGroupDialogComponent, configuration);
-        this.createGroupDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.createGroupDialogRef.componentInstance.rebuildGroups) {
-                    this.buildLabList();
-                }
-            })
+        this.dialogsService.genericDialogContainer(NewGroupDialogComponent, "Add Group", this.constantsService.ICON_USER, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.buildLabList();
+                    }
+        });
 
     }
 
@@ -1470,13 +1481,15 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             labName: this.selectedGroup[this.prefService.labDisplayField]
         };
 
-        this.deleteGroupDialogRef = this.dialog.open(DeleteGroupDialogComponent, configuration);
-        this.deleteGroupDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.deleteGroupDialogRef.componentInstance.rebuildGroups) {
-                    this.buildLabList();
-                }
-            })
+        this.dialogsService.genericDialogContainer(DeleteGroupDialogComponent, "Delete Group", this.constantsService.ICON_USER, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.buildLabList();
+                    }
+        });
 
     }
 
@@ -1492,10 +1505,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             labName: this.selectedGroup[this.prefService.labDisplayField]
         };
 
-        this.verifyUsersDialogRef = this.dialog.open(VerifyUsersDialogComponent, configuration);
-        this.verifyUsersDialogRef.afterClosed()
-            .subscribe(result => {
-            })
+        this.dialogsService.genericDialogContainer(VerifyUsersDialogComponent, "Send Email",
+            this.constantsService.EMAIL_GO_LINK, configuration, {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "verify"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]});
 
     }
 

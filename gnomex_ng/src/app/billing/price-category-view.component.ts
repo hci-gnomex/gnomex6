@@ -15,7 +15,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
     templateUrl: "./price-category-view.component.html",
     styles: [`
         div.grid-div {
-            height: 145px;
+            height: 10em;
             width: 100%;
         }
     `]

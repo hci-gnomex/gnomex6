@@ -1,7 +1,8 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
-import {MatDialog, MatDialogConfig, MatDialogRef, TooltipPosition} from "@angular/material";
+import {MatDialogConfig, TooltipPosition} from "@angular/material";
 import {ContextHelpPopupComponent} from "./context-help-popup.component";
+import {DialogsService} from "./popup/dialogs.service";
 
 @Component({
     selector: 'context-help',
@@ -32,7 +33,7 @@ export class ContextHelpComponent implements OnInit {
     public tooltip: string = "";
 
     constructor(private dictionaryService: DictionaryService,
-                private dialog: MatDialog) {
+                private dialogsService: DialogsService) {
     }
 
     ngOnInit() {
@@ -56,13 +57,13 @@ export class ContextHelpComponent implements OnInit {
             dictionary: this.dictionary,
             isEditMode: this.isEditMode
         };
-        let dialogRef: MatDialogRef<ContextHelpPopupComponent> = this.dialog.open(ContextHelpPopupComponent, config);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.dictionaryService.reloadAndRefresh(() => {
-                    this.loadDictionary();
-                }, null, DictionaryService.CONTEXT_SENSITIVE_HELP);
-            }
+        this.dialogsService.genericDialogContainer(ContextHelpPopupComponent, "", null, config)
+            .subscribe((result: any) => {
+                if (result) {
+                    this.dictionaryService.reloadAndRefresh(() => {
+                        this.loadDictionary();
+                    }, null, DictionaryService.CONTEXT_SENSITIVE_HELP);
+                }
         });
     }
 

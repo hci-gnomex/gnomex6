@@ -1,8 +1,5 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {Component, Inject, OnInit} from "@angular/core";
+import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {WorkflowService} from "../services/workflow.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
@@ -10,24 +7,20 @@ import {HttpParams} from "@angular/common/http";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {GridApi} from 'ag-grid-community/dist/lib/gridApi';
+import {GridApi} from "ag-grid-community/dist/lib/gridApi";
 import {RowDoubleClickedEvent} from "ag-grid-community";
-import {ActionType, GDAction, GDActionConfig} from "../util/interfaces/generic-dialog-action.model";
+import {ActionType, GDActionConfig} from "../util/interfaces/generic-dialog-action.model";
 import {AddSamplesDialogComponent} from "./add-samples-dialog.component";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
-    selector: 'edit-flowcell-dialog',
+    selector: "edit-flowcell-dialog",
     templateUrl: "./edit-flowcell-dialog.html",
     styles: [`
-        .flex-column-container-workflow {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 100%;
-            width: 100%;
-        }
+
         .flex-row-container {
             display: flex;
             flex-direction: row;
@@ -67,15 +60,12 @@ import {UtilService} from "../services/util.service";
     `]
 })
 
-export class EditFlowcellDialogComponent implements OnInit{
-    private showSpinner: boolean = false;
-    public rebuildFlowCells: boolean = false;
-
+export class EditFlowcellDialogComponent extends BaseGenericContainerDialog implements OnInit{
     private flowCell: any;
     private idFlowCell: string;
-    private sequenceProtocolsList: any[] = [];
-    private flowCellChannels: any[];
-    private instrumentList: any[] = [];
+    public sequenceProtocolsList: any[] = [];
+    public flowCellChannels: any[];
+    public instrumentList: any[] = [];
     private flowCellNumber: string;
     public channel: any;
     public allFG: FormGroup;
@@ -88,17 +78,17 @@ export class EditFlowcellDialogComponent implements OnInit{
 
     private codeSequencingPlatform: string;
 
-    private flowCellColDefs;
+    public flowCellColDefs;
     private assmGridApi:GridApi;
 
     constructor(public dialogRef: MatDialogRef<EditFlowcellDialogComponent>,
-                private workflowService: WorkflowService,
+                public workflowService: WorkflowService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
-                private dialog: MatDialog,
                 private dictionaryService: DictionaryService,
-                @Inject(MAT_DIALOG_DATA) private data: any
-    ) {
+                @Inject(MAT_DIALOG_DATA) private data: any,
+                private constService: ConstantsService) {
+        super();
         this.flowCell = data.flowCell;
         this.barcodeFC = new FormControl("", Validators.required);
         this.runFC = new FormControl("", Validators.required);
@@ -128,6 +118,8 @@ export class EditFlowcellDialogComponent implements OnInit{
         );
         this.setEditForm();
         this.touchFields();
+        this.innerTitle = "Edit Flow Cell" + this.flowCell.number;
+        this.primaryDisable = (action) => !this.allFG.dirty || this.allFG.invalid;
     }
 
     touchFields() {
@@ -316,11 +308,10 @@ export class EditFlowcellDialogComponent implements OnInit{
                 response.flowCellNumber = "";
             }
             this.dialogsService.confirm("Flowcell " + response.flowCellNumber + " created", null);
-            this.rebuildFlowCells = true;
-            this.dialogRef.close();
+            this.dialogRef.close(true);
             this.showSpinner = false;
 
-        },(err:IGnomexErrorResponse) =>{
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }
@@ -332,10 +323,10 @@ export class EditFlowcellDialogComponent implements OnInit{
     launchAddSample(event:RowDoubleClickedEvent) {
         if(event.data){
             let actionConfig : GDActionConfig = {actions: [
-                    {name:"Update", internalAction:"update", type: ActionType.PRIMARY},
+                    {name:"Update", internalAction:"update", type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE},
                     {name: "Cancel", internalAction:"cancel", type: ActionType.SECONDARY}
                 ]};
-            let config:MatDialogConfig = new MatDialogConfig();
+            let config: MatDialogConfig = new MatDialogConfig();
 
             config.data = event.data;
             config.width = "65em";

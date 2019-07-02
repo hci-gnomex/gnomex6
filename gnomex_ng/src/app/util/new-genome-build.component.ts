@@ -15,15 +15,14 @@ import {ConstantsService} from "../services/constants.service";
     selector: 'new-genome-build',
     template: `
         <form [formGroup]="genomeBuildForm" class="full-height full-width flex-container-col double-padded-left-right">
-            <div class="flex-container-row align-center padded">
-                <label class="label label-width">Organism</label>
-                <jqxComboBox class="dialogComboBox" [width]="450"
-                             [placeHolder]="'...'" formControlName="idOrganism"
-                             [source]="das2OrganismList" [displayMember]="'binomialName'"
-                             [valueMember]="'idOrganism'"
-                             (onSelect)="onOrganismSelect($event)"
-                             (onUnselect)="onOrganismUnselect()">
-                </jqxComboBox>
+            <div class="flex-container-row align-center padded full-width">
+                <custom-combo-box class="full-width padded" [options]="this.das2OrganismList"
+                                  placeholder="Organism"
+                                  valueField="idOrganism"
+                                  [displayField]="'binomialName'"
+                                  [formControlName]="'idOrganism'"
+                                  (optionSelected)="onOrganismSelect($event)">
+                </custom-combo-box>
             </div>
             <div class="flex-container-row full-width align-center padded">
                 <mat-form-field class="full-width padded">
@@ -98,19 +97,11 @@ export class NewGenomeBuildComponent extends BaseGenericContainerDialog {
     }
 
     public onOrganismSelect(event: any): void {
-        if (event.args !== undefined && event.args.item != null && event.args.item.value != null) {
-            this.idOrganism = event.args.item.value;
+        if (event) {
+            this.idOrganism = event;
         } else {
-            this.resetOrganismSelection();
+            this.idOrganism = "";
         }
-    }
-
-    public onOrganismUnselect(): void {
-        this.resetOrganismSelection();
-    }
-
-    private resetOrganismSelection(): void {
-        this.idOrganism = "";
     }
 
     public save(): void {

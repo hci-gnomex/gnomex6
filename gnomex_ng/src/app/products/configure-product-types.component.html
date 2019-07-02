@@ -1,5 +1,5 @@
-<h6 mat-dialog-title>Configure Product Types</h6>
-<mat-dialog-content>
+<!--<h6 mat-dialog-title>Configure Product Types</h6>-->
+<div class="flex-container-col full-width full-height padded">
     <div class="flex-container-row margin-bottom">
         <button mat-button (click)="this.addProductType()"><img class="icon" src="../../assets/page_add.png">Add Product Type</button>
         <button mat-button [disabled]="this.selectedProductType == null || this.selectedProductType.canDelete != 'Y'" (click)="this.removeProductType()"><img class="icon" src="../../assets/page_remove.png">Remove Product Type</button>
@@ -37,10 +37,10 @@
             </mat-form-field>
         </form>
     </div>
-</mat-dialog-content>
-<mat-dialog-actions>
-    <button mat-button [hidden]="!this.selectedProductType || this.showSpinner" [disabled]="this.form.invalid" color="primary" (click)="this.save()">Save</button>
-    <button mat-button [hidden]="this.showSpinner" [mat-dialog-close]>Close</button>
-    <span [hidden]="!this.form.dirty || this.showSpinner" class="dirty-note margin-right">Changes Have Not Been Saved</span>
-    <mat-spinner [hidden]="!this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-</mat-dialog-actions>
+</div>
+<!--<mat-dialog-actions>-->
+    <!--<button mat-button [hidden]="!this.selectedProductType || this.showSpinner" [disabled]="this.form.invalid" color="primary" (click)="this.save()">Save</button>-->
+    <!--<button mat-button [hidden]="this.showSpinner" [mat-dialog-close]>Close</button>-->
+    <!--<span [hidden]="!this.form.dirty || this.showSpinner" class="dirty-note margin-right">Changes Have Not Been Saved</span>-->
+    <!--<mat-spinner [hidden]="!this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>-->
+<!--</mat-dialog-actions>-->

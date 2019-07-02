@@ -11,20 +11,12 @@
                 </mat-error>
             </mat-form-field>
             <div style="width:40%">
-                <label for="descriptEditor">Lab</label>
-                <angular-editor>
-
-                </angular-editor>
-                <jqxComboBox id="descriptEditor" width="100%"
-                             #comboBox
-                             [placeHolder]="'Select a lab...'"
-                             [displayMember]="this.prefService.labDisplayField"
-                             [valueMember]="'idLab'"
-                             [height]="20"
-                             [disabled]="secAdvisor.isGuest"
-                             [source]="labList"
-                             (onSelect)="onSelect($event)" (onUnselect)="onUnselect($event)">
-                </jqxComboBox>
+                <custom-combo-box [options]="this.labList"
+                                  placeholder="Lab"
+                                  valueField="idLab"
+                                  [displayField]="this.prefService.labDisplayField"
+                                  [formControl]="this.folderFormGroup.get('lab')">
+                </custom-combo-box>
             </div>
 
         </div>

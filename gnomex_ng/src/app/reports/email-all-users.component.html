@@ -1,16 +1,15 @@
-<h6 mat-dialog-title><img class="icon" src="../../assets/email_go.png">Send Email To All GNomEx Users</h6>
-<mat-dialog-content style="display: flex; flex-direction: column; height: 85%; position: relative">
-    <mat-form-field class="formField">
+<div class="flex-container-col full-width full-height padded">
+    <mat-form-field class="formField padded-left-right">
         <mat-select placeholder="Cores" [formControl]="coresFormControl" multiple>
             <mat-option *ngFor="let core of coreFacilities" [value]="core.idCoreFacility">{{core.display}}</mat-option>
         </mat-select>
         <mat-error *ngIf="coresFormControl.hasError('required')">At least one core facility is required</mat-error>
     </mat-form-field>
-    <mat-form-field class="formField">
+    <mat-form-field class="formField padded-left-right">
         <input matInput placeholder="Subject" [formControl]="subjectFormControl">
         <mat-error *ngIf="subjectFormControl.hasError('required')">Subject is required</mat-error>
     </mat-form-field>
-    <mat-form-field class="formField">
+    <mat-form-field class="formField padded-left-right">
         <input matInput placeholder="From" [formControl]="fromFormControl">
         <mat-error *ngIf="fromFormControl.hasError('required')">From is required</mat-error>
         <mat-error *ngIf="fromFormControl.hasError('email') && !fromFormControl.hasError('required')">Please enter a valid email address</mat-error>
@@ -24,33 +23,7 @@
     </div>
     <div class="formField" *ngIf="bodyType === SHOW_FILE_UPLOAD">
         <input type="file" (change)="fileChange($event)" style="width: 70%;" accept=".txt,.text,.htm,.html">
-        <label *ngIf="fileSize != ''" style="width: 30%;">({{fileSize}} bytes)</label>
+        <label *ngIf="fileSize" style="width: 30%;">({{fileSize}} bytes)</label>
     </div>
-</mat-dialog-content>
-<mat-dialog-actions>
-    <button mat-button *ngIf="!showSpinner" [disabled]="!formGroup.valid" (click)="send()"><img class="icon" src="../../assets/email_go.png">Send Email</button>
-    <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
-    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-</mat-dialog-actions>
-<style>
-    .formField {
-        width: 100%;
-        margin: 0.25rem 0;
-    }
-    mat-radio-group.radio {
-        width: 100%;
-        margin: 0.25rem 0;
-    }
-    mat-radio-button.radioOption {
-        margin: 0 0.25rem;
-    }
-    div.formField {
-        width: 100%;
-        margin: 0.25rem 0;
-        display: flex;
-        flex-direction: row;
-    }
-    img.icon {
-        margin-right: 0.5rem;
-    }
-</style>
+</div>
+

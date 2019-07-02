@@ -366,6 +366,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     private makeNewGenomeBuild(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = "35em";
+        configuration.autoFocus = false;
         configuration.data = {
             selectedItem: this.selectedNode
         };

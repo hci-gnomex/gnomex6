@@ -1,29 +1,29 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {Component, Inject, OnInit} from '@angular/core';
-import {Response, URLSearchParams} from "@angular/http";
+import {Component, Inject, OnInit} from "@angular/core";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {WorkflowService} from "../services/workflow.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
-    selector: 'delete-seqlane-dialog',
-    templateUrl: "./delete-seqlane-dialog.html",
+    selector: "delete-seqlane-dialog",
+    template: `
+        <div class="padded">
+            <p>You are about to delete {{laneLength}} sequence {{laneString}}. <br>Continue?</p>
+        </div>
+    `,
 })
 
-export class DeleteSeqlaneDialogComponent implements OnInit{
-    private showSpinner: boolean = false;
-    public rebuildSeqlanes: boolean = false;
-    private seqLanes: string = "";
-    private laneLength: number;
-    private laneString: string;
+export class DeleteSeqlaneDialogComponent extends BaseGenericContainerDialog implements OnInit{
+
+    public laneLength: number;
+    public laneString: string;
+    private readonly seqLanes: string = "";
 
     constructor(public dialogRef: MatDialogRef<DeleteSeqlaneDialogComponent>,
                 private workflowService: WorkflowService,
-                @Inject(MAT_DIALOG_DATA) private data: any,
-    ) {
+                @Inject(MAT_DIALOG_DATA) private data: any) {
+        super();
         this.seqLanes = data.seqLanes;
         this.laneLength = data.laneLength;
         this.laneString = data.laneString;
@@ -37,11 +37,10 @@ export class DeleteSeqlaneDialogComponent implements OnInit{
         let params: HttpParams = new HttpParams()
             .set("workItemIds", this.seqLanes);
 
-        this.workflowService.deleteWorkItem(params).subscribe((response: Response) => {
+        this.workflowService.deleteWorkItem(params).subscribe((response: any) => {
             this.showSpinner = false;
-            this.rebuildSeqlanes = true;
-            this.dialogRef.close();
-        },(err:IGnomexErrorResponse) => {
+            this.dialogRef.close(true);
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }

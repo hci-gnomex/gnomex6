@@ -1,20 +1,11 @@
-import {
-    Component,
-    ElementRef,
-    HostListener,
-    Inject,
-    OnInit,
-    OnDestroy,
-    ViewChild
-} from "@angular/core";
-import {MatDialogRef, MatDialog, MAT_DIALOG_DATA, DialogPosition} from "@angular/material";
-import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
+import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {AdvancedSearchService} from "./advanced-search.service";
 import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {SpinnerDialogComponent} from "../../util/popup/spinner-dialog.component";
 
 import {TextSelectXorMultiselectEditor} from "../../util/grid-editors/text-select-xor-multiselect.editor";
 import {TextSelectXorMultiselectRenderer} from "../../util/grid-renderers/text-select-xor-multiselect.renderer";
@@ -26,6 +17,9 @@ import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align
 import {DateParserComponent} from "../../util/parsers/date-parser.component";
 import {GnomexService} from "../../services/gnomex.service";
 import {Router} from "@angular/router";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../../services/constants.service";
 
 @Component({
     selector: 'advanced-search-component',
@@ -34,10 +28,6 @@ import {Router} from "@angular/router";
         
         .inline-block { display: inline-block; }
         
-        .full-height { height: 100%; }
-        .full-width  { width:  100%; }
-        
-        .padding     { padding:     0.6em; }
         .padding-top { padding-top: 0.6em; }
         
         .no-margin  { margin:  0; }
@@ -47,25 +37,15 @@ import {Router} from "@angular/router";
         .tr { display: table-row;  }
         .td { display: table-cell; }
         
-        .flex-container { 
+        .flex-container {
             display: flex;
-            flex-direction: column; 
+            flex-direction: column;
         }
         .flex-fill {
             flex: 1;
         }
         
-        .header { 
-            background-color: #84b278; 
-            color: white; 
-            display: inline-block;
-        }
-        .body { 
-            overflow: auto; 
-            font-size: small; 
-        }
-        
-        .body-size { 
+        .body-size {
             min-height: 25em;
             margin: 0.4em 0.4em 0 0.4em;
         }
@@ -81,13 +61,6 @@ import {Router} from "@angular/router";
             color: darkblue;
         }
         
-        .margin    { margin: 0.4em; }
-        
-        .background       { background-color: #eeeeeb; }
-        .light-background { background-color: #ffffff; }
-        
-        .right-aligned { text-align: right; }
-
         .horizontal-rule-container {
             padding: 2px 2px 2px 0;
         }
@@ -110,9 +83,9 @@ import {Router} from "@angular/router";
             height: 0.2em;
         }
         
-        .button-container { 
-            text-align:left; 
-            padding:0.4em; 
+        .button-container {
+            text-align:left;
+            padding:0.4em;
         }
 
         .button-bar {
@@ -134,11 +107,7 @@ import {Router} from "@angular/router";
         }
         
         .grid-container {
-            width:  100%; 
-        }
-        
-        .medium-input {
-            width: 20em;
+            width:  100%;
         }
         
         .fixed-height {
@@ -180,17 +149,12 @@ import {Router} from "@angular/router";
         }
     `]
 })
-export class AdvancedSearchComponent implements OnInit, OnDestroy {
+export class AdvancedSearchComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
     @ViewChild("searchResultsTree") treeComponent: TreeComponent;
-
     @ViewChild('topmostLeftmost') topmostLeftmost: ElementRef;
 
-    originalXClick: number = 0;
-    originalYClick: number = 0;
-
-    protected positionX: number = 0;
-    protected positionY: number = 0;
+    public actionType: any = ActionType ;
 
     readonly ALL_OBJECTS : string = 'ALL_OBJECTS';
     readonly EXPERIMENTS : string = 'EXPERIMENTS';
@@ -201,8 +165,6 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
     readonly MATCH_ALL_TERMS : string = 'MATCH_ALL_TERMS';
     readonly MATCH_ANY_TERM  : string = 'MATCH_ANY_TERM';
-
-    movingDialog: boolean = false;
 
     searchText: string = '';
     searchType: string = this.ALL_OBJECTS;
@@ -239,8 +201,6 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
     private searchResultsSubscription: Subscription;
 
-    private spinnerRef: MatDialogRef<SpinnerDialogComponent>;
-
     private currentlyDisplayedRowData: any|any[] = [];
 
     private visibilityDictionary: any[];
@@ -263,12 +223,12 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     private lastSearchTreeNodesDataTracks:  any[] = [];
     private lastSearchTreeNodesTopics:      any[] = [];
 
-    private numberOfAllObjectResults:  number = 0;
-    private numberOfExperimentResults: number = 0;
-    private numberOfAnalysisResults:   number = 0;
-    private numberOfProtocolResults:   number = 0;
-    private numberOfDataTrackResults:  number = 0;
-    private numberOfTopicResults:      number = 0;
+    public numberOfAllObjectResults:  number = 0;
+    public numberOfExperimentResults: number = 0;
+    public numberOfAnalysisResults:   number = 0;
+    public numberOfProtocolResults:   number = 0;
+    public numberOfDataTrackResults:  number = 0;
+    public numberOfTopicResults:      number = 0;
 
     treeNodes: any[] = [];
     treeOptions: ITreeOptions = { };
@@ -287,65 +247,68 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     private gotTopicSearchList : boolean       = false;
     private gotDictionaryMap : boolean         = false;
 
-    constructor(private dialog: MatDialog,
-                private dialogRef: MatDialogRef<AdvancedSearchComponent>,
+    constructor(private dialogRef: MatDialogRef<AdvancedSearchComponent>,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
                 private advancedSearchService: AdvancedSearchService,
                 private router: Router,
-                @Inject(MAT_DIALOG_DATA) private data) {
+                @Inject(MAT_DIALOG_DATA) private data,
+                public constService: ConstantsService) {
+        super();
         if (data) {
             this.searchText = !!data.searchText ? data.searchText : '';
 
-            if (!!data.searchText) {
+            if (data.searchText) {
                 this.searchAfterLoad = true;
             }
         }
 
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        setTimeout(() => {
+            this.dialogService.startDefaultSpinnerDialog();
 
-        this.allObjectSearchListSubscription = this.advancedSearchService.getAllObjectSearchListObservable().subscribe((list) => {
-            this.allObjectSearchList = list;
-            this.gotAllObjectSearchList = true;
-            this.onSearchTypeChanged();
-        });
-        this.experimentSearchListSubscription = this.advancedSearchService.getExperimentSearchListObservable().subscribe((list) => {
-            this.experimentSearchList = list;
-            this.gotExperimentSearchList = true;
-            this.onSearchTypeChanged();
-        });
-        this.analysisSearchListSubscription = this.advancedSearchService.getAnalysisSearchListObservable().subscribe((list) => {
-            this.analysisSearchList = list;
-            this.gotAnalysisSearchList = true;
-            this.onSearchTypeChanged();
-        });
-        this.protocolSearchListSubscription = this.advancedSearchService.getProtocolSearchListObservable().subscribe((list) => {
-            this.protocolSearchList = list;
-            this.gotProtocolSearchList = true;
-            this.onSearchTypeChanged();
-        });
-        this.dataTrackSearchListSubscription = this.advancedSearchService.getDataTrackSearchListObservable().subscribe((list) => {
-            this.dataTrackSearchList = list;
-            this.gotDataTrackSearchList = true;
-            this.onSearchTypeChanged();
-        });
-        this.topicSearchListSubscription = this.advancedSearchService.getTopicSearchListObservable().subscribe((list) => {
-            this.topicSearchList = list;
-            this.gotTopicSearchList = true;
-            this.onSearchTypeChanged();
-        });
+            this.allObjectSearchListSubscription = this.advancedSearchService.getAllObjectSearchListObservable().subscribe((list) => {
+                this.allObjectSearchList = list;
+                this.gotAllObjectSearchList = true;
+                this.onSearchTypeChanged();
+            });
+            this.experimentSearchListSubscription = this.advancedSearchService.getExperimentSearchListObservable().subscribe((list) => {
+                this.experimentSearchList = list;
+                this.gotExperimentSearchList = true;
+                this.onSearchTypeChanged();
+            });
+            this.analysisSearchListSubscription = this.advancedSearchService.getAnalysisSearchListObservable().subscribe((list) => {
+                this.analysisSearchList = list;
+                this.gotAnalysisSearchList = true;
+                this.onSearchTypeChanged();
+            });
+            this.protocolSearchListSubscription = this.advancedSearchService.getProtocolSearchListObservable().subscribe((list) => {
+                this.protocolSearchList = list;
+                this.gotProtocolSearchList = true;
+                this.onSearchTypeChanged();
+            });
+            this.dataTrackSearchListSubscription = this.advancedSearchService.getDataTrackSearchListObservable().subscribe((list) => {
+                this.dataTrackSearchList = list;
+                this.gotDataTrackSearchList = true;
+                this.onSearchTypeChanged();
+            });
+            this.topicSearchListSubscription = this.advancedSearchService.getTopicSearchListObservable().subscribe((list) => {
+                this.topicSearchList = list;
+                this.gotTopicSearchList = true;
+                this.onSearchTypeChanged();
+            });
 
-        this.dictionaryMapSubscription = this.advancedSearchService.getDictionaryMapObservable().subscribe((list) => {
-            this.dictionaryMap = list;
-            this.gotDictionaryMap = true;
-            this.onSearchTypeChanged();
-        });
+            this.dictionaryMapSubscription = this.advancedSearchService.getDictionaryMapObservable().subscribe((list) => {
+                this.dictionaryMap = list;
+                this.gotDictionaryMap = true;
+                this.onSearchTypeChanged();
+            });
 
-        this.searchResultsSubscription = this.advancedSearchService.getSearchResultObservable().subscribe((results) => {
-            this.processSearchResults(results);
-            this.selectedTabIndex = 1; // Change the tab to the Search Results
-            this.dialogService.stopAllSpinnerDialogs();
+            this.searchResultsSubscription = this.advancedSearchService.getSearchResultObservable().subscribe((results) => {
+                this.processSearchResults(results);
+                this.selectedTabIndex = 1; // Change the tab to the Search Results
+                this.dialogService.stopAllSpinnerDialogs();
+            });
         });
 
         this.visibilityDictionary = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.Visibility");
@@ -355,6 +318,7 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.treeModel = this.treeComponent.treeModel;
     }
+
     ngOnDestroy() {
         this.allObjectSearchListSubscription.unsubscribe();
         this.experimentSearchListSubscription.unsubscribe();
@@ -446,47 +410,6 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
             }
         ];
     }
-
-
-    onMouseDownHeader(event: any): void {
-        if (!event) {
-            return;
-        }
-
-        this.positionX = this.topmostLeftmost.nativeElement.offsetLeft;
-        this.positionY = this.topmostLeftmost.nativeElement.offsetTop;
-
-        this.originalXClick = event.screenX;
-        this.originalYClick = event.screenY;
-
-        this.movingDialog = true;
-    }
-    @HostListener('window:mousemove', ['$event'])
-    onMouseMove(event: any): void {
-        if (!event) {
-            return;
-        }
-
-        if (this.movingDialog) {
-            this.positionX += event.screenX - this.originalXClick;
-            this.positionY += event.screenY - this.originalYClick;
-
-            this.originalXClick = event.screenX;
-            this.originalYClick = event.screenY;
-
-            let newDialogPosition: DialogPosition = {
-                left:   '' + this.positionX + 'px',
-                top:    '' + this.positionY + 'px',
-            };
-
-            this.dialogRef.updatePosition(newDialogPosition);
-        }
-    }
-    @HostListener('window:mouseup', ['$event'])
-    onMouseUp(): void {
-        this.movingDialog = false;
-    }
-
 
     onSearchTypeChanged() {
         if (!this.newSearchGridApi || !this.dictionaryMap) {
@@ -806,45 +729,45 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     }
 
     private onGridAllObjectsButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForAllObjects();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onGridExperimentButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForExperiments();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onGridAnalyisButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForAnalyses();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onGridProtocolButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForProtocols();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onGridDataTrackButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForDataTracks();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onGridTopicButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForTopics();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 
@@ -1264,38 +1187,38 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
 
 
     private onTreeExperimentButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForExperiments();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onTreeAnalyisButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForAnalyses();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onTreeProtocolButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForProtocols();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onTreeDataTrackButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForDataTracks();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     private onTreeTopicButtonClicked(): void {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForTopics();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 
@@ -1923,8 +1846,9 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     onClickSearchButton(): void {
         setTimeout(() => {
             this.resultType = this.searchType;
-            this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+            this.dialogService.startDefaultSpinnerDialog();
             this.advancedSearchService.search(this.searchType, this.searchText, this.currentlyDisplayedRowData, this.matchType);
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     onClickClearButton(): void {
@@ -1954,17 +1878,17 @@ export class AdvancedSearchComponent implements OnInit, OnDestroy {
     }
 
     onClickExpandButton() {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.treeModel.expandAll();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
     onClickCollapseButton() {
-        this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+        this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.treeModel.collapseAll();
-            this.spinnerRef.close();
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 

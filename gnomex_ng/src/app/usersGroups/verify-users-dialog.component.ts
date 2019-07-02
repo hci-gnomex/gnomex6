@@ -1,25 +1,37 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {Component, Inject, OnInit} from '@angular/core';
-import {Response, URLSearchParams} from "@angular/http";
+import {Component, Inject, OnInit} from "@angular/core";
+import {URLSearchParams} from "@angular/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
-    selector: 'verify-users-dialog',
-    templateUrl: "./verify-users-dialog.html",
+    selector: "verify-users-dialog",
+    template: `
+        <div class="padded">
+            <div *ngIf="!idLab;else lab">
+                GNomEx will send an email to all groups to verify the active user accounts.
+                <br>
+                Do you wish to continue?
+            </div>
+            <ng-template #lab>
+                <div>
+                    GNomEx will send an email to {{labName}} to verify the active user accounts.
+                    <br>
+                    Do you wish to continue?
+                </div>
+            </ng-template>
+        </div>
+    `,
 })
 
-export class VerifyUsersDialogComponent implements OnInit{
-    public showSpinner: boolean = false;
-    private idLab: string = "";
-    private labName: string = "";
+export class VerifyUsersDialogComponent extends BaseGenericContainerDialog implements OnInit {
+    public idLab: string = "";
+    public labName: string = "";
 
     constructor(public dialogRef: MatDialogRef<VerifyUsersDialogComponent>,
                 private labListService: LabListService,
-                @Inject(MAT_DIALOG_DATA) private data: any,
-    ) {
+                @Inject(MAT_DIALOG_DATA) private data: any) {
+        super();
         this.idLab = data.idLab;
         this.labName = data.labName;
     }
@@ -35,7 +47,8 @@ export class VerifyUsersDialogComponent implements OnInit{
             params.set("idLab", this.idLab);
         }
 
-        this.labListService.generateUserAccountEmail(params).subscribe((response: Response) => {
+        this.labListService.generateUserAccountEmail(params).subscribe((response: any) => {
+            this.showSpinner = false;
             this.dialogRef.close();
         });
     }

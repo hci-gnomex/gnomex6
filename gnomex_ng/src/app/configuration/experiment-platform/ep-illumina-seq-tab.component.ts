@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
@@ -8,10 +8,10 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
-import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
+import {MatDialogConfig} from "@angular/material";
 import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 //assets/page_add.png
 
@@ -213,9 +213,11 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
 
 
 
-    constructor(private fb:FormBuilder,private expPlatfromService:ExperimentPlatformService,
-                public constService:ConstantsService,private dictionaryService:DictionaryService,
-                private dialog: MatDialog,private dialogService:DialogsService){
+    constructor(private fb: FormBuilder,
+                private expPlatfromService: ExperimentPlatformService,
+                public constService: ConstantsService,
+                private dictionaryService: DictionaryService,
+                private dialogService: DialogsService) {
     }
 
     ngOnInit(){
@@ -307,8 +309,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
 
     };
     openSeqEditor(){
-        let config: MatDialogConfig = new MatDialogConfig();
         if(this.selectedSeqOpt.length > 0){
+            let config: MatDialogConfig = new MatDialogConfig();
             config.data = {
                 rowData: this.selectedSeqOpt[0],
                 applyFn: this.applySeqOptionsFn,
@@ -316,12 +318,14 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
                 cycleList: this.seqCycleList,
                 seqTypeRunList: this.seqTypeRunList
             };
-            config.panelClass = "no-padding-dialog";
-            this.dialog.open(IlluminaSeqDialogComponent,config);
+
+            this.dialogService.genericDialogContainer(IlluminaSeqDialogComponent, "Edit Sequencing Option", null, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Apply", internalAction: "applyChanges"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
 
         }
-
-
 
     }
     addSeqOption(){

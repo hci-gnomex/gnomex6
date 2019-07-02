@@ -1,5 +1,4 @@
-<h6 mat-dialog-title>Contact Us</h6>
-<mat-dialog-content>
+<div class="double-padded">
     <p *ngIf="this.bugContact && this.bugContact.propertyValue">
         <img src="../../assets/bullet_green.png">
         To report software bugs and/or provide feedback: <a href="mailto:{{this.bugContact.propertyValue}}">{{this.bugContact.propertyValue}}</a>
@@ -13,7 +12,4 @@
         <label *ngIf="core.contactPhone" class="margin-left"><i>Phone: </i>{{core.contactPhone}}</label>
         <label *ngIf="core.contactEmail" class="margin-left"><i>Email: </i><a href="mailto:{{this.core.contactEmail}}">{{this.core.contactEmail}}</a></label>
     </div>
-</mat-dialog-content>
-<mat-dialog-actions>
-    <button mat-button [mat-dialog-close]>Close</button>
-</mat-dialog-actions>
+</div>

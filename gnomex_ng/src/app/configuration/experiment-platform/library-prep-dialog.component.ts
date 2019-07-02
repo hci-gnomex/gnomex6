@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig, MatDialog} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {numberRange} from "../../util/validators/number-range-validator";
@@ -9,31 +9,19 @@ import {LibraryPrepProtocolDialogComponent} from "./library-prep-protocol-dialog
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.component";
 import * as _ from "lodash";
-
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 
 @Component({
     templateUrl: "./library-prep-dialog.component.html",
     styles: [`
-
-        .padded-outer{
-            margin:0;
-            padding:0;
-        }
-        .padded-inner{
-            padding:0.3em;
-
-        }
         .medium-form-input{
             width: 30em
         }
-
-
-
-
     `]
 })
-export class LibraryPrepDialogComponent implements OnInit{
+export class LibraryPrepDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
     rowData:any;
     uncomittedRowData:any;
@@ -47,7 +35,6 @@ export class LibraryPrepDialogComponent implements OnInit{
     private _indexFamily:any[];
     readonly currencyRegex = /^[0-9]+\.\d{2}$/;
     public readonly applyText = "Apply";
-    private protocolDialogRef: MatDialogRef<LibraryPrepProtocolDialogComponent>;
 
     get indexFamily(){
         if(!this._indexFamily){
@@ -64,8 +51,8 @@ export class LibraryPrepDialogComponent implements OnInit{
                 private expPlatformService: ExperimentPlatformService,
                 private dictionaryService: DictionaryService,
                 private dialogService:DialogsService,
-                private dialog:MatDialog,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (this.data && this.data.rowData) {
             this.rowData = this.data.rowData;
             this.applyFn = this.data.applyFn;
@@ -102,7 +89,8 @@ export class LibraryPrepDialogComponent implements OnInit{
             this.formGroup.addControl(app.value, new FormControl(app.isSelected === 'Y'))
         }
 
-
+        this.primaryDisable = (action) => {return this.formGroup.invalid; };
+        this.dirty = () => {return this.formGroup.dirty; };
     }
     compareByID(obj1,item2){
         return obj1 && item2 && obj1.value === item2;
@@ -147,9 +135,12 @@ export class LibraryPrepDialogComponent implements OnInit{
                 saveProtocolFn: this.saveProtocolFn
             };
         }
-        config.disableClose = true;
-        config.panelClass = "no-padding-dialog";
-        this.protocolDialogRef =  this.dialog.open(LibraryPrepProtocolDialogComponent,config);
+
+        this.dialogService.genericDialogContainer(LibraryPrepProtocolDialogComponent, "Edit Library Prep", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "saveChanges"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
 
     }
     private applySteps = (core:string, lab:string ) =>{
@@ -168,25 +159,19 @@ export class LibraryPrepDialogComponent implements OnInit{
             applyStepsFn: this.applySteps,
             rowData: this.uncomittedRowData
         };
-        config.disableClose = true;
-        config.panelClass = "no-padding-dialog";
         config.width = '65em';
-        this.dialog.open(LibraryPrepStepsDialogComponent,config);
+
+        this.dialogService.genericDialogContainer(LibraryPrepStepsDialogComponent, "Lib Prep Steps", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Apply", internalAction: "applyChanges"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
 
     }
 
     applyLibPrepChanges(){
         this.applyFn(this.formGroup);
         this.dialogRef.close();
-
     }
-
-
-
-
-
-
-
-
 
 }

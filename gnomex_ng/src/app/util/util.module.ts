@@ -2,7 +2,6 @@ import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
-import {DateRangePickerComponent} from "./date-range-picker.component";
 import {BrowseFilterComponent} from "./browse-filter.component";
 import {ComboBoxModule} from '../../modules/combobox.module';
 import {CalendarModule} from "../../modules/calendar.module";
@@ -69,7 +68,6 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         BrowseFilterComponent,
         DateParserComponent,
         DatePickerComponent,
-        DateRangePickerComponent,
         DateRangeFilterComponent,
         DateRangeFilterPopupComponent,
         DeleteDataTrackComponent,
@@ -121,7 +119,6 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         BillingUsageReportComponent,
         DateParserComponent,
         DatePickerComponent,
-        DateRangePickerComponent,
         DateRangeFilterComponent,
         DeleteDataTrackComponent,
         MenuHeaderBillingComponent,

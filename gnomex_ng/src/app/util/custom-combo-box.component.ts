@@ -20,7 +20,8 @@ import {debounceTime} from "rxjs/operators";
     selector: "custom-combo-box",
     template: `
         <mat-form-field class="full-width full-height" [matTooltip]="this.tooltip">
-            <input #input matInput class="full-width full-height" [placeholder]="this.placeholder"
+            <input #input matInput class="full-width full-height" 
+                   [placeholder]="this.temporaryPlaceholder ? (this.innerControl.value ? '' : this.placeholder) : this.placeholder"
                    [matAutocomplete]="auto" [formControl]="this.innerControl">
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
                               (optionSelected)="this.selectOption($event.option.value)"
@@ -45,6 +46,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     @ViewChild("input") inputElement: ElementRef;
 
     @Input() public placeholder: string = "";
+    @Input() public temporaryPlaceholder: boolean = false;
     @Input() public tooltip: string = "";
     @Input() public allowNone: boolean = true;
     public forceShowNone: boolean = false;

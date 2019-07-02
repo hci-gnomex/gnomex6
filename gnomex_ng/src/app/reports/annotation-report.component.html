@@ -1,19 +1,29 @@
-<h6>Annotation Report</h6>
-<div>
+<h4>Annotation Report</h4>
+<div class="flex-container-row align-center half-width">
     <label style="width: 6rem">Core</label>
-    <jqxComboBox style="display: inline-block" [width]="250" [height]="30" [placeHolder]="'All Cores...'"
-                 [source]="coreList" [displayMember]="'display'" [valueMember]="'idCoreFacility'"
-                 (onSelect)="onCoreSelect($event)" (onUnselect)="onCoreUnselect()">
-    </jqxComboBox>
+    <div class="flex-grow">
+        <custom-combo-box [options]="this.coreList"
+                          placeholder="All Cores..."
+                          [temporaryPlaceholder]="true"
+                          valueField="idCoreFacility"
+                          [displayField]="'display'"
+                          (optionSelected)="onCoreSelect($event)">
+        </custom-combo-box>
+    </div>
 </div>
-<div>
+<div class="flex-container-row align-center half-width">
     <label style="width: 6rem">Lab Group</label>
-    <jqxComboBox style="display: inline-block" [width]="250" [height]="30" [placeHolder]="'All Labs...'"
-                 [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                 (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
-    </jqxComboBox>
+    <div class="flex-grow">
+        <custom-combo-box [options]="this.labList"
+                          placeholder="All Labs..."
+                          [temporaryPlaceholder]="true"
+                          valueField="idLab"
+                          [displayField]="this.prefService.labDisplayField"
+                          (optionSelected)="onLabSelect($event)">
+        </custom-combo-box>
+    </div>
 </div>
-<div>
+<div class="children-margin-right">
     <label style="width: 8rem">Annotations For</label>
     <input [(ngModel)]="annotationsFor" id="samplesRadio" value="SAMPLE" type="radio" name="annotationsForRadio" (change)="onAnnotationsForRadioChange()">
     <label for="samplesRadio">Experiment Samples</label>
@@ -30,7 +40,7 @@
     </jqxComboBox>
 </div>
 <div *ngIf="annotationsFor === FOR_SAMPLES">
-    <date-range-picker-custom [(from)]="dateFromString" [(to)]="dateToString"></date-range-picker-custom>
+    <date-range-filter (onChange)="this.onDateRangeChange($event)"></date-range-filter>
 </div>
 <div>
     <label>Check the annotations you want to see on the report.</label>

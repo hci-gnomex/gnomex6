@@ -1,16 +1,17 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {FormControl} from "@angular/forms";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {DialogsService} from "./popup/dialogs.service";
+import {ConstantsService} from "../services/constants.service";
+import {ActionType} from "./interfaces/generic-dialog-action.model";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 
 @Component({
     selector: 'context-help-popup',
     template: `
-        <h6 mat-dialog-title>{{this.popupTitle}}</h6>
-        <mat-dialog-content>
+        <div class="flex-container-col full-width full-height double-padded">
             <div class="editor-grid">
                 <angular-editor #descEditorRef id="descEditor" [formControl]="descriptionControl" [config]="this.editorConfig">
                 </angular-editor>
@@ -21,13 +22,17 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
                               matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
                 </mat-form-field>
             </div>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button *ngIf="this.isEditMode" color="primary" mat-button (click)="this.save()">Save</button>
-            <button mat-button mat-dialog-close>Close</button>
-        </mat-dialog-actions>
+        </div>
+        <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+            <save-footer *ngIf="this.isEditMode" [icon]="this.constService.ICON_SAVE" (saveClicked)="this.save()" name="Save"></save-footer>
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Cancel"></save-footer>
+        </div>
     `,
-    styles: [`        
+    styles: [`
+        div.editor-grid {
+            width: 35em;
+            height: 25em;
+        }
         :host /deep/ angular-editor #editor {
             resize: none;
         }
@@ -38,7 +43,8 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
     `]
 })
 
-export class ContextHelpPopupComponent implements OnInit {
+export class ContextHelpPopupComponent extends BaseGenericContainerDialog implements OnInit {
+    public actionType: any = ActionType;
 
     private readonly NO_HELP_TEXT: string = "No help available";
     public popupTitle: string = "";
@@ -50,18 +56,21 @@ export class ContextHelpPopupComponent implements OnInit {
     @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
     private tooltipControl: FormControl;
 
-
     constructor(@Inject(MAT_DIALOG_DATA) private data: any,
                 private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService,
                 private dialogsService: DialogsService,
+                public constService: ConstantsService,
                 private dialogRef: MatDialogRef<ContextHelpPopupComponent>) {
+        super();
+        if(this.data) {
+            this.innerTitle = this.data.popupTitle;
+            this.dictionary = this.data.dictionary;
+            this.isEditMode = this.data.isEditMode;
+        }
     }
 
     ngOnInit() {
-        this.popupTitle = this.data.popupTitle;
-        this.dictionary = this.data.dictionary;
-        this.isEditMode = this.data.isEditMode;
 
         this.editorConfig = {
             spellcheck: true,
@@ -110,6 +119,10 @@ export class ContextHelpPopupComponent implements OnInit {
                 }
             });
         }
+    }
+
+    onClose(): void {
+        this.dialogRef.close();
     }
 
 }

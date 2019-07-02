@@ -101,6 +101,8 @@ export class ConstantsService {
     public readonly ICON_PRINTER: string = "assets/printer.png";
     public readonly ICON_EXCLAMATION: string = "assets/exclamation.png";
     public readonly ICON_WORK_AUTH_FORM: string = "assets/work_auth_form.png";
+    public readonly ICON_FLAG_YELLOW: string = "assets/flag_yellow.png";
+    public readonly ICON_USER: string = "assets/user.png";
 
     public readonly ICON_ANALYSIS: string = "assets/map.png";
     public readonly ICON_ANALYSIS_ADD: string = "assets/map_add.png";
@@ -124,6 +126,7 @@ export class ConstantsService {
     public readonly ICON_GROUP: string = "assets/group.png";
     public readonly ICON_CLOSE_BLACK: string = "assets/close_black.png";
     public readonly ICON_GREEN_BULLET: string = "assets/bullet_green.png";
+    public readonly ICON_RED_BULLET: string = "assets/bullet_red.png";
     public readonly ICON_BLUE_FOLDER: string = "assets/blue_folder.png";
     public readonly ICON_FOLDER: string = "assets/folder.png";
     public readonly ICON_FOLDER_NEW: string = "assets/folder_new.png";
@@ -161,6 +164,10 @@ export class ConstantsService {
     public readonly ICON_DATABASE_LIGHTNING: string = "assets/database_lightning.png";
     public readonly ICON_TABLE_MULTIPLE: string = "assets/table_multiple.png";
     public readonly ICON_TAG_BLUE_EDIT: string = "assets/tag_blue_edit.png";
+
+    public readonly ICON_MATERIAL_ARROW_EXPAND: string = "assets/icons8-expand-arrow-24.png";
+    public readonly ICON_MATERIAL_ARROW_COLLAPSE: string = "assets/icons8-collapse-arrow-24.png";
+    public readonly ICON_MATERIAL_FILTER_EDIT: string = "assets/icons8-filter-edit-24.png";
 
     public readonly STATUS_IN_PROGRESS: string = "In Progress";
     public readonly STATUS_COMPLETED: string = "Completed";

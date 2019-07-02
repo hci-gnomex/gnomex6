@@ -1,31 +1,27 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {Component, Inject, OnInit} from "@angular/core";
-import { URLSearchParams } from "@angular/http";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../../services/data-track.service";
-import {ActivatedRoute} from "@angular/router";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
-import {DialogsService} from "../../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-container-dialog";
+import {GDAction} from "../../../util/interfaces/generic-dialog-action.model";
 
 @Component({
-    templateUrl:'./import-segments-dialog.html',
-    styles:[`
-        
-        .buttons-right {
-
-            display: flex;
-            justify-content: space-between;
-            margin-left: auto;
-            margin-top: 1em;
-            margin-bottom: 1em;
-            padding-left: 1em;
-        }
-
+    template: `
+        <form [formGroup]="importSegDialogForm" class="full-width full-height double-padded">
+            <textarea class="simple-textarea" formControlName="segTextArea">
+            </textarea>
+            <p style="text-align: right">
+                Example format:
+                <br>
+                chr1  123415
+                <br>chr2  214
+            </p>
+        </form>
+    `,
+    styles: [`
         .simple-textarea {
             overflow-y: scroll;
             height: 18em;
@@ -37,25 +33,30 @@ import {HttpParams} from "@angular/common/http";
 
 })
 
-export class ImportSegmentsDialog implements OnInit {
-    private parseImport: any;
-    private idGenomeBuild:string;
-    public showSpinner: boolean = false;
-    private importSegDialogForm:FormGroup;
+export class ImportSegmentsDialog extends BaseGenericContainerDialog implements OnInit {
+    public primaryDisable: (action?: GDAction) => boolean;
+    public importSegDialogForm: FormGroup;
+    private readonly parseImport: any;
+    private idGenomeBuild: string;
 
     constructor(private dialogRef: MatDialogRef<ImportSegmentsDialog>,
                 @Inject(MAT_DIALOG_DATA) private data: any, private fb: FormBuilder,
-                private datatrackService: DataTrackService,
-                private dialogService: DialogsService) {
-         this.parseImport = data.importFn;
-         this.idGenomeBuild = data.idGenomeBuild;
-
+                private datatrackService: DataTrackService) {
+        super();
+        if(this.data) {
+            this.parseImport = data.importFn;
+            this.idGenomeBuild = data.idGenomeBuild;
+        }
     }
 
-    ngOnInit(){
-        this.importSegDialogForm= this.fb.group({
-            segTextArea: ['',Validators.required ]
-        })
+    ngOnInit() {
+        this.importSegDialogForm = this.fb.group({
+            segTextArea: ["", Validators.required ]
+        });
+
+        this.primaryDisable = (action) => {
+            return this.importSegDialogForm.invalid;
+        };
 
     }
 
@@ -64,32 +65,28 @@ export class ImportSegmentsDialog implements OnInit {
      * Import segments
      */
 
-    save(value:any){
-
-        let valueStr:string = value.segTextArea;
-        let splitValue:Array<string> =  valueStr.split("\n");
+    save() {
+        this.showSpinner = true;
+        let valueStr: string = this.importSegDialogForm.get("segTextArea").value;
+        let splitValue: Array<string> = valueStr.split("\n");
         let formattedValue:string = splitValue.join(" ");
         let params: HttpParams = new HttpParams()
             .set("idGenomeBuild", this.idGenomeBuild)
             .set("chromosomeInfo", valueStr );
 
-
         this.datatrackService.getImportSegments(params).pipe(first()).subscribe(resp => {
-            let genomeParams:HttpParams = new HttpParams()
+            let genomeParams: HttpParams = new HttpParams()
                 .set("idGenomeBuild", resp.idGenomeBuild);
-            this.datatrackService.getGenomeBuild(genomeParams).pipe(first()).subscribe( resp =>{
-                let segs:Array<any> = <Array<any>>resp.Segments;
+            this.datatrackService.getGenomeBuild(genomeParams).pipe(first()).subscribe( resp => {
+                let segs: Array<any> = <Array<any>>resp.Segments;
                 this.parseImport(segs);
-            })
-        },(err:IGnomexErrorResponse) => {
+                this.showSpinner = false;
+                this.dialogRef.close();
+            });
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
 
-
-
-        if (this.dialogRef != undefined && this.dialogRef.componentInstance != undefined) {
-            this.showSpinner = true;
-        }
-        this.dialogRef.close();
     }
 
 }

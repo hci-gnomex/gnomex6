@@ -15,7 +15,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
     templateUrl: "./price-view.component.html",
     styles: [`
         div.grid-div {
-            height: 200px;
+            height: 15em;
             width: 100%;
         }
         .flex-one {
