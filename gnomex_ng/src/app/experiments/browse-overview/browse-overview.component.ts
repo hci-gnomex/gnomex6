@@ -158,10 +158,14 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
             if(data){//when user selects from the tree
                 let idProject = data['idProject'];
-                params = params.set('idProject',idProject);
+                if(idProject){
+                    params = params.set('idProject',idProject);
+                }
             }else{// Use when user changes to tab to progress
                 let idProject = this.route.snapshot.paramMap.get('idProject');
-                params = params.set('idProject',idProject);
+                if(idProject){
+                    params = params.set('idProject',idProject);
+                }
             }
 
             if(!this.initialized) {

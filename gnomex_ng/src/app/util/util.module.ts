@@ -44,6 +44,7 @@ import {TreeModule} from "angular-tree-component";
 import {EditInstitutionsComponent} from "./edit-institutions.component";
 import {CustomComboBoxComponent} from "./custom-combo-box.component";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 @NgModule({
     imports: [
@@ -59,6 +60,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
             CheckboxRenderer,
         ]),
         RichEditorModule,
+        AngularEditorModule,
         AngularSplitModule,
         TreeModule,
     ],

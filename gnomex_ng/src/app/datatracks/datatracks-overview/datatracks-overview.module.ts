@@ -18,9 +18,10 @@ import {AgGridModule} from "ag-grid-angular";
 import {TabsModule} from "../../util/tabs/tabs.module";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {DATATRACKS_ROUTING} from "../datatracks.routes";
-import {RichEditorModule} from "../../../modules/rich-editor.module";
 import {ComboBoxModule} from "../../../modules/combobox.module";
 import {UtilModule} from "../../util/util.module";
+import {RichEditorModule} from "../../../modules";
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 
 @NgModule({
@@ -34,6 +35,7 @@ import {UtilModule} from "../../util/util.module";
         ReactiveFormsModule,
         ProgressBarModule,
         RichEditorModule,
+        AngularEditorModule,
         ComboBoxModule,
         UtilModule
     ],

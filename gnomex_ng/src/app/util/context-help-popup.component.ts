@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {jqxEditorComponent} from "../../assets/jqwidgets-ts/angular_jqxeditor";
 import {FormControl} from "@angular/forms";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {DialogsService} from "./popup/dialogs.service";
+import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 
 @Component({
     selector: 'context-help-popup',
@@ -12,13 +12,8 @@ import {DialogsService} from "./popup/dialogs.service";
         <h6 mat-dialog-title>{{this.popupTitle}}</h6>
         <mat-dialog-content>
             <div class="editor-grid">
-                <jqxEditor #editorReference
-                           width="100%"
-                           [height]="230"
-                           [editable]="this.isEditMode"
-                           [tools]="this.toolbarSettings"
-                           [toolbarPosition]="'top'">
-                </jqxEditor>
+                <angular-editor #descEditorRef id="descEditor" [formControl]="descriptionControl" [config]="this.editorConfig">
+                </angular-editor>
             </div>
             <div *ngIf="this.isEditMode">
                 <mat-form-field class="full-width">
@@ -32,28 +27,29 @@ import {DialogsService} from "./popup/dialogs.service";
             <button mat-button mat-dialog-close>Close</button>
         </mat-dialog-actions>
     `,
-    styles: [`
-        div.editor-grid {
-            width: 450px;
-            height: 250px;
+    styles: [`        
+        :host /deep/ angular-editor #editor {
+            resize: none;
         }
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
+        
     `]
 })
 
-export class ContextHelpPopupComponent implements OnInit, AfterViewInit {
+export class ContextHelpPopupComponent implements OnInit {
 
     private readonly NO_HELP_TEXT: string = "No help available";
-    private readonly DEFAULT_TOOLBAR_SETTINGS: string = "bold italic underline | format font size | color background | left center right | outdent indent | ul ol | link | clean";
-
     public popupTitle: string = "";
     private dictionary: any;
     public isEditMode: boolean = false;
+    public editorConfig: AngularEditorConfig;
+    public descriptionControl:FormControl;
 
-    public toolbarSettings: string = "";
-    private descriptionControl: FormControl;
+    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
     private tooltipControl: FormControl;
 
-    @ViewChild('editorReference') private editorRef: jqxEditorComponent;
 
     constructor(@Inject(MAT_DIALOG_DATA) private data: any,
                 private httpClient: HttpClient,
@@ -67,23 +63,29 @@ export class ContextHelpPopupComponent implements OnInit, AfterViewInit {
         this.dictionary = this.data.dictionary;
         this.isEditMode = this.data.isEditMode;
 
+        this.editorConfig = {
+            spellcheck: true,
+            height: "15em",
+            enableToolbar: true,
+        };
+
         this.descriptionControl = new FormControl(this.dictionary && this.dictionary.helpText ? this.dictionary.helpText : this.NO_HELP_TEXT);
         this.tooltipControl = new FormControl(this.dictionary && this.dictionary.toolTipText ? this.dictionary.toolTipText : '');
 
         if (this.isEditMode) {
-            this.toolbarSettings = this.DEFAULT_TOOLBAR_SETTINGS;
+            //this.toolbarSettings = this.DEFAULT_TOOLBAR_SETTINGS;
+            this.descEditor.editorToolbar.showToolbar = this.isEditMode;
+            this.descriptionControl.enable();
+
         } else {
+            this.descEditor.editorToolbar.showToolbar = this.isEditMode;
             this.descriptionControl.disable();
             this.tooltipControl.disable();
         }
     }
 
-    ngAfterViewInit() {
-        this.editorRef.val(this.descriptionControl.value);
-    }
 
     public save(): void {
-        this.descriptionControl.setValue(this.editorRef.val() ? this.editorRef.val() : '');
 
         if (this.dictionary) {
             this.cookieUtilService.formatXSRFCookie();
