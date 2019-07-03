@@ -34,7 +34,6 @@ import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-pop
 import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
 import {ContextHelpComponent} from "./context-help.component";
 import {ContextHelpPopupComponent} from "./context-help-popup.component";
-import {RichEditorModule} from "../../modules/rich-editor.module";
 import {DownloadPickerComponent} from "./download-picker.component";
 import {DownloadProgressComponent} from "./download-progress.component";
 import {DownloadFilesComponent} from "./download-files.component";
@@ -58,7 +57,6 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         AgGridModule.withComponents([
             CheckboxRenderer,
         ]),
-        RichEditorModule,
         AngularEditorModule,
         AngularSplitModule,
         TreeModule,

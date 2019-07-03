@@ -7,6 +7,8 @@ import {DialogsService} from "./popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {ActionType} from "./interfaces/generic-dialog-action.model";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {DictionaryService} from "../services/dictionary.service";
 
 @Component({
     selector: 'context-help-popup',
@@ -28,11 +30,7 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
             <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Cancel"></save-footer>
         </div>
     `,
-    styles: [`
-        div.editor-grid {
-            width: 35em;
-            height: 25em;
-        }
+    styles: [`        
         :host /deep/ angular-editor #editor {
             resize: none;
         }
@@ -61,6 +59,7 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
                 private cookieUtilService: CookieUtilService,
                 private dialogsService: DialogsService,
                 public constService: ConstantsService,
+                private dictionaryService: DictionaryService,
                 private dialogRef: MatDialogRef<ContextHelpPopupComponent>) {
         super();
         if(this.data) {
@@ -83,14 +82,17 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
 
         if (this.isEditMode) {
             //this.toolbarSettings = this.DEFAULT_TOOLBAR_SETTINGS;
-            this.descEditor.editorToolbar.showToolbar = this.isEditMode;
             this.descriptionControl.enable();
 
         } else {
-            this.descEditor.editorToolbar.showToolbar = this.isEditMode;
             this.descriptionControl.disable();
             this.tooltipControl.disable();
         }
+        this.descEditor.editorToolbar.showToolbar = this.isEditMode;
+        this.editorConfig.editable = this.isEditMode;
+
+
+
     }
 
 
@@ -109,7 +111,10 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
                 .set("Content-Type", "application/x-www-form-urlencoded");
             this.httpClient.post("/gnomex/UpdateContextSensitiveHelp.gx", params.toString(), {headers: headers}).subscribe((result: any) => {
                 if (result && result.idContextSensitiveHelp) {
-                    this.dialogRef.close(true);
+                    this.dictionaryService.reloadAndRefresh(() =>{
+                        this.dialogRef.close(true);
+                    },null, DictionaryService.CONTEXT_SENSITIVE_HELP)
+
                 } else {
                     let message: string = "";
                     if (result && result.message) {

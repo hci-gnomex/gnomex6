@@ -28,7 +28,6 @@ import {MoveTopicComponent} from "./move-topic.component";
 import {DeleteTopicComponent} from "./delete-topic.component";
 import {TopicDetailComponent} from "./topics-detail.component";
 import {TopicsPanelComponent} from "./topics-panel.component"
-import {RichEditorModule} from "../../modules/rich-editor.module";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
@@ -58,7 +57,6 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         WindowModule,
         ReactiveFormsModule,
         AngularSplitModule,
-        RichEditorModule,
         AngularEditorModule,
     ],
     declarations: [

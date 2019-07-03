@@ -11,7 +11,6 @@ import {AgGridModule} from "ag-grid-angular";
 import {AngularSplitModule} from "angular-split";
 import {BrowseDictionaryComponent} from "./browse-dictionary.component";
 import {ConfigureAnnotationsModule} from "../util/configure-annotations.module";
-import {RichEditorModule} from "../../modules/rich-editor.module";
 import {UtilModule} from "../util/util.module";
 
 import {ConfigCoreFacilityComponent} from "./config-core-facility.component"
@@ -45,7 +44,6 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/
             DateRenderer,
         ]),
         UtilModule,
-        RichEditorModule,
         ReactiveFormsModule,
         AngularSplitModule,
         ExperimentPlatformModule,

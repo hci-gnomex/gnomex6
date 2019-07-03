@@ -12,7 +12,6 @@ import { CheckBoxModule} from "../../modules/checkbox.module";
 import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import { ExpanderModule }     from "../../modules/expander.module";
-import { TreeGridModule } from "../../modules/tree-grid.module";
 import { InputModule } from "../../modules/input.module";
 import { LoaderModule }       from "../../modules/loader.module";
 import { PanelModule }        from "../../modules/panel.module";
@@ -82,7 +81,6 @@ import {ProtocolDialogComponent} from "./experiment-detail/protocol-dialog.compo
 import {ExperimentSequenceLanesTab} from "./experiment-detail/experiment-sequence-lanes-tab";
 import {ManageFilesDialogComponent} from "../util/upload/manage-files-dialog.component";
 import {RelatedDataModule} from "../util/related-data.module";
-import {RichEditorModule} from "../../modules/rich-editor.module";
 import {ManageFilesModule} from "../util/upload/manage-files.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {ExperimentBillingTabComponent} from "./experiment-detail/experiment-billing-tab.component";
@@ -114,12 +112,10 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
         UtilModule,
         WindowModule,
         RelatedDataModule,
-        RichEditorModule,
         ManageFilesModule,
         ReactiveFormsModule,
         DropDownModule,
         AngularMaterialModule,
-        TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
         DynamicModule,

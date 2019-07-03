@@ -20,7 +20,6 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {DATATRACKS_ROUTING} from "../datatracks.routes";
 import {ComboBoxModule} from "../../../modules/combobox.module";
 import {UtilModule} from "../../util/util.module";
-import {RichEditorModule} from "../../../modules";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 
 
@@ -34,7 +33,6 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         FormsModule,
         ReactiveFormsModule,
         ProgressBarModule,
-        RichEditorModule,
         AngularEditorModule,
         ComboBoxModule,
         UtilModule

@@ -77,18 +77,8 @@
 
         <div style="width:80%;">
 
-            <label > Description </label>
-            <jqxEditor #editorReference
-                       [(ngModel)]="description"
-                       (onChange)="changed($event)"
-                       [ngModelOptions]="{standalone: true}"
-                       id="experimentDescriptionId"
-                       width="100%"
-                       [height]="250"
-                       [editable]="edit"
-                       [tools]="toolBarSettings"
-                       [toolbarPosition]="'bottom'">
-            </jqxEditor>
+            <angular-editor #descEditorRef id="descEditor" formControlName="description" [config]="this.editorConfig">
+            </angular-editor>
         </div>
         <div style="width:100%;display:flex;">
 

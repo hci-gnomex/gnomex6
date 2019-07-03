@@ -51,6 +51,7 @@ export class DatatracksSummaryTabComponent implements OnInit,  AfterViewInit{
         this.editorConfig = {
             spellcheck: true,
             height: "25em",
+            minHeight: "10em",
             enableToolbar: true,
         };
 

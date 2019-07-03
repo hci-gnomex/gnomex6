@@ -41,13 +41,13 @@ import {PropertyService} from "../services/property.service";
                     <div class="flex-container-row">
                         <div class="flex-grow">
                         </div>
-                        <div #loadingWindow class="gnomex-splash">
+                        <div class="gnomex-splash">
                             <div class="horizontal-center">
                                 <img [src]=site_logo alt="">
                             </div>
                             <div class="full-width progress-bar-container">
-                                <jqxProgressBar #loadingProgress [width]="270" [height]="15" [value]="10" [colorRanges]="colorRanges">
-                                </jqxProgressBar>
+                                <mat-progress-bar  mode="determinate" [value]="this.loadingProgress">
+                                </mat-progress-bar>
                             </div>
                         </div>
                         <div class="flex-grow">
@@ -59,20 +59,22 @@ import {PropertyService} from "../services/property.service";
             </ng-template>
         </div>
     `,
-    styles: [`        
+    styles: [`
         .horizontal-center { text-align: center; }
-        
+
         .flex-grow-large { flex: 4; }
-        
+
         .multiline { white-space: pre-line; }
-        
+
         .major-padded-right { padding-right: 1em; }
         
+
         .progress-bar-container {
+            width: 90%;
             position: absolute;
             bottom: 5em;
         }
-        
+
         .gnomex-splash {
             background-image: url(../gnomex/assets/gnomex_splash_credits.png);
             width: 19em;
@@ -85,7 +87,7 @@ import {PropertyService} from "../services/property.service";
     encapsulation: ViewEncapsulation.None
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
-    @ViewChild("loadingProgress") loadingProgress: jqxProgressBarComponent;
+    loadingProgress: number = 0;
 
     private showProgressSubscription: Subscription;
     public hideLoader: BehaviorSubject<boolean>;
@@ -101,6 +103,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     public searchText: string;
 
+
+
     constructor(private launchPropertiesService: LaunchPropertiesService,
                 private progressService: ProgressService,
                 private gnomexService: GnomexService,
@@ -113,15 +117,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     ngAfterViewInit() {
         this.showProgressSubscription = this.progressService.loaderStatus.subscribe((value) => {
-            if (this.loadingProgress) {
-                this.loadingProgress.val(value);
-                if (value === 100) {
-                    this.progressService.hideLoaderStatus(true);
-
-                    this.setupUserAndPermissionsStrings();
-                    this.setBulletin();
-                }
+            this.loadingProgress = value;
+            if (value === 100) {
+                this.progressService.hideLoaderStatus(true);
+                this.setupUserAndPermissionsStrings();
+                this.setBulletin();
             }
+
         });
     }
     ngOnInit() {
