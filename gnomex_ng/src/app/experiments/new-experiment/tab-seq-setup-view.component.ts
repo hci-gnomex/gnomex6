@@ -9,6 +9,7 @@ import {BillingService} from "../../services/billing.service";
 import {GnomexService} from "../../services/gnomex.service";
 
 import {Experiment} from "../../util/models/experiment.model";
+import {NewExperimentService} from "../../services/new-experiment.service";
 
 @Component({
     selector: "tabSeqSetupView",
@@ -109,7 +110,26 @@ import {Experiment} from "../../util/models/experiment.model";
 
 export class TabSeqSetupViewComponent implements OnInit {
 
-    @Input("requestCategory") requestCategory: any;
+    @Input("requestCategory") public set requestCategory(value: any) {
+        this._requestCategory = value;
+
+        setTimeout(() => {
+            this.isPreppedContainer = this._experiment
+                && this._experiment.requestCategory
+                && this._experiment.requestCategory.type
+                && this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOSTRING;
+
+            if (!this.showCoreFacilityPrepQuestion) {
+                this.form.get("seqPrepByCore").setValue("YES");
+            }
+        });
+    }
+
+    public get requestCategory(): any {
+        return this._requestCategory;
+    }
+
+    private _requestCategory: any;
 
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
@@ -150,11 +170,14 @@ export class TabSeqSetupViewComponent implements OnInit {
         });
     };
 
+    public get showCoreFacilityPrepQuestion(): boolean {
+        return !this.isPreppedContainer;
+    }
+
     public readonly YES: string = "Y";
     public readonly NO: string  = "N";
     public readonly SEPARATE: string = "separate";
     public readonly POOLED: string = "pooled";
-    public currState: string;
 
     private form: FormGroup;
 
@@ -259,17 +282,39 @@ export class TabSeqSetupViewComponent implements OnInit {
 
     ngOnInit() {
         this.form = this.fb.group({
-            // seqPrepByCore:    [''],
-            seqPrepByCore:    ['', Validators.required],
-            pooledLib:     [''],
-            numTubes:      [''],
-            seqType:       ['', Validators.required],
-            appPrice:      ['', Validators.required],
-            libraryDesign: ['']
-        });
+                // seqPrepByCore:    [''],
+                seqPrepByCore:    ['', Validators.required],
+                pooledLib:     [''],
+                numTubes:      [''],
+                seqType:       ['', Validators.required],
+                appPrice:      ['', Validators.required],
+                libraryDesign: ['']
+            },
+            { validator: TabSeqSetupViewComponent.requireLibraryDesignIfShown }
+        );
 
         this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
         this.setupThemes();
+    }
+
+    private static requireLibraryDesignIfShown(group: FormGroup): { [s:string]: boolean } {
+
+        if (group
+            && group.controls
+            && group.controls["appPrice"]
+            && group.controls["appPrice"].value
+            && group.controls["appPrice"].value.hasCaptureLibDesign
+            && group.controls["appPrice"].value.hasCaptureLibDesign === 'Y'
+            && group.controls["libraryDesign"]
+            && !group.controls["libraryDesign"].value) {
+
+            return {
+                'error': true,
+                'libraryDesignRequiredIfShown': true
+            };
+        }
+
+        return null;
     }
 
 
@@ -349,8 +394,6 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.setupThemes();
         });
 
-        this.isPreppedContainer = !(this.currState === "NanoStringState");
-
         this.libToChange = false;
     }
 
@@ -364,7 +407,17 @@ export class TabSeqSetupViewComponent implements OnInit {
             this._experiment.application_object = application;
 
             //If it is sure select we need to show the library capture id input box
-            this.libToChange = application.hasCaptureLibDesign === 'Y';
+            this.libToChange = application && application.hasCaptureLibDesign === this.YES;
+        }
+    }
+
+    public onLibraryDesignChanged(event: any): void {
+        if (this._experiment
+            && this.form
+            && this.form.get('libraryDesign')
+            && this.form.get('libraryDesign')) {
+
+            this._experiment.captureLibDesignId = this.form.get('libraryDesign').value;
         }
     }
 
