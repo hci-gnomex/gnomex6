@@ -121,6 +121,9 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 && requestCategory.isQCType
                 && requestCategory.isQCType !== 'Y';
 
+            let temp = this.propertyService.getProperty(PropertyService.PROPERTY_ESTIMATED_PRICE_WARNING, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
+            this._estimatedChargesWarning = temp && temp.propertyValue ? temp.propertyValue : '';
+
             this.recalculateShowGenerateQuote();
         });
     }
@@ -175,7 +178,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private experimentAnnotationsSubscription: Subscription;
 
 
-    public totalEstimatedCharges: String = '$-.--';
+    public totalEstimatedCharges: string = '$-.--';
+    private _estimatedChargesWarning: string = '';
 
     private tabIndexToInsertAnnotations: number;
 
@@ -184,6 +188,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private propertyList: any[];
     private sequenceLanes: any[];
 
+
+    public get estimatedChargesWarning(): string {
+        return this._estimatedChargesWarning ? this._estimatedChargesWarning : '';
+    }
 
     public get labName(): string {
         if (this._experiment && this._experiment._labName_notReturned) {

@@ -32,12 +32,15 @@
     <input [(ngModel)]="annotationsFor" id="dataTracksRadio" value="DATATRACK" type="radio" name="annotationsForRadio" (change)="onAnnotationsForRadioChange()">
     <label for="dataTracksRadio">Data Tracks</label>
 </div>
-<div *ngIf="annotationsFor === FOR_SAMPLES">
+<div *ngIf="annotationsFor === FOR_SAMPLES" class="flex-container-row align-center half-width">
     <label style="width: 11rem">Experiment Platform(s)</label>
-    <jqxComboBox #requestCategoryCombo style="display: inline-block" [width]="400" [multiSelect]="true"
-                 [source]="requestCategoryList" [displayMember]="'display'" [valueMember]="'codeRequestCategory'"
-                 (onSelect)="onRequestCategorySelect($event)" (onUnselect)="onRequestCategoryUnselect($event)">
-    </jqxComboBox>
+    <div class="flex-grow">
+        <custom-multi-combo-box [options]="this.requestCategoryList"
+                                displayField="display"
+                                valueField="codeRequestCategory"
+                                [(ngModel)]="this.codeRequestCategories">
+        </custom-multi-combo-box>
+    </div>
 </div>
 <div *ngIf="annotationsFor === FOR_SAMPLES">
     <date-range-filter (onChange)="this.onDateRangeChange($event)"></date-range-filter>

@@ -26,14 +26,17 @@ import {MatSelect} from "@angular/material";
                        [placeholder]="this.temporaryPlaceholder ? (this.outerControl.value && this.outerControl.value.length ? '' : this.placeholder) : this.placeholder"
                        [formControl]="this.innerControl">
             </mat-form-field>
-            <mat-select #select [multiple]="true"
-                        (selectionChange)="this.selectOptions($event.value)"
-                        (openedChange)="this.onOpenedChange($event)">
-                <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">
-                    {{this.displayField ? opt[this.displayField] : opt}}
-                </mat-option>
-                <mat-option *ngIf="this.includeLoadingOption">Loading...</mat-option>
-            </mat-select>
+            <div>
+                <mat-select #select [multiple]="true"
+                            (selectionChange)="this.selectOptions($event.value)"
+                            (openedChange)="this.onOpenedChange($event)">
+                    <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">
+                        {{this.displayField ? opt[this.displayField] : opt}}
+                    </mat-option>
+                    <mat-option *ngIf="this.includeLoadingOption">Loading...</mat-option>
+                    <mat-option *ngIf="!this.includeLoadingOption && !this.options.length">None</mat-option>
+                </mat-select>
+            </div>
         </div>
     `,
     styles: [`
@@ -194,7 +197,9 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
     public selectOptions(options: any[]): void {
         let newVal: any[] = [];
         for (let opt of options) {
-            newVal.push(this.valueField ? opt[this.valueField] : opt);
+            if (opt) {
+                newVal.push(this.valueField ? opt[this.valueField] : opt);
+            }
         }
         if (this.noNgControl) {
             this.outerControl.setValue(newVal);

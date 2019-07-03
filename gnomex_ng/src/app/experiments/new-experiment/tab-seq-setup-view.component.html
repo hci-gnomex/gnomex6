@@ -1,7 +1,7 @@
 <div class="full-width full-height double-padded">
     <form [formGroup]="form" class="full-width full-height">
         <ol class="flex-container-col full-width full-height three-depth-numbering small-font">
-            <li *ngIf="isPreppedContainer" class="">
+            <li *ngIf="showCoreFacilityPrepQuestion" class="">
                 <div class="full-width">
                     <div class="flex-container-row">
                         <div class="heading">
@@ -29,7 +29,7 @@
                                     </mat-radio-button>
                                     <mat-radio-button [value]="POOLED">
                                         Libraries will be pre-pooled prior to drop off at the core facility and will be submitted in
-                                        <mat-form-field class="special-width" [floatLabel]="'auto'">
+                                        <mat-form-field class="special-width">
                                             <input matInput
                                                    formControlName="numTubes"
                                                    placeholder="< a number of >"
@@ -86,15 +86,14 @@
                             </div>
                         </mat-radio-group>
                         <div *ngIf="showLibraryDesign" class="full-height flex-grow">
-                            <mat-form-field class="short-width padding double-left-padded" [floatLabel]="'auto'">
-                                <input matInput formControlName="libraryDesign" placeholder="Capture Library Design ID." required>
+                            <mat-form-field class="short-width padding double-left-padded">
+                                <input matInput formControlName="libraryDesign" placeholder="Capture Library Design ID."
+                                       (change)="onLibraryDesignChanged($event)">
                             </mat-form-field>
                         </div>
                     </div>
                 </div>
             </li>
         </ol>
-
-
     </form>
 </div>

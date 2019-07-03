@@ -3,7 +3,6 @@ import {URLSearchParams} from "@angular/http";
 
 import {LabListService} from "../services/lab-list.service";
 import {GetLabService} from "../services/get-lab.service";
-import {jqxComboBox} from "jqwidgets-framework";
 import {AppUserListService} from "../services/app-user-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ExperimentsService} from "../experiments/experiments.service";
@@ -65,10 +64,6 @@ import {ConstantsService} from "../services/constants.service";
             align-items: center;
             width: 11em;
             padding-left: 0.5em;
-        }
-
-        jqxComboBox.inlineComboBox {
-            display: inline-block;
         }
 
         div.divider {

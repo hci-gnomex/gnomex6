@@ -13,7 +13,6 @@ import {ExperimentsService} from "./experiments.service";
 import {
     jqxButtonComponent,
     jqxCheckBoxComponent,
-    jqxComboBoxComponent,
     jqxLoaderComponent,
     jqxNotificationComponent,
     jqxWindowComponent,
