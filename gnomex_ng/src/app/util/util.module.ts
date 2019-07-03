@@ -43,6 +43,7 @@ import {TreeModule} from "angular-tree-component";
 import {EditInstitutionsComponent} from "./edit-institutions.component";
 import {CustomComboBoxComponent} from "./custom-combo-box.component";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
+import {CustomMultiComboBoxComponent} from "./custom-multi-combo-box.component";
 
 @NgModule({
     imports: [
@@ -92,6 +93,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         CustomComboBoxComponent,
+        CustomMultiComboBoxComponent,
         GuestTermsDialogComponent,
     ],
     entryComponents: [
@@ -142,6 +144,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         CustomComboBoxComponent,
+        CustomMultiComboBoxComponent,
         GuestTermsDialogComponent,
     ]
 })

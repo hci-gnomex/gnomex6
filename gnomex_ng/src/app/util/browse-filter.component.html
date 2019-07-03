@@ -157,10 +157,11 @@
         </div>
         <div class="inlineDiv" *ngIf="showLabMultiSelectComboBox">
             <label class="leading-label">Group(s)</label>
-            <jqxComboBox class="inlineComboBox" [width]="220" [multiSelect]="true"
-                         [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                         (onSelect)="onMultiLabSelect($event)" (onUnselect)="onMultiLabUnselect($event)">
-            </jqxComboBox>
+            <custom-multi-combo-box [options]="labList"
+                                    [displayField]="this.prefService.labDisplayField"
+                                    [valueField]="'idLab'"
+                                    (selectionChanged)="onMultiLabChange($event)">
+            </custom-multi-combo-box>
         </div>
         <custom-combo-box *ngIf="showExperimentsRadioGroup && showLabMembersComboBox && experimentsRadioString == 'myLab'"
                           [options]="this.labMembersList"
