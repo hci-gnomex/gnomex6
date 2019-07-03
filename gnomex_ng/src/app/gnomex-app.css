@@ -97,10 +97,6 @@ div.dialogDiv {
     margin: 0.4rem 0rem;
 }
 
-jqxComboBox.dialogComboBox {
-    display: inline;
-}
-
 div.sidenav {
     transition: 0.5s;
     padding: 1% 0;

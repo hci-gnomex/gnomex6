@@ -42,8 +42,8 @@ import {TreeModule} from "angular-tree-component";
 import {EditInstitutionsComponent} from "./edit-institutions.component";
 import {CustomComboBoxComponent} from "./custom-combo-box.component";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
+import {CustomMultiComboBoxComponent} from "./custom-multi-combo-box.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
-
 @NgModule({
     imports: [
         BrowserModule,
@@ -92,6 +92,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         CustomComboBoxComponent,
+        CustomMultiComboBoxComponent,
         GuestTermsDialogComponent,
     ],
     entryComponents: [
@@ -142,6 +143,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         CustomComboBoxComponent,
+        CustomMultiComboBoxComponent,
         GuestTermsDialogComponent,
     ]
 })

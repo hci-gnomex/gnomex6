@@ -16,7 +16,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.model";
 import {ConfigureOrganismsComponent} from "../configuration/configure-organisms.component";
-import jqxComboBox = jqwidgets.jqxComboBox;
 
 @Component({
     selector: "create-analysis-dialog",
@@ -74,7 +73,6 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     private analysisLabList: any[] = [];
     private idOrganism: string;
     private organism: any;
-    private genomBuilds: any[] = [];
     private analysisGroup: any[] = [];
     private codeVisibility: string;
     private readonly parentComponent: string = "";
@@ -123,7 +121,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
             ]],
             visibility: ["", [
                 Validators.required
-            ]]
+            ]],
+            genomeBuilds: []
         });
         if (this.createSecurityAdvisorService.isAdmin) {
             this.createAnalysisForm.addControl("analysisOwner", new FormControl("", Validators.required));
@@ -286,21 +285,6 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     }
 
     /**
-     * Set the genomeBuild.
-     *
-     * @param event
-     */
-    onGenomeBuildSelect(event: any) {
-        if (event.args && event.args.item && event.args.item.value) {
-
-            this.organism = event.args.item;
-            let genomeBuild = {"idGenomeBuild": event.args.item.value,
-                "display": event.args.item.label};
-            this.genomBuilds[this.genomBuilds.length] = genomeBuild;
-        }
-    }
-
-    /**
      * Setup and call the SaveAnalysis.
      */
     saveAnalysis() {
@@ -308,8 +292,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
         let idAnalysis: any = 0;
         let params: HttpParams = new HttpParams();
         let stringifiedGenomBuild = "";
-        if (this.genomBuilds.length > 0) {
-            stringifiedGenomBuild = JSON.stringify(this.genomBuilds);
+        if (this.createAnalysisForm.get("genomeBuilds").value.length > 0) {
+            stringifiedGenomBuild = JSON.stringify(this.createAnalysisForm.get("genomeBuilds").value);
         }
         let stringifiedAnalysisGroup = "";
         if (this.analysisGroup.length > 0) {
@@ -370,7 +354,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
      * The yes button was selected in the delete project dialog.
      */
     createAnalysisYesButtonClicked() {
-        if (this.genomBuilds.length === 0) {
+        if (this.createAnalysisForm.get("genomeBuilds").value.length === 0) {
             this.dialogsService
                 .confirm("Warning", "A genome build has not been specified. Create new analysis anyway?")
                 .subscribe(

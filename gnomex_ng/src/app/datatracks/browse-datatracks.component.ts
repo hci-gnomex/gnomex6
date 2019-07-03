@@ -5,7 +5,6 @@ import {
 import {
     jqxButtonComponent,
     jqxCheckBoxComponent,
-    jqxComboBoxComponent,
     jqxNotificationComponent,
     jqxWindowComponent,
 } from "jqwidgets-framework";
@@ -83,7 +82,6 @@ const actionMapping: IActionMapping = {
 export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("datatracksTree") treeComponent: TreeComponent;
-    @ViewChild("labComboBox") labComboBox: jqxComboBoxComponent;
     @Output() selItem: EventEmitter<ITreeNode> = new EventEmitter();
     private treeModel: TreeModel;
     private navInitSubscription: Subscription;
