@@ -42,7 +42,11 @@ export class ContextHelpComponent implements OnInit {
 
     private loadDictionary(): void {
         let entries: any[] = this.dictionaryService.getEntries(DictionaryService.CONTEXT_SENSITIVE_HELP).filter((dict: any) => {
-            return dict.value && dict.context1 === this.name && dict.context2 === this.idCoreFacility && dict.context3 === this.codeRequestCategory;
+            return
+                dict.value &&
+                dict.context1 === this.name &&
+                (!this.idCoreFacility || dict.context2 === this.idCoreFacility) &&
+                (!this.codeRequestCategory || dict.context3 === this.codeRequestCategory);
         });
         if (entries.length === 1) {
             this.dictionary = entries[0];
