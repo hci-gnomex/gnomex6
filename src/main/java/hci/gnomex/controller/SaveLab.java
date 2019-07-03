@@ -636,17 +636,21 @@ public class SaveLab extends GNomExCommand implements Serializable {
 							}
 							lab.setCoreFacilities(facilities);
 
+							if (labScreen.getIsActive() != null) {
+								lab.setIsActive(labScreen.getIsActive());
+							} else {
+								if (lab.getCoreFacilities() != null && lab.getCoreFacilities().size() > 0) {
+									lab.setIsActive("Y");
+								}
+								else {
+									lab.setIsActive("N");
+								}
+							}
+
 							sess.flush();
 						}
 					}
 
-					// Update active flag
-					if (lab.getCoreFacilities() != null && lab.getCoreFacilities().size() > 0) {
-						lab.setIsActive("Y");
-					}
-					else {
-						lab.setIsActive("N");
-					}
 					sess.flush();
 
 					this.xmlResult = "<SUCCESS idLab=\"" + lab.getIdLab() + "\"/>";

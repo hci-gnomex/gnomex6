@@ -327,6 +327,9 @@
                                                 </mat-error>
                                                 <mat-hint>PI gets billing emails + notifications.</mat-hint>
                                             </mat-form-field>
+                                            <mat-checkbox [checked]="isActive_lab" [disabled]="disable_isActive_lab" (change)="onChange_isActive($event)">
+                                                Lab is Active
+                                            </mat-checkbox>
                                         </div>
                                         <div class="formRow">
                                             <mat-form-field class="formField">
@@ -362,6 +365,8 @@
                                                     </mat-checkbox>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="horizontal-spacer">
                                         </div>
                                         <div class="full-width flex-container-row institution-div" *ngIf="showInstitutions">
                                             <div class="height-auto flex-grow foreground border-padding">
