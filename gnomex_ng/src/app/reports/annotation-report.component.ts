@@ -1,8 +1,7 @@
-import {Component, Inject, ViewChild} from "@angular/core";
+import {Component, Inject} from "@angular/core";
 import {LabListService} from "../services/lab-list.service";
 import {DOCUMENT} from "@angular/common";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {jqxComboBoxComponent} from "../../assets/jqwidgets-ts/angular_jqxcombobox";
 import {DictionaryService} from "../services/dictionary.service";
 import {AnnotationService} from "../services/annotation.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
@@ -23,8 +22,6 @@ export class AnnotationReportComponent {
     public readonly FOR_ANALYSES: string = "ANALYSIS";
     public readonly FOR_DATA_TRACKS: string = "DATATRACK";
 
-    @ViewChild('requestCategoryCombo') requestCategoryCombo: jqxComboBoxComponent;
-
     public coreList: any[] = [];
     private idCoreFacility: string = "";
     public labList: any[] = [];
@@ -32,7 +29,7 @@ export class AnnotationReportComponent {
     public annotationsFor: string = this.FOR_SAMPLES;
     private requestCategoryMasterList: any[] = [];
     public requestCategoryList: any[] = [];
-    private codeRequestCategories: Set<string> = new Set<string>();
+    private codeRequestCategories: string[] = [];
     public dateFromString: string = "";
     public dateToString: string = "";
 
@@ -143,10 +140,7 @@ export class AnnotationReportComponent {
     }
 
     private updateRequestCategoriesOnCoreChange(): void {
-        this.codeRequestCategories.clear();
-        if (this.annotationsFor === this.FOR_SAMPLES) {
-            this.requestCategoryCombo.clear();
-        }
+        this.codeRequestCategories = [];
         this.filterRequestCategories();
     }
 
@@ -160,28 +154,12 @@ export class AnnotationReportComponent {
 
     public onAnnotationsForRadioChange(): void {
         if (!(this.annotationsFor === this.FOR_SAMPLES)) {
-            this.codeRequestCategories.clear();
+            this.codeRequestCategories = [];
             this.dateFromString = "";
             this.dateToString = "";
         }
 
         this.refreshAnnotationList();
-    }
-
-    public onRequestCategorySelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.codeRequestCategories.add(event.args.item.value);
-            }
-        }
-    }
-
-    public onRequestCategoryUnselect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.codeRequestCategories.delete(event.args.item.value);
-            }
-        }
     }
 
     public onDateRangeChange(event: DateRange): void {
@@ -206,13 +184,12 @@ export class AnnotationReportComponent {
         }, this);
 
         let codeRequestCategoriesString: string = "";
-        this.codeRequestCategories.forEach((codeRequestCategory: string) => {
-            if (codeRequestCategoriesString === "") {
-                codeRequestCategoriesString = codeRequestCategoriesString.concat(codeRequestCategory);
-            } else {
-                codeRequestCategoriesString = codeRequestCategoriesString.concat(",", codeRequestCategory);
+        for (let codeRequestCategory of this.codeRequestCategories) {
+            if (codeRequestCategoriesString) {
+                codeRequestCategoriesString += ",";
             }
-        }, this);
+            codeRequestCategoriesString += codeRequestCategory;
+        }
 
         let selectedCustomColumns: any[] = this.customColumnsGridApi.getSelectedRows();
         let customColumnString: string = "";

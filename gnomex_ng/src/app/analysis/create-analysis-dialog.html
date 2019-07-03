@@ -89,11 +89,13 @@
         </div>
 
         <div class="flex-container-row align-center padded">
-            <label class="label label-width">Genome Build</label>
-            <jqxComboBox class="inlineComboBox" [width]="450" [multiSelect]="true"
-                         [source]="genomeBuildList" [displayMember]="'display'" [valueMember]="'idGenomeBuild'"
-                         (onSelect)="onGenomeBuildSelect($event)">
-            </jqxComboBox>
+            <label class="label label-width">Genome Build(s)</label>
+            <div class="flex-grow">
+                <custom-multi-combo-box [options]="this.genomeBuildList"
+                                        displayField="display"
+                                        [formControlName]="'genomeBuilds'">
+                </custom-multi-combo-box>
+            </div>
         </div>
         <div class="flex-container-row align-center padded">
             <button mat-button
