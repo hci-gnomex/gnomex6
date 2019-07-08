@@ -6,13 +6,11 @@ import {HOME_ROUTING} from "./home.routes";
 import {CommonModule} from "@angular/common";
 import {HomeComponent} from "./home.component";
 import {ProgressService} from "../home/progress.service";
-import { WindowModule }       from "../../modules/window.module";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
 import {MatProgressBarModule} from "@angular/material";
 
 @NgModule({
-  imports: [HOME_ROUTING, CommonModule,
-      WindowModule, MatProgressBarModule],
+  imports: [HOME_ROUTING, CommonModule, MatProgressBarModule],
   declarations: [HomeComponent],
   providers: [LaunchPropertiesService
 

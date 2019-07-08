@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { ProgressBarModule } from "../../../modules/progressbar.module";
 
 import { DatatracksPanelComponent,
         DatatracksOrganismComponent,
@@ -18,7 +17,6 @@ import {AgGridModule} from "ag-grid-angular";
 import {TabsModule} from "../../util/tabs/tabs.module";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {DATATRACKS_ROUTING} from "../datatracks.routes";
-import {ComboBoxModule} from "../../../modules/combobox.module";
 import {UtilModule} from "../../util/util.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 
@@ -32,9 +30,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         AngularMaterialModule,
         FormsModule,
         ReactiveFormsModule,
-        ProgressBarModule,
         AngularEditorModule,
-        ComboBoxModule,
         UtilModule
     ],
 

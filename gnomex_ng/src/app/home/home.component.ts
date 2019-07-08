@@ -3,7 +3,6 @@ import {URLSearchParams} from "@angular/http";
 import {Router} from "@angular/router";
 import {BehaviorSubject} from "rxjs";
 import {Subscription} from "rxjs";
-import {jqxProgressBarComponent} from "../../assets/jqwidgets-ts/angular_jqxprogressbar";
 import {GnomexService} from "../services/gnomex.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
 import {ProgressService} from "./progress.service";

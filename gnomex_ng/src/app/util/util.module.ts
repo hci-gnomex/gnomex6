@@ -3,8 +3,6 @@ import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 import {BrowseFilterComponent} from "./browse-filter.component";
-import {ComboBoxModule} from '../../modules/combobox.module';
-import {CalendarModule} from "../../modules/calendar.module";
 import {TabsModule} from "./tabs/tabs.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -49,8 +47,6 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         BrowserModule,
         BrowserAnimationsModule,
         CommonModule,
-        CalendarModule,
-        ComboBoxModule,
         FormsModule,
         ReactiveFormsModule,
         AngularMaterialModule,

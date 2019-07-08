@@ -51,11 +51,11 @@
                                 </div>
                             </div>
                             <div class="full-width padding">
-                                <div class="flex-container-row justify-space-between">
+                                <div class="flex-container-row align-center justify-space-between">
                                     <div>
-                                        <jqxToggleButton #toggleButton [template]="'link'" (onClick)="expandCollapseClicked()">
-                                            Expand Projects
-                                        </jqxToggleButton>
+                                        <button mat-button (click)="expandCollapseClicked()">
+                                            {{toggleButton}}
+                                        </button>
                                     </div>
                                     <div>
                                         <mat-checkbox class="inlineDiv small-font" [(ngModel)]="showEmptyFolders" (change)="onShowEmptyFolders($event)">
@@ -100,150 +100,4 @@
         </div>
     </div>
 </div>
-<div>
-    <jqxWindow #responseMsgWindow
-               [width]="250"
-               [height]="100"
-               [maxHeight]="200" [maxWidth]="300" [minHeight]="30" [minWidth]="100"
-               [isModal]="true" [modalOpacity]="0.3"
-               [autoOpen]="false"
-               [cancelButton]="'.cancel'" [okButton]="'.ok'" [resizable]="false"
-    >
-        <div style="width: 100%; background-color: #4cae4c">
-            <div>
-                <img width="14" height="14" src="../../assets/jqwidgets/images/help.png" alt=""/>
-                Delete Project
-            </div>
-        </div>
-        <div class="background background-border full-width full-height flex-container-col padding">
-            <div class="t full-width">
-                <div class="tr full-width">
-                    <div class="td">
-                        <div class="t full-width">
-                            <div class="tr full-width vertical-center">
-                                <div class="td full-width">
-                                    <div class="full-width">
-                                        <div *ngIf="responseMsg" class="tr full-width horizontal-center">
-                                            {{responseMsg}}
-                                            Delete project
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tr full-width">
-                    <div class="td">
-                        <div style="font-size:small">
-                            <div class="t full-width">
-                                <div class="tr full-width" style="vertical-align: middle">
-                                    <div class="td">
-                                        <jqxButton #noButtonDeleteProject class="No"
-                                                   style="display: inline-block"
-                                                   [width]="80"
-                                                   (onClick)="responseMsgNoButtonClicked()"
-                                        >
-                                            No
-                                        </jqxButton>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </jqxWindow>
-</div>
-<jqxNotification #msgSelectOwner
-                 [width]="450"
-                 [position]="'top-left'"
-                 [opacity]="0.9"
-                 [template]="'info'"
-                 [autoOpen]="false"
-                 [autoClose]="false"
-                 [closeOnClick]="true"
-                 (onClick)="resetReassign($event)">
-    <div>
-        Please select the experiment owner.
-    </div>
-</jqxNotification>
-<jqxNotification #msgSelectBilling
-                 [width]="450"
-                 [position]="'top-left'"
-                 [opacity]="0.9"
-                 [template]="'info'"
-                 [autoOpen]="false"
-                 [autoClose]="false"
-                 [closeOnClick]="true"
-                 (onClick)="resetReassign($event)">
-    <div>
-        Please select the experiment billing account.
-    </div>
-</jqxNotification>
-<jqxNotification #msgEnterProjectName
-                 [width]="450"
-                 [position]="'top-left'"
-                 [opacity]="0.9"
-                 [template]="'info'"
-                 [autoOpen]="false"
-                 [autoClose]="false"
-                 [closeOnClick]="true"
-                 (onClick)="resetReassign($event)">
-    <div>
-        Please enter a project name.
-    </div>
-</jqxNotification>
-<jqxNotification #msgEnterLab
-                 [width]="450"
-                 [position]="'top-left'"
-                 [opacity]="0.9"
-                 [template]="'info'"
-                 [autoOpen]="false"
-                 [autoClose]="false"
-                 [closeOnClick]="true"
-                 (onClick)="clickNoProject($event)">
-    <div>
-        Please select a lab.
-    </div>
-</jqxNotification>
-<jqxNotification #msgLoading
-                 [width]="450"
-                 [position]="'top-left'"
-                 [opacity]="0.9"
-                 [template]="'info'"
-                 [autoOpen]="false"
-                 [autoClose]="true"
-                 [closeOnClick]="true">
-    <div>
-        Loading...
-    </div>
-</jqxNotification>
-<jqxNotification #msgDragDropHint
-                 [width]="'80%'"
-                 [position]="'top-left'"
-                 [opacity]="0.9"
-                 [template]="'info'"
-                 [autoOpen]="false"
-                 [autoClose]="false"
-                 [closeOnClick]="true">
-    <div>
-        Drag-and-drop experiment to move to another project.
-    </div>
-</jqxNotification>
-<jqxNotification #msgNoAuthUsersForLab
-                 [width]="'80%'"
-                 [height]="50"
-                 [position]="'top-left'"
-                 [opacity]="0.9"
-                 [template]="'warning'"
-                 [autoOpen]="false"
-                 [autoClose]="false"
-                 [closeOnClick]="true"
-                 (onClick)="clickNoOwners($event)">
-    <div>
-        Sorry, in order to reassign this experiment you must change its owner to a member of the new lab group. However,
-        you do not have permission to access the member list for this lab. Please contact an administrator.
-    </div>
-</jqxNotification>
+
