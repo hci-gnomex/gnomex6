@@ -57,7 +57,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     public showSaveSpinner: boolean = false;
     public canWrite = false;
     public folderList: any[];
-    public initSummaryView: boolean = true;
     public types = OrderType;
 
     private datatrack: any;
@@ -349,10 +348,6 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
-    }
-
-    tabChanged(event: MatTabChangeEvent) {
-        this.initSummaryView = event.tab.textLabel === "Summary";
     }
 
 }

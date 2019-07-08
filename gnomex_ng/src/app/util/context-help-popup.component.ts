@@ -1,26 +1,22 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {jqxEditorComponent} from "../../assets/jqwidgets-ts/angular_jqxeditor";
 import {FormControl} from "@angular/forms";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {DialogsService} from "./popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {ActionType} from "./interfaces/generic-dialog-action.model";
+import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {DictionaryService} from "../services/dictionary.service";
 
 @Component({
     selector: 'context-help-popup',
     template: `
         <div class="flex-container-col full-width full-height double-padded">
             <div class="editor-grid">
-                <jqxEditor #editorReference
-                           width="100%"
-                           height="15em"
-                           [editable]="this.isEditMode"
-                           [tools]="this.toolbarSettings"
-                           [toolbarPosition]="'top'">
-                </jqxEditor>
+                <angular-editor #descEditorRef id="descEditor" [formControl]="descriptionControl" [config]="this.editorConfig">
+                </angular-editor>
             </div>
             <div *ngIf="this.isEditMode">
                 <mat-form-field class="full-width">
@@ -34,34 +30,36 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
             <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Cancel"></save-footer>
         </div>
     `,
-    styles: [`
-        div.editor-grid {
-            width: 35em;
-            height: 25em;
+    styles: [`        
+        :host /deep/ angular-editor #editor {
+            resize: none;
         }
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
+        
     `]
 })
 
-export class ContextHelpPopupComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
-    public actionType: any = ActionType ;
+export class ContextHelpPopupComponent extends BaseGenericContainerDialog implements OnInit {
+    public actionType: any = ActionType;
 
     private readonly NO_HELP_TEXT: string = "No help available";
-    private readonly DEFAULT_TOOLBAR_SETTINGS: string = "bold italic underline | format font size | color background | left center right | outdent indent | ul ol | link | clean";
-
+    public popupTitle: string = "";
     private dictionary: any;
     public isEditMode: boolean = false;
+    public editorConfig: AngularEditorConfig;
+    public descriptionControl:FormControl;
 
-    public toolbarSettings: string = "";
-    private descriptionControl: FormControl;
-    public tooltipControl: FormControl;
-
-    @ViewChild('editorReference') private editorRef: jqxEditorComponent;
+    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    private tooltipControl: FormControl;
 
     constructor(@Inject(MAT_DIALOG_DATA) private data: any,
                 private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService,
                 private dialogsService: DialogsService,
                 public constService: ConstantsService,
+                private dictionaryService: DictionaryService,
                 private dialogRef: MatDialogRef<ContextHelpPopupComponent>) {
         super();
         if(this.data) {
@@ -73,23 +71,32 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
 
     ngOnInit() {
 
+        this.editorConfig = {
+            spellcheck: true,
+            height: "15em",
+            enableToolbar: true,
+        };
+
         this.descriptionControl = new FormControl(this.dictionary && this.dictionary.helpText ? this.dictionary.helpText : this.NO_HELP_TEXT);
         this.tooltipControl = new FormControl(this.dictionary && this.dictionary.toolTipText ? this.dictionary.toolTipText : '');
 
         if (this.isEditMode) {
-            this.toolbarSettings = this.DEFAULT_TOOLBAR_SETTINGS;
+            //this.toolbarSettings = this.DEFAULT_TOOLBAR_SETTINGS;
+            this.descriptionControl.enable();
+
         } else {
             this.descriptionControl.disable();
             this.tooltipControl.disable();
         }
+        this.descEditor.editorToolbar.showToolbar = this.isEditMode;
+        this.editorConfig.editable = this.isEditMode;
+
+
+
     }
 
-    ngAfterViewInit() {
-        this.editorRef.val(this.descriptionControl.value);
-    }
 
     public save(): void {
-        this.descriptionControl.setValue(this.editorRef.val() ? this.editorRef.val() : '');
 
         if (this.dictionary) {
             this.cookieUtilService.formatXSRFCookie();
@@ -104,7 +111,10 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
                 .set("Content-Type", "application/x-www-form-urlencoded");
             this.httpClient.post("/gnomex/UpdateContextSensitiveHelp.gx", params.toString(), {headers: headers}).subscribe((result: any) => {
                 if (result && result.idContextSensitiveHelp) {
-                    this.dialogRef.close(true);
+                    this.dictionaryService.reloadAndRefresh(() =>{
+                        this.dialogRef.close(true);
+                    },null, DictionaryService.CONTEXT_SENSITIVE_HELP)
+
                 } else {
                     let message: string = "";
                     if (result && result.message) {

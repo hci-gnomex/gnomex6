@@ -7,19 +7,7 @@ import {EXPERIMENTS_ROUTING} from "./experiments.routes";
 import { TreeModule } from "angular-tree-component";
 
 import { AngularMaterialModule } from "../../modules/angular-material.module";
-import { ButtonModule } from "../../modules/button.module";
-import { CheckBoxModule} from "../../modules/checkbox.module";
-import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
-import { ExpanderModule }     from "../../modules/expander.module";
-import { TreeGridModule } from "../../modules/tree-grid.module";
-import { InputModule } from "../../modules/input.module";
-import { LoaderModule }       from "../../modules/loader.module";
-import { PanelModule }        from "../../modules/panel.module";
-import { NotificationModule } from "../../modules/notification.module";
-import { TextAreaModule }     from "../../modules/textarea.module";
-import { ToggleButtonModule } from "../../modules/togglebutton.module";
-import { WindowModule }       from "../../modules/window.module";
 import {UtilModule} from "../util/util.module";
 import {ServicesModule} from "../services/services.module";
 import { AngularSplitModule } from 'angular-split';
@@ -29,11 +17,6 @@ import {ExperimentOrdersComponent} from "./orders/experiment-orders.component";
 import {BrowsePanelComponent} from "./browse-panel.component";
 import {AgGridModule} from 'ag-grid-angular/main';
 import { DynamicModule } from 'ng-dynamic-component';
-
-
-import {
-    DropDownModule
-} from '../../modules/index';
 
 import {
     ExperimentsBrowseTab,
@@ -82,7 +65,6 @@ import {ProtocolDialogComponent} from "./experiment-detail/protocol-dialog.compo
 import {ExperimentSequenceLanesTab} from "./experiment-detail/experiment-sequence-lanes-tab";
 import {ManageFilesDialogComponent} from "../util/upload/manage-files-dialog.component";
 import {RelatedDataModule} from "../util/related-data.module";
-import {RichEditorModule} from "../../modules/rich-editor.module";
 import {ManageFilesModule} from "../util/upload/manage-files.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {ExperimentBillingTabComponent} from "./experiment-detail/experiment-billing-tab.component";
@@ -96,30 +78,16 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
 @NgModule({
     imports: [
         EXPERIMENTS_ROUTING,
-        ButtonModule,
-        CheckBoxModule,
-        ComboBoxModule,
         CommonModule,
         EmailRelatedUsersPopupModule,
-        ExpanderModule,
         FormsModule,
-        InputModule,
-        LoaderModule,
-        NotificationModule,
-        PanelModule,
         ServicesModule,
-        TextAreaModule,
-        ToggleButtonModule,
         TreeModule.forRoot(),
         UtilModule,
-        WindowModule,
         RelatedDataModule,
-        RichEditorModule,
         ManageFilesModule,
         ReactiveFormsModule,
-        DropDownModule,
         AngularMaterialModule,
-        TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
         DynamicModule,

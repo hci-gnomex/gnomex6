@@ -13,18 +13,11 @@
 
 
 
-    <div style="width:99%; font-size:small;">
+    <div style="width:100%; font-size:small;">
 
-        <label for="dtDescriptionId" > Description </label>
-        <jqxEditor
-                   #editorReference
-                   id="dtDescriptionId"
-                   width="100%"
-                   (onChange)="editorChanged($event)"
-                   [height]="350"
-                   [tools]="toolBarSettings"
-                   [toolbarPosition]="'bottom'">
-        </jqxEditor>
+        <angular-editor #descEditorRef id="descEditor" formControlName="description" [config]="this.editorConfig">
+        </angular-editor>
+
 
     </div>
 

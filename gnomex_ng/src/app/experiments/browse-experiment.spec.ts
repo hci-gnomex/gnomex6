@@ -14,15 +14,6 @@ import {DictionaryService} from "../services/dictionary.service";
 import {AnalysisService} from "../services/analysis.service";
 import {DataTrackService} from "../services/data-track.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {ButtonModule} from "../../modules/button.module";
-import {ToggleButtonModule} from "../../modules/togglebutton.module";
-import {ComboBoxModule} from "../../modules/combobox.module";
-import {WindowModule} from "../../modules/window.module";
-import {InputModule} from "../../modules/input.module";
-import {NotificationModule} from "../../modules/notification.module";
-import {TextAreaModule} from "../../modules/textarea.module";
-import {CalendarModule} from "../../modules/calendar.module";
-import {LoaderModule} from "../../modules/loader.module";
 import {By} from "@angular/platform-browser";
 import {UtilModule} from "../util/util.module";
 import { RouterTestingModule } from '@angular/router/testing';
@@ -276,8 +267,7 @@ describe('Browse Experiment Component...', () => {
         console.log("in before each");
 
         TestBed.configureTestingModule({
-            imports: [FormsModule, HttpModule, TreeModule.forRoot(), ButtonModule, ToggleButtonModule, ComboBoxModule,
-                WindowModule, InputModule, NotificationModule, TextAreaModule, CalendarModule, LoaderModule,
+            imports: [FormsModule, HttpModule, TreeModule.forRoot(),
                 UtilModule, RouterTestingModule, AngularMaterialModule, AngularSplitModule],
             declarations: [BrowseExperimentsComponent, BrowsePanelComponent],
             providers: [{provide: ExperimentsService, useClass: MockExperimentService},

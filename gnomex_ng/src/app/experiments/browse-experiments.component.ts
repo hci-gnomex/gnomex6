@@ -10,13 +10,6 @@ import {
 import {URLSearchParams} from "@angular/http";
 
 import {ExperimentsService} from "./experiments.service";
-import {
-    jqxButtonComponent,
-    jqxCheckBoxComponent,
-    jqxLoaderComponent,
-    jqxNotificationComponent,
-    jqxWindowComponent,
-} from "jqwidgets-framework";
 import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {BrowseFilterComponent} from "../util/browse-filter.component";
 import * as _ from "lodash";
@@ -45,11 +38,7 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 @Component({
     selector: "experiments",
     templateUrl: "./browse-experiments.component.html",
-    styles: [`
-        .jqx-notification {
-            margin-top: 30em;
-            margin-left: 20em;
-        }
+    styles: [`        
 
 
         .t  { display: table;      }
@@ -100,9 +89,7 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("tree") treeComponent: TreeComponent;
-    @ViewChild("responseMsgWindow") responseMsgWindow: jqxWindowComponent;
-    @ViewChild("msgNoAuthUsersForLab") msgNoAuthUsersForLab: jqxNotificationComponent;
-    @ViewChild("toggleButton") toggleButton: jqxButtonComponent;
+    toggleButton: string = "Expand Projects";
 
     @ViewChild(BrowseFilterComponent)
 
@@ -251,7 +238,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
             setTimeout(() => {
-                this.toggleButton.val("Collapse Projects");
+                this.toggleButton = "Collapse Projects";
                 this.treeModel.expandAll();
 
                 if(this.gnomexService.orderInitObj) {
@@ -435,9 +422,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     {type: ActionType.PRIMARY, name: "Yes", internalAction: "reassignYesButtonClicked"},
                     {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if(!result) {
-                        this.resetTree();
-                }
+            if(!result) {
+                this.resetTree();
+            }
         });
 
     }
@@ -571,9 +558,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                         {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                         {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
                     ]}).subscribe((result: any) => {
-                        if(result) {
-                            this.setActiveNodeId = "p" + result;
-                        }
+                if(result) {
+                    this.setActiveNodeId = "p" + result;
+                }
             });
         }
     }
@@ -599,9 +586,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     {type: ActionType.PRIMARY, name: "Yes", internalAction: "deleteProject"},
                     {type: ActionType.SECONDARY, name: "No", internalAction: "cancel"}
                 ]}).subscribe((result: any) => {
-                    if(result && this.parentProject) {
-                        this.setActiveNodeId = this.parentProject.data.id;
-                    }
+            if(result && this.parentProject) {
+                this.setActiveNodeId = this.parentProject.data.id;
+            }
         });
     }
 
@@ -617,9 +604,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     {type: ActionType.PRIMARY, name: "Yes", internalAction: "deleteExperiment"},
                     {type: ActionType.SECONDARY, name: "No", internalAction: "cancel"}
                 ]}).subscribe((result: any) => {
-                    if(result && this.parentProject) {
-                        this.setActiveNodeId = this.parentProject.data.id;
-                    }
+            if(result && this.parentProject) {
+                this.setActiveNodeId = this.parentProject.data.id;
+            }
         });
     }
     /**
@@ -672,31 +659,18 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * The expand collapse toggle is selected.
      */
     expandCollapseClicked(): void {
-        setTimeout(_ => {
+        if (this.toggleButton === "Collapse Projects") {
+            this.toggleButton = "Expand Projects"
+            this.treeModel.collapseAll();
+        } else {
+            this.toggleButton = "Collapse Projects";
+            this.treeModel.expandAll();
+        }
 
-            var toggled = this.toggleButton.toggled();
-
-            if (toggled) {
-                this.toggleButton.val("Expand Projects");
-                this.treeModel.collapseAll();
-            } else {
-
-                this.toggleButton.val("Collapse Projects");
-                this.treeModel.expandAll();
-            }
-        });
     }
 
     onClickShowDragDropHint(): void {
         this.showDragDropHint = !this.showDragDropHint;
-    }
-
-    /**
-     * Show the response from the back end.
-     */
-    responseMsgNoButtonClicked() {
-        this.responseMsg = "";
-        this.responseMsgWindow.close();
     }
 
     ngOnDestroy(): void {

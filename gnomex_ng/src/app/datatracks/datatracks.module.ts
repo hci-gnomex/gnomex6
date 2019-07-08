@@ -6,19 +6,7 @@ import {CommonModule} from "@angular/common";
 import {FormsModule,ReactiveFormsModule} from "@angular/forms";
 
 import { TreeModule } from "angular-tree-component";
-
-import { ButtonModule } from "../../modules/button.module";
-import { CheckBoxModule} from "../../modules/checkbox.module";
-import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
-import { ExpanderModule }     from "../../modules/expander.module";
-import { InputModule } from "../../modules/input.module";
-import { LoaderModule }       from "../../modules/loader.module";
-import { PanelModule }        from "../../modules/panel.module";
-import { NotificationModule } from "../../modules/notification.module";
-import { TextAreaModule }     from "../../modules/textarea.module";
-import { ToggleButtonModule } from "../../modules/togglebutton.module";
-import {WindowModule}       from "../../modules/window.module";
 import {ServicesModule} from "../services/services.module";
 import { AngularSplitModule } from 'angular-split';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -43,23 +31,12 @@ import {DatatracksDetailModule} from "./datatracks-detail/datatracks-detail.modu
         DialogsModule,
         BrowserAnimationsModule,
         DATATRACKS_ROUTING,
-        ButtonModule,
-        CheckBoxModule,
-        ComboBoxModule,
         CommonModule,
         EmailRelatedUsersPopupModule,
-        ExpanderModule,
         FormsModule,
-        InputModule,
-        LoaderModule,
-        NotificationModule,
-        PanelModule,
         ServicesModule,
-        TextAreaModule,
-        ToggleButtonModule,
         TreeModule.forRoot(),
         UtilModule,
-        WindowModule,
         ReactiveFormsModule,
         AngularSplitModule,
         DatatracksOverviewModule,

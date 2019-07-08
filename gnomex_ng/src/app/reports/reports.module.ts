@@ -1,7 +1,6 @@
 import {NgModule} from "@angular/core";
 import {REPORTS_ROUTING} from "./reports.routes";
 import {AnnotationProgressReportComponent} from "./annotation-progress-report.component";
-import {ComboBoxModule} from "../../modules/combobox.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {ProjectExperimentReportComponent} from "./project-experiment-report.component";
 import {CommonModule} from "@angular/common";
@@ -21,7 +20,6 @@ import {TrackUsageDetailComponent} from "./track-usage-detail.component";
     imports: [
         REPORTS_ROUTING,
         CommonModule,
-        ComboBoxModule,
         AngularMaterialModule,
         FormsModule,
         UtilModule,

@@ -10,7 +10,6 @@ import {
     AnalysisGroupComponent
 } from './index'
 import {ANALYSIS_ROUTING} from "../analysis.routes";
-import {ComboBoxModule} from "../../../modules/combobox.module";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {AgGridModule} from "ag-grid-angular";
 import {TabsModule} from "../../util/tabs/tabs.module";
@@ -23,7 +22,6 @@ import {UtilModule} from "../../util/util.module";
     imports: [
         CommonModule,
         ANALYSIS_ROUTING,
-        ComboBoxModule,
         AgGridModule.withComponents([IconTextRendererComponent]),
         TabsModule,
         AngularMaterialModule,
