@@ -54,6 +54,9 @@
         <div class="top-margin font-bold" *ngIf="experiment?.isExternal !== 'Y'">
             Estimated Charges : {{ totalEstimatedCharges }}
         </div>
+        <div class="padded heavily-left-padded">
+            {{ estimatedChargesWarning }}
+        </div>
         <div class="flex-container-row">
             <div>
                 <div class="padded heavily-left-padded">

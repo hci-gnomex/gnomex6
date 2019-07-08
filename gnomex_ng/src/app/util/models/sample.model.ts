@@ -1,10 +1,13 @@
+import {OnDestroy} from "@angular/core";
+import {BehaviorSubject} from "rxjs";
+
 import {DictionaryService} from "../../services/dictionary.service";
 import {Experiment} from "./experiment.model";
 import {GnomexService} from "../../services/gnomex.service";
-import {BehaviorSubject} from "rxjs";
 import {PropertyService} from "../../services/property.service";
+import {UtilService} from "../../services/util.service";
 
-export class Sample {
+export class Sample implements OnDestroy {
     public idSample:                        string = ''; // "Sample0";
     public name:                            string = ''; // "asdffdsa";
     public number:                          string = ''; // "asdffdsa";
@@ -146,7 +149,42 @@ export class Sample {
         }
     }
 
+    public get experiment(): Experiment {
+        return this._experiment;
+    }
+
+    public set experiment(value: Experiment) {
+        this._experiment = value;
+
+        this._protocols = [];
+        if (this._experiment.protocols) {
+            this._protocols = this._experiment.protocols
+        }
+
+        this.application_object = this._experiment.application;
+
+        UtilService.safelyUnsubscribe(this.onChange_codeApplication_subscription);
+
+        this.onChange_codeApplication_subscription = this._experiment.onChange_codeApplication.subscribe((value: string) => {
+            let lookup;
+
+            if (value) {
+                lookup = this.dictionaryService.getProtocolFromApplication(value);
+            }
+
+            this.application_object = lookup;
+        });
+    }
+
+    private _experiment: Experiment;
+    private _protocols: any[];
+
+
     constructor(private dictionaryService: DictionaryService) { }
+
+    ngOnDestroy(): void {
+        UtilService.safelyUnsubscribe(this.onChange_codeApplication_subscription);
+    }
 
     public static createSampleObjectFromAny(dictionaryService: DictionaryService, source: any): Sample {
         let sample: Sample = new Sample(dictionaryService);

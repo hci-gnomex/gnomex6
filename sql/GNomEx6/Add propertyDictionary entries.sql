@@ -6,6 +6,7 @@ DECLARE @codeRequestCategory_IlluminaHiSeqSequencing   VARCHAR(10) = -1;
 DECLARE @codeRequestCategory_IlluminaNovaSeqSequencing VARCHAR(10) = -1;
 DECLARE @codeRequestCategory_IlluminaSequencing        VARCHAR(10) = -1;
 DECLARE @codeRequestCategory_MDMiSeq                   VARCHAR(10) = -1;
+DECLARE @codeRequestCategory_nanoString                VARCHAR(10) = -1;
 
 DECLARE @propertyName        VARCHAR(200)  = 'allow_price_quote';
 DECLARE @propertyValue       VARCHAR(2000);
@@ -364,6 +365,50 @@ BEGIN
    WHERE propertyName = @propertyName
      AND idCoreFacility = @idCoreFacility
      AND codeRequestCategory = @codeRequestCategory_MDMiSeq;
+
+END
+       
+-------------------------------------------------------------------------------------------
+
+SELECT TOP(1) @idCoreFacility = cf.idCoreFacility
+  FROM GNomEx.dbo.CoreFacility cf
+ WHERE cf.facilityName = 'Molecular Diagnostics';
+
+-- PRINT (@idCoreFacility)
+
+SELECT TOP(1) @codeRequestCategory_nanoString = rc.codeRequestCategory
+  FROM GNomEx.dbo.RequestCategory rc
+ WHERE rc.idCoreFacility = @idCoreFacility
+   AND rc.requestCategory = 'Nano String';
+
+-- PRINT (@codeRequestCategory_IlluminaMiSeqSequencing)
+
+SET @propertyName        = 'estimated_price_warning';
+SET @propertyDescription = 'Warn users that pricing listed for nano string experiments does not include the cost of code sets and master kits.';
+SET @propertyValue       = 'The pricing listed below includes sample Quality (Qubit and BioAnalyzer) and NanoString analysis.  The pricing does NOT include the cost of code sets and master kits (purchased separately).';
+
+SELECT @temp = COUNT(*)
+  FROM GNomEx.dbo.PropertyDictionary pd
+ WHERE pd.propertyName = @propertyName
+   AND pd.idCoreFacility = @idCoreFacility
+   AND pd.codeRequestCategory = @codeRequestCategory_nanoString;
+
+IF @temp = 0
+BEGIN
+
+  INSERT INTO GNomEx.dbo.PropertyDictionary(propertyName, propertyValue, propertyDescription, forServerOnly, idCoreFacility, codeRequestCategory)
+  VALUES (@propertyName, @propertyValue, @propertyDescription, 'N', @idCoreFacility, @codeRequestCategory_nanoString);
+
+END
+ELSE
+BEGIN
+
+  UPDATE GNomEx.dbo.PropertyDictionary
+     SET propertyValue = @propertyValue
+       , propertyDescription = @propertyDescription
+   WHERE propertyName = @propertyName
+     AND idCoreFacility = @idCoreFacility
+     AND codeRequestCategory = @codeRequestCategory_nanoString;
 
 END
        

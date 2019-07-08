@@ -141,6 +141,8 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             this.dialogService.startDefaultSpinnerDialog();
         });
 
+        this.labListService.getLabList_FromBackEnd();
+
         this._experiment = experiment;
 
         if (!experiment) {
@@ -306,11 +308,10 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                     this.processedWorkflowSteps.push(tempCopy);
                 }
             }
-
             this.updateCollaboratorsDisplay();
         });
     };
-    
+
     public overviewTabForm: FormGroup;
     public _experiment: any = {};
 
@@ -492,6 +493,8 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             this.filterLabDictionary();
         });
 
+        this.labListService.getLabList_FromBackEnd();
+
         if (this._experiment && this._experiment.idLab && !this.labSubscription) {
             this.labSubscription = this.getLabService.getLabById(this._experiment.idLab).subscribe((result) => {
                 this.lab = result;
@@ -646,8 +649,8 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             this._experiment.labName          = temp && temp.length === 1 ? temp[0].display : '';
             this._experiment.truncatedLabName = '';
 
-             this.getLabService.getLabById(this._experiment.idLab).subscribe((result: any) => {
-                 this.lab = result.Lab;
+            this.getLabService.getLabById(this._experiment.idLab).subscribe((result: any) => {
+                this.lab = result.Lab;
             });
         }
     }

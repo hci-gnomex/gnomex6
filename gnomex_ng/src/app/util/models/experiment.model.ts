@@ -864,6 +864,10 @@ export class Experiment {
         let tempSamples: any[] = [];
 
         for (let sample of this.samples) {
+            sample.experiment = this;
+        }
+
+        for (let sample of this.samples) {
             tempSamples.push(sample.getJSONObjectRepresentation());
         }
 
