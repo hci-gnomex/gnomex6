@@ -3,12 +3,6 @@ import {
 } from "@angular/core";
 
 import {
-    jqxButtonComponent,
-    jqxCheckBoxComponent,
-    jqxNotificationComponent,
-    jqxWindowComponent,
-} from "jqwidgets-framework";
-import {
     IActionMapping,
     ITreeOptions,
     TREE_ACTIONS,

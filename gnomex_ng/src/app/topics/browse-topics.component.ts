@@ -7,11 +7,6 @@ import {
 } from "@angular/core";
 
 import { URLSearchParams } from "@angular/http";
-
-import { jqxWindowComponent } from "jqwidgets-framework";
-import { jqxButtonComponent } from "jqwidgets-framework";
-import { jqxNotificationComponent  } from "jqwidgets-framework";
-import { jqxCheckBoxComponent } from "jqwidgets-framework";
 import {
     TreeComponent, ITreeOptions, TreeNode, TreeModel, IActionMapping,
     TREE_ACTIONS
