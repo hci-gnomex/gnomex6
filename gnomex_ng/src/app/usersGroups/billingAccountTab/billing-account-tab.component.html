@@ -1,18 +1,15 @@
 <div class="full-width full-height padded-not-bottom">
 	<div class="flex-container-col full-width full-height">
 		<div class="full-width">
-			<div class="full-width">
-				<mat-form-field class="medium-width">
-					<mat-select
-							placeholder="Select Core Facility"
-							[(value)]="selectedCoreFacility"
-							(selectionChange)="onCoreFacilitySelected($event)"
-							required>
-						<mat-option *ngFor="let coreFacility of coreFacilities" [value]="coreFacility">
-							{{ coreFacility.display }}
-						</mat-option>
-					</mat-select>
-				</mat-form-field>
+			<div class="full-width flex-container-row align-center spaced-children-margin">
+				<div class="medium-width">
+					<custom-combo-box placeholder="Select Core Facility"
+									  [(ngModel)]="selectedCoreFacility"
+									  (optionSelected)="onCoreFacilitySelected()"
+									  [options]="coreFacilities"
+									  displayField="display">
+					</custom-combo-box>
+				</div>
 				<button mat-raised-button *ngIf="!showAddAccountBox" (click)="onAddAccountBeginClicked()">Add account</button>
 				<button mat-raised-button (click)="onCopyAccountsClicked()">Copy Accounts From Other Cores</button>
 			</div>

@@ -1071,10 +1071,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 	}
 
 
-	onCoreFacilitySelected(event: any): void {
-		this.assignChartfieldGridContents(event.value);
-		this.assignPoGridContents(event.value);
-		this.assignCreditCardGridContents(event.value);
+	onCoreFacilitySelected(): void {
+		this.assignChartfieldGridContents(this.selectedCoreFacility);
+		this.assignPoGridContents(this.selectedCoreFacility);
+		this.assignCreditCardGridContents(this.selectedCoreFacility);
 	}
 
 

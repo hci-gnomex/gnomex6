@@ -22,19 +22,14 @@
 									  [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" tooltipPosition="left"></context-help>
 					</div>
 					<div class="td">
-						<mat-form-field style="width: 100%; font-size: small;">
-							<mat-select
-									style="width: 100%;"
-									placeholder="Select Core Facilities"
-									[(ngModel)]="selectedCoreFacilities"
-									(selectionChange)="onCoreFacilitiesSelected($event)"
-									multiple
-									required>
-								<mat-option *ngFor="let coreFacility of coreFacilityReducedList" [value]="coreFacility">
-									{{ coreFacility.display }}
-								</mat-option>
-							</mat-select>
-						</mat-form-field>
+						<div class="full-width" style="font-size: small">
+							<custom-multi-combo-box placeholder="Select Core Facilities"
+													[options]="coreFacilityReducedList"
+													displayField="display"
+													[(ngModel)]="selectedCoreFacilities"
+													(selectionChanged)="onCoreFacilitiesSelected()">
+							</custom-multi-combo-box>
+						</div>
 					</div>
 				</div>
 				<div class="tr full-width">

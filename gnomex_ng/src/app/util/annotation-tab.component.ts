@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "./interfaces/annotation.model";
@@ -218,9 +215,13 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
     }
 
 
-    selectOpt(opt: any) { // on mat option
-        let selected: boolean = opt.selected;
-        opt.value.selected = selected ? 'Y' : 'N';
+    selectOpts(opts: any[], annot: IAnnotation) {
+        for (let opt of annot.PropertyOption) {
+            opt.selected = 'N';
+        }
+        for (let opt of opts) {
+            opt.selected = 'Y';
+        }
     }
 
     selectChanged(opt: any, annot:IAnnotation) { // on mat select
@@ -230,11 +231,6 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         if (opt) {
             opt.selected = 'Y';
         }
-    }
-
-
-    compareByID(itemOne, itemTwo) {
-        return itemOne && itemTwo && itemOne.name == itemTwo.name;
     }
     
     ngOnDestroy(): void {

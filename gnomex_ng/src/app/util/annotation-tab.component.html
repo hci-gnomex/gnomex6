@@ -17,18 +17,14 @@
                     This field is required
                 </mat-error>
             </mat-form-field>
-            <mat-form-field *ngSwitchCase="'MOPTION'" class="annot-control" >
-                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.form.controls[annot.name]">
-                    <mat-option *ngFor="let opt of annot.PropertyOption"
-                                #mOptRef
-                                (onSelectionChange)="selectOpt(mOptRef)"
-                                [value]="opt"> {{opt.name}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('selectRequired')">
-                    This field is required
-                </mat-error>
-            </mat-form-field>
+            <div *ngSwitchCase="'MOPTION'" class="annot-control">
+                <custom-multi-combo-box [placeholder]="annot.name"
+                                        [formControl]="this.form.controls[annot.name]"
+                                        [options]="annot.PropertyOption"
+                                        (selectionChanged)="selectOpts($event, annot)"
+                                        displayField="name">
+                </custom-multi-combo-box>
+            </div>
             <div *ngSwitchCase="'OPTION'" class="annot-control">
                 <custom-combo-box [placeholder]="annot && annot.name ? annot.name : ''"
                                   (optionSelected)="selectChanged($event,annot)"

@@ -43,11 +43,11 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             </div>
             <div class="flex-container-row full-width align-center">
                 <div [hidden]="!this.showLinkToTopic" class="half-width">
-                    <mat-form-field class="full-width">
-                        <mat-select placeholder="Topic(s)" [formControl]="this.form.get('topic')" multiple>
-                            <mat-option *ngFor="let top of this.topicList" [value]="top">{{top.name}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <custom-multi-combo-box placeholder="Topic(s)" 
+                                            [formControl]="this.form.get('topic')" 
+                                            [options]="this.topicList" 
+                                            displayField="name">
+                    </custom-multi-combo-box>
                 </div>
                 <div>
                     <button mat-button (click)="this.toggleShowLinkToTopic()"><img [src]="this.constantsService.ICON_TOPIC" class="icon">{{showLinkToTopic ? 'Hide' : 'Show'}} Link to Topic</button>
