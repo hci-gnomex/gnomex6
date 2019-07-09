@@ -1,10 +1,13 @@
 <div class="flex-container-col full-width full-height padded">
-    <mat-form-field class="formField padded-left-right">
-        <mat-select placeholder="Cores" [formControl]="coresFormControl" multiple>
-            <mat-option *ngFor="let core of coreFacilities" [value]="core.idCoreFacility">{{core.display}}</mat-option>
-        </mat-select>
-        <mat-error *ngIf="coresFormControl.hasError('required')">At least one core facility is required</mat-error>
-    </mat-form-field>
+    <div class="formField padded-left-right">
+        <custom-multi-combo-box class="full-width"
+                                placeholder="Cores"
+                                [formControl]="coresFormControl"
+                                [options]="coreFacilities"
+                                valueField="idCoreFacility"
+                                displayField="display">
+        </custom-multi-combo-box>
+    </div>
     <mat-form-field class="formField padded-left-right">
         <input matInput placeholder="Subject" [formControl]="subjectFormControl">
         <mat-error *ngIf="subjectFormControl.hasError('required')">Subject is required</mat-error>

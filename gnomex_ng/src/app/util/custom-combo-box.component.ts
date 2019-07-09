@@ -58,6 +58,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     public loadedOptions: any[] = [];
 
     @Input() private valueField: string;
+    @Input() private forceEmitObject: boolean = false;
     @Input() public displayField: string;
 
     private outerControl: AbstractControl = new FormControl();
@@ -134,7 +135,17 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
         this.loadedOptions = [];
         let newValue: any = null;
         if (this.outerControl.value) {
-            let currentlySelected: any = this.options.find((opt: any) => (this.valueField ? opt[this.valueField] === this.outerControl.value : opt === this.outerControl.value));
+            let currentlySelected: any = this.options.find((opt: any) => {
+                let optValue: any = this.valueField ? opt[this.valueField] : opt;
+                if (this.forceEmitObject) {
+                    let outerValue: any = this.outerControl.value ? (this.valueField ? this.outerControl.value[this.valueField] : this.outerControl.value) : null;
+                    if (optValue === outerValue) {
+                        return true;
+                    }
+                } else {
+                    return optValue === this.outerControl.value;
+                }
+            });
             if (currentlySelected) {
                 newValue = currentlySelected;
                 this.loadedOptions.push(currentlySelected);
@@ -187,7 +198,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     }
 
     public selectOption(opt: any): void {
-        let newVal: any = opt ? (this.valueField ? opt[this.valueField] : opt) : null;
+        let newVal: any = opt ? ((this.valueField && !this.forceEmitObject) ? opt[this.valueField] : opt) : null;
         if (this.noNgControl) {
             this.outerControl.setValue(newVal);
         }

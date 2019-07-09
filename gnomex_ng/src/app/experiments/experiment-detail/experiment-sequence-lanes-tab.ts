@@ -200,9 +200,15 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     }
     
     setEditMode() {
-        this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed").getColDef().editable = this.canEdit && this.editMode;
-        this.lanesGrid.columnApi.getColumn("lastCycleStatus").getColDef().editable = this.canEdit && this.editMode;
-        this.lanesGrid.columnApi.getColumn("pipelineStatus").getColDef().editable = this.canEdit && this.editMode;
+        if (this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed")) {
+            this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed").getColDef().editable = this.canEdit && this.editMode;
+        }
+        if (this.lanesGrid.columnApi.getColumn("lastCycleStatus")) {
+            this.lanesGrid.columnApi.getColumn("lastCycleStatus").getColDef().editable = this.canEdit && this.editMode;
+        }
+        if (this.lanesGrid.columnApi.getColumn("pipelineStatus")) {
+            this.lanesGrid.columnApi.getColumn("pipelineStatus").getColDef().editable = this.canEdit && this.editMode;
+        }
     }
     
     ngOnChanges(changes: SimpleChanges): void {
