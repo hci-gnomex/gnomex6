@@ -61,7 +61,7 @@ export class DialogsService {
             configuration.data = {templateRef:tempRef}
         }
         configuration.maxHeight = "15em";
-        let dialogRef = this.dialog.open(tempRef, configuration);
+        let dialogRef = this.dialog.open(CustomDialogComponent, configuration);
         return dialogRef.afterClosed();
     }
 
