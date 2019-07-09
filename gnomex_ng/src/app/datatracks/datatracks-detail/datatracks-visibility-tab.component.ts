@@ -10,6 +10,7 @@
         import {first} from "rxjs/operators";
         import {UserPreferencesService} from "../../services/user-preferences.service";
         import {HttpParams} from "@angular/common/http";
+        import {UtilService} from "../../services/util.service";
 
         @Component({
             selector:'dt-visibility-tab',
@@ -96,11 +97,12 @@
                             if(data.Lab){
                                 this.makeOwnerList(data.Lab);
                                 this.lab = data.Lab;
+                                this.updateCollaborators();
                             }
                         });
                     }
 
-                    this.updateCollaborators();
+
                 });
 
             }
@@ -158,7 +160,10 @@
                 let prepCollabsList:Array<any> = [];
 
                 if(visCode === 'MEM'){
-                    let memCollabs = Array.isArray(lab.membersCollaborators) ? lab.membersCollaborators : [lab.membersCollaborators];
+                    let memCollabs: any[] = [];
+                    if (lab.membersCollaborators) {
+                        memCollabs = UtilService.getJsonArray(lab.membersCollaborators, lab.membersCollaborators.AppUser);
+                    }
                     lab.membersCollaborators = memCollabs;
                     prepCollabsList = memCollabs.filter(mem => mem.isActive === 'Y');
                     this.visibilityForm.get('collaborators').enable();

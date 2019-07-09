@@ -128,9 +128,9 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if (result) {
-                        this.onDataTrackCreated.emit(result);
-                    }
+            if (result) {
+                this.onDataTrackCreated.emit(result);
+            }
         });
     }
 
@@ -148,9 +148,9 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if(result) {
-                        this.onDataTrackFolderCreated.emit(result);
-                    }
+            if(result) {
+                this.onDataTrackFolderCreated.emit(result);
+            }
         });
     }
 
@@ -166,37 +166,42 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public deleteDataTrack(type: string, params:HttpParams): void {
-        if (type === DATATRACK) {
 
+        if (type === DATATRACK) {
+            this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteDataTrack(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             }, (err:IGnomexErrorResponse) =>{
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         } else if (type === DATATRACKFOLDER) {
-
+            this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteDataTrackFolder(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             },(err:IGnomexErrorResponse) => {
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         } else if (type === GENOMEBUILD) {
-
+            this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteGenomeBuild(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.GENOME_BUILD);
             },(err:IGnomexErrorResponse) =>{
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         } else if (type === ORGANISM) {
-
+            this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteOrganism(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.ORGANISM);
             }, (err:IGnomexErrorResponse) =>{
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         }
     }
@@ -252,6 +257,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     level = "Confirm";
                     confirmString = "Remove genome build " + this.selectedNode.data.label + "?";
                     type = GENOMEBUILD;
+                    params = params.set("idGenomeBuild", this.selectedNode.data.idGenomeBuild);
                     params = params.set("idGenomeBuild", this.selectedNode.data.idGenomeBuild);
                 }
             }

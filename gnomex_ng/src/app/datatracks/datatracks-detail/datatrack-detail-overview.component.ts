@@ -296,7 +296,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.orderValidateService.emitOrderValidateSubject();
         let name = this.dtOverviewForm.get("summaryForm.folderName").value;
         let summary = this.dtOverviewForm.get("summaryForm.summary").value;
-        let description: string = this.orderValidateService.propsNotOnForm["description"];
+        let description: string = this.dtOverviewForm.get("summaryForm.description").value;
         let idAppUser: string = "";
         let codeVisibility: string = this.dtOverviewForm.get("visibilityForm.codeVisibility").value;
         let idLab: string = this.dtOverviewForm.get("visibilityForm.lab").value;
