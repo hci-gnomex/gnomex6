@@ -445,7 +445,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
                 let errorMessage = "One or more of the selected orders has already been added to an " +
                     "instrument run. The order(s) cannot be deleted.";
 
-                this.dialogService.alert(errorMessage);
+                this.dialogService.error(errorMessage);
             } else {
                 let warningMessage = 'Are you sure you want to delete these orders?';
                 let usedProducts: boolean = false;
@@ -468,14 +468,18 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
                 }
 
                 if (usedProducts) {
-                    warningMessage += "\n\n" +
+                    warningMessage += "<br>" +
                         "WARNING: One or more of the selected orders may have used products. " +
                         "If the products were not actually consumed, please revert the status " +
                         "of the order to an earlier status or manually return the products to " +
-                        "the lab before deleting.\n\n";
+                        "the lab before deleting.<br>";
                 }
 
-                this.dialogService.yesNoDialog(warningMessage, this, 'onConfirmDelete');
+                this.dialogService.confirm(warningMessage).subscribe((result: any) => {
+                    if(result) {
+                        this.onConfirmDelete();
+                    }
+                });
             }
         }
 	}

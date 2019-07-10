@@ -392,8 +392,8 @@ button.mat-button.link-button {
 }
 
 .dialog-header-colors {
-    background-color: #84b278;
-    color: white;
+    background-color: white;
+    color: var(--bluewarmvivid-medlight);
 }
 .generic-dialog-header-colors{
     background-color: var(--bluewarmvivid-medlight);
@@ -407,6 +407,11 @@ button.mat-button.link-button {
 label.mat-radio-label {
     margin-top: 0.15em !important;
     margin-bottom: 0.15em !important;
+}
+
+mat-dialog-content {
+    max-height: 80vh;
+    max-width: 80vw;
 }
 
 /*!

@@ -34,7 +34,6 @@ import {CreateProjectLauncherComponent} from "./create-project-launcher-componen
 import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
 import {TabNotesViewComponent} from "./new-experiment/tab-notes-view.component";
 import {TabSampleSetupViewComponent} from "./new-experiment/tab-sample-setup-view.component";
-import {TabPropertiesViewComponent} from "./new-experiment/tab-properties-view.component";
 import {TabSeqSetupViewComponent} from "./new-experiment/tab-seq-setup-view.component";
 import {NewExperimentComponent} from "./new-experiment/new-experiment.component";
 import {AnnotationTabComponent} from "../util/annotation-tab.component";
@@ -133,7 +132,6 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
         CreateProjectLauncherComponent,
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
-        TabPropertiesViewComponent,
         TabSeqSetupViewComponent,
         TabSeqProtoViewComponent,
         NewExperimentComponent,
@@ -167,7 +165,6 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
         ExperimentBioinformaticsTabComponent,
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
-        TabPropertiesViewComponent,
         TabSeqSetupViewComponent,
         NewExperimentComponent,
         NewExperimentSetupComponent,
@@ -191,7 +188,6 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
         CreateProjectLauncherComponent,
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
-        TabPropertiesViewComponent,
         TabSeqSetupViewComponent,
         NewExperimentComponent,
         NewExperimentSetupComponent,

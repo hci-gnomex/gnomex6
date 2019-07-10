@@ -1,8 +1,7 @@
-
-import {Component, OnInit, OnDestroy} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {IRegisterUser, ISimpleCoreFacility} from "../../util/interfaces/register-user.model";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 
 @Component({
 
@@ -82,7 +81,7 @@ export class SelectCoreComponent  implements OnInit, OnDestroy{
                     this.siteLogo = registerUser.siteLogo;
                     console.log(this.coreFacilities);
                 } else if (regUserResp.message) {
-                    this.dialogService.alert(regUserResp.message);
+                    this.dialogService.alert(regUserResp.message, "", DialogType.FAILED);
                 }
             }
         })

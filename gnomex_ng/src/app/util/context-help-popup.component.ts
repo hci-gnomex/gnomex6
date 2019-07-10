@@ -30,7 +30,7 @@ import {DictionaryService} from "../services/dictionary.service";
             <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Cancel"></save-footer>
         </div>
     `,
-    styles: [`        
+    styles: [`
         :host /deep/ angular-editor #editor {
             resize: none;
         }
@@ -120,7 +120,7 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving the context help" + message, null);
+                    this.dialogsService.error("An error occurred while saving the context help" + message);
                 }
             });
         }

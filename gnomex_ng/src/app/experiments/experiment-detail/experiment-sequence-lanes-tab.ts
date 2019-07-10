@@ -1,8 +1,13 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, SelectionChangedEvent} from "ag-grid-community";
+import {
+    GridApi,
+    GridReadyEvent,
+    GridSizeChangedEvent,
+    SelectionChangedEvent,
+} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {IconRendererComponent} from "../../util/grid-renderers";
@@ -322,7 +327,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
         if (this.selectedSample && this.selectedLanes.length === 1) {
             let selectedLane: any = this.selectedLanes[0];
             if (selectedLane.idSample !== "0") {
-                this.dialogsService.alert("Cannot overwrite existing sample " + selectedLane.sampleName);
+                this.dialogsService.alert("Cannot overwrite existing sample " + selectedLane.sampleName, null, DialogType.WARNING);
                 return;
             }
 
@@ -374,7 +379,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
                 let title: string = "Warning";
                 let message: string = "Lane " + lane.number + " is already loaded on flow cell " + lane.flowCellNumber
                     + "-" + lane.flowCellChannelNumber + ". Remove lane anyway?";
-                this.dialogsService.confirm(title, message).subscribe((answer: boolean) => {
+                this.dialogsService.confirm(message, title).subscribe((answer: boolean) => {
                     if (answer) {
                         this.deleteSequenceLane(lane);
                     }

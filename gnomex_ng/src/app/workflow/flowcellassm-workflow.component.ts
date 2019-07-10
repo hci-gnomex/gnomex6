@@ -6,7 +6,7 @@ import {GridApi, GridOptions} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
@@ -403,7 +403,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         if (this.assmItemList.filter(lane=>
             lane.laneNumber === event.data.laneNumber).length === 0) {
             if (!this.firstSelectedFlowcellRequestType && event.data.codeRequestCategory != this.selectedFlowcellRequestType) {
-                this.dialogsService.confirm("Only one type of experiment can be assembled on a flow cell", null);
+                this.dialogsService.alert("Only one type of experiment can be assembled on a flow cell", null, DialogType.WARNING);
             } else {
                 for (let proto of this.filteredProtocolsList) {
                     if (proto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed) {
@@ -498,11 +498,11 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
             let validIndexTags = this.validateIndexTags();
 
             if (this.protocolFC.value === "") {
-                this.dialogsService.confirm("Please choose a sequencing protocol for the flow cell.", null);
+                this.dialogsService.alert("Please choose a sequencing protocol for the flow cell.", null, DialogType.FAILED);
                 return;
             }
             if (validProtoAndLanes.errorMessage) {
-                this.dialogsService.confirm(validProtoAndLanes.errorMessage, null);
+                this.dialogsService.alert(validProtoAndLanes.errorMessage, null, DialogType.VALIDATION);
                 return;
             }
             if (validProtoAndLanes.warningMessage) {
@@ -515,7 +515,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 warningMessage += validIndexTags.warningMessage;
             }
             if (warningMessage) {
-                this.dialogsService.confirm(warningMessage, " Continue saving?").subscribe((answer: boolean) => {
+                this.dialogsService.confirm(warningMessage + "<br> Continue saving?").subscribe((answer: boolean) => {
                     if (answer) {
                         this.saveWorkItems();
                     }
@@ -546,7 +546,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 if (!responseJSON.flowCellNumber) {
                     responseJSON.flowCellNumber = "";
                 }
-                this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " created", null);
+                this.dialogsService.alert("Flowcell " + responseJSON.flowCellNumber + " created", null, DialogType.SUCCESS);
                 this.assmItemList = [];
                 this.initialize();
             }

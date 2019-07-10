@@ -7,7 +7,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {DateRange} from "../util/date-range-filter.component";
 import {HttpParams} from "@angular/common/http";
 import {ProductsService} from "../services/products.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {MatSnackBar} from "@angular/material";
 import {ITreeOptions, TreeComponent} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
@@ -200,7 +200,7 @@ export class ProductOrdersComponent implements OnInit {
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving the product order list" + message, null);
+                    this.dialogsService.error("An error occurred while retrieving the product order list" + message);
                 }
                 this.treeComponent.treeModel.update();
             }
@@ -234,12 +234,12 @@ export class ProductOrdersComponent implements OnInit {
     public promptToSave(): void {
         if (this.changeStatus && this.changeProductOrders && this.changeProductOrders.length > 0) {
             if (this.createSecurityAdvisorService.coreFacilitiesICanManage.length < 1) {
-                this.dialogsService.confirm("Insufficient permissions to change status", null);
+                this.dialogsService.alert("Insufficient permissions to change status", null, DialogType.FAILED);
                 return;
             }
 
             if (this.displayMode === this.DISPLAY_DETAIL && this.detailDisplayMode === this.DETAIL_LAB_MODE) {
-                this.dialogsService.confirm("Do you want to change the status of all orders in this lab?", " ").subscribe((response: boolean) => {
+                this.dialogsService.confirm("Do you want to change the status of all orders in this lab?").subscribe((response: boolean) => {
                     if (response) {
                         this.save();
                     }
@@ -266,7 +266,7 @@ export class ProductOrdersComponent implements OnInit {
         this.productsService.changeProductOrderStatus(params).subscribe((response: any) => {
             if (response && response.result && response.result === 'SUCCESS') {
                 if (response.message) {
-                    this.dialogsService.confirm(response.message, null);
+                    this.dialogsService.alert(response.message, null, DialogType.SUCCESS);
                 }
                 this.snackBar.open("Item(s) Saved", "Product Orders", {
                     duration: 2000,
@@ -277,7 +277,7 @@ export class ProductOrdersComponent implements OnInit {
                 if (response && response.message) {
                     message = ": " + response.message;
                 }
-                this.dialogsService.confirm("An error occurred while saving product order line item(s)" + message, null);
+                this.dialogsService.error("An error occurred while saving product order line item(s)" + message);
             }
         });
     }
@@ -285,7 +285,7 @@ export class ProductOrdersComponent implements OnInit {
     public promptToDelete(): void {
         if (this.changeProductOrders && this.changeProductOrders.length > 0) {
             if (this.displayMode === this.DISPLAY_DETAIL) {
-                this.dialogsService.confirm("Any completed line item(s) will be skipped. Continue?", " ").subscribe((response: boolean) => {
+                this.dialogsService.confirm("Any completed line item(s) will be skipped. Continue?").subscribe((response: boolean) => {
                     if (response) {
                         this.deleteLineItems();
                     }
@@ -302,9 +302,9 @@ export class ProductOrdersComponent implements OnInit {
                 }
 
                 if (allComplete) {
-                    this.dialogsService.confirm("The selected line item(s) is marked as complete and cannot be deleted", null);
+                    this.dialogsService.alert("The selected line item(s) is marked as complete and cannot be deleted", null, DialogType.SUCCESS);
                 } else if (hasComplete) {
-                    this.dialogsService.confirm("At least one of the selected line item(s) is marked as complete and will be skipped. Continue?", " ").subscribe((response: boolean) => {
+                    this.dialogsService.confirm("At least one of the selected line item(s) is marked as complete and will be skipped. Continue?", "Warning").subscribe((response: boolean) => {
                         if (response) {
                             this.deleteLineItems();
                         }
@@ -323,7 +323,7 @@ export class ProductOrdersComponent implements OnInit {
         this.productsService.deleteProductLineItems(params).subscribe((response: any) => {
             if (response && response.result && response.result === 'SUCCESS') {
                 if (response.message) {
-                    this.dialogsService.confirm(response.message, null);
+                    this.dialogsService.alert(response.message, null, DialogType.SUCCESS);
                 }
                 this.snackBar.open("Item(s) Deleted", "Product Orders", {
                     duration: 2000,
@@ -334,7 +334,7 @@ export class ProductOrdersComponent implements OnInit {
                 if (response && response.message) {
                     message = ": " + response.message;
                 }
-                this.dialogsService.confirm("An error occurred while deleting product order line item(s)" + message, null);
+                this.dialogsService.error("An error occurred while deleting product order line item(s)" + message);
             }
         });
     }

@@ -2,29 +2,30 @@ import {Component, Inject, OnInit} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {PropertyService} from "../services/property.service";
 import {FileService} from "../services/file.service";
+import {ActionType} from "./interfaces/generic-dialog-action.model";
 
 @Component({
     template: `
-        <h6 mat-dialog-title>Confirm Download</h6>
-        <mat-dialog-content>
-            <div>
-                Ready to download approximately {{this.downloadSizeLabel}}.
+        <div class="full-height full-width flex-container-col">
+            <div class="full-height full-width flex-container-col padded">
+                <div>
+                    Ready to download approximately {{this.downloadSizeLabel}}.
+                </div>
+                <div *ngIf="this.isFDTSupported">
+                    Which download mechanism do you want to use?
+                </div>
+                <div *ngIf="this.isFDTSupported">
+                    (FDT download is recommended for downloads > 300 MB)
+                </div>
             </div>
-            <div *ngIf="this.isFDTSupported">
-                Which download mechanism do you want to use?
-            </div>
-            <div *ngIf="this.isFDTSupported">
-                (FDT download is recommended for downloads > 300 MB)
-            </div>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button (click)="this.selectNormalDownload()">Normal Download</button>
-            <button mat-button *ngIf="this.isFDTSupported" (click)="this.selectFDTDownload()">FDT Download</button>
-            <button mat-button mat-dialog-close>Cancel</button>
-        </mat-dialog-actions>
+            <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+                <save-footer (saveClicked)="selectNormalDownload()" name="Normal Download"></save-footer>
+                <save-footer *ngIf="this.isFDTSupported" (saveClicked)="selectFDTDownload()" name="FDT Download"></save-footer>
+                <save-footer [actionType]="actionType.SECONDARY"(saveClicked)="onClose()" name="Cancel"></save-footer>
+            </mat-dialog-actions>
+        </div>
     `,
-    styles:[`
-    `]
+    styles:[``]
 })
 export class DownloadPickerComponent implements OnInit {
 
@@ -35,6 +36,7 @@ export class DownloadPickerComponent implements OnInit {
     private estimatedDownloadSize: string = "";
     private uncompressedDownloadSize: string = "";
     public downloadSizeLabel: string = "";
+    public actionType: any = ActionType;
 
     constructor(private dialogRef: MatDialogRef<DownloadPickerComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
@@ -67,6 +69,10 @@ export class DownloadPickerComponent implements OnInit {
 
     public selectFDTDownload(): void {
         this.dialogRef.close(DownloadPickerComponent.DOWNLOAD_FDT);
+    }
+
+    onClose(): void {
+        this.dialogRef.close();
     }
 
 }

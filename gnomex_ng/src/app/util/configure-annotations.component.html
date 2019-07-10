@@ -1,6 +1,6 @@
 <div class="wholeDocument">
-    <div *ngIf="!experimentPlatformMode" class="fullRow">
-        <h5>Configure Annotations</h5>
+    <div *ngIf="!experimentPlatformMode && !isDialog" class="fullRow">
+        <h5>Configure Annotations</h5> experimentPlatformMode: {{experimentPlatformMode}}
     </div>
     <div class="fullRow">
         <div class="embeddedRow">
@@ -49,7 +49,7 @@
         <mat-tab-group [(selectedIndex)]="this.selectedTabIndex" *ngIf="this.selectedProperty" style="width:65%;">
             <mat-tab label="Annotation">
                 <div class="tabContent">
-                    <div class="tabRow" style="margin-bottom: 2%">
+                    <div class="tabRow">
                         <mat-form-field class="propFormField" style="margin-right: 2%;">
                             <input matInput placeholder="Name" [formControl]="this.nameFC">
                             <mat-error *ngIf="this.nameFC.hasError('required')">Required</mat-error>
@@ -73,18 +73,18 @@
                         <mat-checkbox [formControl]="this.requiredFC">Required (Annotation must be filled in)</mat-checkbox>
                     </div>
                     <div class="tabRow">
-                        <mat-form-field class="propFormField" style="margin-bottom: 1%">
+                        <mat-form-field class="propFormField">
                             <input matInput placeholder="Sort Order" [formControl]="this.sortOrderFC">
                             <mat-error *ngIf="this.sortOrderFC.hasError('pattern')">Sort order must be a number less than or equal to 9999</mat-error>
                         </mat-form-field>
                     </div>
-                    <div class="tabRow" style="flex: 2; margin-bottom: 1%">
+                    <div class="tabRow" style="flex: 2;">
                         <mat-form-field class="propFormField">
                             <textarea matInput placeholder="Description" [formControl]="this.descriptionFC" matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
                             <mat-error *ngIf="this.descriptionFC.hasError('maxlength')">Description can be at most 2000 characters</mat-error>
                         </mat-form-field>
                     </div>
-                    <div class="tabRow" style="width: 65%;">
+                    <div class="tabRow" style="width: 65%; margin-bottom: 2%;">
                         <custom-combo-box placeholder="Owner" [options]="this.appUserList"
                                             valueField="idAppUser" displayField="display"
                                             [formControl]="this.ownerFC" class="full-height full-width">
@@ -232,10 +232,12 @@
     </div>
     <div class="fullRow">
         <label>* Denotes annotations that apply to specific organisms, analysis types, experiment platforms, and/or users</label>
-        <div style="display: flex; flex-direction: row;" *ngIf="this.selectedProperty">
-            <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirtyNote">Changes Have Not Been Saved</span>
-            <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.formGroup.valid" (click)="this.save()"><img class="icon" src="../../assets/action_save.gif">Save</button>
-            <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+        <div *ngIf="!isDialog">
+            <div style="display: flex; flex-direction: row;" *ngIf="this.selectedProperty">
+                <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirtyNote">Changes Have Not Been Saved</span>
+                <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.formGroup.valid" (click)="this.save()"><img class="icon" src="../../assets/action_save.gif">Save</button>
+                <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+            </div>
         </div>
     </div>
 </div>

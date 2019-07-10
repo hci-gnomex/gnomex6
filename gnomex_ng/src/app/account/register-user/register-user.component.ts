@@ -1,12 +1,9 @@
-
-import {Component, OnInit, OnDestroy} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {IRegisterUser, ISimpleLab} from "../../util/interfaces/register-user.model";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {numberRange} from "../../util/validators/number-range-validator";
 import {MatSlideToggleChange} from "@angular/material";
-import {V} from "@angular/cdk/typings/esm5/keycodes";
 import {PasswordUtilService} from "../../services/password-util.service";
 import {UserService} from "../../services/user.service";
 import {HttpParams} from "@angular/common/http";
@@ -113,7 +110,7 @@ import {HttpParams} from "@angular/common/http";
                         </ng-template>
                     </div>
                     <div>
-                        <mat-slide-toggle 
+                        <mat-slide-toggle
                                 *ngIf="isUniversityAuthd"
                                 (change)="toggledUniversityState($event)"
                                 formControlName="uofuAffiliate"
@@ -276,7 +273,7 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
                     }
 
                 }else if(regUserResp && regUserResp.message){
-                    this.dialogService.alert(regUserResp.message);
+                    this.dialogService.alert(regUserResp.message, "", DialogType.FAILED);
                 }
             }
         });

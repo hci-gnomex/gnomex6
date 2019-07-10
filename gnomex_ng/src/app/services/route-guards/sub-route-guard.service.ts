@@ -1,10 +1,16 @@
 // src/app/auth/auth-guard.service.ts
-import { Injectable } from '@angular/core';
-import {Router, CanActivate, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
+import {Injectable} from '@angular/core';
+import {
+    ActivatedRoute,
+    ActivatedRouteSnapshot,
+    CanActivate,
+    Router,
+    RouterStateSnapshot,
+} from '@angular/router';
 import {GnomexService} from "../gnomex.service";
 import {CreateSecurityAdvisorService} from "../create-security-advisor.service";
 import {PropertyService} from "../property.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 
 @Injectable()
 export class SubRouteGuardService implements CanActivate {
@@ -38,7 +44,7 @@ export class SubRouteGuardService implements CanActivate {
 
         if(!this.propertyService.isPublicVisbility()){
             if(this.gnomexService.orderInitObj &&  this.gnomexService.orderInitObj.codeVisbility === "PUBLIC"){
-                this.dialogsService.alert("You do not have permission to view this item.");
+                this.dialogsService.alert("You do not have permission to view this item.", "", DialogType.FAILED);
                 return false;
             }
         }

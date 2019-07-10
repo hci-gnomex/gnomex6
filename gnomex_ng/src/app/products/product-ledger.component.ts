@@ -343,7 +343,7 @@ export class ProductLedgerComponent implements OnInit {
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving" + message, null);
+                    this.dialogsService.error("An error occurred while saving" + message);
                 }
                 this.showSpinner = false;
             });

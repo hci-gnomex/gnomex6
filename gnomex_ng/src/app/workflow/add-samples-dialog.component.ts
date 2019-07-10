@@ -4,7 +4,7 @@ import {WorkflowService} from "../services/workflow.service";
 import {HttpParams} from "@angular/common/http";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {GridApi} from "ag-grid-community/dist/lib/gridApi";
 import {GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
@@ -180,7 +180,7 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
                 }else{
                     if(items.length === 1){
                         this.dialogsService.alert("Sample " + item.label + " has already been assigned to another flow cell channel.",
-                            "Sample(s) not added");
+                            "Sample(s) not added", DialogType.FAILED);
                     }else{
                         errMessage +=  "\'" + item.itemNumber +  "\' ";
                     }
@@ -195,7 +195,7 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
 
             } else {
                 if(items.length === 1){
-                    this.dialogsService.alert("Sequencing samples only.", "Samples not added")
+                    this.dialogsService.alert("Sequencing samples only.", "Samples not added", DialogType.FAILED);
                 }else{
                     errMessage += "\'" + item.itemNumber +  "\' ";
                 }
@@ -206,7 +206,7 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
         if(errMessage && items.length > 1 ){
             errMessage = "The following flow cell items were not added : " + errMessage + ". For a more detailed reason"
                 + " you can try removing those items individually (listed above).";
-            this.dialogsService.alert(errMessage, "Flow Cell Not Added");
+            this.dialogsService.alert(errMessage, "Flow Cell Not Added", DialogType.FAILED);
         }
 
 
@@ -283,7 +283,7 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
     remove(event):void{
 
         for(let item  of this.selectedSampleFlowCell ){
-            this.dialogsService.confirm("Confirm","Are you sure you want to remove Sample " + item.data.number + " ?")
+            this.dialogsService.confirm("Are you sure you want to remove Sample " + item.data.number + " ?")
                 .subscribe(action => {
                     if(action){
                         let removeIndex:number = this.lanes.indexOf(item.data);
@@ -296,7 +296,7 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
         }
     }
     clearAll(event):void{
-        this.dialogsService.confirm("Confirm", "Are you sure you want to remove all samples?" )
+        this.dialogsService.confirm("Are you sure you want to remove all samples?" )
             .subscribe(action => {
                 this.lanes = [];
                 this.gridApi.setRowData(this.lanes);
@@ -306,7 +306,7 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
 
     }
     cancel(){
-        this.dialogsService.confirm("Confirm","Are you sure you want to continue without saving your changes?")
+        this.dialogsService.confirm("Are you sure you want to continue without saving your changes?")
             .subscribe((action) =>{
                 if(action){
                     this.dialogRef.close();

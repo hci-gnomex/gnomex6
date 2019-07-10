@@ -1,7 +1,7 @@
 import {Component, Input, OnDestroy} from "@angular/core";
 import {Response, URLSearchParams} from "@angular/http";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 
 import {GridApi} from "ag-grid-community";
 
@@ -9,12 +9,14 @@ import {first} from "rxjs/internal/operators";
 import {Subscription} from "rxjs/index";
 
 import {PropertyService} from "../../services/property.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {OrderType} from "../../util/annotation-tab.component";
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {Experiment} from "../../util/models/experiment.model";
+import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../../services/constants.service";
 
 
 @Component({
@@ -121,7 +123,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
                 private propertyService: PropertyService,
                 private dialogsService: DialogsService,
                 private gnomexService: GnomexService,
-                private matDialog: MatDialog) {
+                private constService: ConstantsService) {
 
         this.form = this.fb.group({
             customAnnot: [''],
@@ -202,15 +204,23 @@ export class TabAnnotationViewComponent implements OnDestroy {
 
     public editAnnotations(event?: any): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.height = '80%';
-        configuration.data = { orderType: OrderType.EXPERIMENT };
+        configuration.width = "80em";
+        configuration.height = "56em";
+        configuration.autoFocus = false;
+        configuration.data = {
+            isDialog: true,
+            orderType: OrderType.EXPERIMENT
+        };
 
-        let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.matDialog.open(ConfigAnnotationDialogComponent, configuration);
-
-        dialogRef.afterClosed().subscribe(() => {
-            this.dialogsService.startDefaultSpinnerDialog();
-            this._experiment.refreshSampleAnnotationList();
+        this.dialogsService.genericDialogContainer(ConfigureAnnotationsComponent, "Configure Annotations", null, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}
+                ]}).subscribe(() => {
+                    this.dialogsService.startDefaultSpinnerDialog();
+                    this._experiment.refreshSampleAnnotationList();
         });
+
     }
 
     onCustomAnnot(event) {
@@ -244,7 +254,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
                 let responseJSON: any = response.json();
                 if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
                     if (responseJSON.inactivate === "true") {
-                        this.dialogsService.confirm("Certain options were inactivated instead of deleted because they are associated with existing samples", null);
+                        this.dialogsService.alert("Certain options were inactivated instead of deleted because they are associated with existing samples", "Succeed With Warning", DialogType.SUCCESS);
                     }
                 } else {
                     error = true;
@@ -254,7 +264,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
             }
 
             if (error) {
-                this.dialogsService.confirm("An error occurred while saving the annotation", null);
+                this.dialogsService.error("An error occurred while saving the annotation");
             }
 
             this._experiment.refreshSampleAnnotationList();

@@ -93,7 +93,7 @@ export class PriceCategoryViewComponent extends BaseGenericContainerDialog imple
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving the price category" + message, null);
+                    this.dialogsService.error("An error occurred while retrieving the price category" + message);
                 }
             });
         }
@@ -158,7 +158,7 @@ export class PriceCategoryViewComponent extends BaseGenericContainerDialog imple
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while saving the price category" + message, null);
+                this.dialogsService.error("An error occurred while saving the price category" + message);
             }
         });
     }

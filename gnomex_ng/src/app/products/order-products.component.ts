@@ -268,7 +268,7 @@ export class OrderProductsComponent implements OnInit {
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while submitting the product order" + message, null);
+                    this.dialogsService.error("An error occurred while submitting the product order" + message);
                     this.enableSubmit = true;
                 }
             });
