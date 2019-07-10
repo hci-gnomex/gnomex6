@@ -1,34 +1,34 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
-import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {AngularEditorConfig} from "@kolkov/angular-editor";
 
 
 @Component({
     template: `
         <div class="flex-container-col full-width full-height padded">
-            <label class="gx-label" style="margin-bottom:0.5em;" for="experimentDescriptionId" > Notes </label>
-            <jqxEditor
-                    #editorReference
-                    id="experimentDescriptionId"
-                    width="100%"
-                    [height]="300"
-                    [editable]="true"
-                    [tools]="tbarSettings"
-                    [toolbarPosition]="'bottom'">
-            </jqxEditor>
+            <angular-editor (ngModelChange)="editorChange($event)" #notesEditor [(ngModel)]="notes" [config]="this.editorConfig">
+            </angular-editor>
         </div>
     `,
+    styles: [`
+        :host /deep/ angular-editor #editor {
+            resize: none;
+        }
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
+    `]
 })
-export class SampleTypeDetailDialogComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
+export class SampleTypeDetailDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
     rowData:any;
     applyFn:any;
     notes: string;
     isDirty = false;
+    editorConfig:AngularEditorConfig;
+    eChange: boolean = false;
 
-    @ViewChild('editorReference') myEditor: jqxEditorComponent;
-    public readonly tbarSettings :string  ="bold italic underline | left center right |  format font size | color | ul ol | outdent indent";
 
 
 
@@ -44,16 +44,26 @@ export class SampleTypeDetailDialogComponent extends BaseGenericContainerDialog 
 
     ngOnInit(){
        this.innerTitle = this.rowData.display;
+        this.editorConfig = {
+            spellcheck: true,
+            height: "25em",
+            minHeight: "10em",
+            enableToolbar: true,
+            placeholder:"Notes",
+            editable: true
+        };
+
+    }
+    editorChange(event:any):void{
+        console.log(event);
+        this.eChange = true;
+
     }
 
-    ngAfterViewInit(){
-        this.myEditor.val(this.notes);
-    }
 
     applyChanges(){
-        let editorNotes:string = this.myEditor.val();
-        if(editorNotes !== this.notes){
-            this.rowData.notes = editorNotes;
+        if(this.eChange){
+            this.rowData.notes = this.notes;
             this.applyFn(true);
         }else{
             this.applyFn(false);

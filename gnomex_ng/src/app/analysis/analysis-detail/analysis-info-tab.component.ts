@@ -340,7 +340,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
                         if (result && result.message) {
                             message = ": " + result.message;
                         }
-                        this.dialogsService.confirm("An error occurred while retrieving lab" + message, null);
+                        this.dialogsService.error("An error occurred while retrieving lab" + message);
                     }
                 });
             }
@@ -436,7 +436,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
     public openEditAnalysisProtocol(): void {
         let manageProtocolsRoute: string = "/manage-protocols";
         if (this.form.dirty) {
-            this.dialogsService.confirm("Unsaved changes will be lost. Proceed?", " ").subscribe((result: boolean) => {
+            this.dialogsService.confirm("Unsaved changes will be lost. Proceed?").subscribe((result: any) => {
                 if (result) {
                     this.router.navigateByUrl(manageProtocolsRoute);
                 }
@@ -490,7 +490,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving lab" + message, null);
+                    this.dialogsService.error("An error occurred while retrieving lab" + message);
                 }
             });
             return;

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit} from "@angular/core";
 import {TopicService} from "../services/topic.service";
 import {ActivatedRoute} from "@angular/router";
 import {Subscription} from "rxjs";
@@ -10,7 +10,7 @@ import {GetLabService} from "../services/get-lab.service";
 import {URLSearchParams} from "@angular/http";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 import {first} from "rxjs/operators";
@@ -182,14 +182,14 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 if (visMessage) {
                     let message = "A topic may not be given broader visibility than its parent. Since the parent is currently only visible to " +
                         visMessage + ", visibility for this topic has been set to the same level.";
-                    this.dialogService.confirm(message, null);
+                    this.dialogService.alert(message, null, DialogType.SUCCESS);
                 }
             } else {
                 let message: string = "";
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogService.alert("An error occurred while saving the topic" + message);
+                this.dialogService.error("An error occurred while saving the topic" + message);
             }
         });
     }
@@ -217,9 +217,9 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     onEmailClick(): void {
         let idAppUser = this.topicForm.get("idAppUser").value;
         if(!idAppUser) {
-            this.dialogService.confirm("There is no owner selected for this topic. " +
+            this.dialogService.alert("There is no owner selected for this topic. " +
                 " Please select an owner in the dropdown and save before" +
-                " trying to communicate through email.", null);
+                " trying to communicate through email.", null, DialogType.VALIDATION);
             return;
         }
 

@@ -347,8 +347,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     }
     removeSeqOption(){
         let seqOpt = this.selectedSeqOpt[0];
-        this.dialogService.confirm("Remove Illumina Seq Option","Are you sure you want to remove the sequencing option named "
-            + seqOpt.name + "?" ).subscribe(result =>{
+        this.dialogService.confirm("Are you sure you want to remove the sequencing option named "
+            + seqOpt.name + "?", "Remove Illumina Seq Option").subscribe(result =>{
             if(result){
                 let i:number = this.seqOptionsList.indexOf(seqOpt);
                 this.seqOptionsList.splice(i,1);

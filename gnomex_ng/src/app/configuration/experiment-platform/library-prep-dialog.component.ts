@@ -6,7 +6,7 @@ import {numberRange} from "../../util/validators/number-range-validator";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {LibraryPrepProtocolDialogComponent} from "./library-prep-protocol-dialog.component";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.component";
 import * as _ from "lodash";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
@@ -98,8 +98,8 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
 
     initSeqLibProtocol(idSeqLibProtocol:string){
         if(idSeqLibProtocol.split(',').length > 1){
-            this.dialogService.alert("It appears mutiple seq protocols are associated with this application." +
-                "Editing the protocol may cause issues. Please notify GNomEx Support ");
+            this.dialogService.alert("It appears multiple seq protocols are associated with this application." +
+                "Editing the protocol may cause issues. Please notify GNomEx Support ", "", DialogType.WARNING);
         }else if(idSeqLibProtocol){
             let tempProtocolParam = this.dictionaryService.getEntry(DictionaryService.SEQ_LIB_PROTOCOL,idSeqLibProtocol);
             if(tempProtocolParam){

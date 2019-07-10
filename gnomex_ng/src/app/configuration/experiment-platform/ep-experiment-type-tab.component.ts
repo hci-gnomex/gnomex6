@@ -297,8 +297,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
     }
     remove(){
         let libPrep = this.selectedLibPrep[0];
-        this.dialogService.confirm("Remove Lib Prep","Are you sure you want to remove experiment type named "
-            + libPrep.display + "?" ).subscribe(result =>{
+        this.dialogService.confirm("Are you sure you want to remove experiment type named "
+            + libPrep.display + "?", "Remove Lib Prep").subscribe(result =>{
             if(result){
                 let removeIndex:number = this.applicationList.indexOf(libPrep);
                 if(removeIndex > -1){

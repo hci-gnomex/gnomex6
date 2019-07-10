@@ -62,6 +62,7 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
     private isSelectOpen: boolean = false;
 
     @Input() private valueField: string;
+    @Input() private forceEmitObject: boolean = false;
     @Input() public displayField: string;
 
     private outerControl: AbstractControl = new FormControl([]);
@@ -139,8 +140,7 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
         this.loadedOptions = [];
         if (this.outerControl.value && this.outerControl.value.length) {
             for (let opt of this.options) {
-                let optValue: any = this.valueField ? opt[this.valueField] : opt;
-                if (this.outerControl.value.includes(optValue)) {
+                if (this.isOptInOuterValue(opt)) {
                     this.loadedOptions.push(opt);
                 }
             }
@@ -165,11 +165,23 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
         } else {
             let searchValue: string = this.innerControl.value.toLowerCase();
             this.loadedOptions = this.options.filter((opt: any) => {
-                let currentValue: any[] = this.outerControl.value && this.outerControl.value.length ? this.outerControl.value : [];
-                let optValue: any = this.valueField ? opt[this.valueField] : opt;
                 let optDisplay: string = (this.displayField ? opt[this.displayField] : opt).toLowerCase();
-                return optDisplay.includes(searchValue) || currentValue.includes(optValue);
+                return optDisplay.includes(searchValue) || this.isOptInOuterValue(opt);
             });
+        }
+    }
+
+    private isOptInOuterValue(opt: any): boolean {
+        let optValue: any = this.valueField ? opt[this.valueField] : opt;
+        if (this.forceEmitObject) {
+            for (let outerValOpt of this.outerControl.value) {
+                let outerOptValue: any = this.valueField ? outerValOpt[this.valueField] : outerValOpt;
+                if (optValue === outerOptValue) {
+                    return true;
+                }
+            }
+        } else {
+            return this.outerControl.value.includes(optValue);
         }
     }
 
@@ -198,7 +210,7 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
         let newVal: any[] = [];
         for (let opt of options) {
             if (opt) {
-                newVal.push(this.valueField ? opt[this.valueField] : opt);
+                newVal.push((this.valueField && !this.forceEmitObject) ? opt[this.valueField] : opt);
             }
         }
         if (this.noNgControl) {

@@ -316,7 +316,7 @@ export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
 
         this.route.data.forEach((data: any) => {
             if(data && data.analysis) {
-                if (!data.analysis || !data.analysis.Analysis) {
+                if (!data.analysis.Analysis) {
                     return;
                 }
 

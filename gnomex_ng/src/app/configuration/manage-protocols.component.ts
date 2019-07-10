@@ -324,12 +324,15 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             && this.mostRecentlyDisplayedProtocolProtocolClassName) {
 
             let lines: string[] = [
-                "Are you sure you want to delete the ",
-                "" + this.protocolType + ":",
+                "Are you sure you want to delete the " + this.protocolType + ":",
                 "" + this.protocolName + "?"
             ];
 
-            this.dialogService.yesNoDialog(lines, this, "onConfirmDelete");
+            this.dialogService.confirm(lines).subscribe((result: any) => {
+                if(result) {
+                    this.onConfirmDelete();
+                }
+            });
         }
     }
 
@@ -341,7 +344,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 this.protocolService.deleteProtocol(this.mostRecentlyDisplayedProtocolId, this.mostRecentlyDisplayedProtocolProtocolClassName);
             });
         } else {
-            this.dialogService.alert("Error : No selected protocol");
+            this.dialogService.alert("No selected protocol");
         }
     }
 

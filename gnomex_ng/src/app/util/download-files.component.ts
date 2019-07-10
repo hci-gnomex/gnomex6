@@ -1,17 +1,18 @@
 import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
 import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {PropertyService} from "../services/property.service";
 import {FileService} from "../services/file.service";
 import {Observable} from "rxjs";
-import {DialogsService} from "./popup/dialogs.service";
+import {DialogsService, DialogType} from "./popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {DownloadProgressComponent} from "./download-progress.component";
 import {UtilService} from "../services/util.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {ActionType} from "./interfaces/generic-dialog-action.model";
 
 @Component({
     template: `
@@ -84,7 +85,7 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
             color: white;
         }
         .secondary-action {
-            background-color: white;
+            background-color: var(--sidebar-footer-background-color);
             font-weight: bolder;
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
@@ -122,8 +123,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                 private utilService: UtilService,
                 private fileService: FileService,
                 private dialogsService: DialogsService,
-                private securityAdvisor: CreateSecurityAdvisorService,
-                private dialog: MatDialog) {
+                private securityAdvisor: CreateSecurityAdvisorService) {
         super();
     }
 
@@ -170,20 +170,22 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                 let terms: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_GUEST_DOWNLOAD_TERMS);
                 if (terms) {
                     let guestTermsConfig: MatDialogConfig = new MatDialogConfig();
-                    guestTermsConfig.panelClass = "no-padding-dialog";
+                    guestTermsConfig.autoFocus = false;
                     guestTermsConfig.width = "30em";
                     guestTermsConfig.height = "30em";
                     guestTermsConfig.data = {
                         terms: terms,
                     };
-                    guestTermsConfig.disableClose = true;
-                    let guestTermsDialog: MatDialogRef<GuestTermsDialogComponent> = this.dialog.open(GuestTermsDialogComponent, guestTermsConfig);
-                    guestTermsDialog.afterClosed().subscribe((result: any) => {
-                        if (result) {
-                            this.email = result;
-                        } else {
-                            this.dialogRef.close();
-                        }
+                    this.dialogsService.genericDialogContainer(GuestTermsDialogComponent, "Download Terms", null, guestTermsConfig,
+                        {actions: [
+                                {type: ActionType.PRIMARY, icon: this.constantsService.ICON_ACCEPT, name: "Accept", internalAction: "accept"},
+                                {type: ActionType.SECONDARY, icon: this.constantsService.ICON_DECLINE, name: "Decline", internalAction: "onClose"}
+                            ]}).subscribe((result: any) => {
+                                if(result) {
+                                    this.email = result;
+                                } else {
+                                    this.dialogRef.close();
+                                }
                     });
                 }
             });
@@ -315,8 +317,11 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                     suggestedFilename: this.suggestedFilename,
                     fileType: ".zip",
                 };
-                progressWindowConfig.disableClose = true;
-                this.dialog.open(DownloadProgressComponent, progressWindowConfig);
+                progressWindowConfig.autoFocus = false;
+                this.dialogsService.genericDialogContainer(DownloadProgressComponent, null, null, progressWindowConfig,
+                    {actions: [
+                            {type: ActionType.SECONDARY, name: "Close", internalAction: "close"}
+                        ]});
             } else {
                 this.handleBackendError(result, "caching file download list");
             }
@@ -357,7 +362,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
         let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
         this.makeSoftLinksFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS' && result.softLinkPath) {
-                this.dialogsService.alert(result.softLinkPath, "Soft Link Path:");
+                this.dialogsService.alert(result.softLinkPath, "Soft Link Path:", DialogType.SUCCESS);
             } else {
                 this.handleBackendError(result, "making soft links");
             }
@@ -369,7 +374,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
         if (response && response.message) {
             message = ": " + response.message;
         }
-        this.dialogsService.confirm("An error occurred while " + action + message, null);
+        this.dialogsService.error("An error occurred while " + action + message);
     }
 
 }

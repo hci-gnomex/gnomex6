@@ -3,35 +3,43 @@ import {Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {TopicService} from "../services/topic.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'move-topic',
-    templateUrl: "./move-topic-dialog.html",
+    template: `
+        <div class="flex-container-col full-width full-height">
+            <div class="full-width full-height double-padded">
+                Do you want to move or copy items to {{targetFolder}}?
+            </div>
+            <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+                <save-footer (saveClicked)="doMoveCopy('M')" name="Move"></save-footer>
+                <save-footer (saveClicked)="doMoveCopy('C')" name="Copy"></save-footer>
+                <save-footer [actionType]="actionType" (saveClicked)="doCancel()" name="Cancel"></save-footer>
+            </div>
+        </div>
+    `,
 })
 
-export class MoveTopicComponent {
-    public title: string = "";
-    public folderName: string = "";
-    public idLab: string = "";
+export class MoveTopicComponent extends BaseGenericContainerDialog {
+    public actionType: any = ActionType.SECONDARY ;
     public currentItem: any;
     public targetItem: any;
-    public showSpinner: boolean = false;
-    public items: any[] = [];
-    public noButton: boolean = true;
-    private targetFolder: any;
+    public targetFolder: any;
 
     constructor(public dialogRef: MatDialogRef<MoveTopicComponent>,
                 private topicService: TopicService,
                 private dialogService: DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
-
+        super();
         this.currentItem = data.currentItem;
         this.targetItem = data.targetItem;
         this.targetFolder = this.targetItem.label;
     }
 
     public doCancel(): void {
-        this.noButton = true;
+        this.dialogRef.close(false);
     }
 
     public doMoveCopy(mode: any): void {
@@ -48,7 +56,7 @@ export class MoveTopicComponent {
             params.set("name", "Topic");
             this.topicService.moveOrCopyTopic(params).subscribe((response: Response) => {
                 this.showSpinner = false;
-                this.dialogRef.close();
+                this.dialogRef.close(true);
                 this.topicService.refreshTopicsList_fromBackend();
             });
         } else {
@@ -66,7 +74,7 @@ export class MoveTopicComponent {
             }
             this.topicService.addItemToTopic(params).subscribe((response: Response) => {
                 this.showSpinner = false;
-                this.dialogRef.close();
+                this.dialogRef.close(true);
                 this.topicService.refreshTopicsList_fromBackend();
             });
         }

@@ -25,7 +25,7 @@ export class LogoutComponent implements OnInit {
     
         setTimeout(() => {
             let mes: string = "Are you sure you want to sign out?";
-            this.dialogsService.confirm("Confirm", mes)
+            this.dialogsService.confirm(mes, "Confirm to Sign Out")
                 .pipe(first()).subscribe((result:boolean) => {
                 if(result){
                     this.authenticationService.logout();

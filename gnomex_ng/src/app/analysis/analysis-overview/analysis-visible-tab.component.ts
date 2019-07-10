@@ -75,7 +75,7 @@ export class AnalysisVisibleTabComponent implements OnInit {
                 this.analysisService.dirty = true;
                 return true;
             } else {
-                this.dialogService.confirm("Visibility can only be changed by owner, lab manager, or GNomEx admins.", null);
+                this.dialogService.alert("Visibility can only be changed by owner, lab manager, or GNomEx admins.");
                 rowData[field] = params.oldValue;
             }
         }
@@ -231,7 +231,7 @@ export class AnalysisVisibleTabComponent implements OnInit {
         for(let i = 0; i < aList.length; i++) {
             if(aList[i].codeVisibility === "INST" && aList[i].idInstitution === "") {
                 this.saveSuccess.emit();
-                this.dialogService.confirm("Please specify an Institution for requests whose visibility is set to 'Institution'.", null);
+                this.dialogService.alert("Please specify an Institution for requests whose visibility is set to 'Institution'.");
                 return;
             }
         }

@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
 import {AnalysisService} from "../../services/analysis.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {GridApi, GridReadyEvent, RowNode, RowSelectedEvent} from "ag-grid-community";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
@@ -71,7 +71,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
             color: white;
         }
         .secondary-action {
-            background-color: white;
+            background-color: var(--sidebar-footer-background-color);
             font-weight: bolder;
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
@@ -130,7 +130,7 @@ export class ManagePedFileWindowComponent extends BaseGenericContainerDialog imp
                 this.handleControllerError(err.gError,"retrieving file download list")
             });
         } else {
-            this.dialogsService.alert("No analysis found");
+            this.dialogsService.alert("No analysis found", "Data Not Found");
         }
     }
 
@@ -282,7 +282,7 @@ export class ManagePedFileWindowComponent extends BaseGenericContainerDialog imp
         if (result && result.message) {
             message = ": " + result.message;
         }
-        this.dialogsService.alert("An error occurred while " + action + message, null);
+        this.dialogsService.error("An error occurred while " + action + message);
     }
 
     public launch(): void {
@@ -312,7 +312,7 @@ export class ManagePedFileWindowComponent extends BaseGenericContainerDialog imp
             .set("PEDInfo", JSON.stringify(this.pedInfo));
         this.analysisService.managePedFile(params).subscribe((result: any) => {
             if (result && result.result && result.result === "SUCCESS") {
-                this.dialogsService.alert("Ped file saved successfully");
+                this.dialogsService.alert("Ped file saved successfully", null, DialogType.SUCCESS);
                 this.initializeFromPedFile();
             } else {
                 this.handleControllerError(result, "saving ped file");

@@ -3,12 +3,6 @@ import {
 } from "@angular/core";
 
 import {
-    jqxButtonComponent,
-    jqxCheckBoxComponent,
-    jqxNotificationComponent,
-    jqxWindowComponent,
-} from "jqwidgets-framework";
-import {
     IActionMapping,
     ITreeOptions,
     TREE_ACTIONS,
@@ -253,13 +247,16 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     doMove(event) {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = "35em";
-        configuration.height = "10em";
+        configuration.height = "15em";
         configuration.data = {
             currentItem: this.currentItem,
             targetItem: this.targetItem
         };
 
-        this.dialogsService.genericDialogContainer(MoveDataTrackComponent, "Move/Copy to " + this.targetItem.label,
+        let title: string = this.targetItem.label.length > 30 ? this.targetItem.label.substr(0, 29) + "..." : this.targetItem.label;
+        title = "Move/Copy to " + title;
+
+        this.dialogsService.genericDialogContainer(MoveDataTrackComponent, title,
             this.currentItem.icon, configuration).subscribe((result: any) => {
                 if(!result) {
                     this.resetTree();

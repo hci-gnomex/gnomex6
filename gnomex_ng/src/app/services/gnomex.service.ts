@@ -3,20 +3,17 @@ import {DictionaryService} from "./dictionary.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
 import {LabListService} from "./lab-list.service";
-import {forkJoin, Subject, throwError} from "rxjs";
-import {Subscription} from "rxjs";
+import {BehaviorSubject, forkJoin, Observable, Subject, Subscription, throwError} from "rxjs";
 import {ProgressService} from "../home/progress.service";
-import {Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {LaunchPropertiesService} from "./launch-properites.service";
-import {BehaviorSubject} from "rxjs";
 import {Router} from "@angular/router";
 import {ProjectService} from "./project.service";
 import {AppUserListService} from "./app-user-list.service";
 import {AuthenticationService} from "../auth/authentication.service";
 import {catchError, first} from "rxjs/operators";
 import {UserPreferencesService} from "./user-preferences.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {UtilService} from "./util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
@@ -959,7 +956,7 @@ export class GnomexService {
 
             }
         }else{
-            this.dialogService.alert("Lookup ID is Invalid");
+            this.dialogService.alert("Lookup ID is Invalid", null, DialogType.VALIDATION);
         }
     }
 
