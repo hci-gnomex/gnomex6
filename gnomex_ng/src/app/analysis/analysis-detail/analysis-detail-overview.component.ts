@@ -13,7 +13,7 @@ import {LinkToExperimentDialogComponent} from "./index";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {PropertyService} from "../../services/property.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {DataTrackService} from "../../services/data-track.service";
 import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
 import {FormGroup} from "@angular/forms";
@@ -206,7 +206,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
             let genomeBuilds: any[] = this.analysis.genomeBuilds ? (Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]) : [];
             let genomeBuild: any = genomeBuilds.length > 0 ? genomeBuilds[0] : null;
             if (!genomeBuild || !genomeBuild.isActive || genomeBuild.isActive !== "Y") {
-                this.dialogsService.alert("An active genome build is required to create data tracks");
+                this.dialogsService.alert("An active genome build is required to create data tracks", "Invalid");
                 return;
             }
 
@@ -216,7 +216,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 if (result && result.result && result.result === "SUCCESS") {
 
                     // TODO refresh download list of analysis files
-                    this.dialogsService.alert("Data tracks created for all applicable files");
+                    this.dialogsService.alert("Data tracks created for all applicable files", null, DialogType.SUCCESS);
                 }
             }, (err: IGnomexErrorResponse) => {
             });
@@ -281,7 +281,11 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     editButtonClicked(element: Element) {
         if(this.isEditMode && this.analysisService.analysisOverviewForm.dirty) {
             let warningMessage: string = "Your changes haven't been saved. Continue anyway?";
-            this.dialogsService.yesNoDialog(warningMessage, this, "changeEditMode", null, "Changing EditMode");
+            this.dialogsService.confirm(warningMessage).subscribe((result: any) => {
+                if(result) {
+                    this.changeEditMode();
+                }
+            });
         } else {
             this.changeEditMode();
         }

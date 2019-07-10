@@ -10,7 +10,7 @@ import {FileService} from "../../services/file.service";
 import {Subscription} from "rxjs";
 import {HttpParams} from "@angular/common/http";
 import {OrganizeFilesComponent} from "./organize-files.component";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {UploadFileComponent} from "./upload-file.component";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog";
@@ -180,7 +180,7 @@ export class ManageFilesDialogComponent extends BaseGenericContainerDialog imple
         }else{
             this.fileService.organizeExperimentFiles(params).subscribe( resp => {
                 if(resp.warning){
-                    this.dialogService.alert(resp.warning);
+                    this.dialogService.alert(resp.warning, null, DialogType.WARNING);
                 }
                 this.fileService.getManageFilesForm().markAsPristine();
                 this.fileService.emitGetRequestOrganizeFiles({idRequest: this.manageData.id.idRequest });

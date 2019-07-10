@@ -2,7 +2,7 @@ import {Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 
 import {EmailRelatedUsersService} from "./email-related-users.service";
 import {Subscription} from "rxjs";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog";
 import {GDAction} from "../interfaces/generic-dialog-action.model";
@@ -106,11 +106,11 @@ export class EmailRelatedUsersPopupComponent extends BaseGenericContainerDialog 
 
 	private onEmailServiceResponse(response: boolean) {
 		if(response) {
-			this.dialogService.alert("Email sent!").subscribe(() => {
+			this.dialogService.alert("Email sent!", null, DialogType.SUCCESS).subscribe(() => {
                 this.dialogRef.close();
 			});
 		} else {
-            this.dialogService.alert("Error : There was a problem sending the email.");
+            this.dialogService.error("There was a problem sending the email.");
 		}
 	}
 

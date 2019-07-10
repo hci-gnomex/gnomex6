@@ -1,4 +1,5 @@
 import{Component} from '@angular/core';
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'sample-sheet-column-formats',
@@ -16,7 +17,7 @@ import{Component} from '@angular/core';
             background-color: #84b278;
             color: white;
             font-size: larger;
-        } 
+        }
 
         .foreground { background-color: white;   }
         .background { background-color: #eeeeee; }
@@ -36,6 +37,8 @@ import{Component} from '@angular/core';
         
     `]
 })
-export class SampleSheetColumnFormatsComponent {
-    constructor() { }
+export class SampleSheetColumnFormatsComponent extends BaseGenericContainerDialog {
+    constructor() {
+        super();
+    }
 }

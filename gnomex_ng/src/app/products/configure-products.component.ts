@@ -3,7 +3,7 @@ import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 import {ProductsService} from "../services/products.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {HttpParams} from "@angular/common/http";
@@ -128,7 +128,7 @@ export class ConfigureProductsComponent implements OnInit {
                 if (response && response.message) {
                     message = ": " + response.message;
                 }
-                this.dialogsService.confirm("An error occurred while retrieving the product list" + message, null);
+                this.dialogsService.error("An error occurred while retrieving the product list" + message);
             }
         }, (err:IGnomexErrorResponse) =>{
         });
@@ -212,14 +212,14 @@ export class ConfigureProductsComponent implements OnInit {
                             duration: 2000,
                         });
                         if (response.message) {
-                            this.dialogsService.confirm(response.message, null);
+                            this.dialogsService.alert(response.message, null, DialogType.SUCCESS);
                         }
                     } else {
                         let message: string = "";
                         if (response && response.message) {
                             message = ": " + response.message;
                         }
-                        this.dialogsService.confirm("An error occurred while deleting the product" + message, null);
+                        this.dialogsService.error("An error occurred while deleting the product" + message);
                     }
                     this.loadProducts();
                 });
@@ -272,7 +272,7 @@ export class ConfigureProductsComponent implements OnInit {
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving the product" + message, null);
+                    this.dialogsService.error("An error occurred while saving the product" + message);
                 }
                 this.showSpinner = false;
                 this.loadProducts();

@@ -1,43 +1,49 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {
-    AfterViewInit, ChangeDetectorRef, Component,ElementRef, Input, OnDestroy, OnInit, ViewChild,
-    ViewEncapsulation
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    Input,
+    OnDestroy,
+    OnInit,
+    ViewChild,
 } from "@angular/core";
 
-import { URLSearchParams } from "@angular/http";
+import {URLSearchParams} from "@angular/http";
 import {
-    TreeComponent, ITreeOptions, TreeNode, TreeModel, IActionMapping,
-    TREE_ACTIONS
+    IActionMapping,
+    ITreeOptions,
+    TREE_ACTIONS,
+    TreeComponent,
+    TreeModel,
+    TreeNode,
 } from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {NavigationEnd, Router} from "@angular/router";
-import {MatDialogRef, MatDialog} from '@angular/material';
+import {Router} from "@angular/router";
+import {MatDialogConfig} from "@angular/material";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TopicService} from "../services/topic.service";
 import {GnomexService} from "../services/gnomex.service";
 import {MoveTopicComponent} from "./move-topic.component";
-import {DialogsService} from "../util/popup/dialogs.service";
-import {LabListService} from "../services/lab-list.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments/experiments.service";
 import {AnalysisService} from "../services/analysis.service";
 import {DataTrackService} from "../services/data-track.service";
 import {DictionaryService} from "../services/dictionary.service";
-import { transaction } from 'mobx';
+import {transaction} from "mobx";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 
-const actionMapping:IActionMapping = {
+const actionMapping: IActionMapping = {
     mouse: {
         click: (tree, node, $event) => {
             $event.ctrlKey
                 ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
         }
     }
 };
@@ -100,7 +106,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild("analysisInput") analysisInput: ElementRef;
     @ViewChild("experimentInput") experimentInput: ElementRef;
     @Input() childMessage: string;
-    public moveTopicDialogRef: MatDialogRef<MoveTopicComponent>;
 
     private treeModel: TreeModel;
     private experimentTreeModel: TreeModel;
@@ -259,7 +264,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnInit() {
         this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.treeModel = this.treeComponent.treeModel;
-        // this.showSpinner = true;
         setTimeout(() => {
             this.dialogService.startDefaultSpinnerDialog();
         });
@@ -283,7 +287,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                             tNode.setIsActive(true);
                             tNode.scrollIntoView();
                         }else{
-                            this.dialogService.alert("You do not have permission to view Topic " + capID ,"INVALID");
+                            this.dialogService.alert("You do not have permission to view Topic " + capID , "INVALID", DialogType.FAILED);
                         }
                         this.gnomexService.orderInitObj = null;
                     }
@@ -325,7 +329,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     constructor(private topicService: TopicService, private router: Router,
-                private dialog: MatDialog,
                 private dialogService: DialogsService,
                 private gnomexService: GnomexService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -359,8 +362,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     onMoveNode($event) {
-        this.dialogService.startDefaultSpinnerDialog()
-        // this.showSpinner = true;
         this.currentItem = $event.node;
         this.targetItem = $event.to.parent;
         this.doMove($event);
@@ -368,8 +369,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     doMove(event) {
         if (this.currentItem.idTopic === this.targetItem.idTopic) {
-            this.dialogService.confirm("Moving or Copying an item to the same topic is not allowed.'.", null);
+            this.dialogService.alert("Moving or Copying an item to the same topic is not allowed.'.", null, DialogType.WARNING);
         } else {
+            this.dialogService.startDefaultSpinnerDialog();
             var params: URLSearchParams = new URLSearchParams();
 
             if ((event.node.idRequest || event.node.idAnalysis || event.node.idDataTrack) && !this.currentItem.idTopic) {
@@ -392,21 +394,23 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.topicService.refreshTopicsList_fromBackend();
                 });
             } else {
-                this.moveTopicDialogRef = this.dialog.open(MoveTopicComponent, {
-                    height: '220px',
-                    width: '400px',
-                    data: {
-                        currentItem: this.currentItem,
-                        targetItem: this.targetItem
-                    }
-                });
-                this.moveTopicDialogRef.afterClosed()
-                    .subscribe(result => {
-                        if (this.moveTopicDialogRef.componentInstance.noButton) {
+                let config: MatDialogConfig = new MatDialogConfig();
+                config.width = "35em";
+                config.height = "15em";
+                config.data = {
+                    currentItem: this.currentItem,
+                    targetItem: this.targetItem
+                };
+                let title: string = this.targetItem.label.length > 30 ? this.targetItem.label.substr(0, 29) + "..." : this.targetItem.label;
+                title = "Move/Copy to " + title;
+                this.dialogService.genericDialogContainer(MoveTopicComponent, title, this.currentItem.icon, config,
+                    {actions: []}).subscribe((result: any) => {
+                        if (!result) {
                             this.resetTree();
                         }
-                    })
+                });
             }
+            this.dialogService.stopAllSpinnerDialogs();
         }
     }
 
@@ -585,7 +589,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
         }else {
             if ((this.selectedItem.data.label as string).endsWith('(Restricted Visibility)')) {
-                this.dialogService.alert("You do not have permission to view this");
+                this.dialogService.alert("You do not have permission to view this", null, DialogType.FAILED);
                 return;
             }
 

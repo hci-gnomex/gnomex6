@@ -11,7 +11,6 @@ import {UtilModule} from "../../util/util.module";
 import {DatatracksDetailOverviewComponent,
         DatatracksSummaryTabComponent,
         DatatracksVisibilityTabComponent} from "./index"
-import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
 import {RelatedDataModule} from "../../util/related-data.module";
 import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
@@ -43,8 +42,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         DatatracksSummaryTabComponent,
         DatatracksVisibilityTabComponent,
         DatatracksFilesTabComponent,
-    ],
-    entryComponents: [ConfigAnnotationDialogComponent]
+    ]
 })
 export class DatatracksDetailModule {
 }

@@ -97,12 +97,13 @@
                             if(data.Lab){
                                 this.makeOwnerList(data.Lab);
                                 this.lab = data.Lab;
-                                this.updateCollaborators();
                             }
                         });
                     }
 
-
+                    setTimeout(() => {
+                        this.updateCollaborators();
+                    });
                 });
 
             }

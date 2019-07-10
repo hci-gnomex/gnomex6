@@ -1,8 +1,22 @@
-import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output,
+    ViewChild,
+} from "@angular/core";
 import {Subscription} from "rxjs";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
+import {
+    ITreeOptions,
+    TREE_ACTIONS,
+    TreeComponent,
+    TreeModel,
+    TreeNode,
+} from "angular-tree-component";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
@@ -13,7 +27,14 @@ import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 import {ExperimentsService} from "../../experiments/experiments.service";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, RowClickedEvent, RowDragEvent} from "ag-grid-community";
+import {
+    GridApi,
+    GridReadyEvent,
+    GridSizeChangedEvent,
+    RowClickedEvent,
+    RowDragEvent,
+    RowNode,
+} from "ag-grid-community";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
 
 
@@ -35,7 +56,7 @@ import {ActionType} from "../interfaces/generic-dialog-action.model";
         .no-overflow  { overflow: hidden; }
 
         .secondary-action {
-            background-color: white;
+            background-color: var(--sidebar-footer-background-color);
             font-weight: bolder;
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
@@ -203,12 +224,12 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
                 this.dialogService.stopAllSpinnerDialogs();
 
             } else {
-                this.dialogService.alert(resp.message);
+                this.dialogService.error(resp.message);
                 this.dialogService.stopAllSpinnerDialogs();
             }
 
         }, err => {
-            this.dialogService.alert(err.message);
+            this.dialogService.error(err.message);
             this.dialogService.stopAllSpinnerDialogs();
 
         });
@@ -442,7 +463,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
         }
 
         if(!added && !autoLink){
-            this.dialogService.alert(errorMessage );
+            this.dialogService.error(errorMessage );
         }
 
         return added
@@ -573,7 +594,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
             if(sampleInitiated){
                 this.removeFromSibling(nodeName, sampNode)
             }else{
-                this.dialogService.alert("Sample(s) cannot be deleted. ");
+                this.dialogService.alert("Sample(s) cannot be deleted. ", null, DialogType.WARNING);
             }
 
         } else if (nodeName === this.SAMPLE_GROUP) {

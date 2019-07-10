@@ -5,13 +5,7 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {ExperimentsService} from "../experiments.service";
-import {
-    MatDialog,
-    MatDialogConfig,
-    MatDialogRef,
-    MatSnackBar,
-    MatTabChangeEvent,
-} from "@angular/material";
+import {MatDialogConfig, MatSnackBar, MatTabChangeEvent} from "@angular/material";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {BehaviorSubject, Subscription} from "rxjs";
@@ -132,7 +126,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                 private dialogsService: DialogsService,
                 private route: ActivatedRoute,
                 private fileService: FileService,
-                private dialog: MatDialog,
                 private snackBar: MatSnackBar,
                 private billingService: BillingService,
                 private orderValidateService: BrowseOrderValidateService) {
@@ -369,7 +362,11 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     startEdit(element: Element) {
         if(this.isEditMode && this.experimentService.experimentOverviewForm.dirty) {
             let warningMessage: string = "Your changes haven't been saved. Continue anyway?";
-            this.dialogsService.yesNoDialog(warningMessage, this, "changeEditMode", null, "Changing EditMode");
+            this.dialogsService.confirm(warningMessage).subscribe((result: any) => {
+                if(result) {
+                    this.changeEditMode();
+                }
+            });
         } else {
             this.changeEditMode();
         }

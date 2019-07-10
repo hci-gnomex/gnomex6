@@ -19,7 +19,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {CreateProjectComponent} from "./create-project.component";
 import {MatCheckboxChange, MatDialogConfig} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {DeleteProjectComponent} from "./delete-project.component";
 import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
@@ -38,7 +38,7 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 @Component({
     selector: "experiments",
     templateUrl: "./browse-experiments.component.html",
-    styles: [`        
+    styles: [`
 
 
         .t  { display: table;      }
@@ -502,8 +502,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }
         if (this.labMembers.length < 1) {
             this.dialogsService
-                .confirm("Sorry, in order to reassign this experiment you must change its owner to a member of the new lab group. However," +
-                    "you do not have permission to access the member list for this lab. Please contact an administrator.", null)
+                .alert("Sorry, in order to reassign this experiment you must change its owner to a member of the new lab group. However," +
+                    "you do not have permission to access the member list for this lab. Please contact an administrator.", null, DialogType.FAILED)
                 .subscribe(
                     res => {
                         this.resetTree();
@@ -571,7 +571,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     deleteProjectClicked(event: any) {
         if(!this.selectedItem.data.isEmptyFolder) {
-            this.dialogsService.alert("Project cannot be deleted because it has experiments. Please reassign experiments to another project before deleting.", "Warning");
+            this.dialogsService.alert("Project cannot be deleted because it has experiments. <br>Please reassign experiments to another project before deleting.", "", DialogType.WARNING);
             return;
         }
         let configuration: MatDialogConfig = new MatDialogConfig();

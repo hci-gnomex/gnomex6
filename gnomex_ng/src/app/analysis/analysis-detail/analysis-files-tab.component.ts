@@ -1,9 +1,15 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, RowDoubleClickedEvent} from "ag-grid-community";
+import {
+    GridApi,
+    GridReadyEvent,
+    GridSizeChangedEvent,
+    RowDoubleClickedEvent,
+    RowNode,
+} from "ag-grid-community";
 import {AnalysisService} from "../../services/analysis.service";
 import {ActivatedRoute} from "@angular/router";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer";
 import {DataTrackService} from "../../services/data-track.service";
 import {HttpParams} from "@angular/common/http";
@@ -176,7 +182,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             .set("pathName", data.fileName);
         this.dataTrackService.makeURLLink(params).subscribe((result: any) => {
             if (result && result.urlsToLink) {
-                this.dialogsService.alert(result.urlsToLink);
+                this.dialogsService.alert(result.urlsToLink, null, DialogType.SUCCESS);
             }
         },(err:IGnomexErrorResponse) => {
             this.handleBackendLinkError(err.gError);
@@ -199,7 +205,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     private makeIGVLink: (data: any) => void = (data: any) => {
         this.dataTrackService.makeIGVLink().subscribe((result: any) => {
             if (result && result.igvURL) {
-                this.dialogsService.alert(result.igvURL);
+                this.dialogsService.alert(result.igvURL, null, DialogType.SUCCESS);
             }
         }, (err: IGnomexErrorResponse) => {
             this.handleBackendLinkError(err.gError);
@@ -240,7 +246,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         if (result && result.message) {
             message = ": " + result.message;
         }
-        this.dialogsService.alert("An error occurred while making the link" + message, null);
+        this.dialogsService.error("An error occurred while making the link" + message);
     }
 
     public handleUploadFiles(): void {

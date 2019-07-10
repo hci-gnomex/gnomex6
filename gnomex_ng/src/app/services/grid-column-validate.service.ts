@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import {DialogsService} from "../util/popup/dialogs.service";
+import {Injectable} from '@angular/core';
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 
 @Injectable()
 export class GridColumnValidateService {
@@ -11,13 +11,13 @@ export class GridColumnValidateService {
         if (params.newValue === "") {
             params.data[params.colDef.field] = "";
         } else if (params.newValue > params.colDef.maxValue) {
-            this.dialogsService.confirm("Value exceeded max of "+params.colDef.maxValue, null);
+            this.dialogsService.alert("Value exceeded max of " + params.colDef.maxValue, null, DialogType.VALIDATION);
             valid = false;
         } else if (params.newValue < params.colDef.minValue) {
-            this.dialogsService.confirm("Value less than min of " + params.colDef.minValue, null);
+            this.dialogsService.alert("Value less than min of " + params.colDef.minValue, null, DialogType.VALIDATION);
             valid = false;
         } else if (params.newValue < 0) {
-            this.dialogsService.confirm("Value cannot be negative", null);
+            this.dialogsService.alert("Value cannot be negative", null, DialogType.VALIDATION);
             valid = false;
         } else {
             valid = true;

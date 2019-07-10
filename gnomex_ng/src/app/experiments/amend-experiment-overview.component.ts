@@ -4,7 +4,7 @@ import {Subscription} from "rxjs";
 import {AmendExperimentService} from "../services/amend-experiment.service";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {Router} from "@angular/router";
 import {ExperimentsService} from "./experiments.service";
 import {TabAnnotationViewComponent} from "./new-experiment/tab-annotation-view.component";
@@ -231,7 +231,7 @@ export class AmendExperimentOverviewComponent implements OnInit, OnDestroy {
             if (result && result.idRequest) {
                 let submissionMessage = 'Experiment request # ' + result.requestNumber + ' has been submitted, adding services to the existing experiment request.\n'
                     + 'Please print off the request form and deliver it to the ' + this.gnomexService.getCoreFacilityName(idCoreFacility);
-                this.dialogsService.alert(submissionMessage, "Services added to Request");
+                this.dialogsService.alert(submissionMessage, "Services added to Request", DialogType.SUCCESS);
 
                 window.open('ShowRequestForm.gx?idRequest=' + result.idRequest, '_blank');
 
@@ -243,7 +243,7 @@ export class AmendExperimentOverviewComponent implements OnInit, OnDestroy {
     }
 
     public promptToCancel(): void {
-        this.dialogsService.confirm("Warning", "The experiment has not been saved. Are you sure you want to quit?").subscribe((answer: boolean) => {
+        this.dialogsService.confirm("The experiment has not been saved. Are you sure you want to quit?", "Warning").subscribe((answer: boolean) => {
             if (answer) {
                 this.router.navigateByUrl('home');
             }

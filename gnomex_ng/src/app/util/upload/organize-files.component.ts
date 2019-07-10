@@ -10,7 +10,7 @@ import {
 } from "@angular/core";
 import {Subscription} from "rxjs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
 import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent} from "angular-tree-component";
@@ -50,7 +50,7 @@ const actionMapping: IActionMapping = {
         .no-overflow  { overflow: hidden; }
 
         .secondary-action {
-            background-color: white;
+            background-color: var(--sidebar-footer-background-color);
             font-weight: bolder;
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
@@ -188,7 +188,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
             },error =>{
                 this.dialogService.stopAllSpinnerDialogs();
-                this.dialogService.alert(error);
+                this.dialogService.error(error);
             });
             this.fileService.emitGetRequestOrganizeFiles( {idRequest: this.data.id.idRequest});
 
@@ -238,13 +238,13 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         if(root.type == 'dir' && root.PROTECTED === 'Y'){
             if(showMessage){
                 this.dialogService.alert("The folder you are attempting to delete \'" + root.displayName
-                    + "\' has protected files contained within it.");
+                    + "\' has protected files contained within it.", null, DialogType.WARNING);
                 action = true;
             }
         }else if(root.PROTECTED === 'Y'){
             if(showMessage){
                 this.dialogService.alert("The file you are attempting to delete \'"+ root.displayName
-                    + "\' is protected ");
+                    + "\' is protected ", null, DialogType.WARNING);
 
             }
             action = true;
@@ -441,7 +441,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
 
         if(this.datatrackSelectedFile(nodes)){
-            this.dialogService.confirm("Warning","At lease one selected file is linked to a data track.  Do you want to remove the files and delete any associated data tracks?")
+            this.dialogService.confirm("At lease one selected file is linked to a data track.  Do you want to remove the files and delete any associated data tracks?", "Warning")
                 .pipe(first()).subscribe(answer =>{
                 if(answer) {
                     this.remove(treeRemovedFrom, nodes);
@@ -474,7 +474,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         if(this.organizeSelectedNode){
             let p = this.organizeSelectedNode.data.PROTECTED;
             if( p && p === 'Y'){
-                this.dialogService.alert("Warning: Protected files cannot be renamed.");
+                this.dialogService.alert("Protected files cannot be renamed.", null, DialogType.WARNING);
                 return;
             }
 
@@ -497,7 +497,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
 
     showHelp(){
-        this.dialogService.alert(this.organizeHelp);
+        this.dialogService.info(this.organizeHelp);
     }
 
 

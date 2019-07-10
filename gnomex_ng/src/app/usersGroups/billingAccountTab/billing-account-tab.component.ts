@@ -1265,7 +1265,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 ]}).subscribe((result: any) => {
                     if(result) {
                         this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-                        this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                        this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
                         this.translateChangesOntoAccountRecords(rowNode);
                     }
         });
@@ -1289,7 +1289,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 ]}).subscribe((result: any) => {
             if(result) {
                 this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
                 this.translateChangesOntoAccountRecords(rowNode);
             }
         });
@@ -1313,7 +1313,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 ]}).subscribe((result: any) => {
             if(result) {
                 this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
                 this.translateChangesOntoAccountRecords(rowNode);
             }
         });

@@ -1,5 +1,18 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from "@angular/core";
-import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode,} from "angular-tree-component";
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from "@angular/core";
+import {
+    ITreeOptions,
+    TREE_ACTIONS,
+    TreeComponent,
+    TreeModel,
+    TreeNode,
+} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
@@ -12,7 +25,7 @@ import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {GnomexService} from "../services/gnomex.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
@@ -143,7 +156,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.items = [].concat([]);
 
             if (!response) {
-                this.dialogsService.alert("No results");
+                this.dialogsService.alert("No results", "Data Not Found");
                 return;
             }
 
@@ -585,7 +598,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             if (result && result.result === "SUCCESS") {
                 this.analysisService.refreshAnalysisGroupList_fromBackend();
                 if (result.invalidPermission) {
-                    this.dialogsService.alert(result.invalidPermission, "Warning");
+                    this.dialogsService.alert(result.invalidPermission, null, DialogType.WARNING);
                 }
             }
         }, (err: IGnomexErrorResponse) => {

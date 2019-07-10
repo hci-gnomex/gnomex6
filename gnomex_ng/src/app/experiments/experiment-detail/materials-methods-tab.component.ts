@@ -4,7 +4,7 @@ import {MatDialog, MatDialogConfig} from "@angular/material";
 
 import {throwError} from "rxjs";
 
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ProtocolService} from "../../services/protocol.service";
 import {ProtocolDialogComponent} from "./protocol-dialog.component";
@@ -63,7 +63,7 @@ export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDe
             if (exp && exp.Request) {
                 this.getMaterialsMethodsData(exp.Request);
             } else {
-                this.dialogService.alert("Cannot load experiment data", null);
+                this.dialogService.alert("Cannot load experiment data", null, DialogType.FAILED);
                 throwError(new Error("Cannot load experiment data"));
                 return;
             }
@@ -130,7 +130,7 @@ export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDe
                     this.openProtocolDialog(result, protocol.name);
                 }
             }, (error: IGnomexErrorResponse) => {
-                this.dialogService.alert("An exception occurred in GetProtocol:" + error.message, null);
+                this.dialogService.error("An exception occurred in GetProtocol:" + error.message);
             });
         }
 

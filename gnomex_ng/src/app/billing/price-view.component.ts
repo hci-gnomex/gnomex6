@@ -78,7 +78,7 @@ export class PriceViewComponent extends BaseGenericContainerDialog implements On
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving the price" + message, null);
+                    this.dialogsService.error("An error occurred while retrieving the price" + message);
                 }
             });
         }
@@ -128,7 +128,7 @@ export class PriceViewComponent extends BaseGenericContainerDialog implements On
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while retrieving the price category" + message, null);
+                this.dialogsService.error("An error occurred while retrieving the price category" + message);
             }
         });
         this.gridApi = event.api;
@@ -181,7 +181,7 @@ export class PriceViewComponent extends BaseGenericContainerDialog implements On
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while saving the price" + message, null);
+                this.dialogsService.error("An error occurred while saving the price" + message);
             }
         });
     }

@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit, QueryList, Type, ViewChildren} from "@angular/core";
 import {NewExternalExperimentService} from "../../services/new-external-experiment.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {Router} from "@angular/router";
 import {Experiment} from "../../util/models/experiment.model";
 import {ExperimentsService} from "../experiments.service";
@@ -38,11 +38,11 @@ import {TopicService} from "../../services/topic.service";
             </div>
             <div class="full-width flex-container-row justify-space-between">
                 <div class="spaced-children-margin">
-                    <button mat-raised-button (click)="back()" 
+                    <button mat-raised-button (click)="back()"
                             [disabled]="selectedTabIndex === 0 || this.checkTabDisabled(selectedTabIndex - 1)">
                         <mat-icon>arrow_left</mat-icon>Back
                     </button>
-                    <button mat-raised-button (click)="next()" 
+                    <button mat-raised-button (click)="next()"
                             [disabled]="selectedTabIndex === this.tabs.length - 1 || this.checkTabDisabled(selectedTabIndex + 1)">
                         <mat-icon>arrow_right</mat-icon>Next
                     </button>
@@ -100,7 +100,7 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
 
         this.experimentService.getNewRequest().subscribe((response: any) => {
             if (!response) {
-                this.dialogsService.alert("Unable to create new experiment. Please contact GNomEx Support", "Error");
+                this.dialogsService.error("Unable to create new experiment. Please contact GNomEx Support");
                 return;
             }
 
@@ -211,12 +211,12 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
     }
 
     private saveFinished(requestNumber: string): void {
-        this.dialogsService.alert("Experiment #" + requestNumber + " has been added to the GNomEx repository", "Experiment Saved");
+        this.dialogsService.alert("Experiment #" + requestNumber + " has been added to the GNomEx repository", "Experiment Saved", DialogType.SUCCESS);
         this.gnomexService.navByNumber(requestNumber);
     }
 
     public promptToCancel(): void {
-        this.dialogsService.confirm("Warning", "The experiment has not been saved. Are you sure you want to quit?").subscribe((answer: boolean) => {
+        this.dialogsService.confirm("The experiment has not been saved. Are you sure you want to quit?", "Warning").subscribe((answer: boolean) => {
             if (answer) {
                 this.router.navigateByUrl('home');
             }

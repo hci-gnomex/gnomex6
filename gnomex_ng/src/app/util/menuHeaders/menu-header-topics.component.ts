@@ -81,7 +81,7 @@ export class MenuHeaderTopicsComponent implements OnInit {
     }
 
     public doDelete(): void {
-        let title: string = "Confirm: " + this.showRemoveLink ? "Remove Link" : "Delete Topic";
+        let title: string = "Confirm: " + (this.showRemoveLink ? "Remove Link" : "Delete Topic");
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "35em";
         config.height = "15em";

@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 
 import {BillingUsageReportComponent} from "../billing-usage-report.component";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {InvoiceEmailWindowComponent} from "../../billing/invoice-email-window.component";
 import {BillingGlInterfaceViewComponent} from "../../billing/billing-gl-interface-view.component";
@@ -38,19 +38,19 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     public showGeneralLedgerInterface(): void {
         if (this.filterByOrderType && this.filterByOrderType !== "All") {
-            this.dialogsService.confirm("Please select 'Show All' for Billing Items before running the GL interface", null);
+            this.dialogsService.alert("Please select 'Show All' for Billing Items before running the GL interface", null, DialogType.FAILED);
             return;
         }
         if (!this.idBillingPeriod) {
-            this.dialogsService.confirm("Please select a billing period", null);
+            this.dialogsService.alert("Please select a billing period", null, DialogType.FAILED);
             return;
         }
         if (this.showRelatedCharges) {
-            this.dialogsService.confirm("Please hide Related Charges before running the GL interface", null);
+            this.dialogsService.alert("Please hide Related Charges before running the GL interface", null, DialogType.FAILED);
             return;
         }
         if (!this.selectedItem || this.selectedItem.data.name !== "Status" || this.selectedItem.data.status !== "APPROVED") {
-            this.dialogsService.confirm("Please select the approved folder before running the GL interface", null);
+            this.dialogsService.alert("Please select the approved folder before running the GL interface", null, DialogType.FAILED);
             return;
         }
 
@@ -73,15 +73,15 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     public showBillingInvoice(sendEmail: boolean): void {
         if (!this.idBillingPeriod) {
-            this.dialogsService.confirm("Please select a billing period", null);
+            this.dialogsService.alert("Please select a billing period", null, DialogType.FAILED);
             return;
         }
         if (this.isDirty) {
-            this.dialogsService.confirm("Please save or discard unsaved changes", null);
+            this.dialogsService.alert("Please save or discard unsaved changes", null, DialogType.FAILED);
             return;
         }
         if (!this.selectedItem) {
-            this.dialogsService.confirm("Please select a lab folder", null);
+            this.dialogsService.alert("Please select a lab folder", null, DialogType.FAILED);
             return;
         }
 
@@ -90,7 +90,7 @@ export class MenuHeaderBillingComponent implements OnInit {
             if (this.selectedItem.parent.data.name === "Lab") {
                 labNode = this.selectedItem.parent;
             } else {
-                this.dialogsService.confirm("Please complete the billing item(s) first", null);
+                this.dialogsService.alert("Please complete the billing item(s) first", null, DialogType.FAILED);
                 return;
             }
         } else if (this.selectedItem.data.name === "Lab") {
@@ -108,7 +108,7 @@ export class MenuHeaderBillingComponent implements OnInit {
                 window.open(url, '_blank');
             }
         } else if (!sendEmail && this.selectedItem.data.name === "Status" && (this.selectedItem.data.status === "APPROVED" || this.selectedItem.data.status === "APPROVEDEX" || this.selectedItem.data.status === "APPROVEDCC" || this.selectedItem.data.status === "COMPLETE")) {
-            this.dialogsService.confirm("Print all invoices for this folder?", " ").subscribe((result: boolean) => {
+            this.dialogsService.confirm("Print all invoices for this folder?").subscribe((result: boolean) => {
                 if (result) {
                     let idLabs: string = "";
                     let idBillingAccounts: string = "";
@@ -125,7 +125,7 @@ export class MenuHeaderBillingComponent implements OnInit {
                 }
             });
         } else {
-            this.dialogsService.confirm("Please select a lab folder", null);
+            this.dialogsService.alert("Please select a lab folder", null, DialogType.FAILED);
             return;
         }
     }
@@ -146,7 +146,7 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     public showMonthendBillingReport(uMergeFormat: boolean = false): void {
         if (!this.idBillingPeriod) {
-            this.dialogsService.confirm("Please select a billing period", null);
+            this.dialogsService.alert("Please select a billing period", null, DialogType.FAILED);
             return;
         }
 
@@ -158,7 +158,7 @@ export class MenuHeaderBillingComponent implements OnInit {
         }
 
         if (!statusNode || !(statusNode.status === "APPROVED" || statusNode.status === "APPROVEDEX" || statusNode.status === "APPROVEDCC")) {
-            this.dialogsService.confirm("Please select an approved folder", null);
+            this.dialogsService.alert("Please select an approved folder", null, DialogType.FAILED);
             return;
         }
 
@@ -204,7 +204,7 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     public showNotesToCore(): void {
         if (!this.idBillingPeriod) {
-            this.dialogsService.confirm("Please select a billing period", null);
+            this.dialogsService.alert("Please select a billing period", null, DialogType.FAILED);
             return;
         }
 
@@ -221,7 +221,7 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     public refresh(): void {
         if (this.isDirty) {
-            this.dialogsService.confirm("Unsaved changes will be discarded. Proceed?", " ").subscribe((result: boolean) => {
+            this.dialogsService.confirm("Unsaved changes will be discarded. Proceed?").subscribe((result: boolean) => {
                 if (result) {
                     this.billingService.requestBillingScreenRefresh();
                 }

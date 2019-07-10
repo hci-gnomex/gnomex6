@@ -1,9 +1,9 @@
 import {Component, Inject} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ReportIssueService} from "../../services/report-issue.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 @Component({
@@ -100,7 +100,7 @@ export class ReportProblemComponent extends BaseGenericContainerDialog {
             formData.append("Filedata", this.uploadFile, "testfile.png");
             setTimeout(() => this.dialogRef.close());
             this.reportIssueService.sendReportIssueEmail(this.url, formData).subscribe((response: any) => {
-                this.dialogsService.confirm("Issue has been submitted. Thank you.", null);
+                this.dialogsService.alert("Issue has been submitted. Thank you.", null, DialogType.SUCCESS);
             });
         });
     }

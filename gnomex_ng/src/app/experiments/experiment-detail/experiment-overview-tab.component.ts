@@ -4,7 +4,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {LabListService} from "../../services/lab-list.service";
 import {GetLabService} from "../../services/get-lab.service";
 import {Subscription, throwError} from "rxjs";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {PropertyService} from "../../services/property.service";
 import {ConstantsService} from "../../services/constants.service";
 import {MatDialogConfig} from "@angular/material";
@@ -146,7 +146,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
         this._experiment = experiment;
 
         if (!experiment) {
-            this.dialogService.alert("Cannot load experiment data");
+            this.dialogService.alert("Cannot load experiment data", null, DialogType.FAILED);
             throwError(new Error("Cannot load experiment data"));
             return;
         }

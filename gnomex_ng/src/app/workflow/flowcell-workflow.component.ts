@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, Inject, OnInit} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
 import {GridApi, GridOptions} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
@@ -64,7 +64,6 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
                 public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
-                private dialog: MatDialog,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
                 public constService:ConstantsService ) {
