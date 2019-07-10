@@ -62,11 +62,11 @@ export class DeleteDataTrackComponent extends BaseGenericContainerDialog {
 
                 this.dataTrackService.unlinkDataTrack(params).subscribe((response: any) => {
 
-                    var level = "DataTrack '" + this.selectedItem.data.label + "' is referenced under folders '" + dString + "'.";
-                    var confirmString = "Do you want to remove all references to this dataTrack?";
+                    let confirmString: string = "DataTrack '" + this.selectedItem.data.label + "' is referenced under folders '" + dString + "'.";
+                    confirmString = confirmString + "<br> Do you want to remove all references to this dataTrack?";
 
                     this.dialogsService
-                        .confirm(level, confirmString)
+                        .confirm(confirmString)
                         .subscribe(
                             res => {
                                 if (res) {

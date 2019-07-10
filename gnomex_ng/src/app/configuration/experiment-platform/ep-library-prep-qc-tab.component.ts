@@ -123,8 +123,7 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
     removeLibPrepQC(){
 
         let experimentType:string = this.selectedRow.protocolDisplay? this.selectedRow.protocolDisplay :'';
-        this.dialogService.confirm('Remove Lib Prep QC Protocol',
-            'Are you sure you want to remove experiment type ' + "\'"+ experimentType +'\'?')
+        this.dialogService.confirm('Are you sure you want to remove experiment type ' + "\'"+ experimentType +'\'?', 'Remove Lib Prep QC Protocol')
             .subscribe(action => {
                 if(action){
                     let removeIndex:number = this.rowData.indexOf(this.selectedRow);

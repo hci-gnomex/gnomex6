@@ -6,7 +6,7 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {HttpParams} from "@angular/common/http";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {GridApi} from "ag-grid-community/dist/lib/gridApi";
 import {RowDoubleClickedEvent} from "ag-grid-community";
 import {ActionType, GDActionConfig} from "../util/interfaces/generic-dialog-action.model";
@@ -256,8 +256,8 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
 
     checkForDuplicateBarcode(): boolean {
         if (this.hasDuplicateSampleBarcodeSequence()) {
-            this.dialogsService.confirm("Some of the samples to be multiplexed in one flow cell channel have the same index tag.  This should only occur when samples (and their sequence reads) are meant to be pooled.",
-                "Proceed with duplicate index tags?").subscribe((answer: boolean) => {
+            this.dialogsService.confirm("Some of the samples to be multiplexed in one flow cell channel have the same index tag.  This should only occur when samples (and their sequence reads) are meant to be pooled."
+                + "<br> Proceed with duplicate index tags?").subscribe((answer: boolean) => {
                 if (answer) {
                     return true;
                 } else {
@@ -271,15 +271,15 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
     public saveFlowCell() {
         if (this.allFG.dirty) {
             //SaveFlowCell will recalulate the folder name.
-            this.dialogsService.confirm("You have changed the Bar Code, Run #, Cluster Gen Date, Instrument or Side which will cause the Folder Name to change.",
-                "Do you wish to continue with this save?").subscribe((answer: boolean) => {
+            this.dialogsService.confirm("You have changed the Bar Code, Run #, Cluster Gen Date, Instrument or Side which will cause the Folder Name to change."
+                + "<br> Do you wish to continue with this save?").subscribe((answer: boolean) => {
                 if (answer) {
                     let checkReply = this.checkForDuplicateBarcode();
                     if (checkReply) {
                         this.save();
                     }
                 }
-            })
+            });
         }
     }
 
@@ -307,7 +307,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
             if (!response.flowCellNumber) {
                 response.flowCellNumber = "";
             }
-            this.dialogsService.confirm("Flowcell " + response.flowCellNumber + " created", null);
+            this.dialogsService.alert("Flowcell " + response.flowCellNumber + " created", null, DialogType.SUCCESS);
             this.dialogRef.close(true);
             this.showSpinner = false;
 

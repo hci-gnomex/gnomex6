@@ -3,25 +3,21 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {HttpClient, HttpEvent, HttpEventType, HttpParams, HttpRequest} from "@angular/common/http";
 import {Subscription} from "rxjs";
 import {saveAs} from "file-saver";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 
 @Component({
     template: `
-        <h6 mat-dialog-title>Downloading {{this.filename}}</h6>
-        <mat-dialog-content>
+        <div class="flex-container-row full-height full-width double-padded">
             <mat-progress-bar mode="determinate" [value]="this.progressValue"></mat-progress-bar>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button (click)="this.close()">{{this.endButtonLabel}}</button>
-        </mat-dialog-actions>
+        </div>
     `,
     styles:[`
     `]
 })
-export class DownloadProgressComponent implements OnInit {
+export class DownloadProgressComponent extends BaseGenericContainerDialog implements OnInit {
 
     public filename: string = "";
     public progressValue: number = 0;
-    public endButtonLabel: string = "Cancel";
 
     private url: string = "";
     private estimatedDownloadSize: number = 0;
@@ -34,6 +30,7 @@ export class DownloadProgressComponent implements OnInit {
     constructor(private dialogRef: MatDialogRef<DownloadProgressComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 private httpClient: HttpClient) {
+        super();
     }
 
     ngOnInit() {
@@ -60,10 +57,10 @@ export class DownloadProgressComponent implements OnInit {
                         break;
                     case HttpEventType.Response:
                         this.progressValue = 100;
-                        this.endButtonLabel = "Close";
                         saveAs(event.body, this.filename);
                 }
             });
+            this.innerTitle = "Downloading " + (this.filename.length > 30 ? this.filename.substr(0, 29) + "..." : this.filename);
         }
     }
 

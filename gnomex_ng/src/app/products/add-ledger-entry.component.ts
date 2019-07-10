@@ -72,7 +72,7 @@ export class AddLedgerEntryComponent extends BaseGenericContainerDialog implemen
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving the ledger entry" + message, null);
+                    this.dialogsService.error("An error occurred while saving the ledger entry" + message);
                 }
             });
         }

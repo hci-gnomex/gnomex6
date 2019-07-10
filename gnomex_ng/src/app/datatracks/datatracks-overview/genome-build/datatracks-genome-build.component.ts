@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from "@angular/core";
 import {TabContainer} from "../../../util/tabs/tab-container.component";
 import {GenomeBuildValidateService} from "../../../services/genome-build-validate.service";
 import {DataTrackService} from "../../../services/data-track.service";
-import {DialogsService} from "../../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../../util/popup/dialogs.service";
 import {MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
@@ -29,9 +29,6 @@ import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.respon
                         <gb-sequence-files-tab></gb-sequence-files-tab>
                     </mat-tab>
                 </mat-tab-group>
-
-               <!-- <tab-container [state]="state" [componentNames]="componentNames">
-                </tab-container> -->
             </div>
             <div>
                 <save-footer (saveClicked)="save()" [disableSave]="!canWrite" [dirty]="gbValidateService.dirtyNote" ></save-footer>
@@ -83,7 +80,7 @@ export class DatatracksGenomeBuildComponent implements OnInit {
         let messageList: Array<string> = this.gbValidateService.errorMessageList;
 
         if(messageList.length > 0) {
-            this.dialogService.confirm(messageList.join("\n"), null);
+            this.dialogService.alert(messageList.join("\n"), null, DialogType.VALIDATION);
         } else {
             let segsObj = this.gbValidateService.segmentsList;
             let seqFilesObj = this.gbValidateService.sequenceFilesList;

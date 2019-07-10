@@ -1,16 +1,12 @@
 <div class="full-height full-width flex-container-col padded">
     <div class="full-width flex-container-row align-center">
-        <mat-form-field class="flex-grow">
-            <mat-select
-                    placeholder="Possible Collaborator to Add"
-                    [compareWith]="compareByID"
-                    (selectionChange)="collaboratorDropdownChange($event)">
-                <mat-option></mat-option>
-                <mat-option *ngFor="let collab of filteredPossibleCollaborators" [value]="collab">
-                    {{ collab[this.prefService.userDisplayField] }}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+        <div class="flex-grow">
+            <custom-combo-box placeholder="Possible Collaborator to Add"
+                              (optionSelected)="collaboratorDropdownChange($event)"
+                              [options]="filteredPossibleCollaborators"
+                              [displayField]="this.prefService.userDisplayField">
+            </custom-combo-box>
+        </div>
         <button mat-button [disabled]="!enableAdd" type="button" (click)="addCollaborator()">
             <img [src]="enableAdd ? this.constantsService.ICON_ADD : this.constantsService.ICON_ADD_DISABLE">
             Add

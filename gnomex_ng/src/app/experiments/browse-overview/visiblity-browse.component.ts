@@ -1,44 +1,38 @@
-
-import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output} from "@angular/core";
-import {FormGroup,FormBuilder,Validators } from "@angular/forms"
+import {Component, EventEmitter, OnInit, Output} from "@angular/core";
+import {FormBuilder} from "@angular/forms"
 import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {Subscription} from "rxjs";
 import {ExperimentsService} from "../experiments.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {ActivatedRoute} from "@angular/router";
 import {IconTextRendererComponent} from "../../util/grid-renderers/icon-text-renderer.component";
 import {GridOptions} from "ag-grid-community/main";
-import {URLSearchParams} from "@angular/http"
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
     selector: "visibility-browse-tab",
     template: `
-        
         <div style="width:100%; height:100%; display:flex; flex-direction: column ">
             <div style="display:flex; flex-direction:column; flex:1; width:100%;">
-                <ag-grid-angular style="width: 100%; height: 100%;" 
+                <ag-grid-angular style="width: 100%; height: 100%;"
                                  class="ag-theme-fresh"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"
                                  (gridReady)="onGridReady($event)"
-                                 (gridSizeChanged)="adjustColumnSize($event)" 
+                                 (gridSizeChanged)="adjustColumnSize($event)"
                                  (cellEditingStarted)="startEditingCell($event)"
                                  [enableSorting]="true"
                                  [enableColResize]="true">
                 </ag-grid-angular>
             </div>
         </div>
-        
     `,
     styles: [`
-        
         .flex-container{
-           
             display: flex;
             justify-content: space-between;
             margin-left: auto;
@@ -48,15 +42,15 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
     `]
 })
 export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
+    @Output() saveSuccess = new EventEmitter();
     name = "visibility";
 
+    public gridOpt:GridOptions = {};
     private filteredExperimentOverviewListSubscript: Subscription;
     private selectedTreeNodeSubscript: Subscription;
     private visList:Array<any>;
     private instList:Array<any>;
-    private gridOpt:GridOptions = {};
 
-    @Output() saveSuccess = new EventEmitter();
 
     /*setState(){
 
@@ -71,7 +65,7 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
             return display[0];
         }
         return '';
-    };
+    }
 
 
     private valueChanging = (params):boolean => {
@@ -86,7 +80,7 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
                 this.experimentService.dirty = true;
                 return true;
             } else {
-                this.dialogService.confirm("Visibility can only be changed by owner, lab manager, or GNomEx admins.",null);
+                this.dialogService.alert("Visibility can only be changed by owner, lab manager, or GNomEx admins.",null, DialogType.WARNING);
                 rowData[field] = params.oldValue;
             }
         }
@@ -257,7 +251,7 @@ export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
         for(let i = 0; i < eList.length; i++){
             if(eList[i].codeVisibility === "INST" && eList[i].idInstitution === ''){
                 this.saveSuccess.emit();
-                this.dialogService.confirm("Please specify an Institution for requests whose visibility is set to 'Institution'.", null);
+                this.dialogService.alert("Please specify an Institution for requests whose visibility is set to 'Institution'.", null);
                 return;
             }
         }

@@ -160,7 +160,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             }
             //console.log("Previous tab: " + this.selectRowIndex + " current Tab: " + event.rowIndex  );
             if(this.expPlatformService.expPlatformOverviewForm.dirty){
-                this.dialogService.confirm("Warning","Your changes have not been saved.  Discard changes?").pipe(first()).subscribe(answer =>{
+                this.dialogService.confirm("Your changes have not been saved.  Discard changes?", "Warning").pipe(first()).subscribe(answer =>{
                     if(!answer){
                         this.gridOpt.api.forEachNode(node=> {
                             return node.rowIndex === this.selectRowIndex  ? node.setSelected(true) : -1;
@@ -203,8 +203,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     removePlatform(){
         let expPlatform = this.selectedPlatformList.length > 0 ? this.selectedPlatformList[0] : null;
         if(expPlatform){
-            this.dialogService.confirm("Remove Platform ",
-                "Are you sure you want to remove experiment platform " + expPlatform.display + "?")
+            this.dialogService.confirm("Are you sure you want to remove experiment platform " + expPlatform.display + "?", "Remove Platform")
                 .pipe(first()).subscribe((result:boolean) => {
                 if(result){
                     this.showSpinner = true;
@@ -214,7 +213,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                             if(resp && resp.result === "SUCCESS"){
                                 this.expPlatformService.getExperimentPlatformList_fromBackend();
                             }else if(resp && resp.message){
-                                this.dialogService.alert(resp.message);
+                                this.dialogService.error(resp.message);
                             }
                         });
                     this.experimentPlatformTabs = [];
@@ -394,24 +393,18 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         }
         params = params.set("noJSONToXMLConversionNeeded", "Y");
 
-
-        //let params:HttpParams = new HttpParams().set("applicationsXMLString",JSON.stringify(application));
-        //let params: FormData = new FormData();
-        //formData.append("applicationsXMLString",JSON.stringify(application));
-
         this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe( resp => {
             if(resp && resp.result && resp.result === "SUCCESS" ){
                 this.expPlatformService.getExperimentPlatformList_fromBackend();
                 this.dictionaryService.reloadAndRefresh();
             }else if(resp && resp.message){
-                this.dialogService.alert(resp.message);
+                this.dialogService.error(resp.message);
                 this.showSpinner = false;
-                //this.expPlatformService.getExperimentPlatformList_fromBackend();
             }else{
-                this.dialogService.alert("Unknown Error occurred please contact GNomEx Support.");
+                this.dialogService.error("Unknown Error occurred please contact GNomEx Support.");
                 this.showSpinner = false;
             }
-        })
+        });
     }
 
     ngOnDestroy(){

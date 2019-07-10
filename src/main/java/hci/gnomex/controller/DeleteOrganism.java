@@ -118,7 +118,7 @@ public class DeleteOrganism extends GNomExCommand implements Serializable {
       }
 
       this.jsonResult = Json.createObjectBuilder()
-              .add("result", "FAILURE")
+              .add("result", "INVALID")
               .add("message", "Organism is referenced on existing db objects so it was inactivated")
               .build().toString();
       setResponsePage(this.SUCCESS_JSP);

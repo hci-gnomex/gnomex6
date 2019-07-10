@@ -10,6 +10,7 @@
         import {first} from "rxjs/operators";
         import {UserPreferencesService} from "../../services/user-preferences.service";
         import {HttpParams} from "@angular/common/http";
+        import {UtilService} from "../../services/util.service";
 
         @Component({
             selector:'dt-visibility-tab',
@@ -100,7 +101,9 @@
                         });
                     }
 
-                    this.updateCollaborators();
+                    setTimeout(() => {
+                        this.updateCollaborators();
+                    });
                 });
 
             }
@@ -158,7 +161,10 @@
                 let prepCollabsList:Array<any> = [];
 
                 if(visCode === 'MEM'){
-                    let memCollabs = Array.isArray(lab.membersCollaborators) ? lab.membersCollaborators : [lab.membersCollaborators];
+                    let memCollabs: any[] = [];
+                    if (lab.membersCollaborators) {
+                        memCollabs = UtilService.getJsonArray(lab.membersCollaborators, lab.membersCollaborators.AppUser);
+                    }
                     lab.membersCollaborators = memCollabs;
                     prepCollabsList = memCollabs.filter(mem => mem.isActive === 'Y');
                     this.visibilityForm.get('collaborators').enable();
@@ -184,10 +190,13 @@
 
             }
 
-            /*handler gets called twice one for select one for deselect */
-            collaborChange(selected : any,i:number) {
-                this.possibleCollaborators[i].isSelected = selected ? 'Y' : 'N'
-
+            public collaborChange(selectedCollabs: any[]): void {
+                for (let collab of this.possibleCollaborators) {
+                    collab.isSelected = 'N';
+                }
+                for (let collab of selectedCollabs) {
+                    collab.isSelected = 'Y';
+                }
             }
 
             setCollaboratorPermission(selectedCollaborators:Array<any>){
@@ -209,10 +218,6 @@
                     collab.canUpdate = canUpdate ? "Y" : "N";
 
                 }
-            }
-
-            compareByID(itemOne, itemTwo) {
-                return itemOne && itemTwo && itemOne.idAppUser == itemTwo.idAppUser;
             }
 
             toggeSelect(){

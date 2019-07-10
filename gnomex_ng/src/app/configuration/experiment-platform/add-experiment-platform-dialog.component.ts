@@ -102,7 +102,7 @@ export class AddExperimentPlatformDialogComponent extends BaseGenericContainerDi
             console.log(resp);
             if(resp){ // response is the code request category if successful
                 if(resp.message){ // had a known error
-                    this.dialogService.alert(resp.message);
+                    this.dialogService.error(resp.message);
                 }else{
                     this.expPlatformService.getExperimentPlatformList_fromBackend();
                     this.addFn();
@@ -111,7 +111,7 @@ export class AddExperimentPlatformDialogComponent extends BaseGenericContainerDi
 
 
             }else{
-                this.dialogService.alert("An error occured please contact GNomEx Support");
+                this.dialogService.error("An error occured please contact GNomEx Support");
             }
         });
 
@@ -120,8 +120,7 @@ export class AddExperimentPlatformDialogComponent extends BaseGenericContainerDi
 
     saveChanges(){
         if(!this.formGroup.get('code').value){
-            this.dialogService.confirm("Code Request Category",
-                "If you do not provide a code request category, the system will provide one for you.  Is this okay?")
+            this.dialogService.confirm("If you do not provide a code request category, the system will provide one for you.  Is this okay?", "Code Request Category")
                 .subscribe( (answer:boolean) =>{
                     if(answer){
                         this.makeRequest();

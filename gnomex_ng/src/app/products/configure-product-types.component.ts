@@ -5,7 +5,7 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ProductsService} from "../services/products.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material";
@@ -122,7 +122,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while retrieving price categories" + message, null);
+                this.dialogsService.error("An error occurred while retrieving price categories" + message);
             }
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
@@ -173,7 +173,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
 
     public removeProductType(): void {
         if (this.selectedProductType && this.selectedProductType.canDelete === 'Y') {
-            this.dialogsService.confirm("Are you sure you want to delete " + this.selectedProductType.display + "?", " ").subscribe((answer: boolean) => {
+            this.dialogsService.confirm("Are you sure you want to delete " + this.selectedProductType.display + "?").subscribe((answer: boolean) => {
                 if (answer) {
                     this.showSpinner = true;
                     this.productsService.deleteProductType(this.collectFields()).subscribe((response: any) => {
@@ -189,7 +189,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                             if (response && response.message) {
                                 message = ": " + response.message;
                             }
-                            this.dialogsService.confirm("An error occurred while deleting the product type" + message, null);
+                            this.dialogsService.error("An error occurred while deleting the product type" + message);
                         }
                         this.showSpinner = false;
                     });
@@ -202,7 +202,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
         if (this.selectedProductType) {
             let descriptionTrimmed: string = (this.form.controls['description'].value as string).trim();
             if (!descriptionTrimmed) {
-                this.dialogsService.confirm("Please set description", null);
+                this.dialogsService.alert("Please set description", null, DialogType.VALIDATION);
                 return;
             }
             this.showSpinner = true;
@@ -219,7 +219,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving the product type" + message, null);
+                    this.dialogsService.error("An error occurred while saving the product type" + message);
                 }
                 this.showSpinner = false;
             });
@@ -230,7 +230,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
         if (this.showNewPriceCategoryInput && !this.form.controls['newPriceCategoryName'].invalid) {
             let name: string = (this.form.controls['newPriceCategoryName'].value as string).trim();
             if (!name) {
-                this.dialogsService.confirm("Please set name", null);
+                this.dialogsService.alert("Please set name", null, DialogType.VALIDATION);
                 return;
             }
             this.productsService.saveNewProductPriceCategory(name).subscribe((response: any) => {
@@ -244,7 +244,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving the price category" + message, null);
+                    this.dialogsService.error("An error occurred while saving the price category" + message);
                 }
             });
         }

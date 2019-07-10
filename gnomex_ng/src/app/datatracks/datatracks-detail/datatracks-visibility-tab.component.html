@@ -15,19 +15,17 @@
         <label class="gx-label"> Individual collaborators allowed access to this data track  </label>
 
         <div>
-            <mat-form-field style="width:30%" >
-                <mat-select  [compareWith]="compareByID" placeholder="Collaborators" multiple formControlName="collaborators" >
-                    <mat-option *ngFor="let collab of this.possibleCollaborators; let i = index "
-                                #opt
-                                [value]="collab"
-                                (onSelectionChange)="collaborChange(opt.selected, i)">
-                        {{collab[this.prefService.userDisplayField]}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="this.visibilityForm?.get('collaborators')?.hasError('selectRequired')">
-                    This field is required
-                </mat-error>
-            </mat-form-field>
+            <div style="width:30%">
+                <custom-multi-combo-box class="full-width"
+                                        placeholder="Collaborators"
+                                        [formControlName]="'collaborators'"
+                                        [options]="this.possibleCollaborators"
+                                        valueField="idAppUser"
+                                        [forceEmitObject]="true"
+                                        [displayField]="this.prefService.userDisplayField"
+                                        (selectionChanged)="collaborChange($event)">
+                </custom-multi-combo-box>
+            </div>
 
             <button mat-button color="primary" [disabled]="!isSelectable" (click)="toggeSelect()"> {{ selectMode }} </button>
 

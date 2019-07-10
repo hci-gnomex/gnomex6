@@ -445,7 +445,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 }
             }, () => {
                 this.showSpinner = false;
-                this.dialogsService.confirm("An error occurred while saving dictionary", null);
+                this.dialogsService.error("An error occurred while saving dictionary");
             });
         }
     }
@@ -496,7 +496,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             });
         }, () => {
             this.showSpinner = false;
-            this.dialogsService.confirm("An error occurred while deleting dictionary", null);
+            this.dialogsService.error("An error occurred while deleting dictionary");
         });
     }
 

@@ -1,5 +1,11 @@
 import {
-    Component, ComponentRef, OnDestroy, OnInit, Output, EventEmitter, ViewChild
+    Component,
+    ComponentRef,
+    EventEmitter,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewChild,
 } from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {FormGroup} from "@angular/forms";
@@ -9,7 +15,7 @@ import {first} from "rxjs/internal/operators";
 
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {ExperimentBioinformaticsTabComponent} from "../experiment-detail/experiment-bioinformatics-tab.component";
@@ -26,17 +32,16 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
 import {TabVisibilityComponent} from "./tab-visibility.component";
 
 import {Experiment} from "../../util/models/experiment.model";
-import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-experiment',
     templateUrl: "./new-experiment.component.html",
-    styles: [`        
+    styles: [`
         
         .bordered { border: 1px solid silver; }
         
-        .highlight-agreement { 
+        .highlight-agreement {
             color: green;
             font-style: italic;
         }
@@ -611,7 +616,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     + '\n'
                     + 'Please inscribe database ID numbers on the lids of 1.5 ml microcentrifuge tubes.  Inscribe sample names on the sides of tubes. ';
 
-                let temp = this.dialogService.alert(submissionMessage, "Request Submitted").subscribe((value: boolean) => {
+                let temp = this.dialogService.alert(submissionMessage, "Request Submitted", DialogType.SUCCESS).subscribe((value: boolean) => {
                     if (response.requestNumber) {
                         window.open('ShowRequestForm.gx?idRequest=' + response.idRequest, '_blank');
 

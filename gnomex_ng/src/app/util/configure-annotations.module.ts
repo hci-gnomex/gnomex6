@@ -8,7 +8,6 @@ import {ServicesModule} from "../services/services.module";
 import {AgGridModule} from "ag-grid-angular";
 
 import {ConfigureAnnotationsComponent} from "./configure-annotations.component";
-import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
 import {UtilModule} from "./util.module";
 
 
@@ -26,11 +25,9 @@ import {UtilModule} from "./util.module";
     ],
     declarations: [
         ConfigureAnnotationsComponent,
-        ConfigAnnotationDialogComponent
     ],
     exports: [
         ConfigureAnnotationsComponent,
-        ConfigAnnotationDialogComponent
     ]
 
 })

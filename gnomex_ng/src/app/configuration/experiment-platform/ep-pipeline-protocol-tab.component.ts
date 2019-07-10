@@ -44,10 +44,10 @@ import {DictionaryService} from "../../services/dictionary.service";
                     <input matInput (change)="updateGridForProtocol($event)"  [(ngModel)]="protocol" [disabled]="this.disableControl" placeholder="Protocol" >
                 </mat-form-field>
                 <mat-form-field >
-                    <textarea matInput (change)="updateGridForDescription($event)" 
-                              placeholder="Description"  
-                              [(ngModel)]="description" 
-                              [disabled]="this.disableControl" 
+                    <textarea matInput (change)="updateGridForDescription($event)"
+                              placeholder="Description"
+                              [(ngModel)]="description"
+                              [disabled]="this.disableControl"
                               matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3">
                     </textarea>
                 </mat-form-field>
@@ -187,8 +187,8 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
         this.formGroup.markAsDirty();
     }
     removeProtocol(){
-        this.dialogService.confirm("Remove protocol","Are you sure you want to remove pipeline protocol "
-            + this.selectedProtocolRow[0].protocol + "?" ).subscribe(result =>{
+        this.dialogService.confirm("Are you sure you want to remove pipeline protocol "
+            + this.selectedProtocolRow[0].protocol + "?", "Remove protocol").subscribe(result =>{
                 let removeIndex:number = this.pipelineRowData.indexOf(this.selectedProtocolRow[0]);
                 if(result && removeIndex > -1){
                     this.pipelineRowData.splice(removeIndex,1);

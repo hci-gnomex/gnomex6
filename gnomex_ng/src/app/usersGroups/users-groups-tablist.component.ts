@@ -1062,19 +1062,19 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         let coresIManage = this.setCoreFacilities();
 
         if (this.codeUserPermissionKind === 'ADMIN' && coresIManage === 0) {
-            this.dialogsService.confirm("The user is marked as an admin; Please specify the core facilities the user can manage.", null);
+            this.dialogsService.alert("The user is marked as an admin; Please specify the core facilities the user can manage.", null);
         } else {
             if (this.isActiveChanged && this.isActiveFC.value == false) {
                 if ( this.isMemberOfLab()) {
                     let activeMessage = this.buildLabsMessage();
-                    this.dialogsService.confirm("Inactivating this user will remove them from the following lab(s):", activeMessage).subscribe(answer => {
+                    this.dialogsService.confirm("Inactivating this user will remove them from the following lab(s):<br>" + activeMessage).subscribe(answer => {
                         if (answer) {
                             this.beingIsActive = true;
                             this.save();
                         }
                     });
                 } else {
-                    this.dialogsService.confirm("This will inactivate the user", " ").subscribe(answer => {
+                    this.dialogsService.confirm("This will inactivate the user").subscribe(answer => {
                         if (answer) {
                             this.beingIsActive = true;
                             this.save();
@@ -1143,7 +1143,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             warningMessages.push(' ');
             warningMessages.push('Continue with save anyway?');
 
-            this.dialogsService.yesNoDialog(warningMessages, this, "saveGroup");
+            this.dialogsService.confirm(warningMessages).subscribe((result: any) => {
+                if(result) {
+                    this.saveGroup();
+                }
+            });
         } else {
             this.saveGroup();
         }

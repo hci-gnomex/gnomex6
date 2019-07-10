@@ -1,8 +1,8 @@
 import {Component, ElementRef, Inject, OnDestroy, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {Subscription} from "rxjs";
 
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {SampleUploadService} from "./sample-upload.service";
 
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -16,6 +16,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {PropertyService} from "../services/property.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -164,7 +165,6 @@ import {PropertyService} from "../services/property.service";
 
 
     constructor(private dialogRef: MatDialogRef<UploadSampleSheetComponent>,
-                private dialog: MatDialog,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
@@ -257,7 +257,7 @@ import {PropertyService} from "../services/property.service";
         }
 
         if (!anyColumnsChosen) {
-            this.dialogService.alert('Please select a column for at least one field to populate', 'No Columns Selected');
+            this.dialogService.alert('Please select a column for at least one field to populate', 'No Columns Selected', DialogType.VALIDATION);
             return;
         }
 
@@ -273,7 +273,13 @@ import {PropertyService} from "../services/property.service";
                 message = 'The specified sample sheet has more rows than there are samples.\n\nThe excess rows in the sample sheet will be added.\n\nPlease verify you have chosen the correct sample sheet.\n\nDo you wish to continue?';
             }
 
-            this.dialogService.yesNoDialog(message, this, 'populateFieldsWarningPassed', 'populateFieldsWarningCancelled','Row/Sample Mismatch');
+            this.dialogService.confirm( message, "Row/Sample Mismatch").subscribe((result: any) => {
+                if(result) {
+                    this.populateFieldsWarningPassed();
+                } else {
+                    this.populateFieldsWarningCancelled();
+                }
+            });
         } else {
             this.populateFieldsWarningPassed();
         }
@@ -512,7 +518,7 @@ import {PropertyService} from "../services/property.service";
     }
 
     public populateFieldsWarningCancelled(): void {
-        this.dialogService.alert('No samples have been imported.');
+        this.dialogService.alert('No samples have been imported.', null, DialogType.WARNING);
 
         this.dialogRef.close();
     }
@@ -572,7 +578,7 @@ import {PropertyService} from "../services/property.service";
 
                         this.fileParsed = true;
                     } else {
-                        this.dialogService.alert("File failed to upload.");
+                        this.dialogService.alert("File failed to upload.", null, DialogType.FAILED);
                     }
                 });
             } else {
@@ -596,9 +602,12 @@ import {PropertyService} from "../services/property.service";
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = '75em';
         config.height = '30em';
-        config.panelClass = 'no-padding-dialog';
+        config.autoFocus = false;
 
-        let dialogRef = this.dialog.open(SampleSheetColumnFormatsComponent, config);
+        this.dialogService.genericDialogContainer(SampleSheetColumnFormatsComponent, "Sample Sheet Column Formats", null, config,
+            {actions: [
+                    {type: ActionType.SECONDARY, name: "OK", internalAction: "onClose"}
+                ]});
     }
 
 

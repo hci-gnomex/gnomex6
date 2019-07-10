@@ -5,9 +5,10 @@ import {PrimaryTab} from "../../util/tabs/primary-tab.component"
 import {ExperimentsService} from "../experiments.service";
 import * as _ from "lodash";
 import {DictionaryService} from "../../services/dictionary.service";
-import {jqxTreeGridComponent} from "../../../assets/jqwidgets-ts/angular_jqxtreegrid";
 import {ConstantsService} from "../../services/constants.service";
 import {Subscription} from "rxjs";
+import {GridApi, GridReadyEvent} from "ag-grid-community";
+import {IconRendererComponent} from "../../util/grid-renderers";
 
 
 @Component({
@@ -17,24 +18,23 @@ import {Subscription} from "rxjs";
             <div class="full-width full-height flex-container-col">
                 <div class="full-width">
                     <div class="full-width flex-container-row">
-                        <div class="flex-grow radioLikeLink" *ngFor="let opt of progressOptions; let i=index">
-                            <input id="{{opt.id}}" type="radio" name="progressRadio" [(ngModel)]="selectedOpt"  [id]="opt.id" [value]="opt.label" (change)="selectSubFilter()">
-                            <label for="{{opt.id}}">{{opt.label}}</label>
-                            <div *ngIf="!isEnd(i)" class="divider"></div>
-                        </div>
+                        <mat-radio-group  [(ngModel)]="selectedOpt" (change)="selectSubFilter()" >
+                            <mat-radio-button style="margin: 0.5em"  *ngFor="let opt of progressOptions; let i=index" [value]="opt.label">
+                                {{opt.label}}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        
                     </div>
                 </div>
-                <div class="full-width flex-grow">
-                    <div #treeGridContainer style="display:flex; flex-direction:column; flex:10; width:100%;">
-                        <jqxTreeGrid [width]="'calc(100% - 2px)'" 
-                                     [source]="dataAdapter" 
-                                     [pageable]="true" 
-                                     [sortable]="true" 
-                                     [columns]="columns" 
-                                     [columnsResize]="true" 
-                                     #TreeGrid
-                        >
-                        </jqxTreeGrid>
+                <div class="flex-container-col full-width flex-grow">
+                    <div  class="flex-container-col flex-grow full-width">
+                        <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                         (gridReady)="this.onGridReady($event)"
+                                         [rowDeselection]="true"
+                                         [groupDefaultExpanded]="true"
+                                         [getNodeChildDetails]="this.getNodeChildDetails"
+                                         [enableColResize]="true">
+                        </ag-grid-angular>
                     </div>
                 </div>
             </div>
@@ -82,177 +82,72 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
     private rpDNASeqList:Array<any>=[];
     private rpList:Array<any> =[];
     private progressOptions = [];
+    public gridApi: GridApi;
     public readonly MICRO = "Microarray, Sample Quality";
     public readonly IllUMINA = "Illumina";
     public readonly DNASEQ = "DNA Sequencing Core Facility";
     private selectedOpt: string = "Microarray, Sample Quality";
-
-    @ViewChild('TreeGrid') myGrid: jqxTreeGridComponent;
-    @ViewChild('treeGridContainer') container: ElementRef;
-
+    private getNodeChildDetails:any;
+    private progressRowData:any[];
 
 
-    private iconCellRenderer = (row: number, column: any, imgSource: any) =>{
-
-        return `<div style="display: block; text-align: left; padding:0.3rem 0.5rem;">
-							<img src="` + imgSource +`" alt=""/>` +
-            `</div>`;
-    };
-
-    private experimentNumberCellsRenderer = (row: number, column: any, value: any): any => {
-
-        if(row < this.source.localdata.length ){
-            let imgSource = this.source.localdata[row].icon;
-            if(this.source.localdata[row].showRequestNumber == 'Y'){
-                return `<div style="display: block; text-align: left; padding: 0.3rem 0.5rem;">
-							<img src="` + imgSource +`" alt=""/>` + value +
-                    `</div>`;
-            }else{
-                return `<div style="display: block;"></div> `
-            }
-        }
-        return `<div style="display: block;"></div> `
-
-    };
-
-
-    private textCellsRenderer = (row: number, column: any, value: any): any => {
-        let htmlStr:string = `<div style="display: block; text-align: left; padding: 0.3rem 0.5rem;" >`
-                               + value +  `</div>`;
-        return htmlStr;
-    };
 
 
     private dnaSeqColumns: any[] = [
-        {text: "#", datafield: "requestNumber", 	width: "8%", cellsrenderer: this.experimentNumberCellsRenderer },
-        {text: "Date", datafield: "createDate", 	width: "7%", cellsrenderer: this.textCellsRenderer},
-        {text: "Request Type", datafield:"experimentKind", width: "10%", cellsrenderer: this.textCellsRenderer},
-        {text: "Requester",   datafield: "appUserName", width: "10%", cellsrenderer: this.textCellsRenderer},
-        {text: "Source Plate", datafield:"plateName",  width: "14%", cellsrenderer: this.textCellsRenderer},
-        {text: "Sample", datafield: "sampleName",    width: "7%", cellsrenderer: this.textCellsRenderer},
-        {text: "Sample #", datafield:"sampleNumber", width:"7%", cellsrenderer: this.textCellsRenderer },
-        {text: "Source Well", datafield:"sourceWell", width:"7%", cellsrenderer: this.textCellsRenderer },
-        {text: "Assay", datafield:"assay", width:"10%", cellsrenderer: this.textCellsRenderer },
-        {text: "Status", datafield:"status",width:"20%", cellsrenderer: this.textCellsRenderer }
+        { headerName: "#", field: "requestNumber", 	width: 160, cellRenderer:"agGroupCellRenderer",
+            cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true},
+            rowDrag: false
+        },
+        { headerName: "Date", field: "createDate", width: 100 },
+        { headerName: "Request Type", field:"experimentKind", width: 150 },
+        { headerName: "Requester",   field: "appUserName", width: 200 },
+        { headerName: "Source Plate", field:"plateName",  width: 150 },
+        { headerName: "Sample", field: "sampleName",    width: 200 },
+        { headerName: "Sample #", field:"sampleNumber", width: 150 },
+        { headerName: "Source Well", field:"sourceWell", width: 150 },
+        { headerName: "Assay", field:"assay", width: 150 },
+        { headerName: "Status", field:"status",width: 150 }
     ];
 
 
-
-    private dnaSeqSource = {
-        datatype: "json",
-        localdata: [],
-        datafields: [
-            {name:"expID", type:"number"},
-            {name:"parentID", type:"number"},
-            {name: "requestNumber", type: "string"},
-            {name: "createDate", type: "string"},
-            {name: "experimentKind", type:"string"},
-            {name: "appUserName", type: "string"},
-            {name: "plateName", type: "string"},
-            {name: "sampleName", type:"string"},
-            {name: "sampleNumber", type: "string"},
-            {name: "sourceWell", type: "string"},
-            {name: "assay", type: "string"},
-            {name: "status", type:"string"}
-        ],
-        hierarchy:{
-            keyDataField:{ name: 'expID'},
-            parentDataField: { name: 'parentID'}
-        },
-        id: 'expID'
-    };
 
     private microColumns: any[] = [
-        {text: "# ",        datafield: "requestNumber", 	width: "8%", cellsrenderer: this.experimentNumberCellsRenderer },
-        {text: "Date",      datafield: "createDate", 	width: "7%", cellsrenderer: this.textCellsRenderer},
-        {text: "Request Kind", datafield:"experimentKind", width:"12%", cellsrenderer:this.textCellsRenderer},
-        {text: "Requester", datafield:"appUserName", width: "12%", cellsrenderer: this.textCellsRenderer},
-        {text: "Hyb #",   datafield: "hybNumber", width: "7%", cellsrenderer: this.textCellsRenderer},
-        {text: "Cy3 Sample", datafield:"nameSample1",  width: "15%", cellsrenderer: this.textCellsRenderer},
-        {text: "QC", datafield: "qcDate1Checked",    width: "4%", cellsrenderer: this.iconCellRenderer},
-        {text: "Label",datafield: "labelDate1Checked", 	  width: "4%", cellsrenderer: this.iconCellRenderer},
-        {text: "Cy5 Sample",   datafield: "nameSample2", width: "9%", cellsrenderer: this.textCellsRenderer},
-        {text: "QC",   datafield: "qcDate2Checked", width: "4%", cellsrenderer: this.iconCellRenderer},
-        {text: "Label",   datafield: "labelDate2Checked", width: "4%", cellsrenderer: this.iconCellRenderer},
-        {text: "Hyb",   datafield: "hybDateChecked", width: "7%", cellsrenderer: this.iconCellRenderer},
-        {text: "Extract",   datafield: "extractionDateChecked", width: "7%", cellsrenderer: this.textCellsRenderer},
+        { headerName: "#", field: "requestNumber", 	width: 160, cellRenderer:"agGroupCellRenderer",
+            cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true},
+            rowDrag: false
+        },
+        { headerName: "Date",      field: "createDate", 	width: 150 },
+        { headerName: "Request Kind", field:"experimentKind", width:200 },
+        { headerName: "Requester", field:"appUserName", width: 200 },
+        { headerName: "Hyb #",   field: "hybNumber", width: 150 },
+        { headerName: "Cy3 Sample", field:"nameSample1",  width: 150 },
+        { headerName: "QC", field: "qcDate1Checked",    width: 150, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true} },
+        { headerName: "Label",field: "labelDate1Checked", 	  width: 150, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true} },
+        { headerName: "Cy5 Sample",   field: "nameSample2", width: 150 },
+        { headerName: "QC",   field: "qcDate2Checked", width: 150, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true} },
+        { headerName: "Label",   field: "labelDate2Checked", width: 200, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true} },
+        { headerName: "Hyb",   field: "hybDateChecked", width: 150, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true}},
+        { headerName: "Extract", field: "extractionDateChecked", width: 150, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true} },
     ];
 
-    private microSource = {
-        datatype: "json",
-        localdata: [],
-        datafields: [
-            {name:"expID", type:"number"},
-            {name:"parentID", type:"number"},
-            {name: "requestNumber", type: "string"},
-            {name: "createDate", type: "string"},
-            {name: "experimentKind", type: "string"},
-            {name: "appUserName", type: "string"},
-            {name: "hybNumber", type: "string"},
-            {name: "nameSample1", type: "string"},
-            {name: "qcDate1Checked", type: "string"},
-            {name: "labelDate1Checked", type: "string"},
-            {name: "nameSample2", type: "string"},
-            {name: "qcDate2Checked", type: "string"},
-            {name: "labelDate2Checked", type: "string"},
-            {name: "hybDateChecked", type: "string"},
-            {name: "extractionDateChecked", type: "string"},
-        ],
-        hierarchy:{
-            keyDataField:{ name: 'expID'},
-            parentDataField: { name: 'parentID'}
-        },
-        id: 'expID'
-    };
 
     private illuminaColumns: any[] = [
-        {text: "# ",        datafield: "requestNumber", 	width: "12%", cellsrenderer: this.experimentNumberCellsRenderer },
-        {text: "Date",      datafield: "createDate", 	width: "7%", cellsrenderer: this.textCellsRenderer},
-        {text: "Requester", datafield:"idAppUser", width: "8%", cellsrenderer: this.textCellsRenderer},
-        {text: "Sample #",   datafield: "sampleNumber", width: "9%", cellsrenderer: this.textCellsRenderer},
-        {text: "Sample Name", datafield:"sampleName",  width: "17%", cellsrenderer: this.textCellsRenderer},
-        {text: "QC", datafield: "qcChecked",    width: "7%", cellsrenderer: this.iconCellRenderer},
-        {text: "Prep",datafield: "prepChecked", 	  width: "7%", cellsrenderer: this.iconCellRenderer},
-        {text: "# Lanes",   datafield: "numberLanes", width: "7%", cellsrenderer: this.textCellsRenderer},
-        {text: "Seq",   datafield: "seqChecked", width: "7%", cellsrenderer: this.iconCellRenderer},
-        {text: "Seq Status",   datafield: "seqStatus", width: "20%", cellsrenderer: this.textCellsRenderer},
-    ];
-
-    private illuminaSource = {
-        datatype: "json",
-        localdata: [],
-        datafields: [
-            {name:"expID", type:"number"},
-            {name:"parentID", type:"number"},
-            {name: "requestNumber", type: "string"},
-            {name: "createDate", type: "string"},
-            {name: "idAppUser", type: "string"},
-            {name: "sampleNumber", type: "string"},
-            {name: "sampleName", type: "string"},
-            {name: "qcChecked", type: "string"},
-            {name: "prepChecked", type: "string"},
-            {name: "numberLanes", type: "string"},
-            {name: "seqChecked", type: "string"},
-            {name: "seqStatus", type: "string"}
-        ],
-        hierarchy:{
-            keyDataField:{ name: 'expID'},
-            parentDataField: { name: 'parentID'}
+        {headerName: "#", field: "requestNumber", 	width: 160, cellRenderer:"agGroupCellRenderer",
+            cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true},
+            rowDrag: false
         },
-        id: 'expID'
-    };
-
-
-
-
+        { headerName: "Date",      field: "createDate", 	width: 150},
+        { headerName: "Requester", field:"idAppUser", width: 200},
+        { headerName: "Sample #",   field: "sampleNumber", width: 150 },
+        { headerName: "Sample Name", field:"sampleName",  width: 200 },
+        { headerName: "QC", field: "qcChecked",    width: 150, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true}},
+        { headerName: "Prep",field: "prepChecked", 	  width: 150, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true}},
+        { headerName: "# Lanes",   field: "numberLanes", width: 75},
+        { headerName: "Seq",   field: "seqChecked", width: 100, cellRendererFramework: IconRendererComponent, cellRendererParams:{noIconDefault: true}},
+        { headerName: "Seq Status",   field: "seqStatus", width: 100 },
+    ];
     private columns: any[] = [
     ];
-
-    private source = {
-        localdata: []
-    };
-
-    dataAdapter: any = [];
 
     constructor(protected fb: FormBuilder,private experimentService:ExperimentsService,
                 private dictionary:DictionaryService, private constService: ConstantsService) {
@@ -262,12 +157,36 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
 
     ngOnInit(){
 
+        this.getNodeChildDetails = function getItemNodeChildDetails(rowItem) {
+            let children: any[] = rowItem.children ? rowItem.children : [];
+
+            if (children.length > 0) {
+
+                return {
+                    group: true,
+                    expanded: true,
+                    children: children,
+                    key: rowItem.expID
+                };
+            } else {
+                return null;
+            }
+        };
+
         this.progressOptions =[
             {id:0, label:"Microarray, Sample Quality"},
             {id:1, label:"Illumina"},
             {id:2, label:"DNA Sequencing Core Facility"}
 
         ];
+
+
+    }
+
+    public onGridReady(event: GridReadyEvent): void {
+        event.api.sizeColumnsToFit();
+        this.gridApi = event.api;
+        this.columns = this.microColumns;
 
         this.microArraySubscription = this.experimentService.getRequestProgressListObservable()
             .subscribe(data =>{
@@ -290,9 +209,7 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
                     this.selectSubFilter();
                 }
             });
-        this.columns = this.microColumns;
-        this.source = this.microSource;
-        this.updateGridData(this.rpList);
+
     }
 
 
@@ -327,22 +244,20 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
 
         if(this.selectedOpt === this.MICRO ){
             progressList = this.rpList;
-            this.source = this.microSource;
             this.columns = this.microColumns;
 
         }else if(this.selectedOpt === this.IllUMINA){
             progressList = this.rpSolexaList;
-            this.source = this.illuminaSource;
             this.columns = this.illuminaColumns;
 
         }else if(this.selectedOpt === this.DNASEQ){
             progressList = this.rpDNASeqList;
-
-            this.source = this.dnaSeqSource;
             this.columns = this.dnaSeqColumns;
         }
+        this.gridApi.setColumnDefs(this.columns);
 
         //let start= new Date().getTime();
+        this.progressRowData = [];
         if(progressList){
             for(let i = 0; i < progressList.length; i++){
 
@@ -356,27 +271,31 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
                 if(rObject["showRequestNumber"] === 'Y'){
                     currentParent = rObject["requestNumber"];
                     currentParentID = rObject["expID"];
+                    rObject["children"] = [];
                     rObject["parentID"] = null; // jqwidgets had this for parents
+                    this.progressRowData.push(rObject)
                 }
                 else if(rObject["requestNumber"] === currentParent){
+                    let currentParentObj:any =  progressList[currentParentID];
+                    if(currentParentObj.children){
+                        (<any[]>currentParentObj.children).push(rObject)
+                    }
+
                     rObject["parentID"] = currentParentID;
                 }
 
             }
-            this.updateGridData(progressList);
+            this.updateGridData(this.progressRowData);
         }else{
             this.updateGridData([]);
         }
+        this.gridApi.sizeColumnsToFit();
 
-
-
-
-        //this.myGrid.expandAll();
     }
     updateGridData(data:Array<any>):void{
-        this.source.localdata = Array.isArray(data) ? data :[data];
-        this.dataAdapter = new jqx.dataAdapter(this.source);
-        //this.myGrid.selectedrowindexes([]);
+        if(this.gridApi){
+            this.gridApi.setRowData(Array.isArray(data) ? data :[data])
+        }
 
     }
 
@@ -391,9 +310,6 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
 
     }
 
-    isEnd(index:number):boolean{
-        return (this.progressOptions.length - 1 === index);
-    }
 
 
     ngOnDestroy():void{
@@ -403,4 +319,26 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
 
     }
 
+}
+
+function getDownloadGroupRenderer() {
+    function DownloadGroupRenderer() {
+    }
+
+    DownloadGroupRenderer.prototype.init = function(params) {
+        let tempDiv = document.createElement("div");
+        if ( params.data.showRequestNumber == 'Y') {
+                tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" class="icon"/>' + params.value + '</span>';
+
+        } else {
+            tempDiv.innerHTML = '<span >' + '' + '</span>';
+        }
+        this.eGui = tempDiv.firstChild;
+    };
+
+    DownloadGroupRenderer.prototype.getGui = function() {
+        return this.eGui;
+    };
+
+    return DownloadGroupRenderer;
 }

@@ -62,7 +62,7 @@ export class AddProductWindowComponent extends BaseGenericContainerDialog implem
                 if (response && response.message) {
                     message = ": " + response.message;
                 }
-                this.dialogsService.confirm("An error occurred while retrieving the lab list" + message, null);
+                this.dialogsService.error("An error occurred while retrieving the lab list" + message);
             }
         });
     }

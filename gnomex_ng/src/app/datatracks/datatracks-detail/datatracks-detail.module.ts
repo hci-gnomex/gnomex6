@@ -11,12 +11,11 @@ import {UtilModule} from "../../util/util.module";
 import {DatatracksDetailOverviewComponent,
         DatatracksSummaryTabComponent,
         DatatracksVisibilityTabComponent} from "./index"
-import {ConfigAnnotationDialogComponent} from "../../util/config-annotation-dialog.component";
 import {ConfigureAnnotationsModule} from "../../util/configure-annotations.module";
-import {RichEditorModule} from "../../../modules/rich-editor.module";
 import {RelatedDataModule} from "../../util/related-data.module";
 import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 import {AgGridModule} from "ag-grid-angular";
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 /**
  * @author Erik Rasmussen
@@ -30,11 +29,11 @@ import {AgGridModule} from "ag-grid-angular";
         CommonModule,
         FormsModule,
         ServicesModule,
-        RichEditorModule,
         UtilModule,
         ReactiveFormsModule,
         ConfigureAnnotationsModule,
         RelatedDataModule,
+        AngularEditorModule,
         AgGridModule.withComponents([
         ]),
     ],
@@ -43,8 +42,7 @@ import {AgGridModule} from "ag-grid-angular";
         DatatracksSummaryTabComponent,
         DatatracksVisibilityTabComponent,
         DatatracksFilesTabComponent,
-    ],
-    entryComponents: [ConfigAnnotationDialogComponent]
+    ]
 })
 export class DatatracksDetailModule {
 }

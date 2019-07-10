@@ -1,7 +1,7 @@
 import {Component, Inject} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {DataTrackService} from "../services/data-track.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
@@ -41,7 +41,7 @@ export class MoveDataTrackComponent extends BaseGenericContainerDialog {
             this.targetItem = data.targetItem;
             this.targetFolder = this.targetItem.label;
             if (this.targetItem.idGenomeBuild !== this.currentItem.idGenomeBuild) {
-                this.dialogsService.confirm("Cannot move data track to a different genome build", "");
+                this.dialogsService.alert("Cannot move data track to a different genome build", "", DialogType.WARNING);
                 this.doCancel();
             }
         }

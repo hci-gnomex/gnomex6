@@ -339,12 +339,12 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
 
 
             } else if(resp && resp.message) {
-                this.dialogsService.alert(resp.message);
+                this.dialogsService.error(resp.message);
                 this.dialogsService.stopAllSpinnerDialogs();
             }
 
         }, (err) => {
-            this.dialogsService.alert(err);
+            this.dialogsService.error(err);
             this.dialogsService.stopAllSpinnerDialogs();
         });
 
@@ -356,7 +356,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     createAnalysisYesButtonClicked() {
         if (this.createAnalysisForm.get("genomeBuilds").value.length === 0) {
             this.dialogsService
-                .confirm("Warning", "A genome build has not been specified. Create new analysis anyway?")
+                .confirm("A genome build has not been specified. Create new analysis anyway?", "Warning")
                 .subscribe(
                     res => {
                         if (res) {

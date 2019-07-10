@@ -94,7 +94,7 @@ export class NewTopicComponent extends BaseGenericContainerDialog {
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogService.alert("An error occurred while saving the topic" + message);
+                this.dialogService.error("An error occurred while saving the topic" + message);
             }
         }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;

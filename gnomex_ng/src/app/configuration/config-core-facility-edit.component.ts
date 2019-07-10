@@ -3,13 +3,13 @@ import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output, ViewC
 import {FormGroup,FormBuilder,Validators } from "@angular/forms"
 import {ActivatedRoute} from "@angular/router";
 import {URLSearchParams} from "@angular/http";
-import {jqxEditorComponent} from "../../assets/jqwidgets-ts/angular_jqxeditor";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {PrimaryTab} from "../util/tabs/primary-tab.component";
 import {ConfigurationService} from "../services/configuration.service";
 import {GnomexStringUtilService} from "../services/gnomex-string-util.service";
 import {Subscription} from "rxjs";
 import {DictionaryService} from "../services/dictionary.service";
+import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 
 
 
@@ -22,20 +22,24 @@ import {DictionaryService} from "../services/dictionary.service";
             margin-right: 1em;
             flex: 1 1 0;
         }
+        :host /deep/ angular-editor #editor {
+            resize: none;
+        }
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
     `]
 })
-export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnInit, OnDestroy{
+export class ConfigCoreFacilityEditComponent implements OnInit, OnDestroy{
     //Override
     public showSpinner:boolean = false;
-    public readonly tbarSettings :string  ="bold italic underline | left center right |  format font size | color | ul ol | outdent indent";
-    private toolBarSettings:string;
     private coreFacilityForm: FormGroup;
     private idCoreFacility:string = "";
     private coreListSubscription: Subscription;
-    private coreFacilitySubscription: Subscription;
     private saveCoreFacilitySubscription : Subscription = new Subscription();
+    public editorConfig: AngularEditorConfig;
+    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
 
-    @ViewChild('editorReference') myEditor: jqxEditorComponent;
     @Output() refreshedCore = new EventEmitter<any>();
 
 
@@ -48,16 +52,18 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
                 private strUtilService: GnomexStringUtilService,
                 private dictionaryService: DictionaryService
     ){
-        super(fb);
     }
 
 
     ngOnInit():void{ // Note this hook runs once if route changes to another folder you don't recreate component
-        if(this.secAdvisor.isGuest){
-            this.toolBarSettings = '';
-        }else{
-            this.toolBarSettings = this.tbarSettings;
-        }
+
+
+        this.editorConfig = {
+            spellcheck: true,
+            height: "15em",
+            minHeight: "10em",
+            enableToolbar: true,
+        };
 
         this.coreFacilityForm =  this.fb.group({
             contactName:['', [ Validators.required, Validators.maxLength(100)]],
@@ -69,6 +75,7 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
             labPhone:['',Validators.maxLength(20)],
             contactImage:[{value:'',disabled:!this.secAdvisor.isSuperAdmin}],
             shortDescription:['',Validators.maxLength(1000)],
+            description:'',
             isActive:[false],
             acceptOnlineWorkAuth:[false],
             showProjectAnnotations:[false]
@@ -88,6 +95,7 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
                 this.coreFacilityForm.get("labPhone").setValue(core.labPhone);
                 this.coreFacilityForm.get("contactImage").setValue(core.contactImage);
                 this.coreFacilityForm.get("shortDescription").setValue(core.shortDescription);
+                this.coreFacilityForm.get("description").setValue(core.description);
                 this.coreFacilityForm.get("isActive").setValue(core.isActive  === 'Y' ? true : false);
                 this.coreFacilityForm.get("acceptOnlineWorkAuth").setValue(core.acceptOnlineWorkAuth === 'Y' ? true : false);
                 this.coreFacilityForm.get("showProjectAnnotations").setValue(core.showProjectAnnotations === 'Y' ? true : false);
@@ -97,23 +105,18 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
                 this.coreFacilityForm.reset();
                 this.coreFacilityForm.markAsPristine();
             }
+
         });
+
+        if(this.secAdvisor.isGuest){
+            this.descEditor.editorToolbar.showToolbar = false;
+            this.editorConfig.editable = false;
+        }else{
+            this.descEditor.editorToolbar.showToolbar = true;
+            this.editorConfig.editable = true;
+        }
     }
 
-
-    ngAfterViewInit(){
-        this.coreFacilitySubscription = this.configService.getCoreListObservable().subscribe(core =>{
-            if(core.contactName != null && core.contactName != undefined ){ // empty string is valid so have do this the longer way
-                this.myEditor.val(core.description);
-            }else{
-                this.myEditor.val('');
-            }
-        });
-    }
-
-    changed(event:any){
-        this.coreFacilityForm.markAsDirty();
-    }
 
 
     save():void{
@@ -129,7 +132,7 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
         params.set('labPhone', this.coreFacilityForm.get("labPhone").value);
         params.set('contactImage', this.coreFacilityForm.get("contactImage").value);
         params.set('shortDescription', this.coreFacilityForm.get("shortDescription").value);
-        params.set('description', GnomexStringUtilService.cleanRichTextHTML(this.myEditor.val()));
+        params.set('description', GnomexStringUtilService.cleanRichTextHTML(this.coreFacilityForm.get("description").value));
         params.set('isActive', this.coreFacilityForm.get("isActive").value ? 'Y' : 'N');
         params.set('acceptOnlineWorkAuth', this.coreFacilityForm.get("acceptOnlineWorkAuth").value ? 'Y': 'N');
         params.set('showProjectAnnotations', this.coreFacilityForm.get("showProjectAnnotations").value ? 'Y':'N');
@@ -150,7 +153,6 @@ export class ConfigCoreFacilityEditComponent extends PrimaryTab implements OnIni
 
     ngOnDestroy(){
         this.coreListSubscription.unsubscribe();
-        this.coreFacilitySubscription.unsubscribe();
         this.saveCoreFacilitySubscription.unsubscribe();
         this.refreshedCore.unsubscribe();
     }

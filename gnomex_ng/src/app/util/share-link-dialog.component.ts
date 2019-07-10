@@ -2,6 +2,7 @@ import {Component, Inject, OnInit} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {WINDOW} from "../services/window.service";
 
 @Component({
     template: `
@@ -22,7 +23,7 @@ export class ShareLinkDialogComponent extends BaseGenericContainerDialog impleme
     constructor(private dialogRef: MatDialogRef<ShareLinkDialogComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 public constService: ConstantsService,
-                @Inject(Window) private _window: Window) {
+                @Inject(WINDOW) private _window: Window) {
         super();
     }
 

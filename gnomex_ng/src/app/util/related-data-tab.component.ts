@@ -1,17 +1,9 @@
-
-import {AfterViewInit, Component, Input, OnInit, ViewChild} from "@angular/core";
-import {FormGroup,FormBuilder,Validators } from "@angular/forms"
-import {DataTrackService} from "../services/data-track.service";
-import {ActivatedRoute} from "@angular/router";
-import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
+import {AfterViewInit, Component, Input, OnInit} from "@angular/core";
+import {ITreeOptions, TreeModel} from "angular-tree-component";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
 import {IRelatedObject} from "./interfaces/related-objects.model";
-import {DialogsService} from "./popup/dialogs.service";
-
-
+import {DialogsService, DialogType} from "./popup/dialogs.service";
 
 
 @Component({
@@ -36,10 +28,10 @@ import {DialogsService} from "./popup/dialogs.service";
 
 
     `,
-    styles: [`        
-        .flex-item-tree { 
+    styles: [`
+        .flex-item-tree {
             flex:1;
-            border:thin solid gainsboro; 
+            border:thin solid gainsboro;
         }
     `]
 })
@@ -129,7 +121,7 @@ export class RelatedDataTabComponent implements OnInit, AfterViewInit{
         let selectedItem = $event.node;
         let itemData = selectedItem.data;
         if ((itemData.label as string).endsWith("(Not authorized)")) {
-            this.dialogsService.alert("You do not have permission to view this");
+            this.dialogsService.alert("You do not have permission to view this", "Permission", DialogType.FAILED);
             return;
         }
         this.navToItem(itemData);

@@ -65,7 +65,7 @@ export class UploadFileService {
                     let uuid = resp.uuid;
                     return this.getFDTJnlpServlet(new HttpParams().set('uuid', uuid))
                 }else if(resp.message){
-                    this.dialogService.alert(resp.message);
+                    this.dialogService.error(resp.message);
                 }
                 return of(false);
             }));

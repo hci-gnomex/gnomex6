@@ -3,13 +3,22 @@ import { MatDialogRef, MatDialog, MatDialogConfig } from '@angular/material';
 
 import { Observable } from 'rxjs';
 
-import { ConfirmDialog } from './confirm-dialog.component';
 import { AlertDialogComponent } from "./alert-dialog.component";
-import { YesNoDialogComponent } from "./yes-no-dialog.component";
 import { SpinnerDialogComponent } from "./spinner-dialog.component";
 import {CustomDialogComponent} from "./custom-dialog.component";
 import {GenericContainerDialogComponent} from "./generic-container-dialog.component";
 import {GDActionConfig} from "../interfaces/generic-dialog-action.model";
+
+export enum DialogType {
+    ERROR = "Error",
+    WARNING = "Warning",
+    ALERT = "Alert",
+    SUCCESS = "Succeed",
+    FAILED = "Failed",
+    CONFIRM = "Confirm",
+    INFO = "Info",
+    VALIDATION = "Validation Error",
+}
 
 @Injectable()
 export class DialogsService {
@@ -24,64 +33,43 @@ export class DialogsService {
 
     constructor(private dialog: MatDialog) { }
 
-    public alert(message: string, title?: string): Observable<boolean> {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.maxWidth = '40em';
-        configuration.minWidth = '10em';
-
-        let dialogRef: MatDialogRef<AlertDialogComponent>;
-
-        dialogRef = this.dialog.open(AlertDialogComponent, configuration);
-        dialogRef.componentInstance.message = message;
-        dialogRef.componentInstance.title = title;
-
-        return dialogRef.afterClosed();
+    public alert(message: string|string[], title?: string, dialogType?: DialogType, icon?: string, config?: MatDialogConfig): Observable<boolean> {
+        return this.openDialog(message, title, dialogType ? dialogType : DialogType.ALERT, icon, config);
     }
 
-    public confirm(title: string, message: string): Observable<boolean> {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '30em';
+    public confirm(message: string|string[], title?: string, icon?: string, config?: MatDialogConfig): Observable<boolean> {
+        return this.openDialog(message, title, DialogType.CONFIRM, icon, config);
 
-        let dialogRef: MatDialogRef<ConfirmDialog>;
-
-        dialogRef = this.dialog.open(ConfirmDialog, configuration);
-        dialogRef.componentInstance.title = title;
-        dialogRef.componentInstance.message = message;
-
-        return dialogRef.afterClosed();
-    }
-    public createCustomDialog(tempRef:TemplateRef<any>, title?:string){
-
-        let configuration: MatDialogConfig = new MatDialogConfig();
-
-
-        if(title){
-            configuration.data ={templateRef: tempRef,title:title};
-        }else{
-            configuration.data = {templateRef:tempRef}
-        }
-        configuration.maxHeight = "10vh";
-        let dialogRef = this.dialog.open(CustomDialogComponent, configuration);
-        return dialogRef.afterClosed();
     }
 
-    public yesNoDialog(message: string|string[], parent: any, onYesFunctionName: string, onNoFunctionName?: string, title?: string): Observable<boolean> {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '20em';
+    public error(message: string|string[], title?: string, icon?: string, config?: MatDialogConfig): Observable<boolean> {
+        return this.openDialog(message, title, DialogType.ERROR, icon, config);
+    }
 
-        let dialogRef: MatDialogRef<YesNoDialogComponent>;
+    public info(message: string|string[], title?: string, icon?: string, config?: MatDialogConfig): Observable<boolean> {
+        return this.openDialog(message, title, DialogType.INFO, icon, config);
+    }
 
-        dialogRef = this.dialog.open(YesNoDialogComponent, configuration);
-        if (Array.isArray(message)) {
-            dialogRef.componentInstance.lines = message;
+    public createCustomDialog(tempRef: TemplateRef<any>, title?: string, icon?: string, config?: MatDialogConfig) {
+        let configuration: MatDialogConfig = null;
+        if (!config) {
+            configuration = new MatDialogConfig();
         } else {
-            dialogRef.componentInstance.message = message;
+            configuration = config;
         }
-        dialogRef.componentInstance.title = title;
-        dialogRef.componentInstance.parent = parent;
-        dialogRef.componentInstance.onYesFunctionName = onYesFunctionName;
-        dialogRef.componentInstance.onNoFunctionName = onNoFunctionName;
 
+        configuration.data = configuration.data ? configuration.data : {};
+        configuration.data["templateRef"] = tempRef;
+        configuration.data["title"] = title ? title : "";
+        configuration.data["icon"] = icon ? icon : "";
+
+        configuration.minWidth = configuration.minWidth ?  configuration.minWidth : "10em";
+        configuration.width = configuration.width ? configuration.width : "30em";
+
+        configuration.panelClass = "no-padding";
+        configuration.disableClose = true;
+
+        let dialogRef = this.dialog.open(CustomDialogComponent, configuration);
         return dialogRef.afterClosed();
     }
 
@@ -145,6 +133,35 @@ export class DialogsService {
         configuration.panelClass = "no-padding";
         configuration.disableClose = true;
         let dialogRef = this.dialog.open(GenericContainerDialogComponent, configuration );
+
+        return dialogRef.afterClosed();
+    }
+
+    private openDialog(message: string|string[], title?: string, type?: DialogType, icon?: string, config?: MatDialogConfig): Observable<any> {
+        let configuration: MatDialogConfig = null;
+        if (!config) {
+            configuration = new MatDialogConfig();
+        } else {
+            configuration = config;
+        }
+
+        configuration.data = configuration.data ? configuration.data : {};
+        configuration.data["message"] = message;
+        configuration.data["title"] = title ? title : "";
+        configuration.data["icon"] = icon ? icon : "";
+        configuration.data["dialogType"] = type ? type : "";
+
+        configuration.maxWidth = configuration.maxWidth ? configuration.maxWidth : "35em";
+        configuration.minWidth = configuration.minWidth ?  configuration.minWidth : "10em";
+        configuration.width = configuration.width ? configuration.width : "30em";
+
+        configuration.panelClass = "no-padding";
+        configuration.disableClose = true;
+        configuration.autoFocus = false;
+
+        let dialogRef: MatDialogRef<AlertDialogComponent>;
+
+        dialogRef = this.dialog.open(AlertDialogComponent, configuration);
 
         return dialogRef.afterClosed();
     }

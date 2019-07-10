@@ -13,11 +13,12 @@ import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
 import * as _ from "lodash";
 import {TopicService} from "../services/topic.service";
-import {MatDialog, MatDialogConfig, MatToolbar} from "@angular/material";
+import {MatDialogConfig, MatToolbar} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 import {AuthenticationService} from "../auth/authentication.service";
 import {PropertyService} from "../services/property.service";
 import {Subscription} from "rxjs/index";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 @Component({
     selector: "gnomex-header",
@@ -112,7 +113,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 private labListService: LabListService,
                 private gnomexService: GnomexService,
                 private formBuilder: FormBuilder,
-                private dialog: MatDialog) {
+                private dialogsService: DialogsService) {
 
         this.options = this.formBuilder.group({
             hideRequired: false,
@@ -1788,13 +1789,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         let data = { searchText: this.searchText };
 
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
+        configuration.width = "60em";
+        configuration.height = "45em";
+        configuration.autoFocus = false;
         configuration.data = data;
-        configuration.disableClose = true;
-        configuration.hasBackdrop = false;
 
-        this.dialog.open(AdvancedSearchComponent, configuration);
+        this.dialogsService.genericDialogContainer(AdvancedSearchComponent, "Advanced Search", null, configuration);
     }
 
     public resetNavItems() {
