@@ -1174,10 +1174,12 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
             this.dialogsService.confirm(warningMessages).subscribe((result: any) => {
                 if(result) {
+                    this.dialogsService.startDefaultSpinnerDialog();
                     this.saveGroup();
                 }
             });
         } else {
+            this.dialogsService.startDefaultSpinnerDialog();
             this.saveGroup();
         }
     }
@@ -1398,7 +1400,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
                 this.snackBar.open("Changes Saved", "Lab", config);
                 this.buildLabList();
+                this.onGroupsSelectionChanged();
             }
+            this.dialogsService.stopAllSpinnerDialogs();
             this.showSpinner = false;
         });
     }
