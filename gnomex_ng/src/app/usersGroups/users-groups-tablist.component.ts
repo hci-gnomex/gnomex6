@@ -151,6 +151,26 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public readonly EXCOMM = "EXCOMM";
     public readonly INTERNAL = "INTERNAL";
 
+
+    public get isActive_lab(): boolean {
+        return this.selectedGroup
+            && this.selectedGroup.isActive
+            && this.selectedGroup.isActive === 'Y';
+    }
+    public set isActive_lab(value: boolean ){
+        if (this.selectedGroup && this.selectedGroup.isActive) {
+            this.selectedGroup.isActive = (value ? 'Y' : 'N');
+        }
+    }
+    public onChange_isActive(event: any) {
+        if (event && event.checked && event.checked === true) {
+            this.selectedGroup.isActive = 'Y';
+        } else {
+            this.selectedGroup.isActive = 'N';
+        }
+    }
+
+
     public showInstitutions: boolean = false;
     public institutionGridColDefs: ColDef[];
     public institutionGridApi: GridApi;
@@ -511,7 +531,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 lastName: this.selectedGroup.lastName,
                 pricing: this.selectedGroup.pricing,
                 contactPhone: this.selectedGroup.contactPhone,
-                contactEmail: this.selectedGroup.contactEmail,
+                contactEmail: this.selectedGroup.contactEmail
             });
     }
 
@@ -661,6 +681,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     this.institutionGridApi.setRowData(this.labInstitutions);
                 }
             }
+
             this.myCoreFacilities = this.buildGroupCoreControls();
             this.setLabPricing(this.selectedGroup);
             this.setGroupValues();
@@ -1306,7 +1327,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             let stringifiedSF = JSON.stringify(cores);
             params = params.set("coreFacilitiesJSONString", stringifiedSF);
             params = params.set("excludeUsage", this.selectedGroup.excludeUsage);
-            params = params.set("lab", this.selectedGroup.lab);
+            params = params.set("isActive", this.selectedGroup.isActive);
             params = params.set("idLab", this.selectedGroup.idLab);
             params = params.set("version", this.selectedGroup.version);
         }

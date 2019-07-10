@@ -205,7 +205,7 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
 
         // If the login is "guest" just instantiate a security advisor
         // as 'guest'.
-        if (uid.equalsIgnoreCase("guest")) {
+        if (uid != null && uid.equalsIgnoreCase("guest")) {
             return new SecurityAdvisor(idCoreFacility);
         }
 
