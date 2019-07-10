@@ -1,30 +1,38 @@
-<div style="margin-left: 33em;margin-top: 1em">
-    <mat-checkbox [(ngModel)]="showInactive" (change)="onShowInactiveChange($event)">Show inactive members</mat-checkbox>
-</div>
-<div class="flex-row-container" >
-    <div class="users-groups-row-one">
-        <div class="flex-column-container" style="width: 100%">
-            <div style="display: flex;">
-                <div class="formField">
-                    <custom-combo-box placeholder="Member to add"
-                                      [valueField]="this.prefService.userDisplayField"
-                                      [displayField]="this.prefService.userDisplayField"
-                                      [options]="this.users"
-                                      [(ngModel)]="memberUser">
-                    </custom-combo-box>
-                </div>
-                <button mat-button [disabled]="!memberUser" (click)="addUser('member')"><img *ngIf="memberUser;else addDisable" src="../../../assets/add.png"></button>
-                <button mat-button [disabled]="selectedMemberRowIndex<=0" (click)="deleteUser('member')"><img *ngIf="selectedMemberRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png"></button>
+<div class="full-width full-height flex-container-col small-font padded">
+    <div class="flex-container-row">
+        <div class="flex-grow">
+        </div>
+        <mat-checkbox class="padded" [(ngModel)]="showInactive" (change)="onShowInactiveChange($event)">
+            Show inactive personnel
+        </mat-checkbox>
+        <div class="flex-grow">
+        </div>
+    </div>
+    <div class="full-width full-height flex-container-row">
+        <div class="flex-container-col flex-grow padded">
+            <div class="full-width flex-container-row align-baseline">
+                <custom-combo-box placeholder="Member to add"
+                                  class="flex-grow"
+                                  [valueField]="this.prefService.userDisplayField"
+                                  [displayField]="this.prefService.userDisplayField"
+                                  [options]="this.users"
+                                  [(ngModel)]="memberUser">
+                </custom-combo-box>
+                <button mat-button class="minimize" [disabled]="!memberUser" (click)="addUser('member')">
+                    <img *ngIf="memberUser;else addDisable" src="../../../assets/add.png">
+                </button>
+                <button mat-button class="minimize" [disabled]="selectedMemberRowIndex<=0" (click)="deleteUser('member')">
+                    <img *ngIf="selectedMemberRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png">
+                </button>
                 <ng-template #addDisable>
                     <img src="../../../assets/add_disable.png">
                 </ng-template>
-
                 <ng-template #addDeleteDisable>
                     <img src="../../../assets/delete_disable.png">
                 </ng-template>
             </div>
-            <div class="users-groups-row-one">
-                <mat-table  style="width: 80%" #table [dataSource]="membersDataSource">
+            <div class="flex-container-col flex-grow">
+                <mat-table  class="full-width" [dataSource]="membersDataSource">
                     <ng-container matColumnDef="name">
                         <mat-header-cell *matHeaderCellDef> Members </mat-header-cell>
                         <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
@@ -37,79 +45,73 @@
                 </mat-table>
             </div>
         </div>
-    </div>
-    <div class="users-groups-row-one">
-        <div class="flex-column-container" style="width: 100%">
-            <div class="users-groups-row-one">
-                <div class="flex-column-container" style="width: 100%">
-                    <div class="users-groups-row-one align-center">
-                        <div class="formField">
-                            <custom-combo-box placeholder="Collaborator to add"
-                                              [valueField]="this.prefService.userDisplayField"
-                                              [displayField]="this.prefService.userDisplayField"
-                                              [options]="this.users"
-                                              [(ngModel)]="collUser">
-                            </custom-combo-box>
-                        </div>
-                        <button mat-button [disabled]="!collUser" (click)="addUser('collaborator')"><img *ngIf="collUser;else addDisable" src="../../../assets/add.png"></button>
-                        <button mat-button [disabled]="selectedCollRowIndex<=0" (click)="deleteUser('collaborator')"><img *ngIf="selectedCollRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png"></button>
-                        <ng-template #addDisable>
-                            <img src="../../../assets/add_disable.png">
-                        </ng-template>
-
-                        <ng-template #addDeleteDisable>
-                            <img src="../../../assets/delete_disable.png">
-                        </ng-template>
-                    </div>
-                    <div>
-                        <mat-table style="width: 80%" #table [dataSource]="collaboratorsDataSource">
-                            <ng-container matColumnDef="name">
-                                <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
-                                <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
-                            </ng-container>
-                            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                            <mat-row *matRowDef="let row; columns: displayedColumns;"
-                                     [ngClass]="{'highlight': selectedCollRowIndex == row.idAppUser}"
-                                     (click)="selectCollRow(row)">
-                            </mat-row>
-                        </mat-table>
-                    </div>
+        <div class="flex-container-col flex-grow padded">
+            <div class="flex-container-col flex-grow">
+                <div class="flex-container-row align-center">
+                    <custom-combo-box placeholder="Collaborator to add"
+                                      class="flex-grow"
+                                      [valueField]="this.prefService.userDisplayField"
+                                      [displayField]="this.prefService.userDisplayField"
+                                      [options]="this.users"
+                                      [(ngModel)]="collUser">
+                    </custom-combo-box>
+                    <button mat-button class="minimize" [disabled]="!collUser" (click)="addUser('collaborator')">
+                        <img *ngIf="collUser;else addDisable" src="../../../assets/add.png">
+                    </button>
+                    <button mat-button class="minimize" [disabled]="selectedCollRowIndex<=0" (click)="deleteUser('collaborator')">
+                        <img *ngIf="selectedCollRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png">
+                    </button>
+                    <ng-template #addDisable>
+                        <img src="../../../assets/add_disable.png">
+                    </ng-template>
+                    <ng-template #addDeleteDisable>
+                        <img src="../../../assets/delete_disable.png">
+                    </ng-template>
+                </div>
+                <div class="flex-grow">
+                    <mat-table class="full-width" [dataSource]="collaboratorsDataSource">
+                        <ng-container matColumnDef="name">
+                            <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
+                            <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumns;"
+                                 [ngClass]="{'highlight': selectedCollRowIndex == row.idAppUser}"
+                                 (click)="selectCollRow(row)">
+                        </mat-row>
+                    </mat-table>
                 </div>
             </div>
-            <div class="users-groups-row-one">
-                <div class="flex-column-container" style="width: 100%">
-                    <div class="users-groups-row-one align-center">
-                        <div class="formField">
-                            <custom-combo-box placeholder="Manager to add"
-                                              [valueField]="this.prefService.userDisplayField"
-                                              [displayField]="this.prefService.userDisplayField"
-                                              [options]="this.users"
-                                              [(ngModel)]="manUser">
-                            </custom-combo-box>
-                        </div>
-                        <button mat-button [disabled]="!manUser" (click)="addUser('manager')"><img *ngIf="manUser;else addDisable" src="../../../assets/add.png"></button>
-                        <button mat-button [disabled]="selectedManRowIndex<=0" (click)="deleteUser('manager')"><img *ngIf="selectedManRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png"></button>
-                        <ng-template #addDisable>
-                            <img src="../../../assets/add_disable.png">
-                        </ng-template>
-
-                        <ng-template #addDeleteDisable>
-                            <img src="../../../assets/delete_disable.png">
-                        </ng-template>
-                    </div>
-                    <div>
-                        <mat-table style="width: 80%" #table [dataSource]="managersDataSource">
-                            <ng-container matColumnDef="name">
-                                <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
-                                <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
-                            </ng-container>
-                            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                            <mat-row *matRowDef="let row; columns: displayedColumns;"
-                                     [ngClass]="{'highlight': selectedManRowIndex == row.idAppUser}"
-                                     (click)="selectManRow(row)">
-                            </mat-row>
-                        </mat-table>
-                    </div>
+            <div class="flex-container-col flex-grow">
+                <div class="flex-container-row align-center">
+                    <custom-combo-box placeholder="Manager to add"
+                                      class="flex-grow"
+                                      [valueField]="this.prefService.userDisplayField"
+                                      [displayField]="this.prefService.userDisplayField"
+                                      [options]="this.users"
+                                      [(ngModel)]="manUser">
+                    </custom-combo-box>
+                    <button mat-button class="minimize" [disabled]="!manUser" (click)="addUser('manager')"><img *ngIf="manUser;else addDisable" src="../../../assets/add.png"></button>
+                    <button mat-button class="minimize" [disabled]="selectedManRowIndex<=0" (click)="deleteUser('manager')"><img *ngIf="selectedManRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png"></button>
+                    <ng-template #addDisable>
+                        <img src="../../../assets/add_disable.png">
+                    </ng-template>
+                    <ng-template #addDeleteDisable>
+                        <img src="../../../assets/delete_disable.png">
+                    </ng-template>
+                </div>
+                <div class="flex-grow">
+                    <mat-table class="full-width" [dataSource]="managersDataSource">
+                        <ng-container matColumnDef="name">
+                            <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
+                            <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumns;"
+                                 [ngClass]="{'highlight': selectedManRowIndex == row.idAppUser}"
+                                 (click)="selectManRow(row)">
+                        </mat-row>
+                    </mat-table>
                 </div>
             </div>
         </div>

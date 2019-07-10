@@ -10,80 +10,18 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
     selector: 'membership-tab',
     templateUrl: './membership-tab.html',
     styles: [`
-        div.form {
-        display: flex;
-        flex-direction: column;
-        padding: 0 1%;
-        }
-    div.formColumn {
-        display: flex;
-        flex-direction: column;
-        margin: 0.5% 0;
-        width: 80%;
-    }
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 100%;
-        }
-        .users-groups-row-one {
-            display: flex;
-            flex-grow: 1;
-        }
+        
+        
         .highlight{
             background: deepskyblue;
         }
-        mat-form-field.halfFormField {
-            width: 50%;
-            margin: 0 0.5%;
-
-        }
-        mat-form-field.fortyFormField {
-            width: 40%;
-            margin: 0 0.5%;
-
-        }
-        mat-form-field.thirtyFormField {
-            width: 30%;
-            margin: 0 0.5%;
-
-        }
-    .formField {
-        width: 50%;
-        margin: 0 0.5%;
-    }
-    .billing-admin-row-one {
-        display: flex;
-        flex-grow: 1;
-    }
-    .flex-container{
-
-        display: flex;
-        justify-content: space-between;
-        margin-left: auto;
-        margin-top: 1em;
-        padding-left: 1em;
-    }
-    .edit-button {
-        color: blue;
         
-    }
-        .example-container {
-            display: flex;
-            flex-direction: column;
-            max-height: 500px;
-            min-width: 300px;
-        }
-
         .mat-table {
             overflow: auto;
             max-height: 500px;
         }
+        
+        
     `]
 })
 
@@ -110,6 +48,7 @@ export class MembershipTabComponent implements OnInit {
     private collaboratorsFC: FormControl;
     private managersFC: FormControl;
     private showInactive: boolean = false;
+
     constructor(private securityAdvisor: CreateSecurityAdvisorService,
                 public prefService: UserPreferencesService) {
 

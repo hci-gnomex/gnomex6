@@ -30,6 +30,7 @@ import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer
 import {GridApi} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ExperimentsService} from "../experiments.service";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -2071,8 +2072,24 @@ export class TabSamplesIlluminaComponent implements OnInit {
             state = "new";
         }
 
-        if (this._lab) {
-            this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
+        if (this._experiment) {
+            if (this._lab) {
+                this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
+            } else if (this._experiment.lab) {
+                this.sampleUploadService.downloadSampleSheet(this._experiment.lab.name, state, this.samplesGridColumnDefs, this._experiment);
+            } else if (this._experiment.idLab && this.gnomexService.labList && Array.isArray(this.gnomexService.labList)) {
+                let selectionSet = this.gnomexService.labList.filter((lab) => {
+                    return lab.idLab && lab.idLab === this._experiment.idLab;
+                });
+
+                if (selectionSet && Array.isArray(selectionSet) && selectionSet.length > 0) {
+                    this.sampleUploadService.downloadSampleSheet(selectionSet[0].name, state, this.samplesGridColumnDefs, this._experiment);
+                } else {
+                    this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
+                }
+            } else {
+                this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
+            }
         }
     }
 

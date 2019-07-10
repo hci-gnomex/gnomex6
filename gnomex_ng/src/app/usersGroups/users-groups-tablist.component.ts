@@ -38,6 +38,7 @@ import {UtilService} from "../services/util.service";
 import {ConstantsService} from "../services/constants.service";
 import {EditInstitutionsComponent} from "../util/edit-institutions.component";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {TabSeqSetupViewComponent} from "../experiments/new-experiment/tab-seq-setup-view.component";
 
 /**
  * @title Basic tabs
@@ -51,17 +52,15 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
             flex-grow: 1 !important;
         }
         
-        div.formRow {
-            display: flex;
-            flex-direction: row;
-            margin: 0.5% 0;
-            width: 80%;
-        }
         mat-form-field.formField {
-            width: 30%;
+            flex: 1;
             min-width: 15em;
-            margin: 0 0.5%;
         }
+        
+        .min-width {
+            min-width: 15em;
+        }
+        
         ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
             min-width: 10em;
             padding: 3px;
@@ -151,6 +150,23 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public readonly EXCOMM = "EXCOMM";
     public readonly INTERNAL = "INTERNAL";
 
+
+    public get disable_isActive_lab(): boolean {
+        if (this.createSecurityAdvisorService.isSuperAdmin) {
+            return false;
+        } else if (this.selectedGroup
+            && this.selectedGroup.managers
+            && Array.isArray(this.selectedGroup.managers)) {
+
+            let temp: any[] = this.selectedGroup.managers.filter((a: any) => {
+                return "" + a.idAppUser === "" + this.createSecurityAdvisorService.idAppUser;
+            });
+
+            return temp.length === 0;
+        } else {
+            return true;
+        }
+    }
 
     public get isActive_lab(): boolean {
         return this.selectedGroup
@@ -247,6 +263,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 public passwordUtilService: PasswordUtilService,
                 public constantsService: ConstantsService,
                 private appUserListService: AppUserListService,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private formBuilder: FormBuilder,
                 private snackBar: MatSnackBar,
                 private dialogsService: DialogsService,
@@ -611,6 +628,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
      *
      */
     onSelectionChanged(event?: any) {
+        this.dialogsService.startDefaultSpinnerDialog();
+
         let params: URLSearchParams = new URLSearchParams();
         let selectedRows = this.gridOptions.api.getSelectedRows();
         this.idAppUser = selectedRows[0].idAppUser;
@@ -659,6 +678,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             if (this.secAdvisor.isAdmin && !this.secAdvisor.isSuperAdmin && this.selectedUser.codeUserPermissionKind === 'SUPER') {
                 this.userForm.disable();
             }
+
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
@@ -674,6 +695,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
         this.getLabService.getLab(params).subscribe((response: any) => {
             this.selectedGroup = response.Lab;
+            this.isBillingAccountsTabDirty = false;
             if (this.showInstitutions) {
                 this.resetInstitutionControls();
                 this.labInstitutions = UtilService.getJsonArray(this.selectedGroup.institutions, this.selectedGroup.institutions.Institution);
@@ -864,6 +886,13 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
 
         let myCores = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility");
+
+        myCores = myCores.filter((value) => {
+            return !value.isActive || value.isActive !== 'N';
+        });
+
+        myCores = myCores.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
+
         for (let myCore of myCores) {
             let control: FormControl = new FormControl(myCore.display);
             this.groupForm.addControl(myCore.display, control);
@@ -1551,6 +1580,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         if (this.showInstitutions && this.institutionsChanged) {
             return true;
         }
+        if (this.isBillingAccountsTabDirty) {
+            return true;
+        }
         return false;
     }
 
@@ -1568,4 +1600,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.utilService.removeChangeDetectorRef(this.changeRef);
     }
 
+    private isBillingAccountsTabDirty: boolean = false;
+    onManualDirty() {
+        this.isBillingAccountsTabDirty = true;
+    }
 }
