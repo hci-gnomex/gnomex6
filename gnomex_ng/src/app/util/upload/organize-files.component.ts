@@ -441,7 +441,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
 
         if(this.datatrackSelectedFile(nodes)){
-            this.dialogService.confirm("At lease one selected file is linked to a data track.  Do you want to remove the files and delete any associated data tracks?", "Warning")
+            this.dialogService.confirm("At least one selected file is linked to a data track.  Do you want to remove the files and delete any associated data tracks?", "Warning")
                 .pipe(first()).subscribe(answer =>{
                 if(answer) {
                     this.remove(treeRemovedFrom, nodes);
