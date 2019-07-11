@@ -47,9 +47,7 @@ export class NewUserDialogComponent extends BaseGenericContainerDialog implement
             this.showSpinner = false;
             if (response.status === 200) {
                 this.dialogRef.close(true);
-                this.dialogsService.confirm("The user has been saved but is inactive. You must fill in login information and activate the user before the user can login.", null)
-                    .subscribe(answer => {
-                    });
+                this.dialogsService.alert("The user has been saved but is inactive. You must fill in login information and activate the user before the user can login.");
             }
             this.dialogRef.close();
         });

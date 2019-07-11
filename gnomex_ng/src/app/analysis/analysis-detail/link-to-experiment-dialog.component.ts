@@ -1,4 +1,4 @@
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {Component, Inject, OnInit} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {GnomexService} from "../../services/gnomex.service";
@@ -6,7 +6,7 @@ import {HttpParams} from "@angular/common/http";
 import {AnalysisService} from "../../services/analysis.service";
 import {GridApi} from "ag-grid-community";
 import {ConstantsService} from "../../services/constants.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {Router} from "@angular/router";
 import {debounceTime, distinctUntilChanged, first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
@@ -194,7 +194,7 @@ export class LinkToExperimentDialogComponent extends BaseGenericContainerDialog 
             this.analysisService.linkExpToAnalysis(params).pipe(first())
                 .subscribe(resp =>{
                     if(resp && resp.result){
-                        this.dialogService.alert("Analysis was successfully linked");
+                        this.dialogService.alert("Analysis was successfully linked", null, DialogType.SUCCESS);
                         this.dialogRef.close();
                         this.router.navigate(['/analysis',{outlets:{'analysisPanel':[this.idAnalysis]}}]);
 

@@ -16,7 +16,11 @@ import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
 	selector: "billing-users-selector",
 	templateUrl: "billing-users-selector.component.html",
 	styles: [`
+		
+		
 		.error-message { color: red; }
+		
+		
 	`]
 })
 export class BillingUsersSelectorComponent extends BaseGenericContainerDialog implements OnInit {

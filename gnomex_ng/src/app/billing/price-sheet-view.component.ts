@@ -71,7 +71,7 @@ export class PriceSheetViewComponent extends BaseGenericContainerDialog implemen
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving the price sheet" + message, null);
+                    this.dialogsService.error("An error occurred while retrieving the price sheet" + message);
                 }
             });
         }
@@ -125,7 +125,7 @@ export class PriceSheetViewComponent extends BaseGenericContainerDialog implemen
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while saving the price sheet" + message, null);
+                this.dialogsService.error("An error occurred while saving the price sheet" + message);
             }
         });
     }

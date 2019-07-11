@@ -27,7 +27,7 @@ import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
             color: white;
         }
         .secondary-action {
-            background-color: white;
+            background-color: var(--sidebar-footer-background-color);
             font-weight: bolder;
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
@@ -225,7 +225,7 @@ export class UploadFileComponent implements OnInit {
             },error =>{
                 this.rowData = [];
                 this.gridApi.setRowData(this.rowData = []);
-                this.dialogService.alert(error);
+                this.dialogService.error(error);
                 this.primaryButtonText = "Upload";
             });
         }else{

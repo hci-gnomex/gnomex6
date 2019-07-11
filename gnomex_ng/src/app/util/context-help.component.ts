@@ -61,7 +61,13 @@ export class ContextHelpComponent implements OnInit {
             dictionary: this.dictionary,
             isEditMode: this.isEditMode
         };
-        this.dialogsService.genericDialogContainer(ContextHelpPopupComponent, "", null, config)
+        let icon: string = "";
+        if(this.isEditMode) {
+            icon = "<i class='fas fa-wrench fa-1x' style='color: var(--bluewarmvivid-medlight);'></i>";
+        } else {
+            icon = "<i class='fas fa-info-circle fa-1x' style='color: var(--bluewarmvivid-medlight);'></i>";
+        }
+        this.dialogsService.genericDialogContainer(ContextHelpPopupComponent, "", icon, config)
             .subscribe((result: any) => {
                 if (result) {
                     this.dictionaryService.reloadAndRefresh(() => {

@@ -47,7 +47,10 @@ import {ConstantsService} from "../../services/constants.service";
         .force-flex-container-row{
             display:flex !important;
         }
-        
+        .i-class {
+            margin-left:  0.3em;
+            margin-right: 0.3em;
+        }
         
     `]
 })

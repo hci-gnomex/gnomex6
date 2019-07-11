@@ -38,6 +38,7 @@ import {UtilService} from "../services/util.service";
 import {ConstantsService} from "../services/constants.service";
 import {EditInstitutionsComponent} from "../util/edit-institutions.component";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {TabSeqSetupViewComponent} from "../experiments/new-experiment/tab-seq-setup-view.component";
 
 /**
  * @title Basic tabs
@@ -51,17 +52,15 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
             flex-grow: 1 !important;
         }
         
-        div.formRow {
-            display: flex;
-            flex-direction: row;
-            margin: 0.5% 0;
-            width: 80%;
-        }
         mat-form-field.formField {
-            width: 30%;
+            flex: 1;
             min-width: 15em;
-            margin: 0 0.5%;
         }
+        
+        .min-width {
+            min-width: 15em;
+        }
+        
         ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
             min-width: 10em;
             padding: 3px;
@@ -151,6 +150,43 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public readonly EXCOMM = "EXCOMM";
     public readonly INTERNAL = "INTERNAL";
 
+
+    public get disable_isActive_lab(): boolean {
+        if (this.createSecurityAdvisorService.isSuperAdmin) {
+            return false;
+        } else if (this.selectedGroup
+            && this.selectedGroup.managers
+            && Array.isArray(this.selectedGroup.managers)) {
+
+            let temp: any[] = this.selectedGroup.managers.filter((a: any) => {
+                return "" + a.idAppUser === "" + this.createSecurityAdvisorService.idAppUser;
+            });
+
+            return temp.length === 0;
+        } else {
+            return true;
+        }
+    }
+
+    public get isActive_lab(): boolean {
+        return this.selectedGroup
+            && this.selectedGroup.isActive
+            && this.selectedGroup.isActive === 'Y';
+    }
+    public set isActive_lab(value: boolean ){
+        if (this.selectedGroup && this.selectedGroup.isActive) {
+            this.selectedGroup.isActive = (value ? 'Y' : 'N');
+        }
+    }
+    public onChange_isActive(event: any) {
+        if (event && event.checked && event.checked === true) {
+            this.selectedGroup.isActive = 'Y';
+        } else {
+            this.selectedGroup.isActive = 'N';
+        }
+    }
+
+
     public showInstitutions: boolean = false;
     public institutionGridColDefs: ColDef[];
     public institutionGridApi: GridApi;
@@ -227,6 +263,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 public passwordUtilService: PasswordUtilService,
                 public constantsService: ConstantsService,
                 private appUserListService: AppUserListService,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private formBuilder: FormBuilder,
                 private snackBar: MatSnackBar,
                 private dialogsService: DialogsService,
@@ -511,7 +548,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 lastName: this.selectedGroup.lastName,
                 pricing: this.selectedGroup.pricing,
                 contactPhone: this.selectedGroup.contactPhone,
-                contactEmail: this.selectedGroup.contactEmail,
+                contactEmail: this.selectedGroup.contactEmail
             });
     }
 
@@ -591,6 +628,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
      *
      */
     onSelectionChanged(event?: any) {
+        this.dialogsService.startDefaultSpinnerDialog();
+
         let params: URLSearchParams = new URLSearchParams();
         let selectedRows = this.gridOptions.api.getSelectedRows();
         this.idAppUser = selectedRows[0].idAppUser;
@@ -639,6 +678,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             if (this.secAdvisor.isAdmin && !this.secAdvisor.isSuperAdmin && this.selectedUser.codeUserPermissionKind === 'SUPER') {
                 this.userForm.disable();
             }
+
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
@@ -654,6 +695,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
         this.getLabService.getLab(params).subscribe((response: any) => {
             this.selectedGroup = response.Lab;
+            this.isBillingAccountsTabDirty = false;
             if (this.showInstitutions) {
                 this.resetInstitutionControls();
                 this.labInstitutions = UtilService.getJsonArray(this.selectedGroup.institutions, this.selectedGroup.institutions.Institution);
@@ -661,6 +703,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     this.institutionGridApi.setRowData(this.labInstitutions);
                 }
             }
+
             this.myCoreFacilities = this.buildGroupCoreControls();
             this.setLabPricing(this.selectedGroup);
             this.setGroupValues();
@@ -843,6 +886,13 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
 
         let myCores = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility");
+
+        myCores = myCores.filter((value) => {
+            return !value.isActive || value.isActive !== 'N';
+        });
+
+        myCores = myCores.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
+
         for (let myCore of myCores) {
             let control: FormControl = new FormControl(myCore.display);
             this.groupForm.addControl(myCore.display, control);
@@ -1041,19 +1091,19 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         let coresIManage = this.setCoreFacilities();
 
         if (this.codeUserPermissionKind === 'ADMIN' && coresIManage === 0) {
-            this.dialogsService.confirm("The user is marked as an admin; Please specify the core facilities the user can manage.", null);
+            this.dialogsService.alert("The user is marked as an admin; Please specify the core facilities the user can manage.", null);
         } else {
             if (this.isActiveChanged && this.isActiveFC.value == false) {
                 if ( this.isMemberOfLab()) {
                     let activeMessage = this.buildLabsMessage();
-                    this.dialogsService.confirm("Inactivating this user will remove them from the following lab(s):", activeMessage).subscribe(answer => {
+                    this.dialogsService.confirm("Inactivating this user will remove them from the following lab(s):<br>" + activeMessage).subscribe(answer => {
                         if (answer) {
                             this.beingIsActive = true;
                             this.save();
                         }
                     });
                 } else {
-                    this.dialogsService.confirm("This will inactivate the user", " ").subscribe(answer => {
+                    this.dialogsService.confirm("This will inactivate the user").subscribe(answer => {
                         if (answer) {
                             this.beingIsActive = true;
                             this.save();
@@ -1122,8 +1172,14 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             warningMessages.push(' ');
             warningMessages.push('Continue with save anyway?');
 
-            this.dialogsService.yesNoDialog(warningMessages, this, "saveGroup");
+            this.dialogsService.confirm(warningMessages).subscribe((result: any) => {
+                if(result) {
+                    this.dialogsService.startDefaultSpinnerDialog();
+                    this.saveGroup();
+                }
+            });
         } else {
+            this.dialogsService.startDefaultSpinnerDialog();
             this.saveGroup();
         }
     }
@@ -1302,7 +1358,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             let stringifiedSF = JSON.stringify(cores);
             params = params.set("coreFacilitiesJSONString", stringifiedSF);
             params = params.set("excludeUsage", this.selectedGroup.excludeUsage);
-            params = params.set("lab", this.selectedGroup.lab);
+            params = params.set("isActive", this.selectedGroup.isActive);
             params = params.set("idLab", this.selectedGroup.idLab);
             params = params.set("version", this.selectedGroup.version);
         }
@@ -1344,7 +1400,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
                 this.snackBar.open("Changes Saved", "Lab", config);
                 this.buildLabList();
+                this.onGroupsSelectionChanged();
             }
+            this.dialogsService.stopAllSpinnerDialogs();
             this.showSpinner = false;
         });
     }
@@ -1526,6 +1584,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         if (this.showInstitutions && this.institutionsChanged) {
             return true;
         }
+        if (this.isBillingAccountsTabDirty) {
+            return true;
+        }
         return false;
     }
 
@@ -1543,4 +1604,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.utilService.removeChangeDetectorRef(this.changeRef);
     }
 
+    private isBillingAccountsTabDirty: boolean = false;
+    onManualDirty() {
+        this.isBillingAccountsTabDirty = true;
+    }
 }

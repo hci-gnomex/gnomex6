@@ -275,8 +275,7 @@ export class QcAssayDialogComponent extends BaseGenericContainerDialog implement
         let removeIndex:number  = this.uncommitedChipTypeList.indexOf(this.selectedAssay[0]);
         let display = this.selectedAssay[0].display;
 
-        this.dialogService.confirm("Warning",
-            "Are you sure you want to remove assay \'" + display + "\'?" ).pipe(first()).subscribe( action =>{
+        this.dialogService.confirm("Are you sure you want to remove assay \'" + display + "\'?", "Warning").pipe(first()).subscribe( action =>{
                 if(action){
                     if(removeIndex > -1){
                         this.uncommitedChipTypeList.splice(removeIndex,1);

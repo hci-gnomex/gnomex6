@@ -123,7 +123,7 @@ export class TabAmendExperimentSetupComponent implements OnInit, OnDestroy {
                 private constantsService: ConstantsService,
                 private getLabService: GetLabService,
                 private dialogsService: DialogsService,
-                private prefService: UserPreferencesService,
+                public prefService: UserPreferencesService,
                 private gnomexService: GnomexService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private propertyService: PropertyService,
@@ -232,7 +232,7 @@ export class TabAmendExperimentSetupComponent implements OnInit, OnDestroy {
                     });
                 } else {
                     this.candidateRequestList = [];
-                    this.dialogsService.alert("No experiments found");
+                    this.dialogsService.alert("No experiments found", "Data Not Found");
                 }
             }, () => {
                 this.dialogsService.stopAllSpinnerDialogs();
@@ -252,7 +252,7 @@ export class TabAmendExperimentSetupComponent implements OnInit, OnDestroy {
                     request.amendState = AmendExperimentService.AMEND_ADD_SEQ_LANES;
                     this.form.get("experiment").setValue(request);
                 } else {
-                    this.dialogsService.alert("An error occurred loading the experiment", "Warning");
+                    this.dialogsService.error("An error occurred loading the experiment");
                 }
             }, () => {
                 this.dialogsService.stopAllSpinnerDialogs();

@@ -1,12 +1,11 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import { URLSearchParams } from "@angular/http";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions, GridApi} from "ag-grid-community";
+import {GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UtilService} from "../services/util.service";
@@ -16,7 +15,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'libprep-workflow',
     templateUrl: 'libprep-workflow.html',
-    styles: [`        
+    styles: [`
         .flex-row-container {
             display: flex;
             flex-direction: row;
@@ -366,8 +365,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         if (areUnique == false) {
             this.dialogsService.confirm("Request " + requestNumber +
                 " has samples in the same multiplex group whose barcodes do not differ by at least 3 base pairs."
-
-                , "continue?").subscribe(answer => {
+                + "<br> continue?").subscribe(answer => {
                 if (answer) {
                     this.save();
                 }
@@ -429,7 +427,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
             for(let value of Array.from( this.changedRowMap.values()) ) {
                 if(value.idLibPrepPerformedBy === '' && value.seqPrepStatus != '' && value.seqPrepStatus != "Terminated") {
 
-                    this.dialogsService.confirm("Make sure all samples have a name selected in the 'Performed By' column before changing the status.\"", null);
+                    this.dialogsService.alert("Make sure all samples have a name selected in the 'Performed By' column before changing the status.\"", null, DialogType.VALIDATION);
                     return;
                 }
                 workItems.push(value);

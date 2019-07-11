@@ -1,7 +1,7 @@
 import {Component, ElementRef, ViewChild} from "@angular/core";
 import {ICellRendererAngularComp} from "ag-grid-angular";
 import {BillingPOFormService} from "../../services/billingPOForm.service";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 
 @Component({
     template: `
@@ -115,7 +115,11 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
         if (this.hasPoForm) {
             let message: string = "By uploading a new purchase form you will overwrite the existing purchase form.\n\n" +
                 "Continue anyway?";
-            this.dialogService.yesNoDialog(message, this, 'triggerFileSelector');
+            this.dialogService.confirm(message).subscribe((result: any) => {
+                if(result) {
+                    this.triggerFileSelector();
+                }
+            });
         } else {
             this.triggerFileSelector();
         }
@@ -138,9 +142,9 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
 
             this.poFormService.uploadNewForm(formData).subscribe((uploadWasSuccessful) => {
                 if (uploadWasSuccessful) {
-                    this.dialogService.alert("File uploaded successfully");
+                    this.dialogService.alert("File uploaded successfully", "", DialogType.SUCCESS);
                 } else {
-                    this.dialogService.alert("File failed to upload.");
+                    this.dialogService.alert("File failed to upload.", "", DialogType.FAILED);
                 }
 
                 this.hasPoForm = this.hasPoForm || uploadWasSuccessful;
@@ -164,7 +168,7 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
                 this.hasPoForm = !deleteWasSuccessful;
 
                 if (deleteWasSuccessful) {
-                    this.dialogService.alert("File successfully removed");
+                    this.dialogService.alert("File successfully removed", "", DialogType.SUCCESS);
                 }
             });
         }

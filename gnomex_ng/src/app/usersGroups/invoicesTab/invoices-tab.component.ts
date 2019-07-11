@@ -1,8 +1,6 @@
-import {Component, forwardRef, Inject, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
-import {FormControl, NG_VALUE_ACCESSOR, Validators} from '@angular/forms';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material';
-import { MomentDateAdapter } from '@angular/material-moment-adapter';
-import { URLSearchParams } from "@angular/http";
+import {Component, Inject, Input, OnInit, SimpleChanges} from "@angular/core";
+import {FormControl, Validators} from '@angular/forms';
+import {URLSearchParams} from "@angular/http";
 
 import * as moment from 'moment';
 import {BehaviorSubject} from "rxjs";
@@ -14,43 +12,10 @@ import {DOCUMENT} from "@angular/common";
 @Component({
     selector: 'invoices-tab',
     templateUrl: './invoices-tab.html',
-    styles: [`
-        div.form {
-        display: flex;
-        flex-direction: column;
-        padding: 0 1%;
-        }
-    div.formColumn {
-        display: flex;
-        flex-direction: column;
-        margin: 0.5% 0;
-        width: 80%;
-    }
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-        .flex-column-container {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 100%;
-        }
-        .users-groups-row-one {
-            display: flex;
-            flex-grow: 1;
-        }
-    .formField {
-        width: 50%;
-        margin: 0 0.5%;
-    }
-`],
-
+    styles: [``],
 })
-
 export class InvoicesTabComponent implements OnInit {
-    @Input()
-    memberGroup: any;
+    @Input() memberGroup: any;
 
     @Input() label = '';
 
@@ -58,7 +23,6 @@ export class InvoicesTabComponent implements OnInit {
     private monthInputCtrl: FormControl = new FormControl(new Date(2020,0,1));
     private billingPeriods: any[] = [];
 
-    private visible = true;
     private coreFacilityComplete: boolean = true;
     private billingPeriodComplete: boolean = false;
     private complete: BehaviorSubject<boolean> = new BehaviorSubject<boolean> (false);
@@ -195,9 +159,6 @@ export class InvoicesTabComponent implements OnInit {
         }
     }
 
-    onNgModelChange(event) {
-    }
-
     public run(): void {
         this.buildAccountsLabs();
         let url: string = this.document.location.href;
@@ -207,6 +168,4 @@ export class InvoicesTabComponent implements OnInit {
         url += "&idBillingAccounts=" + this.invoiceBillingAccountList;
         window.open(url, "_blank");
     }
-
-
 }

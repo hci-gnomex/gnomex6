@@ -1,7 +1,6 @@
 
-import {Component, Input, OnInit, SimpleChanges, ViewChild} from "@angular/core";
+import {Component, Input, OnInit, SimpleChanges} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {Observable} from "rxjs";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Router} from "@angular/router";
 
@@ -9,56 +8,19 @@ import {Router} from "@angular/router";
     selector: 'billing-admin-tab',
     templateUrl: './billing-admin-tab.html',
     styles: [`
-        div.form {
-        display: flex;
-        flex-direction: column;
-        padding: 0 1%;
-        }
-    div.formColumn {
-        display: flex;
-        flex-direction: column;
-        margin: 0.5% 0;
-        width: 80%;
-    }
-        mat-form-field.halfFormField {
-            width: 50%;
-            margin: 0 0.5%;
-
-        }
-        mat-form-field.fortyFormField {
-            width: 40%;
-            margin: 0 0.5%;
-
-        }
-        mat-form-field.thirtyFormField {
-            width: 30%;
-            margin: 0 0.5%;
-
-        }
-    .formField {
-        width: 30%;
-        margin: 0 0.5%;
-    }
-    .billing-admin-row-one {
-        display: flex;
-        flex-grow: 1;
-    }
-    .flex-container{
-
-        display: flex;
-        justify-content: space-between;
-        margin-left: auto;
-        margin-top: 1em;
-        padding-left: 1em;
-    }
-    .edit-button {
-        color: blue;
         
-    }
+        .form-width {
+            width: 45em;
+            min-width: 45em;
+            max-width: 100%;
+        }
+        
+        .edit-button {
+            color: blue;
+        }
 
     `]
 })
-
 export class BillingAdminTabComponent implements OnInit {
     @Input()
     group: any;
@@ -80,9 +42,7 @@ export class BillingAdminTabComponent implements OnInit {
     private selectedState: string;
 
     constructor(private dictionaryService: DictionaryService,
-                private router: Router) {
-
-    }
+                private router: Router) { }
 
 
     ngOnInit() {
@@ -95,9 +55,6 @@ export class BillingAdminTabComponent implements OnInit {
         if (changes['group']) {
             this.setBillingFields();
         }
-    }
-
-    ngAfterViewInit() {
     }
 
     createBillingForm() {
@@ -124,7 +81,6 @@ export class BillingAdminTabComponent implements OnInit {
             contactZip: this.zipFC,
             contactCountry: this.countryFC
         });
-
     }
 
     setBillingFields() {

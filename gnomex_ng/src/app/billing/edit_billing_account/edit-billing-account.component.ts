@@ -586,7 +586,7 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 			accountNumberAccount = this.accountNumberAccount_Chartfield;
 		}
 
-		if (this.selectedCoreFacilities != undefined && this.selectedCoreFacilities != null) {
+		if (this.selectedCoreFacilities.length) {
 			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
 				let coreFacility: any = {
 					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
@@ -672,7 +672,7 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
-		if (!(this.selectedCoreFacilities.length > 0)) {
+		if (!this.selectedCoreFacilities.length) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select one or more Core Facilities\n';
 		}
@@ -779,7 +779,7 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 		let custom2: string = '';
 		let custom3: string = '';
 
-		if (this.selectedCoreFacilities != undefined && this.selectedCoreFacilities != null) {
+		if (this.selectedCoreFacilities.length) {
 			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
 				let coreFacility: any = {
 					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
@@ -858,7 +858,7 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
-		if (!(this.selectedCoreFacilities.length > 0)) {
+		if (!this.selectedCoreFacilities.length) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select one or more Core Facilities\n';
 		}
@@ -925,7 +925,7 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 		let custom3: string = '';
 
 
-		if (this.selectedCoreFacilities != undefined && this.selectedCoreFacilities != null) {
+		if (this.selectedCoreFacilities.length) {
 			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
 				let coreFacility: any = {
 					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
@@ -1006,7 +1006,7 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
-		if (!(this.selectedCoreFacilities.length > 0)) {
+		if (!this.selectedCoreFacilities.length) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select one or more Core Facilities\n';
 		}
@@ -1103,19 +1103,17 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 		}
 	}
 
-	private onCoreFacilitiesSelected(event: any): void {
-		if (event && event.value && event.value.length > 0) {
-			this.showFundingAgencies = false;
-			// Look through for core facilities which use funding agencies, if there are any, show that dropdown
-			for (let i: number = 0; i < event.value.length; i++) {
-				let showFundingAgency = this.propertyService.getExactProperty(this.propertyService.SHOW_FUNDING_AGENCY, event.value[i].idCoreFacility);
-				if (!!showFundingAgency && showFundingAgency.propertyValue === 'Y') {
-					this.showFundingAgencies = true;
-					break;
-				}
-			}
-		} else {
-			this.showFundingAgencies = false;
+	private onCoreFacilitiesSelected(): void {
+        this.showFundingAgencies = false;
+        if (this.selectedCoreFacilities.length) {
+            // Look through for core facilities which use funding agencies, if there are any, show that dropdown
+            for (let cf of this.selectedCoreFacilities) {
+                let showFundingAgency: boolean = this.propertyService.getPropertyAsBoolean(this.propertyService.SHOW_FUNDING_AGENCY, cf.idCoreFacility);
+                if (showFundingAgency) {
+                    this.showFundingAgencies = true;
+                    break;
+                }
+            }
 		}
 	}
 

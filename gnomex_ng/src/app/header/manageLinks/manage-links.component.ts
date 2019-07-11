@@ -1,8 +1,8 @@
 import {Component, OnInit} from "@angular/core";
-import {FormBuilder } from "@angular/forms";
+import {FormBuilder} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {GridOptions} from "ag-grid-community/main";
 import {URLSearchParams} from "@angular/http";
 import {LaunchPropertiesService} from "../../services/launch-properites.service";
@@ -110,7 +110,9 @@ export class ManageLinksComponent extends BaseGenericContainerDialog implements 
     }
 
     ngOnInit(){
-        this.coreList = this.secAdvisor.myCoreFacilities;
+        if(!this.coreList) {
+            this.coreList = this.secAdvisor.myCoreFacilities;
+        }
 
         this.getFAQSubscription = this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
             console.log("subscribe createSecurityAdvisor");
@@ -125,7 +127,7 @@ export class ManageLinksComponent extends BaseGenericContainerDialog implements 
 
     setCoreFacility(reqObj: any): void{
         let coreObj = this.coreList.find(core => core.value === reqObj.idCoreFacility);
-        reqObj["coreString"] = coreObj.display;
+        reqObj["coreString"] = coreObj ? coreObj.display : "";
     }
 
     dataChanged(): void {
@@ -143,7 +145,7 @@ export class ManageLinksComponent extends BaseGenericContainerDialog implements 
         let faqCollection: 'FAQ';
         for (let faq of this.rowData) {
             if (faq.title === '' || faq.url === '') {
-                this.dialogService.confirm("Please enter both title and URL for each item before proceeding.", null);
+                this.dialogService.alert("Please enter both title and URL for each item before proceeding.", null, DialogType.VALIDATION);
                 return;
             }
         }

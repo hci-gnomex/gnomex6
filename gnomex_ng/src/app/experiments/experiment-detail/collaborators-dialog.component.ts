@@ -138,11 +138,7 @@ export class CollaboratorsDialogComponent extends BaseGenericContainerDialog imp
 
 
     public collaboratorDropdownChange(event: any): void {
-        if (event && event.value && event.value.idAppUser) {
-            this.collaboratorToAdd = event.value;
-        } else {
-            this.collaboratorToAdd = null;
-        }
+        this.collaboratorToAdd = event ? event : null;
 
         if (this.collaboratorToAdd) {
             let existingCollaborator = this.currentCollaborators.filter((a) => {

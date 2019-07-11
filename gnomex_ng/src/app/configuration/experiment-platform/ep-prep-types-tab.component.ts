@@ -196,9 +196,8 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
     }
     removePrepType(){
         let prepType = this.selectedPrepTypeRow[0];
-        this.dialogService.confirm("Remove Prep Type",
-            "Are you sure you want to remove prep type named \'" + prepType.isolationPrepType +'\'?')
-            .subscribe(result =>{
+        this.dialogService.confirm("Are you sure you want to remove prep type named \'" + prepType.isolationPrepType +'\'?', "Remove Prep Type")
+            .subscribe((result: any) =>{
             if(result){
                 let removeIndex:number = this.rowData.indexOf(prepType);
                 if(removeIndex > -1){

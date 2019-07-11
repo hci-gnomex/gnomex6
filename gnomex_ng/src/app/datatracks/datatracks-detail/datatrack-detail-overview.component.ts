@@ -5,9 +5,9 @@ import {IAnnotation, IPropertyEntryValue} from "../../util/interfaces/annotation
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {DatatracksSummaryTabComponent} from "./datatracks-summary-tab.component";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
@@ -192,7 +192,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 if (resp && resp.message) {
                     message = ": " + resp.message;
                 }
-                this.dialogService.confirm("An error occurred while making link. " + message, null);
+                this.dialogService.error("An error occurred while making link. " + message);
             }
         });
     }
@@ -202,7 +202,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
         let IGVLinkCallBack = (resp): void => {
             if (resp && resp.result && resp.result === "SUCCESS") {
-                this.dialogService.confirm(resp.igvURL, null);
+                this.dialogService.alert(resp.igvURL, null, DialogType.SUCCESS);
             }
             this.showSpinner = false;
         };
@@ -212,7 +212,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dialogService.confirm("Creating an IGV data repository containing all user-visible datatracks affiliated with IGV-supported genome builds. " +
                     "If there are unconverted USeq files, this can take a significant amount of time.  When finished, a URL link will be displayed. " +
                     "Paste the link into IGV's Data Registry URL field.  If new data tracks are added, a new repository must be created, but the " +
-                    "link will remain valid.", "Do you wish to continue?").pipe(first()).subscribe((answer: boolean) => {
+                    "link will remain valid.<br> Do you wish to continue?").pipe(first()).subscribe((answer: boolean) => {
                     if (answer) {
                         this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack, (err: IGnomexErrorResponse) => {
                             this.showSpinner = false;
@@ -248,7 +248,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
         this.dataTrackService.makeURLLink(params).pipe(first()).subscribe(resp => {
             if (resp && resp.result && resp.result === "SUCCESS") {
-                this.dialogService.confirm(resp.urlsToLink, null);
+                this.dialogService.alert(resp.urlsToLink, null, DialogType.SUCCESS);
             }
         }, (err:IGnomexErrorResponse) => {
             this.showSpinner = false;
@@ -260,7 +260,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.dataTrackService.destroyLinks().pipe(first())
             .subscribe(resp => {
                 if (resp && resp.result && resp.result === "SUCCESS") {
-                    this.dialogService.confirm("All Links Destroyed.", null);
+                    this.dialogService.alert("All Links Destroyed.", null, DialogType.SUCCESS);
                 }
             },(err:IGnomexErrorResponse) =>{
                 this.showSpinner = false;
@@ -285,7 +285,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     }
 
     showFolders(showFolders: any) {
-        this.dialogService.createCustomDialog(showFolders, "Folders for " + this.datatrack.name);
+        this.dialogService.createCustomDialog(showFolders, "Folders for " + this.datatrack.name, this.constService.ICON_FOLDER);
     }
 
     ngOnDestroy() {

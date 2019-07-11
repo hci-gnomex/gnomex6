@@ -4,7 +4,7 @@ import {ConstantsService} from "../services/constants.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
-import {DialogsService} from "./popup/dialogs.service";
+import {DialogsService, DialogType} from "./popup/dialogs.service";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 
 @Component({
@@ -129,7 +129,7 @@ export class EditInstitutionsComponent extends BaseGenericContainerDialog implem
             if (result.unremovableInstitutions) {
                 this.dialogsService.alert(
                     "The following institutions could not be deleted because they are associated with data: " + result.unremovableInstitutions,
-                    "Warning");
+                    "Warning", DialogType.WARNING);
             }
             this.dictionaryService.reloadAndRefresh(() => {
                 this.dialogRef.close(true);

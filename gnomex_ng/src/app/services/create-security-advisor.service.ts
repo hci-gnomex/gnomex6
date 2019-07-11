@@ -179,7 +179,7 @@ export class CreateSecurityAdvisorService {
                 this.isExternalUserValue = this.result.isExternalUser == "Y";
                 this.versionValue = this.result.version;
                 this.isSuperAdminValue = this.hasPermission("canAdministerAllCoreFacilities");
-                if (this.result.groupsToManage.Lab) {
+                if (this.result.groupsToManage && this.result.groupsToManage.Lab) {
                     this.isLabManagerValue = true;
                     if (!this.isArray(this.result.groupsToManage.Lab)) {
                         this.groupsToManage = [this.result.groupsToManage.Lab];

@@ -1,10 +1,10 @@
 import {
     AfterViewInit,
     Component,
-    ElementRef,
+    ElementRef, EventEmitter,
     Input,
     OnDestroy,
-    OnInit,
+    OnInit, Output,
     ViewChild,
 } from "@angular/core";
 import {ErrorStateMatcher, MatDialogConfig} from "@angular/material";
@@ -76,7 +76,7 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
             padding-right: 0.3em;
         }
 
-        .medium-width    { width:  20em;  }
+        .medium-width    { width:  30em;  }
         .vertical-spacer { height: 0.3em; }
         
         .small-font { font-size: x-small; }
@@ -104,6 +104,21 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		this._labInfo = value;
 		this.onLabChanged();
 	}
+
+    @Output() onDirty: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+	public get isDirty(): boolean {
+	    return this._isDirty;
+    }
+    public set isDirty(value: boolean) {
+	    if (this._isDirty === false && value === true) {
+            this.onDirty.emit(value);
+        }
+
+        this._isDirty = value;
+    }
+
+	private _isDirty: boolean = false;
 
 	coreFacilities: any[];
 	selectedCoreFacility: any;
@@ -269,6 +284,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
         this.tabFormGroup.removeControl("chartfieldGridFormControl");
         this.tabFormGroup.removeControl("poGridFormControl");
         this.tabFormGroup.removeControl("creditCardGridFormControl");
+
+        this.markAsPristine();
 	}
 
 
@@ -1071,10 +1088,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 	}
 
 
-	onCoreFacilitySelected(event: any): void {
-		this.assignChartfieldGridContents(event.value);
-		this.assignPoGridContents(event.value);
-		this.assignCreditCardGridContents(event.value);
+	onCoreFacilitySelected(): void {
+		this.assignChartfieldGridContents(this.selectedCoreFacility);
+		this.assignPoGridContents(this.selectedCoreFacility);
+		this.assignCreditCardGridContents(this.selectedCoreFacility);
 	}
 
 
@@ -1265,7 +1282,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 ]}).subscribe((result: any) => {
                     if(result) {
                         this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-                        this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                        this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
                         this.translateChangesOntoAccountRecords(rowNode);
                     }
         });
@@ -1289,7 +1306,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 ]}).subscribe((result: any) => {
             if(result) {
                 this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
                 this.translateChangesOntoAccountRecords(rowNode);
             }
         });
@@ -1313,7 +1330,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 ]}).subscribe((result: any) => {
             if(result) {
                 this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.");
+                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
                 this.translateChangesOntoAccountRecords(rowNode);
             }
         });
@@ -1371,7 +1388,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
 
 	onChartfieldUsersClicked(rowIndex: string): void {
-		if (this.chartfieldGridApi && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex) && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+		if (this.chartfieldGridApi
+            && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
+            && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+
 			let data = {
 				options: this.labActiveSubmitters,
 				optionName: "Users",
@@ -1388,10 +1408,12 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
 			this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, "", null, configuration)
                 .subscribe((result: any) => {
-                    if (result
+                    if (result !== null
+                        && result !== undefined
                         && this.chartfieldGridApi
                         && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
                         && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+
                         this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
                         this.chartfieldGridApi.refreshCells();
                     }
@@ -1417,10 +1439,12 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
             this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
                 .subscribe((result: any) => {
-                    if (result
+                    if (result !== null
+                        && result !== undefined
                         && this.poGridApi
                         && this.poGridApi.getDisplayedRowAtIndex(rowIndex)
                         && this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+
                         this.poGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
                         this.poGridApi.refreshCells();
                     }
@@ -1446,10 +1470,12 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
             this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
                 .subscribe((result: any) => {
-                    if (result
+                    if (result !== null
+                        && result !== undefined
                         && this.creditCardGridApi
                         && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex)
                         && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+
                         this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
                         this.creditCardGridApi.refreshCells();
                     }
@@ -1627,6 +1653,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             return;
         }
 
+        this.markAsDirty();
+
         // There should never be more than one row with the same _uniqueId, (depending on how
         // the copy account function is implemented) but this should be able to handle the changes either way.
 
@@ -1671,6 +1699,13 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 }
             }
         }
+    }
+
+    private markAsPristine(): void {
+        this.isDirty = false;
+    }
+    private markAsDirty(): void {
+        this.isDirty = true;
     }
 
     testFunction(): void {

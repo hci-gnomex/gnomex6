@@ -199,13 +199,14 @@ export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
         this.possibleCollaborators = prepCollabsList;
 
         this.setCollaboratorPermission(toSelectCollaborators);
-
     }
-
-    /*handler gets called twice one for select one for deselect */
-    collaborChange(selected : any,i:number) {
-        this.possibleCollaborators[i].isSelected = selected ? 'Y' : 'N'
-
+    public collaborChange(selectedCollabs: any[]): void {
+        for (let collab of this.possibleCollaborators) {
+            collab.isSelected = 'N';
+        }
+        for (let collab of selectedCollabs) {
+            collab.isSelected = 'Y';
+        }
     }
 
     setCollaboratorPermission(selectedCollaborators:Array<any>){
@@ -228,11 +229,6 @@ export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
 
         }
     }
-
-    compareByID(itemOne, itemTwo) {
-        return itemOne && itemTwo && itemOne.idAppUser == itemTwo.idAppUser;
-    }
-
     toggeSelect(){
         //let tempCollabs =
         if(this.selectMode === "Select All"){

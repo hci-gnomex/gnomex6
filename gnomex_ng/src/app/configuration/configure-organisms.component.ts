@@ -173,7 +173,7 @@ export class ConfigureOrganismsComponent extends BaseGenericContainerDialog impl
 
     public removeOrganism(): void {
         if (this.selectedOrganism && this.selectedOrganism.idOrganism && this.canDeleteSelectedOrganism) {
-            this.dialogsService.confirm("Are you sure you want to delete this organism and its associated genome builds?", " ").subscribe((result: boolean) => {
+            this.dialogsService.confirm("Are you sure you want to delete this organism and its associated genome builds?").subscribe((result: boolean) => {
                 if (result) {
                     this.showSpinner = true;
                     this.organismService.deleteOrganism(this.selectedOrganism.idOrganism).subscribe((response: any) => {
@@ -188,7 +188,7 @@ export class ConfigureOrganismsComponent extends BaseGenericContainerDialog impl
                             if (response && response.message) {
                                 message = ": " + response.message;
                             }
-                            this.dialogsService.confirm("An error occurred while deleting the organism" + message, null);
+                            this.dialogsService.error("An error occurred while deleting the organism" + message);
                         }
                     });
                 }
@@ -207,23 +207,23 @@ export class ConfigureOrganismsComponent extends BaseGenericContainerDialog impl
     public prepareToSaveOrganism(): void {
         if (this.selectedOrganism && this.canUpdateSelectedOrganism) {
             if (!this.checkGenomeBuildDates()) {
-                this.dialogsService.confirm("Please specify a build date for each genome build", null);
+                this.dialogsService.alert("Please specify a build date for each genome build", "Invalid");
                 return;
             }
 
             if (!this.checkGenomeBuildNames()) {
-                this.dialogsService.confirm("Genome build name is required. Please specify a name for each genome build", null);
+                this.dialogsService.alert("Genome build name is required. Please specify a name for each genome build", "Invalid");
                 return;
             }
 
             if (this.das2NameFC.value === "" || this.binomialNameFC.value === "") {
-                this.dialogsService.confirm("If binomial name or das2Name are left blank they will not be displayed in the Data Tracks View. Save Anyway?", " ").subscribe((response: boolean) => {
+                this.dialogsService.confirm("If binomial name or das2Name are left blank they will not be displayed in the Data Tracks View. Save Anyway?").subscribe((response: boolean) => {
                     if (response) {
                         this.saveOrganism();
                     }
                 });
             } else if (!this.checkGenomeBuildDas2Names()) {
-                this.dialogsService.confirm("You have left the das2Name field blank in the Genome Build grid. If you leave this field blank it will not be displayed in the Data Tracks View. Save Anyway?", " ").subscribe((response: boolean) => {
+                this.dialogsService.confirm("You have left the das2Name field blank in the Genome Build grid. If you leave this field blank it will not be displayed in the Data Tracks View. Save Anyway?").subscribe((response: boolean) => {
                     if (response) {
                         this.saveOrganism();
                     }

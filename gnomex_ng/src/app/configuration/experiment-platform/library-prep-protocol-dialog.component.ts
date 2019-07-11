@@ -1,16 +1,15 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ProtocolService} from "../../services/protocol.service";
 import {HttpParams} from "@angular/common/http";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
-
 
 
 @Component({
@@ -148,18 +147,19 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
                 if(resp && resp.result && resp.result === "SUCCESS"){
                     this.showSpinner = false;
                     if(resp.message){
-                        this.dialogService.alert(resp.message);
+                        this.dialogService.alert(resp.message, "", DialogType.SUCCESS);
                         return;
                     }
                     this.saveProtocolFn(resp);
                     this.dialogRef.close();
                 }else{
                     this.showSpinner = false;
-                    this.dialogService.alert("An error occurred please contact GNomEx Support")
+                    this.dialogService.error("An error occurred please contact GNomEx Support");
                 }
             }, error => {
                 this.showSpinner = false;
-                this.dialogService.alert(error)});
+                this.dialogService.error(error);
+        });
     }
 
     ngOnDestroy(){

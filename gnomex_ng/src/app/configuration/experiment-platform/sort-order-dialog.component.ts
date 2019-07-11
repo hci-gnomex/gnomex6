@@ -137,7 +137,7 @@ export class SortOrderDialogComponent extends BaseGenericContainerDialog impleme
                     this.rowData.sort(this.sortFn);
 
                 }else if(resp && resp.message) {
-                    this.dialogService.alert(resp.message);
+                    this.dialogService.error(resp.message);
                 }
             });
 
@@ -162,9 +162,8 @@ export class SortOrderDialogComponent extends BaseGenericContainerDialog impleme
     }
 
     refresh(){
-        this.dialogService.confirm("Discard changes",
-            "Refreshing will discard your changes.  Do want to discard your changes?" )
-            .subscribe((answer:boolean) =>{
+        this.dialogService.confirm("Refreshing will discard your changes.  Do want to discard your changes?", "Discard Changes Confirm")
+            .subscribe((answer:any) =>{
                 if(answer){
                     this.expPlatformService.getExperimentPlatformSortOrderList(new HttpParams().set('idCoreFacility',this.idCoreFacility)).
                         pipe(first()).subscribe(resp => {
@@ -176,7 +175,7 @@ export class SortOrderDialogComponent extends BaseGenericContainerDialog impleme
                                 this.isDirty = false;
 
                             }else if(resp && resp.message) {
-                                this.dialogService.alert(resp.message);
+                                this.dialogService.error(resp.message);
                             }
                         });
                 }
@@ -199,7 +198,7 @@ export class SortOrderDialogComponent extends BaseGenericContainerDialog impleme
                     this.isDirty = false;
                     this.expPlatformService.getExperimentPlatformList_fromBackend();
                 }else if(resp && resp.message){
-                    this.dialogService.alert(resp.message);
+                    this.dialogService.error(resp.message);
                 }
             });
     }

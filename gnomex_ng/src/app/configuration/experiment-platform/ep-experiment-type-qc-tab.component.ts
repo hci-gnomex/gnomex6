@@ -296,8 +296,8 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
 
     removeApplication(){
         let app = this.selectedApp[0];
-        this.dialogService.confirm("Warn","Are you sure you want to remove experiment type \'"
-            + app.display + "\'?" ).subscribe(result =>{
+        this.dialogService.confirm("Are you sure you want to remove experiment type \'"
+            + app.display + "\'?", "Warning").subscribe(result =>{
             if(result){
                 let i:number = this.rowData.indexOf(app);
                 if(i > -1 ){
