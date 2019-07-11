@@ -325,10 +325,9 @@
                     <!--groups tab group-->
                     <mat-tab-group id="groupTabGroup"
                                    class="full-width flex-grow"
-                                   [selectedIndex]="selectedGroupTab"
-                                   (selectedTabChange)="onGroupsTabChange($event)">
+                                   [selectedIndex]="selectedGroupTab">
                         <mat-tab groupTab label="Group" class="full-height">
-                            <div *ngIf="isGroupSubTab && selectedGroup" #groupsDetail class="full-height full-width background border-padding">
+                            <div #groupsDetail class="full-height full-width background border-padding">
                                 <div class="full-height full-width foreground flex-container-col">
                                     <form class="full-width padded" [formGroup]="groupForm">
                                         <div class="flex-container-row align-baseline">
@@ -449,7 +448,7 @@
                             </div>
                         </mat-tab>
                         <mat-tab #groupTab label="Billing Accounts" class="full-height full-width">
-                            <billing-account-tab #billingAccountTab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup" (onDirty)="onManualDirty()"></billing-account-tab>
+                            <billing-account-tab #billingAccountTab [labInfo]="selectedGroup" (onDirty)="onManualDirty()"></billing-account-tab>
                         </mat-tab>
                         <mat-tab label="Invoices" class="full-height">
                             <div *ngIf="selectedGroup" class="full-height full-width">

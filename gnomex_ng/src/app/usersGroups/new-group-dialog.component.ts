@@ -117,9 +117,10 @@ export class NewGroupDialogComponent extends BaseGenericContainerDialog implemen
         this.labListService.saveLab(params).subscribe((responseJSON: any) => {
             this.showSpinner = false;
             if (responseJSON.result && responseJSON.result === "SUCCESS") {
-                this.dialogRef.close(true);
+                this.dialogRef.close(responseJSON.idLab);
+            } else {
+                this.dialogRef.close();
             }
-            this.dialogRef.close();
         });
     }
 }
