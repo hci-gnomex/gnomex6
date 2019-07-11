@@ -237,10 +237,10 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 let idLab = this.gnomexService.orderInitObj.idLab;
                 let idAnalysisGroup = this.gnomexService.orderInitObj.idAnalysisGroup;
                 let ids: HttpParams = new HttpParams()
-                    .set("idLab", idLab)
+                    .set("idLab", idLab ? idLab : '')
                     .set("searchPublicProjects", "Y")
                     .set("showCategory", "N")
-                    .set("idAnalysisGroup", idAnalysisGroup)
+                    .set("idAnalysisGroup", idAnalysisGroup ? idAnalysisGroup : '')
                     .set("showSamples", "N");
 
                 this.analysisService.analysisPanelParams = ids;
